@@ -28,8 +28,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -123,16 +123,17 @@ public final class SearchFragment extends AbstractFragment implements
     private FilterToolbarButton filterButton;
     private String currentQuery;
     private final FileTypeCounter fileTypeCounter;
-    private final SparseArray<KeywordDetector> keywordDetectors;
+    private final KeywordDetector keywordDetector;
     private DrawerLayout drawerLayout;
     private KeywordFilterDrawerView keywordFilterDrawerView;
     private OnClickListener headerClickListener;
+    private long lastHistogramRequestUpdate;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
-        keywordDetectors = new SparseArray<>();
+        keywordDetector = new KeywordDetector(Engine.instance().getThreadPool());
     }
 
     @Override
@@ -164,8 +165,15 @@ public final class SearchFragment extends AbstractFragment implements
         ImageButton filterButtonIcon = (ImageButton) header.findViewById(R.id.view_search_header_search_filter_button);
         TextView filterCounter = (TextView) header.findViewById(R.id.view_search_header_search_filter_counter);
         filterButton = new FilterToolbarButton(filterButtonIcon, filterCounter);
-        filterButton.setVisible(adapter != null && adapter.getCount() > 0);
+        updateHeaderFilterButtonVisibility();
+
         return header;
+    }
+
+    private void updateHeaderFilterButtonVisibility() {
+        boolean adapterHasResults = adapter != null && adapter.getCount() > 0;
+        boolean adapterHasAppliedFilters = adapter != null && adapter.getKeywordFiltersPipeline().size() > 0;
+        filterButton.setVisible(adapterHasResults || adapterHasAppliedFilters);
     }
 
     @Override
@@ -176,10 +184,9 @@ public final class SearchFragment extends AbstractFragment implements
 
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
 
-            filterButton.setVisible(true);
             List<SearchResult> filteredList = adapter.filter(adapter.getList()).filtered;
-            updateKeywordDetector(adapter.getFileType(), filteredList);
-
+            updateKeywordDetector(filteredList);
+            updateHeaderFilterButtonVisibility();
         } else {
             setupPromoSlides();
         }
@@ -297,8 +304,8 @@ public final class SearchFragment extends AbstractFragment implements
         final List<SearchResult> filteredList = fsr.filtered;
         fileTypeCounter.add(fsr);
         // if it's a fresh search, make sure to clear keyword detector
-        if (adapter.getCount() == 0) {
-            resetKeywordDetector(adapter.getFileType());
+        if (adapter.getCount() == 0 && adapter.getKeywordFiltersPipeline().size() == 0) {
+            resetKeywordDetector();
         }
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -307,20 +314,15 @@ public final class SearchFragment extends AbstractFragment implements
                 showSearchView(getView());
                 refreshFileTypeCounters(true);
                 // MIGHT-DO: Move this method out of this thread, this logic path knows when to update the UI thread.
-                updateKeywordDetector(adapter.getFileType(), filteredList);
+                updateKeywordDetector(filteredList);
             }
         });
     }
 
-    private void updateKeywordDetector(final int fileType, final List<? extends SearchResult> results) {
+    private void updateKeywordDetector(final List<? extends SearchResult> results) {
         Engine.instance().getThreadPool().submit(new Runnable() {
             @Override
             public void run() {
-                KeywordDetector keywordDetector = keywordDetectors.get(fileType);
-                if (keywordDetector == null) {
-                    keywordDetector = new KeywordDetector(Engine.instance().getThreadPool());
-                    keywordDetectors.put(fileType, keywordDetector);
-                }
                 if (filterButton != null) {
                     keywordDetector.setKeywordDetectorListener(filterButton);
                 }
@@ -329,10 +331,10 @@ public final class SearchFragment extends AbstractFragment implements
 
                     if (!searchFinished) {
                         for (SearchResult sr : results) {
-                            keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource());
+                            keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
                             if (sr instanceof FileSearchResult) {
-                                String fileName = ((FileSearchResult) sr).getFilename();
-                                String ext = FilenameUtils.getExtension(fileName);
+                                String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
+                                String ext = FilenameUtils.getExtension(fileName).toLowerCase();
                                 if (fileName != null && !fileName.isEmpty()) {
                                     keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
                                 }
@@ -341,9 +343,14 @@ public final class SearchFragment extends AbstractFragment implements
                                 }
                             }
                         }
-                        // expensive / async call
-                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
-                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
+                        // these are CPU expensive / async calls, we don't abuse them to not drop frame rate
+                        if (SystemClock.currentThreadTimeMillis() - lastHistogramRequestUpdate > 500) {
+                            lastHistogramRequestUpdate = SystemClock.currentThreadTimeMillis();
+                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
+                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
+                        }
+
                     } else {
                         keywordDetector.notifyListener();
                     }
@@ -410,6 +417,7 @@ public final class SearchFragment extends AbstractFragment implements
         adapter.setFileType(mediaTypeId);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
+        resetKeywordDetector();
 
         List<KeywordFilter> keywordFilters = KeywordFilter.parseKeywordFilters(query);
         if (!keywordFilters.isEmpty()) {
@@ -428,6 +436,7 @@ public final class SearchFragment extends AbstractFragment implements
         adapter.clear();
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
+        resetKeywordDetector();
         currentQuery = null;
         LocalSearchEngine.instance().cancelSearch();
         searchProgress.setProgressEnabled(false);
@@ -442,8 +451,8 @@ public final class SearchFragment extends AbstractFragment implements
             switchView(view, R.id.fragment_search_promos);
             deepSearchProgress.setVisibility(View.GONE);
         } else {
+            updateHeaderFilterButtonVisibility();
             boolean adapterHasResults = adapter != null && adapter.getCount() > 0;
-            filterButton.setVisible(adapterHasResults);
             if (adapterHasResults) {
                 switchView(view, R.id.fragment_search_list);
                 deepSearchProgress.setVisibility(searchFinished ? View.GONE : View.VISIBLE);
@@ -636,7 +645,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         public void onSearch(View v, String query, int mediaTypeId) {
-            fragment.resetKeywordDetector(mediaTypeId);
+            fragment.resetKeywordDetector();
             if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
                 fragment.cancelSearch();
                 new DownloadSoundcloudFromUrlTask(fragment.getActivity(), query).execute();
@@ -663,11 +672,8 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private void resetKeywordDetector(int mediaType) {
-        KeywordDetector keywordDetector = keywordDetectors.get(mediaType);
-        if (keywordDetector != null) {
-            keywordDetector.reset();
-        }
+    private void resetKeywordDetector() {
+        keywordDetector.reset();
     }
 
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
@@ -802,10 +808,12 @@ public final class SearchFragment extends AbstractFragment implements
 
             keywordFilterDrawerView.setKeywordFiltersPipelineListener(this);
             drawerLayout.openDrawer(keywordFilterDrawerView);
-            KeywordDetector keywordDetector = keywordDetectors.get(adapter.getFileType());
+
+            //KeywordDetector keywordDetector = keywordDetectors.get(adapter.getFileType());
             if (keywordDetector != null) {
                 keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
                 keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
             }
         }
 
