@@ -132,21 +132,22 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private Entry<String, Integer>[] highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
         int high = 0;
+        int totalCount = 0;
         for (Entry<String, Integer> entry : histogram) {
             int count = entry.getValue();
+            totalCount += count;
             if (count > high) {
                 high = count;
             }
         }
         List<Entry<String, Integer>> filteredValues = new LinkedList<>();
         for (Entry<String, Integer> entry : histogram) {
-            float rate = (float) entry.getValue()/high;
-            // 1.5% of the most popular keyword is the sweet spot
-            if (rate >= threshold) {
+            float rate = (float) entry.getValue()/(high + totalCount);
+            if (entry.getValue() > 1 && rate >= threshold) {
                 filteredValues.add(entry);
-                LOG.info("<<< highPassFilter(high=" + high + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
+                LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
             } else {
-                LOG.info(">>> highPassFilter(high=" + high + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
+                LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
             }
         }
         // sort'em!
