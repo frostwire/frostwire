@@ -36,9 +36,15 @@ import java.util.concurrent.ExecutorService;
 public final class KeywordDetector {
 
     public enum Feature {
-        FILE_NAME,
-        FILE_EXTENSION,
-        SEARCH_SOURCE
+        SEARCH_SOURCE(0.015f),
+        FILE_EXTENSION(0f),
+        FILE_NAME(0f);
+
+        public final float filterThreshold;
+
+        Feature(float filterThreshold) {
+            this.filterThreshold = filterThreshold;
+        }
     }
 
     public enum Mode {
@@ -63,9 +69,10 @@ public final class KeywordDetector {
     public KeywordDetector(ExecutorService threadPool) {
         histograms = new HashMap<>();
         // TODO: Turn these two on
-        //histograms.put(Feature.FILE_NAME, new HistoHashMap<String>());
-        //histograms.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
         histograms.put(Feature.SEARCH_SOURCE, new HistoHashMap<String>());
+        histograms.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
+        //histograms.put(Feature.FILE_NAME, new HistoHashMap<String>());
+
 
         numSearchesProcessed = new HashMap<>();
         this.threadPool = threadPool;

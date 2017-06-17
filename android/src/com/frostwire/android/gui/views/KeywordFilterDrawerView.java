@@ -125,8 +125,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
         if (feature != null && histogram != null && histogram.length > 0) {
-            // TODO: use different threshold depending on the feature. File extensions might be different for instance
-            Entry<String, Integer>[] filteredHistogram = highPassFilter(histogram, 0.015f);
+            Entry<String, Integer>[] filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
         }
     }
