@@ -101,6 +101,12 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        clearKeywordFilters();
+    }
+
+    @Override
     protected void populateView(View view, SearchResult sr) {
         if (sr instanceof FileSearchResult) {
             populateFilePart(view, (FileSearchResult) sr);
