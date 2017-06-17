@@ -343,6 +343,7 @@ public final class SearchFragment extends AbstractFragment implements
                         }
                         // expensive / async call
                         keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
                     } else {
                         keywordDetector.notifyListener();
                     }
@@ -804,6 +805,7 @@ public final class SearchFragment extends AbstractFragment implements
             KeywordDetector keywordDetector = keywordDetectors.get(adapter.getFileType());
             if (keywordDetector != null) {
                 keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
             }
         }
 
