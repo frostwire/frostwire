@@ -548,7 +548,21 @@ public class MusicPlaybackService extends Service {
 
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            initService();
+
+            try {
+                // "This initService() call may result in ANRs, when some of the ContentResovler queries (like getCardId())
+                // take too long.
+                //
+                // I didn't want to use Engine.instance().getThreadPool() as this might be initialized before EngineService
+                // give this is a service declared in AndroidManifest.xml"
+                // -gubatron
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        initService();
+                    }
+                }).start();
+            } catch (Throwable ignored) {}
         }
     }
 
