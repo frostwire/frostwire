@@ -144,12 +144,16 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         final Bundle bundle = new Bundle();
         mItem = mAdapter.getItem(position);
         String playlistName = "<no name>";
-        // Favorites list
+        // New Playlist list
         if (position == 0) {
+            playlistName = getString(R.string.new_empty_playlist);
+            bundle.putString(Config.MIME_TYPE, getString(R.string.new_empty_playlist));
+            // Favorites list
+        } else if (position == 1) {
             playlistName = getString(R.string.playlist_favorites);
             bundle.putString(Config.MIME_TYPE, getString(R.string.playlist_favorites));
-            // Last added
-        } else if (position == 1) {
+            // Last Added list
+        } else if (position == 2) {
             playlistName = getString(R.string.playlist_last_added);
             bundle.putString(Config.MIME_TYPE, getString(R.string.playlist_last_added));
         } else {

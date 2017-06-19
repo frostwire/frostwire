@@ -12,11 +12,14 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
@@ -57,27 +60,38 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
      */
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        // Recycle ViewHolder's items
-        MusicViewHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
-            holder = new MusicViewHolder(convertView);
-            // Hide the second and third lines of text
-            holder.mLineTwo.get().setVisibility(View.GONE);
-            holder.mLineThree.get().setVisibility(View.GONE);
-            // Make line one slightly larger
-            holder.mLineOne.get().setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    getContext().getResources().getDimension(R.dimen.text_size_large));
-            convertView.setTag(holder);
-        } else {
-            holder = (MusicViewHolder) convertView.getTag();
+        if (position ==  0) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.new_playlist_list_item, null);
+            convertView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Log.i("Hello:", " you clicked on New Empty Playlist");
+                    //TODO: make this layout open a New Playlist dialog, just like from the menu - onOptionsItemNewPlaylistSelected() BaseActivity
+                }
+            });
+        } else if (position >= 1) {
+            // Recycle ViewHolder's items
+            MusicViewHolder holder;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(mLayoutId, parent, false);
+                holder = new MusicViewHolder(convertView);
+                // Hide the second and third lines of text
+                holder.mLineTwo.get().setVisibility(View.GONE);
+                holder.mLineThree.get().setVisibility(View.GONE);
+                // Make line one slightly larger
+                holder.mLineOne.get().setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        getContext().getResources().getDimension(R.dimen.text_size_medium));
+                holder.mLineOne.get().setTypeface(Typeface.SANS_SERIF);
+                convertView.setTag(holder);
+            } else {
+                holder = (MusicViewHolder) convertView.getTag();
+            }
+
+            // Retrieve the data holder
+            final DataHolder dataHolder = mData[position];
+
+            // Set each playlist name (line one)
+            holder.mLineOne.get().setText(dataHolder.mLineOne);
         }
-
-        // Retrieve the data holder
-        final DataHolder dataHolder = mData[position];
-
-        // Set each playlist name (line one)
-        holder.mLineOne.get().setText(dataHolder.mLineOne);
         return convertView;
     }
 
