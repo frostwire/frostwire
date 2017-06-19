@@ -94,7 +94,7 @@ public final class KeywordDetector {
 
     public void addSearchTerms(Feature feature, String terms) {
         // tokenize
-        String[] pre_tokens = terms.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s");
+        String[] pre_tokens = terms.replaceAll("[^a-zA-Z0-9\\p{L} ]", "").toLowerCase().split("\\s");
         if (pre_tokens.length == 0) {
             return;
         }
