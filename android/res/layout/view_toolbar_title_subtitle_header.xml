@@ -31,7 +31,7 @@
         android:maxLines="1"
         android:text="@string/dummy_title"
         android:textColor="@color/basic_white"
-        android:textSize="@dimen/text_size_medium" />
+        android:textSize="17dp" />
 
     <TextView
         android:id="@+id/view_toolbar_header_subtitle"
