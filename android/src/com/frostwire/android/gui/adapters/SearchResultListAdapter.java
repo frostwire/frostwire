@@ -283,9 +283,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public void setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
         if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
             this.keywordFiltersPipeline.clear();
-            this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
+            if (keywordFiltersPipeline != null && keywordFiltersPipeline.size() > 0) {
+                this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
+            }
         }
-
         filter();
     }
 
