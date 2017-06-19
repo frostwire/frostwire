@@ -149,6 +149,7 @@
             android:background="@color/basic_white">
 
             <TextView
+                android:id="@+id/view_drawer_search_filters_search_sources_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/search_sources"
@@ -171,6 +172,7 @@
             </com.frostwire.android.gui.views.FlowLayout>
 
             <TextView
+                android:id="@+id/view_drawer_search_filters_file_extensions_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/file_extensions"
@@ -184,6 +186,7 @@
             </com.frostwire.android.gui.views.FlowLayout>
 
             <TextView
+                android:id="@+id/view_drawer_search_filters_file_names_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/file_names"
