@@ -26,10 +26,6 @@ import com.frostwire.android.BuildConfig;
  * @author aldenml
  */
 public final class Constants {
-
-    private Constants() {
-    }
-
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
     public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
@@ -196,4 +192,7 @@ public final class Constants {
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
     public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
+
+    private Constants() {
+    }
 }

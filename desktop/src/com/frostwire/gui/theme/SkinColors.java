@@ -29,10 +29,6 @@ import javax.swing.plaf.ColorUIResource;
  *
  */
 final class SkinColors {
-
-    private SkinColors() {
-    }
-
     public static final Color PROGRESS_BAR_ENABLED_COLOR1 = new ColorUIResource(158, 200, 224);
     public static final Color PROGRESS_BAR_ENABLED_COLOR2 = new ColorUIResource(124, 175, 204);
 
@@ -148,4 +144,7 @@ final class SkinColors {
     public static final Color TEXT_FONT_FOREGROUND_COLOR = new ColorUIResource(55, 69, 82);
 
     public static final Color TRANSPARENT_COLOR = new ColorUIResource(new Color(255, 255, 255, 0));
+
+    private SkinColors() {
+    }
 }
