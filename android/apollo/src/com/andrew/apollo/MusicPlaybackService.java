@@ -385,6 +385,7 @@ public class MusicPlaybackService extends Service {
     private Cursor mCursor;
 
     private final Object cursorLock = new Object();
+    private final Object audioSessionIdLock = new Object();
 
     /**
      * The cursor used to retrieve info on the album the current track is
@@ -1900,7 +1901,7 @@ public class MusicPlaybackService extends Service {
             return -1;
         }
 
-        synchronized (this) {
+        synchronized (audioSessionIdLock) {
             return mPlayer.getAudioSessionId();
         }
     }
