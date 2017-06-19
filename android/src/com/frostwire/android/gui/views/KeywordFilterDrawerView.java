@@ -36,6 +36,7 @@ import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -52,8 +53,7 @@ import java.util.Map.Entry;
 
 public final class KeywordFilterDrawerView extends LinearLayout implements KeywordTagView.KeywordTagViewListener {
     private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
-    private KeywordFiltersPipelineListener listener;
-    private List<KeywordFilter> keywordFiltersPipeline;
+    private KeywordFiltersPipelineListener pipelineListener;
     private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
 
@@ -65,12 +65,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        keywordFiltersPipeline = new ArrayList<>();
         histograms = new HashMap<>();
     }
 
     public void setKeywordFiltersPipelineListener(KeywordFiltersPipelineListener listener) {
-        this.listener = listener;
+        this.pipelineListener = listener;
     }
 
     @Override
@@ -107,8 +106,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         KeywordFilter keywordFilter = new KeywordFilter(true, keyword); // idea remember if user changed a filter to exclusive
         v.setText("");
         v.clearFocus();
-        if (listener != null) {
-            listener.onAddKeywordFilter(keywordFilter);
+        if (pipelineListener != null) {
+            pipelineListener.onAddKeywordFilter(keywordFilter);
+            updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
         }
         UIUtils.hideKeyboardFromActivity((Activity) getContext());
         return true;
@@ -117,7 +117,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private void clearAppliedFilters() {
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
-        updateAppliedKeywordFilters(new ArrayList<KeywordFilter>());
+        updateAppliedKeywordFilters(Collections.EMPTY_LIST);
     }
 
     public void updateData(List<KeywordFilter> keywordFiltersPipeline, KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
@@ -177,28 +177,17 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private void updateAppliedKeywordFilters(List<KeywordFilter> keywordFiltersPipeline) {
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
-        for (KeywordFilter filter : keywordFiltersPipeline) {
-            KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
-            flowLayout.addView(keywordTagView);
-        }
-        this.keywordFiltersPipeline = keywordFiltersPipeline;
-        if (listener != null) {
-            listener.onPipelineUpdate(keywordFiltersPipeline);
-        }
 
-    }
-
-    private int getKeywordCount(String keyword) {
-        // TODO: Gotta do this better later
-        for (KeywordDetector.Feature feature : histograms.keySet()) {
-            Entry<String, Integer>[] entries = histograms.get(feature);
-            for (Entry<String, Integer> entry : entries) {
-                if (entry.getKey().equals(keyword)) {
-                    return entry.getValue();
-                }
+        if (keywordFiltersPipeline.size() > 0) {
+            for (KeywordFilter filter : keywordFiltersPipeline) {
+                KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
+                flowLayout.addView(keywordTagView);
             }
         }
-        return 0;
+
+        if (pipelineListener != null) {
+            pipelineListener.onPipelineUpdate(keywordFiltersPipeline);
+        }
     }
 
     /**
@@ -208,13 +197,21 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     public void onKeywordTagViewDismissed(KeywordTagView view) {
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeView(view);
-        keywordFiltersPipeline.remove(view.getKeywordFilter());
-        updateAppliedKeywordFilters(keywordFiltersPipeline);
+
+        if (pipelineListener != null) {
+            // this will update the keywordFiltersPipeline
+            pipelineListener.onRemoveKeywordFilter(view.getKeywordFilter());
+            updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
+        }
     }
 
     @Override
     public void onKeywordTagViewTouched(KeywordTagView view) {
+        if (pipelineListener == null) {
+            return;
+        }
         // if it's a dismissible one it's one of the applied filters
+        List<KeywordFilter> keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
         KeywordFilter keywordFilter = view.getKeywordFilter();
         if (view.isDismissible()) {
             int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
@@ -224,7 +221,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         } else {
             // attempt to add to pipeline
             if (!keywordFiltersPipeline.contains(keywordFilter)) {
-                keywordFiltersPipeline.add(keywordFilter);
+                pipelineListener.onAddKeywordFilter(keywordFilter);
             }
         }
         updateAppliedKeywordFilters(keywordFiltersPipeline);
@@ -237,6 +234,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
         void onRemoveKeywordFilter(KeywordFilter keywordFilter);
 
-        void clearPipeline();
+        List<KeywordFilter> getKeywordFiltersPipeline();
     }
 }

@@ -96,6 +96,7 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -772,12 +773,10 @@ public final class SearchFragment extends AbstractFragment implements
     private class FilterToolbarButton implements KeywordDetector.KeywordDetectorListener, KeywordFilterDrawerView.KeywordFiltersPipelineListener {
         private ImageButton imageButton;
         private TextView counterTextView;
-        private int appliedTagsCounter;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
             this.counterTextView = counterTextView;
-            appliedTagsCounter = 0;
             initListeners();
         }
 
@@ -785,8 +784,8 @@ public final class SearchFragment extends AbstractFragment implements
             int visibility = visible ? View.VISIBLE : View.GONE;
             imageButton.setVisibility(visibility);
             if (visible) {
-                counterTextView.setVisibility(appliedTagsCounter > 0 ? View.VISIBLE : View.GONE);
-                counterTextView.setText(String.valueOf(appliedTagsCounter));
+                counterTextView.setVisibility(getKeywordFiltersPipeline().size() > 0 ? View.VISIBLE : View.GONE);
+                counterTextView.setText(String.valueOf(getKeywordFiltersPipeline().size()));
             } else {
                 counterTextView.setVisibility(View.GONE);
             }
@@ -828,9 +827,9 @@ public final class SearchFragment extends AbstractFragment implements
             Runnable uiRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    LOG.info("FilterToolbarButton.onHistogramUpdate() - detector: " + detector.toString() + " - feature:" + feature.name() + " - appliedCounter: " + appliedTagsCounter);
+                    LOG.info("FilterToolbarButton.onHistogramUpdate() - detector: " + detector.toString() + " - feature:" + feature.name() + " - appliedCounter: " + getKeywordFiltersPipeline().size());
                     setVisible(histogram != null && histogram.length > 0);
-                    keywordFilterDrawerView.updateData(adapter.getKeywordFiltersPipeline(), feature, histogram);
+                    keywordFilterDrawerView.updateData(getKeywordFiltersPipeline(), feature, histogram);
                 }
             };
             if (onMainThread) {
@@ -867,17 +866,18 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void onPipelineUpdate(List<KeywordFilter> pipeline) {
             adapter.setKeywordFiltersPipeline(pipeline);
-            appliedTagsCounter = adapter.getKeywordFiltersPipeline().size();
-            counterTextView.setVisibility(appliedTagsCounter > 0 ? View.VISIBLE : View.GONE);
-            if (appliedTagsCounter > 0) {
-                counterTextView.setText(""+appliedTagsCounter);
+            counterTextView.setVisibility(pipeline.size() > 0 ? View.VISIBLE : View.GONE);
+            if (pipeline.size() > 0) {
+                counterTextView.setText(""+pipeline.size());
+            }
+            if (pipeline == Collections.EMPTY_LIST) {
+                reset(false);
             }
         }
 
         @Override
         public void onAddKeywordFilter(KeywordFilter keywordFilter) {
             adapter.addKeywordFilter(keywordFilter);
-            keywordFilterDrawerView.updateData(adapter.getKeywordFiltersPipeline(), null, null);
         }
 
         @Override
@@ -886,8 +886,11 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         @Override
-        public void clearPipeline() {
-            adapter.clearKeywordFilters();
+        public List<KeywordFilter> getKeywordFiltersPipeline() {
+            if (adapter == null) {
+                return Collections.EMPTY_LIST;
+            }
+            return adapter.getKeywordFiltersPipeline();
         }
     }
 }
