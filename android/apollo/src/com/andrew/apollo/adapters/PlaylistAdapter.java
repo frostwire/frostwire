@@ -38,7 +38,10 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
     /**
      * Number of views (TextView)
      */
-    private static final int VIEW_TYPE_COUNT = 1;
+    private static final int VIEW_TYPE_COUNT = 2;
+
+    private static final int VIEW_TYPE_NEW_PLAYLIST = 0;
+    private static final int VIEW_TYPE_PLAYLIST_ITEM = 1;
 
     /**
      * Constructor of <code>PlaylistAdapter</code>
@@ -62,15 +65,14 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         if (position ==  0) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.new_playlist_list_item, null);
-            convertView.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-
-                    CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(getContext(), null);
-                    createPlaylistAction.onClick();
-                    MusicUtils.refresh();
-                }
-            });
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.new_playlist_list_item, null);
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        onNewPlaylistItemClick();
+                    }
+                });
+            }
         } else if (position >= 1) {
             // Recycle ViewHolder's items
             MusicViewHolder holder;
@@ -98,6 +100,12 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
         return convertView;
     }
 
+    private void onNewPlaylistItemClick() {
+        CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(getContext(), null);
+        createPlaylistAction.onClick();
+        MusicUtils.refresh();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -114,6 +122,10 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
         return VIEW_TYPE_COUNT;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? VIEW_TYPE_NEW_PLAYLIST : VIEW_TYPE_PLAYLIST_ITEM;
+    }
 
     /**
      * Method used to cache the data used to populate the list or grid. The idea
