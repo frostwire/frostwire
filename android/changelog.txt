@@ -1,11 +1,13 @@
-FrostWire 1.9.7 - JUN/15/2017
+FrostWire 1.9.7 - JUN/19/2017
  - New jlibtorrent 1.2.0.10
+ - Playlist screen has 'New empty playlist' action as first list item
  - Fixed Thread pool max size issue
  - Fixed possible app shutdown issues
  - Fixed seeding enablement issue
  - Ogury 2.1.8
  - Fixed possible freeze refreshing file count in My Files
  - Fixed possible crash browsing images
+ - Fixed possible freeze shutting down audio service
 
 FrostWire 1.9.6 - JUN/09/2017
  - Performance and stability improvements
