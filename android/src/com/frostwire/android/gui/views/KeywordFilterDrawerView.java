@@ -96,6 +96,29 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 return false;
             }
         });
+        findViewById(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleTagsContainer(R.id.view_drawer_search_filters_search_sources);
+            }
+        });
+        findViewById(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleTagsContainer(R.id.view_drawer_search_filters_file_extensions);
+            }
+        });
+        findViewById(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleTagsContainer(R.id.view_drawer_search_filters_file_names);
+            }
+        });
+    }
+
+    private void toggleTagsContainer(int containerId) {
+        View v = findViewById(containerId);
+        v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
     }
 
     private boolean onKeywordEntered(TextView v) {
