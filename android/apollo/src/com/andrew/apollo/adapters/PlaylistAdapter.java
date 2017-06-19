@@ -20,11 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.andrew.apollo.Config;
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the playlists on a user's
@@ -64,8 +67,10 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.new_playlist_list_item, null);
             convertView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    Log.i("Hello:", " you clicked on New Empty Playlist");
-                    //TODO: make this layout open a New Playlist dialog, just like from the menu - onOptionsItemNewPlaylistSelected() BaseActivity
+
+                    CreateNewPlaylistMenuAction createPlaylistAction = new CreateNewPlaylistMenuAction(getContext(), null);
+                    createPlaylistAction.onClick();
+                    MusicUtils.refresh();
                 }
             });
         } else if (position >= 1) {
