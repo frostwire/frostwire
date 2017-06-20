@@ -38,7 +38,7 @@ public final class KeywordDetector {
     public enum Feature {
         SEARCH_SOURCE(0.015f, 4, 20),
         FILE_EXTENSION(0f, 3, 8),
-        FILE_NAME(0f, 3, 20);
+        FILE_NAME(0.01f, 3, 20);
 
         public final float filterThreshold;
         public final int minimumTokenLength;
@@ -182,8 +182,9 @@ public final class KeywordDetector {
     static {
         // english
         feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
-        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why");
-        feedStopWords("that", "the", "to", "that", "this", "ft", "no", "me", "you", "dont");
+        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why","your");
+        feedStopWords("that", "the", "to", "that", "this", "ft", "no", "me", "you", "dont", "feat");
+        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put");
         // spanish
         feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
         feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
