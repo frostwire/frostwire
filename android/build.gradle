@@ -19,14 +19,19 @@ import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply from: '../common/dependencies.gradle'
 
 buildscript {
+    ext.kotlin_version = '1.1.2-5'
+
     repositories {
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -130,7 +135,17 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled true
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled true
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
         }
     }
 
@@ -151,6 +166,7 @@ android {
 }
 
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile 'com.android.support:design:25.4.0'
     compile 'com.android.support:preference-v14:25.4.0'
     compile 'com.android.support:support-v13:25.4.0'
@@ -161,6 +177,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.10'
     compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.10'
+    compile 'com.google.code.findbugs:jsr305:3.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
     //    exclude group: 'com.android.support', module: 'support-annotations'
