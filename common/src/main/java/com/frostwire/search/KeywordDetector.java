@@ -61,14 +61,9 @@ public final class KeywordDetector {
     private static final Set<String> stopWords = new HashSet<>();
     private final Map<Feature, HistoHashMap<String>> histograms;
     private final Map<Feature, Integer> numSearchesProcessed;
+    private final Map<Feature, Long> lastHistogramUpdates;
     private final ExecutorService threadPool;
-    private KeywordDetectorListener listener;
-
-
-    @SuppressWarnings("unused")
-    public KeywordDetector() {
-        this(null);
-    }
+    private KeywordDetectorListener keywordDetectorListener;
 
     public KeywordDetector(ExecutorService threadPool) {
         histograms = new HashMap<>();
@@ -76,34 +71,43 @@ public final class KeywordDetector {
         histograms.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
         histograms.put(Feature.FILE_NAME, new HistoHashMap<String>());
         numSearchesProcessed = new HashMap<>();
+        lastHistogramUpdates = new HashMap<>();
+        lastHistogramUpdates.put(Feature.SEARCH_SOURCE, 0l);
+        lastHistogramUpdates.put(Feature.FILE_EXTENSION, 0l);
+        lastHistogramUpdates.put(Feature.FILE_NAME, 0l);
         this.threadPool = threadPool;
     }
 
+    public int totalHistogramKeys() {
+        return histograms.get(Feature.SEARCH_SOURCE).getKeyCount() +
+                histograms.get(Feature.FILE_EXTENSION).getKeyCount() +
+                histograms.get(Feature.FILE_NAME).getKeyCount();
+    }
+
     public void notifyListener() {
-        if (this.listener != null) {
-            this.listener.notify(this, histograms);
+        if (this.keywordDetectorListener != null) {
+            this.keywordDetectorListener.notify(this, histograms);
         }
     }
 
     public void setKeywordDetectorListener(KeywordDetectorListener listener) {
-        this.listener = listener;
-    }
-
-    public KeywordDetectorListener getKeywordDetectorListener() {
-        return listener;
+        this.keywordDetectorListener = listener;
     }
 
     public void addSearchTerms(Feature feature, String terms) {
         // tokenize
-        String[] pre_tokens = terms.replaceAll("[^a-zA-Z0-9\\p{L} ]", "").toLowerCase().split("\\s");
+        String[] pre_tokens = terms.replaceAll("[^a-zA-Z0-9\\p{L}\\. ]", "").toLowerCase().split("\\s");
         if (pre_tokens.length == 0) {
             return;
         }
         // count consequential terms only
         for (String token : pre_tokens) {
             token = token.trim();
-            if (token.length() >= feature.minimumTokenLength && token.length() <= feature.maximumTokenLength && !stopWords.contains(token)) {
+
+            if (feature.minimumTokenLength <= token.length() && token.length() <= feature.maximumTokenLength && !stopWords.contains(token)) {
                 updateHistogramTokenCount(feature, token);
+            } else if (feature == Feature.FILE_EXTENSION) {
+                LOG.info("!addSearchTerm(" + token + ")");
             }
         }
         Integer numTermsProcessed = numSearchesProcessed.get(feature);
@@ -113,9 +117,7 @@ public final class KeywordDetector {
             numTermsProcessed++;
         }
         numSearchesProcessed.put(feature, numTermsProcessed);
-        if (listener != null) {
-            listener.onSearchReceived(this, feature, numTermsProcessed);
-        }
+        notifyListener();
     }
 
     /**
@@ -131,37 +133,37 @@ public final class KeywordDetector {
     /**
      * Expensive
      */
-    public void requestHistogramUpdate(Feature feature) {
+    public void requestHistogramUpdate(Feature feature, boolean forceUIUpdate) {
         HistoHashMap<String> histoHashMap = histograms.get(feature);
         if (histoHashMap != null) {
-            //LOG.info("KeywordDetector.requestHistogramUpdateAsync(" + feature + ")");
-            requestHistogramUpdateAsync(feature, histoHashMap);
-        } else {
-            //LOG.info("KeywordDetector.requestHistogramUpdateAsync(" + feature + ") failed. No histoHashMap for this feature.");
+            requestHistogramUpdateAsync(feature, histoHashMap, forceUIUpdate);
         }
     }
 
     /**
      * Expensive
      */
-    private void requestHistogramUpdateAsync(final Feature feature, final HistoHashMap<String> histoHashMap) {
+    private void requestHistogramUpdateAsync(final Feature feature, final HistoHashMap<String> histoHashMap, final boolean forceUIUpdate) {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                if (listener != null) {
+                if (keywordDetectorListener != null) {
                     //LOG.info("KeywordDetector.requestHistogramUpdateAsync(" + feature + "): calculating histogram...");
+                    if (!forceUIUpdate) {
+                        long now = System.currentTimeMillis();
+                        long lastUpdate = lastHistogramUpdates.get(feature);
+                        if (now - lastUpdate < 1000) {
+                            return;
+                        }
+                    }
+                    lastHistogramUpdates.put(feature, System.currentTimeMillis());
                     Map.Entry<String, Integer>[] histogram = histoHashMap.histogram();
-                    //LOG.info("KeywordDetector.requestHistogramUpdateAsync(" + feature + "): histogram has " + histogram.length + " entries");
-                    listener.onHistogramUpdate(KeywordDetector.this, feature, histogram);
-                } else {
-                    LOG.warn("KeywordDetector.requestHistogramUpdateAsync(feature=" + feature + ", histoHashMap=...) inconsequential. No listener found.");
+                    keywordDetectorListener.onHistogramUpdate(KeywordDetector.this, feature, histogram, true);
                 }
             }
         };
         if (threadPool != null) {
             threadPool.submit(r);
-        } else {
-            new Thread(r, "KeywordDetector::requestHistogramUpdateAsync()").start();
         }
     }
 
@@ -182,13 +184,13 @@ public final class KeywordDetector {
     static {
         // english
         feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
-        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why","your");
-        feedStopWords("that", "the", "to", "that", "this", "ft", "no", "me", "you", "dont", "feat");
-        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put");
+        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why", "your");
+        feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me" );
+        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "youre");
         // spanish
         feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
         feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
-        feedStopWords("eso", "el", "esa", "esto", "yo", "usted", "tu");
+        feedStopWords("eso", "el", "esa", "esto", "yo", "usted", "tu", "los", "para");
         // portuguese
         feedStopWords("filho", "como", "em", "quando", "nos");
         feedStopWords("tem", "ele", "seu", "nós", "quem");
@@ -201,9 +203,7 @@ public final class KeywordDetector {
     }
 
     public interface KeywordDetectorListener {
-        void onSearchReceived(final KeywordDetector detector, final Feature feature, final int numSearchesProcessed);
-
-        void onHistogramUpdate(final KeywordDetector detector, final Feature feature, final Map.Entry<String, Integer>[] histogram);
+        void onHistogramUpdate(final KeywordDetector detector, final Feature feature, final Map.Entry<String, Integer>[] histogram, boolean force);
 
         void notify(final KeywordDetector detector, final Map<Feature, HistoHashMap<String>> histograms);
     }
