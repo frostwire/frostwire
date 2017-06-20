@@ -36,14 +36,18 @@ import java.util.concurrent.ExecutorService;
 public final class KeywordDetector {
 
     public enum Feature {
-        SEARCH_SOURCE(0.015f),
-        FILE_EXTENSION(0f),
-        FILE_NAME(0f);
+        SEARCH_SOURCE(0.015f, 4, 20),
+        FILE_EXTENSION(0f, 3, 8),
+        FILE_NAME(0f, 3, 20);
 
         public final float filterThreshold;
+        public final int minimumTokenLength;
+        public final int maximumTokenLength;
 
-        Feature(float filterThreshold) {
+        Feature(float filterThreshold, int minimumTokenLength, int maximumTokenLength) {
             this.filterThreshold = filterThreshold;
+            this.minimumTokenLength = minimumTokenLength;
+            this.maximumTokenLength = maximumTokenLength;
         }
     }
 
@@ -98,7 +102,7 @@ public final class KeywordDetector {
         // count consequential terms only
         for (String token : pre_tokens) {
             token = token.trim();
-            if (token.length() > 3 && !stopWords.contains(token)) {
+            if (token.length() >= feature.minimumTokenLength && token.length() <= feature.maximumTokenLength && !stopWords.contains(token)) {
                 updateHistogramTokenCount(feature, token);
             }
         }
