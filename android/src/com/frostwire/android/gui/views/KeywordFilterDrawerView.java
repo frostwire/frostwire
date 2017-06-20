@@ -35,7 +35,6 @@ import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -177,7 +176,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         }
         // sort'em!
-        filteredValues.sort(new Comparator<Entry<String, Integer>>() {
+        Collections.sort(filteredValues, new Comparator<Entry<String, Integer>>() {
             @Override
             public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
                 if (o1.getValue() == o2.getValue()) {
