@@ -32,10 +32,10 @@
         android:paddingRight="@dimen/list_simple_horizontal_padding" >
 
         <TextView
-            android:id="@+id/line_one"
+            android:id="@+id/new_playlist_list_item_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/playlist_icon"
+            android:layout_toRightOf="@+id/new_playlist_list_item_icon"
             android:gravity="center_vertical"
             android:maxLines="1"
             android:paddingRight="@dimen/list_simple_horizontal_padding"
@@ -45,7 +45,7 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/playlist_icon"
+            android:id="@+id/new_playlist_list_item_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
