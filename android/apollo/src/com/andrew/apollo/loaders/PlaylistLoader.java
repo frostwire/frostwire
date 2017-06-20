@@ -30,9 +30,9 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
-    public static final int NEW_PLAYLIST_ID = -1;
-    public static final int FAVORITE_PLAYLIST_ID = -2;
-    public static final int LAST_ADDED_PLAYLIST_ID = -3;
+    public static final int FAVORITE_PLAYLIST_ID = -1;
+    public static final int LAST_ADDED_PLAYLIST_ID = -2;
+    public static final int NEW_PLAYLIST_ID = -3;
 
     /**
      * Constructor of <code>PlaylistLoader</code>
