@@ -21,191 +21,201 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:frostwire="http://schemas.android.com/apk/res-auto"
               android:id="@+id/view_drawer_search_filters_main_container"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_gravity="end"
+              android:clickable="true"
               android:fitsSystemWindows="true"
-              android:weightSum="1"
-              android:clickable="true">
+              android:orientation="vertical"
+              android:weightSum="1">
 
     <!-- header -->
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/app_toolbar_background"
+        android:orientation="horizontal"
         android:padding="15dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:text="@string/filter_search_results"
             android:textColor="@color/basic_white"
             android:textStyle="bold"
-            android:gravity="start"
             />
+
         <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1.0"/>
+
         <TextView
             android:id="@+id/view_drawer_search_filters_clear_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="right"
             android:text="@string/clear_filters"
-            android:textStyle="bold"
             android:textColor="@color/basic_blue_highlight_dark"
-            android:gravity="right"/>
+            android:textStyle="bold"/>
     </LinearLayout>
-
-    <!-- manual entry and current pipeline -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/basic_gray_light"
-        android:orientation="vertical"
-        android:padding="15dp"
-        android:weightSum="1">
-
-        <EditText
-            android:id="@+id/view_drawer_search_filters_keyword_edittext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="25dp"
-            android:hint="@string/filter_by_keyword"
-            android:inputType="text"
-            android:maxLines="1"
-            android:imeOptions="actionDone"
-            android:singleLine="true"/>
-
-        <!-- CURRENT PIPELINE -->
-        <com.frostwire.android.gui.views.FlowLayout
-            android:id="@+id/view_drawer_search_filters_pipeline_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.frostwire.android.gui.views.KeywordTagView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="45"
-                frostwire:keyword_tag_inclusive="true"
-                frostwire:keyword_tag_dismissable="false"
-                frostwire:keyword_tag_keyword="lorem"
-                />
-
-            <com.frostwire.android.gui.views.KeywordTagView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="45"
-                frostwire:keyword_tag_inclusive="true"
-                frostwire:keyword_tag_dismissable="false"
-                frostwire:keyword_tag_keyword="ipsum"
-                />
-
-            <com.frostwire.android.gui.views.KeywordTagView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="55"
-                frostwire:keyword_tag_inclusive="true"
-                frostwire:keyword_tag_dismissable="false"
-                frostwire:keyword_tag_keyword="dolor"
-                />
-
-            <com.frostwire.android.gui.views.KeywordTagView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="5"
-                frostwire:keyword_tag_inclusive="false"
-                frostwire:keyword_tag_dismissable="false"
-                frostwire:keyword_tag_keyword="sit"
-                />
-
-            <com.frostwire.android.gui.views.KeywordTagView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                frostwire:keyword_tag_count="3"
-                frostwire:keyword_tag_inclusive="true"
-                frostwire:keyword_tag_keyword="consectetur"
-                />
-        </com.frostwire.android.gui.views.FlowLayout>
-
-        <TextView
-            android:id="@+id/view_drawer_search_filters_touch_tag_tips"
-            android:layout_marginTop="25dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textColor="@color/basic_gray_dark"
-            android:text="@string/touch_applied_tags_to_include_exclude"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/black"></LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" android:fillViewport="true">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.85"
             android:orientation="vertical"
-            android:background="@color/basic_white">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/view_drawer_search_filters_search_sources_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_sources"
-                android:padding="15dp"
-                android:textStyle="bold"/>
-
-            <com.frostwire.android.gui.views.FlowLayout
-                android:id="@+id/view_drawer_search_filters_search_sources"
+            <!-- manual entry and current pipeline -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <com.frostwire.android.gui.views.KeywordTagView
+                android:layout_height="wrap_content"
+                android:background="@color/basic_gray_light"
+                android:orientation="vertical"
+                android:padding="15dp"
+                android:weightSum="1">
+
+                <EditText
+                    android:id="@+id/view_drawer_search_filters_keyword_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="25dp"
+                    android:hint="@string/filter_by_keyword"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"/>
+
+                <!-- CURRENT PIPELINE -->
+                <com.frostwire.android.gui.views.FlowLayout
+                    android:id="@+id/view_drawer_search_filters_pipeline_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="45"
+                        frostwire:keyword_tag_dismissable="false"
+                        frostwire:keyword_tag_inclusive="true"
+                        frostwire:keyword_tag_keyword="lorem"
+                        />
+
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="45"
+                        frostwire:keyword_tag_dismissable="false"
+                        frostwire:keyword_tag_inclusive="true"
+                        frostwire:keyword_tag_keyword="ipsum"
+                        />
+
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="55"
+                        frostwire:keyword_tag_dismissable="false"
+                        frostwire:keyword_tag_inclusive="true"
+                        frostwire:keyword_tag_keyword="dolor"
+                        />
+
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="5"
+                        frostwire:keyword_tag_dismissable="false"
+                        frostwire:keyword_tag_inclusive="false"
+                        frostwire:keyword_tag_keyword="sit"
+                        />
+
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="3"
+                        frostwire:keyword_tag_inclusive="true"
+                        frostwire:keyword_tag_keyword="consectetur"
+                        />
+                </com.frostwire.android.gui.views.FlowLayout>
+
+                <TextView
+                    android:id="@+id/view_drawer_search_filters_touch_tag_tips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/touch_applied_tags_to_include_exclude"
+                    android:textColor="@color/basic_gray_dark"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/black"></LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.85"
+                android:background="@color/basic_white"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/view_drawer_search_filters_search_sources_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    frostwire:keyword_tag_count="30"
-                    frostwire:keyword_tag_inclusive="true"
-                    frostwire:keyword_tag_dismissable="false"
-                    frostwire:keyword_tag_keyword="youtube"
-                    />
+                    android:padding="15dp"
+                    android:text="@string/search_sources"
+                    android:textStyle="bold"/>
 
-            </com.frostwire.android.gui.views.FlowLayout>
+                <com.frostwire.android.gui.views.FlowLayout
+                    android:id="@+id/view_drawer_search_filters_search_sources"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/view_drawer_search_filters_file_extensions_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/file_extensions"
-                android:padding="15dp"
-                android:textStyle="bold"/>
+                    <com.frostwire.android.gui.views.KeywordTagView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        frostwire:keyword_tag_count="30"
+                        frostwire:keyword_tag_dismissable="false"
+                        frostwire:keyword_tag_inclusive="true"
+                        frostwire:keyword_tag_keyword="youtube"
+                        />
 
-            <com.frostwire.android.gui.views.FlowLayout
-                android:id="@+id/view_drawer_search_filters_file_extensions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </com.frostwire.android.gui.views.FlowLayout>
+                </com.frostwire.android.gui.views.FlowLayout>
 
-            <TextView
-                android:id="@+id/view_drawer_search_filters_file_names_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/file_names"
-                android:padding="15dp"
-                android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/view_drawer_search_filters_file_extensions_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:text="@string/file_extensions"
+                    android:textStyle="bold"/>
 
-            <com.frostwire.android.gui.views.FlowLayout
-                android:id="@+id/view_drawer_search_filters_file_names"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </com.frostwire.android.gui.views.FlowLayout>
+                <com.frostwire.android.gui.views.FlowLayout
+                    android:id="@+id/view_drawer_search_filters_file_extensions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </com.frostwire.android.gui.views.FlowLayout>
 
+                <TextView
+                    android:id="@+id/view_drawer_search_filters_file_names_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    android:text="@string/file_names"
+                    android:textStyle="bold"/>
+
+                <com.frostwire.android.gui.views.FlowLayout
+                    android:id="@+id/view_drawer_search_filters_file_names"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </com.frostwire.android.gui.views.FlowLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
