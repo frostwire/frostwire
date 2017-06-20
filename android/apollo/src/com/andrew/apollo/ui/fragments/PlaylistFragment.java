@@ -49,6 +49,10 @@ import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.List;
 
+import static com.andrew.apollo.loaders.PlaylistLoader.FAVORITE_PLAYLIST_ID;
+import static com.andrew.apollo.loaders.PlaylistLoader.LAST_ADDED_PLAYLIST_ID;
+import static com.andrew.apollo.loaders.PlaylistLoader.NEW_PLAYLIST_ID;
+
 /**
  * This class is used to display all of the playlists on a user's device.
  *
@@ -83,7 +87,8 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                 .setIcon(R.drawable.contextmenu_icon_queue_add);
 
         // Delete and rename (user made playlists)
-        if (info.position > 1) {
+        long pId = mItem.mPlaylistId;
+        if (pId != NEW_PLAYLIST_ID && pId != FAVORITE_PLAYLIST_ID && pId != LAST_ADDED_PLAYLIST_ID) {
             menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.RENAME_PLAYLIST, Menu.NONE, R.string.context_menu_rename_playlist).setIcon(R.drawable.contextmenu_icon_rename);
             menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, R.string.context_menu_delete).setIcon(R.drawable.contextmenu_icon_trash);
         }
