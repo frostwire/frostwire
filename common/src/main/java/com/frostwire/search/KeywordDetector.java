@@ -56,7 +56,7 @@ public final class KeywordDetector {
     private static Logger LOG = Logger.getLogger(KeywordDetector.class);
     private static final Set<String> stopWords = new HashSet<>();
     private final Map<Feature, HistoHashMap<String>> histograms;
-    private final Map<Feature,Integer> numSearchesProcessed;
+    private final Map<Feature, Integer> numSearchesProcessed;
     private final ExecutorService threadPool;
     private KeywordDetectorListener listener;
 
@@ -68,12 +68,9 @@ public final class KeywordDetector {
 
     public KeywordDetector(ExecutorService threadPool) {
         histograms = new HashMap<>();
-
         histograms.put(Feature.SEARCH_SOURCE, new HistoHashMap<String>());
         histograms.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
         histograms.put(Feature.FILE_NAME, new HistoHashMap<String>());
-
-
         numSearchesProcessed = new HashMap<>();
         this.threadPool = threadPool;
     }
@@ -101,7 +98,7 @@ public final class KeywordDetector {
         // count consequential terms only
         for (String token : pre_tokens) {
             token = token.trim();
-            if (token.length() > 1 && !stopWords.contains(token)) {
+            if (token.length() > 3 && !stopWords.contains(token)) {
                 updateHistogramTokenCount(feature, token);
             }
         }
@@ -112,13 +109,14 @@ public final class KeywordDetector {
             numTermsProcessed++;
         }
         numSearchesProcessed.put(feature, numTermsProcessed);
-
         if (listener != null) {
             listener.onSearchReceived(this, feature, numTermsProcessed);
         }
     }
 
-    /** Cheap */
+    /**
+     * Cheap
+     */
     private void updateHistogramTokenCount(Feature feature, String token) {
         HistoHashMap<String> histogram = histograms.get(feature);
         if (histogram != null) {
@@ -126,7 +124,9 @@ public final class KeywordDetector {
         }
     }
 
-    /** Expensive */
+    /**
+     * Expensive
+     */
     public void requestHistogramUpdate(Feature feature) {
         HistoHashMap<String> histoHashMap = histograms.get(feature);
         if (histoHashMap != null) {
@@ -137,7 +137,9 @@ public final class KeywordDetector {
         }
     }
 
-    /** Expensive */
+    /**
+     * Expensive
+     */
     private void requestHistogramUpdateAsync(final Feature feature, final HistoHashMap<String> histoHashMap) {
         Runnable r = new Runnable() {
             @Override
@@ -169,15 +171,27 @@ public final class KeywordDetector {
         notifyListener();
     }
 
-    private static void feedStopWords(String ... words) {
+    private static void feedStopWords(String... words) {
         Collections.addAll(stopWords, words);
     }
 
     static {
         // english
-        feedStopWords("-","a", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
+        feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
         feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why");
         feedStopWords("that", "the", "to", "that", "this", "ft", "no", "me", "you", "dont");
+        // spanish
+        feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
+        feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
+        feedStopWords("eso", "el", "esa", "esto", "yo", "usted", "tu");
+        // portuguese
+        feedStopWords("filho", "como", "em", "quando", "nos");
+        feedStopWords("tem", "ele", "seu", "nós", "quem");
+        feedStopWords("isto", "voce", "você", "seu");
+        // french
+        feedStopWords("fils", "sous", "par", "où", "ou", "quand");
+        feedStopWords("leur", "dans", "nous", "par", "ce", "qui");
+        feedStopWords("il", "le", "vous", "votre");
         // TODO: Add more here as we start testing and getting noise
     }
 

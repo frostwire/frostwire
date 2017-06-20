@@ -56,6 +56,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private KeywordFiltersPipelineListener pipelineListener;
     private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
+    private TextView appliedTagsTipTextView;
 
     static {
         featureContainerIds.put(KeywordDetector.Feature.SEARCH_SOURCE, R.id.view_drawer_search_filters_search_sources);
@@ -76,6 +77,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
+        appliedTagsTipTextView = (TextView) findViewById(R.id.view_drawer_search_filters_touch_tag_tips);
+        appliedTagsTipTextView.setVisibility(View.GONE);
         TextView clearAllTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
         clearAllTextView.setOnClickListener(new OnClickListener() {
             @Override
@@ -206,6 +209,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
                 flowLayout.addView(keywordTagView);
             }
+            appliedTagsTipTextView.setVisibility(View.VISIBLE);
+        } else {
+            appliedTagsTipTextView.setVisibility(View.GONE);
         }
 
         if (pipelineListener != null) {
