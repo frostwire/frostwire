@@ -81,6 +81,9 @@ public class KeywordTagView extends LinearLayout {
     }
 
     private void updateComponents() {
+        if (isInEditMode()) {
+            return;
+        }
         TextView inclusiveIndicatorTextView = (TextView) findViewById(R.id.view_keyword_tag_inclusive_indicator);
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         TextView countTextView = (TextView) findViewById(R.id.view_keyword_tag_count);

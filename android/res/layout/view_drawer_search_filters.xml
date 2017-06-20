@@ -127,9 +127,16 @@
                 frostwire:keyword_tag_inclusive="true"
                 frostwire:keyword_tag_keyword="consectetur"
                 />
-
-
         </com.frostwire.android.gui.views.FlowLayout>
+
+        <TextView
+            android:id="@+id/view_drawer_search_filters_touch_tag_tips"
+            android:layout_marginTop="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/basic_gray_dark"
+            android:text="@string/touch_applied_tags_to_include_exclude"/>
 
     </LinearLayout>
 
