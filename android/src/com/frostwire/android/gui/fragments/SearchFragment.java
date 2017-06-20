@@ -128,7 +128,6 @@ public final class SearchFragment extends AbstractFragment implements
     private DrawerLayout drawerLayout;
     private KeywordFilterDrawerView keywordFilterDrawerView;
     private OnClickListener headerClickListener;
-    private long lastHistogramRequestUpdate;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -166,28 +165,21 @@ public final class SearchFragment extends AbstractFragment implements
         ImageButton filterButtonIcon = (ImageButton) header.findViewById(R.id.view_search_header_search_filter_button);
         TextView filterCounter = (TextView) header.findViewById(R.id.view_search_header_search_filter_counter);
         filterButton = new FilterToolbarButton(filterButtonIcon, filterCounter);
-        updateHeaderFilterButtonVisibility();
+        filterButton.updateVisibility();
 
         return header;
     }
 
-    private void updateHeaderFilterButtonVisibility() {
-        boolean adapterHasResults = adapter != null && adapter.getCount() > 0;
-        boolean adapterHasAppliedFilters = adapter != null && adapter.getKeywordFiltersPipeline().size() > 0;
-        filterButton.setVisible(adapterHasResults || adapterHasAppliedFilters);
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
-
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
-
-            List<SearchResult> filteredList = adapter.filter(adapter.getList()).filtered;
-            updateKeywordDetector(filteredList);
-            updateHeaderFilterButtonVisibility();
+            filterButton.reset(false);
+            updateKeywordDetector(adapter.getList());
+            filterButton.updateVisibility();
         } else {
             setupPromoSlides();
         }
@@ -308,14 +300,15 @@ public final class SearchFragment extends AbstractFragment implements
         if (adapter.getCount() == 0 && adapter.getKeywordFiltersPipeline().size() == 0) {
             resetKeywordDetector();
         }
+
+        updateKeywordDetector(results);
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 adapter.addResults(results, filteredList);
                 showSearchView(getView());
                 refreshFileTypeCounters(true);
-                // MIGHT-DO: Move this method out of this thread, this logic path knows when to update the UI thread.
-                updateKeywordDetector(filteredList);
             }
         });
     }
@@ -330,7 +323,8 @@ public final class SearchFragment extends AbstractFragment implements
                 if (results != null) {
                     boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
 
-                    if (!searchFinished) {
+                    // the second condition exists to accomodate a reset keywordDetector upon screen rotation
+                    if (!searchFinished || (keywordDetector.totalHistogramKeys() == 0 && results.size() > 0)) {
                         for (SearchResult sr : results) {
                             keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
                             if (sr instanceof FileSearchResult) {
@@ -344,18 +338,12 @@ public final class SearchFragment extends AbstractFragment implements
                                 }
                             }
                         }
-                        // these are CPU expensive / async calls, we don't abuse them to not drop frame rate
-                        if (SystemClock.currentThreadTimeMillis() - lastHistogramRequestUpdate > 500) {
-                            lastHistogramRequestUpdate = SystemClock.currentThreadTimeMillis();
-                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
-                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
-                            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
-                        }
-
+                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, false);
+                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, false);
+                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, false);
                     } else {
                         keywordDetector.notifyListener();
                     }
-
                 } else {
                     keywordDetector.notifyListener();
                 }
@@ -442,7 +430,7 @@ public final class SearchFragment extends AbstractFragment implements
         LocalSearchEngine.instance().cancelSearch();
         searchProgress.setProgressEnabled(false);
         showSearchView(getView());
-        filterButton.setVisible(false);
+        filterButton.reset(true); // hide=true
     }
 
     private void showSearchView(View view) {
@@ -452,11 +440,11 @@ public final class SearchFragment extends AbstractFragment implements
             switchView(view, R.id.fragment_search_promos);
             deepSearchProgress.setVisibility(View.GONE);
         } else {
-            updateHeaderFilterButtonVisibility();
             boolean adapterHasResults = adapter != null && adapter.getCount() > 0;
             if (adapterHasResults) {
                 switchView(view, R.id.fragment_search_list);
                 deepSearchProgress.setVisibility(searchFinished ? View.GONE : View.VISIBLE);
+                filterButton.updateVisibility();
             } else {
                 switchView(view, R.id.fragment_search_search_progress);
                 deepSearchProgress.setVisibility(View.GONE);
@@ -675,6 +663,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void resetKeywordDetector() {
         keywordDetector.reset();
+        keywordFilterDrawerView.reset();
     }
 
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
@@ -773,6 +762,7 @@ public final class SearchFragment extends AbstractFragment implements
     private class FilterToolbarButton implements KeywordDetector.KeywordDetectorListener, KeywordFilterDrawerView.KeywordFiltersPipelineListener {
         private ImageButton imageButton;
         private TextView counterTextView;
+        private long lastKeywordFilterDrawerViewUpdate;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
@@ -780,7 +770,83 @@ public final class SearchFragment extends AbstractFragment implements
             initListeners();
         }
 
-        public void setVisible(boolean visible) {
+        // self determine if it should be hidden or not
+        public void updateVisibility() {
+            setVisible(keywordDetector.totalHistogramKeys() > 0);
+        }
+
+        @Override
+        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final Entry<String, Integer>[] histogram, boolean forceUIUpdate) {
+            long now = SystemClock.currentThreadTimeMillis();
+            if (!forceUIUpdate && now - lastKeywordFilterDrawerViewUpdate < 2000) {
+                // expensive operation for main thread, ignore sub-second requests for refreshing
+                return;
+            }
+            lastKeywordFilterDrawerViewUpdate = now;
+            Runnable uiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    updateVisibility();
+                    keywordFilterDrawerView.updateData(getKeywordFiltersPipeline(), feature, histogram);
+                }
+            };
+            getActivity().runOnUiThread(uiRunnable);
+        }
+
+        @Override
+        public void notify(final KeywordDetector detector, Map<KeywordDetector.Feature, HistoHashMap<String>> histograms) {
+            if (histograms != null && !histograms.isEmpty()) {
+                Set<KeywordDetector.Feature> features = histograms.keySet();
+                for (KeywordDetector.Feature feature : features) {
+                    onHistogramUpdate(detector, feature, histograms.get(feature).histogram(), false);
+                }
+            }
+        }
+
+        public void reset(boolean hide) { //might do, parameter to not hide drawer
+            setVisible(!hide);
+            keywordDetector.reset();
+            if (keywordFilterDrawerView != null) {
+                drawerLayout.closeDrawer(keywordFilterDrawerView);
+            }
+        }
+
+        public void reset() {
+            reset(true);
+        }
+
+        @Override
+        public void onPipelineUpdate(List<KeywordFilter> pipeline) {
+            adapter.setKeywordFiltersPipeline(pipeline);
+            if (pipeline != null) {
+                if (pipeline.isEmpty()) {
+                    counterTextView.setText("");
+                } else {
+                    counterTextView.setText("" + pipeline.size());
+                }
+            }
+            updateVisibility();
+        }
+
+        @Override
+        public void onAddKeywordFilter(KeywordFilter keywordFilter) {
+            adapter.addKeywordFilter(keywordFilter);
+        }
+
+        @Override
+        public void onRemoveKeywordFilter(KeywordFilter keywordFilter) {
+            adapter.removeKeywordFilter(keywordFilter);
+        }
+
+        @Override
+        public List<KeywordFilter> getKeywordFiltersPipeline() {
+            if (adapter == null) {
+                return Collections.EMPTY_LIST;
+            }
+            return adapter.getKeywordFiltersPipeline();
+        }
+
+        private void setVisible(boolean visible) {
             int visibility = visible ? View.VISIBLE : View.GONE;
             imageButton.setVisibility(visibility);
             if (visible) {
@@ -808,89 +874,11 @@ public final class SearchFragment extends AbstractFragment implements
             keywordFilterDrawerView.setKeywordFiltersPipelineListener(this);
             drawerLayout.openDrawer(keywordFilterDrawerView);
 
-            //KeywordDetector keywordDetector = keywordDetectors.get(adapter.getFileType());
             if (keywordDetector != null) {
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, true);
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, true);
+                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, true);
             }
-        }
-
-        @Override
-        public void onSearchReceived(final KeywordDetector detector, final KeywordDetector.Feature feature, int numSearchesProcessed) {
-            //LOG.info("FilterToolbarButton.onSearchReceived() - detector: " + detector.toString() + " - feature:" + feature.name() + " searchesProcessed: " + numSearchesProcessed);
-        }
-
-        @Override
-        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final Entry<String, Integer>[] histogram) {
-            boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
-            Runnable uiRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    LOG.info("FilterToolbarButton.onHistogramUpdate() - detector: " + detector.toString() + " - feature:" + feature.name() + " - appliedCounter: " + getKeywordFiltersPipeline().size());
-                    setVisible(histogram != null && histogram.length > 0);
-                    keywordFilterDrawerView.updateData(getKeywordFiltersPipeline(), feature, histogram);
-                }
-            };
-            if (onMainThread) {
-                uiRunnable.run();
-            } else {
-                getActivity().runOnUiThread(uiRunnable);
-                // MIGHT-DO: if KeywordFilterDrawerView is visible it might
-                // receive keyword updates here.
-            }
-        }
-
-        @Override
-        public void notify(final KeywordDetector detector, Map<KeywordDetector.Feature, HistoHashMap<String>> histograms) {
-            if (histograms != null && !histograms.isEmpty()) {
-                Set<KeywordDetector.Feature> features = histograms.keySet();
-                for (KeywordDetector.Feature feature : features) {
-                    onHistogramUpdate(detector, feature, histograms.get(feature).histogram());
-                }
-            }
-        }
-
-        public void reset(boolean hide) {
-            setVisible(!hide);
-            if (keywordFilterDrawerView != null) {
-                drawerLayout.closeDrawer(keywordFilterDrawerView);
-            }
-            LOG.info("FilterButton.reset(hide=" + hide + ")");
-        }
-
-        public void reset() {
-            reset(true);
-        }
-
-        @Override
-        public void onPipelineUpdate(List<KeywordFilter> pipeline) {
-            adapter.setKeywordFiltersPipeline(pipeline);
-            counterTextView.setVisibility(pipeline.size() > 0 ? View.VISIBLE : View.GONE);
-            if (pipeline.size() > 0) {
-                counterTextView.setText(""+pipeline.size());
-            }
-            if (pipeline == Collections.EMPTY_LIST) {
-                reset(false);
-            }
-        }
-
-        @Override
-        public void onAddKeywordFilter(KeywordFilter keywordFilter) {
-            adapter.addKeywordFilter(keywordFilter);
-        }
-
-        @Override
-        public void onRemoveKeywordFilter(KeywordFilter keywordFilter) {
-            adapter.removeKeywordFilter(keywordFilter);
-        }
-
-        @Override
-        public List<KeywordFilter> getKeywordFiltersPipeline() {
-            if (adapter == null) {
-                return Collections.EMPTY_LIST;
-            }
-            return adapter.getKeywordFiltersPipeline();
         }
     }
 }
