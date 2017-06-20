@@ -56,6 +56,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
     private TextView appliedTagsTipTextView;
+    private TextView clearAppliedFiltersTextView;
 
     static {
         featureContainerIds.put(KeywordDetector.Feature.SEARCH_SOURCE, R.id.view_drawer_search_filters_search_sources);
@@ -78,6 +79,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
         appliedTagsTipTextView = (TextView) findViewById(R.id.view_drawer_search_filters_touch_tag_tips);
         appliedTagsTipTextView.setVisibility(View.GONE);
+        clearAppliedFiltersTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
+        clearAppliedFiltersTextView.setVisibility(View.GONE);
+
         TextView clearAllTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
         clearAllTextView.setOnClickListener(new OnClickListener() {
             @Override
@@ -123,6 +127,19 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
     }
 
+
+    private void resetTagsContainers() {
+        resetTagsContainer(R.id.view_drawer_search_filters_search_sources);
+        resetTagsContainer(R.id.view_drawer_search_filters_file_extensions);
+        resetTagsContainer(R.id.view_drawer_search_filters_file_names);
+    }
+
+    private void resetTagsContainer(int containerId) {
+        FlowLayout flowLayout = (FlowLayout) findViewById(containerId);
+        flowLayout.removeAllViews();
+        flowLayout.setVisibility(View.VISIBLE);
+    }
+
     private boolean onKeywordEntered(TextView v) {
         String keyword = v.getText().toString().trim().toLowerCase();
         if (keyword.length() == 0) {
@@ -153,6 +170,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             Entry<String, Integer>[] filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
         }
+        invalidate();
     }
 
     private Entry<String, Integer>[] highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
@@ -170,10 +188,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             float rate = (float) entry.getValue()/(high + totalCount);
             if (entry.getValue() > 1 && rate >= threshold) {
                 filteredValues.add(entry);
-                LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
-            } else {
-                LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
-            }
+                //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
+            } //else {
+                //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
+            //}
         }
         // sort'em!
         Collections.sort(filteredValues, new Comparator<Entry<String, Integer>>() {
@@ -197,22 +215,24 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey()), entry.getValue(), false, this);
             container.addView(keywordTagView);
         }
+        container.invalidate();
+        LOG.info("updateSuggestedKeywordFilters() updated tags for Feature: " + feature.name());
     }
 
     private void updateAppliedKeywordFilters(List<KeywordFilter> keywordFiltersPipeline) {
+        boolean filtersHaveBeenApplied = keywordFiltersPipeline.size() > 0;
+        int textViewsVisibility = filtersHaveBeenApplied ? View.VISIBLE : View.GONE;
+        clearAppliedFiltersTextView.setVisibility(textViewsVisibility);
+        appliedTagsTipTextView.setVisibility(textViewsVisibility);
+
         FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
-
-        if (keywordFiltersPipeline.size() > 0) {
+        if (filtersHaveBeenApplied) {
             for (KeywordFilter filter : keywordFiltersPipeline) {
                 KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
                 flowLayout.addView(keywordTagView);
             }
-            appliedTagsTipTextView.setVisibility(View.VISIBLE);
-        } else {
-            appliedTagsTipTextView.setVisibility(View.GONE);
         }
-
         if (pipelineListener != null) {
             pipelineListener.onPipelineUpdate(keywordFiltersPipeline);
         }
@@ -253,6 +273,17 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         }
         updateAppliedKeywordFilters(keywordFiltersPipeline);
+    }
+
+    public void reset() {
+        // visual reset
+        ((Activity) getContext()).runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                clearAppliedFilters();
+                resetTagsContainers();
+            }
+        });
     }
 
     public interface KeywordFiltersPipelineListener {
