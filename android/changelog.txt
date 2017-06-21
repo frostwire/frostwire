@@ -1,6 +1,7 @@
-FrostWire 1.9.7 - JUN/19/2017
- - New jlibtorrent 1.2.0.10
+FrostWire 1.9.7 - JUN/21/2017
+ - New jlibtorrent 1.2.0.11-RC1
  - Playlist screen has 'New empty playlist' action as first list item
+ - Player playlist layout and font updates for UI consistency
  - Fixed Thread pool max size issue
  - Fixed possible app shutdown issues
  - Fixed seeding enablement issue
@@ -8,6 +9,8 @@ FrostWire 1.9.7 - JUN/19/2017
  - Fixed possible freeze refreshing file count in My Files
  - Fixed possible crash browsing images
  - Fixed possible freeze shutting down audio service
+ - New Kotlin support
+ - gradle 4.0, gms 11.0.1
 
 FrostWire 1.9.6 - JUN/09/2017
  - Performance and stability improvements
