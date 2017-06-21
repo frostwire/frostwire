@@ -38,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
@@ -217,7 +218,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void initToolbarSearchFilter(Menu menu) {
         final SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
-        searchView.setQueryHint("Filter...");
+        searchView.setFocusable(true);
+        searchView.setQueryHint(getResources().getString(R.string.filter_ellipsis));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -228,15 +230,21 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                performFilter(newText);
-                return true;
+                if (!"".equals(newText)) {
+                    performFilter(newText);
+                } else {
+                    return false;
+                }
+                return false;
             }
         });
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+        LOG.info("onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.fragment_browse_peer_menu_filter:
                 return true;

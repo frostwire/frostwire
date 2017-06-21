@@ -246,7 +246,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             setupAdapter();
         }
         // TODO: optimize these calls
-        if (getActivity() != null) {
+        if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
         }
         //  format strings
