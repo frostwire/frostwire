@@ -1,9 +1,9 @@
 frostwire (6.5.3) stable; urgency=high
-  * New jlibtorrent 1.2.0.10
+  * New jlibtorrent 1.2.0.11-RC1
   * Fixed Thread pool max size issue
-  * Serbian, Albanian translations updated
+  * Serbian, Albanian, Japanese, Korean translations updated
 	
- -- FrostWire Team <contact@frostwire.com>  Fri, 16 Jun 2017 11:47:32 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 21 Jun 2017 11:19:12 -0600
 
 frostwire (6.5.2) stable; urgency=high
   * New jlibtorrent 1.2.0.9-RC5
