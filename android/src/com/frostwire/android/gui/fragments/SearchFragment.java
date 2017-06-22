@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -112,7 +111,7 @@ import java.util.regex.Pattern;
 public final class SearchFragment extends AbstractFragment implements
         MainFragment,
         OnDialogClickListener,
-        SearchProgressView.CurrentQueryReporter, PromotionDownloader {
+        SearchProgressView.CurrentQueryReporter, PromotionDownloader, KeywordFilterDrawerView.KeywordFilterDrawerController {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -622,6 +621,32 @@ public final class SearchFragment extends AbstractFragment implements
     public void connectDrawerLayoutFilterView(DrawerLayout drawerLayout, View filterView) {
         this.drawerLayout = drawerLayout;
         keywordFilterDrawerView = (KeywordFilterDrawerView) filterView;
+        keywordFilterDrawerView.setKeywordFilterDrawerController(this);
+    }
+
+    @Override
+    public void closeKeywordFilterDrawer() {
+        if (keywordFilterDrawerView != null) {
+            drawerLayout.closeDrawer(keywordFilterDrawerView);
+        }
+    }
+
+    @Override
+    public void openKeywordFilterDrawer() {
+        if (drawerLayout == null || keywordFilterDrawerView == null) {
+            return;
+        }
+
+        if (keywordFilterDrawerView != null) {
+            drawerLayout.openDrawer(keywordFilterDrawerView);
+        }
+
+        if (keywordDetector != null) {
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, true);
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, true);
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, true);
+        }
+
     }
 
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
@@ -806,9 +831,7 @@ public final class SearchFragment extends AbstractFragment implements
         public void reset(boolean hide) { //might do, parameter to not hide drawer
             setVisible(!hide);
             keywordDetector.reset();
-            if (keywordFilterDrawerView != null) {
-                drawerLayout.closeDrawer(keywordFilterDrawerView);
-            }
+            closeKeywordFilterDrawer();
         }
 
         public void reset() {
@@ -867,18 +890,8 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         private void openKeywordFilterDrawerView() {
-            if (drawerLayout == null || keywordFilterDrawerView == null) {
-                return;
-            }
-
             keywordFilterDrawerView.setKeywordFiltersPipelineListener(this);
-            drawerLayout.openDrawer(keywordFilterDrawerView);
-
-            if (keywordDetector != null) {
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, true);
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, true);
-                keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, true);
-            }
+            openKeywordFilterDrawer();
         }
     }
 }

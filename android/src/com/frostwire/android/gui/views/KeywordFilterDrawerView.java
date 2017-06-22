@@ -64,6 +64,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         featureContainerIds.put(KeywordDetector.Feature.FILE_NAME, R.id.view_drawer_search_filters_file_names);
     }
 
+    private KeywordFilterDrawerController keywordFilterDrawerController;
+
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         histograms = new HashMap<>();
@@ -81,6 +83,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         appliedTagsTipTextView.setVisibility(View.GONE);
         clearAppliedFiltersTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
         clearAppliedFiltersTextView.setVisibility(View.GONE);
+
+        findViewById(R.id.view_drawer_search_filters_exit_button).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onExitButtonClicked();
+            }
+        });
 
         TextView clearAllTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
         clearAllTextView.setOnClickListener(new OnClickListener() {
@@ -120,6 +129,14 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 toggleTagsContainer(R.id.view_drawer_search_filters_file_names);
             }
         });
+    }
+
+    private void onExitButtonClicked() {
+        if (keywordFilterDrawerController != null) {
+            keywordFilterDrawerController.closeKeywordFilterDrawer();
+        } else {
+            LOG.warn("Check your logic, the keyword filter drawer controller has not been assigned");
+        }
     }
 
     private void toggleTagsContainer(int containerId) {
@@ -284,6 +301,15 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 resetTagsContainers();
             }
         });
+    }
+
+    public void setKeywordFilterDrawerController(KeywordFilterDrawerController keywordFilterDrawerController) {
+        this.keywordFilterDrawerController = keywordFilterDrawerController;
+    }
+
+    public interface KeywordFilterDrawerController {
+        void closeKeywordFilterDrawer();
+        void openKeywordFilterDrawer();
     }
 
     public interface KeywordFiltersPipelineListener {
