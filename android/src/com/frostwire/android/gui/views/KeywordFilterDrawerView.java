@@ -26,17 +26,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
-import com.google.android.gms.ads.formats.NativeAd;
 
 import java.util.Collections;
 import java.util.Comparator;
