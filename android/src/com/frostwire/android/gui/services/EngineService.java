@@ -232,8 +232,6 @@ public class EngineService extends Service implements IEngineService {
 
         state = STATE_STARTING;
 
-        Librarian.instance().invalidateCountCache();
-
         BTEngine.getInstance().resume();
 
         state = STATE_STARTED;

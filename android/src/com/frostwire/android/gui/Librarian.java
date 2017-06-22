@@ -57,7 +57,6 @@ public final class Librarian {
     private static final String TAG = "FW.Librarian";
 
     private final Application context;
-    private final FileCountCache[] cache; // it is an array for performance reasons
 
     private static Librarian instance;
 
@@ -77,7 +76,6 @@ public final class Librarian {
 
     private Librarian(Application context) {
         this.context = context;
-        this.cache = new FileCountCache[]{new FileCountCache(), new FileCountCache(), new FileCountCache(), new FileCountCache(), new FileCountCache(), new FileCountCache(), new FileCountCache()};
     }
 
     public List<FileDescriptor> getFiles(byte fileType, int offset, int pageSize) {
@@ -94,10 +92,6 @@ public final class Librarian {
      */
     public int getNumFiles(byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-        if (cache[fileType].cacheValid()) {
-            return cache[fileType].getCount();
-        }
 
         Cursor c = null;
 
@@ -117,8 +111,6 @@ public final class Librarian {
         }
 
         result = numFiles;
-
-        cache[fileType].updateOnDisk(result);
 
         return result;
     }
@@ -174,7 +166,6 @@ public final class Librarian {
         } catch (Throwable e) {
             Log.e(TAG, "Failed to delete files from media store", e);
         }
-        invalidateCountCache(fileType);
         UIUtils.broadcastAction(context,
                 Constants.ACTION_FILE_ADDED_OR_REMOVED,
                 new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, fileType));
@@ -226,22 +217,6 @@ public final class Librarian {
         playlist.setNextItem(new PlaylistItem(fd));
 
         return playlist;
-    }
-
-    public void invalidateCountCache() {
-        for (FileCountCache c : cache) {
-            if (c != null) {
-                c.lastTimeCachedOnDisk = 0;
-            }
-        }
-        //broadcastRefreshFinger();
-    }
-
-    /**
-     * @param fileType
-     */
-    void invalidateCountCache(byte fileType) {
-        cache[fileType].lastTimeCachedOnDisk = 0;
     }
 
     private void syncMediaStoreSupport() {
@@ -426,31 +401,6 @@ public final class Librarian {
             }
         }
         return results;
-    }
-
-    private static class FileCountCache {
-
-        public int onDisk;
-        public long lastTimeCachedOnDisk;
-
-        public FileCountCache() {
-            onDisk = 0;
-            lastTimeCachedOnDisk = 0;
-        }
-
-        public void updateOnDisk(int num) {
-            onDisk = num;
-            lastTimeCachedOnDisk = System.currentTimeMillis();
-        }
-
-        public int getCount() {
-            return onDisk;
-        }
-
-        public boolean cacheValid() {
-            long delta = System.currentTimeMillis() - lastTimeCachedOnDisk;
-            return delta < Constants.LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT;
-        }
     }
 
     private byte getFileType(String filename, boolean returnTorrentsAsDocument) {

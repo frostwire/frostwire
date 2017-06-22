@@ -431,7 +431,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             LOG.warn("Something wrong. peer is null");
             return;
         }
-        Librarian.instance().invalidateCountCache();
         peer.finger(new Finger.FingerCallback() {
             @Override
             public void onFinger(final Finger finger) {
