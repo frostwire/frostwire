@@ -840,6 +840,12 @@ public class MusicPlaybackService extends Service {
             saveQueue(true);
             stopSelf(mServiceStartId);
         }
+
+        if (force) {
+            // clear queue position
+            mPreferences.edit().putInt("curpos", -1).apply();
+        }
+
         return true;
     }
 
