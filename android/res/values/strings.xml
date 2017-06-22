@@ -679,8 +679,8 @@
     <string name="file_information">File information</string>
     <string name="use_btjunkie">Use BTJunkie</string>
     <string name="filter_ellipsis">"Filter..."</string>
-    <string name="filter_search_results">Filter Search Results</string>
-    <string name="clear_filters">Clear Filters</string>
+    <string name="filter">Filter</string>
+    <string name="clear_all">Clear All</string>
     <string name="filter_by_keyword">Filter by keyword...</string>
     <string name="search_sources">Search sources</string>
     <string name="file_extensions">File extensions</string>

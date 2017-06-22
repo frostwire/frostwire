@@ -24,5 +24,8 @@
 
     <solid android:color="@android:color/white" />
     <corners android:radius="3dp" />
+    <stroke
+        android:width="2px"
+        android:color="@color/basic_gray_medium" />
 
 </shape>
