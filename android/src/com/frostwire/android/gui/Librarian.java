@@ -23,7 +23,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
@@ -39,7 +38,6 @@ import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
-import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -430,34 +428,6 @@ public final class Librarian {
         return results;
     }
 
-    /**
-     * When a file descriptor's URI does not fall into one of the TableFetchers (ContentProviders)
-     * the FileDescriptor object obtained will come from TableFetchers.DocumentsTableFetcher and
-     * it will NOT have a `filePath` attribute set (null), also the `fileType` field will be set to
-     * Constants.FILE_TYPE_DOCUMENTS, which can throw things off if the given URI is not as expected
-     * even though the file may be a media file.
-     * <p/>
-     * This method will use the given URI on the generic content resolver to find the disk file path,
-     * update the fileDescriptor.filePath field, and then with the extension it will try to determine
-     * the closest fileType (byte) associated.
-     *
-     * @param uri            (input)
-     * @param fileDescriptor (output, can't be null)
-     */
-    public void updateFileDescriptor(Uri uri, FileDescriptor fileDescriptor) {
-        if (fileDescriptor.filePath == null) {
-            try {
-                Cursor query = context.getContentResolver().query(uri, null, null, null, null);
-                int pathColumn = query.getColumnIndex("_data");
-                query.moveToFirst();
-                fileDescriptor.filePath = query.getString(pathColumn);
-                fileDescriptor.fileType = (byte) MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(fileDescriptor.filePath)).getId();
-                query.close();
-            } catch (Throwable t) {
-            }
-        }
-    }
-
     private static class FileCountCache {
 
         public int onDisk;
@@ -481,59 +451,6 @@ public final class Librarian {
             long delta = System.currentTimeMillis() - lastTimeCachedOnDisk;
             return delta < Constants.LIBRARIAN_FILE_COUNT_CACHE_TIMEOUT;
         }
-    }
-
-    private FileDescriptor getFileDescriptor(File f) {
-        FileDescriptor fd = null;
-        if (f.exists()) {
-            List<FileDescriptor> files = getFiles(f.getAbsolutePath(), false);
-            if (!files.isEmpty()) {
-                fd = files.get(0);
-            }
-        }
-        return fd;
-    }
-
-    public FileDescriptor getFileDescriptor(Uri uri) {
-        FileDescriptor fd = null;
-        try {
-            if (uri != null) {
-                if (uri.toString().startsWith("file://")) {
-                    fd = getFileDescriptor(new File(uri.getPath()));
-                } else {
-                    TableFetcher fetcher = TableFetchers.getFetcher(uri);
-                    byte fileType = fetcher.getFileType();
-                    int id = Integer.valueOf(uri.getLastPathSegment());
-                    fd = getFileDescriptor(fileType, id);
-                }
-            }
-        } catch (Throwable e) {
-            fd = null;
-            // sometimes uri.getLastPathSegment() is not an integer
-            e.printStackTrace();
-        }
-
-        // try to save it.
-        if (fd == null && uri != null) {
-            fd = new FileDescriptor();
-            if (uri.toString().startsWith("content://")) {
-                fd.id = Integer.valueOf(uri.getLastPathSegment());
-                updateFileDescriptor(uri, fd);
-            } else if (uri.toString().startsWith("file://")) {
-                fd.filePath = uri.toString();
-                final String extension = FilenameUtils.getExtension(fd.filePath);
-                final MediaType mediaTypeForExtension = MediaType.getMediaTypeForExtension(extension);
-
-                if (mediaTypeForExtension != null) {
-                    fd.fileType = (byte) mediaTypeForExtension.getId();
-                } else {
-                    // set the file type to be a document if we don't know the given extension
-                    // we were having a NPE here.
-                    fd.fileType = (byte) MediaType.getDocumentMediaType().getId();
-                }
-            }
-        }
-        return fd;
     }
 
     private byte getFileType(String filename, boolean returnTorrentsAsDocument) {
