@@ -230,11 +230,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!"".equals(newText)) {
-                    performFilter(newText);
-                } else {
-                    return false;
-                }
+                performFilter(newText);
                 return false;
             }
         });
@@ -244,7 +240,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        LOG.info("onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.fragment_browse_peer_menu_filter:
                 return true;
