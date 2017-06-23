@@ -71,6 +71,7 @@
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/view_drawer_search_filters_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">

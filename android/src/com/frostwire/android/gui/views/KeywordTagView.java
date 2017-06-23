@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
 
@@ -57,7 +58,7 @@ public class KeywordTagView extends LinearLayout {
             count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
             boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
             dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
-            keywordFilter = new KeywordFilter(inclusive, keyword);
+            keywordFilter = new KeywordFilter(inclusive, keyword, (KeywordDetector.Feature) null);
             attributes.recycle();
         }
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -125,6 +126,10 @@ public class KeywordTagView extends LinearLayout {
         return keywordFilter;
     }
 
+    public KeywordDetector.Feature getFeature() {
+        return keywordFilter.getFeature();
+    }
+
     public int getCount() {
         return count;
     }
@@ -136,7 +141,7 @@ public class KeywordTagView extends LinearLayout {
     /** Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode */
     public KeywordFilter toogleFilterInclusionMode() {
         KeywordFilter oldKeywordFilter = getKeywordFilter();
-        KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword());
+        KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
         this.keywordFilter = newKeywordFilter;
         updateComponents();
         return newKeywordFilter;
