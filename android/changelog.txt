@@ -1,7 +1,6 @@
 FrostWire 1.9.7 - JUN/22/2017
  - New jlibtorrent 1.2.0.11-RC1
- - After stopping the player, songs will not come back on the mini player
-   next time FrostWire starts.
+ - Stopped tracks don't come back on mini player after restart
  - Playlist screen has 'New empty playlist' action as first list item
  - Player playlist layout and font updates for UI consistency
  - Fixed Thread pool max size issue
