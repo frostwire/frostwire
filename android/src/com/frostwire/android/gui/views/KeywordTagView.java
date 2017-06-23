@@ -20,9 +20,14 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -85,17 +90,23 @@ public class KeywordTagView extends LinearLayout {
         if (isInEditMode()) {
             return;
         }
-        TextView inclusiveIndicatorTextView = (TextView) findViewById(R.id.view_keyword_tag_inclusive_indicator);
+        ImageButton inclusiveIndicatorImageView = (ImageButton) findViewById(R.id.view_keyword_tag_inclusive_indicator);
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         TextView countTextView = (TextView) findViewById(R.id.view_keyword_tag_count);
+        LinearLayout tagContainer = (LinearLayout) findViewById(R.id.view_keyword_tag_container);
+
         if (count == -1) {
             countTextView.setVisibility(View.GONE);
         }
-        TextView dismissTextView = (TextView) findViewById(R.id.view_keyword_tag_dismiss);
-        inclusiveIndicatorTextView.setText(keywordFilter.isInclusive() ? "+":"-");
+        ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
+        inclusiveIndicatorImageView.setImageDrawable(getResources().getDrawable(keywordFilter.isInclusive() ? R.drawable.filter_add:R.drawable.filter_minus));
         keywordTextView.setText(keywordFilter.getKeyword());
         countTextView.setText("(" + String.valueOf(count) + ")");
         if (dismissible) {
+            tagContainer.setBackground(getResources().getDrawable(R.drawable.keyword_tag_background_active));
+            keywordTextView.setTextColor(getResources().getColor(R.color.app_text_white));
+            inclusiveIndicatorImageView.setBackground(getResources().getDrawable(R.drawable.keyword_tag_inclusive_background));
+            inclusiveIndicatorImageView.setColorFilter(new PorterDuffColorFilter(Color.parseColor("#2e9ec7"), PorterDuff.Mode.SRC_IN));
             dismissTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -103,6 +114,9 @@ public class KeywordTagView extends LinearLayout {
                 }
             });
         } else {
+            tagContainer.setBackground(getResources().getDrawable(R.drawable.keyword_tag_background));
+            keywordTextView.setTextColor(getResources().getColor(R.color.app_text_primary));
+            inclusiveIndicatorImageView.setBackgroundResource(0);
             dismissTextView.setVisibility(View.GONE);
         }
         OnClickListener onClickListener = new OnClickListener() {
@@ -111,7 +125,7 @@ public class KeywordTagView extends LinearLayout {
                 onKeywordTagViewTouched();
             }
         };
-        inclusiveIndicatorTextView.setOnClickListener(onClickListener);
+        inclusiveIndicatorImageView.setOnClickListener(onClickListener);
         keywordTextView.setOnClickListener(onClickListener);
         countTextView.setOnClickListener(onClickListener);
     }

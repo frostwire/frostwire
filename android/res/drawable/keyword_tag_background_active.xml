@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(TM). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,12 @@
  */
 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="3dp"
-    android:shape="rectangle">
+    android:shape="rectangle" >
 
-    <solid android:color="@android:color/white" />
-    <corners android:radius="3dp" />
+    <solid android:color="@color/basic_blue_highlight" />
     <stroke
         android:width="1px"
-        android:color="@color/basic_gray_dark" />
-
+        android:color="@color/basic_blue_highlight_dark" />
+    <corners
+        android:radius="20dp" />
 </shape>

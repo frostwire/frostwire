@@ -700,4 +700,12 @@
         <item name="android:textColor">@color/app_text_white</item>
         <item name="textAllCaps">true</item>
     </style>
+
+    <!-- Search Keyword Filter -->
+    <style name="keywordFilterSectionTitle">
+        <item name="android:textSize">@dimen/text_x_small</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+        <item name="android:padding">15dp</item>
+    </style>
 </resources>

@@ -19,45 +19,49 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_margin="4dp"
-              android:background="@drawable/blue_light_button_background_selector">
-    <TextView
+    android:id="@+id/view_keyword_tag_container"
+    android:layout_width="wrap_content"
+    android:layout_height="34dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginRight="6dp"
+    android:background="@drawable/keyword_tag_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="4dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="12dp"
+    android:paddingTop="4dp">
+
+    <ImageButton
         android:id="@+id/view_keyword_tag_inclusive_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+"
-        android:textColor="@color/basic_blue_highlight_dark"
-        android:textSize="@dimen/text_large"
-        android:padding="5dp"
-        />
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginRight="6dp"
+        android:src="@drawable/filter_add" />
 
     <TextView
         android:id="@+id/view_keyword_tag_keyword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="fooKeyword"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_small"
-        />
+        android:textColor="@color/app_text_primary"
+        android:textSize="@dimen/text_x_small"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/view_keyword_tag_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
         android:text="(42)"
-        android:textColor="@color/basic_blue_highlight_dark"
-        android:textSize="@dimen/text_small"
-        android:padding="2dp"/>
+        android:textColor="@color/app_text_primary"
+        android:textSize="@dimen/text_extra_micro" />
 
-    <TextView
+    <ImageView
         android:id="@+id/view_keyword_tag_dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="x"
-        android:textColor="@color/basic_blue_dark"
-        android:textSize="@dimen/text_large"
-        android:padding="10dp"/>
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="2dp"
+        android:src="@drawable/close_clear_cancel_full" />
 </LinearLayout>
