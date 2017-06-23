@@ -182,13 +182,23 @@
                 android:paddingRight="10dp"
                 android:paddingTop="5dp">
 
-                <TextView
-                    android:id="@+id/view_drawer_search_filters_search_sources_textview"
-                    style="@style/keywordFilterSectionTitle"
+                <LinearLayout
+                    android:id="@+id/view_drawer_search_filters_search_sources_container_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/search_sources"/>
-
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/view_drawer_search_filters_search_sources_textview"
+                        style="@style/keywordFilterSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/search_sources"/>
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/filter_expand" />
+                </LinearLayout>
                 <com.frostwire.android.gui.views.FlowLayout
                     android:id="@+id/view_drawer_search_filters_search_sources"
                     android:layout_width="match_parent"
@@ -204,24 +214,48 @@
 
                 </com.frostwire.android.gui.views.FlowLayout>
 
-                <TextView
-                    android:id="@+id/view_drawer_search_filters_file_extensions_textview"
-                    style="@style/keywordFilterSectionTitle"
+                <LinearLayout
+                    android:id="@+id/view_drawer_search_filters_search_sources_container_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_extensions"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/view_drawer_search_filters_file_extensions_textview"
+                        style="@style/keywordFilterSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_extensions"/>
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/filter_expand" />
+                </LinearLayout>
 
                 <com.frostwire.android.gui.views.FlowLayout
                     android:id="@+id/view_drawer_search_filters_file_extensions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"></com.frostwire.android.gui.views.FlowLayout>
 
-                <TextView
-                    android:id="@+id/view_drawer_search_filters_file_names_textview"
-                    style="@style/keywordFilterSectionTitle"
+                <LinearLayout
+                    android:id="@+id/view_drawer_search_filters_search_sources_container_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_names"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/view_drawer_search_filters_file_names_textview"
+                        style="@style/keywordFilterSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/file_names"/>
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/filter_minimize" />
+                </LinearLayout>
 
                 <com.frostwire.android.gui.views.FlowLayout
                     android:id="@+id/view_drawer_search_filters_file_names"
