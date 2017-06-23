@@ -525,7 +525,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     public boolean restartLoader(boolean force) {
-        if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000) {
+        if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000 && isAdded()) {
             lastRestartLoader = System.currentTimeMillis();
             try {
                 getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
@@ -539,7 +539,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     private void initLoader() {
         final Intent intent = getActivity().getIntent();
-        if (intent != null && intent.getExtras() != null) {
+        if (intent != null && intent.getExtras() != null && isAdded()) {
             getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
         } else {
             restartLoader(true);

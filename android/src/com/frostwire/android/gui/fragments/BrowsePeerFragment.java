@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.AsyncTaskLoader;
 import android.content.BroadcastReceiver;
@@ -400,10 +401,17 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void reloadFiles(byte fileType) {
-        getLoaderManager().destroyLoader(LOADER_FILES_ID);
-        Bundle bundle = new Bundle();
-        bundle.putByte("fileType", fileType);
-        getLoaderManager().restartLoader(LOADER_FILES_ID, bundle, this);
+        try {
+            if (isAdded()) {
+                LoaderManager loaderManager = getLoaderManager();
+                loaderManager.destroyLoader(LOADER_FILES_ID);
+                Bundle bundle = new Bundle();
+                bundle.putByte("fileType", fileType);
+                loaderManager.restartLoader(LOADER_FILES_ID, bundle, this);
+            }
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     private Loader<Object> createLoaderFiles(final byte fileType) {
