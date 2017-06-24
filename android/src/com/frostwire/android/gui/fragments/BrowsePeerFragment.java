@@ -468,10 +468,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                     numTotal = finger.numTotalVideoFiles;
                                     break;
                             }
-                            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-                            TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+                            if (isAdded()) {
+                                String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+                                TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+                                title.setText(fileTypeStr);
+                            }
                             TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-                            title.setText(fileTypeStr);
                             total.setText("(" + String.valueOf(numTotal) + ")");
                         }
                         if (adapter == null) {
