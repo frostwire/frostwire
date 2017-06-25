@@ -50,7 +50,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
     private final ArrayList<String> fragmentTags;
 
     private boolean paused;
-    private View toolbarView;
 
     private static boolean menuIconsVisible = false;
 
@@ -178,16 +177,15 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     protected final void setToolbarView(View view, int gravity) {
         FrameLayout placeholder = findView(R.id.toolbar_main_placeholder);
-        if (toolbarView != null && placeholder != null) {
-            placeholder.removeView(toolbarView);
+        if (placeholder != null) {
+            placeholder.removeAllViews();
         }
-        toolbarView = view;
-        if (toolbarView != null && placeholder != null) {
+        if (view != null && placeholder != null) {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.gravity = gravity;
-            placeholder.addView(toolbarView, params);
+            placeholder.addView(view, params);
             placeholder.setVisibility(View.VISIBLE);
         }
     }
