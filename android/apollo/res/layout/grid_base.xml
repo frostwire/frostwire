@@ -42,6 +42,7 @@
         android:horizontalSpacing="@dimen/grid_item_spacing"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
-        android:verticalSpacing="@dimen/grid_item_spacing" />
+        android:verticalSpacing="@dimen/grid_item_spacing"
+        android:padding="1dp"/>
 
 </FrameLayout>

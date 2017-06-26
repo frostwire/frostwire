@@ -268,11 +268,32 @@
         <item name="android:textSize">@dimen/text_size_small</item>
     </style>
 
+    <!-- All list item sizes -->
     <style name="ListItemTitle">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">@dimen/text_x_medium</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="ListItemTitle.TwoLines" parent="ListItemTitle">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+    </style>
+
+    <style name="ListItemSecondaryLine">
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+
+    <style name="ListItemSecondaryLine.TwoLines" parent="ListItemSecondaryLine">
+        <item name="android:singleLine">false</item>
+        <item name="android:maxLines">2</item>
+    </style>
+
+    <style name="ListItemExt" parent="ListItemSecondaryLine">
+        <item name="android:textColor">@color/app_text_secondary</item>
     </style>
 
     <style name="ListItemSize">
@@ -286,11 +307,7 @@
         <item name="android:fontFamily">sans-serif-regular</item>
     </style>
 
-    <style name="ListItemExt">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">@color/app_text_secondary</item>
-    </style>
+    <style name="ListItemTime" parent="ListItemSize.browsePeerList"></style>
 
     <style name="ListItemExtra">
         <item name="android:singleLine">true</item>
