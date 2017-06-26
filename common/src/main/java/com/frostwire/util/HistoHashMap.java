@@ -21,6 +21,7 @@ package com.frostwire.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -52,7 +53,7 @@ public class HistoHashMap<K> {
      * @return
      */
     public Entry<K,Integer>[] histogram() {
-        Set<Entry<K, Integer>> entrySet = map.entrySet();
+        Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
         @SuppressWarnings("unchecked")
         Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
         Arrays.sort(array, new Comparator<Entry<K,Integer>>() {
