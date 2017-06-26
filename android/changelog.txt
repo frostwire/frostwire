@@ -1,7 +1,10 @@
 FrostWire 1.9.8 - JUN/26/2017
- - New search filtering tools (tentative)
+ - New search filtering tools
  - Improved VPN detection
  - kotlin update to 1.1.3
+ - UI-refresh: Transfer list items, drawable cleanup, My Music list items,
+   removed double divider in search result list item, added missing new line
+   to grid base
 
 FrostWire 1.9.7 - JUN/22/2017
  - New jlibtorrent 1.2.0.11-RC1
