@@ -16,21 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.android.gui.adapters;
-
-import android.support.annotation.NonNull;
+package com.frostwire.search;
 
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.SearchResult;
 
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created on 11/24/16.
@@ -43,9 +42,11 @@ public class KeywordFilter {
     private final String keyword;
     private final String stringForm;
     private static final String KEYWORD_FILTER_PATTERN = "(?is)(?<inclusive>\\+|-)?(:keyword:)(?<keyword>[^\\s-]*)";
+    private KeywordDetector.Feature feature;
 
-    public KeywordFilter(boolean inclusive, String keyword) {
-        this(inclusive, keyword, null);
+    public KeywordFilter(boolean inclusive, String keyword, KeywordDetector.Feature feature) {
+        this(inclusive, keyword, (String) null);
+        this.feature = feature;
     }
 
     /**
@@ -64,6 +65,34 @@ public class KeywordFilter {
         } else {
             this.stringForm = ((inclusive) ? "+":"-") + ":keyword:" + this.keyword;
         }
+        this.feature = null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof KeywordFilter)) {
+            return false;
+        } else {
+            KeywordFilter other = (KeywordFilter) obj;
+            return inclusive == other.inclusive && keyword.equals(other.keyword);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return keyword.hashCode() * (inclusive ? 1 : -1);
+    }
+
+    public boolean isInclusive() {
+        return inclusive;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public KeywordDetector.Feature getFeature() {
+        return this.feature;
     }
 
     @Override
@@ -93,12 +122,12 @@ public class KeywordFilter {
         return pipeline;
     }
 
-    public boolean accept(@NonNull final String lowercaseHaystack) {
+    public boolean accept(final String lowercaseHaystack) {
         boolean found = lowercaseHaystack.contains(keyword);
         return ((inclusive && found) || (!inclusive && !found));
     }
 
-    private static String getSearchResultHaystack(@NonNull SearchResult sr) {
+    private static String getSearchResultHaystack(SearchResult sr) {
         StringBuilder queryString = new StringBuilder();
         if (sr.getSource() == null) {
             System.err.println("WARNING: " + sr.getClass().getSimpleName() + " has no source!");
@@ -122,15 +151,39 @@ public class KeywordFilter {
         return queryString.toString().toLowerCase();
     }
 
-    public static boolean passesFilterPipeline(@NonNull final SearchResult sr, @NonNull final List<KeywordFilter> filterPipeline) {
-        boolean accepted = true;
+    public static boolean passesFilterPipeline(final SearchResult sr, final List<KeywordFilter> filterPipeline) {
         String haystack = getSearchResultHaystack(sr);
+        // Group Filters by Feature so we can make the following search.
+        // or by feature, and by different feature.
+        // Eg. (sourceA || sourceB) && (extensionA || extensionB) && (filenameX || filenameY)
+        Map<KeywordDetector.Feature, List<KeywordFilter>>  featureFilters = new HashMap<>();
         Iterator<KeywordFilter> it = filterPipeline.iterator();
-        while (accepted && it.hasNext()) {
+        while (it.hasNext()) {
             KeywordFilter filter = it.next();
-            accepted = filter.accept(haystack);
+            List<KeywordFilter> filters = featureFilters.get(filter.feature);
+            if (filters == null) {
+                filters = new LinkedList<>();
+                featureFilters.put(filter.feature, filters);
+            }
+            filters.add(filter);
         }
-        return accepted;
+        // now depending on the features that we have we'll have N Feature conditions we'll AND.
+        Set<KeywordDetector.Feature> features = featureFilters.keySet();
+
+
+        for (KeywordDetector.Feature feature : features) {
+            boolean featureResult = false;
+            List<KeywordFilter> keywordFilters = featureFilters.get(feature);
+            for (KeywordFilter filter : keywordFilters) {
+                featureResult |= filter.accept(haystack);
+            }
+            if (!featureResult) {
+                return false; // since the final query is an AND (featureA) && (featureB)
+                // the moment we have a failure on a feature the logic is shortcuited.
+            }
+
+        }
+        return true;
     }
 
     public static String cleanQuery(String query, List<KeywordFilter> keywordFilters) {
@@ -207,17 +260,17 @@ public class KeywordFilter {
 
         private static boolean testInclusiveFilters() {
             final String haystack = KeywordFilter.getSearchResultHaystack(fsr);
-            KeywordFilter MITfilter = new KeywordFilter(true, "MIT");
+            KeywordFilter MITfilter = new KeywordFilter(true, "MIT", (KeywordDetector.Feature) null);
             if (!assertTrue("'MIT' keyword inclusion test", MITfilter.accept(haystack))) {
                 return false;
             }
 
-            KeywordFilter notthereFilter = new KeywordFilter(true, "notthere");
+            KeywordFilter notthereFilter = new KeywordFilter(true, "notthere", (KeywordDetector.Feature) null);
             if (!assertFalse("'notthere' keyword inclusion fail test", notthereFilter.accept(haystack))) {
                 return false;
             }
 
-            KeywordFilter athensFilter = new KeywordFilter(true, "athens");
+            KeywordFilter athensFilter = new KeywordFilter(true, "athens", (KeywordDetector.Feature) null);
             if (!assertTrue("'athens' keyword inclusion test", athensFilter.accept(haystack))) {
                 return false;
             }
@@ -242,17 +295,17 @@ public class KeywordFilter {
 
         private static boolean testExclusiveFilters() {
             final String haystack = KeywordFilter.getSearchResultHaystack(fsr);
-            KeywordFilter MITfilter = new KeywordFilter(false, "MIT");
+            KeywordFilter MITfilter = new KeywordFilter(false, "MIT", (KeywordDetector.Feature) null);
             if (!assertFalse("'MIT' keyword exclusion fail test", MITfilter.accept(haystack))) {
                 return false;
             }
 
-            KeywordFilter notthereFilter = new KeywordFilter(false, "notthere");
+            KeywordFilter notthereFilter = new KeywordFilter(false, "notthere", (KeywordDetector.Feature) null);
             if (!assertTrue("'notthere' keyword exclusion test", notthereFilter.accept(haystack))) {
                 return false;
             }
 
-            KeywordFilter frostwireFilter = new KeywordFilter(false, "frostwire");
+            KeywordFilter frostwireFilter = new KeywordFilter(false, "frostwire", (KeywordDetector.Feature) null);
             if (!assertTrue("'frostwire' keyword exclusion test", notthereFilter.accept(haystack))) {
                 return false;
             }
@@ -261,10 +314,10 @@ public class KeywordFilter {
             acceptablePipeline.add(notthereFilter);
             acceptablePipeline.add(frostwireFilter);
             if (!assertTrue("exclusion pipeline test", passesFilterPipeline(fsr,acceptablePipeline))) {
-               return false;
+                return false;
             }
 
-            KeywordFilter athensFilter = new KeywordFilter(false, "athens");
+            KeywordFilter athensFilter = new KeywordFilter(false, "athens", (KeywordDetector.Feature) null);
             if (!assertFalse("'athens' exclusion fail test", athensFilter.accept(haystack))) {
                 return false;
             }
@@ -282,9 +335,9 @@ public class KeywordFilter {
         }
 
         private static boolean testMixedFilters() {
-            KeywordFilter MITfilter = new KeywordFilter(true, "MIT");
-            KeywordFilter frostwireExclusionFilter = new KeywordFilter(false, "frostwire");
-            KeywordFilter athensFilter = new KeywordFilter(true, "athens");
+            KeywordFilter MITfilter = new KeywordFilter(true, "MIT", (KeywordDetector.Feature) null);
+            KeywordFilter frostwireExclusionFilter = new KeywordFilter(false, "frostwire", (KeywordDetector.Feature) null);
+            KeywordFilter athensFilter = new KeywordFilter(true, "athens", (KeywordDetector.Feature) null);
             List<KeywordFilter> mixedPipeline = new LinkedList<>();
             mixedPipeline.add(MITfilter);
             mixedPipeline.add(frostwireExclusionFilter);
@@ -312,11 +365,11 @@ public class KeywordFilter {
         }
 
         private static boolean testConstructors() {
-            KeywordFilter f = new KeywordFilter(true, "wisdom");
+            KeywordFilter f = new KeywordFilter(true, "wisdom", (KeywordDetector.Feature) null);
             if (!assertTrue("constructor test 1", f.inclusive)) return false;
             if (!assertTrue("constructor test 2", f.keyword.equals("wisdom"))) return false;
             if (!assertTrue("constructor test 3", f.toString().equals("+:keyword:wisdom"))) return false;
-            f = new KeywordFilter(false, "patience");
+            f = new KeywordFilter(false, "patience", (KeywordDetector.Feature) null);
             if (!assertFalse("constructor test 4", f.inclusive)) return false;
             if (!assertTrue("constructor test 5", f.keyword.equals("patience"))) return false;
             if (!assertTrue("constructor test 6", f.toString().equals("-:keyword:patience"))) return false;
