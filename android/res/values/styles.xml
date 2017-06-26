@@ -201,7 +201,7 @@
     <style name="TransfersList.Item"></style>
     <!--v21-->
     <style name="TransfersList.Item.Title">
-        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textSize">@dimen/text_x_medium</item>
         <item name="android:textStyle">bold</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/app_text_primary</item>

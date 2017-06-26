@@ -2,6 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,7 +109,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/app_background_body_light">
+        android:background="@color/app_background_white">
 
         <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_transfers_swipe"
@@ -119,10 +120,11 @@
             <ExpandableListView
                 android:id="@+id/fragment_transfers_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/app_background_body_light"
-                android:fadingEdge="none"
-                android:groupIndicator="@android:color/transparent" />
+                android:layout_height="wrap_content"
+                android:divider="@color/transparent"
+                android:dividerHeight="0dp"
+                android:childDivider="#00000000"
+                android:groupIndicator="@null" />
         </com.frostwire.android.gui.views.SwipeLayout>
 
         <TextView
