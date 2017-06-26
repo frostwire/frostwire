@@ -313,41 +313,70 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void updateKeywordDetector(final List<? extends SearchResult> results) {
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                if (filterButton != null) {
-                    keywordDetector.setKeywordDetectorListener(filterButton);
-                }
-                if (results != null) {
-                    boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
+        if (filterButton != null) {
+            keywordDetector.setKeywordDetectorListener(filterButton);
+        }
+        if (results != null) {
+            boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
+            // the second condition exists to accommodate a reset keywordDetector upon screen rotation
+            if (!searchFinished || (keywordDetector.totalHistogramKeys() == 0 && results.size() > 0)) {
+                KeywordDetectorFeeder.submitSearchResults(this, results);
+            } else {
+                keywordDetector.notifyListener();
+            }
+        } else {
+            keywordDetector.notifyListener();
+        }
+    }
 
-                    // the second condition exists to accomodate a reset keywordDetector upon screen rotation
-                    if (!searchFinished || (keywordDetector.totalHistogramKeys() == 0 && results.size() > 0)) {
-                        for (SearchResult sr : results) {
-                            keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
-                            if (sr instanceof FileSearchResult) {
-                                String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
-                                String ext = FilenameUtils.getExtension(fileName).toLowerCase();
-                                if (fileName != null && !fileName.isEmpty()) {
-                                    keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
-                                }
-                                if (ext != null && !ext.isEmpty()) {
-                                    keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
-                                }
+    /**
+     * When submitting an anonymous Runnable class to the threadpool, the anonymous class's outer object reference (this)
+     * reference will not be our SearchFragment, it will be this KeywordDetectorFeeder static class.
+     *
+     * If this result adding routine ever takes too long there won't be any references to the Fragment
+     * thus we avoid any possibility of a Context leak while rotating the screen or going home and coming back.
+     *
+     * The most this loop can take is about 1 second (maybe 1.5s on slow cpus) when the first big batch of results arrives,
+     * otherwise it processes about 20-50 results at the time in up to 80ms. There's a chance the user will rotate
+     * the screen by mistake when a search is submitted, otherwise I would've put this code directly on the main
+     * thread, but some frames might be skipped, not a good experience whe you hit 'Search'
+     *
+     */
+    private static class KeywordDetectorFeeder {
+        private static void submitSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
+            final WeakReference<SearchFragment> fragmentRef = Ref.weak(fragment);
+            Engine.instance().getThreadPool().submit(new Runnable() {
+                @Override
+                public void run() {
+                    if (!Ref.alive(fragmentRef)) {
+                        return;
+                    }
+                    SearchFragment fragment = fragmentRef.get();
+                    if (fragment == null) {
+                        return; // everything is possible
+                    }
+                    long start = SystemClock.currentThreadTimeMillis();
+                    for (SearchResult sr : results) {
+                        fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
+                        if (sr instanceof FileSearchResult) {
+                            String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
+                            String ext = FilenameUtils.getExtension(fileName).toLowerCase();
+                            if (fileName != null && !fileName.isEmpty()) {
+                                fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
+                            }
+                            if (ext != null && !ext.isEmpty()) {
+                                fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
                             }
                         }
-                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, false);
-                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, false);
-                        keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, false);
-                    } else {
-                        keywordDetector.notifyListener();
                     }
-                } else {
-                    keywordDetector.notifyListener();
+                    long delta = SystemClock.currentThreadTimeMillis() - start;
+                    LOG.info("updateKeywordDetector, added " + results.size() + " results in " + delta + " ms");
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, false);
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, false);
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, false);
                 }
-            }
-        });
+            });
+        }
     }
 
     private ScrollDirectionListener createScrollDirectionListener() {
