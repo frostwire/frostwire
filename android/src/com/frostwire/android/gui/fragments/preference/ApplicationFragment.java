@@ -165,6 +165,10 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                             !NetworkManager.instance().isTunnelUp()) {
                         UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
                         return false;
+                    } else if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false) &&
+                            NetworkManager.instance().isDataMobileUp()) {
+                        UIUtils.showShortMessage(getView(), R.string.wifi_network_unavailable);
+                        return false;
                     } else {
                         connect();
                     }
