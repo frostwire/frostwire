@@ -114,6 +114,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
         LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
+
+        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                isNetworkVPN(networkInfo)) {
+            //don't stop
+            return;
+        }
+
         Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -156,7 +163,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     // avoid ANR error inside a broadcast receiver
 
                     if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                            !NetworkManager.instance().isTunnelUp()) {
+                            !(NetworkManager.instance().isTunnelUp() || isNetworkVPN(networkInfo))) {
                         //don't start
                         return;
                     }
@@ -223,5 +230,15 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             File primaryExternal = Environment.getExternalStorageDirectory();
             ConfigurationManager.instance().setStoragePath(primaryExternal.getAbsolutePath());
         }
+    }
+
+    // on some devices, the VPN network is properly identified with
+    // the VPN type, some research is necessary to determine if this
+    // is valid a valid check, and probably replace the dev/tun test
+    private static boolean isNetworkVPN(NetworkInfo networkInfo) {
+        // the constant TYPE_VPN=17 is in API 21, but using
+        // the type name is OK for now
+        String typeName = networkInfo.getTypeName();
+        return typeName != null && typeName.contains("VPN");
     }
 }

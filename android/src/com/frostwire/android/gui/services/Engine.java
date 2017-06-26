@@ -51,6 +51,12 @@ public final class Engine implements IEngineService {
     private static Engine instance;
     private FWVibrator vibrator;
 
+    // the startServices call is a special call that can be made
+    // to early (relatively speaking) during the application startup
+    // the creation of the service is not (and can't be) synchronized
+    // with the main activity resume.
+    private boolean pendingStartServices = false;
+
     public synchronized static void create(Application context) {
         if (instance != null) {
             return;
@@ -70,7 +76,6 @@ public final class Engine implements IEngineService {
         vibrator = new FWVibrator(context);
         loadNotifiedDownloads();
         startEngineService(context);
-
     }
 
     /**
@@ -156,6 +161,9 @@ public final class Engine implements IEngineService {
     public void startServices() {
         if (service != null) {
             service.startServices();
+        } else {
+            // save pending startServices call
+            pendingStartServices = true;
         }
     }
 
@@ -264,6 +272,11 @@ public final class Engine implements IEngineService {
                 if (service instanceof EngineServiceBinder) {
                     Engine.this.service = ((EngineServiceBinder) service).getService();
                     registerStatusReceiver(context);
+
+                    if (pendingStartServices) {
+                        pendingStartServices = false;
+                        Engine.this.service.startServices();
+                    }
                 }
             }
         }, 0);

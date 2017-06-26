@@ -52,6 +52,9 @@ public final class NetworkManager {
 
     private NetworkManager(Application context) {
         this.context = context;
+        // detect tunnel as early as possible, but only as
+        // detectTunnel remains a cheap call
+        detectTunnel();
     }
 
     public boolean isInternetDown() {
