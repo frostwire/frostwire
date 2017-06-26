@@ -67,7 +67,8 @@
         <FrameLayout
             android:id="@+id/fragment_search_framelayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/app_background_white">
 
             <com.frostwire.android.gui.views.PromotionsView
                 android:id="@+id/fragment_search_promos"
@@ -82,8 +83,11 @@
             <ListView
                 android:id="@+id/fragment_search_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/basic_white"
+                android:layout_height="wrap_content"
+                android:divider="@color/transparent"
+                android:dividerHeight="0dp"
+                android:childDivider="#00000000"
+                android:groupIndicator="@null"
                 android:fastScrollEnabled="true"/>
         </FrameLayout>
     </com.frostwire.android.gui.views.SwipeLayout>

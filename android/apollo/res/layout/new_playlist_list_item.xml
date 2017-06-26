@@ -25,7 +25,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_normal_height"
-        android:backgroundTint="@color/app_background_body_light"
+        android:background="@color/app_background_body_light"
         android:gravity="center_vertical"
         android:minHeight="@dimen/item_normal_height"
         android:paddingLeft="@dimen/list_simple_horizontal_padding"
@@ -53,10 +53,5 @@
             android:src="@drawable/contextmenu_icon_playlist_add_dark" />
 
     </RelativeLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/app_divider" />
 
 </LinearLayout>

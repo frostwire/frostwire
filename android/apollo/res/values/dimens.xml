@@ -32,12 +32,10 @@
     <dimen name="fast_scroll_padding_left">0dp</dimen>
     <!-- List view fast scroll padding right -->
     <dimen name="fast_scroll_padding_right">0dp</dimen>
-    <!-- grid view vertical and horizontal spacing -->
-    <dimen name="grid_item_spacing">0dp</dimen>
     <!-- List item detailed height -->
     <dimen name="list_item_detailed_height">120.0dp</dimen>
     <!-- Top margin of "line_two" -->
-    <dimen name="list_item_line_two_margin_top">4.0dp</dimen>
+    <dimen name="list_item_line_two_margin_top">2.0dp</dimen>
     <!-- Left padding in the grid text -->
     <dimen name="grid_item_padding_left">8.0dp</dimen>
     <!-- Grid and list item normal height -->

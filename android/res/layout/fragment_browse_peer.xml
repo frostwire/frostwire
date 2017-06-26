@@ -2,6 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,7 +129,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="2dp">
+        android:padding="1dp">
 
         <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_browse_peer_swipe"
@@ -145,7 +146,7 @@
                     android:id="@+id/fragment_browse_peer_gridview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/app_divider"
+                    android:background="@color/app_background_white"
                     android:fastScrollEnabled="true"
                     android:gravity="center"
                     android:horizontalSpacing="1dp"

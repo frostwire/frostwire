@@ -2,6 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,84 +21,94 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/basic_white"
-    android:baselineAligned="false"
-    android:orientation="horizontal"
-    tools:ignore="PxUsage" >
+    android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/app_background_body_light"
-        android:gravity="center|center_vertical"
-        android:paddingBottom="10dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingTop="10dp" >
+        android:background="@color/app_background_white"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        tools:ignore="PxUsage">
 
-        <ImageView
-            android:id="@+id/view_transfer_item_list_item_icon"
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/app_background_body_light"
+            android:gravity="center|center_vertical"
+            android:paddingBottom="10dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="10dp">
+
+            <ImageView
+                android:id="@+id/view_transfer_item_list_item_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_vertical"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/browse_peer_audio_icon_selector_off" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingBottom="6dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="6dp">
+
+            <TextView
+                android:id="@+id/view_transfer_item_list_item_title"
+                style="@style/TransfersList.SubItem.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3sp"
+                android:text="@string/dummy_title" />
+
+            <ProgressBar
+                android:id="@+id/view_transfer_item_list_item_progress"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/view_transfer_item_list_item_title"
+                android:layout_margin="4sp"
+                android:indeterminateOnly="false"
+                android:progressDrawable="@drawable/transfer_progress_horizontal_dark" />
+
+            <TextView
+                android:id="@+id/view_transfer_item_list_item_size"
+                style="@style/TransferListItemSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/view_transfer_item_list_item_progress"
+                android:layout_marginBottom="3sp"
+                android:layout_marginLeft="3sp"
+                android:text="@string/dummy_size" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/view_transfer_item_list_item_button_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|center_vertical"
+            android:layout_margin="3dp"
+            android:background="@null"
             android:contentDescription="@null"
             android:scaleType="fitCenter"
-            android:src="@drawable/browse_peer_audio_icon_selector_off" />
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
-
-        <TextView
-            android:id="@+id/view_transfer_item_list_item_title"
-            style="@style/TransfersList.SubItem.Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3sp"
-            android:text="@string/dummy_title" />
-
-        <ProgressBar
-            android:id="@+id/view_transfer_item_list_item_progress"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/view_transfer_item_list_item_title"
-            android:layout_margin="4sp"
-            android:indeterminateOnly="false"
-            android:progressDrawable="@drawable/transfer_progress_horizontal_dark" />
-
-        <TextView
-            android:id="@+id/view_transfer_item_list_item_size"
-            style="@style/TransferListItemSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/view_transfer_item_list_item_progress"
-            android:layout_marginBottom="3sp"
-            android:layout_marginLeft="3sp"
-            android:text="@string/dummy_size" />
+            android:src="@drawable/browse_peer_play_icon" />
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/view_transfer_item_list_item_button_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|center_vertical"
-        android:layout_margin="3dp"
-        android:background="@null"
-        android:contentDescription="@null"
-        android:scaleType="fitCenter"
-        android:src="@drawable/browse_peer_play_icon" />
-
+    <View
+        style="@style/divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 </LinearLayout>
