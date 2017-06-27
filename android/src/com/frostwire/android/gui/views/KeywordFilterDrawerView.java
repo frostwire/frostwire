@@ -80,13 +80,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
-        scrollView = (ScrollView) findViewById(R.id.view_drawer_search_filters_scrollview);
-        appliedTagsTipTextView = (TextView) findViewById(R.id.view_drawer_search_filters_touch_tag_tips);
+        scrollView = findView(R.id.view_drawer_search_filters_scrollview);
+        appliedTagsTipTextView = findView(R.id.view_drawer_search_filters_touch_tag_tips);
         appliedTagsTipTextView.setVisibility(View.GONE);
-        clearAppliedFiltersTextView = (TextView) findViewById(R.id.view_drawer_search_filters_clear_all);
+        clearAppliedFiltersTextView = findView(R.id.view_drawer_search_filters_clear_all);
         clearAppliedFiltersTextView.setVisibility(View.GONE);
 
-        findViewById(R.id.view_drawer_search_filters_exit_button).setOnClickListener(new OnClickListener() {
+        findView(R.id.view_drawer_search_filters_exit_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onExitButtonClicked();
@@ -100,7 +100,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 clearAppliedFilters();
             }
         });
-        EditText keywordEditText = (EditText) findViewById(R.id.view_drawer_search_filters_keyword_edittext);
+        EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
         keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -118,8 +118,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 toggleTagsContainer(R.id.view_drawer_search_filters_search_sources, R.id.view_drawer_search_filters_search_sources_expand_contract_imageview);
             }
         };
-        findViewById(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(searchSourcesToggler);
-        findViewById(R.id.view_drawer_search_filters_search_sources_expand_contract_imageview).setOnClickListener(searchSourcesToggler);
+        findView(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(searchSourcesToggler);
+        findView(R.id.view_drawer_search_filters_search_sources_expand_contract_imageview).setOnClickListener(searchSourcesToggler);
 
         OnClickListener fileExtensionsToggler = new OnClickListener() {
             @Override
@@ -127,8 +127,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 toggleTagsContainer(R.id.view_drawer_search_filters_file_extensions, R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview);
             }
         };
-        findViewById(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(fileExtensionsToggler);
-        findViewById(R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview).setOnClickListener(fileExtensionsToggler);
+        findView(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(fileExtensionsToggler);
+        findView(R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview).setOnClickListener(fileExtensionsToggler);
 
         OnClickListener fileNamesToggler = new OnClickListener() {
             @Override
@@ -136,8 +136,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 toggleTagsContainer(R.id.view_drawer_search_filters_file_names, R.id.view_drawer_search_filters_search_file_names_contract_imageview);
             }
         };
-        findViewById(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
-        findViewById(R.id.view_drawer_search_filters_search_file_names_contract_imageview).setOnClickListener(fileNamesToggler);
+        findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
+        findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview).setOnClickListener(fileNamesToggler);
     }
 
     private void onExitButtonClicked() {
@@ -149,9 +149,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void toggleTagsContainer(int containerId, int expandContractIconImageViewId) {
-        View v = findViewById(containerId);
+        View v = findView(containerId);
         v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-        ImageView expandContractIcon = (ImageView) findViewById(expandContractIconImageViewId);
+        ImageView expandContractIcon = findView(expandContractIconImageViewId);
         expandContractIcon.setImageResource(v.getVisibility() == View.VISIBLE ? R.drawable.filter_expand : R.drawable.filter_minimize);
     }
 
@@ -163,16 +163,16 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void resetTagsContainer(int containerId, int expandContractIconImageViewId) {
-        ViewGroup flowLayout = (ViewGroup) findViewById(containerId);
+        ViewGroup flowLayout = findView(containerId);
         flowLayout.removeAllViews();
         flowLayout.setVisibility(View.VISIBLE);
-        ImageView expandContractIcon = (ImageView) findViewById(expandContractIconImageViewId);
+        ImageView expandContractIcon = findView(expandContractIconImageViewId);
         expandContractIcon.setImageResource(R.drawable.filter_expand);
     }
 
     private void showAllContainerTags(int containerId) {
         // in case it was "contracted"
-        ViewGroup flowLayout = (ViewGroup) findViewById(containerId);
+        ViewGroup flowLayout = findView(containerId);
         flowLayout.setVisibility(View.VISIBLE);
         for (int i = 0; i < flowLayout.getChildCount(); i++) {
             flowLayout.getChildAt(i).setVisibility(View.VISIBLE);
@@ -196,7 +196,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void clearAppliedFilters() {
-        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
         showAllContainerTags(R.id.view_drawer_search_filters_search_sources);
@@ -249,7 +249,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
         Integer containerId = featureContainerIds.get(feature);
-        ViewGroup container = (ViewGroup) findViewById(containerId);
+        ViewGroup container = findView(containerId);
         container.removeAllViews();
         boolean keywordsApplied = false;
         List<KeywordFilter> keywordFiltersPipeline = null;
@@ -281,7 +281,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         clearAppliedFiltersTextView.setVisibility(textViewsVisibility);
         appliedTagsTipTextView.setVisibility(textViewsVisibility);
 
-        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         if (filtersHaveBeenApplied) {
             for (KeywordFilter filter : keywordFiltersPipeline) {
@@ -299,7 +299,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
      */
     @Override
     public void onKeywordTagViewDismissed(KeywordTagView view) {
-        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeView(view);
 
         if (pipelineListener != null) {
@@ -311,7 +311,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         // unhide tag in container
         if (view.getKeywordFilter().getFeature() != null) {
             int featureContainerId = featureContainerIds.get(view.getKeywordFilter().getFeature());
-            ViewGroup container = (ViewGroup) findViewById(featureContainerId);
+            ViewGroup container = findView(featureContainerId);
             for (int i = 0; i < container.getChildCount(); i++) {
                 KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
                 if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
@@ -359,6 +359,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     public void setKeywordFilterDrawerController(KeywordFilterDrawerController keywordFilterDrawerController) {
         this.keywordFilterDrawerController = keywordFilterDrawerController;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends View> T findView(int id) {
+        return (T) super.findViewById(id);
     }
 
     public interface KeywordFilterDrawerController {
