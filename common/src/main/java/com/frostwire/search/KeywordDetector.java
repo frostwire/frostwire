@@ -208,7 +208,11 @@ public final class KeywordDetector {
                         // take next request in line
                         HistogramUpdateRequestTask histogramUpdateRequestTask;
                         synchronized (histogramUpdateRequests) {
-                            histogramUpdateRequestTask = histogramUpdateRequests.remove(0);
+                            try {
+                                histogramUpdateRequestTask = histogramUpdateRequests.remove(0);
+                            } catch (Throwable t) {
+                                histogramUpdateRequestTask = null;
+                            }
                         }
                         // submit next task if there is any left
                         if (threadPool != null && histogramUpdateRequestTask != null && running.get()) {
