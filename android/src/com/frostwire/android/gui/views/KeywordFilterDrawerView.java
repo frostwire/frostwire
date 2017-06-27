@@ -113,8 +113,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         clearTextButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getId() == R.id.view_drawer_search_filters_keyword_edittext) ;
-                keywordEditText.setText("");
+                if (v.getId() == R.id.view_drawer_search_filters_keyword_edittext) {
+                    keywordEditText.setText("");
+                }
             }
         });
 
