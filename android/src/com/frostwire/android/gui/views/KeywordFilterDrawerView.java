@@ -30,7 +30,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -137,7 +136,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         };
         findView(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(searchSourcesToggler);
-        findView(R.id.view_drawer_search_filters_search_sources_expand_contract_imageview).setOnClickListener(searchSourcesToggler);
 
         OnClickListener fileExtensionsToggler = new OnClickListener() {
             @Override
@@ -146,7 +144,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         };
         findView(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(fileExtensionsToggler);
-        findView(R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview).setOnClickListener(fileExtensionsToggler);
 
         OnClickListener fileNamesToggler = new OnClickListener() {
             @Override
@@ -155,22 +152,18 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         };
         findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
-        findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview).setOnClickListener(fileNamesToggler);
 
         featureContainer.put(KeywordDetector.Feature.SEARCH_SOURCE,
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_search_sources_textview),
-                        (ImageView) findView(R.id.view_drawer_search_filters_search_sources_expand_contract_imageview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_search_sources)));
         featureContainer.put(KeywordDetector.Feature.FILE_EXTENSION,
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_file_extensions_textview),
-                        (ImageView) findView(R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_file_extensions)));
         featureContainer.put(KeywordDetector.Feature.FILE_NAME,
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
-                        (ImageView) findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_file_names)));
     }
 
@@ -394,12 +387,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private static final class TagsController {
 
         final TextView header;
-        final ImageView expImg; // to be removed in a few commits
         final ViewGroup container;
 
-        TagsController(TextView header, ImageView expImg, ViewGroup container) {
+        TagsController(TextView header, ViewGroup container) {
             this.header = header;
-            this.expImg = expImg;
             this.container = container;
         }
 
@@ -408,13 +399,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         }
 
         void expand() {
+            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_expand, 0, 0, 0);
             container.setVisibility(View.VISIBLE);
-            expImg.setImageResource(R.drawable.filter_expand);
         }
 
         void collapse() {
+            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_minimize, 0, 0, 0);
             container.setVisibility(View.GONE);
-            expImg.setImageResource(R.drawable.filter_minimize);
         }
 
         void toggle() {
