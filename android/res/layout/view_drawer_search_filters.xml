@@ -96,20 +96,36 @@
                 android:paddingTop="25dp"
                 android:weightSum="1">
 
-                <EditText
-                    android:id="@+id/view_drawer_search_filters_keyword_edittext"
+                <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/clearable_edittext_filter_background"
-                    android:hint="@string/filter_by_keyword"
-                    android:imeOptions="actionDone"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="12dp"
-                    android:textSize="@dimen/text_medium" />
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/view_drawer_search_filters_keyword_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/clearable_edittext_filter_background"
+                        android:hint="@string/filter_by_keyword"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:padding="12dp"
+                        android:textSize="@dimen/text_medium" />
 
+                    <ImageButton
+                        android:id="@+id/view_drawer_search_filters_keyword_text_button_clear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginRight="15dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@null"
+                        android:contentDescription="@null"
+                        android:src="@drawable/clearable_edittext_clear_icon" />
+                </RelativeLayout>
                 <!-- CURRENT PIPELINE -->
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_pipeline_layout"

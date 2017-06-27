@@ -21,14 +21,18 @@ package com.frostwire.android.gui.views;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -93,14 +97,14 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         });
 
-
         clearAppliedFiltersTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearAppliedFilters();
             }
         });
-        EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
+
+        final EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
         keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -108,6 +112,32 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                     actionId = EditorInfo.IME_ACTION_DONE;
                 }
                 return actionId == EditorInfo.IME_ACTION_DONE && onKeywordEntered(v);
+            }
+        });
+
+        final ImageButton clearTextButton = findView(R.id.view_drawer_search_filters_keyword_text_button_clear);
+        clearTextButton.setVisibility(RelativeLayout.GONE);
+        clearTextButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.view_drawer_search_filters_keyword_edittext) ;
+                keywordEditText.setText("");
+            }
+        });
+
+        keywordEditText.addTextChangedListener(new TextWatcher() {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    clearTextButton.setVisibility(View.VISIBLE);
+                } else {
+                    clearTextButton.setVisibility(View.GONE);
+                }
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void afterTextChanged(Editable s) {
             }
         });
 
