@@ -186,23 +186,26 @@ public abstract class BaseActivity extends AbstractActivity
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
-        searchView.setSearchableInfo(searchableInfo);
-        // Perform the search
-        searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
-            @Override
-            public boolean onQueryTextSubmit(final String query) {
-                // Open the search activity
-                NavUtils.openSearch(BaseActivity.this, query);
-                return true;
-            }
+        if (searchView != null) { // rare NPE can occur
+            searchView.setSearchableInfo(searchableInfo);
+            // Perform the search
+            searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
-            @Override
-            public boolean onQueryTextChange(final String newText) {
-                // Nothing to do
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextSubmit(final String query) {
+                    // Open the search activity
+                    NavUtils.openSearch(BaseActivity.this, query);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(final String newText) {
+                    // Nothing to do
+                    return false;
+                }
+            });
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
