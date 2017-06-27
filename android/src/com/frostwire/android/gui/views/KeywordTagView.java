@@ -108,6 +108,7 @@ public class KeywordTagView extends LinearLayout {
             keywordTextView.setTextColor(getResources().getColor(R.color.app_text_white));
             inclusiveIndicatorImageView.setBackground(getResources().getDrawable(R.drawable.keyword_tag_inclusive_background));
             inclusiveIndicatorImageView.setColorFilter(new PorterDuffColorFilter(Color.parseColor("#2e9ec7"), PorterDuff.Mode.SRC_IN));
+            inclusiveIndicatorImageView.setVisibility(View.VISIBLE);
             dismissTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -118,6 +119,7 @@ public class KeywordTagView extends LinearLayout {
             tagContainer.setBackground(getResources().getDrawable(R.drawable.keyword_tag_background));
             keywordTextView.setTextColor(getResources().getColor(R.color.app_text_primary));
             inclusiveIndicatorImageView.setBackgroundResource(0);
+            inclusiveIndicatorImageView.setVisibility(View.GONE);
             dismissTextView.setVisibility(View.GONE);
         }
         OnClickListener onClickListener = new OnClickListener() {
