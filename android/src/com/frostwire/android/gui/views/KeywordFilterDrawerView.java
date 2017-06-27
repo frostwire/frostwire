@@ -133,7 +133,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         OnClickListener searchSourcesToggler = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleTagsContainer(R.id.view_drawer_search_filters_search_sources, R.id.view_drawer_search_filters_search_sources_expand_contract_imageview);
+                featureContainer.get(KeywordDetector.Feature.SEARCH_SOURCE).toggle();
             }
         };
         findView(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(searchSourcesToggler);
@@ -142,7 +142,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         OnClickListener fileExtensionsToggler = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleTagsContainer(R.id.view_drawer_search_filters_file_extensions, R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview);
+                featureContainer.get(KeywordDetector.Feature.FILE_EXTENSION).toggle();
             }
         };
         findView(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(fileExtensionsToggler);
@@ -151,7 +151,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         OnClickListener fileNamesToggler = new OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleTagsContainer(R.id.view_drawer_search_filters_file_names, R.id.view_drawer_search_filters_search_file_names_contract_imageview);
+                featureContainer.get(KeywordDetector.Feature.FILE_NAME).toggle();
             }
         };
         findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
@@ -180,13 +180,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         } else {
             LOG.warn("Check your logic, the keyword filter drawer controller has not been assigned");
         }
-    }
-
-    private void toggleTagsContainer(int containerId, int expandContractIconImageViewId) {
-        View v = findView(containerId);
-        v.setVisibility(v.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-        ImageView expandContractIcon = findView(expandContractIconImageViewId);
-        expandContractIcon.setImageResource(v.getVisibility() == View.VISIBLE ? R.drawable.filter_expand : R.drawable.filter_minimize);
     }
 
     private void resetTagsContainers() {
@@ -425,6 +418,28 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             this.header = header;
             this.expImg = expImg;
             this.container = container;
+        }
+
+        boolean isExpanded() {
+            return container.getVisibility() == View.VISIBLE;
+        }
+
+        void expand() {
+            container.setVisibility(View.VISIBLE);
+            expImg.setImageResource(R.drawable.filter_expand);
+        }
+
+        void collapse() {
+            container.setVisibility(View.GONE);
+            expImg.setImageResource(R.drawable.filter_minimize);
+        }
+
+        void toggle() {
+            if (isExpanded()) {
+                collapse();
+            } else {
+                expand();
+            }
         }
     }
 }
