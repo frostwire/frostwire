@@ -186,9 +186,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         if (keywordFiltersPipeline != null) {
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
+        TagsController tagsController = featureContainer.get(feature);
         if (feature != null && histogram != null && histogram.length > 0) {
+            tagsController.showHeader();
             List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
+        } else if (histogram.length == 0 && tagsController != null) {
+            tagsController.hideHeader();
         }
         invalidate();
     }
@@ -396,6 +400,14 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             } else {
                 expand();
             }
+        }
+
+        void hideHeader() {
+            header.setVisibility(View.GONE);
+        }
+
+        void showHeader() {
+            header.setVisibility(View.VISIBLE);
         }
 
         void restore() {
