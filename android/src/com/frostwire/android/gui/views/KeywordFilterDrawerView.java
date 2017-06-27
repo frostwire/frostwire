@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -164,7 +165,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void resetTagsContainer(int containerId, int expandContractIconImageViewId) {
-        FlowLayout flowLayout = (FlowLayout) findViewById(containerId);
+        ViewGroup flowLayout = (ViewGroup) findViewById(containerId);
         flowLayout.removeAllViews();
         flowLayout.setVisibility(View.VISIBLE);
         ImageView expandContractIcon = (ImageView) findViewById(expandContractIconImageViewId);
@@ -173,7 +174,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private void showAllContainerTags(int containerId) {
         // in case it was "contracted"
-        FlowLayout flowLayout = (FlowLayout) findViewById(containerId);
+        ViewGroup flowLayout = (ViewGroup) findViewById(containerId);
         flowLayout.setVisibility(View.VISIBLE);
         for (int i=0; i < flowLayout.getChildCount(); i++) {
             flowLayout.getChildAt(i).setVisibility(View.VISIBLE);
@@ -197,7 +198,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void clearAppliedFilters() {
-        FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         updateAppliedKeywordFilters(Collections.EMPTY_LIST);
         showAllContainerTags(R.id.view_drawer_search_filters_search_sources);
@@ -253,7 +254,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
         histograms.put(feature, histogram);
         Integer containerId = featureContainerIds.get(feature);
-        FlowLayout container = (FlowLayout) findViewById(containerId);
+        ViewGroup container = (ViewGroup) findViewById(containerId);
         container.removeAllViews();
         boolean keywordsApplied = false;
         List<KeywordFilter> keywordFiltersPipeline = null;
@@ -285,7 +286,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         clearAppliedFiltersTextView.setVisibility(textViewsVisibility);
         appliedTagsTipTextView.setVisibility(textViewsVisibility);
 
-        FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         if (filtersHaveBeenApplied) {
             for (KeywordFilter filter : keywordFiltersPipeline) {
@@ -303,7 +304,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
      */
     @Override
     public void onKeywordTagViewDismissed(KeywordTagView view) {
-        FlowLayout flowLayout = (FlowLayout) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
+        ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeView(view);
 
         if (pipelineListener != null) {
@@ -315,7 +316,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         // unhide tag in container
         if (view.getKeywordFilter().getFeature() != null) {
             int featureContainerId = featureContainerIds.get(view.getKeywordFilter().getFeature());
-            FlowLayout container = (FlowLayout) findViewById(featureContainerId);
+            ViewGroup container = (ViewGroup) findViewById(featureContainerId);
             for (int i=0; i < container.getChildCount(); i++) {
                 KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
                 if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
