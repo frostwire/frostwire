@@ -211,19 +211,19 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/view_drawer_search_filters_search_sources_textview"
-                        style="@style/keywordFilterSectionTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/search_sources" />
-
                     <ImageView
                         android:id="@+id/view_drawer_search_filters_search_sources_expand_contract_imageview"
                         android:layout_width="15dp"
                         android:layout_height="wrap_content"
                         android:contentDescription="@null"
                         android:src="@drawable/filter_expand" />
+
+                    <TextView
+                        android:id="@+id/view_drawer_search_filters_search_sources_textview"
+                        style="@style/keywordFilterSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/search_sources" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -251,6 +251,13 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <ImageView
+                        android:id="@+id/view_drawer_search_filters_file_extensions_expand_contract_imageview"
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@null"
+                        android:src="@drawable/filter_expand" />
+
                     <TextView
                         android:id="@+id/view_drawer_search_filters_file_extensions_textview"
                         style="@style/keywordFilterSectionTitle"
@@ -258,12 +265,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/file_extensions" />
 
-                    <ImageView
-                        android:id="@+id/view_drawer_search_filters_file_extensions_expand_contract_imageview"
-                        android:layout_width="15dp"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@null"
-                        android:src="@drawable/filter_expand" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -291,6 +292,13 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <ImageView
+                        android:id="@+id/view_drawer_search_filters_search_file_names_contract_imageview"
+                        android:layout_width="15dp"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@null"
+                        android:src="@drawable/filter_minimize" />
+
                     <TextView
                         android:id="@+id/view_drawer_search_filters_file_names_textview"
                         style="@style/keywordFilterSectionTitle"
@@ -298,12 +306,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/file_names" />
 
-                    <ImageView
-                        android:id="@+id/view_drawer_search_filters_search_file_names_contract_imageview"
-                        android:layout_width="15dp"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@null"
-                        android:src="@drawable/filter_minimize" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
