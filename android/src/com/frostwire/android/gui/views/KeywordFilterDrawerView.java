@@ -183,17 +183,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void resetTagsContainers() {
-        resetTagsContainer(R.id.view_drawer_search_filters_search_sources, R.id.view_drawer_search_filters_search_sources_expand_contract_imageview);
-        resetTagsContainer(R.id.view_drawer_search_filters_file_extensions, R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview);
-        resetTagsContainer(R.id.view_drawer_search_filters_file_names, R.id.view_drawer_search_filters_search_file_names_contract_imageview);
-    }
-
-    private void resetTagsContainer(int containerId, int expandContractIconImageViewId) {
-        ViewGroup flowLayout = findView(containerId);
-        flowLayout.removeAllViews();
-        flowLayout.setVisibility(View.VISIBLE);
-        ImageView expandContractIcon = findView(expandContractIconImageViewId);
-        expandContractIcon.setImageResource(R.drawable.filter_expand);
+        for (TagsController c : featureContainer.values()) {
+            c.reset();
+        }
     }
 
     private void showAllContainerTags(int containerId) {
@@ -440,6 +432,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             } else {
                 expand();
             }
+        }
+
+        void reset() {
+            container.removeAllViews();
+            expand();
         }
     }
 }
