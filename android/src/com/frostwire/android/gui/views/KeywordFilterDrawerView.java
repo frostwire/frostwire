@@ -399,12 +399,12 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         }
 
         void expand() {
-            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_expand, 0, 0, 0);
+            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_minimize, 0, 0, 0);
             container.setVisibility(View.VISIBLE);
         }
 
         void collapse() {
-            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_minimize, 0, 0, 0);
+            header.setCompoundDrawablesWithIntrinsicBounds(R.drawable.filter_expand, 0, 0, 0);
             container.setVisibility(View.GONE);
         }
 
