@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,11 +50,11 @@ import java.util.Map.Entry;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 3/23/17.
  */
-
 public final class KeywordFilterDrawerView extends LinearLayout implements KeywordTagView.KeywordTagViewListener {
+
     private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
+
     private KeywordFiltersPipelineListener pipelineListener;
     private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
@@ -176,7 +176,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         // in case it was "contracted"
         ViewGroup flowLayout = (ViewGroup) findViewById(containerId);
         flowLayout.setVisibility(View.VISIBLE);
-        for (int i=0; i < flowLayout.getChildCount(); i++) {
+        for (int i = 0; i < flowLayout.getChildCount(); i++) {
             flowLayout.getChildAt(i).setVisibility(View.VISIBLE);
         }
     }
@@ -230,12 +230,12 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         }
         List<Entry<String, Integer>> filteredValues = new LinkedList<>();
         for (Entry<String, Integer> entry : histogram) {
-            float rate = (float) entry.getValue()/(high + totalCount);
+            float rate = (float) entry.getValue() / (high + totalCount);
             if (entry.getValue() > 1 && rate >= threshold) {
                 filteredValues.add(entry);
                 //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
             } //else {
-                //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
+            //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
             //}
         }
         // sort'em!
@@ -263,7 +263,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             keywordsApplied = keywordFiltersPipeline.size() > 0;
         }
         for (Entry<String, Integer> entry : histogram) {
-            int visibility =  (keywordsApplied && keywordInPipeline(entry.getKey(), keywordFiltersPipeline)) ? View.GONE : View.VISIBLE;
+            int visibility = (keywordsApplied && keywordInPipeline(entry.getKey(), keywordFiltersPipeline)) ? View.GONE : View.VISIBLE;
             KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey(), feature), entry.getValue(), false, this);
             container.addView(keywordTagView);
             keywordTagView.setVisibility(visibility);
@@ -317,7 +317,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         if (view.getKeywordFilter().getFeature() != null) {
             int featureContainerId = featureContainerIds.get(view.getKeywordFilter().getFeature());
             ViewGroup container = (ViewGroup) findViewById(featureContainerId);
-            for (int i=0; i < container.getChildCount(); i++) {
+            for (int i = 0; i < container.getChildCount(); i++) {
                 KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
                 if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
                     keywordTagView.setVisibility(View.VISIBLE);
@@ -368,6 +368,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     public interface KeywordFilterDrawerController {
         void closeKeywordFilterDrawer();
+
         void openKeywordFilterDrawer();
     }
 
