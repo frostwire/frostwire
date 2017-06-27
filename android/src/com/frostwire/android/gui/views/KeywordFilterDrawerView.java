@@ -237,13 +237,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             //}
         }
         // sort'em!
+        // TODO: review this sort in a LinkedList, bad bad performance
         Collections.sort(filteredValues, new Comparator<Entry<String, Integer>>() {
             @Override
             public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-                if (o1.getValue() == o2.getValue()) {
-                    return 0;
-                }
-                return (o2.getValue() > o1.getValue()) ? 1 : -1;
+                return o2.getValue().compareTo(o1.getValue());
             }
         });
         return filteredValues;
