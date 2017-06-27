@@ -59,7 +59,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
 
     private KeywordFiltersPipelineListener pipelineListener;
-    private EnumMap<KeywordDetector.Feature, Integer> featureContainerIds = new EnumMap<>(KeywordDetector.Feature.class);
+    private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
     private TextView appliedTagsTipTextView;
     private TextView clearAppliedFiltersTextView;
     private KeywordFilterDrawerController keywordFilterDrawerController;
@@ -157,9 +157,21 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
         findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview).setOnClickListener(fileNamesToggler);
 
-        featureContainerIds.put(KeywordDetector.Feature.SEARCH_SOURCE, R.id.view_drawer_search_filters_search_sources);
-        featureContainerIds.put(KeywordDetector.Feature.FILE_EXTENSION, R.id.view_drawer_search_filters_file_extensions);
-        featureContainerIds.put(KeywordDetector.Feature.FILE_NAME, R.id.view_drawer_search_filters_file_names);
+        featureContainer.put(KeywordDetector.Feature.SEARCH_SOURCE,
+                new TagsController(
+                        (TextView) findView(R.id.view_drawer_search_filters_search_sources_textview),
+                        (ImageView) findView(R.id.view_drawer_search_filters_search_sources_expand_contract_imageview),
+                        (ViewGroup) findView(R.id.view_drawer_search_filters_search_sources)));
+        featureContainer.put(KeywordDetector.Feature.FILE_EXTENSION,
+                new TagsController(
+                        (TextView) findView(R.id.view_drawer_search_filters_file_extensions_textview),
+                        (ImageView) findView(R.id.view_drawer_search_filters_file_extensions_expand_contract_imageview),
+                        (ViewGroup) findView(R.id.view_drawer_search_filters_file_extensions)));
+        featureContainer.put(KeywordDetector.Feature.FILE_NAME,
+                new TagsController(
+                        (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
+                        (ImageView) findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview),
+                        (ViewGroup) findView(R.id.view_drawer_search_filters_file_names)));
     }
 
     private void onExitButtonClicked() {
@@ -269,8 +281,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
-        Integer containerId = featureContainerIds.get(feature);
-        ViewGroup container = findView(containerId);
+        ViewGroup container = featureContainer.get(feature).container;
         container.removeAllViews();
         boolean keywordsApplied = false;
         List<KeywordFilter> keywordFiltersPipeline = null;
@@ -331,8 +342,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
         // unhide tag in container
         if (view.getKeywordFilter().getFeature() != null) {
-            int featureContainerId = featureContainerIds.get(view.getKeywordFilter().getFeature());
-            ViewGroup container = findView(featureContainerId);
+            ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
             for (int i = 0; i < container.getChildCount(); i++) {
                 KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
                 if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
@@ -401,5 +411,20 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         void onRemoveKeywordFilter(KeywordFilter keywordFilter);
 
         List<KeywordFilter> getKeywordFiltersPipeline();
+    }
+
+    // this is a mini controller for a sub-view of
+    // tags, consisting of the label-header and the container
+    private static final class TagsController {
+
+        final TextView header;
+        final ImageView expImg; // to be removed in a few commits
+        final ViewGroup container;
+
+        TagsController(TextView header, ImageView expImg, ViewGroup container) {
+            this.header = header;
+            this.expImg = expImg;
+            this.container = container;
+        }
     }
 }
