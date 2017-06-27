@@ -682,7 +682,7 @@
     <string name="filter">Filter</string>
     <string name="clear_all">Clear All</string>
     <string name="filter_by_keyword">Filter by keyword...</string>
-    <string name="search_sources">Search sources</string>
+    <string name="sources_channels">Sources / Channels</string>
     <string name="file_extensions">File extensions</string>
     <string name="file_names">File names</string>
     <string name="touch_applied_tags_to_include_exclude">Touch applied tags to include/exclude</string>

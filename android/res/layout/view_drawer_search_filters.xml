@@ -214,7 +214,7 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/filter_expand"
                     android:drawableStart="@drawable/filter_expand"
-                    android:text="@string/search_sources" />
+                    android:text="@string/sources_channels" />
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_search_sources"
