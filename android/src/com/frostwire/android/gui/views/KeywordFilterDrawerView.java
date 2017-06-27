@@ -56,7 +56,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
 
     private KeywordFiltersPipelineListener pipelineListener;
-    private Map<KeywordDetector.Feature, Entry<String, Integer>[]> histograms;
     private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
     private TextView appliedTagsTipTextView;
     private TextView clearAppliedFiltersTextView;
@@ -71,7 +70,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        histograms = new HashMap<>();
     }
 
     public void setKeywordFiltersPipelineListener(KeywordFiltersPipelineListener listener) {
@@ -252,7 +250,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
-        histograms.put(feature, histogram);
         Integer containerId = featureContainerIds.get(feature);
         ViewGroup container = (ViewGroup) findViewById(containerId);
         container.removeAllViews();
