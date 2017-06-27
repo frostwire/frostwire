@@ -128,31 +128,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         });
 
-        // Init events for tag panel visibility toggling on sub-title and expand/minimize icons
-        OnClickListener searchSourcesToggler = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                featureContainer.get(KeywordDetector.Feature.SEARCH_SOURCE).toggle();
-            }
-        };
-        findView(R.id.view_drawer_search_filters_search_sources_textview).setOnClickListener(searchSourcesToggler);
-
-        OnClickListener fileExtensionsToggler = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                featureContainer.get(KeywordDetector.Feature.FILE_EXTENSION).toggle();
-            }
-        };
-        findView(R.id.view_drawer_search_filters_file_extensions_textview).setOnClickListener(fileExtensionsToggler);
-
-        OnClickListener fileNamesToggler = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                featureContainer.get(KeywordDetector.Feature.FILE_NAME).toggle();
-            }
-        };
-        findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
-
         featureContainer.put(KeywordDetector.Feature.SEARCH_SOURCE,
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_search_sources_textview),
@@ -392,6 +367,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         TagsController(TextView header, ViewGroup container) {
             this.header = header;
             this.container = container;
+
+            this.header.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggle();
+                }
+            });
         }
 
         boolean isExpanded() {
