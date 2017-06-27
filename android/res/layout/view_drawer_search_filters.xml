@@ -108,11 +108,12 @@
                     android:textSize="@dimen/text_medium"/>
 
                 <!-- CURRENT PIPELINE -->
-                <com.frostwire.android.gui.views.FlowLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_pipeline_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    frostwire:flexWrap="wrap">
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -152,7 +153,7 @@
                         frostwire:keyword_tag_count="3"
                         frostwire:keyword_tag_inclusive="true"
                         frostwire:keyword_tag_keyword="consectetur"/>
-                </com.frostwire.android.gui.views.FlowLayout>
+                </com.google.android.flexbox.FlexboxLayout>
 
                 <TextView
                     android:id="@+id/view_drawer_search_filters_touch_tag_tips"
@@ -205,10 +206,11 @@
                         android:src="@drawable/filter_expand"/>
                 </LinearLayout>
 
-                <com.frostwire.android.gui.views.FlowLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_search_sources"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    frostwire:flexWrap="wrap">
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -218,7 +220,7 @@
                         frostwire:keyword_tag_inclusive="true"
                         frostwire:keyword_tag_keyword="youtube"/>
 
-                </com.frostwire.android.gui.views.FlowLayout>
+                </com.google.android.flexbox.FlexboxLayout>
 
                 <!-- file extensions -->
 
@@ -243,10 +245,11 @@
                         android:src="@drawable/filter_expand"/>
                 </LinearLayout>
 
-                <com.frostwire.android.gui.views.FlowLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_file_extensions"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    frostwire:flexWrap="wrap">
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -256,7 +259,7 @@
                         frostwire:keyword_tag_inclusive="true"
                         frostwire:keyword_tag_keyword="mp4"/>
 
-                </com.frostwire.android.gui.views.FlowLayout>
+                </com.google.android.flexbox.FlexboxLayout>
 
                 <!-- file name tags -->
 
@@ -281,10 +284,11 @@
                         android:src="@drawable/filter_minimize"/>
                 </LinearLayout>
 
-                <com.frostwire.android.gui.views.FlowLayout
+                <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_file_names"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"></com.frostwire.android.gui.views.FlowLayout>
+                    android:layout_height="wrap_content"
+                    frostwire:flexWrap="wrap"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
