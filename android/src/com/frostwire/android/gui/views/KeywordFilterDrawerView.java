@@ -44,10 +44,9 @@ import com.frostwire.util.Logger;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -60,17 +59,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
 
     private KeywordFiltersPipelineListener pipelineListener;
-    private static Map<KeywordDetector.Feature, Integer> featureContainerIds = new HashMap<>();
+    private EnumMap<KeywordDetector.Feature, Integer> featureContainerIds = new EnumMap<>(KeywordDetector.Feature.class);
     private TextView appliedTagsTipTextView;
     private TextView clearAppliedFiltersTextView;
     private KeywordFilterDrawerController keywordFilterDrawerController;
     private ScrollView scrollView;
-
-    static {
-        featureContainerIds.put(KeywordDetector.Feature.SEARCH_SOURCE, R.id.view_drawer_search_filters_search_sources);
-        featureContainerIds.put(KeywordDetector.Feature.FILE_EXTENSION, R.id.view_drawer_search_filters_file_extensions);
-        featureContainerIds.put(KeywordDetector.Feature.FILE_NAME, R.id.view_drawer_search_filters_file_names);
-    }
 
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -168,6 +161,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         };
         findView(R.id.view_drawer_search_filters_file_names_textview).setOnClickListener(fileNamesToggler);
         findView(R.id.view_drawer_search_filters_search_file_names_contract_imageview).setOnClickListener(fileNamesToggler);
+
+        featureContainerIds.put(KeywordDetector.Feature.SEARCH_SOURCE, R.id.view_drawer_search_filters_search_sources);
+        featureContainerIds.put(KeywordDetector.Feature.FILE_EXTENSION, R.id.view_drawer_search_filters_file_extensions);
+        featureContainerIds.put(KeywordDetector.Feature.FILE_NAME, R.id.view_drawer_search_filters_file_names);
     }
 
     private void onExitButtonClicked() {
@@ -184,7 +181,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         ImageView expandContractIcon = findView(expandContractIconImageViewId);
         expandContractIcon.setImageResource(v.getVisibility() == View.VISIBLE ? R.drawable.filter_expand : R.drawable.filter_minimize);
     }
-
 
     private void resetTagsContainers() {
         resetTagsContainer(R.id.view_drawer_search_filters_search_sources, R.id.view_drawer_search_filters_search_sources_expand_contract_imageview);
