@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,7 +47,10 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:contentDescription="@null"
+            android:paddingEnd="10dp"
+            android:paddingLeft="0dp"
             android:paddingRight="10dp"
+            android:paddingStart="0dp"
             frostwire:srcCompat="@drawable/ic_ab_close_clear_cancel" />
 
         <TextView
@@ -105,7 +108,7 @@
                     android:inputType="text"
                     android:maxLines="1"
                     android:padding="12dp"
-                    android:textSize="@dimen/text_medium"/>
+                    android:textSize="@dimen/text_medium" />
 
                 <!-- CURRENT PIPELINE -->
                 <com.google.android.flexbox.FlexboxLayout
@@ -121,7 +124,7 @@
                         frostwire:keyword_tag_count="45"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="lorem"/>
+                        frostwire:keyword_tag_keyword="lorem" />
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -129,7 +132,7 @@
                         frostwire:keyword_tag_count="45"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="ipsum"/>
+                        frostwire:keyword_tag_keyword="ipsum" />
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -137,7 +140,7 @@
                         frostwire:keyword_tag_count="55"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="dolor"/>
+                        frostwire:keyword_tag_keyword="dolor" />
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
@@ -145,14 +148,14 @@
                         frostwire:keyword_tag_count="5"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="false"
-                        frostwire:keyword_tag_keyword="sit"/>
+                        frostwire:keyword_tag_keyword="sit" />
 
                     <com.frostwire.android.gui.views.KeywordTagView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         frostwire:keyword_tag_count="3"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="consectetur"/>
+                        frostwire:keyword_tag_keyword="consectetur" />
                 </com.google.android.flexbox.FlexboxLayout>
 
                 <TextView
@@ -163,14 +166,14 @@
                     android:gravity="center_horizontal"
                     android:text="@string/touch_applied_tags_to_include_exclude"
                     android:textColor="@color/app_text_secondary"
-                    android:textSize="@dimen/text_x_small"/>
+                    android:textSize="@dimen/text_x_small" />
 
             </LinearLayout>
 
             <View
                 style="@style/divider_line"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+                android:layout_height="1dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -197,13 +200,14 @@
                         style="@style/keywordFilterSectionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/search_sources"/>
+                        android:text="@string/search_sources" />
 
                     <ImageView
                         android:id="@+id/view_drawer_search_filters_search_sources_expand_contract_imageview"
                         android:layout_width="15dp"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/filter_expand"/>
+                        android:contentDescription="@null"
+                        android:src="@drawable/filter_expand" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -218,7 +222,7 @@
                         frostwire:keyword_tag_count="30"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="youtube"/>
+                        frostwire:keyword_tag_keyword="youtube" />
 
                 </com.google.android.flexbox.FlexboxLayout>
 
@@ -236,13 +240,14 @@
                         style="@style/keywordFilterSectionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/file_extensions"/>
+                        android:text="@string/file_extensions" />
 
                     <ImageView
                         android:id="@+id/view_drawer_search_filters_file_extensions_expand_contract_imageview"
                         android:layout_width="15dp"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/filter_expand"/>
+                        android:contentDescription="@null"
+                        android:src="@drawable/filter_expand" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
@@ -257,7 +262,7 @@
                         frostwire:keyword_tag_count="623"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="mp4"/>
+                        frostwire:keyword_tag_keyword="mp4" />
 
                 </com.google.android.flexbox.FlexboxLayout>
 
@@ -275,20 +280,21 @@
                         style="@style/keywordFilterSectionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/file_names"/>
+                        android:text="@string/file_names" />
 
                     <ImageView
                         android:id="@+id/view_drawer_search_filters_search_file_names_contract_imageview"
                         android:layout_width="15dp"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/filter_minimize"/>
+                        android:contentDescription="@null"
+                        android:src="@drawable/filter_minimize" />
                 </LinearLayout>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_file_names"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    frostwire:flexWrap="wrap"/>
+                    frostwire:flexWrap="wrap" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
