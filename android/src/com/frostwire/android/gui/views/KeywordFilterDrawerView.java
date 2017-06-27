@@ -210,13 +210,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
         if (feature != null && histogram != null && histogram.length > 0) {
-            Entry<String, Integer>[] filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
+            List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
         }
         invalidate();
     }
 
-    private Entry<String, Integer>[] highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
+    private List<Entry<String, Integer>> highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
         int high = 0;
         int totalCount = 0;
         for (Entry<String, Integer> entry : histogram) {
@@ -246,10 +246,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 return (o2.getValue() > o1.getValue()) ? 1 : -1;
             }
         });
-        return filteredValues.toArray(new Entry[0]);
+        return filteredValues;
     }
 
-    private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
+    private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
         Integer containerId = featureContainerIds.get(feature);
         ViewGroup container = (ViewGroup) findViewById(containerId);
         container.removeAllViews();
