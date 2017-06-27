@@ -198,7 +198,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private void clearAppliedFilters() {
         ViewGroup flowLayout = (ViewGroup) findViewById(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
-        updateAppliedKeywordFilters(Collections.EMPTY_LIST);
+        updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
         showAllContainerTags(R.id.view_drawer_search_filters_search_sources);
         showAllContainerTags(R.id.view_drawer_search_filters_file_extensions);
         showAllContainerTags(R.id.view_drawer_search_filters_file_names);
