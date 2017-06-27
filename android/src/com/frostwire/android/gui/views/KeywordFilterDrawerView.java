@@ -188,15 +188,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         }
     }
 
-    private void showAllContainerTags(int containerId) {
-        // in case it was "contracted"
-        ViewGroup flowLayout = findView(containerId);
-        flowLayout.setVisibility(View.VISIBLE);
-        for (int i = 0; i < flowLayout.getChildCount(); i++) {
-            flowLayout.getChildAt(i).setVisibility(View.VISIBLE);
-        }
-    }
-
     private boolean onKeywordEntered(TextView v) {
         String keyword = v.getText().toString().trim().toLowerCase();
         if (keyword.length() == 0) {
@@ -217,9 +208,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         ViewGroup flowLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
         flowLayout.removeAllViews();
         updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
-        showAllContainerTags(R.id.view_drawer_search_filters_search_sources);
-        showAllContainerTags(R.id.view_drawer_search_filters_file_extensions);
-        showAllContainerTags(R.id.view_drawer_search_filters_file_names);
+        for (TagsController c : featureContainer.values()) {
+            c.restore();
+        }
         scrollView.scrollTo(0, 0);
     }
 
@@ -432,6 +423,15 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             } else {
                 expand();
             }
+        }
+
+        void restore() {
+            int count = container.getChildCount();
+            for (int i = 0; i < count; i++) {
+                container.getChildAt(i).setVisibility(View.VISIBLE);
+            }
+            // in case it was "collapsed"
+            expand();
         }
 
         void reset() {
