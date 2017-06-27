@@ -97,13 +97,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         });
 
-
         clearAppliedFiltersTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearAppliedFilters();
             }
         });
+
         final EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
         keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -115,7 +115,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             }
         });
 
-        final ImageButton clearTextButton = (ImageButton) findViewById(R.id.view_drawer_search_filters_keyword_text_button_clear);
+        final ImageButton clearTextButton = findView(R.id.view_drawer_search_filters_keyword_text_button_clear);
         clearTextButton.setVisibility(RelativeLayout.GONE);
         clearTextButton.setOnClickListener(new OnClickListener() {
             @Override
