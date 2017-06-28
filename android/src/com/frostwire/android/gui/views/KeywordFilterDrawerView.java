@@ -143,6 +143,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_file_names)));
+
+        if (featureContainer.size() != KeywordDetector.Feature.values().length) {
+            throw new IllegalStateException("Not all 'KeywordDetector.Feature' values covered");
+        }
     }
 
     private void onExitButtonClicked() {
@@ -193,7 +197,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             tagsController.showHeader();
             List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
-        } else if (histogram.size() == 0 && tagsController != null) {
+        } else if (histogram.size() == 0) {
             tagsController.hideHeader();
         }
         invalidate();
