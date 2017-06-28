@@ -598,17 +598,18 @@ public class LibraryUtils {
                 genres.update("(" + mt.getGenre() + ")");
             }
         }
-        Entry<String, Integer>[] histogramArtistNames = artistNames.histogram();
-        Entry<String, Integer>[] histogramArtistsAlbums = artistsAlbums.histogram();
-        Entry<String, Integer>[] histogramAlbumNames = albumNames.histogram();
-        Entry<String, Integer>[] histogramGenres = genres.histogram();
-        String topArtistName = histogramArtistNames[histogramArtistNames.length - 1].getKey();
-        int topArtistNameCount = histogramArtistNames[histogramArtistNames.length - 1].getValue();
-        String topArtistAlbum = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getKey();
-        int topArtistAlbumCount = histogramArtistsAlbums[histogramArtistsAlbums.length - 1].getValue();
-        String topAlbumName = histogramAlbumNames[histogramAlbumNames.length - 1].getKey();
-        int topAlbumNameCount = histogramAlbumNames[histogramAlbumNames.length - 1].getValue();
-        String topGenre = histogramGenres[histogramGenres.length - 1].getKey();
+        // TODO: refactor this
+        List<Entry<String, Integer>> histogramArtistNames = artistNames.histogram();
+        List<Entry<String, Integer>> histogramArtistsAlbums = artistsAlbums.histogram();
+        List<Entry<String, Integer>> histogramAlbumNames = albumNames.histogram();
+        List<Entry<String, Integer>> histogramGenres = genres.histogram();
+        String topArtistName = histogramArtistNames.get(histogramArtistNames.size() - 1).getKey();
+        int topArtistNameCount = histogramArtistNames.get(histogramArtistNames.size() - 1).getValue();
+        String topArtistAlbum = histogramArtistsAlbums.get(histogramArtistsAlbums.size() - 1).getKey();
+        int topArtistAlbumCount = histogramArtistsAlbums.get(histogramArtistsAlbums.size() - 1).getValue();
+        String topAlbumName = histogramAlbumNames.get(histogramAlbumNames.size() - 1).getKey();
+        int topAlbumNameCount = histogramAlbumNames.get(histogramAlbumNames.size() - 1).getValue();
+        String topGenre = histogramGenres.get(histogramGenres.size() - 1).getKey();
         String suggestedPlaylistName = topArtistName;
         if (topArtistAlbumCount >= topArtistNameCount) {
             suggestedPlaylistName = topArtistAlbum;
