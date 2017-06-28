@@ -22,19 +22,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 public final class HistoHashMap<K> {
 
-    private final Map<K, Integer> map = new HashMap<>();
+    private final HashMap<K, Integer> map = new HashMap<>();
 
     /**
      * (Cheap operation)
      *
-     * @param key
-     * @return
+     * @param key the key
+     * @return the frequency
      */
     public int update(K key) {
         int r = 1;
@@ -51,9 +50,9 @@ public final class HistoHashMap<K> {
 
     /**
      * (Expensive operation)
-     * Returns the inner map as a sorted Entry array.
+     * Returns sorted list of entries.
      *
-     * @return
+     * @return the list
      */
     public Entry<K, Integer>[] histogram() {
         Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
