@@ -155,7 +155,7 @@ public class KeywordFilter {
         String haystack = getSearchResultHaystack(sr);
         // Group Filters by Feature so we can make the following search.
         // or by feature, and by different feature.
-        // Eg. (sourceA || sourceB) && (extensionA || extensionB) && (filenameX || filenameY)
+        // Eg. (sourceA || sourceB && ^sourceC) && (extensionA || extensionB && extensionC) && (filenameX || filenameY && ^filenameZ)
         Map<KeywordDetector.Feature, List<KeywordFilter>>  featureFilters = new HashMap<>();
         Iterator<KeywordFilter> it = filterPipeline.iterator();
         while (it.hasNext()) {
@@ -175,11 +175,16 @@ public class KeywordFilter {
             boolean featureResult = false;
             List<KeywordFilter> keywordFilters = featureFilters.get(feature);
             for (KeywordFilter filter : keywordFilters) {
-                featureResult |= filter.accept(haystack);
+                boolean found = filter.accept(haystack);
+                if (filter.inclusive) {
+                        featureResult |= found;
+                } else {
+                    featureResult &= found;
+                }
             }
             if (!featureResult) {
                 return false; // since the final query is an AND (featureA) && (featureB)
-                // the moment we have a failure on a feature the logic is shortcuited.
+                // the moment we have a failure on a feature the logic is short-circuited.
             }
 
         }
