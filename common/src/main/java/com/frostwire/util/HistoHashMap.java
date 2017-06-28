@@ -20,6 +20,7 @@ package com.frostwire.util;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -55,16 +56,24 @@ public final class HistoHashMap<K> {
      * @return the list
      */
     public Entry<K, Integer>[] histogram() {
-        Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
-        @SuppressWarnings("unchecked")
-        Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
-        Arrays.sort(array, new Comparator<Entry<K, Integer>>() {
-            @Override
-            public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
-                return o1.getValue().compareTo(o2.getValue());
-            }
-        });
-        return array;
+        try {
+            Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
+            @SuppressWarnings("unchecked")
+            Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
+            Arrays.sort(array, new Comparator<Entry<K, Integer>>() {
+                @Override
+                public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+            });
+            return array;
+        } catch (ConcurrentModificationException e) {
+            // working with no synchronized structures, even with the copies
+            // it's possible that this exception can happens, but the cost
+            // of synchronization bigger than the lack of accuracy
+            // ignore
+            return new Entry[0];
+        }
     }
 
     public int getKeyCount() {
