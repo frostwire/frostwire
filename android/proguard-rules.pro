@@ -1,4 +1,5 @@
 # presage seems to have passed by proguard already
+-dontwarn javax.annotation.Nullable
 -keep class do.** {*;}
 -keep class for.** {*;}
 -keep class if.** {*;}
