@@ -729,7 +729,7 @@
     </style>
     <style name="filterTipTagInclusive">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/basic_blue_highlight_dark</item>
+        <item name="android:textColor">@color/tip_tag_blue</item>
         <item name="android:textSize">@dimen/text_micro</item>
         <item name="android:background">@drawable/keyword_tag_inclusive_background</item>
     </style>

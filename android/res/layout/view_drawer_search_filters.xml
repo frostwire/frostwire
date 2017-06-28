@@ -200,13 +200,13 @@
                             android:layout_marginRight="4dp"
                             android:gravity="center_vertical"
                             android:text="@string/tip_touch_the_button_to"
-                            android:textColor="@color/app_text_secondary"
+                            android:textColor="@color/app_text_primary"
                             android:textSize="@dimen/text_x_small" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/keyword_tag_background_active"
+                            android:background="@drawable/keyword_tag_background_tip_active"
                             android:orientation="horizontal"
                             android:paddingBottom="3dp"
                             android:paddingLeft="8dp"
@@ -240,13 +240,13 @@
                             android:layout_marginRight="4dp"
                             android:gravity="center_vertical"
                             android:text="@string/or"
-                            android:textColor="@color/app_text_secondary"
+                            android:textColor="@color/app_text_primary"
                             android:textSize="@dimen/text_x_small" />
 
-                        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/keyword_tag_background_active"
+                            android:background="@drawable/keyword_tag_background_tip_active"
                             android:orientation="horizontal"
                             android:paddingBottom="3dp"
                             android:paddingLeft="8dp"
