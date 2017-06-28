@@ -30,6 +30,15 @@ public final class HistoHashMap<K> {
 
     private final HashMap<K, Integer> map = new HashMap<>();
 
+    // creates the comparator as a field to avoid GC pressure every
+    // time histogram is called, but still not static (no need)
+    private final Comparator<Entry<K, Integer>> cmp = new Comparator<Entry<K, Integer>>() {
+        @Override
+        public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
+            return o1.getValue().compareTo(o2.getValue());
+        }
+    };
+
     /**
      * (Cheap operation)
      *
@@ -60,12 +69,7 @@ public final class HistoHashMap<K> {
             Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
             @SuppressWarnings("unchecked")
             Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
-            Arrays.sort(array, new Comparator<Entry<K, Integer>>() {
-                @Override
-                public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
-                    return o1.getValue().compareTo(o2.getValue());
-                }
-            });
+            Arrays.sort(array, cmp);
             return array;
         } catch (ConcurrentModificationException e) {
             // working with no synchronized structures, even with the copies
