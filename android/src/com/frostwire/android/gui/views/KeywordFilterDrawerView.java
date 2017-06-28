@@ -59,7 +59,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private KeywordFiltersPipelineListener pipelineListener;
     private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
-    private TextView appliedTagsTipTextView;
+    private LinearLayout appliedTagsTipTextViewContainer;
     private TextView clearAppliedFiltersTextView;
     private KeywordFilterDrawerController keywordFilterDrawerController;
     private ScrollView scrollView;
@@ -79,8 +79,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
 
         scrollView = findView(R.id.view_drawer_search_filters_scrollview);
-        appliedTagsTipTextView = findView(R.id.view_drawer_search_filters_touch_tag_tips);
-        appliedTagsTipTextView.setVisibility(View.GONE);
+        appliedTagsTipTextViewContainer = findView(R.id.view_drawer_search_filters_touch_tag_tips_container);
+        appliedTagsTipTextViewContainer.setVisibility(View.GONE);
         clearAppliedFiltersTextView = findView(R.id.view_drawer_search_filters_clear_all);
         clearAppliedFiltersTextView.setVisibility(View.GONE);
         pipelineLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
@@ -253,7 +253,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         boolean filtersHaveBeenApplied = keywordFiltersPipeline.size() > 0;
         int textViewsVisibility = filtersHaveBeenApplied ? View.VISIBLE : View.GONE;
         clearAppliedFiltersTextView.setVisibility(textViewsVisibility);
-        appliedTagsTipTextView.setVisibility(textViewsVisibility);
+        appliedTagsTipTextViewContainer.setVisibility(textViewsVisibility);
 
         pipelineLayout.removeAllViews();
         if (filtersHaveBeenApplied) {

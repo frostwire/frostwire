@@ -686,4 +686,9 @@
     <string name="file_extensions">File extensions</string>
     <string name="file_names">File names</string>
     <string name="touch_applied_tags_to_include_exclude">Touch applied tags to include/exclude</string>
+    <string name="tip_touch_the_button_to">Tip: Touch the button to</string>
+    <string name="or">or</string>
+    <string name="include">Include</string>
+    <string name="exclude">Exclude</string>
+
 </resources>
