@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class HistoHashMap<K> {
-    private final Map<K,Integer> map = new HashMap<>();
+public final class HistoHashMap<K> {
+
+    private final Map<K, Integer> map = new HashMap<>();
 
     /**
      * (Cheap operation)
+     *
      * @param key
      * @return
      */
@@ -42,7 +44,7 @@ public class HistoHashMap<K> {
         map.put(key, r);
         return r;
     }
-    
+
     public Integer get(K key) {
         return map.get(key);
     }
@@ -50,13 +52,14 @@ public class HistoHashMap<K> {
     /**
      * (Expensive operation)
      * Returns the inner map as a sorted Entry array.
+     *
      * @return
      */
-    public Entry<K,Integer>[] histogram() {
+    public Entry<K, Integer>[] histogram() {
         Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
         @SuppressWarnings("unchecked")
         Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
-        Arrays.sort(array, new Comparator<Entry<K,Integer>>() {
+        Arrays.sort(array, new Comparator<Entry<K, Integer>>() {
             @Override
             public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
                 return o1.getValue().compareTo(o2.getValue());
