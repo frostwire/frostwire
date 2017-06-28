@@ -827,7 +827,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         @Override
-        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final Entry<String, Integer>[] histogram, boolean forceUIUpdate) {
+        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final List<Map.Entry<String, Integer>> histogram, boolean forceUIUpdate) {
             long now = SystemClock.currentThreadTimeMillis();
             if (!forceUIUpdate && now - lastKeywordFilterDrawerViewUpdate < 2000) {
                 // expensive operation for main thread, ignore sub-second requests for refreshing

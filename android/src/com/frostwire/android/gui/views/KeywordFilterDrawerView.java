@@ -184,22 +184,22 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         scrollView.scrollTo(0, 0);
     }
 
-    public void updateData(List<KeywordFilter> keywordFiltersPipeline, KeywordDetector.Feature feature, Entry<String, Integer>[] histogram) {
+    public void updateData(List<KeywordFilter> keywordFiltersPipeline, KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
         if (keywordFiltersPipeline != null) {
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
         TagsController tagsController = featureContainer.get(feature);
-        if (feature != null && histogram != null && histogram.length > 0) {
+        if (feature != null && histogram != null && histogram.size() > 0) {
             tagsController.showHeader();
             List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
-        } else if (histogram.length == 0 && tagsController != null) {
+        } else if (histogram.size() == 0 && tagsController != null) {
             tagsController.hideHeader();
         }
         invalidate();
     }
 
-    private List<Entry<String, Integer>> highPassFilter(Entry<String, Integer>[] histogram, float threshold) {
+    private List<Entry<String, Integer>> highPassFilter(List<Entry<String, Integer>> histogram, float threshold) {
         int high = 0;
         int totalCount = 0;
         for (Entry<String, Integer> entry : histogram) {

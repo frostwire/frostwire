@@ -140,7 +140,7 @@ public final class KeywordDetector {
         @Override
         public void run() {
             if (keywordDetectorListener != null) {
-                Map.Entry<String, Integer>[] histogram = histoHashMap.histogram();
+                List<Map.Entry<String, Integer>> histogram = histoHashMap.histogram();
                 histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
                 keywordDetectorListener.onHistogramUpdate(KeywordDetector.this, feature, histogram, true);
             }
@@ -322,8 +322,8 @@ public final class KeywordDetector {
     }
 
     public interface KeywordDetectorListener {
-        void onHistogramUpdate(final KeywordDetector detector, final Feature feature, final Map.Entry<String, Integer>[] histogram, boolean force);
+        void onHistogramUpdate(KeywordDetector detector, Feature feature, List<Map.Entry<String, Integer>> histogram, boolean force);
 
-        void notify(final KeywordDetector detector, final Map<Feature, HistoHashMap<String>> histograms);
+        void notify(KeywordDetector detector, Map<Feature, HistoHashMap<String>> histograms);
     }
 }

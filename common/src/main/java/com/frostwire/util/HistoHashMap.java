@@ -18,13 +18,13 @@
 
 package com.frostwire.util;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public final class HistoHashMap<K> {
 
@@ -64,19 +64,17 @@ public final class HistoHashMap<K> {
      *
      * @return the list
      */
-    public Entry<K, Integer>[] histogram() {
+    public List<Entry<K, Integer>> histogram() {
         try {
-            Set<Entry<K, Integer>> entrySet = new HashSet<>(map.entrySet());
-            @SuppressWarnings("unchecked")
-            Entry<K, Integer>[] array = entrySet.toArray(new Entry[0]);
-            Arrays.sort(array, cmp);
-            return array;
+            ArrayList<Entry<K, Integer>> list = new ArrayList<>(map.entrySet());
+            Collections.sort(list, cmp);
+            return Collections.unmodifiableList(list);
         } catch (ConcurrentModificationException e) {
             // working with no synchronized structures, even with the copies
             // it's possible that this exception can happens, but the cost
             // of synchronization bigger than the lack of accuracy
             // ignore
-            return new Entry[0];
+            return Collections.emptyList();
         }
     }
 
