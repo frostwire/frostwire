@@ -31,6 +31,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.util.BloomFilter;
 import com.frostwire.util.Logger;
+import com.frostwire.util.ThreadPool;
 
 import java.io.*;
 import java.util.BitSet;
@@ -41,7 +42,11 @@ import java.util.concurrent.ExecutorService;
  * @author aldenml
  */
 public final class Engine implements IEngineService {
+
     private static final Logger LOG = Logger.getLogger(Engine.class);
+
+    private static final ExecutorService MAIN_THREAD_POOL = ThreadPool.newThreadPool("Engine");
+
     private EngineService service;
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
@@ -174,7 +179,7 @@ public final class Engine implements IEngineService {
     }
 
     public ExecutorService getThreadPool() {
-        return EngineService.threadPool;
+        return MAIN_THREAD_POOL;
     }
 
     public BloomFilter<String> getNotifiedDownloadsBloomFilter() {

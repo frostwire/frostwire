@@ -63,7 +63,6 @@ public class EngineService extends Service implements IEngineService {
     private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
 
     private final IBinder binder;
-    static final ExecutorService threadPool = ThreadPool.newThreadPool("Engine");
     // services in background
     private final CoreMediaPlayer mediaPlayer;
     private byte state;
@@ -252,10 +251,6 @@ public class EngineService extends Service implements IEngineService {
 
         state = disconnected ? STATE_DISCONNECTED : STATE_STOPPED;
         LOG.info("Engine stopped, state: " + state);
-    }
-
-    public ExecutorService getThreadPool() {
-        return threadPool;
     }
 
     public void notifyDownloadFinished(String displayName, File file) {

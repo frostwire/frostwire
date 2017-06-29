@@ -56,8 +56,6 @@ public interface IEngineService {
 
     void stopServices(boolean disconnected);
 
-    ExecutorService getThreadPool();
-
     void notifyDownloadFinished(String displayName, File file);
     
     Application getApplication();
