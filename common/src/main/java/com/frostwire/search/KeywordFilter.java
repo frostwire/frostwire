@@ -158,7 +158,6 @@ public class KeywordFilter {
         String haystack = getSearchResultHaystack(sr);
         // Group Filters by Feature so we can make the following search.
         // or by feature, and by different feature.
-        // Eg. (sourceA || sourceB && ^sourceC) && (extensionA || extensionB && extensionC) && (filenameX || filenameY && ^filenameZ)
         Map<KeywordDetector.Feature, List<KeywordFilter>>  featureFilters = new HashMap<>();
         Iterator<KeywordFilter> it = filterPipeline.iterator();
         while (it.hasNext()) {
@@ -173,24 +172,28 @@ public class KeywordFilter {
         // now depending on the features that we have we'll have N Feature conditions we'll AND.
         Set<KeywordDetector.Feature> features = featureFilters.keySet();
 
+        List<List<Boolean>> conditionsPerFeature = new LinkedList<>();
         for (KeywordDetector.Feature feature : features) {
-            boolean featureResult = false;
+            List<Boolean> featureFilterResults = new LinkedList<>();
             List<KeywordFilter> keywordFilters = featureFilters.get(feature);
-            for (KeywordFilter filter : keywordFilters) {
-                boolean found = filter.accept(haystack);
-                if (filter.inclusive) {
-                        featureResult |= found;
-                } else {
-                    featureResult &= found;
-                }
-            }
-            if (!featureResult) {
-                return false; // since the final query is an AND (featureA) && (featureB)
-                // the moment we have a failure on a feature the logic is short-circuited.
-            }
 
+            for (KeywordFilter filter : keywordFilters) {
+                featureFilterResults.add(filter.accept(haystack));
+            }
+            conditionsPerFeature.add(featureFilterResults);
         }
-        return true;
+
+        // evaluate logic circuit
+        boolean result = true;
+        for (List<Boolean> featureResults : conditionsPerFeature) {
+            boolean featureResult = false;
+            for (Boolean fr : featureResults) {
+                featureResult = featureResult || fr;
+            }
+            result = result && featureResult;
+        }
+        conditionsPerFeature.clear();
+        return result;
     }
 
     public static String cleanQuery(String query, List<KeywordFilter> keywordFilters) {
