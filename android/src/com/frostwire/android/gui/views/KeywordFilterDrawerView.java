@@ -143,12 +143,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_file_names)));
-
-        featureContainer.put(KeywordDetector.Feature.MANUAL_ENTRY, null);
-
-        if (featureContainer.size() != KeywordDetector.Feature.values().length) {
-            throw new IllegalStateException("Not all 'KeywordDetector.Feature' values covered");
-        }
     }
 
     private void onExitButtonClicked() {
@@ -161,9 +155,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private void resetTagsContainers() {
         for (TagsController c : featureContainer.values()) {
-            if (c != null) { // MANUAL_ENTRY feature has no TagController
-                c.reset();
-            }
+            c.reset();
         }
     }
 
@@ -187,9 +179,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         pipelineLayout.removeAllViews();
         updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
         for (TagsController c : featureContainer.values()) {
-            if (c != null) {
-                c.restore();
-            }
+            c.restore();
         }
         scrollView.scrollTo(0, 0);
     }
