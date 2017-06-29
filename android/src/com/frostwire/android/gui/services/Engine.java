@@ -45,7 +45,7 @@ public final class Engine implements IEngineService {
 
     private static final Logger LOG = Logger.getLogger(Engine.class);
 
-    private static final ExecutorService MAIN_THREAD_POOL = ThreadPool.newThreadPool("Engine");
+    private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
     private EngineService service;
     private ServiceConnection connection;
