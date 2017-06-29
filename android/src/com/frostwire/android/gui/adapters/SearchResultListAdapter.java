@@ -207,6 +207,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         FilteredSearchResults filteredSearchResults = filter(list);
 
         this.visualList = filteredSearchResults.filtered;
+        notifyDataSetChanged();
         notifyDataSetInvalidated();
         return filteredSearchResults;
     }
@@ -280,6 +281,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public FilteredSearchResults setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
+        // if another instance is being assigned, we clear and copy its members
         if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
             this.keywordFiltersPipeline.clear();
             if (keywordFiltersPipeline != null && keywordFiltersPipeline.size() > 0) {
