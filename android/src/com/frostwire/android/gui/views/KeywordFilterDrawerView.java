@@ -144,6 +144,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                         (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
                         (ViewGroup) findView(R.id.view_drawer_search_filters_file_names)));
 
+        featureContainer.put(KeywordDetector.Feature.MANUAL_ENTRY, null);
+
         if (featureContainer.size() != KeywordDetector.Feature.values().length) {
             throw new IllegalStateException("Not all 'KeywordDetector.Feature' values covered");
         }
@@ -159,7 +161,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private void resetTagsContainers() {
         for (TagsController c : featureContainer.values()) {
-            c.reset();
+            if (c != null) { // MANUAL_ENTRY feature has no TagController
+                c.reset();
+            }
         }
     }
 
@@ -168,7 +172,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         if (keyword.length() == 0) {
             return true;
         }
-        KeywordFilter keywordFilter = new KeywordFilter(true, keyword, (KeywordDetector.Feature) null);
+        KeywordFilter keywordFilter = new KeywordFilter(true, keyword, KeywordDetector.Feature.MANUAL_ENTRY);
         v.setText("");
         v.clearFocus();
         if (pipelineListener != null) {
@@ -183,7 +187,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         pipelineLayout.removeAllViews();
         updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
         for (TagsController c : featureContainer.values()) {
-            c.restore();
+            if (c != null) {
+                c.restore();
+            }
         }
         scrollView.scrollTo(0, 0);
     }
@@ -292,7 +298,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
         }
 
-        // unhide tag in container
+        // un-hide tag in container
         if (view.getKeywordFilter().getFeature() != null) {
             ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
             for (int i = 0; i < container.getChildCount(); i++) {
@@ -313,12 +319,12 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         // if it's a dismissible one it's one of the applied filters
         List<KeywordFilter> keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
         KeywordFilter keywordFilter = view.getKeywordFilter();
-        if (view.isDismissible()) {
+        if (view.isDismissible() && keywordFiltersPipeline.size() > 0) {
             int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
             keywordFilter = view.toogleFilterInclusionMode();
             keywordFiltersPipeline.add(oldIndex, keywordFilter);
             keywordFiltersPipeline.remove(oldIndex + 1);
-        } else {
+        } else if (!view.isDismissible()) {
             // attempt to add to pipeline
             if (!keywordFiltersPipeline.contains(keywordFilter)) {
                 pipelineListener.onAddKeywordFilter(keywordFilter);

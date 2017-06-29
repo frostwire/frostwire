@@ -122,6 +122,7 @@ public class KeywordTagView extends LinearLayout {
             inclusiveIndicatorImageView.setVisibility(View.GONE);
             dismissTextView.setVisibility(View.GONE);
         }
+
         OnClickListener onClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {

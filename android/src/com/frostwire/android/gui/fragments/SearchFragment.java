@@ -130,7 +130,7 @@ public final class SearchFragment extends AbstractFragment implements
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
-        keywordDetector = new KeywordDetector(Engine.instance().getThreadPool());
+        keywordDetector = new KeywordDetector();
     }
 
     @Override
@@ -371,9 +371,9 @@ public final class SearchFragment extends AbstractFragment implements
                     }
                     long delta = SystemClock.currentThreadTimeMillis() - start;
                     LOG.info("updateKeywordDetector, added " + results.size() + " results in " + delta + " ms");
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, false);
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, false);
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, false);
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
+                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
                 }
             });
         }
@@ -414,7 +414,7 @@ public final class SearchFragment extends AbstractFragment implements
             fileTypeCounter.clear();
             fileTypeCounter.add(filteredSearchResults);
         }
-        refreshFileTypeCounters(true);
+        refreshFileTypeCounters(adapter != null && adapter.getList() != null && adapter.getList().size() > 0);
     }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
@@ -678,9 +678,9 @@ public final class SearchFragment extends AbstractFragment implements
         }
         drawerLayout.openDrawer(keywordFilterDrawerView);
         if (keywordDetector != null) {
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE, true);
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION, true);
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME, true);
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
+            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
         }
 
     }
