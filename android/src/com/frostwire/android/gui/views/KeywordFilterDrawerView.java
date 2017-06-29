@@ -219,14 +219,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
             //}
         }
-        // sort'em!
-        // TODO: review this sort in a LinkedList, bad bad performance
-        Collections.sort(filteredValues, new Comparator<Entry<String, Integer>>() {
-            @Override
-            public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
         return filteredValues;
     }
 

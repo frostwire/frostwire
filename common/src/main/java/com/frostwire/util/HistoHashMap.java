@@ -35,7 +35,7 @@ public final class HistoHashMap<K> {
     private final Comparator<Entry<K, Integer>> cmp = new Comparator<Entry<K, Integer>>() {
         @Override
         public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
-            return o1.getValue().compareTo(o2.getValue());
+            return o2.getValue().compareTo(o1.getValue());
         }
     };
 
