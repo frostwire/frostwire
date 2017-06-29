@@ -134,6 +134,8 @@ public final class Debug {
             return true;
         } else if (clazzName.contains("com.sun.")) {
             return true;
+        } else if (clazzName.contains("com.frostwire.search.")) {
+            return true;
         }
 
         return false;
