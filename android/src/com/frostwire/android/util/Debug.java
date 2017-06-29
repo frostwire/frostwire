@@ -126,6 +126,16 @@ public final class Debug {
             return true;
         }
 
+        // exclude some well know packages
+        String clazzName = obj.getClass().getName();
+        if (clazzName.contains("java.")) {
+            return true;
+        } else if (clazzName.contains("javax.")) {
+            return true;
+        } else if (clazzName.contains("com.sun.")) {
+            return true;
+        }
+
         return false;
     }
 }
