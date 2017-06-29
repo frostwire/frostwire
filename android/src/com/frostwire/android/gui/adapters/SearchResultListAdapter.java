@@ -64,7 +64,6 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
-
     private static final int NO_FILE_TYPE = -1;
 
     private final OnLinkClickListener linkListener;
@@ -204,16 +203,18 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     abstract protected void searchResultClicked(SearchResult sr);
 
-    private void filter() {
-        this.visualList = filter(list).filtered;
+    public FilteredSearchResults filter() {
+        FilteredSearchResults filteredSearchResults = filter(list);
+
+        this.visualList = filteredSearchResults.filtered;
         notifyDataSetInvalidated();
+        return filteredSearchResults;
     }
 
     public FilteredSearchResults filter(List<SearchResult> results) {
         FilteredSearchResults fsr = new FilteredSearchResults();
         ArrayList<SearchResult> l = new ArrayList<>();
         List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
-
         for (SearchResult sr : results) {
             MediaType mt;
             String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
@@ -226,14 +227,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                 mt = null;
             }
 
+            boolean passedKeywordFilter = KeywordFilter.passesFilterPipeline(sr, keywordFilters);
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
-                if (keywordFilters.isEmpty()) {
-                    l.add(sr);
-                } else if (KeywordFilter.passesFilterPipeline(sr, keywordFilters)) {
+                if (keywordFilters.isEmpty() || passedKeywordFilter) {
                     l.add(sr);
                 }
             }
-            fsr.increment(mt);
+            fsr.increment(mt, passedKeywordFilter);
         }
         fsr.filtered = l;
         return fsr;
@@ -279,31 +279,32 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return keywordFiltersPipeline;
     }
 
-    public void setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
+    public FilteredSearchResults setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
         if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
             this.keywordFiltersPipeline.clear();
             if (keywordFiltersPipeline != null && keywordFiltersPipeline.size() > 0) {
                 this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
             }
         }
-        filter();
+        return filter();
     }
 
-    public void addKeywordFilter(KeywordFilter kf) {
+    public FilteredSearchResults addKeywordFilter(KeywordFilter kf) {
         if (!keywordFiltersPipeline.contains(kf)) {
             this.keywordFiltersPipeline.add(kf);
-            filter();
+            return filter();
         }
+        return null;
     }
 
-    public void removeKeywordFilter(KeywordFilter kf) {
+    public FilteredSearchResults removeKeywordFilter(KeywordFilter kf) {
         this.keywordFiltersPipeline.remove(kf);
-        filter();
+        return filter();
     }
 
-    public void clearKeywordFilters() {
+    public FilteredSearchResults clearKeywordFilters() {
         this.keywordFiltersPipeline.clear();
-        filter();
+        return filter();
     }
 
     private static class OnLinkClickListener implements OnClickListener {
@@ -324,26 +325,39 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         public int numDocuments;
         public int numTorrents;
 
-        private void increment(MediaType mt) {
+        public int numFilteredAudio;
+        public int numFilteredVideo;
+        public int numFilteredPictures;
+        public int numFilteredApplications;
+        public int numFilteredDocuments;
+        public int numFilteredTorrents;
+
+        private void increment(MediaType mt, boolean passedFilter) {
             if (mt != null) {
                 switch (mt.getId()) {
                     case Constants.FILE_TYPE_AUDIO:
                         numAudio++;
+                        numFilteredAudio += passedFilter ? 1 : 0;
                         break;
                     case Constants.FILE_TYPE_VIDEOS:
                         numVideo++;
+                        numFilteredVideo += passedFilter ? 1 : 0;
                         break;
                     case Constants.FILE_TYPE_PICTURES:
                         numPictures++;
+                        numFilteredPictures += passedFilter ? 1 : 0;
                         break;
                     case Constants.FILE_TYPE_APPLICATIONS:
                         numApplications++;
+                        numFilteredApplications += passedFilter ? 1 : 0;
                         break;
                     case Constants.FILE_TYPE_DOCUMENTS:
                         numDocuments++;
+                        numFilteredDocuments += passedFilter ? 1 : 0;
                         break;
                     case Constants.FILE_TYPE_TORRENTS:
                         numTorrents++;
+                        numFilteredTorrents += passedFilter ? 1 : 0;
                         break;
                 }
             }

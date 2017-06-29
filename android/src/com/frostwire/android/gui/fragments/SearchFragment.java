@@ -98,7 +98,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -265,6 +264,7 @@ public final class SearchFragment extends AbstractFragment implements
                     startTransfer(sr, getString(R.string.download_added_to_queue));
                 }
             };
+
             LocalSearchEngine.instance().setListener(new SearchListener() {
                 @Override
                 public void onResults(long token, final List<? extends SearchResult> results) {
@@ -409,13 +409,29 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.hideTextInput();
     }
 
+    private void updateFileTypeCounter(FilteredSearchResults filteredSearchResults) {
+        if (filteredSearchResults != null) {
+            fileTypeCounter.clear();
+            fileTypeCounter.add(filteredSearchResults);
+        }
+        refreshFileTypeCounters(true);
+    }
+
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fileTypeCounter.fsr.numApplications);
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_AUDIO, fileTypeCounter.fsr.numAudio);
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_DOCUMENTS, fileTypeCounter.fsr.numDocuments);
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_PICTURES, fileTypeCounter.fsr.numPictures);
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_TORRENTS, fileTypeCounter.fsr.numTorrents);
-        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, fileTypeCounter.fsr.numVideo);
+        boolean keywordFiltersApplied = adapter.getKeywordFiltersPipeline().size() > 0;
+        FilteredSearchResults fsr = fileTypeCounter.fsr;
+        int applications = keywordFiltersApplied ? fsr.numFilteredApplications : fsr.numApplications;
+        int audios = keywordFiltersApplied ? fsr.numFilteredAudio : fsr.numAudio;
+        int documents = keywordFiltersApplied ? fsr.numFilteredDocuments : fsr.numDocuments;
+        int pictures = keywordFiltersApplied ? fsr.numFilteredPictures : fsr.numPictures;
+        int torrents = keywordFiltersApplied ? fsr.numFilteredTorrents : fsr.numTorrents;
+        int videos = keywordFiltersApplied ? fsr.numFilteredVideo : fsr.numVideo;
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, applications);
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_AUDIO, audios);
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_DOCUMENTS, documents);
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_PICTURES, pictures);
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_TORRENTS, torrents);
+        searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, videos);
         searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
     }
 
@@ -435,12 +451,6 @@ public final class SearchFragment extends AbstractFragment implements
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
         resetKeywordDetector();
-
-        List<KeywordFilter> keywordFilters = KeywordFilter.parseKeywordFilters(query);
-        if (!keywordFilters.isEmpty()) {
-            query = KeywordFilter.cleanQuery(query, keywordFilters);
-            adapter.setKeywordFiltersPipeline(keywordFilters);
-        }
 
         currentQuery = query;
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
@@ -773,6 +783,13 @@ public final class SearchFragment extends AbstractFragment implements
             this.fsr.numPictures += fsr.numPictures;
             this.fsr.numTorrents += fsr.numTorrents;
             this.fsr.numVideo += fsr.numVideo;
+
+            this.fsr.numFilteredAudio += fsr.numFilteredAudio;
+            this.fsr.numFilteredApplications += fsr.numFilteredApplications;
+            this.fsr.numFilteredDocuments += fsr.numFilteredDocuments;
+            this.fsr.numFilteredPictures += fsr.numFilteredPictures;
+            this.fsr.numFilteredTorrents += fsr.numFilteredTorrents;
+            this.fsr.numFilteredVideo += fsr.numFilteredVideo;
         }
 
         public void clear() {
@@ -782,6 +799,12 @@ public final class SearchFragment extends AbstractFragment implements
             this.fsr.numPictures = 0;
             this.fsr.numTorrents = 0;
             this.fsr.numVideo = 0;
+            this.fsr.numFilteredAudio = 0;
+            this.fsr.numFilteredApplications = 0;
+            this.fsr.numFilteredDocuments = 0;
+            this.fsr.numFilteredPictures = 0;
+            this.fsr.numFilteredTorrents = 0;
+            this.fsr.numFilteredVideo = 0;
         }
     }
 
@@ -866,7 +889,8 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void onPipelineUpdate(List<KeywordFilter> pipeline) {
-            adapter.setKeywordFiltersPipeline(pipeline);
+            updateFileTypeCounter(adapter.setKeywordFiltersPipeline(pipeline));
+
             if (pipeline != null) {
                 if (pipeline.isEmpty()) {
                     counterTextView.setText("");
@@ -879,12 +903,12 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void onAddKeywordFilter(KeywordFilter keywordFilter) {
-            adapter.addKeywordFilter(keywordFilter);
+            updateFileTypeCounter(adapter.addKeywordFilter(keywordFilter));
         }
 
         @Override
         public void onRemoveKeywordFilter(KeywordFilter keywordFilter) {
-            adapter.removeKeywordFilter(keywordFilter);
+            updateFileTypeCounter(adapter.removeKeywordFilter(keywordFilter));
         }
 
         @Override

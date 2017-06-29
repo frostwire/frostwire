@@ -152,6 +152,9 @@ public class KeywordFilter {
     }
 
     public static boolean passesFilterPipeline(final SearchResult sr, final List<KeywordFilter> filterPipeline) {
+        if (filterPipeline == null || filterPipeline.size() == 0) {
+            return true;
+        }
         String haystack = getSearchResultHaystack(sr);
         // Group Filters by Feature so we can make the following search.
         // or by feature, and by different feature.
@@ -169,7 +172,6 @@ public class KeywordFilter {
         }
         // now depending on the features that we have we'll have N Feature conditions we'll AND.
         Set<KeywordDetector.Feature> features = featureFilters.keySet();
-
 
         for (KeywordDetector.Feature feature : features) {
             boolean featureResult = false;
