@@ -21,10 +21,13 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * This class is not final, but it's not meant to be inherited but
+ * only in very specific situations.
+ *
  * @author gubatron
  * @author aldenml
  */
-public final class ThreadPool extends ThreadPoolExecutor {
+public class ThreadPool extends ThreadPoolExecutor {
 
     private final AtomicInteger threadNumber = new AtomicInteger(1);
 
