@@ -293,9 +293,10 @@
                         android:background="@null"
                         android:contentDescription="@null"
                         android:paddingEnd="18dp"
-                        android:paddingLeft="100dp"
+                        android:paddingLeft="25dp"
                         android:paddingRight="25dp"
                         android:paddingStart="12dp"
+                        android:layout_marginLeft="75dp"
                         android:src="@drawable/clearable_edittext_clear_icon" />
 
                 </LinearLayout>
