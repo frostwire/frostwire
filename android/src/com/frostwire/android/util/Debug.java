@@ -128,13 +128,15 @@ public final class Debug {
 
         // exclude some well know packages
         String clazzName = obj.getClass().getName();
-        if (clazzName.contains("java.")) {
+        if (clazzName.startsWith("java.")) {
             return true;
-        } else if (clazzName.contains("javax.")) {
+        } else if (clazzName.startsWith("javax.")) {
             return true;
-        } else if (clazzName.contains("com.sun.")) {
+        } else if (clazzName.startsWith("com.sun.")) {
             return true;
-        } else if (clazzName.contains("com.frostwire.search.")) {
+        } else if (clazzName.startsWith("com.frostwire.search.")) {
+            return true;
+        } else if (clazzName.startsWith("com.frostwire.bittorrent.")) {
             return true;
         }
 

@@ -41,10 +41,11 @@ final class EngineThreadPool extends ThreadPool {
 
     @Override
     public void execute(Runnable command) {
-        if (Debug.hasContext(command)) {
+        // TODO: restore after fixes are done in the app
+        //if (Debug.hasContext(command)) {
             // TODO: uncomment after excessive submission is solved
             //throw new RuntimeException("Runnable contains context, possible context leak");
-        }
+        //}
 
         // if debug/development, allow only 20 tasks in the queue
         if (getQueue().size() > 20) {
