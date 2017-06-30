@@ -294,7 +294,7 @@
                         android:contentDescription="@null"
                         android:paddingEnd="18dp"
                         android:paddingLeft="100dp"
-                        android:paddingRight="18dp"
+                        android:paddingRight="25dp"
                         android:paddingStart="12dp"
                         android:src="@drawable/clearable_edittext_clear_icon" />
 
