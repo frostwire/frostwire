@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -115,6 +116,9 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 return actionId == EditorInfo.IME_ACTION_DONE && onKeywordEntered(v);
             }
         });
+        final TextView appliedTagsTipHtmlTextView = findView(R.id.view_drawer_search_filters_touch_tag_tips_text_html_textview);
+        appliedTagsTipHtmlTextView.setText(Html.fromHtml(getResources().getString(R.string.tip_touch_tags_to)));
+
         final ImageButton clearTextButton = findView(R.id.view_drawer_search_filters_keyword_text_button_clear);
         clearTextButton.setVisibility(RelativeLayout.GONE);
         clearTextButton.setOnClickListener(new OnClickListener() {

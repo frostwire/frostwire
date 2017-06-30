@@ -25,6 +25,7 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touch applied tags to]]></string>
 
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
@@ -688,9 +689,7 @@
     <string name="file_extensions">File extensions</string>
     <string name="file_names">File names</string>
     <string name="touch_applied_tags_to_include_exclude">Touch applied tags to include/exclude</string>
-    <string name="tip_touch_the_button_to"><b>TIP:</b> Touch the button to</string>
     <string name="or">or</string>
     <string name="include">Include</string>
     <string name="exclude">Exclude</string>
-
 </resources>

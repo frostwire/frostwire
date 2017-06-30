@@ -198,12 +198,13 @@
                         frostwire:flexWrap="wrap">
 
                         <TextView
+                            android:id="@+id/view_drawer_search_filters_touch_tag_tips_text_html_textview"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="4dp"
                             android:layout_marginRight="4dp"
                             android:gravity="center_vertical"
-                            android:text="@string/tip_touch_the_button_to"
+                            android:text="@string/tip_touch_tags_to"
                             android:textColor="@color/app_text_primary"
                             android:textSize="@dimen/text_x_small" />
 
