@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created on 11/26/2016
@@ -90,7 +93,7 @@ public final class KeywordDetector {
 
     public void addSearchTerms(Feature feature, String terms) {
         // tokenize
-        String[] pre_tokens = terms.replaceAll("[^a-zA-Z0-9\\p{L}\\. ]", "").toLowerCase().split("\\s");
+        String[] pre_tokens = terms.replaceAll("[^a-zA-Z0-9\\p{L}[.]{1} ]", "").toLowerCase().split("\\s");
         if (pre_tokens.length == 0) {
             return;
         }
@@ -162,7 +165,7 @@ public final class KeywordDetector {
      * You must remember to shutdown the inner thread on shutdown.
      */
     private class HistogramUpdateRequestDispatcher implements Runnable {
-        private static final long HISTOGRAM_REQUEST_TASK_DELAY_IN_MS = 1000L;
+        private static final long HISTOGRAM_REQUEST_TASK_DELAY_IN_MS = 500L;
         private final AtomicLong lastHistogramUpdateRequestFinished;
         /**
          * This Map can only contain as many elements as Features are available.
@@ -173,7 +176,9 @@ public final class KeywordDetector {
         private final List<HistogramUpdateRequestTask> histogramUpdateRequests;
 
         private final AtomicBoolean running = new AtomicBoolean(false);
-        private final Object loopLock = new Object();
+        private final ReentrantLock lock = new ReentrantLock();
+        private final Condition loopLock = lock.newCondition();
+
 
         public HistogramUpdateRequestDispatcher() {
             histogramUpdateRequests = new LinkedList<>();
@@ -199,7 +204,7 @@ public final class KeywordDetector {
                 }
                 histogramUpdateRequests.add(updateRequestTask);
             }
-            notifyLoopLock();
+            signalLoopLock();
         }
 
         @Override
@@ -231,9 +236,11 @@ public final class KeywordDetector {
                 }
                 try {
                     if (running.get()) {
-                        synchronized (loopLock) {
-                            loopLock.wait(60000);
-                        }
+                        LOG.info("HistogramUpdateRequestDispatcher loopLock.await()...");
+                        lock.lock();
+                        loopLock.await(1, TimeUnit.MINUTES);
+                        lock.unlock();
+                        LOG.info("HistogramUpdateRequestDispatcher loopLock.signaled!...");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -248,13 +255,13 @@ public final class KeywordDetector {
         public void onLastHistogramRequestFinished() {
             if (running.get()) {
                 lastHistogramUpdateRequestFinished.set(System.currentTimeMillis());
-                notifyLoopLock();
+                signalLoopLock();
             }
         }
 
         public void start() {
             LOG.info("HistogramUpdateRequestDispatcher start()");
-            threadPool = ThreadPool.newThreadPool("KeywordDetector-pool", 3, false);
+            threadPool = ThreadPool.newThreadPool("KeywordDetector-pool", 1, false);
 
             running.set(true);
             new Thread(this, "HistogramUpdateRequestDispatcher").start();
@@ -262,7 +269,7 @@ public final class KeywordDetector {
 
         public void shutdown() {
             running.set(false);
-            notifyLoopLock();
+            signalLoopLock();
             shutdownThreadPool();
         }
 
@@ -278,15 +285,17 @@ public final class KeywordDetector {
             synchronized (histogramUpdateRequests) {
                 histogramUpdateRequests.clear();
             }
-            notifyLoopLock();
+            signalLoopLock();
         }
 
-        private void notifyLoopLock() {
+        private void signalLoopLock() {
+            LOG.info("HistogramUpdateRequestDispatcher signalLoopLock()");
             try {
-                synchronized (loopLock) {
-                    loopLock.notify();
-                }
+                lock.lock();
+                loopLock.signal();
             } catch (Throwable ignored) {
+            } finally {
+                lock.unlock();
             }
         }
     }
