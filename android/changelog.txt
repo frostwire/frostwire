@@ -1,4 +1,4 @@
-FrostWire 1.9.8 - JUN/28/2017
+FrostWire 1.9.8 - JUN/30/2017
  - New search filtering tools
  - Improved VPN detection
  - BitTorrent connection recovers when VPN service goes off and VPN protection off
@@ -7,6 +7,7 @@ FrostWire 1.9.8 - JUN/28/2017
    removed double divider in search result list item, added missing new line
    to grid base
  - MoPub 4.15 update
+ - Fixed memory leaks and runnaway threadpools causing out of memory errors
 
 FrostWire 1.9.7 - JUN/22/2017
  - New jlibtorrent 1.2.0.11-RC1
