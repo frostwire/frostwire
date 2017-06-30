@@ -19,6 +19,7 @@ package com.frostwire.search;
 
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
+import com.frostwire.util.ThreadPool;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -60,6 +62,7 @@ public final class KeywordDetector {
     private final Map<Feature, HistoHashMap<String>> histograms;
     private KeywordDetectorListener keywordDetectorListener;
     private final HistogramUpdateRequestDispatcher histogramUpdateRequestsDispatcher;
+    private ThreadPool threadPool;
 
     public KeywordDetector() {
         histograms = new HashMap<>();
@@ -217,9 +220,9 @@ public final class KeywordDetector {
                             }
                         }
                         // submit next task if there is any left
-                        if (histogramUpdateRequestTask != null && running.get()) {
+                        if (histogramUpdateRequestTask != null && running.get() && threadPool != null) {
                             try {
-                                histogramUpdateRequestTask.run();
+                                threadPool.submit(histogramUpdateRequestTask);
                             } catch (Throwable t) {
                                 LOG.error(t.getMessage(), t);
                             }
@@ -239,6 +242,7 @@ public final class KeywordDetector {
             }
             LOG.info("HistogramUpdateRequestDispatcher thread shutdown.");
             clear();
+            shutdownThreadPool();
         }
 
         public void onLastHistogramRequestFinished() {
@@ -250,6 +254,7 @@ public final class KeywordDetector {
 
         public void start() {
             LOG.info("HistogramUpdateRequestDispatcher start()");
+            threadPool = new ThreadPool("KeywordDetector-pool", 3, new LinkedBlockingQueue<Runnable>(), false);
             running.set(true);
             new Thread(this, "HistogramUpdateRequestDispatcher").start();
         }
@@ -257,6 +262,14 @@ public final class KeywordDetector {
         public void shutdown() {
             running.set(false);
             notifyLoopLock();
+            shutdownThreadPool();
+        }
+
+        private void shutdownThreadPool() {
+            if (threadPool != null) {
+                threadPool.shutdown();
+                threadPool = null;
+            }
         }
 
         public void clear() {
