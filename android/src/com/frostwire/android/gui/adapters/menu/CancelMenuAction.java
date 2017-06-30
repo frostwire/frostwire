@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
@@ -36,6 +37,8 @@ import com.frostwire.transfers.*;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -152,23 +155,51 @@ public final class CancelMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
-            Thread t = new Thread("Delete files - " + transfer.getDisplayName()) {
-                @Override
-                public void run() {
-                    if (transfer instanceof UIBittorrentDownload) {
-                        ((UIBittorrentDownload) transfer).remove(Ref.weak(dlg.getContext()), deleteTorrent, deleteData);
-                    } else if (transfer instanceof Transfer) {
-                        transfer.remove(deleteData);
-                    } else {
-                        transfer.remove(false);
-                    }
-
-                    UIUtils.broadcastAction(dlg.getContext(), Constants.ACTION_FILE_ADDED_OR_REMOVED);
-                    UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
-                }
-            };
-            Engine.instance().getThreadPool().execute(t);
+            RemoveTransferTask task = new RemoveTransferTask(transfer, deleteTorrent,
+                    deleteData, dlg.getContext());
+            Engine.instance().getThreadPool().execute(task);
             dlg.dismiss();
+        }
+    }
+
+    private static final class RemoveTransferTask implements Runnable {
+
+        // don't hold a hard reference to the transfers, since
+        // it could be a UIBittorrentDownload, and gui objects
+        // indirectly hold references to a context
+        private final WeakReference<Transfer> transferRef;
+        private final boolean deleteTorrent;
+        private final boolean deleteData;
+        private final WeakReference<Context> context;
+
+        RemoveTransferTask(Transfer transfer, boolean deleteTorrent,
+                           boolean deleteData, Context context) {
+            this.transferRef = Ref.weak(transfer);
+            this.deleteTorrent = deleteTorrent;
+            this.deleteData = deleteData;
+            this.context = Ref.weak(context);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(transferRef)) {
+                // this should never happens (unless it's already removed),
+                // since all transfer are keep in the TransferManager list
+                return;
+            }
+
+            Transfer transfer = transferRef.get();
+
+            if (transfer instanceof UIBittorrentDownload) {
+                ((UIBittorrentDownload) transfer).remove(context, deleteTorrent, deleteData);
+            } else {
+                transfer.remove(deleteData);
+            }
+
+            if (Ref.alive(context)) {
+                UIUtils.broadcastAction(context.get(), Constants.ACTION_FILE_ADDED_OR_REMOVED);
+            }
+            UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
         }
     }
 }
