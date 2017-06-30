@@ -24,7 +24,7 @@
     <solid android:color="@color/tip_tag_blue" />
     <stroke
         android:width="1px"
-        android:color="@color/basic_blue_highlight" />
+        android:color="@color/tip_tag_blue" />
     <corners
         android:radius="20dp" />
 </shape>

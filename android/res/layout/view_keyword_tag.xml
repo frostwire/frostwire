@@ -23,27 +23,32 @@
     android:layout_width="wrap_content"
     android:layout_height="34dp"
     android:layout_marginBottom="8dp"
+    android:layout_marginEnd="6dp"
     android:layout_marginRight="6dp"
     android:background="@drawable/keyword_tag_background"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingBottom="4dp"
-    android:paddingLeft="10dp"
+    android:paddingEnd="12dp"
+    android:paddingLeft="12dp"
     android:paddingRight="12dp"
+    android:paddingStart="12dp"
     android:paddingTop="4dp">
 
     <ImageButton
         android:id="@+id/view_keyword_tag_inclusive_indicator"
         android:layout_width="22dp"
         android:layout_height="22dp"
+        android:layout_marginEnd="6dp"
         android:layout_marginRight="6dp"
+        android:contentDescription="@null"
         android:src="@drawable/filter_add" />
 
     <TextView
         android:id="@+id/view_keyword_tag_keyword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="fooKeyword"
+        android:text="@string/dummy_text"
         android:textColor="@color/app_text_primary"
         android:textSize="@dimen/text_x_small"
         android:textStyle="bold" />
@@ -52,16 +57,22 @@
         android:id="@+id/view_keyword_tag_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingEnd="0dp"
         android:paddingLeft="5dp"
-        android:text="(42)"
+        android:paddingRight="0dp"
+        android:paddingStart="5dp"
+        android:text="@string/dummy_number"
         android:textColor="@color/app_text_primary"
         android:textSize="@dimen/text_extra_micro" />
 
     <ImageView
         android:id="@+id/view_keyword_tag_dismiss"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="2dp"
+        android:layout_width="22dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
+        android:contentDescription="@null"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         android:src="@drawable/close_clear_cancel_full" />
 </LinearLayout>
