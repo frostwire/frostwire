@@ -259,6 +259,8 @@
     <string name="dummy_extra" translatable="false">[Extra]</string>
     <string name="dummy_seeds" translatable="false">[Seeds]</string>
     <string name="dummy_peers" translatable="false">[Peers]</string>
+    <string name="dummy_text" translatable="false">[Text]</string>
+    <string name="dummy_number" translatable="false">[Number]</string>
     <string name="view_transfer_item_list_item_icon">Icon for file type</string>
     <string name="nickname_sharing_count_files">%1$s - Sharing %2$d files</string>
     <string name="play_image_description">Play</string>
@@ -686,7 +688,7 @@
     <string name="file_extensions">File extensions</string>
     <string name="file_names">File names</string>
     <string name="touch_applied_tags_to_include_exclude">Touch applied tags to include/exclude</string>
-    <string name="tip_touch_the_button_to">Tip: Touch the button to</string>
+    <string name="tip_touch_the_button_to"><b>TIP:</b> Touch the button to</string>
     <string name="or">or</string>
     <string name="include">Include</string>
     <string name="exclude">Exclude</string>

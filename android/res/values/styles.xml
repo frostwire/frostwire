@@ -730,7 +730,14 @@
     <style name="filterTipTagInclusive">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/tip_tag_blue</item>
-        <item name="android:textSize">@dimen/text_micro</item>
+        <item name="android:textSize">@dimen/text_x_small</item>
         <item name="android:background">@drawable/keyword_tag_inclusive_background</item>
+    </style>
+    <style name="filterTipTagText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_extra_micro</item>
+        <item name="android:textColor">@color/app_text_white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginLeft">4dp</item>
     </style>
 </resources>
