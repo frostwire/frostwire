@@ -17,6 +17,7 @@
 
 package com.frostwire.android.util;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.view.View;
@@ -105,6 +106,9 @@ public final class Debug {
                     return true;
                 }
                 if (value instanceof View) {
+                    return true;
+                }
+                if (value instanceof Dialog) {
                     return true;
                 }
             }
