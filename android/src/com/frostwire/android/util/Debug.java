@@ -64,8 +64,22 @@ public final class Debug {
      * to a context, {@code false} otherwise.
      */
     public static boolean hasContext(Object obj) {
+        try {
+            return hasContext(obj, 0);
+        } catch (IllegalStateException e) {
+            // don't just rethrow to flatten the stack information
+            throw new IllegalStateException(e.getMessage() + ", class=" + obj.getClass().getName());
+        }
+    }
+
+    private static boolean hasContext(Object obj, int level) {
         if (!isEnable()) {
             return false;
+        }
+
+        if (level > 200) {
+            throw new IllegalStateException(
+                    "Too much recursion in hasContext, flatten your objects");
         }
 
         try {
@@ -101,13 +115,14 @@ public final class Debug {
                 f.setAccessible(true);
                 Object value = f.get(obj);
 
-                if (hasContext(value)) {
+                if (hasContext(value, level + 1)) {
                     return true;
                 }
             }
 
             return false;
-
+        } catch (IllegalStateException e) {
+            throw e;
         } catch (Throwable e) {
             // in case of a fatal error, this is just a runtime
             // check under debug, just let it run
