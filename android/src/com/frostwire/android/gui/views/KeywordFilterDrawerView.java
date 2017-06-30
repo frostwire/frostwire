@@ -36,13 +36,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private KeywordFiltersPipelineListener pipelineListener;
     private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
-    private TextView appliedTagsTipTextView;
+    private LinearLayout appliedTagsTipTextViewContainer;
     private TextView clearAppliedFiltersTextView;
     private KeywordFilterDrawerController keywordFilterDrawerController;
     private ScrollView scrollView;
@@ -79,26 +80,31 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         View.inflate(getContext(), R.layout.view_drawer_search_filters, this);
 
         scrollView = findView(R.id.view_drawer_search_filters_scrollview);
-        appliedTagsTipTextView = findView(R.id.view_drawer_search_filters_touch_tag_tips);
-        appliedTagsTipTextView.setVisibility(View.GONE);
+        appliedTagsTipTextViewContainer = findView(R.id.view_drawer_search_filters_touch_tag_tips_container);
+        appliedTagsTipTextViewContainer.setVisibility(View.GONE);
         clearAppliedFiltersTextView = findView(R.id.view_drawer_search_filters_clear_all);
         clearAppliedFiltersTextView.setVisibility(View.GONE);
         pipelineLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
-
         findView(R.id.view_drawer_search_filters_exit_button).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onExitButtonClicked();
             }
         });
-
         clearAppliedFiltersTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 clearAppliedFilters();
             }
         });
-
+        final ImageButton tagTipsCloseButton = findView(R.id.view_drawer_search_filters_touch_tag_tips_close_button);
+        tagTipsCloseButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                appliedTagsTipTextViewContainer.setVisibility(View.GONE);
+                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED, true);
+            }
+        });
         final EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
         keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -109,7 +115,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 return actionId == EditorInfo.IME_ACTION_DONE && onKeywordEntered(v);
             }
         });
-
         final ImageButton clearTextButton = findView(R.id.view_drawer_search_filters_keyword_text_button_clear);
         clearTextButton.setVisibility(RelativeLayout.GONE);
         clearTextButton.setOnClickListener(new OnClickListener() {
@@ -118,7 +123,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
                 keywordEditText.setText("");
             }
         });
-
         keywordEditText.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 clearTextButton.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
@@ -130,7 +134,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             public void afterTextChanged(Editable s) {
             }
         });
-
         featureContainer.put(KeywordDetector.Feature.SEARCH_SOURCE,
                 new TagsController(
                         (TextView) findView(R.id.view_drawer_search_filters_search_sources_textview),
@@ -193,7 +196,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             tagsController.showHeader();
             List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
-        } else if (histogram.size() == 0) {
+        } else if (histogram == null || histogram.size() == 0) {
             tagsController.hideHeader();
         }
         invalidate();
@@ -251,9 +254,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
 
     private void updateAppliedKeywordFilters(List<KeywordFilter> keywordFiltersPipeline) {
         boolean filtersHaveBeenApplied = keywordFiltersPipeline.size() > 0;
-        int textViewsVisibility = filtersHaveBeenApplied ? View.VISIBLE : View.GONE;
-        clearAppliedFiltersTextView.setVisibility(textViewsVisibility);
-        appliedTagsTipTextView.setVisibility(textViewsVisibility);
+        int clearAppliedFiltersVisibility = filtersHaveBeenApplied ? View.VISIBLE : View.GONE;
+        clearAppliedFiltersTextView.setVisibility(clearAppliedFiltersVisibility);
+
+        // touch tags include/exclude tip container visibility logic
+        boolean appliedTagsTipTextViewDismissedBefore = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED);
+        int appliedTagsTipTextViewVisibility = (filtersHaveBeenApplied && !appliedTagsTipTextViewDismissedBefore) ? View.VISIBLE : View.GONE;
+        appliedTagsTipTextViewContainer.setVisibility(appliedTagsTipTextViewVisibility);
 
         pipelineLayout.removeAllViews();
         if (filtersHaveBeenApplied) {
@@ -273,13 +280,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     @Override
     public void onKeywordTagViewDismissed(KeywordTagView view) {
         pipelineLayout.removeView(view);
-
         if (pipelineListener != null) {
             // this will update the keywordFiltersPipeline
             pipelineListener.onRemoveKeywordFilter(view.getKeywordFilter());
             updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
         }
-
         // un-hide tag in container
         if (view.getKeywordFilter().getFeature() != null) {
             ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
@@ -363,7 +368,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         TagsController(TextView header, ViewGroup container) {
             this.header = header;
             this.container = container;
-
             this.header.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -90,15 +90,14 @@
                 android:layout_height="wrap_content"
                 android:background="@color/app_background_body_light"
                 android:orientation="vertical"
-                android:paddingBottom="15dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
                 android:paddingTop="25dp"
                 android:weightSum="1">
 
                 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp">
 
                     <EditText
                         android:id="@+id/view_drawer_search_filters_keyword_edittext"
@@ -118,13 +117,11 @@
                         android:id="@+id/view_drawer_search_filters_keyword_text_button_clear"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignEnd="@+id/view_drawer_search_filters_keyword_edittext"
+                        android:layout_alignRight="@+id/view_drawer_search_filters_keyword_edittext"
                         android:layout_centerVertical="true"
-                        android:layout_marginBottom="6dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_marginRight="15dp"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
                         android:background="@null"
                         android:contentDescription="@null"
                         android:src="@drawable/clearable_edittext_clear_icon" />
@@ -135,6 +132,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     frostwire:flexWrap="wrap">
 
                     <com.frostwire.android.gui.views.KeywordTagView
@@ -177,16 +177,114 @@
                         frostwire:keyword_tag_keyword="consectetur" />
                 </com.google.android.flexbox.FlexboxLayout>
 
-                <TextView
-                    android:id="@+id/view_drawer_search_filters_touch_tag_tips"
+                <LinearLayout
+                    android:id="@+id/view_drawer_search_filters_touch_tag_tips_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/touch_applied_tags_to_include_exclude"
-                    android:textColor="@color/app_text_secondary"
-                    android:textSize="@dimen/text_x_small" />
+                    android:background="@color/app_rich_notification_background"
+                    android:orientation="horizontal">
 
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/view_drawer_search_filters_touch_tag_tips_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".8"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="10dp"
+                        frostwire:flexWrap="wrap">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="4dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/tip_touch_the_button_to"
+                            android:textColor="@color/app_text_primary"
+                            android:textSize="@dimen/text_x_small" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/keyword_tag_background_tip_active"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:paddingTop="3dp">
+
+                            <TextView
+                                style="@style/filterTipTagInclusive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="+" />
+
+                            <TextView
+                                android:id="@+id/textView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="4dp"
+                                android:gravity="center_vertical"
+                                android:text="@string/include"
+                                android:textColor="@color/app_text_white"
+                                android:textSize="@dimen/text_micro"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="4dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/or"
+                            android:textColor="@color/app_text_primary"
+                            android:textSize="@dimen/text_x_small" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/keyword_tag_background_tip_active"
+                            android:orientation="horizontal"
+                            android:paddingBottom="3dp"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp"
+                            android:paddingTop="3dp">
+
+                            <TextView
+                                style="@style/filterTipTagInclusive"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:text="-" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="4dp"
+                                android:gravity="center"
+                                android:text="@string/exclude"
+                                android:textColor="@color/app_text_white"
+                                android:textSize="@dimen/text_micro"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <ImageButton
+                        android:id="@+id/view_drawer_search_filters_touch_tag_tips_close_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight=".2"
+                        android:background="@null"
+                        android:contentDescription="@null"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/clearable_edittext_clear_icon" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <View
