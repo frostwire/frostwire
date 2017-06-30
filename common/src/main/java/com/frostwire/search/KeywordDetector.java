@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -62,7 +62,7 @@ public final class KeywordDetector {
     private final Map<Feature, HistoHashMap<String>> histograms;
     private KeywordDetectorListener keywordDetectorListener;
     private final HistogramUpdateRequestDispatcher histogramUpdateRequestsDispatcher;
-    private ThreadPool threadPool;
+    private ExecutorService threadPool;
 
     public KeywordDetector() {
         histograms = new HashMap<>();
@@ -254,7 +254,8 @@ public final class KeywordDetector {
 
         public void start() {
             LOG.info("HistogramUpdateRequestDispatcher start()");
-            threadPool = new ThreadPool("KeywordDetector-pool", 3, new LinkedBlockingQueue<Runnable>(), false);
+            threadPool = ThreadPool.newThreadPool("KeywordDetector-pool", 3, false);
+
             running.set(true);
             new Thread(this, "HistogramUpdateRequestDispatcher").start();
         }
