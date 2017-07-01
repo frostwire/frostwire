@@ -254,8 +254,9 @@ public final class KeywordDetector {
 
         private void shutdownThreadPool() {
             if (threadPool != null) {
-                threadPool.shutdown();
-                threadPool = null;
+                try {
+                    threadPool.shutdown();
+                } catch (Throwable ignored) {}
             }
         }
 
