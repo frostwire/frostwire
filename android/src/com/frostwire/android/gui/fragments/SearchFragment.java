@@ -31,6 +31,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -834,13 +836,16 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private class FilterToolbarButton implements KeywordDetector.KeywordDetectorListener, KeywordFilterDrawerView.KeywordFiltersPipelineListener {
+
         private ImageButton imageButton;
         private TextView counterTextView;
         private long lastKeywordFilterDrawerViewUpdate;
+        private Animation pulse;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
             this.counterTextView = counterTextView;
+            this.pulse = AnimationUtils.loadAnimation(getActivity(), R.anim.pulse);
             initListeners();
         }
 
@@ -921,11 +926,18 @@ public final class SearchFragment extends AbstractFragment implements
 
         private void setVisible(boolean visible) {
             int visibility = visible ? View.VISIBLE : View.GONE;
+            int oldVisibility = imageButton.getVisibility();
+
             imageButton.setVisibility(visibility);
             if (visible) {
+                if (oldVisibility == View.GONE) {
+                    pulse.reset();
+                    imageButton.startAnimation(pulse);
+                }
                 counterTextView.setVisibility(getKeywordFiltersPipeline().size() > 0 ? View.VISIBLE : View.GONE);
                 counterTextView.setText(String.valueOf(getKeywordFiltersPipeline().size()));
             } else {
+                imageButton.clearAnimation();
                 counterTextView.setVisibility(View.GONE);
             }
         }
