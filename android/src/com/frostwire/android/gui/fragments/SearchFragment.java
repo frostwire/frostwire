@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -323,11 +322,7 @@ public final class SearchFragment extends AbstractFragment implements
             // the second condition exists to accommodate a reset keywordDetector upon screen rotation
             if (!searchFinished || (keywordDetector.totalHistogramKeys() == 0 && results.size() > 0)) {
                 KeywordDetectorFeeder.submitSearchResults(this, results);
-            } else {
-                keywordDetector.notifyListener();
             }
-        } else {
-            keywordDetector.notifyListener();
         }
     }
 
@@ -357,25 +352,23 @@ public final class SearchFragment extends AbstractFragment implements
                     if (fragment == null) {
                         return; // everything is possible
                     }
-                    long start = SystemClock.currentThreadTimeMillis();
+                    KeywordDetector keywordDetector = fragment.keywordDetector;
                     for (SearchResult sr : results) {
-                        fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
+                        keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
                         if (sr instanceof FileSearchResult) {
                             String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
                             String ext = FilenameUtils.getExtension(fileName).toLowerCase();
                             if (fileName != null && !fileName.isEmpty()) {
-                                fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
+                                keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
                             }
                             if (ext != null && !ext.isEmpty()) {
-                                fragment.keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
+                                keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
                             }
                         }
                     }
-                    long delta = SystemClock.currentThreadTimeMillis() - start;
-                    LOG.info("updateKeywordDetector, added " + results.size() + " results in " + delta + " ms");
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
-                    fragment.keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME);
                 }
             });
         }
@@ -679,11 +672,9 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         drawerLayout.openDrawer(keywordFilterDrawerView);
-        if (keywordDetector != null) {
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.SEARCH_SOURCE);
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_EXTENSION);
-            keywordDetector.requestHistogramUpdate(KeywordDetector.Feature.FILE_NAME);
-        }
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE);
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION);
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME);
 
     }
 
@@ -839,7 +830,6 @@ public final class SearchFragment extends AbstractFragment implements
 
         private ImageButton imageButton;
         private TextView counterTextView;
-        private long lastKeywordFilterDrawerViewUpdate;
         private Animation pulse;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
@@ -855,13 +845,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         @Override
-        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final List<Map.Entry<String, Integer>> histogram, boolean forceUIUpdate) {
-            long now = SystemClock.currentThreadTimeMillis();
-            if (!forceUIUpdate && now - lastKeywordFilterDrawerViewUpdate < 2000) {
-                // expensive operation for main thread, ignore sub-second requests for refreshing
-                return;
-            }
-            lastKeywordFilterDrawerViewUpdate = now;
+        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final List<Map.Entry<String, Integer>> histogram) {
             Runnable uiRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -873,11 +857,11 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         @Override
-        public void notify(final KeywordDetector detector, Map<KeywordDetector.Feature, HistoHashMap<String>> histograms) {
-            if (histograms != null && !histograms.isEmpty()) {
-                Set<KeywordDetector.Feature> features = histograms.keySet();
+        public void notify(final KeywordDetector detector, Map<KeywordDetector.Feature, HistoHashMap<String>> histoHashMaps) {
+            if (histoHashMaps != null && !histoHashMaps.isEmpty()) {
+                Set<KeywordDetector.Feature> features = histoHashMaps.keySet();
                 for (KeywordDetector.Feature feature : features) {
-                    onHistogramUpdate(detector, feature, histograms.get(feature).histogram(), false);
+                    onHistogramUpdate(detector, feature, histoHashMaps.get(feature).histogram());
                 }
             }
         }
@@ -932,7 +916,8 @@ public final class SearchFragment extends AbstractFragment implements
             if (visible) {
                 if (oldVisibility == View.GONE) {
                     pulse.reset();
-                    imageButton.startAnimation(pulse);
+                    imageButton.setAnimation(pulse);
+                    pulse.setStartTime(AnimationUtils.currentAnimationTimeMillis()+1000);
                 }
                 counterTextView.setVisibility(getKeywordFiltersPipeline().size() > 0 ? View.VISIBLE : View.GONE);
                 counterTextView.setText(String.valueOf(getKeywordFiltersPipeline().size()));
@@ -946,6 +931,7 @@ public final class SearchFragment extends AbstractFragment implements
             imageButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    imageButton.clearAnimation();
                     openKeywordFilterDrawerView();
                 }
             });
