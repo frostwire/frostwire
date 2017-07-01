@@ -831,11 +831,15 @@ public final class SearchFragment extends AbstractFragment implements
         private ImageButton imageButton;
         private TextView counterTextView;
         private Animation pulse;
+        private boolean filterButtonClickedBefore;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
             this.counterTextView = counterTextView;
-            this.pulse = AnimationUtils.loadAnimation(getActivity(), R.anim.pulse);
+            this.filterButtonClickedBefore = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED);
+            if (!filterButtonClickedBefore) {
+                this.pulse = AnimationUtils.loadAnimation(getActivity(), R.anim.pulse);
+            }
             initListeners();
         }
 
@@ -914,7 +918,7 @@ public final class SearchFragment extends AbstractFragment implements
 
             imageButton.setVisibility(visibility);
             if (visible) {
-                if (oldVisibility == View.GONE) {
+                if (oldVisibility == View.GONE && !filterButtonClickedBefore) {
                     pulse.reset();
                     imageButton.setAnimation(pulse);
                     pulse.setStartTime(AnimationUtils.currentAnimationTimeMillis()+1000);
@@ -931,7 +935,12 @@ public final class SearchFragment extends AbstractFragment implements
             imageButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    imageButton.clearAnimation();
+                    if (!filterButtonClickedBefore) {
+                        filterButtonClickedBefore = true;
+                        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED, true);
+                        imageButton.clearAnimation();
+                        pulse = null;
+                    }
                     openKeywordFilterDrawerView();
                 }
             });
