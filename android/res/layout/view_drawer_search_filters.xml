@@ -177,6 +177,7 @@
                         frostwire:keyword_tag_keyword="consectetur" />
                 </com.google.android.flexbox.FlexboxLayout>
 
+                <!-- Dismissible Tip -->
                 <LinearLayout
                     android:id="@+id/view_drawer_search_filters_touch_tag_tips_container"
                     android:layout_width="match_parent"
@@ -327,7 +328,8 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/filter_expand"
                     android:drawableStart="@drawable/filter_expand"
-                    android:text="@string/sources_channels" />
+                    android:text="@string/sources_channels"
+                    android:visibility="gone"/>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_search_sources"
@@ -354,7 +356,8 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/filter_expand"
                     android:drawableStart="@drawable/filter_expand"
-                    android:text="@string/file_extensions" />
+                    android:text="@string/file_extensions"
+                    android:visibility="gone"/>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_file_extensions"
@@ -381,7 +384,8 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/filter_minimize"
                     android:drawableStart="@drawable/filter_minimize"
-                    android:text="@string/file_names" />
+                    android:text="@string/file_names"
+                    android:visibility="gone"/>
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/view_drawer_search_filters_file_names"

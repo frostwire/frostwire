@@ -196,12 +196,10 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             updateAppliedKeywordFilters(keywordFiltersPipeline);
         }
         TagsController tagsController = featureContainer.get(feature);
+        tagsController.hideHeader();
         if (feature != null && histogram != null && histogram.size() > 0) {
-            tagsController.showHeader();
             List<Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
             updateSuggestedKeywordFilters(feature, filteredHistogram);
-        } else if (histogram == null || histogram.size() == 0) {
-            tagsController.hideHeader();
         }
         invalidate();
     }
@@ -245,6 +243,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             keywordTagView.setVisibility(visibility);
         }
         container.invalidate();
+
+        TagsController tagsController = featureContainer.get(feature);
+        if (container.getChildCount() > 0) {
+            tagsController.showHeader();
+        } else {
+            tagsController.hideHeader();
+        }
     }
 
     private boolean keywordInPipeline(String keyword, List<KeywordFilter> pipeline) {
