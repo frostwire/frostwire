@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.services;
 
+import android.support.compat.BuildConfig;
+
 import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
@@ -48,7 +50,7 @@ final class EngineThreadPool extends ThreadPool {
 
         // if debug/development, allow only 20 tasks in the queue
         if (Debug.isEnable() && getQueue().size() > 20) {
-            throw new RuntimeException("Too much tasks in the queue");
+            throw new RuntimeException("Too many tasks in the queue");
         }
 
         super.execute(command);
