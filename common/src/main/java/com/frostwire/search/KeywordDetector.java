@@ -102,8 +102,6 @@ public final class KeywordDetector {
             token = token.trim();
             if (feature.minimumTokenLength <= token.length() && token.length() <= feature.maximumTokenLength && !stopWords.contains(token)) {
                 updateHistogramTokenCount(feature, token);
-            } else if (feature == Feature.FILE_EXTENSION) {
-                LOG.info("!addSearchTerm(" + token + ")");
             }
         }
     }
@@ -222,18 +220,15 @@ public final class KeywordDetector {
                 }
                 try {
                     if (running.get()) {
-                        LOG.info("HistogramUpdateRequestDispatcher loopLock.await()...");
                         lock.lock();
                         loopLock.await(1, TimeUnit.MINUTES);
                         lock.unlock();
-                        LOG.info("HistogramUpdateRequestDispatcher loopLock.signaled!...");
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
             }
-            LOG.info("HistogramUpdateRequestDispatcher thread shutdown.");
             clear();
             shutdownThreadPool();
         }
@@ -246,7 +241,6 @@ public final class KeywordDetector {
         }
 
         public void start() {
-            LOG.info("HistogramUpdateRequestDispatcher start()");
             running.set(true);
             threadPool = ThreadPool.newThreadPool("KeywordDetector-pool", 1, false);
             new Thread(this, "HistogramUpdateRequestDispatcher").start();
@@ -274,7 +268,6 @@ public final class KeywordDetector {
         }
 
         private void signalLoopLock() {
-            LOG.info("HistogramUpdateRequestDispatcher signalLoopLock()");
             try {
                 lock.lock();
                 loopLock.signal();
