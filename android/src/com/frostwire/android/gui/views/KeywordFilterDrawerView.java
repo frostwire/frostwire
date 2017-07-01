@@ -228,7 +228,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
-        ViewGroup container = featureContainer.get(feature).container;
+        TagsController tagsController = featureContainer.get(feature);
+        ViewGroup container = tagsController.container;
         container.removeAllViews();
         boolean keywordsApplied = false;
         List<KeywordFilter> keywordFiltersPipeline = null;
@@ -243,8 +244,6 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             keywordTagView.setVisibility(visibility);
         }
         container.invalidate();
-
-        TagsController tagsController = featureContainer.get(feature);
         if (container.getChildCount() > 0) {
             tagsController.showHeader();
         } else {
