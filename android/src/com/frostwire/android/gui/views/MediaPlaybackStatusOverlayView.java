@@ -24,6 +24,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * @author aldenml
@@ -40,8 +41,20 @@ public class MediaPlaybackStatusOverlayView extends View {
     public MediaPlaybackStatusOverlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.MediaPlaybackStatusOverlayView, 0, 0);
-        circleStrokeWidth = attributes.getInteger(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth, 8);
+        circleStrokeWidth = getCircleStrokeWidth(attributes);
         attributes.recycle();
+    }
+
+    private int getCircleStrokeWidth(TypedArray attributes) {
+        int[] screenDimensions = UIUtils.getScreenDimensionsAndRotation(getContext());
+        int verticalScreenWidth = Math.min(screenDimensions[0], screenDimensions[1]);
+        int strokeWidth = 8;
+        if (verticalScreenWidth < 412) {
+            strokeWidth = 3;
+        } else if (verticalScreenWidth >= 412 && verticalScreenWidth < 640) {
+            strokeWidth = 5;
+        }
+        return attributes.getInteger(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth, strokeWidth);
     }
 
     @Override
