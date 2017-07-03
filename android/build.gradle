@@ -170,8 +170,8 @@ dependencies {
     compile 'com.android.support:design:25.4.0'
     compile 'com.android.support:preference-v14:25.4.0'
     compile 'com.android.support:support-v13:25.4.0'
-    compile 'com.google.android.gms:play-services-ads-lite:11.0.1'
-    compile 'com.google.android.gms:play-services-base:11.0.1'
+    compile 'com.google.android.gms:play-services-ads-lite:11.0.2'
+    compile 'com.google.android.gms:play-services-base:11.0.2'
     compile('com.mopub:mopub-sdk-banner:4.15.0@aar') { transitive = true }
     compile('com.mopub:mopub-sdk-interstitial:4.15.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
