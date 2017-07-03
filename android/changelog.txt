@@ -1,12 +1,12 @@
-FrostWire 1.9.8 - JUN/30/2017
+FrostWire 1.9.8 - JUL/03/2017
  - New search filtering tools
+ - New jlibtorrent 1.2.0.11-RC2
  - Improved VPN detection
  - BitTorrent connection recovers when VPN service goes off and VPN protection off
- - kotlin update to 1.1.3
+ - Library updates: kotlin 1.1.3, gms 11.0.2, MoPub 4.15
  - UI-refresh: Transfer list items, drawable cleanup, My Music list items,
    removed double divider in search result list item, added missing new line
    to grid base
- - MoPub 4.15 update
  - Fixed memory leaks and runnaway threadpools causing out of memory errors
 
 FrostWire 1.9.7 - JUN/22/2017
