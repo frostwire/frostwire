@@ -21,9 +21,10 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:drawablePadding="14dip"
+    android:drawablePadding="16dp"
     android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="15dip"
-    android:paddingRight="15dip"
-    android:textSize="@dimen/text_large" />
+    android:minHeight="55dp"
+    android:paddingLeft="14dp"
+    android:paddingRight="14dp"
+    android:textColor="@color/app_text_primary"
+    android:textSize="@dimen/text_medium" />
