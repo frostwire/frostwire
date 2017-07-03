@@ -227,36 +227,45 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void buildTorrentAndSeedIt(final FileDescriptor fd) {
-        // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File file = new File(fd.filePath);
-                    File saveDir = file.getParentFile();
-                    file_storage fs = new file_storage();
-                    fs.add_file(file.getName(), file.length());
-                    fs.set_name(file.getName());
-                    create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                    // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-                    // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-                    ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-                    ct.set_priv(false);
+        Engine.instance().getThreadPool().execute(new BuildTorrentAndSeedTask(fd));
+    }
 
-                    final error_code ec = new error_code();
-                    libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+    private static final class BuildTorrentAndSeedTask implements Runnable {
 
-                    final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-                    final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+        private final FileDescriptor fd;
 
-                    // so the TorrentHandle object is created and added to the libtorrent session.
-                    BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
-                } catch (Throwable e) {
-                    // TODO: better handling of this error
-                    LOG.error("Error creating torrent for seed", e);
-                }
+        BuildTorrentAndSeedTask(FileDescriptor fd) {
+            this.fd = fd;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
+                File file = new File(fd.filePath);
+                File saveDir = file.getParentFile();
+                file_storage fs = new file_storage();
+                fs.add_file(file.getName(), file.length());
+                fs.set_name(file.getName());
+                create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
+                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
+                ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+                ct.set_priv(false);
+
+                final error_code ec = new error_code();
+                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+
+                final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
+                final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+
+                // so the TorrentHandle object is created and added to the libtorrent session.
+                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
+            } catch (Throwable e) {
+                // TODO: better handling of this error
+                LOG.error("Error creating torrent for seed", e);
             }
-        });
+        }
     }
 
     private void onSeedingEnabled() {
