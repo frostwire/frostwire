@@ -1,86 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:weightSum="1.0">
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <LinearLayout android:id="@+id/view_social_buttons_installation_complete_layout"
-                  android:orientation="vertical"
-                  android:layout_width="fill_parent"
-                  android:layout_height="0dp"
-                  android:layout_weight="0.30"
-                  android:layout_marginTop="30dp"
-                  android:visibility="gone"
-                  android:gravity="center_horizontal"
-                  android:weightSum="1.0">
-        <ImageButton android:id="@+id/view_social_buttons_dismiss_check"
-                     android:src="@drawable/social_wizard_check"
-                     android:layout_width="wrap_content"
-                     android:layout_height="0dp"
-                     android:layout_weight="0.4"
-                     android:layout_marginBottom="20dp"
-                     android:background="@color/transparent"
-                     android:scaleType="fitCenter"/>
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/your_installation_is_complete"
-                  android:textSize="@dimen/text_size_large"/>
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="@string/thank_you"
-                  android:textSize="@dimen/text_size_large"
-                  android:textStyle="bold"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/view_social_buttons_installation_complete_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageButton
+                android:id="@+id/view_social_buttons_dismiss_check"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginBottom="26dp"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/social_wizard_check" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="@string/your_installation_is_complete"
+                android:textSize="@dimen/text_size_large" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/thank_you"
+                android:textSize="@dimen/text_size_large"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_horizontal"
+            android:text="@string/keep_in_touch"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:weightSum="1">
+
+            <ImageButton
+                android:id="@+id/view_social_buttons_facebook_button"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="0.22"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/social_wizard_facebook" />
+
+
+            <ImageButton
+                android:id="@+id/view_social_buttons_twitter_button"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="0.22"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/social_wizard_twitter" />
+
+
+            <ImageButton
+                android:id="@+id/view_social_buttons_reddit_button"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.22"
+                android:background="@color/transparent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/social_wizard_reddit" />
+        </LinearLayout>
     </LinearLayout>
-
-    <Space android:layout_width="fill_parent" android:layout_height="20dp"/>
-
-    <TextView android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:gravity="center_horizontal"
-              android:text="@string/keep_in_touch"
-              android:textSize="20sp"
-              android:layout_marginBottom="20dp"
-            />
-
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_weight="0.20"
-                  android:layout_width="fill_parent"
-                  android:layout_height="0dp"
-                  android:layout_marginBottom="50dp"
-                  android:paddingLeft="20dp"
-                  android:paddingRight="20dp"
-                  android:weightSum="1"
-                  android:gravity="center_horizontal"
-            >
-
-        <ImageButton android:id="@+id/view_social_buttons_facebook_button"
-                     android:src="@drawable/social_wizard_facebook"
-                     android:layout_width="0dp"
-                     android:layout_weight="0.22"
-                     android:layout_height="wrap_content"
-                     android:background="@color/transparent"
-                     android:layout_marginRight="20dp"
-                     android:scaleType="fitCenter"/>
-
-
-        <ImageButton android:id="@+id/view_social_buttons_twitter_button"
-                     android:src="@drawable/social_wizard_twitter"
-                     android:layout_width="0dp"
-                     android:layout_weight="0.22"
-                     android:layout_height="wrap_content"
-                     android:background="@color/transparent"
-                     android:layout_marginRight="20dp"
-                     android:scaleType="fitCenter"/>
-
-
-        <ImageButton android:id="@+id/view_social_buttons_reddit_button"
-                     android:src="@drawable/social_wizard_reddit"
-                     android:layout_width="0dp"
-                     android:layout_weight="0.22"
-                     android:layout_height="wrap_content"
-                     android:background="@color/transparent"
-                     android:scaleType="fitCenter"/>
-
-    </LinearLayout>
-</LinearLayout>
+</ScrollView>
