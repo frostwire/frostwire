@@ -208,7 +208,15 @@ public class SearchInputView extends LinearLayout {
     }
 
     public void selectTabByMediaType(final byte mediaTypeId) {
-        tabLayout.getTabAt(toFileTypeTab.get(mediaTypeId).position).select();
+        if (toFileTypeTab != null) {
+            FileTypeTab fileTypeTab = toFileTypeTab.get(mediaTypeId);
+            if (fileTypeTab != null && tabLayout != null) {
+                TabLayout.Tab tab = tabLayout.getTabAt(fileTypeTab.position);
+                if (tab != null) {
+                    tab.select();
+                }
+            }
+        }
     }
 
     public void switchToThe(boolean right) {
