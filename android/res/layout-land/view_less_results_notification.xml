@@ -18,18 +18,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="140dp"
-    android:background="@drawable/view_less_results_background_yellow"
-    android:gravity="center_vertical|center_horizontal"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/view_less_results_notification_image"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/view_less_results_text" />
+        android:layout_height="140dp"
+        android:background="@drawable/view_less_results_notification_background"
+        android:gravity="center"
+        android:orientation="vertical">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/view_less_results_notification_headline_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/clearable_edittext_search_icon"
+            android:drawableStart="@drawable/clearable_edittext_search_icon"
+            android:gravity="center"
+            android:text="@string/seeing_less_results"
+            android:textAllCaps="true"
+            android:textColor="@color/app_text_primary"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/view_less_results_notification_instruction_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/fix_instructions"
+            android:textColor="@color/app_text_primary"
+            android:textSize="@dimen/text_small" />
+
+    </LinearLayout>
+</LinearLayout>

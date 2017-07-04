@@ -18,35 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@drawable/view_remove_ads_background_blue"
-    android:gravity="center_vertical|center_horizontal"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_remove_ads_notification"
-    android:layout_height="150dp"
     android:layout_width="match_parent"
-    android:paddingTop="25dp"
+    android:layout_height="200dp"
+    android:background="@drawable/view_remove_ads_notification_background"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="horizontal"
     android:paddingBottom="25dp"
-    android:orientation="horizontal">
+    android:paddingTop="25dp">
 
     <TextView
         android:id="@+id/view_remove_ads_notification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
         android:text="@string/support_frostwire"
         android:textAllCaps="true"
         android:textColor="@color/app_text_primary"
-        android:textSize="@dimen/text_medium"
+        android:textSize="@dimen/text_x_medium"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/view_remove_ads_notification_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/view_remove_ads_notification_title"
         android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
         android:text="@string/remove_ads"
         android:textColor="@color/basic_white"
         android:textSize="@dimen/text_xx_large"
@@ -55,22 +54,22 @@
 
     <ImageView
         android:id="@+id/view_remove_ads_notification_image"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/view_remove_ads_notification_subtitle"
         android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_width="45dp"
         android:src="@drawable/ad_remove_speaker_white" />
 
 
     <TextView
-        android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
         android:id="@+id/view_remove_ads_notification_image_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/view_remove_ads_notification_subtitle"
         android:layout_centerHorizontal="true"
-        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_width="wrap_content"
+        android:background="@drawable/activity_buy_interstitial_ad_free_button_background"
         android:padding="14dp"
         android:text="@string/remove_ads"
         android:textAllCaps="true"
@@ -81,11 +80,11 @@
 
     <ImageView
         android:id="@+id/view_remove_ads_notification_close"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_height="wrap_content"
         android:layout_marginRight="4dp"
-        android:layout_width="25dp"
         android:src="@drawable/full_screen_close"
         android:visibility="gone" />
 </RelativeLayout>
