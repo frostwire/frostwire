@@ -39,12 +39,18 @@
                 android:layout_marginTop="20dp"
                 android:visibility="gone"/>
 
-        <TextView android:id="@+id/view_search_progress_try_other_keywords" android:layout_width="wrap_content"
-                  android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
-                  android:text="@string/try_other_keywords" android:textSize="20sp" android:textStyle="bold"
-                  android:layout_marginTop="20dp" android:layout_marginBottom="10dp"
-                  android:singleLine="true"
-                  android:visibility="gone"/>
+        <TextView
+            android:id="@+id/view_search_progress_try_other_keywords_or_filters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
+            android:singleLine="true"
+            android:text="@string/try_other_keywords"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
         <TextView android:id="@+id/view_search_progress_try_frostwire_plus"
                   android:text="@string/try_frostwire_plus_for_more_results"

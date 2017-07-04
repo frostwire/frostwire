@@ -694,5 +694,5 @@
     <string name="exclude">Exclude</string>
     <string name="seeing_less_results">Seeing less or no results?</string>
     <string name="fix_instructions">See support.frostwire.com for info and fix instructions</string>
-
+    <string name="try_changing_applied_filters">Try changing applied filters</string>
 </resources>

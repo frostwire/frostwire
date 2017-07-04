@@ -110,7 +110,7 @@ import java.util.regex.Pattern;
 public final class SearchFragment extends AbstractFragment implements
         MainFragment,
         OnDialogClickListener,
-        SearchProgressView.CurrentQueryReporter, PromotionDownloader, KeywordFilterDrawerView.KeywordFilterDrawerController {
+        SearchProgressView.CurrentQueryReporter, PromotionDownloader, KeywordFilterDrawerView.KeywordFilterDrawerController, DrawerLayout.DrawerListener {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -177,6 +177,7 @@ public final class SearchFragment extends AbstractFragment implements
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
             filterButton.reset(false);
             updateKeywordDetector(adapter.getList());
+            searchProgress.setKeywordFiltersApplied(!adapter.getKeywordFiltersPipeline().isEmpty());
             filterButton.updateVisibility();
         } else {
             setupPromoSlides();
@@ -324,6 +325,25 @@ public final class SearchFragment extends AbstractFragment implements
                 KeywordDetectorFeeder.submitSearchResults(this, results);
             }
         }
+    }
+
+    @Override
+    public void onDrawerSlide(View view, float v) {
+    }
+
+    @Override
+    public void onDrawerOpened(View view) {
+    }
+
+    @Override
+    public void onDrawerClosed(View view) {
+        if (view == keywordFilterDrawerView) {
+            searchInput.selectTabByMediaType((byte) adapter.getFileType());
+        }
+    }
+
+    @Override
+    public void onDrawerStateChanged(int i) {
     }
 
     /**
@@ -483,6 +503,9 @@ public final class SearchFragment extends AbstractFragment implements
                 switchView(view, R.id.fragment_search_search_progress);
                 deepSearchProgress.setVisibility(View.GONE);
             }
+        }
+        if (getCurrentQuery() != null && adapter != null) {
+            searchProgress.setKeywordFiltersApplied(!adapter.getKeywordFiltersPipeline().isEmpty());
         }
         searchProgress.setProgressEnabled(!searchFinished);
     }
@@ -655,6 +678,8 @@ public final class SearchFragment extends AbstractFragment implements
 
     public void connectDrawerLayoutFilterView(DrawerLayout drawerLayout, View filterView) {
         this.drawerLayout = drawerLayout;
+        drawerLayout.removeDrawerListener(this);
+        drawerLayout.addDrawerListener(this);
         keywordFilterDrawerView = (KeywordFilterDrawerView) filterView;
         keywordFilterDrawerView.setKeywordFilterDrawerController(this);
     }

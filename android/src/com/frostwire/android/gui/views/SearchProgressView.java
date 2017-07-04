@@ -40,8 +40,10 @@ public class SearchProgressView extends LinearLayout {
     private ProgressBar progressbar;
     private Button buttonCancel;
     private TextView textNoResults;
-    private TextView textTryOtherKeywords;
+    private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
+    private String stringTryOtherKeywords;
+    private String stringTryChangingAppliedFilters;
 
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
@@ -72,8 +74,8 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void showRetryViews() {
-        if (textTryOtherKeywords != null) {
-            textTryOtherKeywords.setVisibility(View.VISIBLE);
+        if (textTryOtherKeywordsOrFilters != null) {
+            textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
@@ -81,8 +83,8 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void hideRetryViews() {
-        if (textTryOtherKeywords != null) {
-            textTryOtherKeywords.setVisibility(View.GONE);
+        if (textTryOtherKeywordsOrFilters != null) {
+            textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
         if (textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.GONE);
@@ -102,7 +104,9 @@ public class SearchProgressView extends LinearLayout {
         progressbar = (ProgressBar) findViewById(R.id.view_search_progress_progressbar);
         buttonCancel = (Button) findViewById(R.id.view_search_progress_button_cancel);
         textNoResults = (TextView) findViewById(R.id.view_search_progress_text_no_results_feedback);
-        textTryOtherKeywords = (TextView) findViewById(R.id.view_search_progress_try_other_keywords);
+        textTryOtherKeywordsOrFilters = (TextView) findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+        stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
+        stringTryChangingAppliedFilters = getResources().getString(R.string.try_changing_applied_filters);
 
         textTryFrostWirePlus = (TextView) findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -151,6 +155,10 @@ public class SearchProgressView extends LinearLayout {
 
     public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
         this.currentQueryReporter = currentQueryReporter;
+    }
+
+    public void setKeywordFiltersApplied(boolean filtersApplied) {
+        textTryOtherKeywordsOrFilters.setText(filtersApplied ? stringTryChangingAppliedFilters : stringTryOtherKeywords);
     }
 
     public interface CurrentQueryReporter {
