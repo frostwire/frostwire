@@ -21,7 +21,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="140dp"
-    android:background="@drawable/view_remove_ads_background_blue"
+    android:background="@drawable/view_remove_ads_notification_background"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="horizontal">
 
