@@ -21,7 +21,7 @@
 <resources>
 
     <declare-styleable name="MediaPlaybackStatusOverlayView">
-        <attr name="circleStrokeWidth" format="integer"/>
+        <attr name="circleStrokeWidth" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="KeywordTagView">

@@ -46,15 +46,9 @@ public final class MediaPlaybackStatusOverlayView extends View {
     }
 
     private int getCircleStrokeWidth(TypedArray attributes) {
-        int[] screenDimensions = UIUtils.getScreenDimensionsAndRotation(getContext());
-        int verticalScreenWidth = Math.min(screenDimensions[0], screenDimensions[1]);
-        int strokeWidth = 8;
-        if (verticalScreenWidth < 412) {
-            strokeWidth = 3;
-        } else if (verticalScreenWidth >= 412 && verticalScreenWidth < 640) {
-            strokeWidth = 5;
-        }
-        return attributes.getInteger(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth, strokeWidth);
+        int defaultCircleStrokeWidth = getResources().getDimensionPixelSize(R.dimen.default_circleStrokeWidth);
+        return attributes.getDimensionPixelSize(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth,
+                defaultCircleStrokeWidth);
     }
 
     @Override

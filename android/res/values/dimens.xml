@@ -55,4 +55,6 @@
 
     <!-- Settings -->
     <dimen name="settings_list_item_inner_horizontal_padding">16dp</dimen>
+
+    <dimen name="default_circleStrokeWidth">2dp</dimen>
 </resources>

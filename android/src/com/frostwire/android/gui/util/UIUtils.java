@@ -563,18 +563,6 @@ public final class UIUtils {
         return Math.sqrt(x_sq + y_sq);
     }
 
-    /**
-     * @param context
-     * @return a 3 int array with: { widthInPixels, heightInPixels, Surface#ROTATION_XXX value }
-     */
-    public static int[] getScreenDimensionsAndRotation(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        return new int[]{metrics.widthPixels, metrics.heightPixels, display.getRotation()};
-    }
-
     public static boolean isMain() {
         return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
