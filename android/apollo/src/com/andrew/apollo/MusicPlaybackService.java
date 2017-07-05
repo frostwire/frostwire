@@ -833,7 +833,11 @@ public class MusicPlaybackService extends Service {
 
         if (D) LOG.info("Nothing is playing anymore, releasing notification");
         mNotificationHelper.killNotification();
-        mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        // on some devices where it requires MODIFY_PHONE_STATE
+        // mAudioManager could be null
+        if (mAudioManager != null) {
+            mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
 
         if (!mServiceInUse || force) {
