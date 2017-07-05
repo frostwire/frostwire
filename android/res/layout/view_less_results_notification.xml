@@ -23,34 +23,34 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:background="@drawable/view_less_results_notification_background"
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    android:background="@drawable/view_less_results_notification_background"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/view_less_results_notification_headline_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/clearable_edittext_search_icon"
+        android:drawableStart="@drawable/clearable_edittext_search_icon"
         android:gravity="center"
-        android:orientation="vertical">
+        android:text="@string/seeing_less_results"
+        android:textAllCaps="true"
+        android:textColor="@color/app_text_primary"
+        android:textSize="@dimen/text_x_medium"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/view_less_results_notification_headline_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/clearable_edittext_search_icon"
-            android:drawableStart="@drawable/clearable_edittext_search_icon"
-            android:gravity="center"
-            android:text="@string/seeing_less_results"
-            android:textAllCaps="true"
-            android:textColor="@color/app_text_primary"
-            android:textSize="@dimen/text_x_medium"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/view_less_results_notification_instruction_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/fix_instructions"
+        android:textColor="@color/app_text_primary"
+        android:textSize="@dimen/text_x_small" />
 
-        <TextView
-            android:id="@+id/view_less_results_notification_instruction_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/fix_instructions"
-            android:textColor="@color/app_text_primary"
-            android:textSize="@dimen/text_x_small" />
-
-    </LinearLayout>
+</LinearLayout>
 </LinearLayout>
