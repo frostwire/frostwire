@@ -1768,7 +1768,17 @@ public class MusicPlaybackService extends Service {
             updateCursor(mPlayList[mPlayPos]);
             if (mCursor == null) {
                 SystemClock.sleep(3000);
-                updateCursor(mPlayList[mPlayPos]);
+                try {
+                    // TODO: well, this is garbage, since
+                    // there is a 3 seconds sleep, all sort
+                    // of things could happen to the mutable
+                    // variable mPlayPos, including set it to -1
+                    // this need to be recoded
+                    updateCursor(mPlayList[mPlayPos]);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    // ignore and return
+                    return;
+                }
             }
             synchronized (this) {
                 closeCursor();
