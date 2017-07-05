@@ -65,7 +65,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
         super(ctx, R.layout.view_promotions_item);
         this.slides = slides;
-        final boolean landscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         this.imageLoader = ImageLoader.getInstance(ctx);
         this.promotionDownloader = promotionDownloader;
     }
@@ -228,7 +227,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         if (pitch != null) {
             View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
             TextView pitchTitle = (TextView) specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
-            if (pitchTitle != null && specialOfferView != null) {
+            if (pitchTitle != null) {
                 pitchTitle.setText(pitch);
                 return specialOfferView;
             }
