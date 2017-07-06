@@ -24,9 +24,11 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 
 import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
@@ -41,6 +43,11 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.swig.bloom_filter_256;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.sha1_hash;
+import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.OKHTTPClient;
@@ -68,12 +75,19 @@ public class EngineService extends Service implements IEngineService {
     private byte state;
     private NotificationUpdateDemon notificationUpdateDemon;
 
+    private NotifiedStorage notifiedStorage;
+
     public EngineService() {
         binder = new EngineServiceBinder();
 
         mediaPlayer = new ApolloMediaPlayer();
 
         state = STATE_DISCONNECTED;
+    }
+
+    @Override
+    public void onCreate() {
+        notifiedStorage = new NotifiedStorage(this);
     }
 
     @Override
@@ -255,6 +269,13 @@ public class EngineService extends Service implements IEngineService {
 
     public void notifyDownloadFinished(String displayName, File file, String infoHash) {
         try {
+            if (notifiedStorage.contains(infoHash)) {
+                // already notified
+                return;
+            } else {
+                notifiedStorage.add(infoHash);
+            }
+
             Context context = getApplicationContext();
             Intent i = new Intent(context, MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -320,5 +341,78 @@ public class EngineService extends Service implements IEngineService {
         long longPause = 180;
 
         return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
+    }
+
+    private static final class NotifiedStorage {
+
+        // this is a preference key to be used only by this class
+        private static final String PREF_KEY_NOTIFIED_HASHES = "frostwire.prefs.gui.notified_hashes";
+
+        // not using ConfigurationManager to avoid setup/startup timing issues
+        private final SharedPreferences preferences;
+        private final bloom_filter_256 hashes;
+
+        NotifiedStorage(Context context) {
+            preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            hashes = new bloom_filter_256();
+
+            loadHashes();
+        }
+
+        public boolean contains(String infoHash) {
+            if (infoHash == null || infoHash.length() != 40) {
+                // not a valid info hash
+                return false;
+            }
+
+            try {
+
+                byte[] arr = Hex.decode(infoHash);
+                sha1_hash ih = new sha1_hash(Vectors.bytes2byte_vector(arr));
+                return hashes.find(ih);
+
+            } catch (Throwable e) {
+                LOG.warn("Error checking if info hash was notified", e);
+            }
+
+            return false;
+        }
+
+        public void add(String infoHash) {
+            if (infoHash == null || infoHash.length() != 40) {
+                // not a valid info hash
+                return;
+            }
+
+            try {
+
+                byte[] arr = Hex.decode(infoHash);
+                sha1_hash ih = new sha1_hash(Vectors.bytes2byte_vector(arr));
+                hashes.set(ih);
+
+                byte_vector v = hashes.to_bytes();
+                arr = Vectors.byte_vector2bytes(v);
+                String s = Hex.encode(arr);
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(PREF_KEY_NOTIFIED_HASHES, s);
+                editor.apply();
+
+            } catch (Throwable e) {
+                LOG.warn("Error adding info hash to notified storage", e);
+            }
+        }
+
+        private void loadHashes() {
+            String s = preferences.getString(PREF_KEY_NOTIFIED_HASHES, null);
+            if (s != null) {
+                try {
+                    byte[] arr = Hex.decode(s);
+                    hashes.from_bytes(Vectors.bytes2byte_vector(arr));
+                } catch (Throwable e) {
+                    LOG.warn("Error loading notified storage from preference data", e);
+                }
+            }
+        }
     }
 }
