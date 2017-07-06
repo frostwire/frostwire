@@ -69,7 +69,7 @@ public class MainApplication extends Application {
 
             NetworkManager.create(this);
             Librarian.create(this);
-            Engine.create(this);
+            Engine.instance().onApplicationCreate(this);
 
             ImageLoader.getInstance(this);
             CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));

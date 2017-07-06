@@ -28,10 +28,10 @@ import android.telephony.TelephonyManager;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.util.BloomFilter;
 import com.frostwire.util.Logger;
-import com.frostwire.util.ThreadPool;
 
 import java.io.*;
 import java.util.BitSet;
@@ -51,9 +51,8 @@ public final class Engine implements IEngineService {
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
     private BloomFilter<String> notifiedDownloads;
-    private final File notifiedDat;
+    private File notifiedDat;
 
-    private static Engine instance;
     private FWVibrator vibrator;
 
     // the startServices call is a special call that can be made
@@ -62,25 +61,26 @@ public final class Engine implements IEngineService {
     // with the main activity resume.
     private boolean pendingStartServices = false;
 
-    public synchronized static void create(Application context) {
-        if (instance != null) {
-            return;
-        }
-        instance = new Engine(context);
+    private static class Loader {
+        static final Engine INSTANCE = new Engine();
     }
 
     public static Engine instance() {
-        if (instance == null) {
-            throw new RuntimeException("Engine not created");
-        }
-        return instance;
+        return Engine.Loader.INSTANCE;
     }
 
-    private Engine(Application context) {
-        notifiedDat = new File(context.getExternalFilesDir(null), "notified.dat");
-        vibrator = new FWVibrator(context);
+    /**
+     * Don't call this method directly, it's called by {@link MainApplication#onCreate()}.
+     * See {@link Application#onCreate()} documentation for general restrictions on the
+     * type of operations that are suitable to run here.
+     *
+     * @param application the application object
+     */
+    public void onApplicationCreate(Application application) {
+        notifiedDat = new File(application.getExternalFilesDir(null), "notified.dat");
+        vibrator = new FWVibrator(application);
         loadNotifiedDownloads();
-        startEngineService(context);
+        startEngineService(application);
     }
 
     /**
@@ -326,6 +326,7 @@ public final class Engine implements IEngineService {
     public static class FWVibrator {
         private final Vibrator vibrator;
         private boolean enabled;
+
         public FWVibrator(Application context) {
             vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             enabled = isActive();
