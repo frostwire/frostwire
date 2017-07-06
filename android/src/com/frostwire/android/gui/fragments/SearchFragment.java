@@ -588,13 +588,15 @@ public final class SearchFragment extends AbstractFragment implements
         if (alreadyRated || ratingReminder.wasDismissed()) {
             return;
         }
-        final int finishedDownloads = Engine.instance().getNotifiedDownloadsBloomFilter().count();
-        final int intervalFactor = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 4 : 1;
-        final int REMINDER_INTERVAL = intervalFactor * CM.getInt(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER);
+        // TODO: restore the logic, but with some sort of module operation, otherwise it will always show
+        //final int finishedDownloads = Engine.instance().getNotifiedDownloadsBloomFilter().count();
+        //final int intervalFactor = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 4 : 1;
+        //final int REMINDER_INTERVAL = intervalFactor * CM.getInt(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER);
         //LOG.info("successful finishedDownloads: " + finishedDownloads);
-        if (finishedDownloads < REMINDER_INTERVAL) {
-            return;
-        }
+        //if (finishedDownloads < REMINDER_INTERVAL) {
+        //    return;
+        //}
+        if (true) return;
         ClickAdapter<SearchFragment> onRateAdapter = createOnRateClickAdapter(ratingReminder, CM);
         ratingReminder.setOnClickListener(onRateAdapter);
         RichNotificationActionLink rateFrostWireActionLink =
