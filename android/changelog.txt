@@ -1,4 +1,5 @@
-FrostWire 1.9.8 - JUL/03/2017
+FrostWire 1.9.8 - JUL/06/2017
+ - More robust app startup
  - New search filtering tools
  - New jlibtorrent 1.2.0.11-RC2
  - Improved VPN detection
