@@ -1656,11 +1656,7 @@ public class MusicPlaybackService extends Service {
                 mPlayerHandler.post(postExecute);
             }
         };
-        try {
-            Engine.instance().getThreadPool().submit(task);
-        } catch (Throwable ignored) {
-            // possible Runtime Exception is being thrown here due to Engine.instance() == null
-        }
+        Engine.instance().getThreadPool().submit(task);
     }
 
 
