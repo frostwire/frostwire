@@ -62,6 +62,7 @@ public class MainApplication extends Application {
             installHttpCache();
 
             ConfigurationManager.create(this);
+            Engine.create(this);
 
             Platforms.set(new AndroidPlatform(this));
 
@@ -69,7 +70,6 @@ public class MainApplication extends Application {
 
             NetworkManager.create(this);
             Librarian.create(this);
-            Engine.create(this);
 
             ImageLoader.getInstance(this);
             CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));
