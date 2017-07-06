@@ -194,7 +194,7 @@ public final class Engine implements IEngineService {
                     return;
                 }
             }
-            service.notifyDownloadFinished(displayName, file);
+            service.notifyDownloadFinished(displayName, file, optionalInfoHash);
         }
     }
 

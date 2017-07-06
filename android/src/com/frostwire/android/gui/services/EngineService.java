@@ -253,7 +253,7 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("Engine stopped, state: " + state);
     }
 
-    public void notifyDownloadFinished(String displayName, File file) {
+    public void notifyDownloadFinished(String displayName, File file, String infoHash) {
         try {
             Context context = getApplicationContext();
             Intent i = new Intent(context, MainActivity.class);
