@@ -24,6 +24,7 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si no lo estás, te recomendamos usar <b>ExpressVPN</b> para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER UN VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toca las etiquetas aplicadas para]]></string>
     <!-- NON HTML TAGS -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configuración</string>
@@ -650,9 +651,8 @@
     <string name="file_information">Información del archivo</string>
     <string name="use_btjunkie">Usar BTJunkie</string>
     <string name="add_transfer">Añadir transferencia</string>
-    <string name="filter_ellipsis">"Filtrando..."</string>
+    <string name="filter_ellipsis">"Filtra..."</string>
     <string name="include">Incluir</string>
-    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toca las etiquetas aplicadas para]]></string>
     <string name="fix_instructions">Visita support.frostwire.com para información e instrucciones de arreglo</string>
     <string name="seeing_less_results">¿Está viendo menos o ningún resultado?</string>
     <string name="touch_applied_tags_to_include_exclude">Toca las etiquetas aplicadas para incluir/excluir</string>
