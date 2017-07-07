@@ -651,7 +651,7 @@
     <string name="file_information">Información del archivo</string>
     <string name="use_btjunkie">Usar BTJunkie</string>
     <string name="add_transfer">Añadir transferencia</string>
-    <string name="filter_ellipsis">"Filtra..."</string>
+    <string name="filter_ellipsis">"Filtra…"</string>
     <string name="include">Incluir</string>
     <string name="fix_instructions">Visita support.frostwire.com para información e instrucciones de arreglo</string>
     <string name="seeing_less_results">¿Está viendo menos o ningún resultado?</string>
@@ -660,7 +660,7 @@
     <string name="filter">Filtrar</string>
     <string name="try_changing_applied_filters">Intente cambiar los filtros aplicados</string>
     <string name="file_extensions">Extensiones de archivo</string>
-    <string name="filter_by_keyword">Filtrar por palabra...</string>
+    <string name="filter_by_keyword">Filtrar por palabra…</string>
     <string name="sources_channels">Fuentes/Canales</string>
     <string name="clear_all">Limpiar todo</string>
     <string name="or">o</string>
