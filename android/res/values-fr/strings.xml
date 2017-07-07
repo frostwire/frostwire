@@ -20,6 +20,10 @@
 
 -->
 <resources>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touchez les étiquettes appliqués à]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Un moyen de connexion non protégée tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Paramètres</string>
     <string name="activity_browse_peer_name">Navigateur d\'accueil</string>
@@ -473,7 +477,7 @@
     <string name="wifi_seeding_has_been_turned_off">Aucune Wifi disponible, Seeding a été désactivé</string>
     <string name="app_shutdown_dlg_message">Cela va fermer tous les transferts et services d\'arrière-plan. Êtes-vous sûr?</string>
     <string name="send_feedback">Envoyer un commentaire</string>
-    <string name="choose_email_app">Choisissez un App email...</string>
+    <string name="choose_email_app">Choisissez un App email…</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Le fichier n\'a pas pu être ensemencée. BitTorrent restera déconnectée.</string>
     <string name="protected_connection">VPN protégé</string>
     <string name="cheaper_than_parking">Moins cher que stationnement</string>
@@ -487,7 +491,6 @@
     <string name="one_time_purchase">Acheter une fois</string>
     <string name="activity_VPN">Connexion</string>
     <string name="one_year">1 an</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Un moyen de connexion non protégée tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
     <string name="i_have_read_and_agree_to_the">J\'ai lu et accepté les</string>
     <string name="scanning">Finition - Scanning</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">Selon vos paramètres, je ne peux pas commencer le seeding, sauf si vous êtes sur une connexion Wi-Fi. Le fichier sera prêt pour l\'ensemencement automatiquement lorsque vous revenez à un internet activé réseau Wi-Fi.</string>
@@ -528,7 +531,6 @@
     <string name="learn_more">Apprendre encore plus</string>
     <string name="save_bandwidth">Enregistrer la bande passante</string>
     <string name="vpn_client_feature_4">Appuyer à la clientèle 24/7</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">Chiffrement de niveau militaire</string>
     <string name="vpn_client_feature_3">Navigation privée et logless</string>
     <string name="free_download">Téléchargement Gratuit</string>
@@ -557,7 +559,7 @@
     <string name="wifi_network_unavailable">Wifi Réseau Non disponible</string>
     <string name="select_all">Sélectionner tout</string>
     <string name="cheaper_than_drinks">Moins cher que les boissons</string>
-    <string name="restarting">Redémarrage...</string>
+    <string name="restarting">Redémarrage…</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Choisissez les fichiers que vous souhaitez télécharger à partir de ce torrent</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Les transferts du torrent ne démarre pas jusqu\'à ce que vous connectez à un réseau Wi-Fi. (Vérifiez vos paramètres réseau en ce qui concerne l\'utilisation des données 3G/4G)</string>
     <string name="automatic_renewal">Renouvellement automatique</string>
@@ -596,7 +598,6 @@
     <string name="cheaper_than_cigarettes">Moins cher que les cigarettes</string>
     <string name="days_left">jours restants</string>
     <string name="six_months">6 mois</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Le chemin sélectionné est pas un répertoire</string>
     <string name="protect_my_privacy">Protéger ma vie privée</string>
     <string name="your_privacy_is_a_fundamental_right_html">Votre vie privée est un droit humain fondamental.</string>
@@ -648,6 +649,19 @@
     <string name="file_information">Informations sur le fichier</string>
     <string name="use_btjunkie">Utilisez BTJunkie</string>
     <string name="add_transfer">Ajouter un transfert</string>
-    <string name="your_android_wall_paper_will_change">Votre fond d\'écran Android changera en quelques secondes
-    </string>
+    <string name="your_android_wall_paper_will_change">Votre fond d\'écran Android changera en quelques secondes</string>
+    <string name="filter_ellipsis">"Filtre…"</string>
+    <string name="include">Inclure</string>
+    <string name="fix_instructions">Voir support.frostwire.com pour obtenir des informations et des instructions sur la fixation</string>
+    <string name="seeing_less_results">En voyant moins ou pas de résultats?</string>
+    <string name="touch_applied_tags_to_include_exclude">Touchez les étiquettes appliqués pour inclure/exclure</string>
+    <string name="exclude">Exclure</string>
+    <string name="filter">Filtre</string>
+    <string name="try_changing_applied_filters">Essayez de changer les filtres appliqués</string>
+    <string name="file_extensions">Extensions de fichier</string>
+    <string name="filter_by_keyword">Filtrer par mot clé…</string>
+    <string name="sources_channels">Sources / Chaînes</string>
+    <string name="clear_all">Tout effacer</string>
+    <string name="or">ou</string>
+    <string name="file_names">Nom des fichiers</string>
 </resources>
