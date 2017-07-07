@@ -661,7 +661,7 @@
     <string name="try_changing_applied_filters">Intente cambiar los filtros aplicados</string>
     <string name="file_extensions">Extensiones de archivo</string>
     <string name="filter_by_keyword">Filtrar por palabra...</string>
-    <string name="sources_channels">Fuentes / Canales</string>
+    <string name="sources_channels">Fuentes/Canales</string>
     <string name="clear_all">Limpiar todo</string>
     <string name="or">o</string>
     <string name="file_names">Nombres de archivo</string>
