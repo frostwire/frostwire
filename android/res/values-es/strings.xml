@@ -653,7 +653,7 @@
     <string name="filter_ellipsis">"Filtrando..."</string>
     <string name="include">Incluir</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toca las etiquetas aplicadas para]]></string>
-    <string name="fix_instructions">Visita support.frostwire.com para información e instrucciones para arreglar</string>
+    <string name="fix_instructions">Visita support.frostwire.com para información e instrucciones de arreglo</string>
     <string name="seeing_less_results">¿Está viendo menos o ningún resultado?</string>
     <string name="touch_applied_tags_to_include_exclude">Toca las etiquetas aplicadas para incluir/excluir</string>
     <string name="exclude">Excluir</string>
