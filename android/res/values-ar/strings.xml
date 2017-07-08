@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
     <string name="activity_browse_peer_name">تصفح المُضيف</string>
@@ -46,7 +50,7 @@
     <string name="clear_finished">تم إنهاء المسح</string>
     <string name="support_free_software">ادعم البرنامج المجاني</string>
     <string name="show_love">هل تحب فروست واير؟</string>
-    <string name="waiting">...جاري الإنتظار</string>
+    <string name="waiting">…جاري الإنتظار</string>
     <string name="use_icons_to_browse">.استخدم الأيقونات لتصفح الملفات</string>
     <string name="type_to_filter_results">.اكتب لترشيح النتائج</string>
     <string name="fetching_file_list">جاري إحضار قائمة المشاركة</string>
@@ -271,15 +275,15 @@
     <string name="peer_http_upload_status_error">خطأ</string>
     <string name="peer_http_upload_status_cancelled">تم الإلغاء</string>
     <string name="peer_http_upload_status_unknown">غير معروف</string>
-    <string name="loading_indeterminate">...جاري العرض</string>
-    <string name="searching_indeterminate">...جاري البحث</string>
+    <string name="loading_indeterminate">…جاري العرض</string>
+    <string name="searching_indeterminate">…جاري البحث</string>
     <string name="show_exit_button">إظهار زر الخروج</string>
     <string name="download_finished">انتهى التنزيل</string>
     <string name="clear_complete">اكتمل الحذف</string>
     <string name="downloading_promotion">تنزيل %s</string>
     <string name="activity_about_droidwire_description">فروست واير للأندرويد</string>
     <string name="download_type_not_supported">نوع التنزيل غير مرغوب</string>
-    <string name="im_on_it">...أنا\فيه</string>
+    <string name="im_on_it">…أنا\فيه</string>
     <string name="hint_transfers">استخدم "القائمة" للأوامر الكثيرة</string>
     <string name="torrent_settings">إعدادات تورينت</string>
     <string name="torrent_max_download_speed_summary">السرعة القصوى للتنزيل</string>
@@ -454,7 +458,6 @@
     <string name="one_year">1 سنة</string>
     <string name="transfers_select_completed">منجز</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">وقفة/إيقاف كافة عمليات النقل</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
     <string name="transfers_select_downloading">تحميل</string>
     <string name="frostwire_features">المميزات برنامج FrostWire</string>
     <string name="i_have_read_and_agree_to_the">لقد قرات ووافقت على ال</string>
@@ -511,7 +514,6 @@
     <string name="learn_more">أعرف أكثر</string>
     <string name="save_bandwidth">حفظ عرض النطاق الترددي</string>
     <string name="vpn_client_feature_4">دعم العملاء 24/7</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
     <string name="vpn_client_feature_1">التشفير الرتب العسكرية</string>
     <string name="transfers_context_resume_all_torrent_transfers">استئناف جميع عمليات نقل سيل</string>
     <string name="vpn_client_feature_3">التصفح الخاص وlogless</string>
@@ -599,7 +601,6 @@
     <string name="cheaper_than_cigarettes">أرخص من السجائر</string>
     <string name="days_left">ايام متبقية</string>
     <string name="six_months">6 اشهر</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
     <string name="storage_picker_treeuri_not_directory">المسار المحدد ليس دليلا</string>
     <string name="protect_my_privacy">حماية خصوصيتي</string>
     <string name="your_privacy_is_a_fundamental_right_html">خصوصيتك هي حق أساسي من حقوق الإنسان.</string>
@@ -649,4 +650,19 @@
     <string name="file_information">معلومات الملف</string>
     <string name="use_btjunkie">استخدام BTJunkie</string>
     <string name="add_transfer">إضافة نقل</string>
+    <string name="filter_ellipsis">"الفلتر…"</string>
+    <string name="include">تضمين</string>
+    <string name="fix_instructions">راجع support.frostwire.com للحصول على معلومات وتعليمات الإصلاح</string>
+    <string name="seeing_less_results">رؤية أقل أو لا نتائج؟</string>
+    <string name="touch_applied_tags_to_include_exclude">المس العلامات المطبقة لتضمين/استبعاد</string>
+    <string name="exclude">استبعد</string>
+    <string name="filter">الفلتر</string>
+    <string name="try_changing_applied_filters">جرب تغيير الفلاتر التطبيقية</string>
+    <string name="file_extensions">ملحقات الملفات</string>
+    <string name="fullscreen">تكبير الشاشة</string>
+    <string name="filter_by_keyword">التصفية بحسب الكلمة الرئيسية…</string>
+    <string name="sources_channels">المصادر / القنوات</string>
+    <string name="clear_all">امسح الكل</string>
+    <string name="or">أو</string>
+    <string name="file_names">أسماء الملفات</string>
 </resources>
