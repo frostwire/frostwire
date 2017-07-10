@@ -1662,7 +1662,16 @@ public final class MusicUtils {
     }
 
     public static void deleteTracks(final Context context, final long[] list) {
-        deleteTracks(context, list, false);
+        // TODO: return the information of real tracks deleted to provide
+        // better feedback
+        // TODO: refactor to provide better handling of SecurityException
+        // ignoring for now, since we can't do anything about it, the result
+        // is not tracks are deleted without feedback
+        try {
+            deleteTracks(context, list, false);
+        } catch (SecurityException e) {
+            LOG.error("Error in deleteTracks", e);
+        }
     }
 
     public static void playAllFromUserItemClick(final ArrayAdapter<Song> adapter, final int position) {
