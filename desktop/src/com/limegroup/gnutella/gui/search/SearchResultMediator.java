@@ -651,6 +651,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
                 if (scrollPaneSearchOptions.isVisible()) {
                     searchOptionsPanel.onOptionsPanelShown();
+                    UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
                 }
             }
         });
