@@ -143,7 +143,15 @@ public final class ImageCache {
     private synchronized void initDiskCache(final Context context) {
         // Set up disk cache
         if (mDiskCache == null || mDiskCache.isClosed()) {
-            File diskCacheDir = getDiskCacheDir(context, TAG);
+            File diskCacheDir = null;
+            try {
+                diskCacheDir = getDiskCacheDir(context, TAG);
+            } catch (NullPointerException e) {
+                Log.e(TAG, "initDiskCache - " + e);
+                // this will probably cause a fail at a later time, but
+                // this give the opportunity to handle the error at another
+                // level with a better user feedback
+            }
             if (diskCacheDir != null) {
                 if (!diskCacheDir.exists()) {
                     diskCacheDir.mkdirs();
