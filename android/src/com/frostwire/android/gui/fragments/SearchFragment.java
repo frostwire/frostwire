@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -349,15 +349,14 @@ public final class SearchFragment extends AbstractFragment implements
     /**
      * When submitting an anonymous Runnable class to the threadpool, the anonymous class's outer object reference (this)
      * reference will not be our SearchFragment, it will be this KeywordDetectorFeeder static class.
-     *
+     * <p>
      * If this result adding routine ever takes too long there won't be any references to the Fragment
      * thus we avoid any possibility of a Context leak while rotating the screen or going home and coming back.
-     *
+     * <p>
      * The most this loop can take is about 1 second (maybe 1.5s on slow cpus) when the first big batch of results arrives,
      * otherwise it processes about 20-50 results at the time in up to 80ms. There's a chance the user will rotate
      * the screen by mistake when a search is submitted, otherwise I would've put this code directly on the main
      * thread, but some frames might be skipped, not a good experience whe you hit 'Search'
-     *
      */
     private static class KeywordDetectorFeeder {
         private static void submitSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
@@ -525,6 +524,7 @@ public final class SearchFragment extends AbstractFragment implements
         if (headerClickListener == null) {
             headerClickListener = new OnClickListener() {
                 private int clickCount = 0;
+
                 @Override
                 public void onClick(View v) {
                     clickCount++;
@@ -948,7 +948,7 @@ public final class SearchFragment extends AbstractFragment implements
                 if (oldVisibility == View.GONE && !filterButtonClickedBefore) {
                     pulse.reset();
                     imageButton.setAnimation(pulse);
-                    pulse.setStartTime(AnimationUtils.currentAnimationTimeMillis()+1000);
+                    pulse.setStartTime(AnimationUtils.currentAnimationTimeMillis() + 1000);
                 }
                 counterTextView.setVisibility(getKeywordFiltersPipeline().size() > 0 ? View.VISIBLE : View.GONE);
                 counterTextView.setText(String.valueOf(getKeywordFiltersPipeline().size()));
