@@ -1005,7 +1005,7 @@ public class MusicPlaybackService extends Service {
     }
 
     private void scheduleDelayedShutdown() {
-        if (mAlarmManager != null) {
+        if (mAlarmManager != null && mShutdownIntent != null) {
 
             if (mShutdownScheduled) {
                 cancelShutdown();
