@@ -172,6 +172,18 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public void onResume() {
         super.onResume();
+
+        // getHeader was conceived for quick update of main fragments headers,
+        // mainly in a functional style, but it is ill suited to extract from
+        // it a mutable state, like filterButton.
+        // As a result, you will get multiple NPE during the normal lifestyle
+        // of the fragment, since getHeader is not guaranteed to be called
+        // at the right time during a full resume of the fragment.
+        // TODO: refactor this
+        if (filterButton == null && getActivity() != null) { // best effort
+            getHeader(getActivity());
+        }
+
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
