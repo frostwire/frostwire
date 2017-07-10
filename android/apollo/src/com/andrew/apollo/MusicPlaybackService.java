@@ -1895,7 +1895,9 @@ public class MusicPlaybackService extends Service {
                         mPlayList[0] = mCursor.getLong(IDCOLIDX);
                         mPlayPos = 0;
                     }
-                } catch (final UnsupportedOperationException ignored) {
+                } catch (UnsupportedOperationException e) {
+                    LOG.error("Error while opening file for play", e);
+                    return false;
                 }
             }
             mFileToPlay = path;
