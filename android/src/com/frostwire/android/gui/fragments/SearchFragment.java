@@ -986,6 +986,7 @@ public final class SearchFragment extends AbstractFragment implements
                         pulse = null;
                     }
                     openKeywordFilterDrawerView();
+                    UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
                 }
             });
         }
