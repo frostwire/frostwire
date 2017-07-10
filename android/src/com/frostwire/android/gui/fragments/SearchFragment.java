@@ -181,6 +181,11 @@ public final class SearchFragment extends AbstractFragment implements
         // at the right time during a full resume of the fragment.
         // TODO: refactor this
         if (filterButton == null && getActivity() != null) { // best effort
+            // this will happen due to the call to onTabReselected on full resume
+            // and this is only solving the NPE, the drawback is that it will
+            // create a few orphan view objects to be GC'ed soon.
+            // it'is a poor solution overall, but the right one requires
+            // a big refactor.
             getHeader(getActivity());
         }
 
