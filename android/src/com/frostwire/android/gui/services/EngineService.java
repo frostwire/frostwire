@@ -97,7 +97,11 @@ public class EngineService extends Service implements IEngineService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+        try {
+            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+        } catch (SecurityException ignore) {
+            // new exception in Android 7
+        }
         if (intent == null) {
             return START_NOT_STICKY;
         }
