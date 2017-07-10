@@ -121,6 +121,10 @@ public class NotificationHelper {
 
         mNotification = aNotification;
         mService.startForeground(APOLLO_MUSIC_SERVICE, mNotification);
+        // TODO: research RuntimeException in Android 7
+        // we are getting this error at Bitmap.nativeWriteToParcel(Native Method:0)
+        // in very low numbers and only in android 7, better research it
+        // and not hide it for now
     }
 
     private int getNotificationIcon() {
