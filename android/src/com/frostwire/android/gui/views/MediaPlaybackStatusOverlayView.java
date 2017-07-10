@@ -47,8 +47,14 @@ public final class MediaPlaybackStatusOverlayView extends View {
 
     private int getCircleStrokeWidth(TypedArray attributes) {
         int defaultCircleStrokeWidth = getResources().getDimensionPixelSize(R.dimen.default_circleStrokeWidth);
-        return attributes.getDimensionPixelSize(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth,
-                defaultCircleStrokeWidth);
+        try {
+            return attributes.getDimensionPixelSize(R.styleable.MediaPlaybackStatusOverlayView_circleStrokeWidth,
+                    defaultCircleStrokeWidth);
+        } catch (UnsupportedOperationException e) {
+            // surprisingly (or not), there are a small number of poor phone implementations of
+            // this method out there
+            return defaultCircleStrokeWidth;
+        }
     }
 
     @Override
