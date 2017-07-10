@@ -722,7 +722,10 @@ public class MusicPlaybackService extends Service {
         }
 
         // remove any pending alarms
-        if (mAlarmManager != null) {
+        // note: mShutdownIntent could be null because during creation
+        // internally PendingIntent.getService is eating (and ignoring)
+        // a possible RemoteException
+        if (mAlarmManager != null && mShutdownIntent != null) {
             mAlarmManager.cancel(mShutdownIntent);
         }
 
