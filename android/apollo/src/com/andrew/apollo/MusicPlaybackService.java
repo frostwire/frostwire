@@ -24,6 +24,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.StaleDataException;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -1897,6 +1898,9 @@ public class MusicPlaybackService extends Service {
                     }
                 } catch (UnsupportedOperationException e) {
                     LOG.error("Error while opening file for play", e);
+                    return false;
+                } catch (StaleDataException e) {
+                    LOG.error("Error with database cursor while opening file for play", e);
                     return false;
                 }
             }
