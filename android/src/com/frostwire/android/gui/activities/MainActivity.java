@@ -610,7 +610,16 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void hideFragments() {
         FragmentTransaction tx = getFragmentManager().beginTransaction();
         tx.hide(search).hide(library).hide(transfers);
-        tx.commit();
+        try {
+            tx.commit();
+        } catch (IllegalStateException e) {
+            // if not that we can do a lot here, since the root of the problem
+            // is the multiple entry points to MainActivity, just let it run
+            // a possible inconsistent (but probably right) version.
+            // in the future with a higher API, commitNow should be considered
+            LOG.warn("Error running commit in fragment transaction, using weaker option", e);
+            tx.commitAllowingStateLoss();
+        }
     }
 
     private void setupInitialFragment(Bundle savedInstanceState) {
