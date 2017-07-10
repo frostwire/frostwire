@@ -796,6 +796,11 @@ public final class MusicUtils {
             musicPlaybackService.play();
 
         } catch (final RemoteException ignored) {
+        } catch (NullPointerException e) {
+            // we are getting this error because musicPlaybackService is
+            // a global static mutable variable, we can't do anything
+            // until a full refactor in player
+            LOG.warn("Review code logic", e);
         }
     }
 
