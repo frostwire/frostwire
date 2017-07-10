@@ -11,7 +11,6 @@
 
 package com.andrew.apollo.cache;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
@@ -165,7 +164,6 @@ public final class ImageCache {
      *
      * @param context The {@link Context} to use
      */
-    @SuppressLint("NewApi")
     public void initLruCache(final Context context) {
         final ActivityManager activityManager = (ActivityManager)context
                 .getSystemService(Context.ACTIVITY_SERVICE);
