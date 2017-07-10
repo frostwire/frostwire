@@ -43,6 +43,7 @@ public final class UXAction {
     public static final int SEARCH_RESULT_DETAIL_VIEW = SEARCH_BASE + 11; // desktop only
     public static final int SEARCH_RESULT_SOURCE_VIEW = SEARCH_BASE + 12; // both
     public static final int SEARCH_RESULT_FILE_TYPE_CLICK = SEARCH_BASE + 13; // both
+    public static final int SEARCH_FILTER_BUTTON_CLICK = SEARCH_BASE + 14; // both
 
     public static final int DOWNLOAD_BASE = 2000;
     public static final int DOWNLOAD_FULL_TORRENT_FILE = DOWNLOAD_BASE + 1; // both
