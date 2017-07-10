@@ -2104,10 +2104,18 @@ public class MusicPlaybackService extends Service {
      */
     public long getAlbumId() {
         synchronized (this) {
-            if (mCursor == null || mCursor.isClosed()) {
+            try {
+                if (mCursor == null || mCursor.isClosed()) {
+                    return -1;
+                }
+                return mCursor.getLong(mCursor.getColumnIndexOrThrow(AudioColumns.ALBUM_ID));
+            } catch (IllegalStateException e) {
+                // this what happens when a cursor is stored as a state
+                LOG.error("Error using db cursor in to get album id", e);
+                // TODO: do I really need to set mCursor = null here, mCursor is invalid right?
+                mCursor = null;
                 return -1;
             }
-            return mCursor.getLong(mCursor.getColumnIndexOrThrow(AudioColumns.ALBUM_ID));
         }
     }
 
