@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
     <string name="activity_browse_peer_name">Procházet Hostitelem</string>
@@ -427,7 +431,6 @@
     <string name="transfers_select_completed">dokončený</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pozastavení/Zastavit všechny převody</string>
     <string name="wifi_sharing">Wifi Sdílení</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
     <string name="transfers_select_downloading">stahování</string>
     <string name="frostwire_features">FROSTWIRE VLASTNOSTI</string>
     <string name="free_apps">Volný Apps</string>
@@ -498,7 +501,6 @@
     <string name="learn_more">Přečtěte si více</string>
     <string name="save_bandwidth">Uložit šířky pásma</string>
     <string name="vpn_client_feature_4">24/7 zákaznická podpora</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">Šifrování vojensko-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví veškeré převody torrent</string>
     <string name="vpn_client_feature_3">Soukromé a logless prohlížení</string>
@@ -597,7 +599,6 @@
     <string name="cheaper_than_cigarettes">Levnější než cigarety</string>
     <string name="days_left">vlevo dní</string>
     <string name="six_months">6 měsíců</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Vybraná cesta není adresář</string>
     <string name="protect_my_privacy">Chránit své soukromí</string>
     <string name="your_privacy_is_a_fundamental_right_html">Vaše soukromí je základním lidským právem.</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Informace o souboru</string>
     <string name="use_btjunkie">Použít BTJunkie</string>
     <string name="add_transfer">Přidat přenos</string>
+    <string name="filter_ellipsis">"Filtr…"</string>
+    <string name="include">Zahrnout</string>
+    <string name="fix_instructions">Podívejte se na support.frostwire.com, kde naleznete informace a opravy</string>
+    <string name="seeing_less_results">Vidíte méně nebo žádné výsledky?</string>
+    <string name="touch_applied_tags_to_include_exclude">Dotkněte se aplikovaných značek, které chcete zahrnout/vyloučit</string>
+    <string name="exclude">Vyloučit</string>
+    <string name="filter">Filtr</string>
+    <string name="try_changing_applied_filters">Zkuste změnit použité filtry</string>
+    <string name="file_extensions">Rozšíření souborů</string>
+    <string name="filter_by_keyword">Filtrování podle klíčových slov…</string>
+    <string name="sources_channels">Zdroje / kanály</string>
+    <string name="clear_all">Vymazat vše</string>
+    <string name="or">nebo</string>
+    <string name="file_names">Názvy souborů</string>
 </resources>
