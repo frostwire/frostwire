@@ -12,6 +12,7 @@
 package com.andrew.apollo.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -48,16 +49,35 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     public View getView(final int position, View convertView, final ViewGroup parent) {
         convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
         MusicViewHolder holder = (MusicViewHolder) convertView.getTag();
+
+        // Retrieve the data holder
+        final DataHolder dataHolder = mData[position];
+
+        updateFirstTwoArtistLines(holder, dataHolder);
+//        mImageFetcher.loadCurrentArtwork(holder.mImage.get());
+
+        if (mImageFetcher == null) {
+            Log.w("warning", "ArtistAdapter has null image fetcher");
+        }
+
+        if (mImageFetcher != null && dataHolder != null && Ref.alive(holder.mImage)) {
+            //TODO: find a way to fetch an album art for a given track and not just an artist image
+            // Asynchronously load the album images into the adapter
+//            mImageFetcher.loadAlbumImage(dataHolder.mLineOne, dataHolder.mLineTwo, dataHolder.mItemId, holder.mImage.get());
+            mImageFetcher.loadArtistImage(dataHolder.mLineTwo, holder.mImage.get());
+        }
+
         if (holder != null && Ref.alive(holder.mLineThree)) {
             holder.mLineThree.get().setVisibility(View.GONE);
         }
-        final DataHolder dataHolder = mData[position];
+
         // Set each song name (line one)
         holder.mLineOne.get().setText(dataHolder.mLineOne);
         // Set the song duration (line one, right)
         holder.mLineOneRight.get().setText(dataHolder.mLineOneRight);
         // Set the artist name (line two)
         holder.mLineTwo.get().setText(dataHolder.mLineTwo);
+
         if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
             holder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
             holder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));

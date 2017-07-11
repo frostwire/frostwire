@@ -15,50 +15,66 @@
   limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="@dimen/item_normal_height"
-	android:background="@drawable/listview_item_background_selector"
-	android:gravity="center_vertical"
-	android:minHeight="@dimen/item_normal_height"
-	android:paddingBottom="@dimen/list_simple_vertical_padding"
-	android:paddingLeft="@dimen/list_simple_horizontal_padding"
-	android:paddingRight="@dimen/list_simple_horizontal_padding"
-	android:paddingTop="@dimen/list_simple_vertical_padding">
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/item_normal_height"
+    android:background="@drawable/listview_item_background_selector"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/item_normal_height">
 
-	<TextView
-		android:id="@+id/line_one"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentTop="true"
-		android:layout_toLeftOf="@+id/line_one_right"
-		android:paddingRight="@dimen/list_simple_horizontal_padding"
-		style="@style/ListItemTitle" />
+    <com.andrew.apollo.widgets.SquareImageView
+        android:id="@+id/image"
+        android:layout_width="@dimen/item_normal_height"
+        android:layout_height="@dimen/item_normal_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="2dp"
+        android:scaleType="fitXY" />
 
-	<TextView
-		android:id="@+id/line_one_right"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"
-		android:gravity="center_vertical"
-		style="@style/ListItemTime" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_normal_height"
+        android:layout_toRightOf="@+id/image"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/item_normal_height"
+        android:paddingLeft="@dimen/list_simple_horizontal_padding"
+        android:paddingRight="@dimen/list_simple_horizontal_padding">
 
-	<TextView
-		android:id="@+id/line_two"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_below="@+id/line_one"
-		android:layout_marginTop="@dimen/list_item_line_two_margin_top"
-		android:paddingRight="@dimen/list_simple_horizontal_padding"
-		style="@style/ListItemSecondaryLine" />
+        <TextView
+            android:id="@+id/line_one"
+            style="@style/ListItemTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/line_one_right"
+            android:paddingRight="@dimen/list_simple_horizontal_padding" />
 
-	<TextView
-		android:id="@+id/line_three"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true"
-		android:maxLines="1"
-		android:paddingRight="@dimen/list_simple_horizontal_padding"
-		style="@style/ListItemSecondaryLine" />
+        <TextView
+            android:id="@+id/line_one_right"
+            style="@style/ListItemTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical" />
 
+        <TextView
+            android:id="@+id/line_two"
+            style="@style/ListItemSecondaryLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/line_one"
+            android:layout_marginTop="@dimen/list_item_line_two_margin_top"
+            android:paddingRight="@dimen/list_simple_horizontal_padding" />
+
+        <TextView
+            android:id="@+id/line_three"
+            style="@style/ListItemSecondaryLine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:maxLines="1"
+            android:paddingRight="@dimen/list_simple_horizontal_padding" />
+
+    </RelativeLayout>
 </RelativeLayout>

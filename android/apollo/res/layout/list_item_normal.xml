@@ -29,6 +29,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:padding="2dp"
         android:scaleType="fitXY" />
 
     <RelativeLayout
