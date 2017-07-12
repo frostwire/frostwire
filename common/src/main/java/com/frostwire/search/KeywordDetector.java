@@ -21,6 +21,8 @@ import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,6 +108,22 @@ public final class KeywordDetector {
         }
     }
 
+    public void feedSearchResults(final List<? extends SearchResult> results) {
+        for (SearchResult sr : results) {
+            addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
+            if (sr instanceof FileSearchResult) {
+                String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
+                String ext = FilenameUtils.getExtension(fileName).toLowerCase();
+                if (fileName != null && !fileName.isEmpty()) {
+                    addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
+                }
+                if (ext != null && !ext.isEmpty()) {
+                    addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
+                }
+            }
+        }
+    }
+
     /**
      * Cheap
      */
@@ -123,15 +141,23 @@ public final class KeywordDetector {
     private class HistogramUpdateRequestTask implements Runnable {
 
         private final Feature feature;
+        private final List<SearchResult> filtered;
 
-        public HistogramUpdateRequestTask(final Feature feature) {
+        public HistogramUpdateRequestTask(final Feature feature, List<SearchResult> filtered) {
             this.feature = feature;
+            this.filtered = filtered;
         }
 
         @Override
         public void run() {
             if (keywordDetectorListener != null) {
                 try {
+
+                    if (filtered != null) {
+                        KeywordDetector.this.reset(feature);
+                        KeywordDetector.this.feedSearchResults(filtered);
+                    }
+
                     histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
                     notifyKeywordDetectorListener();
                 } catch (Throwable t) {
@@ -282,11 +308,11 @@ public final class KeywordDetector {
     /**
      * Expensive
      */
-    public void requestHistogramUpdateAsync(final Feature feature) {
+    public void requestHistogramUpdateAsync(final Feature feature, List<SearchResult> filtered) {
         if (!histogramUpdateRequestsDispatcher.running.get()) {
             histogramUpdateRequestsDispatcher.start();
         }
-        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(feature);
+        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(feature, filtered);
         histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
     }
 
@@ -298,6 +324,13 @@ public final class KeywordDetector {
             }
         }
         notifyKeywordDetectorListener();
+    }
+
+    private void reset(Feature featureKey) {
+        if (histograms != null && !histograms.isEmpty()) {
+            HistoHashMap<String> histogram = histograms.get(featureKey);
+            histogram.reset();
+        }
     }
 
     private static void feedStopWords(String... words) {

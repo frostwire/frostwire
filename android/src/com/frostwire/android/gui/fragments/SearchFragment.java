@@ -92,10 +92,8 @@ import com.frostwire.util.http.HttpClient;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import org.apache.commons.io.FilenameUtils;
-
 import java.lang.ref.WeakReference;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -192,9 +190,15 @@ public final class SearchFragment extends AbstractFragment implements
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
+
             filterButton.reset(false);
-            updateKeywordDetector(adapter.getList());
-            searchProgress.setKeywordFiltersApplied(!adapter.getKeywordFiltersPipeline().isEmpty());
+            boolean filtersApplied = !adapter.getKeywordFiltersPipeline().isEmpty();
+            if (filtersApplied) {
+                updateKeywordDetector(adapter.filter().filtered);
+            } else {
+                updateKeywordDetector(adapter.getList());
+            }
+            searchProgress.setKeywordFiltersApplied(filtersApplied);
             filterButton.updateVisibility();
         } else {
             setupPromoSlides();
@@ -287,7 +291,7 @@ public final class SearchFragment extends AbstractFragment implements
             LocalSearchEngine.instance().setListener(new SearchListener() {
                 @Override
                 public void onResults(long token, final List<? extends SearchResult> results) {
-                    onSearchResults(results);
+                    onSearchResults((List<SearchResult>) results);
                 }
 
                 @Override
@@ -310,8 +314,8 @@ public final class SearchFragment extends AbstractFragment implements
         list.setAdapter(adapter);
     }
 
-    private void onSearchResults(final List<? extends SearchResult> results) {
-        FilteredSearchResults fsr = adapter.filter((List<SearchResult>) results);
+    private void onSearchResults(final List<SearchResult> results) {
+        FilteredSearchResults fsr = adapter.filter(results);
         final List<SearchResult> filteredList = fsr.filtered;
         fileTypeCounter.add(fsr);
         // if it's a fresh search, make sure to clear keyword detector
@@ -319,7 +323,11 @@ public final class SearchFragment extends AbstractFragment implements
             resetKeywordDetector();
         }
 
-        updateKeywordDetector(results);
+        if (adapter.getKeywordFiltersPipeline().isEmpty()) {
+            updateKeywordDetector(results);
+        } else {
+            updateKeywordDetector(filteredList);
+        }
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -389,22 +397,10 @@ public final class SearchFragment extends AbstractFragment implements
                         return; // everything is possible
                     }
                     KeywordDetector keywordDetector = fragment.keywordDetector;
-                    for (SearchResult sr : results) {
-                        keywordDetector.addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
-                        if (sr instanceof FileSearchResult) {
-                            String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
-                            String ext = FilenameUtils.getExtension(fileName).toLowerCase();
-                            if (fileName != null && !fileName.isEmpty()) {
-                                keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
-                            }
-                            if (ext != null && !ext.isEmpty()) {
-                                keywordDetector.addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
-                            }
-                        }
-                    }
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE);
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION);
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME);
+                    keywordDetector.feedSearchResults(results);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, null);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, null);
+                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, null);
                 }
             });
         }
@@ -716,10 +712,9 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         drawerLayout.openDrawer(keywordFilterDrawerView);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME);
-
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, null);
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, null);
+        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, null);
     }
 
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
@@ -926,7 +921,9 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void onPipelineUpdate(List<KeywordFilter> pipeline) {
-            updateFileTypeCounter(adapter.setKeywordFiltersPipeline(pipeline));
+            // this will make the adapter filter
+            FilteredSearchResults filteredSearchResults = adapter.setKeywordFiltersPipeline(pipeline);
+            updateFileTypeCounter(filteredSearchResults);
 
             if (pipeline != null) {
                 if (pipeline.isEmpty()) {
@@ -936,6 +933,12 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
             updateVisibility();
+
+            List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.filtered;
+            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, results);
+            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, results);
+            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, results);
+            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.MANUAL_ENTRY, results);
         }
 
         @Override
@@ -951,7 +954,7 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public List<KeywordFilter> getKeywordFiltersPipeline() {
             if (adapter == null) {
-                return Collections.EMPTY_LIST;
+                return new ArrayList<>(0);
             }
             return adapter.getKeywordFiltersPipeline();
         }
