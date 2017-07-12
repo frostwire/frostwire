@@ -24,12 +24,8 @@ import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created on 11/24/16.
@@ -143,8 +139,6 @@ public class KeywordFilter {
         }
         queryString.append(" ");
         queryString.append(sr.getDetailsUrl());
-        queryString.append(" ");
-        queryString.append(sr.getThumbnailUrl());
         if (sr.getLicense() != Licenses.UNKNOWN) {
             queryString.append(sr.getLicense().getName());
         }
@@ -156,44 +150,12 @@ public class KeywordFilter {
             return true;
         }
         String haystack = getSearchResultHaystack(sr);
-        // Group Filters by Feature so we can make the following search.
-        // or by feature, and by different feature.
-        Map<KeywordDetector.Feature, List<KeywordFilter>>  featureFilters = new HashMap<>();
-        Iterator<KeywordFilter> it = filterPipeline.iterator();
-        while (it.hasNext()) {
-            KeywordFilter filter = it.next();
-            List<KeywordFilter> filters = featureFilters.get(filter.feature);
-            if (filters == null) {
-                filters = new LinkedList<>();
-                featureFilters.put(filter.feature, filters);
+        for (KeywordFilter filter : filterPipeline) {
+            if (!filter.accept(haystack)) {
+                return false;
             }
-            filters.add(filter);
         }
-        // now depending on the features that we have we'll have N Feature conditions we'll AND.
-        Set<KeywordDetector.Feature> features = featureFilters.keySet();
-
-        List<List<Boolean>> conditionsPerFeature = new LinkedList<>();
-        for (KeywordDetector.Feature feature : features) {
-            List<Boolean> featureFilterResults = new LinkedList<>();
-            List<KeywordFilter> keywordFilters = featureFilters.get(feature);
-
-            for (KeywordFilter filter : keywordFilters) {
-                featureFilterResults.add(filter.accept(haystack));
-            }
-            conditionsPerFeature.add(featureFilterResults);
-        }
-
-        // evaluate logic circuit
-        boolean result = true;
-        for (List<Boolean> featureResults : conditionsPerFeature) {
-            boolean featureResult = false;
-            for (Boolean fr : featureResults) {
-                featureResult = featureResult || fr;
-            }
-            result = result && featureResult;
-        }
-        conditionsPerFeature.clear();
-        return result;
+        return true;
     }
 
     public static String cleanQuery(String query, List<KeywordFilter> keywordFilters) {

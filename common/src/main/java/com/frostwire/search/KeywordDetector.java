@@ -152,12 +152,10 @@ public final class KeywordDetector {
         public void run() {
             if (keywordDetectorListener != null) {
                 try {
-
                     if (filtered != null) {
                         KeywordDetector.this.reset(feature);
                         KeywordDetector.this.feedSearchResults(filtered);
                     }
-
                     histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
                     notifyKeywordDetectorListener();
                 } catch (Throwable t) {
