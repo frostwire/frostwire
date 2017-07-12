@@ -139,12 +139,13 @@ public final class KeywordDetector {
         histogramUpdateRequestsDispatcher.shutdown();
     }
 
-    private class HistogramUpdateRequestTask implements Runnable {
-
+    private static class HistogramUpdateRequestTask implements Runnable {
+        private final KeywordDetector keywordDetector;
         private final Feature feature;
         private final List<SearchResult> filtered;
 
-        public HistogramUpdateRequestTask(final Feature feature, List<SearchResult> filtered) {
+        public HistogramUpdateRequestTask(KeywordDetector keywordDetector, final Feature feature, List<SearchResult> filtered) {
+            this.keywordDetector = keywordDetector;
             this.feature = feature;
             // TODO: this is necessary to due the amount of concurrency, but not
             // good for memory, need to refactor this
@@ -153,14 +154,14 @@ public final class KeywordDetector {
 
         @Override
         public void run() {
-            if (keywordDetectorListener != null) {
+            if (keywordDetector.keywordDetectorListener != null) {
                 try {
                     if (filtered != null) {
-                        KeywordDetector.this.reset(feature);
-                        KeywordDetector.this.feedSearchResults(filtered);
+                        keywordDetector.reset(feature);
+                        keywordDetector.feedSearchResults(filtered);
                     }
-                    histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
-                    notifyKeywordDetectorListener();
+                    keywordDetector.histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
+                    keywordDetector.notifyKeywordDetectorListener();
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }
@@ -313,7 +314,7 @@ public final class KeywordDetector {
         if (!histogramUpdateRequestsDispatcher.running.get()) {
             histogramUpdateRequestsDispatcher.start();
         }
-        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(feature, filtered);
+        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, feature, filtered);
         histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
     }
 
