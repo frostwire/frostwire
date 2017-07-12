@@ -17,8 +17,6 @@
 
 package com.frostwire.android.gui.services;
 
-import android.support.compat.BuildConfig;
-
 import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
@@ -44,8 +42,7 @@ final class EngineThreadPool extends ThreadPool {
     @Override
     public void execute(Runnable command) {
         if (Debug.hasContext(command)) {
-            // TODO: uncomment after excessive submission is solved
-            //throw new RuntimeException("Runnable contains context, possible context leak");
+            throw new RuntimeException("Runnable contains context, possible context leak");
         }
 
         // if debug/development, allow only 20 tasks in the queue
