@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε ExpressVPN να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Αν και συνιστάται για τις λήψεις σας, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="activity_browse_peer_name">Περιήγηση στο Διακομιστή</string>
@@ -490,7 +494,6 @@
     <string name="one_time_purchase">Αγορασε τωρα!</string>
     <string name="activity_VPN">Σύνδεση</string>
     <string name="one_year">1 χρόνος</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε ExpressVPN να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
     <string name="frostwire_features">ΧΑΡΑΚΤΗΡΙΣΤΙΚΑ FROSTWIRE</string>
     <string name="i_have_read_and_agree_to_the">Έχω διαβάσει και συμφωνώ με το</string>
     <string name="scanning">Φινίρισμα - Σάρωση</string>
@@ -532,7 +535,6 @@
     <string name="learn_more">Μάθε περισσότερα</string>
     <string name="save_bandwidth">Αποθήκευση εύρος ζώνης</string>
     <string name="vpn_client_feature_4">24/7 υποστήριξη πελατών</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Αν και συνιστάται για τις λήψεις σας, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">κρυπτογράφησης στρατιωτικών προδιαγραφών</string>
     <string name="vpn_client_feature_3">Ιδιωτικά και logless περιήγηση</string>
     <string name="free_download">Δωρεάν κατέβασμα</string>
@@ -600,7 +602,6 @@
     <string name="cheaper_than_cigarettes">Φθηνότερο από τα τσιγάρα</string>
     <string name="days_left">μέρες που απομένουν</string>
     <string name="six_months">6 μήνες</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Η επιλεγμένη διαδρομή δεν είναι κατάλογος</string>
     <string name="protect_my_privacy">Προστασία της ιδιωτικής ζωής μου</string>
     <string name="your_privacy_is_a_fundamental_right_html">προστασία της ιδιωτικής ζωής σας είναι ένα θεμελιώδες ανθρώπινο δικαίωμα.</string>
@@ -650,4 +651,18 @@
     <string name="file_information">Πληροφορίες αρχείου</string>
     <string name="use_btjunkie">Χρήση BTJunkie</string>
     <string name="add_transfer">Προσθήκη μεταφοράς</string>
+    <string name="filter_ellipsis">"Φίλτρο…"</string>
+    <string name="include">Περιλαμβάνω</string>
+    <string name="fix_instructions">Ανατρέξτε στη διεύθυνση support.frostwire.com για πληροφορίες και οδηγίες διορθώσεων</string>
+    <string name="seeing_less_results">Βλέποντας λιγότερα ή καθόλου αποτελέσματα;</string>
+    <string name="touch_applied_tags_to_include_exclude">Αγγίξτε ετικέτες με ετικέτα για να συμπεριλάβετε/εξαιρέσετε</string>
+    <string name="exclude">Αποκλείω</string>
+    <string name="filter">Φίλτρο</string>
+    <string name="try_changing_applied_filters">Δοκιμάστε να αλλάξετε φίλτρα</string>
+    <string name="file_extensions">Επεκτάσεις αρχείων</string>
+    <string name="filter_by_keyword">Φιλτράρετε με λέξη-κλειδί…</string>
+    <string name="sources_channels">Πηγές / κανάλια</string>
+    <string name="clear_all">Διαγραφή όλων</string>
+    <string name="or">ή</string>
+    <string name="file_names">Ονόματα αρχείων</string>
 </resources>
