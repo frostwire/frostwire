@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +28,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.offers.Product;
 
 /**
- * Created on 7/7/16.
- *
  * @author gubatron
  * @author marcelinkaaa
  * @author aldenml
@@ -45,7 +44,7 @@ public class ProductCardView extends RelativeLayout {
 
     public ProductCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ProductCardView, 0, 0);
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ProductCardView, 0, 0);
         titleBold = attributes.getString(R.styleable.ProductCardView_product_card_title_bold);
         titleNormal = attributes.getString(R.styleable.ProductCardView_product_card_title_normal);
         price = attributes.getString(R.styleable.ProductCardView_product_card_price);

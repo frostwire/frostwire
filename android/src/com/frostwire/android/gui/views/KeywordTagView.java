@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
+ *            Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
@@ -40,11 +39,11 @@ import com.frostwire.util.Logger;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- * Created on 3/26/17.
  */
 public class KeywordTagView extends LinearLayout {
 
-    private static Logger LOG = Logger.getLogger(KeywordTagView.class);
+    private static final Logger LOG = Logger.getLogger(KeywordTagView.class);
+
     private boolean dismissible;
     private KeywordFilter keywordFilter;
     private int count;
@@ -52,13 +51,14 @@ public class KeywordTagView extends LinearLayout {
 
     public interface KeywordTagViewListener {
         void onKeywordTagViewDismissed(KeywordTagView view);
+
         void onKeywordTagViewTouched(KeywordTagView view);
     }
 
-    public KeywordTagView(Context context, @Nullable AttributeSet attrs) {
+    public KeywordTagView(Context context, AttributeSet attrs) {
         super(context, attrs);
         if (attrs != null) {
-            TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
+            TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
             String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
             count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
             boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
@@ -95,7 +95,7 @@ public class KeywordTagView extends LinearLayout {
             countTextView.setVisibility(View.GONE);
         }
         ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
-        inclusiveIndicatorImageView.setImageDrawable(getResources().getDrawable(keywordFilter.isInclusive() ? R.drawable.filter_add:R.drawable.filter_minus));
+        inclusiveIndicatorImageView.setImageDrawable(getResources().getDrawable(keywordFilter.isInclusive() ? R.drawable.filter_add : R.drawable.filter_minus));
         keywordTextView.setText(keywordFilter.getKeyword());
         countTextView.setText("(" + String.valueOf(count) + ")");
 
@@ -156,7 +156,9 @@ public class KeywordTagView extends LinearLayout {
         return dismissible;
     }
 
-    /** Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode */
+    /**
+     * Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode
+     */
     public KeywordFilter toogleFilterInclusionMode() {
         KeywordFilter oldKeywordFilter = getKeywordFilter();
         KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
