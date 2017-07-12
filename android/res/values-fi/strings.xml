@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme ExpressVPN salata yhteyden ja <b>turvata yksityisyyttäsi</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Vaikka suositellaan latauksia, <b>sinun ei tarvitse VPN käyttää FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>ExpressVPN</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
     <string name="vpn_not_found">Ei VPN. Mieti salaamalla yhteys.</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
     <string name="activity_mediaplayer_name">Mediasoitin</string>
@@ -648,4 +649,18 @@
     <string name="use_btjunkie">Käytä BTJunkie</string>
     <string name="add_transfer">Lisää siirto</string>
     <string name="your_android_wall_paper_will_change">Android-taustakuva muuttuu muutamassa sekunnissa</string>
+    <string name="filter_ellipsis">"Suodattaa…"</string>
+    <string name="include">Sisältää</string>
+    <string name="fix_instructions">Lisätietoja ja korjausohjeet on osoitteessa support.frostwire.com</string>
+    <string name="seeing_less_results">Näyttää vähemmän tuloksia tai ei lainkaan tuloksia?</string>
+    <string name="touch_applied_tags_to_include_exclude">Kosketa sovellettuja tunnisteita sisällyttääksesi/sulje pois</string>
+    <string name="exclude">Sulkea</string>
+    <string name="filter">Suodattaa</string>
+    <string name="try_changing_applied_filters">Yritä vaihtaa käytetyt suodattimet</string>
+    <string name="file_extensions">Tiedostopäätteet</string>
+    <string name="filter_by_keyword">Suodata avainsanan mukaan…</string>
+    <string name="sources_channels">Lähteet / kanavat</string>
+    <string name="clear_all">Poista kaikki</string>
+    <string name="or">tai</string>
+    <string name="file_names">Tiedostonimet</string>
 </resources>
