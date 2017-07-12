@@ -237,14 +237,18 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
             keywordsApplied = keywordFiltersPipeline.size() > 0;
         }
+        int visible = 0;
         for (Entry<String, Integer> entry : histogram) {
             int visibility = (keywordsApplied && keywordInPipeline(entry.getKey(), keywordFiltersPipeline)) ? View.GONE : View.VISIBLE;
             KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey(), feature), entry.getValue(), false, this);
             container.addView(keywordTagView);
             keywordTagView.setVisibility(visibility);
+            if (visibility == View.VISIBLE) {
+                visible++;
+            }
         }
         container.invalidate();
-        if (container.getChildCount() > 0) {
+        if (visible > 0) {
             tagsController.showHeader();
         } else {
             tagsController.hideHeader();
