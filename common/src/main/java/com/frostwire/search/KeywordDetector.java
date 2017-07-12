@@ -113,12 +113,12 @@ public final class KeywordDetector {
             addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
             if (sr instanceof FileSearchResult) {
                 String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
-                String ext = FilenameUtils.getExtension(fileName).toLowerCase();
+                String ext = FilenameUtils.getExtension(fileName);
                 if (fileName != null && !fileName.isEmpty()) {
                     addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
                 }
                 if (ext != null && !ext.isEmpty()) {
-                    addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, FilenameUtils.getExtension(fileName));
+                    addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, ext);
                 }
             }
         }
