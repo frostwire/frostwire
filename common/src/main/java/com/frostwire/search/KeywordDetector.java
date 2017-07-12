@@ -23,6 +23,7 @@ import com.frostwire.util.ThreadPool;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -145,7 +146,9 @@ public final class KeywordDetector {
 
         public HistogramUpdateRequestTask(final Feature feature, List<SearchResult> filtered) {
             this.feature = feature;
-            this.filtered = filtered;
+            // TODO: this is necessary to due the amount of concurrency, but not
+            // good for memory, need to refactor this
+            this.filtered = filtered != null ? new ArrayList<>(filtered) : null;
         }
 
         @Override
