@@ -938,7 +938,6 @@ public final class SearchFragment extends AbstractFragment implements
             keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, results);
             keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, results);
             keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, results);
-            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.MANUAL_ENTRY, results);
         }
 
         @Override
