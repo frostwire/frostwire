@@ -144,14 +144,6 @@ public class KeywordTagView extends LinearLayout {
         return keywordFilter;
     }
 
-    public KeywordDetector.Feature getFeature() {
-        return keywordFilter.getFeature();
-    }
-
-    public int getCount() {
-        return count;
-    }
-
     public boolean isDismissible() {
         return dismissible;
     }
