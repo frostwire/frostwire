@@ -57,15 +57,13 @@ public class KeywordTagView extends LinearLayout {
 
     public KeywordTagView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if (attrs != null) {
-            TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
-            String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
-            count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
-            boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
-            dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
-            keywordFilter = new KeywordFilter(inclusive, keyword, (KeywordDetector.Feature) null);
-            attributes.recycle();
-        }
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
+        String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
+        count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
+        boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
+        dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
+        keywordFilter = new KeywordFilter(inclusive, keyword, (KeywordDetector.Feature) null);
+        attributes.recycle();
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         setVisibility(View.VISIBLE);
     }
