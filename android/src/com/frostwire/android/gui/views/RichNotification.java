@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -60,13 +59,9 @@ public class RichNotification extends LinearLayout {
 	private int numberOfActionLinks;
     private int actionLinksHorizontalMargin;
 	private OnClickListener clickListener;
-    public final List<RichNotificationActionLink> actionLinks = new LinkedList<RichNotificationActionLink>();
 	
 	public RichNotification(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		if (isInEditMode()) {
-			return;
-		}
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.RichNotification);
 		icon = attributes.getDrawable(R.styleable.RichNotification_rich_notification_icon);
 		title = attributes.getString(R.styleable.RichNotification_rich_notification_title);
