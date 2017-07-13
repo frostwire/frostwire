@@ -1,4 +1,4 @@
-FrostWire 1.9.8 - JUL/12/2017
+FrostWire 1.9.8 - JUL/13/2017
  - More robust app startup
  - New search filtering tools
  - New jlibtorrent 1.2.0.11-RC2
@@ -9,7 +9,8 @@ FrostWire 1.9.8 - JUL/12/2017
    removed double divider in search result list item, added missing new line
    to grid base
  - Fixed memory leaks and runnaway threadpools causing out of memory errors
- - Translations updated (Finnish, Greek, Danish, Czech, Italian, Arabic, French, Portuguese, Spanish)
+ - Translations updated (Finnish, Greek, Danish, Czech, Italian, Arabic, French, 
+   Portuguese, Spanish, Hindi, Croatian, Indonesian, Hebrew, Korean, Japanese)
 
 FrostWire 1.9.7 - JUN/22/2017
  - New jlibtorrent 1.2.0.11-RC1
