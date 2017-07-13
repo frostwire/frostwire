@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ חיבור לא מוגן פירושו כל מה שאתה עושה באינטרנט (כולל <b/> חיפושים, הודעות והורדות <b>) יכול להיות מנוטר על ידי כל אחד ברשת שלך ואפילו על ידי ספק שירותי האינטרנט שלך. <br> <br> אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך <b/> לשמור על הפרטיות שלך <b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[ * למרות המומלץ עבור הורדות שלך,אתה לא צריך VPN להשתמש FrostWire ]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[   אתה מחובר לאינטרנט באמצעות VPN. אם אתה כבר לא, אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך ולשמור על הפרטיות שלך. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> גע בתגים שחלים על]]></string>
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="activity_mediaplayer_name">נגן מדיה</string>
@@ -229,7 +233,6 @@
     <string name="support_frostwire">FrostWire תמיכה</string>
     <string name="wifi_sharing">שיתוף אינטרנט אלחוטי</string>
     <string name="torrent_max_total_connections_summary">חיבורי מקס סה"כ</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="toast_on_disconnect">מנותק ביטורנט. כל ההעברות ביטורנט הפסיקו.</string>
     <string name="transfers_select_downloading">הורדת</string>
     <string name="clear_torrent_index_summary">Clear Torrent Index</string>
@@ -386,7 +389,6 @@
     <string name="save_bandwidth">שמור רוחב פס</string>
     <string name="accept_connection_from">קבל חיבור בין</string>
     <string name="vpn_client_feature_4">תמיכת לקוחות 24/7</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">הצפנה ברמה צבאית</string>
     <string name="transfers_context_resume_all_torrent_transfers">חדש את כל העברות הסיקור</string>
     <string name="vpn_client_feature_3">גלישה פרטית logless</string>
@@ -606,7 +608,6 @@
     <string name="are_you_sure">האם אתה בטוח?</string>
     <string name="application">יישום</string>
     <string name="update_title">עדכון זמן!</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="peer_http_download_status_downloading">הורדת</string>
     <string name="picture">תְמוּנָה</string>
     <string name="files_shared">קבצים משותפים</string>
@@ -648,4 +649,18 @@
     <string name="file_information">פרטי קובץ</string>
     <string name="use_btjunkie">השתמש BTJunkie</string>
     <string name="add_transfer">הוסף העברה</string>
+    <string name="filter_ellipsis">"לְסַנֵן…"</string>
+    <string name="include">לִכלוֹל</string>
+    <string name="fix_instructions">ראה support.frostwire.com לקבלת מידע ותיקון הוראות</string>
+    <string name="seeing_less_results">לראות פחות או לא תוצאות?</string>
+    <string name="touch_applied_tags_to_include_exclude">גע בתגים מוחלים כדי לכלול / לא לכלול</string>
+    <string name="exclude">אל תכלול</string>
+    <string name="filter">לְסַנֵן</string>
+    <string name="try_changing_applied_filters">נסה לשנות מסננים שהוחלו</string>
+    <string name="file_extensions">סיומות קבצים</string>
+    <string name="filter_by_keyword">סנן לפי מילת מפתח…</string>
+    <string name="sources_channels">מקורות / ערוצים</string>
+    <string name="clear_all">נקה הכל</string>
+    <string name="or">אוֹ</string>
+    <string name="file_names">שמות קבצים</string>
 </resources>
