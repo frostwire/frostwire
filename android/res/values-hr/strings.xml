@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje ExpressVPN za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
     <string name="activity_browse_peer_name">Pregledaj domaćina</string>
@@ -489,7 +493,7 @@
     <string name="restarting">Ponovno pokrećem…</string>
     <string name="keep_in_touch">Ostanite u kontaktu!</string>
     <string name="action_menu_overflow_description">Više opcija</string>
-    <string name="try_frostwire_plus_for_more_results"></string>
+    <string name="try_frostwire_plus_for_more_results">Pokušajte FrostWire Plus za više rezultata</string>
     <string name="media_preview">%s pregled</string>
     <string name="send_tip_donation">Pošaljite napojnicu ili donaciju</string>
     <string name="plus">Plus</string>
@@ -530,7 +534,6 @@
     <string name="activity_VPN">priključak</string>
     <string name="notifications_other_settings">Obavijesti i ostale</string>
     <string name="one_year">1 godina</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje ExpressVPN za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
     <string name="frostwire_features">FROSTWIRE ZNAČAJKE</string>
     <string name="i_have_read_and_agree_to_the">Pročitao sam i slažem se</string>
     <string name="scanning">Dovršavanje - Skeniranje</string>
@@ -564,7 +567,6 @@
     <string name="learn_more">Uči više</string>
     <string name="save_bandwidth">Manji promet</string>
     <string name="vpn_client_feature_4">24/7 korisničku podršku</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">šifriranje vojno-razred</string>
     <string name="vpn_client_feature_3">Privatna i logless pregledavanja</string>
     <string name="no_trial_period_included">Ne razdoblje suđenje uključen</string>
@@ -608,7 +610,6 @@
     <string name="cheaper_than_cigarettes">Jeftinije nego cigarete</string>
     <string name="days_left">Preostalo dana:</string>
     <string name="six_months">6 mjeseci</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Odabrani put nije imenik</string>
     <string name="protect_my_privacy">Zaštitite svoju privatnost</string>
     <string name="your_privacy_is_a_fundamental_right_html">Vaša privatnost je temeljno ljudsko pravo.</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Informacije o datotekama</string>
     <string name="use_btjunkie">Koristi BTJunkie</string>
     <string name="add_transfer">Dodaj prijenos</string>
+    <string name="filter_ellipsis">"Filtriraj…"</string>
+    <string name="include">Uključiti</string>
+    <string name="fix_instructions">Za informacije i popravke potražite support.frostwire.com</string>
+    <string name="seeing_less_results">Vidite li manje ili bez ikakvih rezultata?</string>
+    <string name="touch_applied_tags_to_include_exclude">Dodirnite primijenjene oznake za uključivanje / isključivanje</string>
+    <string name="exclude">Isključiti</string>
+    <string name="filter">Filtriraj</string>
+    <string name="try_changing_applied_filters">Pokušajte promijeniti podnesene filtre</string>
+    <string name="file_extensions">Proširenja datoteka</string>
+    <string name="filter_by_keyword">Filtriraj po ključnoj riječi…</string>
+    <string name="sources_channels">Izvori / kanali</string>
+    <string name="clear_all">Očistiti sve</string>
+    <string name="or">ili</string>
+    <string name="file_names">Nazivi datoteka</string>
 </resources>
