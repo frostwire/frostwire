@@ -649,7 +649,7 @@
     <string name="file_information">파일 정보</string>
     <string name="use_btjunkie">BTJunkie사용</string>
     <string name="add_transfer">이전 추가</string>
-    <string name="filter_ellipsis">"필터…"</string>
+    <string name="filter_ellipsis">필터…</string>
     <string name="include">포함</string>
     <string name="fix_instructions">정보 및 수정 방법은 support.frostwire.com 을 참조하십시오.</string>
     <string name="seeing_less_results">결과가 거의 또는 전혀 표시되지 않습니까?</string>

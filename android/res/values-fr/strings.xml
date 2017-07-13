@@ -650,7 +650,7 @@
     <string name="use_btjunkie">Utilisez BTJunkie</string>
     <string name="add_transfer">Ajouter un transfert</string>
     <string name="your_android_wall_paper_will_change">Votre fond d\'écran Android changera en quelques secondes</string>
-    <string name="filter_ellipsis">"Filtre…"</string>
+    <string name="filter_ellipsis">Filtre…</string>
     <string name="include">Inclure</string>
     <string name="fix_instructions">Voir support.frostwire.com pour obtenir des informations et des instructions sur la fixation</string>
     <string name="seeing_less_results">En voyant moins ou pas de résultats?</string>

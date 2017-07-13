@@ -649,7 +649,7 @@
     <string name="file_information">Filoplysninger</string>
     <string name="use_btjunkie">Brug BTJunkie</string>
     <string name="add_transfer">Tilføj overførsel</string>
-    <string name="filter_ellipsis">"Filtrer…"</string>
+    <string name="filter_ellipsis">Filtrer…</string>
     <string name="include">Omfatte</string>
     <string name="fix_instructions">Se support.frostwire.com for information og rettelser</string>
     <string name="seeing_less_results">Se mindre eller ingen resultater?</string>

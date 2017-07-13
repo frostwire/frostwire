@@ -649,7 +649,7 @@
     <string name="use_btjunkie">Käytä BTJunkie</string>
     <string name="add_transfer">Lisää siirto</string>
     <string name="your_android_wall_paper_will_change">Android-taustakuva muuttuu muutamassa sekunnissa</string>
-    <string name="filter_ellipsis">"Suodattaa…"</string>
+    <string name="filter_ellipsis">Suodattaa…</string>
     <string name="include">Sisältää</string>
     <string name="fix_instructions">Lisätietoja ja korjausohjeet on osoitteessa support.frostwire.com</string>
     <string name="seeing_less_results">Näyttää vähemmän tuloksia tai ei lainkaan tuloksia?</string>

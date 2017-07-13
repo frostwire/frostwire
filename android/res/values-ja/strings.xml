@@ -652,7 +652,7 @@
     <string name="file_information">ファイル情報</string>
     <string name="use_btjunkie">BTJunkieを使用する</string>
     <string name="add_transfer">転送を追加</string>
-    <string name="filter_ellipsis">"フィルタ…"</string>
+    <string name="filter_ellipsis">フィルタ…</string>
     <string name="include">含める</string>
     <string name="fix_instructions">情報と修正方法については、support.frostwire.com を参照してください</string>
     <string name="seeing_less_results">結果が少ないか全く見ない？</string>

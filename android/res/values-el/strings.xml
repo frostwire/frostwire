@@ -651,7 +651,7 @@
     <string name="file_information">Πληροφορίες αρχείου</string>
     <string name="use_btjunkie">Χρήση BTJunkie</string>
     <string name="add_transfer">Προσθήκη μεταφοράς</string>
-    <string name="filter_ellipsis">"Φίλτρο…"</string>
+    <string name="filter_ellipsis">Φίλτρο…</string>
     <string name="include">Περιλαμβάνω</string>
     <string name="fix_instructions">Ανατρέξτε στη διεύθυνση support.frostwire.com για πληροφορίες και οδηγίες διορθώσεων</string>
     <string name="seeing_less_results">Βλέποντας λιγότερα ή καθόλου αποτελέσματα;</string>

@@ -649,7 +649,7 @@
     <string name="file_information">Fájlinformációk</string>
     <string name="use_btjunkie">Használja BTJunkie</string>
     <string name="add_transfer">Átvitel hozzáadása</string>
-    <string name="filter_ellipsis">"Szűrő…"</string>
+    <string name="filter_ellipsis">Szűrő…</string>
     <string name="include">Tartalmazza</string>
     <string name="fix_instructions">Lásd a support.frostwire.com weboldalt az információhoz és a javításhoz</string>
     <string name="seeing_less_results">Kevesebb vagy kevesebb eredmény?</string>
