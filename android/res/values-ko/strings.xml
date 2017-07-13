@@ -19,6 +19,10 @@
   */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
     <string name="activity_browse_peer_name">호스트 탐색</string>
@@ -105,8 +109,7 @@
     <string name="uh_still_listening_on_port">여전히 포트에서 수신 대기중</string>
     <string name="new_port_saved">새로운 포트 저장됨</string>
     <string name="now_on_port">포트에 있음</string>
-    <string name="stop_all_transfers_message">대기중이거나 진행중인 다운로드 파일이 모두 취소됩니다. 트랜스퍼되는 중이던 모든 데이터가 손실됩니다. 그래도 진행하시겠습니까?
-    </string>
+    <string name="stop_all_transfers_message">대기중이거나 진행중인 다운로드 파일이 모두 취소됩니다. 트랜스퍼되는 중이던 모든 데이터가 손실됩니다. 그래도 진행하시겠습니까?</string>
     <string name="files">파일</string>
     <string name="touch_filetype_icon">파일형태를 바꾸시려면 아이콘을 눌러주세요</string>
     <string name="tos_title">이용약관</string>
@@ -119,9 +122,7 @@
     <string name="failed_to_set_wallpaper">배경화면으로 설정 실패</string>
     <string name="tell_others_chooser">트위터로 보내기/SMS/이메일</string>
     <string name="tell_others_subject">FrostWire의 안드로이드 버전을 보유하고 계십니까?</string>
-    <string name="and_choose_what_filetypes_to_share">어떤 형태의 파일을 FrostWire 모바일 네트워크나 근처 무선인터넷 사용이 가능한 컴퓨터와 공유하고 싶으신지
-        체크해주세요.
-    </string>
+    <string name="and_choose_what_filetypes_to_share">어떤 형태의 파일을 FrostWire 모바일 네트워크나 근처 무선인터넷 사용이 가능한 컴퓨터와 공유하고 싶으신지 체크해주세요.</string>
     <string name="before_getting_started">시작하기 전</string>
     <string name="user_connecting">연결중</string>
     <string name="accept_connection_from">연결 승낙</string>
@@ -320,9 +321,7 @@
     <string name="seeding_settings">시드 설정</string>
     <string name="seeding_settings_explanation">BitTorrent 인터넷 사용자는 당신의 토렌트 시드로부터 파일을 다운로드 할것입니다.</string>
     <string name="seeding_wifi_settings_explanation">무선인터넷 연결시에만 시드. 이동통신 추가요금을 피하기 위한 설정.</string>
-    <string name="intent_text">FrostWire는 친구를 통해 검증된 파일만 공유하는 프로그램입니다. 프로그램을 설치하고 사용하는 것은 검증되지 않은 컨텐츠를 얻거나 배포하는 것에 대한
-        라이센스를 부여하지 않습니다.
-    </string>
+    <string name="intent_text">FrostWire는 친구를 통해 검증된 파일만 공유하는 프로그램입니다. 프로그램을 설치하고 사용하는 것은 검증되지 않은 컨텐츠를 얻거나 배포하는 것에 대한라이센스를 부여하지 않습니다.</string>
     <string name="accept_intent">저는 저작권 침해를 위해 FrostWire를 사용하지 않겠습니다.</string>
     <string name="toast_on_disconnect">BitTorrent로부터 연결이 끊어졌습니다. 모든 BitTorrent 트랜스퍼가 중지되었습니다.</string>
     <string name="toast_on_connect">BitTorrent Core가 시작되었습니다.</string>
@@ -425,7 +424,6 @@
     <string name="transfers_select_completed">완료된</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">모든 전송 일시 중지 / 중지</string>
     <string name="wifi_sharing">Wi-Fi 공유</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
     <string name="transfers_select_downloading">다운로드 중</string>
     <string name="frostwire_features">FROSTWIRE 기능</string>
     <string name="free_apps">무료 앱</string>
@@ -500,7 +498,6 @@
     <string name="learn_more">더 알아보기</string>
     <string name="save_bandwidth">대역폭 절약</string>
     <string name="vpn_client_feature_4">24/7 고객 지원</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
     <string name="vpn_client_feature_1">군대 급 암호화</string>
     <string name="transfers_context_resume_all_torrent_transfers">모든 급류 전송 재개</string>
     <string name="vpn_client_feature_3">비공개 및 로그인 검색</string>
@@ -602,7 +599,6 @@
     <string name="cheaper_than_cigarettes">담배보다 쌉니다.</string>
     <string name="days_left">일 남음</string>
     <string name="six_months">6 개월</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">선택한 경로가 디렉토리가 아닙니다.</string>
     <string name="protect_my_privacy">내 개인 정보 보호</string>
     <string name="your_privacy_is_a_fundamental_right_html">귀하의 개인 정보는 근본적인 인권입니다.</string>
@@ -653,4 +649,18 @@
     <string name="file_information">파일 정보</string>
     <string name="use_btjunkie">BTJunkie사용</string>
     <string name="add_transfer">이전 추가</string>
+    <string name="filter_ellipsis">"필터…"</string>
+    <string name="include">포함</string>
+    <string name="fix_instructions">정보 및 수정 방법은 support.frostwire.com 을 참조하십시오.</string>
+    <string name="seeing_less_results">결과가 거의 또는 전혀 표시되지 않습니까?</string>
+    <string name="touch_applied_tags_to_include_exclude">적용된 태그를 터치하여 포함 / 제외합니다.</string>
+    <string name="exclude">제외</string>
+    <string name="filter">필터</string>
+    <string name="try_changing_applied_filters">적용된 필터 변경 시도</string>
+    <string name="file_extensions">파일 확장명</string>
+    <string name="filter_by_keyword">키워드로 필터링…</string>
+    <string name="sources_channels">소스 / 채널</string>
+    <string name="clear_all">모두 지우기</string>
+    <string name="or">또는</string>
+    <string name="file_names">파일 이름</string>
 </resources>
