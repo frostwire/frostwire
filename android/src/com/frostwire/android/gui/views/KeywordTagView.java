@@ -74,7 +74,6 @@ public class KeywordTagView extends LinearLayout {
         this.count = count;
         this.dismissible = dismissible;
         this.listener = listener;
-        onFinishInflate();
     }
 
     @Override
