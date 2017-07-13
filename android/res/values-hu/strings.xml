@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
     <string name="activity_mediaplayer_name">Médialejátszó</string>
@@ -648,5 +649,18 @@
     <string name="file_information">Fájlinformációk</string>
     <string name="use_btjunkie">Használja BTJunkie</string>
     <string name="add_transfer">Átvitel hozzáadása</string>
-
+    <string name="filter_ellipsis">"Szűrő…"</string>
+    <string name="include">Tartalmazza</string>
+    <string name="fix_instructions">Lásd a support.frostwire.com weboldalt az információhoz és a javításhoz</string>
+    <string name="seeing_less_results">Kevesebb vagy kevesebb eredmény?</string>
+    <string name="touch_applied_tags_to_include_exclude">Érintse meg az alkalmazott vagy kizáró címkéket</string>
+    <string name="exclude">Kizár</string>
+    <string name="filter">Szűrő</string>
+    <string name="try_changing_applied_filters">Próbálja meg módosítani az alkalmazott szűrőket</string>
+    <string name="file_extensions">Fájlbővítmények</string>
+    <string name="filter_by_keyword">Szűrés kulcsszó szerint…</string>
+    <string name="sources_channels">Források / Csatornák</string>
+    <string name="clear_all">Kitörölni mindent</string>
+    <string name="or">vagy</string>
+    <string name="file_names">Fájlnevek</string>
 </resources>
