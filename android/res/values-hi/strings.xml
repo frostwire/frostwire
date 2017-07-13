@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश ExpressVPN अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>.]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
     <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
     <string name="activity_browse_peer_name">होस्ट ब्राउज़ करें</string>
@@ -417,7 +421,6 @@
     <string name="transfers_context_menu_pause_stop_all_transfers">रोकें/सभी स्थानान्तरण बंद करो</string>
     <string name="support_frostwire">समर्थन FrostWire</string>
     <string name="wifi_sharing">वाईफ़ाई शेयरिंग</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश ExpressVPN अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>.]]></string>
     <string name="transfers_select_downloading">डाउनलोडिंग</string>
     <string name="free_apps">मुफ्त ऍप्स</string>
     <string name="i_have_read_and_agree_to_the">मैंने पढ़ा है और मैं सहमत हूं</string>
@@ -491,7 +494,6 @@
     <string name="learn_more">और अधिक जानें</string>
     <string name="save_bandwidth">बचाने के लिए बैंडविड्थ</string>
     <string name="vpn_client_feature_4">24/7 ग्राहक सहायता</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
     <string name="vpn_client_feature_1">सैन्य ग्रेड एन्क्रिप्शन</string>
     <string name="transfers_context_resume_all_torrent_transfers">सभी धार स्थानान्तरण फिर से शुरू</string>
     <string name="vpn_client_feature_3">निजी और लॉग ब्राउज़िंग के बिना</string>
@@ -594,7 +596,6 @@
     <string name="cheaper_than_cigarettes">सिगरेट की तुलना में सस्ता</string>
     <string name="days_left">दिन शेष</string>
     <string name="six_months">6 महीने</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">चयनित पथ एक निर्देशिका नहीं है</string>
     <string name="protect_my_privacy">मेरी गोपनीयता की सुरक्षा</string>
     <string name="your_privacy_is_a_fundamental_right_html">आपकी गोपनीयता एक मौलिक मानवाधिकार है।</string>
@@ -648,4 +649,18 @@
     <string name="use_btjunkie">उपयोग BTJunkie</string>
     <string name="your_android_wall_paper_will_change">आपका एंड्रॉइड वॉलपेपर कुछ ही सेकंड में बदल जाएगा</string>
     <string name="add_transfer">स्थानांतरण जोड़ें</string>
+    <string name="filter_ellipsis">"फ़िल्टर…"</string>
+    <string name="include">शामिल</string>
+    <string name="fix_instructions">जानकारी के लिए support.frostwire.com देखें और निर्देशों को ठीक करें</string>
+    <string name="seeing_less_results">कम या कोई परिणाम नहीं देख रहे हैं?</string>
+    <string name="touch_applied_tags_to_include_exclude">शामिल / बहिष्कृत करने के लिए लागू किए गए टैग स्पर्श करें</string>
+    <string name="exclude">निकालना</string>
+    <string name="filter">फ़िल्टर</string>
+    <string name="try_changing_applied_filters">लागू फ़िल्टर बदलने की कोशिश करें</string>
+    <string name="file_extensions">फाइल एक्सटेंशन</string>
+    <string name="filter_by_keyword">कीवर्ड द्वारा फ़िल्टर करें…</string>
+    <string name="sources_channels">स्रोत / चैनल</string>
+    <string name="clear_all">सभी साफ करें</string>
+    <string name="or">या</string>
+    <string name="file_names">फ़ाइल नाम</string>
 </resources>
