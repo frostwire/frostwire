@@ -205,7 +205,7 @@ public final class KeywordDetector {
                 histogramUpdateRequests.add(updateRequestTask);
             } else {
                 // search if there's another update request task for this same feature and remove it
-                // NOT on synchronized use: this should be super fast since it's only up to 3 elements
+                // NOTE on 'synchronized' use: this should be super fast since it's only up to 3 elements
                 synchronized (histogramUpdateRequests) {
                     for (int i = 0; i < histogramUpdateRequests.size(); i++) {
                         try {
