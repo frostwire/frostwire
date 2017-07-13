@@ -123,7 +123,7 @@ public class KeywordFilter {
         return ((inclusive && found) || (!inclusive && !found));
     }
 
-    private static String getSearchResultHaystack(SearchResult sr) {
+    static String getSearchResultHaystack(SearchResult sr) {
         StringBuilder queryString = new StringBuilder();
         if (sr.getSource() == null) {
             System.err.println("WARNING: " + sr.getClass().getSimpleName() + " has no source!");
