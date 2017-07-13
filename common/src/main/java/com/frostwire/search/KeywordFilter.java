@@ -59,12 +59,12 @@ public class KeywordFilter {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof KeywordFilter)) {
+        if (!(obj instanceof KeywordFilter)) {
             return false;
-        } else {
-            KeywordFilter other = (KeywordFilter) obj;
-            return inclusive == other.inclusive && keyword.equals(other.keyword);
         }
+
+        KeywordFilter other = (KeywordFilter) obj;
+        return inclusive == other.inclusive && keyword.equals(other.keyword);
     }
 
     @Override
