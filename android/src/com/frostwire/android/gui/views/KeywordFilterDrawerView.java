@@ -42,7 +42,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
-import com.frostwire.util.Logger;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -213,10 +212,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
             float rate = (float) entry.getValue() / (high + totalCount);
             if (entry.getValue() > 1 && rate >= threshold) {
                 filteredValues.add(entry);
-                //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is IN");
-            } //else {
-            //LOG.info("<<< highPassFilter(total= " + totalCount + ", high=" + high + ", high+total=" + (high + totalCount) + ", rate=" + rate + "): <" + entry.getKey() + ":" + entry.getValue() + "> is OUT");
-            //}
+            }
         }
         return filteredValues;
     }
