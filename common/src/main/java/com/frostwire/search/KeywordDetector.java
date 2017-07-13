@@ -205,16 +205,21 @@ public final class KeywordDetector {
                 histogramUpdateRequests.add(updateRequestTask);
             } else {
                 // search if there's another update request task for this same feature and remove it
-                for (int i = 0; i < histogramUpdateRequests.size(); i++) {
-                    HistogramUpdateRequestTask histogramUpdateRequestTask = histogramUpdateRequests.get(i);
-                    if (histogramUpdateRequestTask.feature.equals(updateRequestTask.feature)) {
-                        synchronized (histogramUpdateRequests) {
-                            histogramUpdateRequests.remove(i);
+                // NOT on synchronized use: this should be super fast since it's only up to 3 elements
+                synchronized (histogramUpdateRequests) {
+                    for (int i = 0; i < histogramUpdateRequests.size(); i++) {
+                        try {
+                            HistogramUpdateRequestTask histogramUpdateRequestTask = histogramUpdateRequests.get(i);
+                            if (histogramUpdateRequestTask.feature.equals(updateRequestTask.feature)) {
+                                histogramUpdateRequests.remove(i);
+                                break;
+                            }
+                        } catch (Throwable t) {
+                            // possible IndexOutOfBounds on histogramUpdateRequests.get()
                         }
-                        break;
                     }
+                    histogramUpdateRequests.add(updateRequestTask);
                 }
-                histogramUpdateRequests.add(updateRequestTask);
             }
             signalLoopLock();
         }
