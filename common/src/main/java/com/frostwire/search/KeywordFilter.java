@@ -25,36 +25,16 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class KeywordFilter {
+public final class KeywordFilter {
 
     private final boolean inclusive;
     private final String keyword;
-    private final String stringForm;
     private KeywordDetector.Feature feature;
 
     public KeywordFilter(boolean inclusive, String keyword, KeywordDetector.Feature feature) {
-        this(inclusive, keyword, (String) null);
-        this.feature = feature;
-    }
-
-    /**
-     * NOTE: If you use this constructor, make sure the stringForm passed matches the inclusive and keyword
-     * parameters. The constructor performs no validations and this could lead to unwanted behavior when
-     * asking for toString(), as the stringForm will be the one returned by toString().
-     *
-     * @param inclusive  - the keyword should be included or not
-     * @param keyword    - the keyword
-     * @param stringForm - How this keyword filter was parsed out from a search
-     */
-    public KeywordFilter(boolean inclusive, String keyword, String stringForm) {
         this.inclusive = inclusive;
         this.keyword = keyword.toLowerCase();
-        if (stringForm != null) {
-            this.stringForm = stringForm;
-        } else {
-            this.stringForm = ((inclusive) ? "+" : "-") + ":keyword:" + this.keyword;
-        }
-        this.feature = null;
+        this.feature = feature;
     }
 
     @Override
@@ -82,11 +62,6 @@ public class KeywordFilter {
 
     public KeywordDetector.Feature getFeature() {
         return this.feature;
-    }
-
-    @Override
-    public String toString() {
-        return stringForm;
     }
 
     public boolean accept(final String lowercaseHaystack) {
