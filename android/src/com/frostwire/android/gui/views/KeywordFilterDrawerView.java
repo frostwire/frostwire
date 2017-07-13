@@ -57,8 +57,6 @@ import java.util.Map.Entry;
  */
 public final class KeywordFilterDrawerView extends LinearLayout implements KeywordTagView.KeywordTagViewListener {
 
-    private static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
-
     private KeywordFiltersPipelineListener pipelineListener;
     private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
     private LinearLayout appliedTagsTipTextViewContainer;
@@ -153,11 +151,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     }
 
     private void onExitButtonClicked() {
-        if (keywordFilterDrawerController != null) {
-            keywordFilterDrawerController.closeKeywordFilterDrawer();
-        } else {
-            LOG.warn("Check your logic, the keyword filter drawer controller has not been assigned");
-        }
+        keywordFilterDrawerController.closeKeywordFilterDrawer();
     }
 
     private void resetTagsContainers() {
