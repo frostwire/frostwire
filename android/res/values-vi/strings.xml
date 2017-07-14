@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>ExpressVPN</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
     <string name="activity_browse_peer_name">Chọn host</string>
@@ -426,7 +430,6 @@
     <string name="transfers_select_completed">hoàn thành</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Tạm dừng/Dừng tất cả các chuyển</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
     <string name="transfers_select_downloading">tải</string>
     <string name="frostwire_features">Các tính năng FrostWire</string>
     <string name="free_apps">Những ứng dụng miễn phí</string>
@@ -497,7 +500,6 @@
     <string name="learn_more">Tìm hiểu thêm</string>
     <string name="save_bandwidth">Lưu băng thông</string>
     <string name="vpn_client_feature_4">hỗ trợ khách hàng 24/7</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
     <string name="vpn_client_feature_1">mã hóa cấp độ quân sự</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tiếp tục tất cả các chuyển torrent</string>
     <string name="vpn_client_feature_3">Tin và logless duyệt</string>
@@ -597,7 +599,6 @@
     <string name="cheaper_than_cigarettes">Rẻ hơn so với thuốc lá</string>
     <string name="days_left">ngày còn lại</string>
     <string name="six_months">6 tháng</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>ExpressVPN</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Các con đường lựa chọn không phải là một thư mục</string>
     <string name="protect_my_privacy">Bảo vệ sự riêng tư của tôi</string>
     <string name="your_privacy_is_a_fundamental_right_html">Riêng tư của bạn là một quyền con người cơ bản.</string>
@@ -647,4 +648,19 @@
     <string name="file_information">Thông tin về tệp</string>
     <string name="use_btjunkie">Chọn BTJunkie</string>
     <string name="add_transfer">Thêm chuyển khoản</string>
+    <string name="filter_ellipsis">Bộ lọc…</string>
+    <string name="include">Bao gồm</string>
+    <string name="fix_instructions">Xem support.frostwire.com để biết thông tin và hướng dẫn khắc phục</string>
+    <string name="seeing_less_results">Xem ít hoặc không có kết quả?</string>
+    <string name="touch_applied_tags_to_include_exclude">Chạm vào thẻ được áp dụng để bao gồm / loại trừ</string>
+    <string name="exclude">Loại trừ</string>
+    <string name="filter">Bộ lọc</string>
+    <string name="try_changing_applied_filters">Hãy thử thay đổi bộ lọc được áp dụng</string>
+    <string name="size">Kích thước</string>
+    <string name="file_extensions">Tiện ích mở rộng tệp</string>
+    <string name="filter_by_keyword">Lọc theo từ khóa…</string>
+    <string name="sources_channels">Nguồn / Kênh</string>
+    <string name="clear_all">Làm sạch tất cả</string>
+    <string name="or">hoặc là</string>
+    <string name="file_names">Tên tệp</string>
 </resources>
