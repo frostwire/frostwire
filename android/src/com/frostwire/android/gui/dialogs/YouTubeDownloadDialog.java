@@ -18,12 +18,12 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -34,21 +34,21 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
-import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created on 4/30/16.
  *
  * @author gubatron
  * @author aldenml
- *
  */
-@SuppressWarnings("WeakerAccess") // We need the class to be public so that the dialog can be rotated (via Reflection)
-@SuppressLint("ValidFragment")
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
 
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
@@ -115,8 +115,8 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         for (SearchResult sr : listData) {
             String format = extractFormat(sr.getDisplayName());
             if (format.startsWith("AAC") ||
-                format.startsWith("MP3") ||
-                format.startsWith("H263 MP3")) {
+                    format.startsWith("MP3") ||
+                    format.startsWith("H263 MP3")) {
                 continue;
             }
             result.add(sr);
@@ -128,7 +128,7 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         final Matcher matcher = FORMAT_PATTERN.matcher(fileName);
         String format = null;
         if (matcher.find()) {
-            format = matcher.group(1).replace("_"," ").trim();
+            format = matcher.group(1).replace("_", " ").trim();
         }
         return format;
     }
