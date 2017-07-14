@@ -50,7 +50,7 @@ import java.util.*;
 @SuppressWarnings("WeakerAccess") // We need the class to be public so that the dialog can be rotated (via Reflection)
 @SuppressLint("ValidFragment")
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
-    private static Logger LOG = Logger.getLogger(YouTubeDownloadDialog.class);
+
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
     private static Pattern FORMAT_PATTERN = Pattern.compile("(?is)(H26.*p?|VP8.*p?|AAC.*p?)");
 
@@ -139,7 +139,7 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         } else if (data instanceof YouTubeCrawledStreamableSearchResult) {
             return ((YouTubeCrawledStreamableSearchResult) data).getSize();
         } else {
-            LOG.warn("getItemSize() -> -1: unhandled instance type, class = ["+data.getClass().getSimpleName()+"]");
+            //LOG.warn("getItemSize() -> -1: unhandled instance type, class = ["+data.getClass().getSimpleName()+"]");
         }
         return -1;
     }

@@ -38,7 +38,6 @@ import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.util.JsonUtils;
-import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -55,8 +54,6 @@ import java.util.Set;
  * @author aldenml
  */
 public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDialog<HandpickedTorrentDownloadDialog.TorrentFileEntry> {
-
-    private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialog.class);
 
     private TorrentInfo torrentInfo;
     private String magnetUri;
@@ -276,7 +273,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 }
 
                 if (!checked.isEmpty()) {
-                    LOG.info("about to startTorrentPartialDownload()");
                     try {
                         dlg.dismiss();
                     } catch (Throwable ignored) {
@@ -297,7 +293,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                     results == null ||
                     dlgRef.get().getList() == null ||
                     results.size() > dlgRef.get().getList().size()) {
-                LOG.warn("can't startTorrentPartialDownload()");
                 return;
             }
 
