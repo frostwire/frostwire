@@ -296,13 +296,11 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         // if it's a dismissible one it's one of the applied filters
         List<KeywordFilter> keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
         KeywordFilter keywordFilter = view.getKeywordFilter();
-        if (view.isDismissible()) {
-            if (keywordFiltersPipeline.size() > 0) {
-                 int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
-                 keywordFilter = view.toogleFilterInclusionMode();
-                 keywordFiltersPipeline.add(oldIndex, keywordFilter);
-                 keywordFiltersPipeline.remove(oldIndex + 1);
-             }
+        if (view.isDismissible() && keywordFiltersPipeline.size() > 0) {
+            int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
+            keywordFilter = view.toogleFilterInclusionMode();
+            keywordFiltersPipeline.add(oldIndex, keywordFilter);
+            keywordFiltersPipeline.remove(oldIndex + 1);
         } else if (!view.isDismissible()) {
             // attempt to add to pipeline
             if (!keywordFiltersPipeline.contains(keywordFilter)) {
