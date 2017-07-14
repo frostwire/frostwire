@@ -67,12 +67,14 @@ public class KeywordTagView extends LinearLayout {
             if (keyword == null) {
                 keyword = ""; // dummy value
             }
-            this.keywordFilter = new KeywordFilter(inclusive, keyword, null);
+        } else {
+            this.keywordFilter = keywordFilter;
         }
 
         attributes.recycle();
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         setVisibility(View.VISIBLE);
+        inflate(context, R.layout.view_keyword_tag, this);
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
@@ -84,12 +86,6 @@ public class KeywordTagView extends LinearLayout {
         this.count = count;
         this.dismissible = dismissible;
         this.listener = listener;
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        View.inflate(getContext(), R.layout.view_keyword_tag, this);
         updateComponents();
     }
 
