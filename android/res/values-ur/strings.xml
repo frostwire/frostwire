@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
     <string name="activity_browse_peers_name">قریبی لوگ</string>
     <string name="activity_chat_name">بات چیت</string>
@@ -280,7 +284,6 @@
     <string name="sharing_num_files">Sharing %1$s files of type %2$s</string>
     <string name="cancel_transfer">منتقلی منسوخ</string>
     <string name="support_frostwire">سپورٹ FrostWire</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="toast_on_disconnect">BitTorrent کے سے رابطہ منقطع ہوگیا. تمام BitTorrent کے ٹرانسفر بند کر دیا ہے.</string>
     <string name="transfers_select_downloading">ڈاؤن لوڈ کرنے</string>
     <string name="clear_torrent_index_summary">واضح نامہ انڈیکس</string>
@@ -414,7 +417,6 @@
     <string name="save_bandwidth">بینڈوڈتھ بچانے</string>
     <string name="accept_connection_from">سے کنکشن کو قبول کریں</string>
     <string name="vpn_client_feature_4">24/7 کسٹمر سپورٹ</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
     <string name="vpn_client_feature_1">فوجی گریڈ خفیہ کاری</string>
     <string name="transfers_context_resume_all_torrent_transfers">تمام سیلاب کی منتقلی دوبارہ شروع</string>
     <string name="vpn_client_feature_3">ذاتی اور logless براؤزنگ</string>
@@ -602,7 +604,6 @@
     <string name="media_player_failed">میڈیا پلیئر میں ناکام رہے</string>
     <string name="six_months">6 ماہ</string>
     <string name="update_title">بار اپ ڈیٹ کریں!</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="files_shared">فائلوں کا اشتراک کیا</string>
     <string name="storage_picker_treeuri_not_directory">منتخب شدہ راستے کی ایک ڈائریکٹری نہیں ہے</string>
     <string name="wizard_next">اگلے</string>
@@ -647,4 +648,19 @@
     <string name="file_information">فائل کی معلومات</string>
     <string name="use_btjunkie">استعمال BTJunkie</string>
     <string name="add_transfer">منتقلی کے لئے شامل کریں</string>
+    <string name="filter_ellipsis">فلٹر…</string>
+    <string name="include">شامل کریں</string>
+    <string name="fix_instructions">معلومات کے لئے support.frostwire.com ملاحظہ کریں اور ہدایات کو ٹھیک کریں</string>
+    <string name="seeing_less_results">کم یا کوئی نتائج دیکھ کر؟</string>
+    <string name="touch_applied_tags_to_include_exclude">شامل کردہ/خارج کرنے کیلئے لاگو کردہ ٹیگز کو چھونا</string>
+    <string name="exclude">خارج کریں</string>
+    <string name="filter">فلٹر</string>
+    <string name="try_changing_applied_filters">لاگو کردہ فلٹر تبدیل کرنے کی کوشش کریں</string>
+    <string name="size">سائز</string>
+    <string name="file_extensions">فائل کی توسیع</string>
+    <string name="filter_by_keyword">مطلوبہ الفاظ کی طرف سے فلٹر…</string>
+    <string name="sources_channels">ذرائع / چینلز</string>
+    <string name="clear_all">تمام کو صاف کریں</string>
+    <string name="or">یا</string>
+    <string name="file_names">فائل نام</string>
 </resources>
