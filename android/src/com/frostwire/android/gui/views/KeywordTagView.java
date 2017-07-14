@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
@@ -31,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
 
@@ -67,7 +67,7 @@ public class KeywordTagView extends LinearLayout {
             if (keyword == null) {
                 keyword = ""; // dummy value
             }
-            this.keywordFilter = new KeywordFilter(inclusive, keyword, (KeywordDetector.Feature) null);
+            this.keywordFilter = new KeywordFilter(inclusive, keyword, null);
         }
 
         attributes.recycle();
@@ -102,7 +102,7 @@ public class KeywordTagView extends LinearLayout {
             countTextView.setVisibility(View.GONE);
         }
         ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
-        inclusiveIndicatorImageView.setImageDrawable(getResources().getDrawable(keywordFilter.isInclusive() ? R.drawable.filter_add : R.drawable.filter_minus));
+        inclusiveIndicatorImageView.setImageResource(keywordFilter.isInclusive() ? R.drawable.filter_add : R.drawable.filter_minus);
         keywordTextView.setText(keywordFilter.getKeyword());
         countTextView.setText("(" + String.valueOf(count) + ")");
 
@@ -111,9 +111,9 @@ public class KeywordTagView extends LinearLayout {
         }
 
         if (dismissible) {
-            tagContainer.setBackground(getResources().getDrawable(R.drawable.keyword_tag_background_active));
-            keywordTextView.setTextColor(getResources().getColor(R.color.app_text_white));
-            inclusiveIndicatorImageView.setBackground(getResources().getDrawable(R.drawable.keyword_tag_inclusive_background));
+            tagContainer.setBackgroundResource(R.drawable.keyword_tag_background_active);
+            keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
+            inclusiveIndicatorImageView.setBackgroundResource(R.drawable.keyword_tag_inclusive_background);
             inclusiveIndicatorImageView.setColorFilter(new PorterDuffColorFilter(Color.parseColor("#2e9ec7"), PorterDuff.Mode.SRC_IN));
             inclusiveIndicatorImageView.setVisibility(View.VISIBLE);
             dismissTextView.setOnClickListener(new OnClickListener() {
@@ -123,8 +123,8 @@ public class KeywordTagView extends LinearLayout {
                 }
             });
         } else {
-            tagContainer.setBackground(getResources().getDrawable(R.drawable.keyword_tag_background));
-            keywordTextView.setTextColor(getResources().getColor(R.color.app_text_primary));
+            tagContainer.setBackgroundResource(R.drawable.keyword_tag_background);
+            keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
             inclusiveIndicatorImageView.setBackgroundResource(0);
             inclusiveIndicatorImageView.setVisibility(View.GONE);
             dismissTextView.setVisibility(View.GONE);
