@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用ExpressVPN加密您的连接和 <b>保护您的隐私</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
     <string name="activity_browse_peer_name">浏览主机</string>
@@ -511,7 +515,6 @@
     <string name="one_time_purchase">一次性购买</string>
     <string name="activity_VPN">连接</string>
     <string name="one_year">1年</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用ExpressVPN加密您的连接和 <b>保护您的隐私</b>.]]></string>
     <string name="i_have_read_and_agree_to_the">我已经阅读并且同意</string>
     <string name="scanning">完成 - 扫描</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">根据您的设置，我不能开始播种，除非你在Wi-Fi。 当您返回启用互联网的Wi-Fi网络时，该文件将可以自动播种.</string>
@@ -544,7 +547,6 @@
     <string name="learn_more">了解更多</string>
     <string name="save_bandwidth">保存带宽</string>
     <string name="vpn_client_feature_4">24/7客户支持</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
     <string name="vpn_client_feature_1">军用级加密</string>
     <string name="vpn_client_feature_3">私人和无记录浏览</string>
     <string name="try_frostwire_plus_for_more_results">尝试FrostWire Plus获得更多结果</string>
@@ -602,7 +604,6 @@
     <string name="cheaper_than_cigarettes">比香烟便宜</string>
     <string name="days_left">天左</string>
     <string name="six_months">6个月</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">所选路径不是目录</string>
     <string name="protect_my_privacy">保护我的隐私</string>
     <string name="your_privacy_is_a_fundamental_right_html">您的隐私是一项基本人权.</string>
@@ -654,4 +655,19 @@
     <string name="size">尺寸</string>
     <string name="use_btjunkie">使用 BTJunkie</string>
     <string name="add_transfer">添加转移</string>
+    <string name="filter_ellipsis">过滤…</string>
+    <string name="include">包括</string>
+    <string name="fix_instructions">有关信息和修复说明，请参阅 support.frostwire.com</string>
+    <string name="seeing_less_results">看不到或没有结果？</string>
+    <string name="touch_applied_tags_to_include_exclude">触摸应用的标签以包含/排除</string>
+    <string name="exclude">排除</string>
+    <string name="date">日期</string>
+    <string name="filter">过滤</string>
+    <string name="try_changing_applied_filters">尝试更改应用过滤器</string>
+    <string name="file_extensions">文件扩展名</string>
+    <string name="filter_by_keyword">按关键字过滤…</string>
+    <string name="sources_channels">来源/渠道</string>
+    <string name="clear_all">全部清除</string>
+    <string name="or">要么</string>
+    <string name="file_names">文件名</string>
 </resources>
