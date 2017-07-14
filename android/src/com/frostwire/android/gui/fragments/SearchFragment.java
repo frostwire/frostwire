@@ -881,7 +881,9 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(keywordDetector.totalHistogramKeys() > 0 || getKeywordFiltersPipeline().size() > 0 || keywordFilterDrawerView.hasSuggestedTags());
+            setVisible(keywordDetector.totalHistogramKeys() > 0 ||
+                    getKeywordFiltersPipeline().size() > 0 ||
+                    (promotions != null && promotions.getVisibility() == View.GONE && keywordFilterDrawerView.hasSuggestedTags()));
         }
 
         @Override

@@ -411,6 +411,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         }
 
         void hideHeader() {
+            header.setVisibility(View.GONE);
             showProgressView(false);
         }
 
