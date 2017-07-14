@@ -65,9 +65,12 @@ import java.util.Set;
  */
 abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener<T> {
+
+    private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
+
     static final String BUNDLE_KEY_CHECKED_OFFSETS = "checkedOffsets";
     static final String BUNDLE_KEY_LAST_SELECTED_RADIO_BUTTON_INDEX = "lastSelectedRadioButtonIndex";
-    private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
+
     private static final String BUNDLE_KEY_DIALOG_TITLE = "title";
     private static final String BUNDLE_KEY_DIALOG_TEXT = "dialogText";
     private static final String BUNDLE_KEY_LIST_DATA = "listData";
@@ -77,7 +80,6 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
      * TODOS: 1. Add an optional text filter control that will be connected to the adapter.
      */
 
-    private Logger LOGGER = Logger.getLogger(AbstractConfirmListDialog.class);
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxOnCheckedChangeListener;
 
     enum SelectionMode {
@@ -352,7 +354,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                 if (i >= 0) {
                     result[i]=true;
                 } else {
-                    LOGGER.warn("getSelected() is not finding the checked items on the list. Verify that [" + item.getClass().getSimpleName() + "] implements equals() and hashCode()");
+                    LOG.warn("getSelected() is not finding the checked items on the list. Verify that [" + item.getClass().getSimpleName() + "] implements equals() and hashCode()");
                 }
             }
         }
