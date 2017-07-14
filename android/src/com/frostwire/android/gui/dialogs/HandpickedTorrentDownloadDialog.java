@@ -282,7 +282,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                     } catch (Throwable ignored) {
                         // FragmentManager might throw illegal state exception after dialog is dismissed checking state loss
                     }
-                    startTorrentPartialDownload(ctxRef.get(), checked);
+                    startTorrentPartialDownload(checked);
 
                     if (ctxRef.get() instanceof Activity) {
                         Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
@@ -291,8 +291,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             }
         }
 
-        private void startTorrentPartialDownload(final Context context, List<TorrentFileEntry> results) {
-            if (context == null ||
+        private void startTorrentPartialDownload(List<TorrentFileEntry> results) {
+            if (!Ref.alive(ctxRef) ||
                     !Ref.alive(dlgRef) ||
                     results == null ||
                     dlgRef.get().getList() == null ||
@@ -301,9 +301,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 return;
             }
 
-            final HandpickedTorrentDownloadDialog theDialog = (HandpickedTorrentDownloadDialog) dlgRef.get();
-
-            final boolean[] selection = new boolean[theDialog.getList().size()];
+            final boolean[] selection = new boolean[((HandpickedTorrentDownloadDialog) dlgRef.get()).getList().size()];
             for (TorrentFileEntry selectedFileEntry : results) {
                 selection[selectedFileEntry.getIndex()] = true;
             }
@@ -312,14 +310,22 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 @Override
                 public void run() {
                     try {
-                        String magnet = theDialog.getMagnetUri();
+                        // there is a still a chance of reference getting null, this is in
+                        // the background
+                        if (!Ref.alive(ctxRef) || !Ref.alive(dlgRef)) {
+                            return;
+                        }
+                        Context ctx = ctxRef.get();
+                        HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
+
+                        String magnet = dlg.getMagnetUri();
                         List<TcpEndpoint> peers = parsePeers(magnet);
-                        BTEngine.getInstance().download(theDialog.getTorrentInfo(),
+                        BTEngine.getInstance().download(dlg.getTorrentInfo(),
                                 null,
                                 selection,
                                 peers,
                                 TransferManager.instance().isDeleteStartedTorrentEnabled());
-                        UIUtils.showTransfersOnDownloadStart(context);
+                        UIUtils.showTransfersOnDownloadStart(ctx);
                     } catch (Throwable ignored) {
                     }
                 }
