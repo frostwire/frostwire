@@ -85,8 +85,8 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
 
 
     @Override
-    protected View.OnClickListener createOnYesListener(AbstractConfirmListDialog dlg) {
-        return new OnStartDownloadsClickListener(getActivity(), dlg);
+    protected View.OnClickListener createOnYesListener() {
+        return new OnStartDownloadsClickListener(getActivity(), this);
     }
 
     @Override
@@ -185,16 +185,13 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         }
     }
 
+    // TODO: this class needs heavy refactor/cleanup
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
-            dlgRef = new WeakReference<>(dlg);
-        }
-
-        public void setDialog(AbstractConfirmListDialog dlg) {
             dlgRef = new WeakReference<>(dlg);
         }
 

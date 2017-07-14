@@ -104,7 +104,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     private OnClickListener onYesListener;
     private ConfirmListDialogDefaultAdapter<T> adapter;
 
-    abstract protected OnClickListener createOnYesListener(AbstractConfirmListDialog dlg);
+    abstract protected OnClickListener createOnYesListener();
 
     /** rebuilds list of objects from json and does listView.setAdapter(YourAdapter(theObjectList)) */
     abstract public List<T> deserializeData(String listDataInJSON);
@@ -190,7 +190,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             }
         });
 
-        onYesListener = createOnYesListener(this);
+        onYesListener = createOnYesListener();
         if (onYesListener != null) {
             Button yesButton = findView(dialog, R.id.dialog_confirm_list_button_yes);
             yesButton.setOnClickListener(onYesListener);

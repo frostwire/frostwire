@@ -118,8 +118,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     }
 
     @Override
-    protected View.OnClickListener createOnYesListener(AbstractConfirmListDialog dlg) {
-        return new OnStartDownloadsClickListener(getActivity(), dlg);
+    protected View.OnClickListener createOnYesListener() {
+        return new OnStartDownloadsClickListener(getActivity(), this);
     }
 
     @Override

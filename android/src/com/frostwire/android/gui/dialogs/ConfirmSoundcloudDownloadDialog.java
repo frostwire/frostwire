@@ -66,24 +66,21 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
 
 
     @Override
-    protected OnStartDownloadsClickListener createOnYesListener(final AbstractConfirmListDialog dlg) {
-        return new OnStartDownloadsClickListener(getActivity(), dlg);
+    protected OnStartDownloadsClickListener createOnYesListener() {
+        return new OnStartDownloadsClickListener(getActivity(), this);
     }
 
     private static class SoundcloudSearchResultList {
         List<SoundcloudSearchResult> listData;
     }
 
+    // TODO: this class needs heavy refactor/cleanup
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
-            dlgRef = new WeakReference<>(dlg);
-        }
-
-        public void setDialog(AbstractConfirmListDialog dlg) {
             dlgRef = new WeakReference<>(dlg);
         }
 
