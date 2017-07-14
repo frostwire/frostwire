@@ -83,7 +83,6 @@ import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeSearchResult;
-import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -97,7 +96,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -365,6 +364,7 @@ public final class SearchFragment extends AbstractFragment implements
         if (view == keywordFilterDrawerView) {
             searchInput.selectTabByMediaType((byte) adapter.getFileType());
         }
+        filterButton.updateVisibility();
     }
 
     @Override
@@ -398,9 +398,7 @@ public final class SearchFragment extends AbstractFragment implements
                     }
                     KeywordDetector keywordDetector = fragment.keywordDetector;
                     keywordDetector.feedSearchResults(results);
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, null);
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, null);
-                    keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, null);
+                    keywordDetector.requestHistogramsUpdateAsync(null);
                 }
             });
         }
@@ -712,9 +710,7 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         drawerLayout.openDrawer(keywordFilterDrawerView);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, null);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, null);
-        keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, null);
+        keywordDetector.requestHistogramsUpdateAsync(null);
     }
 
     private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
@@ -871,6 +867,7 @@ public final class SearchFragment extends AbstractFragment implements
         private TextView counterTextView;
         private Animation pulse;
         private boolean filterButtonClickedBefore;
+        private final AtomicLong lastUIUpdate = new AtomicLong(0l);
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
@@ -884,29 +881,32 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(keywordDetector.totalHistogramKeys() > 0);
+            setVisible(keywordDetector.totalHistogramKeys() > 0 || getKeywordFiltersPipeline().size() > 0 || keywordFilterDrawerView.hasSuggestedTags());
         }
 
         @Override
-        public void onHistogramUpdate(final KeywordDetector detector, final KeywordDetector.Feature feature, final List<Map.Entry<String, Integer>> histogram) {
+        public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
+            long now = System.currentTimeMillis();
+            if (now - lastUIUpdate.get() < 500l) {
+                return;
+            }
+            lastUIUpdate.set(now);
+
             Runnable uiRunnable = new Runnable() {
                 @Override
                 public void run() {
+                    List<KeywordFilter> keywordFiltersPipeline = getKeywordFiltersPipeline();
+                    keywordFilterDrawerView.updateAppliedKeywordFilters(keywordFiltersPipeline);
+                    for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+                        List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
+                        keywordFilterDrawerView.updateData(
+                                feature,
+                                filteredHistogram);
+                    }
                     updateVisibility();
-                    keywordFilterDrawerView.updateData(getKeywordFiltersPipeline(), feature, histogram);
                 }
             };
             getActivity().runOnUiThread(uiRunnable);
-        }
-
-        @Override
-        public void notify(final KeywordDetector detector, Map<KeywordDetector.Feature, HistoHashMap<String>> histoHashMaps) {
-            if (histoHashMaps != null && !histoHashMaps.isEmpty()) {
-                Set<KeywordDetector.Feature> features = histoHashMaps.keySet();
-                for (KeywordDetector.Feature feature : features) {
-                    onHistogramUpdate(detector, feature, histoHashMaps.get(feature).histogram());
-                }
-            }
         }
 
         public void reset(boolean hide) { //might do, parameter to not hide drawer
@@ -933,20 +933,21 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
             updateVisibility();
+            keywordFilterDrawerView.showIndeterminateProgressViews();
 
             List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.filtered;
-            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.SEARCH_SOURCE, results);
-            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_NAME, results);
-            keywordDetector.requestHistogramUpdateAsync(KeywordDetector.Feature.FILE_EXTENSION, results);
+            keywordDetector.requestHistogramsUpdateAsync(results);
         }
 
         @Override
         public void onAddKeywordFilter(KeywordFilter keywordFilter) {
+            keywordDetector.clearHistogramUpdateRequestDispatcher();
             updateFileTypeCounter(adapter.addKeywordFilter(keywordFilter));
         }
 
         @Override
         public void onRemoveKeywordFilter(KeywordFilter keywordFilter) {
+            keywordDetector.clearHistogramUpdateRequestDispatcher();
             updateFileTypeCounter(adapter.removeKeywordFilter(keywordFilter));
         }
 

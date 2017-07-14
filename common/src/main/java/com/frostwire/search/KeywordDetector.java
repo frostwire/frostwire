@@ -65,28 +65,30 @@ public final class KeywordDetector {
 
     private static Logger LOG = Logger.getLogger(KeywordDetector.class);
     private static final Set<String> stopWords = new HashSet<>();
-    private final Map<Feature, HistoHashMap<String>> histograms;
+    private final Map<Feature, HistoHashMap<String>> histoHashMaps;
     private KeywordDetectorListener keywordDetectorListener;
     private final HistogramUpdateRequestDispatcher histogramUpdateRequestsDispatcher;
     private ExecutorService threadPool;
+    private int totalHistogramKeysCount = -1;
 
     public KeywordDetector() {
-        histograms = new HashMap<>();
+        histoHashMaps = new HashMap<>();
         histogramUpdateRequestsDispatcher = new HistogramUpdateRequestDispatcher();
-        histograms.put(Feature.SEARCH_SOURCE, new HistoHashMap<String>());
-        histograms.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
-        histograms.put(Feature.FILE_NAME, new HistoHashMap<String>());
+        histoHashMaps.put(Feature.SEARCH_SOURCE, new HistoHashMap<String>());
+        histoHashMaps.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
+        histoHashMaps.put(Feature.FILE_NAME, new HistoHashMap<String>());
     }
 
     public int totalHistogramKeys() {
-        return histograms.get(Feature.SEARCH_SOURCE).getKeyCount() +
-                histograms.get(Feature.FILE_EXTENSION).getKeyCount() +
-                histograms.get(Feature.FILE_NAME).getKeyCount();
+        if (totalHistogramKeysCount == -1) {
+            getFilteredHistograms();
+        }
+        return totalHistogramKeysCount;
     }
 
     public void notifyKeywordDetectorListener() {
         if (this.keywordDetectorListener != null) {
-            this.keywordDetectorListener.notify(this, histograms);
+            this.keywordDetectorListener.notifyHistogramsUpdate(getFilteredHistograms());
         }
     }
 
@@ -129,24 +131,64 @@ public final class KeywordDetector {
      * Cheap
      */
     private void updateHistogramTokenCount(Feature feature, String token) {
-        HistoHashMap<String> histogram = histograms.get(feature);
+        HistoHashMap<String> histogram = histoHashMaps.get(feature);
         if (histogram != null) {
             histogram.update(token);
         }
+    }
+
+    public void clearHistogramUpdateRequestDispatcher() {
+        histogramUpdateRequestsDispatcher.clear();
     }
 
     public void shutdownHistogramUpdateRequestDispatcher() {
         histogramUpdateRequestsDispatcher.shutdown();
     }
 
+    public Map<Feature, List<Map.Entry<String, Integer>>> getFilteredHistograms() {
+        HashMap<Feature, List<Map.Entry<String, Integer>>> filteredHistograms = new HashMap<>();
+        totalHistogramKeysCount = 0;
+        for (Feature feature : histoHashMaps.keySet()) {
+            HistoHashMap<String> histoHashMap = histoHashMaps.get(feature);
+            if (histoHashMap.getKeyCount() > 0) {
+                List<Map.Entry<String, Integer>> histogram = histoHashMap.histogram();
+                List<Map.Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
+                if (filteredHistogram.size() > 0) {
+                    filteredHistograms.put(feature, filteredHistogram);
+                    totalHistogramKeysCount += filteredHistogram.size();
+                }
+            }
+        }
+
+        return filteredHistograms;
+    }
+
+    public static List<Map.Entry<String, Integer>> highPassFilter(List<Map.Entry<String, Integer>> histogram, float threshold) {
+        int high = 0;
+        int totalCount = 0;
+        for (Map.Entry<String, Integer> entry : histogram) {
+            int count = entry.getValue();
+            totalCount += count;
+            if (count > high) {
+                high = count;
+            }
+        }
+        List<Map.Entry<String, Integer>> filteredValues = new LinkedList<>();
+        for (Map.Entry<String, Integer> entry : histogram) {
+            float rate = (float) entry.getValue() / (high + totalCount);
+            if (entry.getValue() > 1 && rate >= threshold) {
+                filteredValues.add(entry);
+            }
+        }
+        return filteredValues;
+    }
+
     private static class HistogramUpdateRequestTask implements Runnable {
         private final KeywordDetector keywordDetector;
-        private final Feature feature;
         private final List<SearchResult> filtered;
 
-        public HistogramUpdateRequestTask(KeywordDetector keywordDetector, final Feature feature, List<SearchResult> filtered) {
+        public HistogramUpdateRequestTask(KeywordDetector keywordDetector, List<SearchResult> filtered) {
             this.keywordDetector = keywordDetector;
-            this.feature = feature;
             // TODO: this is necessary to due the amount of concurrency, but not
             // good for memory, need to refactor this
             this.filtered = filtered != null ? new ArrayList<>(filtered) : null;
@@ -154,14 +196,14 @@ public final class KeywordDetector {
 
         @Override
         public void run() {
-            if (keywordDetector.keywordDetectorListener != null) {
+            if (keywordDetector != null) {
                 try {
                     if (filtered != null) {
-                        keywordDetector.reset(feature);
+                        keywordDetector.reset();
                         keywordDetector.feedSearchResults(filtered);
                     }
-                    keywordDetector.histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
                     keywordDetector.notifyKeywordDetectorListener();
+                    keywordDetector.histogramUpdateRequestsDispatcher.onLastHistogramRequestFinished();
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }
@@ -177,7 +219,7 @@ public final class KeywordDetector {
      * You must remember to shutdown the inner thread on shutdown.
      */
     private class HistogramUpdateRequestDispatcher implements Runnable {
-        private static final long HISTOGRAM_REQUEST_TASK_DELAY_IN_MS = 500L;
+        private static final long HISTOGRAM_REQUEST_TASK_DELAY_IN_MS = 1000L;
         private final AtomicLong lastHistogramUpdateRequestFinished;
         /**
          * This Map can only contain as many elements as Features are available.
@@ -201,26 +243,14 @@ public final class KeywordDetector {
             if (!running.get() || updateRequestTask == null) {
                 return;
             }
-            if (histogramUpdateRequests.isEmpty()) {
-                histogramUpdateRequests.add(updateRequestTask);
-            } else {
-                // search if there's another update request task for this same feature and remove it
-                // NOTE on 'synchronized' use: this should be super fast since it's only up to 3 elements
-                synchronized (histogramUpdateRequests) {
-                    for (int i = 0; i < histogramUpdateRequests.size(); i++) {
-                        try {
-                            HistogramUpdateRequestTask histogramUpdateRequestTask = histogramUpdateRequests.get(i);
-                            if (histogramUpdateRequestTask.feature.equals(updateRequestTask.feature)) {
-                                histogramUpdateRequests.remove(i);
-                                break;
-                            }
-                        } catch (Throwable t) {
-                            // possible IndexOutOfBounds on histogramUpdateRequests.get()
-                        }
-                    }
-                    histogramUpdateRequests.add(updateRequestTask);
+
+            synchronized (histogramUpdateRequests) {
+                if (histogramUpdateRequests.size() > 0) {
+                    histogramUpdateRequests.clear();
                 }
+                histogramUpdateRequests.add(updateRequestTask);
             }
+
             signalLoopLock();
         }
 
@@ -274,6 +304,7 @@ public final class KeywordDetector {
         }
 
         public void start() {
+            clear();
             running.set(true);
             threadPool = ThreadPool.newThreadPool("KeywordDetector-pool", 1, false);
             new Thread(this, "HistogramUpdateRequestDispatcher").start();
@@ -294,10 +325,10 @@ public final class KeywordDetector {
         }
 
         public void clear() {
-            lastHistogramUpdateRequestFinished.set(0);
             synchronized (histogramUpdateRequests) {
                 histogramUpdateRequests.clear();
             }
+            lastHistogramUpdateRequestFinished.set(0);
             signalLoopLock();
         }
 
@@ -315,29 +346,22 @@ public final class KeywordDetector {
     /**
      * Expensive
      */
-    public void requestHistogramUpdateAsync(final Feature feature, List<SearchResult> filtered) {
+    public void requestHistogramsUpdateAsync(List<SearchResult> filtered) {
         if (!histogramUpdateRequestsDispatcher.running.get()) {
             histogramUpdateRequestsDispatcher.start();
         }
-        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, feature, filtered);
+        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, filtered);
         histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
     }
 
     public void reset() {
         histogramUpdateRequestsDispatcher.clear();
-        if (histograms != null && !histograms.isEmpty()) {
-            for (HistoHashMap<String> stringHistoHashMap : histograms.values()) {
+        if (histoHashMaps != null && !histoHashMaps.isEmpty()) {
+            for (HistoHashMap<String> stringHistoHashMap : histoHashMaps.values()) {
                 stringHistoHashMap.reset();
             }
         }
         notifyKeywordDetectorListener();
-    }
-
-    private void reset(Feature featureKey) {
-        if (histograms != null && !histograms.isEmpty()) {
-            HistoHashMap<String> histogram = histograms.get(featureKey);
-            histogram.reset();
-        }
     }
 
     private static void feedStopWords(String... words) {
@@ -348,7 +372,7 @@ public final class KeywordDetector {
         // english
         feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
         feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why", "your");
-        feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me");
+        feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me", "null");
         feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "youre");
         // spanish
         feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
@@ -366,8 +390,6 @@ public final class KeywordDetector {
     }
 
     public interface KeywordDetectorListener {
-        void onHistogramUpdate(KeywordDetector detector, Feature feature, List<Map.Entry<String, Integer>> histogram);
-
-        void notify(KeywordDetector detector, Map<Feature, HistoHashMap<String>> histograms);
+        void notifyHistogramsUpdate(Map<Feature, List<Map.Entry<String, Integer>>> filteredHistograms);
     }
 }
