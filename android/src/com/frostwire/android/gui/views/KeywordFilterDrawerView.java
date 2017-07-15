@@ -345,7 +345,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         Set<KeywordDetector.Feature> features = featureContainer.keySet();
         for (KeywordDetector.Feature feature : features) {
             TagsController tagsController = featureContainer.get(feature);
-            if (tagsController.container.getChildCount() > 0) {
+            if (tagsController.container.getChildCount() > 0 || tagsController.progressBar.getVisibility() == View.VISIBLE) {
                 return true;
             }
         }
