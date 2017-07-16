@@ -185,6 +185,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
         for (TagsController c : featureContainer.values()) {
             c.restore();
+            c.showProgressView(true);
         }
         scrollView.scrollTo(0, 0);
     }
