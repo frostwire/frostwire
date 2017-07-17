@@ -19,6 +19,10 @@
  */
 -->
 <resources>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için ExpressVPN\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ayarlar</string>
     <string name="activity_browse_peer_name">Sunucu Tara</string>
@@ -64,7 +68,7 @@
     <string name="pictures">Resimler</string>
     <string name="ringtone">Cep Melodisi</string>
     <string name="ringtones">Cep Melodileri</string>
-    <string name="document">Döküman</string>
+    <string name="document">Doküman</string>
     <string name="documents">Dökümanlar</string>
     <string name="share">Paylaş</string>
     <string name="unshare">Paylaşımı Kaldır</string>
@@ -454,7 +458,6 @@
     <string name="one_year">1 yıl</string>
     <string name="transfers_select_completed">tamamlanmış</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Tüm transferleri duraklatın/durdurun</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için ExpressVPN\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
     <string name="transfers_select_downloading">indirme</string>
     <string name="frostwire_features">FROSTWIRE ÖZELLİKLERİ</string>
     <string name="i_have_read_and_agree_to_the">Okudum ve onaylıyorum</string>
@@ -481,7 +484,7 @@
     <string name="delete_files">Dosyaları sil</string>
     <string name="vpn_price">ayda $%1$.2f dolardan</string>
     <string name="you_need_a_bitcoin_wallet_app">BTC bağışı göndermek için cihazınıza bir Bitcoin cüzdanı kurulu olmalıdır.</string>
-    <string name="transfers_select_all">herşey</string>
+    <string name="transfers_select_all">Her şey</string>
     <string name="thirty_days">30 gün</string>
     <string name="remove_ads_description">Reklamsız deneyimi yaşayın, FrostWire\'ı destekleyin</string>
     <string name="pausing">Duraklatma</string>
@@ -511,7 +514,6 @@
     <string name="learn_more">Daha fazla bilgi edin</string>
     <string name="save_bandwidth">Bant Genişliğini Kaydet</string>
     <string name="vpn_client_feature_4">7/24 müşteri desteği</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
     <string name="vpn_client_feature_1">Askeri sınıf şifreleme</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tüm torrent transferlerini devam ettirin</string>
     <string name="vpn_client_feature_3">Özel ve logless tarama</string>
@@ -599,7 +601,6 @@
     <string name="cheaper_than_cigarettes">Sigaradan daha ucuz</string>
     <string name="days_left">kalan günler</string>
     <string name="six_months">6 ay</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Seçilen yol bir dizin değil</string>
     <string name="protect_my_privacy">Gizliliğimi korumak</string>
     <string name="your_privacy_is_a_fundamental_right_html">Gizliliğiniz temel bir insan hakkıdır.</string>
@@ -650,4 +651,18 @@
     <string name="file_information">Dosya bilgileri</string>
     <string name="use_btjunkie">BTJunkie\'u Kullan</string>
     <string name="add_transfer">Aktarımı ekle</string>
+    <string name="filter_ellipsis">Filtre…</string>
+    <string name="include">Dahil etmek</string>
+    <string name="fix_instructions">Bilgi ve düzeltme talimatları için support.frostwire.com adresini ziyaret edin.</string>
+    <string name="seeing_less_results">Daha az sonuç görmek veya hiç sonuç almıyor musunuz?</string>
+    <string name="touch_applied_tags_to_include_exclude">Dahil etmek/hariç tutmak için uygulanmış etiketler\'e dokunun</string>
+    <string name="exclude">Hariç tutmak</string>
+    <string name="filter">Filtre</string>
+    <string name="try_changing_applied_filters">Uygulanan filtreleri değiştirmeyi deneyin</string>
+    <string name="file_extensions">Dosya uzantıları</string>
+    <string name="filter_by_keyword">Anahtar kelimeye göre filtrele…</string>
+    <string name="sources_channels">Kaynaklar / Kanallar</string>
+    <string name="clear_all">Hepsini temizle</string>
+    <string name="or">veya</string>
+    <string name="file_names">Dosya adları</string>
 </resources>
