@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Atingeți etichetele aplicate la]]></string>
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Informații despre fișier</string>
     <string name="use_btjunkie">Utilizați BTJunkie</string>
     <string name="add_transfer">Adăugați transferul</string>
+    <string name="filter_ellipsis">Filtrați…</string>
+    <string name="include">Include</string>
+    <string name="fix_instructions">Consultați support.frostwire.com pentru informații și instrucțiuni de remediere</string>
+    <string name="seeing_less_results">Văzând rezultate mai puțin sau deloc?</string>
+    <string name="touch_applied_tags_to_include_exclude">Atingeți etichetele aplicate pentru a include/exclude</string>
+    <string name="exclude">Exclude</string>
+    <string name="filter">Filtrați</string>
+    <string name="try_changing_applied_filters">Încercați să modificați filtrele aplicate</string>
+    <string name="file_extensions">Extensii de fișiere</string>
+    <string name="filter_by_keyword">Filtrați după cuvântul cheie…</string>
+    <string name="sources_channels">Surse / canale</string>
+    <string name="clear_all">Curata tot</string>
+    <string name="or">sau</string>
+    <string name="file_names">Numele fișierelor</string>
 </resources>
