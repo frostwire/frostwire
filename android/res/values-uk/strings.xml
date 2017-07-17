@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати ExpressVPN для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоча рекомендується для завантаження, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>ExpressVPN</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
     <string name="vpn_not_found">Ні VPN. Розглянемо шифрування з\'єднання.</string>
     <string name="azureus_peer_manager_status_finished">Закінчено</string>
     <string name="activity_mediaplayer_name">Медіа плеєр</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Iнформація про фото</string>
     <string name="use_btjunkie">користування BTJunkie</string>
     <string name="add_transfer">Додати переклад</string>
+    <string name="filter_ellipsis">Фільтрувати…</string>
+    <string name="include">Включати</string>
+    <string name="fix_instructions">Дивіться support.frostwire.com для отримання інформації та виправлення інструкцій</string>
+    <string name="seeing_less_results">Бачачи менше чи ні результатів?</string>
+    <string name="touch_applied_tags_to_include_exclude">Торкніться застосованих тегів для включення/виключення</string>
+    <string name="exclude">Виключити</string>
+    <string name="filter">Фільтрувати</string>
+    <string name="try_changing_applied_filters">Спробуйте змінити застосовані фільтри</string>
+    <string name="file_extensions">Розширення файлів</string>
+    <string name="filter_by_keyword">Фільтрувати за ключовим словом…</string>
+    <string name="sources_channels">Джерела / канали</string>
+    <string name="clear_all">Очистити все</string>
+    <string name="or">Або</string>
+    <string name="file_names">Імена файлів</string>
 </resources>
