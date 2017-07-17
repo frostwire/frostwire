@@ -740,4 +740,13 @@
         <item name="android:gravity">center</item>
         <item name="android:layout_marginLeft">4dp</item>
     </style>
+    <style name="keywordTagText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_x_small</item>
+    </style>
+    <style name="keywordTagCount">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/text_extra_micro</item>
+    </style>
+
 </resources>

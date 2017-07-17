@@ -49,21 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dummy_text"
-        android:textColor="@color/app_text_primary"
-        android:textSize="@dimen/text_x_small"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/view_keyword_tag_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="0dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="0dp"
-        android:paddingStart="5dp"
-        android:text="@string/dummy_number"
-        android:textColor="@color/app_text_primary"
-        android:textSize="@dimen/text_extra_micro" />
+        android:textColor="@color/app_text_primary" />
 
     <ImageView
         android:id="@+id/view_keyword_tag_dismiss"
