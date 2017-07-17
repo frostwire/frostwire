@@ -22,6 +22,7 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ ExpressVPN การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
     <string name="vpn_not_found">ไม่มี VPN พิจารณาการเข้ารหัสการเชื่อมต่อ</string>
     <string name="azureus_peer_manager_status_finished">เสร็จ</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -648,4 +649,18 @@
     <string name="file_information">ข้อมูลไฟล์</string>
     <string name="use_btjunkie">ใช้ BTJunkie</string>
     <string name="add_transfer">เพิ่มการโอน</string>
+    <string name="filter_ellipsis">กรอง…</string>
+    <string name="include">ประกอบด้วย</string>
+    <string name="fix_instructions">ดูข้อมูลเพิ่มเติมและคำแนะนำในการแก้ไขได้ที่ support.frostwire.com</string>
+    <string name="seeing_less_results">เห็นผลน้อยลงหรือไม่?</string>
+    <string name="touch_applied_tags_to_include_exclude">แตะแท็กที่ใช้เพื่อรวม/ยกเว้น</string>
+    <string name="exclude">ไม่รวม</string>
+    <string name="filter">กรอง</string>
+    <string name="try_changing_applied_filters">ลองเปลี่ยนตัวกรองที่ใช้</string>
+    <string name="file_extensions">นามสกุลไฟล์</string>
+    <string name="filter_by_keyword">กรองตามคำสำคัญ…</string>
+    <string name="sources_channels">แหล่งที่มา / แชแนล</string>
+    <string name="clear_all">ลบทั้งหมด</string>
+    <string name="or">หรือ</string>
+    <string name="file_names">ชื่อไฟล์</string>
 </resources>
