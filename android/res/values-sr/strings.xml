@@ -24,6 +24,7 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Иако се препоручује за своје преузимања, <b>не треба ВПН за коришћење FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Незаштићена веза значи све што радиш на мрежи (укључујући <b>претраге, поруке и преузимања</b>) може се пратити од било кога на мрежи, па чак и од свог провајдера интернет услуга.<br><br>Препоручујемо да користите ExpressVPN за шифровање везу и <b>заштитили своју приватност</b>.]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ви сте повезани са Интернетом помоћу ВПН. <br><br> Ако већ нисте, препоручујемо да користите <b>ExpressVPN</b> за шифрирање везу и <b>заштитили своју приватност</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Инфо:</b> Тоуцх примењене ознаке на]]></string>
 
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
@@ -653,4 +654,18 @@
     <string name="file_information">File информатион</string>
     <string name="use_btjunkie">Користе BTJunkie</string>
     <string name="add_transfer">Додај трансфер</string>
+    <string name="filter_ellipsis">Филтер…</string>
+    <string name="include">Укључи</string>
+    <string name="fix_instructions">Погледајте support.frostwire.com за информације и упутства за фиксирање</string>
+    <string name="seeing_less_results">Видети мање или никаквих резултата?</string>
+    <string name="touch_applied_tags_to_include_exclude">Додирните примењене ознаке да укључите/искључите</string>
+    <string name="exclude">Искључи</string>
+    <string name="filter">Филтер</string>
+    <string name="try_changing_applied_filters">Покушајте да промените примењене филтере</string>
+    <string name="file_extensions">Екстензије датотека</string>
+    <string name="filter_by_keyword">Филтрирај према кључној речи…</string>
+    <string name="sources_channels">Извори / канали</string>
+    <string name="clear_all">Избриши све</string>
+    <string name="or">Или</string>
+    <string name="file_names">Имена датотека</string>
 </resources>
