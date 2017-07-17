@@ -26,7 +26,6 @@ import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -96,11 +95,9 @@ public class KeywordTagView extends LinearLayout {
     }
 
     private void updateComponents() {
-        ImageButton inclusiveIndicatorImageView = (ImageButton) findViewById(R.id.view_keyword_tag_inclusive_indicator);
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         LinearLayout tagContainer = (LinearLayout) findViewById(R.id.view_keyword_tag_container);
         ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
-        inclusiveIndicatorImageView.setImageResource(keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus);
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -115,8 +112,9 @@ public class KeywordTagView extends LinearLayout {
 
         if (dismissible) {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background_active);
+            int drawableResId = keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus;
+            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
-            inclusiveIndicatorImageView.setVisibility(View.VISIBLE);
             dismissTextView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -125,19 +123,17 @@ public class KeywordTagView extends LinearLayout {
             });
         } else {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background);
+            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
-            inclusiveIndicatorImageView.setVisibility(View.GONE);
             dismissTextView.setVisibility(View.GONE);
         }
 
-        OnClickListener onClickListener = new OnClickListener() {
+        keywordTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onKeywordTagViewTouched();
             }
-        };
-        inclusiveIndicatorImageView.setOnClickListener(onClickListener);
-        keywordTextView.setOnClickListener(onClickListener);
+        });
     }
 
     private void onKeywordTagViewTouched() {

@@ -35,19 +35,14 @@
     android:paddingStart="12dp"
     android:paddingTop="4dp">
 
-    <ImageButton
-        android:id="@+id/view_keyword_tag_inclusive_indicator"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginRight="6dp"
-        android:contentDescription="@null"
-        android:src="@drawable/keyword_tag_filter_add" />
-
     <TextView
         android:id="@+id/view_keyword_tag_keyword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/keyword_tag_filter_add"
+        android:drawablePadding="6dp"
+        android:drawableStart="@drawable/keyword_tag_filter_add"
+        android:gravity="center_vertical"
         android:text="@string/dummy_text"
         android:textColor="@color/app_text_primary" />
 
