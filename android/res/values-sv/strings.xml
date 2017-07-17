@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder ExpressVPN att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Även rekommenderas för dina nedladdningar, <b>du behöver inte en VPN att använda Frostwire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>ExpressVPN</b> att kryptera din anslutning och <b>skydda din integritet</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Peka på använda taggar till]]></string>
     <string name="vpn_not_found">Ingen VPN. Överväga att kryptera anslutning.</string>
     <string name="azureus_peer_manager_status_finished">Färdiga</string>
     <string name="activity_mediaplayer_name">Mediaspelare</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Filinformation</string>
     <string name="use_btjunkie">Använda BTJunkie</string>
     <string name="add_transfer">Lägg till överföring</string>
+    <string name="filter_ellipsis">Filtrera…</string>
+    <string name="include">Inkludera</string>
+    <string name="fix_instructions">Se support.frostwire.com för information och fixa instruktioner</string>
+    <string name="seeing_less_results">Ser du mindre eller inga resultat?</string>
+    <string name="touch_applied_tags_to_include_exclude">Peka på använda taggar för att inkludera/utesluta</string>
+    <string name="exclude">Utesluta</string>
+    <string name="filter">Filtrera</string>
+    <string name="try_changing_applied_filters">Försök byta tillämpade filter</string>
+    <string name="file_extensions">Filtillägg</string>
+    <string name="filter_by_keyword">Filtrera efter nyckelord…</string>
+    <string name="sources_channels">Källor / Kanaler</string>
+    <string name="clear_all">Rensa alla</string>
+    <string name="or">eller</string>
+    <string name="file_names">Filnamn</string>
 </resources>
