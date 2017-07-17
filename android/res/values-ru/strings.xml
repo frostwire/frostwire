@@ -19,6 +19,11 @@
  */
 -->
 <resources>
+    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
+    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Ваша приватность является основополагающим правом человека.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *Вам НЕ ОБЯЗАТЕЛЬНО использовать VPN для FrostWire</b>, но мы НАСТОЯТЕЛЬНО РЕКОМЕНДУЕМ это делать, чтобы защитить свое право на неприкосновенность Вам не нужен VPN использовать FrostWire, но мы настоятельно рекомендуем это, чтобы защитить свое право на неприкосновенность частной жизни. жизни.</p>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Незащищенное соединение делает все, что вы делаете в интернете видным</b> для вашего интернет-провайдер и всех пользователей вашей сети, в том числе когда вы пользуетесь поиском, просматриваете веб-страницы, обмениваетесь сообщениями, а так же электронную почту и загрузки.]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Прикоснитесь к приложенным тегам к]]></string>
     <string name="activity_preferences_name">Настройки</string>
     <string name="activity_browse_peer_name">Обзор хостов</string>
     <string name="activity_browse_peers_name">Люди поблизости</string>
@@ -510,11 +515,6 @@
     <string name="unprotected_connection">Незащищенное соединение</string>
     <string name="protected_connection">Защищенное соединение</string>
     <string name="protect_my_privacy">Защита моей приватности</string>
-
-    <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Ваша приватность является основополагающим правом человека.</b>]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *Вам НЕ ОБЯЗАТЕЛЬНО использовать VPN для FrostWire</b>, но мы НАСТОЯТЕЛЬНО РЕКОМЕНДУЕМ это делать, чтобы защитить свое право на неприкосновенность Вам не нужен VPN использовать FrostWire, но мы настоятельно рекомендуем это, чтобы защитить свое право на неприкосновенность частной жизни. жизни.</p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Незащищенное соединение делает все, что вы делаете в интернете видным</b> для вашего интернет-провайдер и всех пользователей вашей сети, в том числе когда вы пользуетесь поиском, просматриваете веб-страницы, обмениваетесь сообщениями, а так же электронную почту и загрузки.]]></string>
     <string name="error_connection_timed_out">Ошибка: тайм-аут подключения/упал. Попробуй еще раз.</string>
     <string name="application_label">FrostWire</string>
     <string name="buy_uppercase">КУПИТЬ</string>
@@ -650,4 +650,18 @@
     <string name="file_information">Информация о файле</string>
     <string name="use_btjunkie">Использовать BTJunkie</string>
     <string name="add_transfer">Добавить перевод</string>
+    <string name="filter_ellipsis">фильтровать…</string>
+    <string name="include">Включают</string>
+    <string name="fix_instructions">См. support.frostwire.com для получения информации и инструкций по установке.</string>
+    <string name="seeing_less_results">Увидеть меньше или нет результатов?</string>
+    <string name="touch_applied_tags_to_include_exclude">Прикоснитесь к применяемым тегам, чтобы включить/исключить</string>
+    <string name="exclude">исключать</string>
+    <string name="filter">фильтровать</string>
+    <string name="try_changing_applied_filters">Попробуйте изменить применяемые фильтры</string>
+    <string name="file_extensions">Расширения файлов</string>
+    <string name="filter_by_keyword">Фильтровать по ключевому слову…</string>
+    <string name="sources_channels">Источники / каналы</string>
+    <string name="clear_all">Очистить все</string>
+    <string name="or">или</string>
+    <string name="file_names">Имена файлов</string>
 </resources>
