@@ -20,9 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -103,7 +100,7 @@ public class KeywordTagView extends LinearLayout {
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         LinearLayout tagContainer = (LinearLayout) findViewById(R.id.view_keyword_tag_container);
         ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
-        inclusiveIndicatorImageView.setImageResource(keywordFilter.isInclusive() ? R.drawable.filter_add : R.drawable.filter_minus);
+        inclusiveIndicatorImageView.setImageResource(keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus);
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -119,8 +116,6 @@ public class KeywordTagView extends LinearLayout {
         if (dismissible) {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background_active);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
-            inclusiveIndicatorImageView.setBackgroundResource(R.drawable.keyword_tag_inclusive_background);
-            inclusiveIndicatorImageView.setColorFilter(new PorterDuffColorFilter(Color.parseColor("#2e9ec7"), PorterDuff.Mode.SRC_IN));
             inclusiveIndicatorImageView.setVisibility(View.VISIBLE);
             dismissTextView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -131,7 +126,6 @@ public class KeywordTagView extends LinearLayout {
         } else {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
-            inclusiveIndicatorImageView.setBackgroundResource(0);
             inclusiveIndicatorImageView.setVisibility(View.GONE);
             dismissTextView.setVisibility(View.GONE);
         }

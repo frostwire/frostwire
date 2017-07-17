@@ -731,7 +731,6 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/tip_tag_blue</item>
         <item name="android:textSize">@dimen/text_x_small</item>
-        <item name="android:background">@drawable/keyword_tag_inclusive_background</item>
     </style>
     <style name="filterTipTagText">
         <item name="android:textStyle">bold</item>
