@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechránený spojenie znamená, že všetko, čo robíte on-line (vrátane <b>vyhľadávania, posielanie správ a sťahovanie</b>) môže byť sledovaný kýmkoľvek v sieti a dokonca aj zo strany poskytovateľa pripojenia na Internet.<br><br>Odporúčame používať ExpressVPN na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoci odporúčaná pre sťahovanie, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dotknite sa aplikovaných značiek na]]></string>
     <string name="vpn_not_found">No VPN. Zoberme si šifrovanie spojenia.</string>
     <string name="azureus_peer_manager_status_finished">Dokončené</string>
     <string name="activity_mediaplayer_name">Mediálny prehrávač</string>
@@ -647,4 +648,19 @@
     <string name="your_android_wall_paper_will_change">Vaša tapeta so systémom Android sa po niekoľkých sekundách zmení</string>
     <string name="file_information">Informácie o súbore</string>
     <string name="add_transfer">Pridať prenos</string>
+    <string name="filter_ellipsis">Filtrovať…</string>
+    <string name="include">Zahrnúť</string>
+    <string name="fix_instructions">Pozrite si support.frostwire.com, kde nájdete informácie a návody na opravu</string>
+    <string name="seeing_less_results">Vidíte menej alebo žiadne výsledky?</string>
+    <string name="touch_applied_tags_to_include_exclude">Dotknite sa aplikovaných značiek na zahrnutie/vylúčenie</string>
+    <string name="exclude">Vylúčiť</string>
+    <string name="filter">Filtrovať</string>
+    <string name="try_changing_applied_filters">Skúste zmeniť použité filtre</string>
+    <string name="file_extensions">Rozšírenia súborov</string>
+    <string name="filter_by_keyword">Filtrovať podľa kľúčového slova…</string>
+    <string name="sources_channels">Zdroje / kanály</string>
+    <string name="clear_all">Zmazať všetko</string>
+    <string name="or">alebo</string>
+    <string name="file_names">Názvy súborov</string>
+    <string name="use_btjunkie">Použite BTJunkie</string>
 </resources>
