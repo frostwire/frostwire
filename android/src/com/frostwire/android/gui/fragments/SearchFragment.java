@@ -881,9 +881,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(keywordDetector.totalHistogramKeys() > 0 ||
-                    getKeywordFiltersPipeline().size() > 0 ||
-                    (promotions != null && promotions.getVisibility() == View.GONE && keywordFilterDrawerView.hasSuggestedTags()));
+            setVisible(promotions != null && promotions.getVisibility() == View.GONE);
         }
 
         @Override
@@ -915,10 +913,6 @@ public final class SearchFragment extends AbstractFragment implements
             setVisible(!hide);
             keywordDetector.reset();
             closeKeywordFilterDrawer();
-        }
-
-        public void reset() {
-            reset(true);
         }
 
         @Override
