@@ -87,7 +87,7 @@ public class MusicViewHolder {
         mBackground = new WeakReference<>((ImageView) view.findViewById(R.id.list_item_background));
 
         // Initialize mImage
-        mImage = new WeakReference<>((ImageView) view.findViewById(R.id.image));
+        mImage = new WeakReference<>((ImageView) view.findViewById(R.id.list_item_image));
 
         // Initialize mLineOne
         mLineOne = new WeakReference<>((TextView) view.findViewById(R.id.line_one));
@@ -140,6 +140,11 @@ public class MusicViewHolder {
          * This is the ID of the item being loaded in the adapter
          */
         public long mItemId;
+
+        /**
+         * Optional: The parent ID of the item being loaded in the adapter. e.g. Album Id if item loaded is a song
+         */
+        public long mParentId = -1;
 
         /**
          * This is the first line displayed in the list or grid
