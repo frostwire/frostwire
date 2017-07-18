@@ -39,21 +39,12 @@
         android:id="@+id/view_keyword_tag_keyword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/keyword_tag_close_clear_cancel_full"
         android:drawableLeft="@drawable/keyword_tag_filter_add"
         android:drawablePadding="6dp"
+        android:drawableRight="@drawable/keyword_tag_close_clear_cancel_full"
         android:drawableStart="@drawable/keyword_tag_filter_add"
         android:gravity="center_vertical"
         android:text="@string/dummy_text"
         android:textColor="@color/app_text_primary" />
-
-    <ImageView
-        android:id="@+id/view_keyword_tag_dismiss"
-        android:layout_width="22dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:contentDescription="@null"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:src="@drawable/keyword_tag_close_clear_cancel_full" />
 </LinearLayout>

@@ -20,13 +20,14 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -97,7 +98,6 @@ public class KeywordTagView extends LinearLayout {
     private void updateComponents() {
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         LinearLayout tagContainer = (LinearLayout) findViewById(R.id.view_keyword_tag_container);
-        ImageView dismissTextView = (ImageView) findViewById(R.id.view_keyword_tag_dismiss);
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -113,25 +113,34 @@ public class KeywordTagView extends LinearLayout {
         if (dismissible) {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background_active);
             int drawableResId = keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus;
-            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0);
+            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
-            dismissTextView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onDismissed();
-                }
-            });
         } else {
             tagContainer.setBackgroundResource(R.drawable.keyword_tag_background);
             keywordTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
-            dismissTextView.setVisibility(View.GONE);
         }
 
         keywordTextView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onKeywordTagViewTouched();
+            }
+        });
+        keywordTextView.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Drawable d = ((TextView) v).getCompoundDrawables()[2];
+                if (d == null) {
+                    return false;
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getX() >= (v.getRight() - d.getBounds().width())) {
+                        onDismissed();
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }
