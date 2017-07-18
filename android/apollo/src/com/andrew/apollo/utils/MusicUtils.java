@@ -655,6 +655,28 @@ public final class MusicUtils {
         return sEmptyList;
     }
 
+    public static long getAlbumIdForSong(final Context context, final long songId) {
+        long albumId = -1;
+        final String[] projection = new String[]{
+                AudioColumns.ALBUM_ID
+        };
+        final String selection = AudioColumns._ID + "=" + songId + " AND " + AudioColumns.IS_MUSIC + "=1";
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                null,
+                null
+        );
+        if (cursor != null) {
+            cursor.moveToFirst();
+            albumId = cursor.getLong(0);
+            cursor.close();
+        }
+        return albumId;
+    }
+
     public static String getAlbumName(final Context context, final long id) {
         String albumName = null;
         final String[] projection = new String[]{
