@@ -428,7 +428,6 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
             songTitle = playlistItem.getTrackTitle() + " ";
         }
 
-        File selectedFile = getFile(sel[0]);
         JPanel lyricsPanel = new JPanel(new MigLayout("fillx, wrap 1, insets 0","[]"));
         lyricsPanel.add(new JLabel(songTitle + I18n.tr("Lyrics")),"wrap");
         JTextArea lyricsTextArea = new JTextArea(lyrics);
