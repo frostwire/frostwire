@@ -27,7 +27,7 @@
         android:scaleType="centerCrop" />
 
     <com.andrew.apollo.widgets.LayoutSuppressingImageView
-        android:id="@+id/image"
+        android:id="@+id/list_item_image"
         android:layout_width="@dimen/list_item_detailed_height"
         android:layout_height="@dimen/list_item_detailed_height"
         android:layout_alignParentBottom="true"
@@ -38,7 +38,7 @@
         android:id="@+id/image_background"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_detailed_height"
-        android:layout_toRightOf="@+id/image"
+        android:layout_toRightOf="@+id/list_item_image"
         android:background="@color/list_item_background"
         android:paddingLeft="@dimen/list_simple_horizontal_padding"
         android:paddingRight="@dimen/list_simple_horizontal_padding"

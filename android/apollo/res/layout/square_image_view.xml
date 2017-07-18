@@ -20,7 +20,7 @@
     android:layout_height="match_parent" >
 
     <com.andrew.apollo.widgets.SquareImageView
-        android:id="@+id/image"
+        android:id="@+id/list_item_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />

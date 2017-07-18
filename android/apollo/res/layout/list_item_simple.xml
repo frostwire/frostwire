@@ -22,7 +22,7 @@
     android:minHeight="@dimen/item_normal_height">
 
     <com.andrew.apollo.widgets.SquareImageView
-        android:id="@+id/image"
+        android:id="@+id/list_item_image"
         android:layout_width="@dimen/item_normal_height"
         android:layout_height="@dimen/item_normal_height"
         android:layout_alignParentBottom="true"
@@ -34,7 +34,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_normal_height"
-        android:layout_toRightOf="@+id/image"
+        android:layout_toRightOf="@+id/list_item_image"
         android:gravity="center_vertical"
         android:minHeight="@dimen/item_normal_height"
         android:paddingLeft="@dimen/list_simple_horizontal_padding"
