@@ -342,7 +342,13 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
         currentPlaylist = playlist;
         List<PlaylistItem> items = currentPlaylist.getItems();
 
-        updatePlaylistComponentHeader(null);
+        GUIMediator.safeInvokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updatePlaylistComponentHeader(null);
+            }
+        });
+
         clearTable();
         for (final PlaylistItem item : items) {
             GUIMediator.safeInvokeLater(new Runnable() {
@@ -564,6 +570,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
     public void handleSelection(int row) {
         int[] sel = TABLE.getSelectedRows();
         if (sel.length == 0) {
+            System.out.println("handleSelection() -> sel.length == 0 -> handleNoSelection");
             handleNoSelection();
             return;
         }
