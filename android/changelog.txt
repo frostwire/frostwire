@@ -13,6 +13,7 @@ FrostWire 1.9.8 - JUL/17/2017
    Portuguese, Spanish, Hindi, Croatian, Indonesian, Hebrew, Korean, Japanese,
    Russian, Slovak, Romanian, Serbian, Swedish, Thai, Turkish, Ukranian)
  - ogury 2.1.11
+ - Music player 'Last Added' now shows album cover art for each song
 
 FrostWire 1.9.7 - JUN/22/2017
  - New jlibtorrent 1.2.0.11-RC1
