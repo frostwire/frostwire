@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
@@ -33,11 +32,5 @@
     android:drawableStart="@drawable/keyword_tag_filter_add"
     android:gravity="center_vertical"
     android:minHeight="34dp"
-    android:paddingBottom="4dp"
-    android:paddingEnd="12dp"
-    android:paddingLeft="12dp"
-    android:paddingRight="12dp"
-    android:paddingStart="12dp"
-    android:paddingTop="4dp"
     android:text="@string/dummy_text"
     android:textColor="@color/app_text_primary" />

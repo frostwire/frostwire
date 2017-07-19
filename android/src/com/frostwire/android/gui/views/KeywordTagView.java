@@ -25,6 +25,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -70,6 +71,10 @@ public class KeywordTagView extends LinearLayout {
         // TODO: refactor and move logic to onLayoutInflate
         keywordSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagText);
         countSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagCount);
+
+        // setup of inner textview, but soon to be the main one
+        TextView v = (TextView) findViewById(R.id.view_keyword_tag_keyword);
+        v.setPadding(toPx(12), toPx(4), toPx(12), toPx(4));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
@@ -171,6 +176,10 @@ public class KeywordTagView extends LinearLayout {
                 LOG.error(t.getMessage(), t);
             }
         }
+    }
+
+    private int toPx(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
     // for API 16 compatibility
