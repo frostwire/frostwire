@@ -214,7 +214,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public FilteredSearchResults filter(List<SearchResult> results) {
         FilteredSearchResults fsr = new FilteredSearchResults();
-        ArrayList<SearchResult> l = new ArrayList<>();
+        ArrayList<SearchResult> mediaTypedFiltered = new ArrayList<>();
+        ArrayList<SearchResult> keywordFiltered = new ArrayList<>();
         List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
         for (SearchResult sr : results) {
             MediaType mt;
@@ -231,12 +232,16 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             boolean passedKeywordFilter = KeywordFilter.passesFilterPipeline(sr, keywordFilters);
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
                 if (keywordFilters.isEmpty() || passedKeywordFilter) {
-                    l.add(sr);
+                    mediaTypedFiltered.add(sr);
+                    keywordFiltered.add(sr);
                 }
+            } else if (passedKeywordFilter) {
+                keywordFiltered.add(sr);
             }
             fsr.increment(mt, passedKeywordFilter);
         }
-        fsr.filtered = l;
+        fsr.filtered = mediaTypedFiltered;
+        fsr.keywordFiltered = keywordFiltered;
         return fsr;
     }
 
@@ -320,6 +325,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public static class FilteredSearchResults {
         public List<SearchResult> filtered;
+        public List<SearchResult> keywordFiltered;
+
         public int numAudio;
         public int numVideo;
         public int numPictures;
@@ -333,6 +340,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         public int numFilteredApplications;
         public int numFilteredDocuments;
         public int numFilteredTorrents;
+        ;
 
         private void increment(MediaType mt, boolean passedFilter) {
             if (mt != null) {

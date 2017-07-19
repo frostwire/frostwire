@@ -193,7 +193,7 @@ public final class SearchFragment extends AbstractFragment implements
             filterButton.reset(false);
             boolean filtersApplied = !adapter.getKeywordFiltersPipeline().isEmpty();
             if (filtersApplied) {
-                updateKeywordDetector(adapter.filter().filtered);
+                updateKeywordDetector(adapter.filter().keywordFiltered);
             } else {
                 updateKeywordDetector(adapter.getList());
             }
@@ -315,7 +315,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void onSearchResults(final List<SearchResult> results) {
         FilteredSearchResults fsr = adapter.filter(results);
-        final List<SearchResult> filteredList = fsr.filtered;
+        final List<SearchResult> keywordFiltered = fsr.keywordFiltered;
         fileTypeCounter.add(fsr);
         // if it's a fresh search, make sure to clear keyword detector
         if (adapter.getCount() == 0 && adapter.getKeywordFiltersPipeline().size() == 0) {
@@ -325,13 +325,13 @@ public final class SearchFragment extends AbstractFragment implements
         if (adapter.getKeywordFiltersPipeline().isEmpty()) {
             updateKeywordDetector(results);
         } else {
-            updateKeywordDetector(filteredList);
+            updateKeywordDetector(keywordFiltered);
         }
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                adapter.addResults(results, filteredList);
+                adapter.addResults(results, keywordFiltered);
                 showSearchView(getView());
                 refreshFileTypeCounters(true);
             }
@@ -881,7 +881,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(promotions != null && promotions.getVisibility() == View.GONE);
+            setVisible(currentQuery != null);
         }
 
         @Override
@@ -931,14 +931,15 @@ public final class SearchFragment extends AbstractFragment implements
             updateVisibility();
             keywordFilterDrawerView.showIndeterminateProgressViews();
 
-            List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.filtered;
+            List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.keywordFiltered;
             keywordDetector.requestHistogramsUpdateAsync(results);
         }
 
         @Override
         public void onAddKeywordFilter(KeywordFilter keywordFilter) {
             keywordDetector.clearHistogramUpdateRequestDispatcher();
-            updateFileTypeCounter(adapter.addKeywordFilter(keywordFilter));
+            FilteredSearchResults filteredSearchResults = adapter.addKeywordFilter(keywordFilter);
+            updateFileTypeCounter(filteredSearchResults);
         }
 
         @Override
