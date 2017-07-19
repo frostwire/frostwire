@@ -75,6 +75,11 @@ public class KeywordTagView extends LinearLayout {
         // setup of inner textview, but soon to be the main one
         TextView v = (TextView) findViewById(R.id.view_keyword_tag_keyword);
         v.setPadding(toPx(12), toPx(4), toPx(12), toPx(4));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, toPx(34));
+        params.setMargins(0, 0, toPx(6), toPx(8));
+        v.setLayoutParams(params);
+        v.setMinHeight(toPx(34));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {

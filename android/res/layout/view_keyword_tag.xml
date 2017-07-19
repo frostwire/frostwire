@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
@@ -20,10 +21,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_keyword_tag_keyword"
     android:layout_width="wrap_content"
-    android:layout_height="34dp"
-    android:layout_marginBottom="8dp"
-    android:layout_marginEnd="6dp"
-    android:layout_marginRight="6dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/keyword_tag_background"
     android:drawableEnd="@drawable/keyword_tag_close_clear_cancel_full"
     android:drawableLeft="@drawable/keyword_tag_filter_add"
@@ -31,6 +29,5 @@
     android:drawableRight="@drawable/keyword_tag_close_clear_cancel_full"
     android:drawableStart="@drawable/keyword_tag_filter_add"
     android:gravity="center_vertical"
-    android:minHeight="34dp"
     android:text="@string/dummy_text"
     android:textColor="@color/app_text_primary" />
