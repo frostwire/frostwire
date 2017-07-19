@@ -60,11 +60,18 @@ public final class KeywordTagView extends AppCompatTextView {
 
     private KeywordTagView(Context context, AttributeSet attrs, KeywordFilter keywordFilter) {
         super(context, attrs);
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
-        count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
-        dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
+
+        if (keywordFilter == null) {
+            TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
+            count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
+            dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
+            boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
+            String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
+            keywordFilter = new KeywordFilter(inclusive, keyword != null ? keyword : "[Text]", KeywordDetector.Feature.MANUAL_ENTRY);
+            attributes.recycle();
+        }
+
         this.keywordFilter = keywordFilter;
-        attributes.recycle();
 
         keywordSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagText);
         countSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagCount);
@@ -80,8 +87,6 @@ public final class KeywordTagView extends AppCompatTextView {
 
     public KeywordTagView(Context context, AttributeSet attrs) {
         this(context, attrs, null);
-        // dummy, to refactor soon
-        keywordFilter = new KeywordFilter(true, "[Text]", KeywordDetector.Feature.MANUAL_ENTRY);
         updateComponents();
     }
 
