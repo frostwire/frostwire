@@ -61,7 +61,11 @@ public final class KeywordFilter {
     }
 
     public KeywordDetector.Feature getFeature() {
-        return this.feature;
+        return feature;
+    }
+
+    public KeywordFilter negate() {
+        return new KeywordFilter(!inclusive, keyword, feature);
     }
 
     public boolean accept(final String lowercaseHaystack) {
