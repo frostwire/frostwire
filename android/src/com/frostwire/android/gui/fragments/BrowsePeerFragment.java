@@ -442,47 +442,49 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         peer.finger(new Finger.FingerCallback() {
             @Override
             public void onFinger(final Finger finger) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (header != null) {
-                            byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-                            int numTotal = 0;
-                            switch (fileType) {
-                                case Constants.FILE_TYPE_TORRENTS:
-                                    numTotal = finger.numTotalTorrentFiles;
-                                    break;
-                                case Constants.FILE_TYPE_AUDIO:
-                                    numTotal = finger.numTotalAudioFiles;
-                                    break;
-                                case Constants.FILE_TYPE_DOCUMENTS:
-                                    numTotal = finger.numTotalDocumentFiles;
-                                    break;
-                                case Constants.FILE_TYPE_PICTURES:
-                                    numTotal = finger.numTotalPictureFiles;
-                                    break;
-                                case Constants.FILE_TYPE_RINGTONES:
-                                    numTotal = finger.numTotalRingtoneFiles;
-                                    break;
-                                case Constants.FILE_TYPE_VIDEOS:
-                                    numTotal = finger.numTotalVideoFiles;
-                                    break;
+                if (isAdded()) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (header != null) {
+                                byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+                                int numTotal = 0;
+                                switch (fileType) {
+                                    case Constants.FILE_TYPE_TORRENTS:
+                                        numTotal = finger.numTotalTorrentFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_AUDIO:
+                                        numTotal = finger.numTotalAudioFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_DOCUMENTS:
+                                        numTotal = finger.numTotalDocumentFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_PICTURES:
+                                        numTotal = finger.numTotalPictureFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_RINGTONES:
+                                        numTotal = finger.numTotalRingtoneFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_VIDEOS:
+                                        numTotal = finger.numTotalVideoFiles;
+                                        break;
+                                }
+                                if (isAdded()) {
+                                    String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+                                    TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+                                    title.setText(fileTypeStr);
+                                }
+                                TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
+                                total.setText("(" + String.valueOf(numTotal) + ")");
                             }
-                            if (isAdded()) {
-                                String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-                                TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
-                                title.setText(fileTypeStr);
+                            if (adapter == null) {
+                                clickFileTypeTab(lastFileType);
                             }
-                            TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
-                            total.setText("(" + String.valueOf(numTotal) + ")");
+                            MusicUtils.stopSimplePlayer();
+                            restoreListViewScrollPosition();
                         }
-                        if (adapter == null) {
-                            clickFileTypeTab(lastFileType);
-                        }
-                        MusicUtils.stopSimplePlayer();
-                        restoreListViewScrollPosition();
-                    }
-                });
+                    });
+                }
             }
         });
     }

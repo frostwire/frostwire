@@ -300,13 +300,15 @@ public final class SearchFragment extends AbstractFragment implements
 
                 @Override
                 public void onStopped(long token) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            searchProgress.setProgressEnabled(false);
-                            deepSearchProgress.setVisibility(View.GONE);
-                        }
-                    });
+                    if (isAdded()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                searchProgress.setProgressEnabled(false);
+                                deepSearchProgress.setVisibility(View.GONE);
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -329,14 +331,16 @@ public final class SearchFragment extends AbstractFragment implements
             updateKeywordDetector(keywordFiltered);
         }
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.addResults(keywordFiltered, mediaTypeFiltered);
-                showSearchView(getView());
-                refreshFileTypeCounters(true);
-            }
-        });
+        if (isAdded()) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.addResults(keywordFiltered, mediaTypeFiltered);
+                    showSearchView(getView());
+                    refreshFileTypeCounters(true);
+                }
+            });
+        }
     }
 
     private void updateKeywordDetector(final List<? extends SearchResult> results) {
@@ -891,7 +895,7 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
             long now = System.currentTimeMillis();
-            if (now - lastUIUpdate.get() < 500l) {
+            if (now - lastUIUpdate.get() < 500l || !isAdded()) {
                 return;
             }
             lastUIUpdate.set(now);
@@ -916,14 +920,15 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void onKeywordDetectorFinished() {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    keywordFilterDrawerView.hideIndeterminateProgressViews();
-                    keywordFilterDrawerView.requestLayout();
-                }
-            });
-
+            if (isAdded()) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        keywordFilterDrawerView.hideIndeterminateProgressViews();
+                        keywordFilterDrawerView.requestLayout();
+                    }
+                });
+            }
         }
 
         public void reset(boolean hide) { //might do, parameter to not hide drawer
