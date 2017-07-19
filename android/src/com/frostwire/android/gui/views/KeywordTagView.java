@@ -46,7 +46,7 @@ public final class KeywordTagView extends AppCompatTextView {
 
     private int count;
     private boolean dismissible;
-    private KeywordTagViewListener listener;
+    private OnActionListener listener;
 
     private KeywordFilter keywordFilter;
 
@@ -86,7 +86,7 @@ public final class KeywordTagView extends AppCompatTextView {
         updateComponents();
     }
 
-    public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissible, KeywordTagViewListener listener) {
+    public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissible, OnActionListener listener) {
         this(context, null, keywordFilter);
         this.count = count;
         this.dismissible = dismissible;
@@ -141,7 +141,7 @@ public final class KeywordTagView extends AppCompatTextView {
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onKeywordTagViewTouched();
+                onTouched();
             }
         });
         if (dismissible) {
@@ -162,15 +162,15 @@ public final class KeywordTagView extends AppCompatTextView {
         }
     }
 
-    private void onKeywordTagViewTouched() {
-        if (this.listener != null) {
-            this.listener.onKeywordTagViewTouched(this);
+    private void onTouched() {
+        if (listener != null) {
+            listener.onTouched(this);
         }
     }
 
     private void onDismissed() {
         if (listener != null) {
-            listener.onKeywordTagViewDismissed(this);
+            listener.onDismissed(this);
         }
     }
 
@@ -186,10 +186,10 @@ public final class KeywordTagView extends AppCompatTextView {
         return sb;
     }
 
-    public interface KeywordTagViewListener {
+    public interface OnActionListener {
 
-        void onKeywordTagViewTouched(KeywordTagView view);
+        void onTouched(KeywordTagView view);
 
-        void onKeywordTagViewDismissed(KeywordTagView view);
+        void onDismissed(KeywordTagView view);
     }
 }

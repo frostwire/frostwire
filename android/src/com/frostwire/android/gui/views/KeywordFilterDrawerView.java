@@ -314,10 +314,10 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         List<KeywordFilter> getKeywordFiltersPipeline();
     }
 
-    private final class KeywordTagListener implements KeywordTagView.KeywordTagViewListener {
+    private final class KeywordTagListener implements KeywordTagView.OnActionListener {
 
         @Override
-        public void onKeywordTagViewTouched(KeywordTagView view) {
+        public void onTouched(KeywordTagView view) {
             if (pipelineListener == null) {
                 return;
             }
@@ -345,7 +345,7 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         }
 
         @Override
-        public void onKeywordTagViewDismissed(KeywordTagView view) {
+        public void onDismissed(KeywordTagView view) {
             pipelineLayout.removeView(view);
 
             resetTagsContainers();
