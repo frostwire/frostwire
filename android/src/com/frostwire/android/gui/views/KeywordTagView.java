@@ -111,12 +111,10 @@ public final class KeywordTagView extends AppCompatTextView {
      * Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode
      */
     public KeywordFilter toggleFilterInclusionMode() {
-        KeywordFilter oldKeywordFilter = getKeywordFilter();
-        KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
-        this.keywordFilter = newKeywordFilter;
+        keywordFilter = keywordFilter.negate();
         updateComponents();
         invalidate();
-        return newKeywordFilter;
+        return keywordFilter;
     }
 
     private void updateComponents() {
