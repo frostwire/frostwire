@@ -131,7 +131,7 @@ public class KeywordTagView extends LinearLayout {
             public boolean onTouch(View v, MotionEvent event) {
                 TextView tv = (TextView) v;
                 if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getRawX() >= tv.getRight() - tv.getTotalPaddingRight()) {
+                    if (event.getRawX() >= tv.getRight() - tv.getTotalPaddingRight() && dismissible) {
                         onDismissed();
                         return true;
                     }
