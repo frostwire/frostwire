@@ -315,6 +315,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void onSearchResults(final List<SearchResult> results) {
         FilteredSearchResults fsr = adapter.filter(results);
+        final List<SearchResult> mediaTypeFiltered = fsr.filtered;
         final List<SearchResult> keywordFiltered = fsr.keywordFiltered;
         fileTypeCounter.add(fsr);
         // if it's a fresh search, make sure to clear keyword detector
@@ -331,7 +332,7 @@ public final class SearchFragment extends AbstractFragment implements
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                adapter.addResults(results, keywordFiltered);
+                adapter.addResults(keywordFiltered, mediaTypeFiltered);
                 showSearchView(getView());
                 refreshFileTypeCounters(true);
             }
@@ -487,6 +488,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void cancelSearch() {
         adapter.clear();
+        searchInput.selectTabByMediaType(Constants.FILE_TYPE_AUDIO);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
         resetKeywordDetector();
@@ -724,6 +726,8 @@ public final class SearchFragment extends AbstractFragment implements
 
         public void onSearch(View v, String query, int mediaTypeId) {
             fragment.resetKeywordDetector();
+            fragment.searchInput.selectTabByMediaType((byte) mediaTypeId);
+
             if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
                 fragment.cancelSearch();
                 new DownloadSoundcloudFromUrlTask(fragment.getActivity(), query).execute();

@@ -61,17 +61,7 @@ public class KeywordTagView extends LinearLayout {
         TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.KeywordTagView, 0, 0);
         count = attributes.getInteger(R.styleable.KeywordTagView_keyword_tag_count, 0);
         dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
-
-        if (keywordFilter == null) { // try to build one from attribute values
-            boolean inclusive = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_inclusive, true);
-            String keyword = attributes.getString(R.styleable.KeywordTagView_keyword_tag_keyword);
-            if (keyword == null) {
-                keyword = ""; // dummy value
-            }
-        } else {
-            this.keywordFilter = keywordFilter;
-        }
-
+        this.keywordFilter = keywordFilter;
         attributes.recycle();
         setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         setVisibility(View.VISIBLE);
@@ -126,19 +116,30 @@ public class KeywordTagView extends LinearLayout {
                 onKeywordTagViewTouched();
             }
         });
-        keywordTextView.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                TextView tv = (TextView) v;
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getRawX() >= tv.getRight() - tv.getTotalPaddingRight() && dismissible) {
+        if (dismissible) {
+            keywordTextView.setOnTouchListener(new OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() != MotionEvent.ACTION_UP) {
+                        return false;
+                    }
+                    TextView tv = (TextView) v;
+                    int rawX = (int) event.getRawX();
+                    int left = tv.getLeft() + tv.getTotalPaddingLeft();
+                    int right = tv.getRight() + tv.getTotalPaddingLeft() + tv.getTotalPaddingRight();
+                    if (rawX >= left &&
+                            rawX <= right) {
+                        onKeywordTagViewTouched();
+                        return true;
+                    }
+                    if (rawX >= tv.getRight() - tv.getTotalPaddingRight()) {
                         onDismissed();
                         return true;
                     }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
         invalidate();
     }
 

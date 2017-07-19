@@ -106,6 +106,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     @Override
     public void clear() {
         super.clear();
+        cachedFilteredSearchResults = null;
         clearKeywordFilters();
     }
 
@@ -211,7 +212,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public FilteredSearchResults filter() {
         long now = SystemClock.currentThreadTimeMillis();
         long timeSinceLastFilterCall = now - lastFilterCallTimestamp.get();
-        if (cachedFilteredSearchResults != null && timeSinceLastFilterCall < 500) {
+        if (cachedFilteredSearchResults != null && timeSinceLastFilterCall < 250) {
             return cachedFilteredSearchResults;
         }
         lastFilterCallTimestamp.set(now);
