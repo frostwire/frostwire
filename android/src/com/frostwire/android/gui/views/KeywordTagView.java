@@ -86,7 +86,6 @@ public class KeywordTagView extends LinearLayout {
 
     private void updateComponents() {
         TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
-        LinearLayout tagContainer = (LinearLayout) findViewById(R.id.view_keyword_tag_container);
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -100,12 +99,12 @@ public class KeywordTagView extends LinearLayout {
         }
 
         if (dismissible) {
-            tagContainer.setBackgroundResource(R.drawable.keyword_tag_background_active);
+            keywordTextView.setBackgroundResource(R.drawable.keyword_tag_background_active);
             int drawableResId = keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus;
             keywordTextView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
         } else {
-            tagContainer.setBackgroundResource(R.drawable.keyword_tag_background);
+            keywordTextView.setBackgroundResource(R.drawable.keyword_tag_background);
             keywordTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
             keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
         }

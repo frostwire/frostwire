@@ -19,32 +19,32 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_keyword_tag_container"
     android:layout_width="wrap_content"
-    android:layout_height="34dp"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     android:layout_marginEnd="6dp"
     android:layout_marginRight="6dp"
-    android:background="@drawable/keyword_tag_background"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingBottom="4dp"
-    android:paddingEnd="12dp"
-    android:paddingLeft="12dp"
-    android:paddingRight="12dp"
-    android:paddingStart="12dp"
-    android:paddingTop="4dp">
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/view_keyword_tag_keyword"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="34dp"
+        android:background="@drawable/keyword_tag_background"
         android:drawableEnd="@drawable/keyword_tag_close_clear_cancel_full"
         android:drawableLeft="@drawable/keyword_tag_filter_add"
         android:drawablePadding="6dp"
         android:drawableRight="@drawable/keyword_tag_close_clear_cancel_full"
         android:drawableStart="@drawable/keyword_tag_filter_add"
         android:gravity="center_vertical"
+        android:minHeight="34dp"
+        android:paddingBottom="4dp"
+        android:paddingEnd="12dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
         android:text="@string/dummy_text"
         android:textColor="@color/app_text_primary" />
 </LinearLayout>
