@@ -75,13 +75,7 @@ public final class KeywordTagView extends AppCompatTextView {
         setPadding(toPx(12), toPx(4), toPx(12), toPx(4));
         setMinHeight(toPx(34));
         setGravity(Gravity.CENTER_VERTICAL);
-
-        setBackgroundResource(R.drawable.keyword_tag_background);
-        setCompoundDrawablesWithIntrinsicBounds(R.drawable.keyword_tag_filter_add, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
         setCompoundDrawablePadding(toPx(6));
-
-        setText(R.string.dummy_text);
-        setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
@@ -111,10 +105,6 @@ public final class KeywordTagView extends AppCompatTextView {
             sb = append(sb, "  (" + String.valueOf(count) + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         setText(sb, TextView.BufferType.NORMAL);
-
-        if (isInEditMode()) {
-            return;
-        }
 
         if (dismissible) {
             setBackgroundResource(R.drawable.keyword_tag_background_active);
@@ -149,7 +139,6 @@ public final class KeywordTagView extends AppCompatTextView {
                 }
             });
         }
-        invalidate();
     }
 
     private void onKeywordTagViewTouched() {
@@ -174,6 +163,7 @@ public final class KeywordTagView extends AppCompatTextView {
         KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
         this.keywordFilter = newKeywordFilter;
         updateComponents();
+        invalidate();
         return newKeywordFilter;
     }
 
