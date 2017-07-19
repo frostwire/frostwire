@@ -124,15 +124,7 @@ public class KeywordTagView extends LinearLayout {
                         return false;
                     }
                     TextView tv = (TextView) v;
-                    int rawX = (int) event.getRawX();
-                    int left = tv.getLeft() + tv.getTotalPaddingLeft();
-                    int right = tv.getRight() + tv.getTotalPaddingLeft() + tv.getTotalPaddingRight();
-                    if (rawX >= left &&
-                            rawX <= right) {
-                        onKeywordTagViewTouched();
-                        return true;
-                    }
-                    if (rawX >= tv.getRight() - tv.getTotalPaddingRight()) {
+                    if (event.getX() >= tv.getWidth() - tv.getTotalPaddingRight()) {
                         onDismissed();
                         return true;
                     }
