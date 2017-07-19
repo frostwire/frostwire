@@ -26,6 +26,7 @@ import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -80,6 +81,11 @@ public class KeywordTagView extends LinearLayout {
         params.setMargins(0, 0, toPx(6), toPx(8));
         v.setLayoutParams(params);
         v.setMinHeight(toPx(34));
+        v.setGravity(Gravity.CENTER_VERTICAL);
+
+        v.setBackgroundResource(R.drawable.keyword_tag_background);
+        v.setCompoundDrawablesWithIntrinsicBounds(R.drawable.keyword_tag_filter_add, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
+        v.setCompoundDrawablePadding(toPx(6));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
