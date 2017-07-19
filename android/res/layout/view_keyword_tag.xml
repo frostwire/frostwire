@@ -21,6 +21,4 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_keyword_tag_keyword"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/dummy_text"
-    android:textColor="@color/app_text_primary" />
+    android:layout_height="wrap_content" />

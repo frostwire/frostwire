@@ -86,6 +86,9 @@ public class KeywordTagView extends LinearLayout {
         v.setBackgroundResource(R.drawable.keyword_tag_background);
         v.setCompoundDrawablesWithIntrinsicBounds(R.drawable.keyword_tag_filter_add, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
         v.setCompoundDrawablePadding(toPx(6));
+
+        v.setText(R.string.dummy_text);
+        v.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
