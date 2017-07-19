@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -130,12 +129,9 @@ public class KeywordTagView extends LinearLayout {
         keywordTextView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Drawable d = ((TextView) v).getCompoundDrawables()[2];
-                if (d == null) {
-                    return false;
-                }
+                TextView tv = (TextView) v;
                 if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (event.getX() >= (v.getRight() - d.getBounds().width())) {
+                    if (event.getRawX() >= tv.getRight() - tv.getTotalPaddingRight()) {
                         onDismissed();
                         return true;
                     }
