@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
@@ -29,19 +30,19 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.util.Logger;
+import com.google.android.flexbox.FlexboxLayout;
 
 /**
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
  */
-public class KeywordTagView extends LinearLayout {
+public class KeywordTagView extends AppCompatTextView {
 
     private static final Logger LOG = Logger.getLogger(KeywordTagView.class);
 
@@ -51,6 +52,7 @@ public class KeywordTagView extends LinearLayout {
     private KeywordTagViewListener listener;
     private TextAppearanceSpan keywordSpan;
     private TextAppearanceSpan countSpan;
+    private FlexboxLayout.LayoutParams layoutParams;
 
     public interface KeywordTagViewListener {
         void onKeywordTagViewDismissed(KeywordTagView view);
@@ -65,30 +67,23 @@ public class KeywordTagView extends LinearLayout {
         dismissible = attributes.getBoolean(R.styleable.KeywordTagView_keyword_tag_dismissable, true);
         this.keywordFilter = keywordFilter;
         attributes.recycle();
-        setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        setVisibility(View.VISIBLE);
-        inflate(context, R.layout.view_keyword_tag, this);
 
-        // TODO: refactor and move logic to onLayoutInflate
         keywordSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagText);
         countSpan = new TextAppearanceSpan(getContext(), R.style.keywordTagCount);
 
-        // setup of inner textview, but soon to be the main one
-        TextView v = (TextView) findViewById(R.id.view_keyword_tag_keyword);
-        v.setPadding(toPx(12), toPx(4), toPx(12), toPx(4));
+        layoutParams = new FlexboxLayout.LayoutParams(FlexboxLayout.LayoutParams.WRAP_CONTENT, toPx(34));
+        layoutParams.setMargins(0, 0, toPx(6), toPx(8));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, toPx(34));
-        params.setMargins(0, 0, toPx(6), toPx(8));
-        v.setLayoutParams(params);
-        v.setMinHeight(toPx(34));
-        v.setGravity(Gravity.CENTER_VERTICAL);
+        setPadding(toPx(12), toPx(4), toPx(12), toPx(4));
+        setMinHeight(toPx(34));
+        setGravity(Gravity.CENTER_VERTICAL);
 
-        v.setBackgroundResource(R.drawable.keyword_tag_background);
-        v.setCompoundDrawablesWithIntrinsicBounds(R.drawable.keyword_tag_filter_add, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
-        v.setCompoundDrawablePadding(toPx(6));
+        setBackgroundResource(R.drawable.keyword_tag_background);
+        setCompoundDrawablesWithIntrinsicBounds(R.drawable.keyword_tag_filter_add, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
+        setCompoundDrawablePadding(toPx(6));
 
-        v.setText(R.string.dummy_text);
-        v.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
+        setText(R.string.dummy_text);
+        setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
     }
 
     public KeywordTagView(Context context, AttributeSet attrs) {
@@ -103,39 +98,42 @@ public class KeywordTagView extends LinearLayout {
         updateComponents();
     }
 
-    private void updateComponents() {
-        TextView keywordTextView = (TextView) findViewById(R.id.view_keyword_tag_keyword);
+    @Override
+    public FlexboxLayout.LayoutParams getLayoutParams() {
+        return layoutParams;
+    }
 
+    private void updateComponents() {
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         if (count != -1) {
             sb = append(sb, "  (" + String.valueOf(count) + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        keywordTextView.setText(sb, TextView.BufferType.SPANNABLE);
+        setText(sb, TextView.BufferType.SPANNABLE);
 
         if (isInEditMode()) {
             return;
         }
 
         if (dismissible) {
-            keywordTextView.setBackgroundResource(R.drawable.keyword_tag_background_active);
+            setBackgroundResource(R.drawable.keyword_tag_background_active);
             int drawableResId = keywordFilter.isInclusive() ? R.drawable.keyword_tag_filter_add : R.drawable.keyword_tag_filter_minus;
-            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
-            keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
+            setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, R.drawable.keyword_tag_close_clear_cancel_full, 0);
+            setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_white));
         } else {
-            keywordTextView.setBackgroundResource(R.drawable.keyword_tag_background);
-            keywordTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-            keywordTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
+            setBackgroundResource(R.drawable.keyword_tag_background);
+            setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+            setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
         }
 
-        keywordTextView.setOnClickListener(new OnClickListener() {
+        setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onKeywordTagViewTouched();
             }
         });
         if (dismissible) {
-            keywordTextView.setOnTouchListener(new OnTouchListener() {
+            setOnTouchListener(new OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if (event.getAction() != MotionEvent.ACTION_UP) {
