@@ -33,6 +33,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -85,6 +86,9 @@ public final class KeywordTagView extends AppCompatTextView {
 
     public KeywordTagView(Context context, AttributeSet attrs) {
         this(context, attrs, null);
+        // dummy, to refactor soon
+        keywordFilter = new KeywordFilter(true, "[Text]", KeywordDetector.Feature.MANUAL_ENTRY);
+        updateComponents();
     }
 
     public KeywordTagView(Context context, KeywordFilter keywordFilter, int count, boolean dismissible, KeywordTagViewListener listener) {
@@ -106,7 +110,7 @@ public final class KeywordTagView extends AppCompatTextView {
         if (count != -1) {
             sb = append(sb, "  (" + String.valueOf(count) + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        setText(sb, TextView.BufferType.SPANNABLE);
+        setText(sb, TextView.BufferType.NORMAL);
 
         if (isInEditMode()) {
             return;
