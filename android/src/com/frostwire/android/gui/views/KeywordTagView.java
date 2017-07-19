@@ -44,19 +44,15 @@ import com.google.android.flexbox.FlexboxLayout;
  */
 public final class KeywordTagView extends AppCompatTextView {
 
-    private boolean dismissible;
-    private KeywordFilter keywordFilter;
     private int count;
+    private boolean dismissible;
     private KeywordTagViewListener listener;
+
+    private KeywordFilter keywordFilter;
+
     private TextAppearanceSpan keywordSpan;
     private TextAppearanceSpan countSpan;
     private FlexboxLayout.LayoutParams layoutParams;
-
-    public interface KeywordTagViewListener {
-        void onKeywordTagViewDismissed(KeywordTagView view);
-
-        void onKeywordTagViewTouched(KeywordTagView view);
-    }
 
     private KeywordTagView(Context context, AttributeSet attrs, KeywordFilter keywordFilter) {
         super(context, attrs);
@@ -101,6 +97,26 @@ public final class KeywordTagView extends AppCompatTextView {
     @Override
     public FlexboxLayout.LayoutParams getLayoutParams() {
         return layoutParams;
+    }
+
+    public KeywordFilter getKeywordFilter() {
+        return keywordFilter;
+    }
+
+    public boolean isDismissible() {
+        return dismissible;
+    }
+
+    /**
+     * Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode
+     */
+    public KeywordFilter toggleFilterInclusionMode() {
+        KeywordFilter oldKeywordFilter = getKeywordFilter();
+        KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
+        this.keywordFilter = newKeywordFilter;
+        updateComponents();
+        invalidate();
+        return newKeywordFilter;
     }
 
     private void updateComponents() {
@@ -152,30 +168,6 @@ public final class KeywordTagView extends AppCompatTextView {
         }
     }
 
-    public KeywordFilter getKeywordFilter() {
-        return keywordFilter;
-    }
-
-    public boolean isDismissible() {
-        return dismissible;
-    }
-
-    /**
-     * Replaces instance of internal KeywordFilter with one that toggles the previous one's inclusive mode
-     */
-    public KeywordFilter toggleFilterInclusionMode() {
-        KeywordFilter oldKeywordFilter = getKeywordFilter();
-        KeywordFilter newKeywordFilter = new KeywordFilter(!oldKeywordFilter.isInclusive(), oldKeywordFilter.getKeyword(), oldKeywordFilter.getFeature());
-        this.keywordFilter = newKeywordFilter;
-        updateComponents();
-        invalidate();
-        return newKeywordFilter;
-    }
-
-    public void setListener(KeywordTagViewListener listener) {
-        this.listener = listener;
-    }
-
     private void onDismissed() {
         if (listener != null) {
             listener.onKeywordTagViewDismissed(this);
@@ -192,5 +184,12 @@ public final class KeywordTagView extends AppCompatTextView {
         sb.append(text);
         sb.setSpan(what, start, sb.length(), flags);
         return sb;
+    }
+
+    public interface KeywordTagViewListener {
+
+        void onKeywordTagViewTouched(KeywordTagView view);
+
+        void onKeywordTagViewDismissed(KeywordTagView view);
     }
 }
