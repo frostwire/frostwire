@@ -139,6 +139,7 @@ public class KeywordTagView extends LinearLayout {
                 return false;
             }
         });
+        invalidate();
     }
 
     private void onKeywordTagViewTouched() {

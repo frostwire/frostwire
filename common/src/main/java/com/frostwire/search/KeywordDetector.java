@@ -194,6 +194,7 @@ public final class KeywordDetector {
             this.filtered = filtered != null ? new ArrayList<>(filtered) : null;
         }
 
+
         @Override
         public void run() {
             if (keywordDetector != null) {
@@ -282,6 +283,10 @@ public final class KeywordDetector {
                     }
                 }
                 try {
+                    if (histogramUpdateRequests.size() == 0 && keywordDetectorListener != null) {
+                        keywordDetectorListener.onKeywordDetectorFinished();
+                        signalLoopLock();
+                    }
                     if (running.get()) {
                         lock.lock();
                         loopLock.await(1, TimeUnit.MINUTES);
@@ -299,8 +304,8 @@ public final class KeywordDetector {
         public void onLastHistogramRequestFinished() {
             if (running.get()) {
                 lastHistogramUpdateRequestFinished.set(System.currentTimeMillis());
-                signalLoopLock();
             }
+            signalLoopLock();
         }
 
         public void start() {
@@ -391,5 +396,6 @@ public final class KeywordDetector {
 
     public interface KeywordDetectorListener {
         void notifyHistogramsUpdate(Map<Feature, List<Map.Entry<String, Integer>>> filteredHistograms);
+        void onKeywordDetectorFinished();
     }
 }

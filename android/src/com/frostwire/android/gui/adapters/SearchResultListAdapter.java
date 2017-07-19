@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -58,6 +59,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author gubatron
@@ -73,6 +75,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     private ImageLoader thumbLoader;
     private final List<KeywordFilter> keywordFiltersPipeline;
+    private final AtomicLong lastFilterCallTimestamp = new AtomicLong();
+    private FilteredSearchResults cachedFilteredSearchResults = null;
 
     protected SearchResultListAdapter(Context context) {
         super(context, R.layout.view_bittorrent_search_result_list_item);
@@ -89,6 +93,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public void setFileType(int fileType) {
         this.fileType = fileType;
+        cachedFilteredSearchResults = null;
         filter();
     }
 
@@ -204,12 +209,18 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     abstract protected void searchResultClicked(SearchResult sr);
 
     public FilteredSearchResults filter() {
-        FilteredSearchResults filteredSearchResults = filter(list);
+        long now = SystemClock.currentThreadTimeMillis();
+        long timeSinceLastFilterCall = now - lastFilterCallTimestamp.get();
+        if (cachedFilteredSearchResults != null && timeSinceLastFilterCall < 500) {
+            return cachedFilteredSearchResults;
+        }
+        lastFilterCallTimestamp.set(now);
+        cachedFilteredSearchResults = filter(list);
 
-        this.visualList = filteredSearchResults.filtered;
+        this.visualList = cachedFilteredSearchResults.filtered;
         notifyDataSetChanged();
         notifyDataSetInvalidated();
-        return filteredSearchResults;
+        return cachedFilteredSearchResults;
     }
 
     public FilteredSearchResults filter(List<SearchResult> results) {
@@ -289,6 +300,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         // if another instance is being assigned, we clear and copy its members
         if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
             this.keywordFiltersPipeline.clear();
+            cachedFilteredSearchResults = null;
             if (keywordFiltersPipeline != null && keywordFiltersPipeline.size() > 0) {
                 this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
             }
@@ -299,6 +311,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public FilteredSearchResults addKeywordFilter(KeywordFilter kf) {
         if (!keywordFiltersPipeline.contains(kf)) {
             this.keywordFiltersPipeline.add(kf);
+            cachedFilteredSearchResults = null;
             return filter();
         }
         return null;
@@ -306,11 +319,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public FilteredSearchResults removeKeywordFilter(KeywordFilter kf) {
         this.keywordFiltersPipeline.remove(kf);
+        cachedFilteredSearchResults = null;
         return filter();
     }
 
     public FilteredSearchResults clearKeywordFilters() {
         this.keywordFiltersPipeline.clear();
+        cachedFilteredSearchResults = null;
         return filter();
     }
 
@@ -340,7 +355,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         public int numFilteredApplications;
         public int numFilteredDocuments;
         public int numFilteredTorrents;
-        ;
 
         private void increment(MediaType mt, boolean passedFilter) {
             if (mt != null) {

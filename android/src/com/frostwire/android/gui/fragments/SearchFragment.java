@@ -904,9 +904,22 @@ public final class SearchFragment extends AbstractFragment implements
                                 filteredHistogram);
                     }
                     updateVisibility();
+                    keywordFilterDrawerView.requestLayout();
                 }
             };
             getActivity().runOnUiThread(uiRunnable);
+        }
+
+        @Override
+        public void onKeywordDetectorFinished() {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    keywordFilterDrawerView.hideIndeterminateProgressViews();
+                    keywordFilterDrawerView.requestLayout();
+                }
+            });
+
         }
 
         public void reset(boolean hide) { //might do, parameter to not hide drawer
