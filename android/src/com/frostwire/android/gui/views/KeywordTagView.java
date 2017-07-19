@@ -34,7 +34,6 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.search.KeywordFilter;
-import com.frostwire.util.Logger;
 import com.google.android.flexbox.FlexboxLayout;
 
 /**
@@ -42,9 +41,7 @@ import com.google.android.flexbox.FlexboxLayout;
  * @author gubatron
  * @author marcelinkaaa
  */
-public class KeywordTagView extends AppCompatTextView {
-
-    private static final Logger LOG = Logger.getLogger(KeywordTagView.class);
+public final class KeywordTagView extends AppCompatTextView {
 
     private boolean dismissible;
     private KeywordFilter keywordFilter;
@@ -182,11 +179,7 @@ public class KeywordTagView extends AppCompatTextView {
 
     private void onDismissed() {
         if (listener != null) {
-            try {
-                listener.onKeywordTagViewDismissed(this);
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
-            }
+            listener.onKeywordTagViewDismissed(this);
         }
     }
 
