@@ -300,7 +300,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         KeywordFilter keywordFilter = view.getKeywordFilter();
         if (view.isDismissible() && keywordFiltersPipeline.size() > 0) {
             int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
-            keywordFilter = view.toogleFilterInclusionMode();
+            keywordFilter = view.toggleFilterInclusionMode();
             keywordFiltersPipeline.add(oldIndex, keywordFilter);
             keywordFiltersPipeline.remove(oldIndex + 1);
         } else if (!view.isDismissible()) {
