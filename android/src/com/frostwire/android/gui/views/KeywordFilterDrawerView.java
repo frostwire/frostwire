@@ -55,7 +55,7 @@ import java.util.Set;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class KeywordFilterDrawerView extends LinearLayout implements KeywordTagView.KeywordTagViewListener {
+public final class KeywordFilterDrawerView extends LinearLayout {
 
     private KeywordFiltersPipelineListener pipelineListener;
     private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
@@ -64,6 +64,8 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
     private KeywordFilterDrawerController keywordFilterDrawerController;
     private ScrollView scrollView;
     private ViewGroup pipelineLayout;
+
+    private final KeywordTagListener keywordTagListener = new KeywordTagListener();
 
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -214,7 +216,7 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         int visibleTags = 0;
         for (Entry<String, Integer> entry : histogram) {
             int visibility = (keywordsApplied && keywordInPipeline(entry.getKey(), keywordFiltersPipeline)) ? View.GONE : View.VISIBLE;
-            KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey(), feature), entry.getValue(), false, this);
+            KeywordTagView keywordTagView = new KeywordTagView(getContext(), new KeywordFilter(true, entry.getKey(), feature), entry.getValue(), false, keywordTagListener);
             container.addView(keywordTagView);
             keywordTagView.setVisibility(visibility);
             if (visibility == View.VISIBLE) {
@@ -251,68 +253,13 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         pipelineLayout.removeAllViews();
         if (filtersHaveBeenApplied) {
             for (KeywordFilter filter : keywordFiltersPipeline) {
-                KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, this);
+                KeywordTagView keywordTagView = new KeywordTagView(getContext(), filter, -1, true, keywordTagListener);
                 pipelineLayout.addView(keywordTagView);
             }
         }
         if (pipelineListener != null) {
             pipelineListener.onPipelineUpdate(keywordFiltersPipeline);
         }
-    }
-
-    /**
-     * KeywordTagViewListener.onDismissed
-     */
-    @Override
-    public void onKeywordTagViewDismissed(KeywordTagView view) {
-        pipelineLayout.removeView(view);
-
-        resetTagsContainers();
-
-        if (pipelineListener != null) {
-            // this will update the keywordFiltersPipeline
-            pipelineListener.onRemoveKeywordFilter(view.getKeywordFilter());
-            updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
-        }
-        // un-hide tag in container
-        if (view.getKeywordFilter().getFeature() != null) {
-            ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
-            for (int i = 0; i < container.getChildCount(); i++) {
-                KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
-                if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
-                    keywordTagView.setVisibility(View.VISIBLE);
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onKeywordTagViewTouched(KeywordTagView view) {
-        if (pipelineListener == null) {
-            return;
-        }
-
-        resetTagsContainers();
-
-        // if it's a dismissible one it's one of the applied filters
-        List<KeywordFilter> keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
-        KeywordFilter keywordFilter = view.getKeywordFilter();
-        if (view.isDismissible() && keywordFiltersPipeline.size() > 0) {
-            int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
-            keywordFilter = view.toggleFilterInclusionMode();
-            keywordFiltersPipeline.add(oldIndex, keywordFilter);
-            keywordFiltersPipeline.remove(oldIndex + 1);
-        } else if (!view.isDismissible()) {
-            // attempt to add to pipeline
-            if (!keywordFiltersPipeline.contains(keywordFilter)) {
-                pipelineListener.onAddKeywordFilter(keywordFilter);
-            }
-            view.setVisibility(View.GONE);
-        }
-
-        updateAppliedKeywordFilters(keywordFiltersPipeline);
-        scrollView.scrollTo(0, 0);
     }
 
     public void reset() {
@@ -365,6 +312,61 @@ public final class KeywordFilterDrawerView extends LinearLayout implements Keywo
         void onRemoveKeywordFilter(KeywordFilter keywordFilter);
 
         List<KeywordFilter> getKeywordFiltersPipeline();
+    }
+
+    private final class KeywordTagListener implements KeywordTagView.KeywordTagViewListener {
+
+        @Override
+        public void onKeywordTagViewTouched(KeywordTagView view) {
+            if (pipelineListener == null) {
+                return;
+            }
+
+            resetTagsContainers();
+
+            // if it's a dismissible one it's one of the applied filters
+            List<KeywordFilter> keywordFiltersPipeline = pipelineListener.getKeywordFiltersPipeline();
+            KeywordFilter keywordFilter = view.getKeywordFilter();
+            if (view.isDismissible() && keywordFiltersPipeline.size() > 0) {
+                int oldIndex = keywordFiltersPipeline.indexOf(keywordFilter);
+                keywordFilter = view.toggleFilterInclusionMode();
+                keywordFiltersPipeline.add(oldIndex, keywordFilter);
+                keywordFiltersPipeline.remove(oldIndex + 1);
+            } else if (!view.isDismissible()) {
+                // attempt to add to pipeline
+                if (!keywordFiltersPipeline.contains(keywordFilter)) {
+                    pipelineListener.onAddKeywordFilter(keywordFilter);
+                }
+                view.setVisibility(View.GONE);
+            }
+
+            updateAppliedKeywordFilters(keywordFiltersPipeline);
+            scrollView.scrollTo(0, 0);
+        }
+
+        @Override
+        public void onKeywordTagViewDismissed(KeywordTagView view) {
+            pipelineLayout.removeView(view);
+
+            resetTagsContainers();
+
+            if (pipelineListener != null) {
+                // this will update the keywordFiltersPipeline
+                pipelineListener.onRemoveKeywordFilter(view.getKeywordFilter());
+                updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
+            }
+            // un-hide tag in container
+            if (view.getKeywordFilter().getFeature() != null) {
+                ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
+                for (int i = 0; i < container.getChildCount(); i++) {
+                    KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
+                    if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
+                        keywordTagView.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     // this is a mini controller for a sub-view of
