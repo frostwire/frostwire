@@ -410,7 +410,7 @@
     <string name="search_preferences">تلاش ترجیحات</string>
     <string name="activity_debug_name">ڈیبگ</string>
     <string name="multicast_discovery">کثیر نشریات ڈسکوری</string>
-    <string name="downloading_promotion">ڈاؤن لوڈ کرنا s%</string>
+    <string name="downloading_promotion">ڈاؤن لوڈ کرنا %s</string>
     <string name="search_settings_description">بارشیں کے لئے تلاش کریں</string>
     <string name="user_connecting">منسلک کرنے صارف</string>
     <string name="learn_more">اورجانیے</string>

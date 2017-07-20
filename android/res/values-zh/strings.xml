@@ -279,7 +279,7 @@
     <string name="show_exit_button">显示退出按钮</string>
     <string name="download_finished">下载完成</string>
     <string name="clear_complete">清除完成</string>
-    <string name="downloading_promotion">下载 %</string>
+    <string name="downloading_promotion">下载 %s</string>
     <string name="activity_about_droidwire_description">适用安卓的FrostWire</string>
     <string name="download_type_not_supported">不支持下载类型</string>
     <string name="im_on_it">我正在进行中?</string>

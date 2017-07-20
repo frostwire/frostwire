@@ -381,7 +381,7 @@
     <string name="search_preferences">Search Preferences</string>
     <string name="activity_debug_name">Debug</string>
     <string name="multicast_discovery">Multicast Discovery</string>
-    <string name="downloading_promotion">הורדת s%</string>
+    <string name="downloading_promotion">הורדת %s</string>
     <string name="search_settings_description">חפש Torrents</string>
     <string name="user_connecting">משתמש מחבר</string>
     <string name="learn_more">למד עוד</string>
