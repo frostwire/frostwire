@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -32,12 +33,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -560,6 +559,14 @@ public final class UIUtils {
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
         // pitagoras
         return Math.sqrt(x_sq + y_sq);
+    }
+
+    public static Uri getUriFromResourceId(Context context, int resourceId) {
+        Resources r = context.getResources();
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                r.getResourcePackageName(resourceId) + '/'+
+                r.getResourceTypeName(resourceId) + '/' +
+                r.getResourceEntryName(resourceId));
     }
 
     public static boolean isMain() {
