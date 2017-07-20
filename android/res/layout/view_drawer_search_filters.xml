@@ -225,6 +225,7 @@
                                 android:layout_marginEnd="4dp"
                                 android:layout_marginRight="4dp"
                                 android:background="@drawable/keyword_tag_background_tip_active"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingBottom="3dp"
                                 android:paddingEnd="8dp"
@@ -233,12 +234,10 @@
                                 android:paddingStart="6dp"
                                 android:paddingTop="3dp">
 
-                                <TextView
-                                    style="@style/filterTipTagInclusive"
+                                <ImageView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:text="+" />
+                                    android:src="@drawable/keyword_tag_filter_tip_add" />
 
                                 <TextView
                                     style="@style/filterTipTagText"
@@ -261,6 +260,7 @@
                                 android:layout_marginLeft="4dp"
                                 android:layout_marginStart="4dp"
                                 android:background="@drawable/keyword_tag_background_tip_active"
+                                android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:paddingBottom="3dp"
                                 android:paddingEnd="8dp"
@@ -269,13 +269,10 @@
                                 android:paddingStart="6dp"
                                 android:paddingTop="3dp">
 
-                                <TextView
-                                    android:id="@+id/textView"
-                                    style="@style/filterTipTagInclusive"
+                                <ImageView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:text="-" />
+                                    android:src="@drawable/keyword_tag_filter_tip_minus" />
 
                                 <TextView
                                     style="@style/filterTipTagText"
