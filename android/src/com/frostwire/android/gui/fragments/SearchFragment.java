@@ -875,7 +875,7 @@ public final class SearchFragment extends AbstractFragment implements
         private TextView counterTextView;
         private Animation pulse;
         private boolean filterButtonClickedBefore;
-        private final AtomicLong lastUIUpdate = new AtomicLong(0l);
+        private long lastUIUpdate = 0;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
@@ -895,10 +895,10 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
             long now = System.currentTimeMillis();
-            if (now - lastUIUpdate.get() < 500l || !isAdded()) {
+            if (now - lastUIUpdate < 500 || !isAdded()) {
                 return;
             }
-            lastUIUpdate.set(now);
+            lastUIUpdate = now;
 
             Runnable uiRunnable = new Runnable() {
                 @Override
