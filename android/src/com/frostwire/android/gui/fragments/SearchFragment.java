@@ -902,8 +902,6 @@ public final class SearchFragment extends AbstractFragment implements
             Runnable uiRunnable = new Runnable() {
                 @Override
                 public void run() {
-                    List<KeywordFilter> keywordFiltersPipeline = getKeywordFiltersPipeline();
-                    keywordFilterDrawerView.updateAppliedKeywordFilters(keywordFiltersPipeline);
                     for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
                         List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
                         keywordFilterDrawerView.updateData(
@@ -953,6 +951,7 @@ public final class SearchFragment extends AbstractFragment implements
             keywordFilterDrawerView.showIndeterminateProgressViews();
 
             List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.keywordFiltered;
+            keywordDetector.reset();
             keywordDetector.requestHistogramsUpdateAsync(results);
         }
 
