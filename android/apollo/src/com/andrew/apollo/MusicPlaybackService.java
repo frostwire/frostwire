@@ -1139,10 +1139,14 @@ public class MusicPlaybackService extends Service {
                     }
                     final boolean wasPlaying = isPlaying();
                     stop(false);
-                    openCurrentAndNext();
-                    if (wasPlaying) {
-                        play();
-                    }
+                    openCurrentAndNext(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (wasPlaying) {
+                                play();
+                            }
+                        }
+                    });
                 }
                 notifyChange(META_CHANGED);
             }
@@ -1253,8 +1257,12 @@ public class MusicPlaybackService extends Service {
      * Called to open a new file as the current track and prepare the next for
      * playback
      */
+    private void openCurrentAndNext(Runnable onOpenedCallback) {
+        openCurrentAndMaybeNext(true, onOpenedCallback);
+    }
+
     private void openCurrentAndNext() {
-        openCurrentAndMaybeNext(true);
+        openCurrentAndMaybeNext(true, null);
     }
 
     /**
@@ -1264,48 +1272,67 @@ public class MusicPlaybackService extends Service {
      * @param openNext True to prepare the next track for playback, false
      *                 otherwise.
      */
-    private void openCurrentAndMaybeNext(final boolean openNext) {
+    private void openCurrentAndMaybeNext(final boolean openNext, final Runnable onOpenedCallback) {
         synchronized (this) {
             closeCursor();
-
             if (mPlayListLen == 0 || mPlayList == null) {
                 return;
             }
             stop(false);
-
             mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
             updateCursor(mPlayList[mPlayPos]);
+            boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
+            if (!hasOpenCursor) {
+                if (openNext) {
+                    setNextTrack();
+                }
+            } else {
+                final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
+                openFile(path, new OpenFileResultCallback() {
+                    @Override
+                    public void openFileResult(boolean result) {
+                        if (!result) {
+                            // if we get here then opening the file failed. We can close the
+                            // cursor now, because
+                            // we're either going to create a new one next, or stop trying
+                            closeCursor();
+                            if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
+                                final int pos = getNextPosition(false);
+                                if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
+                                mPlayPos = pos;
+                                stop(false);
+                                mPlayPos = pos;
+                                updateCursor(mPlayList[mPlayPos]);
 
-            while (true) {
-                if (mCursor != null && !mCursor.isClosed()
-                        && openFile(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/"
-                        + mCursor.getLong(IDCOLIDX))) {
-                    break;
-                }
-                // if we get here then opening the file failed. We can close the
-                // cursor now, because
-                // we're either going to create a new one next, or stop trying
-                closeCursor();
-                if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
-                    final int pos = getNextPosition(false);
-                    if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
-                    mPlayPos = pos;
-                    stop(false);
-                    mPlayPos = pos;
-                    updateCursor(mPlayList[mPlayPos]);
-                } else {
-                    mOpenFailedCounter = 0;
-                    LOG.warn("Failed to open file for playback");
-                    scheduleDelayedShutdown();
-                    if (mIsSupposedToBePlaying) {
-                        mIsSupposedToBePlaying = false;
-                        notifyChange(PLAYSTATE_CHANGED);
+                                boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
+                                if (!hasOpenCursor) {
+                                    if (openNext) {
+                                        setNextTrack();
+                                    }
+                                } else {
+                                    final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
+                                    openFile(path, this); // try again
+                                }
+                            } else {
+                                mOpenFailedCounter = 0;
+                                LOG.warn("Failed to open file for playback");
+                                scheduleDelayedShutdown();
+                                if (mIsSupposedToBePlaying) {
+                                    mIsSupposedToBePlaying = false;
+                                    notifyChange(PLAYSTATE_CHANGED);
+                                }
+                                return;
+                            }
+                        } else {
+                            if (openNext) {
+                                setNextTrack();
+                            }
+                            if (onOpenedCallback != null) {
+                                onOpenedCallback.run();
+                            }
+                        }
                     }
-                    return;
-                }
-            }
-            if (openNext) {
-                setNextTrack();
+                });
             }
         }
     }
@@ -1499,13 +1526,15 @@ public class MusicPlaybackService extends Service {
             // insert
             final long[] newlist = new long[size * 2];
             final int len = mPlayList != null ? mPlayList.length : mPlayListLen;
-            for (int i = 0; i < len; i++) {
-                newlist[i] = mPlayList[i];
+            if (mPlayList != null) {
+                for (int i = 0; i < len; i++) {
+                    newlist[i] = mPlayList[i];
+                }
             }
             mPlayList = newlist;
+            // FIXME: shrink the array when the needed size is much smaller
+            // than the allocated size
         }
-        // FIXME: shrink the array when the needed size is much smaller
-        // than the allocated size
     }
 
     /**
@@ -1634,7 +1663,7 @@ public class MusicPlaybackService extends Service {
                     config = Bitmap.Config.ARGB_8888;
                 }
                 final Bitmap albumArtCopy = albumArt.copy(config, false);
-
+                final long duration = duration();
                 // UI thread portion
                 Runnable postExecute = new Runnable() {
                     public void run() {
@@ -1646,7 +1675,7 @@ public class MusicPlaybackService extends Service {
                                             getAlbumArtistName())
                                     .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
                                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
-                                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
+                                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
                                     .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
                                     .apply();
                         } catch (Throwable t) {
@@ -1857,16 +1886,24 @@ public class MusicPlaybackService extends Service {
         }
     }
 
+    interface OpenFileResultCallback {
+        void openFileResult(boolean result);
+    }
+
     /**
      * Opens a file and prepares it for playback
      *
      * @param path The path of the file to open
      */
-    public boolean openFile(final String path) {
+    public void openFile(final String path, final OpenFileResultCallback callback) {
         if (D) LOG.info("openFile: path = " + path);
+        if (callback == null) {
+            throw new IllegalArgumentException("MusicPlaybackService.openFile requires a non null OpenFileResultCallback argument");
+        }
         synchronized (this) {
             if (path == null) {
-                return false;
+                callback.openFileResult(false);
+                return;
             }
 
             // If mCursor is null, try to associate path with a database cursor
@@ -1879,14 +1916,10 @@ public class MusicPlaybackService extends Service {
                     // Ignore
                 }
 
-                if (id != -1 && path.startsWith(MediaStore.Audio.Media.
-                        EXTERNAL_CONTENT_URI.toString())) {
+                if (id != -1 && path.startsWith(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString())) {
                     updateCursor(uri);
-
-                } else if (id != -1 && path.startsWith(MediaStore.Files.getContentUri(
-                        "external").toString())) {
+                } else if (id != -1 && path.startsWith(MediaStore.Files.getContentUri("external").toString())) {
                     updateCursor(id);
-
                 } else {
                     String where = MediaStore.Audio.Media.DATA + "=?";
                     String[] selectionArgs = new String[]{path};
@@ -1901,22 +1934,33 @@ public class MusicPlaybackService extends Service {
                     }
                 } catch (UnsupportedOperationException e) {
                     LOG.error("Error while opening file for play", e);
-                    return false;
+                    callback.openFileResult(false);
+                    return;
                 } catch (StaleDataException e) {
                     LOG.error("Error with database cursor while opening file for play", e);
-                    return false;
+                    callback.openFileResult(false);
+                    return;
                 }
             }
             mFileToPlay = path;
             if (mPlayer != null) { // machine state issues in general with original Apollo code
-                mPlayer.setDataSource(mFileToPlay);
-                if (mPlayer != null && mPlayer.isInitialized()) {
-                    mOpenFailedCounter = 0;
-                    return true;
-                }
+                mPlayer.setDataSource(mFileToPlay, new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mPlayer != null && mPlayer.isInitialized()) {
+                            mOpenFailedCounter = 0;
+                            callback.openFileResult(true);
+                        } else {
+                            stop(true);
+                            callback.openFileResult(false);
+                        }
+
+                    }
+                });
+            } else {
+                stop(true);
+                callback.openFileResult(false);
             }
-            stop(true);
-            return false;
         }
     }
 
@@ -2217,6 +2261,8 @@ public class MusicPlaybackService extends Service {
     }
 
     /**
+     * Expensive method, do not use in main thread.
+     *
      * Returns the full duration of the current track
      *
      * @return The duration of the current track in milliseconds
@@ -2307,10 +2353,15 @@ public class MusicPlaybackService extends Service {
                 mPlayPos = mShuffler.nextInt(mPlayListLen);
             }
             mHistory.clear();
-            openCurrentAndNext();
-            if (oldId != getAudioId()) {
-                notifyChange(META_CHANGED);
-            }
+            openCurrentAndNext(new Runnable() {
+                @Override
+                public void run() {
+                    if (oldId != getAudioId()) {
+                        play();
+                        notifyChange(META_CHANGED);
+                    }
+                }
+            });
         }
     }
 
@@ -2414,9 +2465,13 @@ public class MusicPlaybackService extends Service {
             mPlayPos = pos;
             stop(false);
             mPlayPos = pos;
-            openCurrentAndNext();
-            play();
-            notifyChange(META_CHANGED);
+            openCurrentAndNext(new Runnable() {
+                @Override
+                public void run() {
+                    play();
+                    notifyChange(META_CHANGED);
+                }
+            });
         }
     }
 
@@ -2454,9 +2509,13 @@ public class MusicPlaybackService extends Service {
                 }
             }
             stop(false);
-            openCurrent();
-            play();
-            notifyChange(META_CHANGED);
+            openCurrent(new Runnable() {
+                @Override
+                public void run() {
+                    play();
+                    notifyChange(META_CHANGED);
+                }
+            });
         }
     }
 
@@ -2465,8 +2524,8 @@ public class MusicPlaybackService extends Service {
      * the {@code #prev()} method because they won't be able to travel back to
      * the previously listened track if they're shuffling.
      */
-    private void openCurrent() {
-        openCurrentAndMaybeNext(false);
+    private void openCurrent(Runnable postOpenCallback) {
+        openCurrentAndMaybeNext(false, postOpenCallback);
     }
 
     /**
@@ -2552,9 +2611,13 @@ public class MusicPlaybackService extends Service {
                     mPlayListLen = 0;
                     doAutoShuffleUpdate();
                     mPlayPos = 0;
-                    openCurrentAndNext();
-                    play();
-                    notifyChange(META_CHANGED);
+                    openCurrentAndNext(new Runnable() {
+                        @Override
+                        public void run() {
+                            play();
+                            notifyChange(META_CHANGED);
+                        }
+                    });
                     return;
                 } else {
                     mShuffleMode = SHUFFLE_NONE;
@@ -2574,12 +2637,16 @@ public class MusicPlaybackService extends Service {
         synchronized (this) {
             stop(false);
             mPlayPos = index;
-            openCurrentAndNext();
-            play();
-            notifyChange(META_CHANGED);
-            if (mShuffleMode == SHUFFLE_AUTO) {
-                doAutoShuffleUpdate();
-            }
+            openCurrentAndNext(new Runnable() {
+                @Override
+                public void run() {
+                    play();
+                    notifyChange(META_CHANGED);
+                    if (mShuffleMode == SHUFFLE_AUTO) {
+                        doAutoShuffleUpdate();
+                    }
+                }
+            });
         }
     }
 
@@ -2599,17 +2666,25 @@ public class MusicPlaybackService extends Service {
                 notifyChange(QUEUE_CHANGED);
                 if (action == NOW) {
                     mPlayPos = mPlayListLen - list.length;
-                    openCurrentAndNext();
-                    play();
-                    notifyChange(META_CHANGED);
+                    openCurrentAndNext(new Runnable() {
+                        @Override
+                        public void run() {
+                            play();
+                            notifyChange(META_CHANGED);
+                        }
+                    });
                     return;
                 }
             }
             if (mPlayPos < 0) {
                 mPlayPos = 0;
-                openCurrentAndNext();
-                play();
-                notifyChange(META_CHANGED);
+                openCurrentAndNext(new Runnable() {
+                    @Override
+                    public void run() {
+                        play();
+                        notifyChange(META_CHANGED);
+                    }
+                });
             }
         }
     }
@@ -2877,6 +2952,10 @@ public class MusicPlaybackService extends Service {
 
         private boolean mIsInitialized = false;
 
+        private interface OnPlayerPrepareCallback {
+            void onPrepared(boolean result);
+        }
+
         /**
          * Constructor of <code>MultiPlayer</code>
          */
@@ -2889,11 +2968,20 @@ public class MusicPlaybackService extends Service {
          * @param path The path of the file, or the http/rtsp URL of the stream
          *             you want to play
          */
-        public void setDataSource(final String path) {
-            mIsInitialized = setDataSourceImpl(mCurrentMediaPlayer, path);
-            if (mIsInitialized) {
-                setNextDataSource(null);
-            }
+        public void setDataSource(final String path, final Runnable callback) {
+            setDataSourceImpl(mCurrentMediaPlayer, path, new OnPlayerPrepareCallback() {
+                @Override
+                public void onPrepared(boolean result) {
+                    mIsInitialized = result;
+                    if (mIsInitialized) {
+                        setNextDataSource(null);
+                    }
+
+                    if (callback != null) {
+                        callback.run();
+                    }
+                }
+            });
         }
 
         /**
@@ -2903,36 +2991,45 @@ public class MusicPlaybackService extends Service {
          * @return True if the <code>player</code> has been prepared and is
          * ready to play, false otherwise
          */
-        private boolean setDataSourceImpl(final MediaPlayer player, final String path) {
-            try {
-                player.reset();
-                if (Ref.alive(mService) && mService.get().launchPlayerActivity) {
-                    player.setOnPreparedListener(new AudioOnPreparedListener(mService));
+        private void setDataSourceImpl(final MediaPlayer player, final String path, final OnPlayerPrepareCallback callback) {
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        player.reset();
+                        if (Ref.alive(mService) && mService.get().launchPlayerActivity) {
+                            player.setOnPreparedListener(new AudioOnPreparedListener(mService));
+                        }
+                        if (path.startsWith("content://")) {
+                            player.setDataSource(mService.get(), Uri.parse(path));
+                        } else {
+                            player.setDataSource(path);
+                        }
+                        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        player.prepare();
+                    } catch (final IOException todo) {
+                        // TODO: notify the user why the file couldn't be opened
+                        callback.onPrepared(false);
+                        return;
+                    } catch (final IllegalArgumentException todo) {
+                        // TODO: notify the user why the file couldn't be opened
+                        callback.onPrepared(false);
+                        return;
+                    } catch (Throwable e) {
+                        // TODO: notify the user why the file couldn't be opened due to an unknown error
+                        callback.onPrepared(false);
+                        return;
+                    }
+                    player.setOnCompletionListener(MultiPlayer.this);
+                    player.setOnErrorListener(MultiPlayer.this);
+                    final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+                    intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
+                    intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.get().getPackageName());
+                    mService.get().sendBroadcast(intent);
+                    callback.onPrepared(true);
                 }
-                if (path.startsWith("content://")) {
-                    player.setDataSource(mService.get(), Uri.parse(path));
-                } else {
-                    player.setDataSource(path);
-                }
-                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                player.prepare();
-            } catch (final IOException todo) {
-                // TODO: notify the user why the file couldn't be opened
-                return false;
-            } catch (final IllegalArgumentException todo) {
-                // TODO: notify the user why the file couldn't be opened
-                return false;
-            } catch (Throwable e) {
-                // TODO: notify the user why the file couldn't be opened due to an unknown error
-                return false;
-            }
-            player.setOnCompletionListener(this);
-            player.setOnErrorListener(this);
-            final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
-            intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
-            intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.get().getPackageName());
-            mService.get().sendBroadcast(intent);
-            return true;
+            };
+            Engine.instance().getThreadPool().submit(r);
         }
 
         /**
@@ -2962,16 +3059,21 @@ public class MusicPlaybackService extends Service {
 
             initNextMediaPlayer();
 
-            if (setDataSourceImpl(mNextMediaPlayer, path)) {
-                try {
-                    mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
-                } catch (Throwable e) {
-                    LOG.error("Media player fatal error", e);
-                    return;
+            setDataSourceImpl(mNextMediaPlayer, path, new OnPlayerPrepareCallback() {
+                @Override
+                public void onPrepared(boolean result) {
+                    if (result) {
+                        try {
+                            mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                        } catch (Throwable e) {
+                            LOG.error("Media player fatal error", e);
+                            return;
+                        }
+                    } else {
+                        releaseNextMediaPlayer();
+                    }
                 }
-            } else {
-                releaseNextMediaPlayer();
-            }
+            });
         }
 
         private void initNextMediaPlayer() {
@@ -3076,6 +3178,7 @@ public class MusicPlaybackService extends Service {
         }
 
         /**
+         * NOTE: This method can take a long time, do not use on the main thread
          * Gets the duration of the file.
          *
          * @return The duration in milliseconds
@@ -3215,7 +3318,12 @@ public class MusicPlaybackService extends Service {
         @Override
         public void openFile(final String path) throws RemoteException {
             if (Ref.alive(mService)) {
-                mService.get().openFile(path);
+                mService.get().openFile(path, new OpenFileResultCallback() {
+                    @Override
+                    public void openFileResult(boolean result) {
+                        // do nothing
+                    }
+                });
             }
         }
 
@@ -3606,7 +3714,6 @@ public class MusicPlaybackService extends Service {
 
         @Override
         public void onPrepared(MediaPlayer mp) {
-
             if (Ref.alive(serviceRef) && serviceRef.get().launchPlayerActivity) {
                 serviceRef.get().launchPlayerActivity = false;
                 Intent i = new Intent(serviceRef.get(), AudioPlayerActivity.class);
