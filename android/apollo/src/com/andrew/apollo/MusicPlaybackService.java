@@ -1663,6 +1663,10 @@ public class MusicPlaybackService extends Service {
                     config = Bitmap.Config.ARGB_8888;
                 }
                 final Bitmap albumArtCopy = albumArt.copy(config, false);
+                final String artistName = getArtistName();
+                final String albumName = getAlbumName();
+                final String trackName = getTrackName();
+                final String albumArtistName = getAlbumArtistName();
                 final long duration = duration();
                 // UI thread portion
                 Runnable postExecute = new Runnable() {
@@ -1670,11 +1674,10 @@ public class MusicPlaybackService extends Service {
                         try {
                             mRemoteControlClient
                                     .editMetadata(true)
-                                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, getArtistName())
-                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
-                                            getAlbumArtistName())
-                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
-                                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
+                                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
                                     .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
                                     .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
                                     .apply();
