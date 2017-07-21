@@ -44,6 +44,7 @@ public class MiniPlayerView extends LinearLayout {
     private TextView titleText;
     private TextView artistText;
     private ImageView coverImage;
+    private ImageView playPauseButton;
     private TimerObserver refresher;
 
     public MiniPlayerView(Context context, AttributeSet set) {
@@ -97,15 +98,15 @@ public class MiniPlayerView extends LinearLayout {
             }
         });
 
-        ImageView playPause = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
-        playPause.setClickable(true);
-        playPause.setOnClickListener(new OnClickListener() {
+        playPauseButton = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
+        playPauseButton.setClickable(true);
+        playPauseButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 onPlayPauseClick();
             }
         });
-        playPause.setOnLongClickListener(new OnLongClickListener() {
+        playPauseButton.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 onPlayPauseLongClick();
@@ -165,7 +166,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void refreshPlayPauseIcon() {
-        ImageView playPauseButton = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
+
         int notifierResourceId;
         if (!MusicUtils.isPlaying()) {
             notifierResourceId = R.drawable.btn_playback_play_bottom;
