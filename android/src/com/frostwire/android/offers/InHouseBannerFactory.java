@@ -18,11 +18,8 @@
 
 package com.frostwire.android.offers;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -62,8 +59,7 @@ public final class InHouseBannerFactory {
         Message randomMessage = Message.random();
         int randomDrawable = getRandomDrawable(adFormat, randomMessage);
         Context context = placeholder.getContext();
-        Uri drawableUri = UIUtils.getUriFromResourceId(placeholder.getContext(), randomDrawable);
-        ImageLoader.getInstance(context).load(drawableUri, placeholder);
+        ImageLoader.getInstance(context).load(randomDrawable, placeholder);
         placeholder.setOnClickListener(CLICK_LISTENERS.get(randomMessage));
     }
 

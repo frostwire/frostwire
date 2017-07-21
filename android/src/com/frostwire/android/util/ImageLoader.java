@@ -31,7 +31,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -83,7 +82,6 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
-    private final ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
     private final ImageCache cache;
     private final Picasso picasso;
 
@@ -154,6 +152,7 @@ public final class ImageLoader {
         long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
         int memSize = SystemUtils.calculateMemoryCacheSize(context);
         this.cache = new ImageCache(directory, diskSize, memSize);
+        ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 memoryCache(cache).
@@ -192,6 +191,12 @@ public final class ImageLoader {
         load(uri, target, p);
     }
 
+    public void load(int resourceId, ImageView target) {
+        Params p = new Params();
+        p.noFade = true;
+        load(resourceId, target, p);
+    }
+
     public void load(Uri uri, ImageView target, int targetWidth, int targetHeight) {
         Params p = new Params();
         p.targetWidth = targetWidth;
@@ -200,8 +205,47 @@ public final class ImageLoader {
         load(uri, target, p);
     }
 
-    public void load(Uri uri, Uri retryUri, ImageView target,
-                     int targetWidth, int targetHeight) {
+    public void load(int resourceId, ImageView target, int targetWidth, int targetHeight) {
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.noFade = true;
+        load(resourceId, target, p);
+    }
+
+    public void load(Uri uri, ImageView target, int placeholderResId) {
+        Params p = new Params();
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(uri, target, p);
+    }
+
+    public void load(int resourceId, ImageView target, int placeholderResId) {
+        Params p = new Params();
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(resourceId, target, p);
+    }
+
+    public void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(uri, target, p);
+    }
+
+    public void load(int resourceId, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
+        Params p = new Params();
+        p.targetWidth = targetWidth;
+        p.targetHeight = targetHeight;
+        p.placeholderResId = placeholderResId;
+        p.noFade = true;
+        load(resourceId, target, p);
+    }
+
+    public void load(Uri uri, Uri retryUri, ImageView target, int targetWidth, int targetHeight) {
         Params p = new Params();
         p.targetWidth = targetWidth;
         p.targetHeight = targetHeight;
@@ -214,29 +258,17 @@ public final class ImageLoader {
         load(uri, target, p);
     }
 
-    public void load(Uri uri, ImageView target, int placeholderResId) {
-        Params p = new Params();
-        p.placeholderResId = placeholderResId;
-        p.noFade = true;
-        load(uri, target, p);
-    }
-
-    public void load(Uri uri, ImageView target, int targetWidth, int targetHeight, int placeholderResId) {
-        Params p = new Params();
-        p.targetWidth = targetWidth;
-        p.targetHeight = targetHeight;
-        p.placeholderResId = placeholderResId;
-        p.noFade = true;
-        load(uri, target, p);
+    public void load(int resourceId, ImageView target, Params p) {
+        load(resourceId, null, target, p);
     }
 
     public void load(Uri uri, ImageView target, Params p) {
+        load(-1, uri, target, p);
+    }
+
+    private void load(int resourceId, Uri uri, ImageView target, Params p) {
         if (shutdown) {
             return;
-        }
-
-        if (uri == null) {
-            throw new IllegalArgumentException("Uri can't be null");
         }
         if (target == null) {
             throw new IllegalArgumentException("Target image view can't be null");
@@ -252,7 +284,14 @@ public final class ImageLoader {
             throw new RuntimeException("Possible context leak");
         }
 
-        RequestCreator rc = picasso.load(uri);
+        RequestCreator rc;
+        if (uri != null) {
+            rc = picasso.load(uri);
+        } else if (resourceId != -1) {
+            rc = picasso.load(resourceId);
+        } else {
+            throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
+        }
 
         if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
         if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
@@ -264,11 +303,9 @@ public final class ImageLoader {
             rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
             rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
         }
-
         if (p.filter != null) {
             rc.transform(new FilterWrapper(p.filter));
         }
-
         if (p.callback != null) {
             rc.into(target, new CallbackWrapper(p.callback));
         } else {
