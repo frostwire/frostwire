@@ -22,19 +22,28 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
+import android.os.Looper;
 import android.os.SystemClock;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.util.Logger;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -85,17 +94,13 @@ final class UniversalScanner {
         }
 
         public void onMediaScannerConnected() {
-            try {
-                /** should only arrive here on connected state, but let's double check since it's possible */
-                if (connection.isConnected() && files != null && !files.isEmpty()) {
-                    for (File f : files) {
-                        connection.scanFile(f.getAbsolutePath(), null);
-                    }
-                }
-            } catch (IllegalStateException e) {
-                LOG.warn("Scanner service wasn't really connected or service was null", e);
-                //should we try to connect again? don't want to end up in endless loop
-                //maybe destroy connection?
+            Runnable onMediaScannerConnectedRunnable = prepareOnMediaScannerConnectedRunnable(connection, files);
+
+            // do not do this on main thread, causing ANRs
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                Engine.instance().getThreadPool().submit(onMediaScannerConnectedRunnable);
+            } else {
+                onMediaScannerConnectedRunnable.run();
             }
         }
 
@@ -130,6 +135,29 @@ final class UniversalScanner {
                     //LOG.debug("Scanned new file as document: " + path);
                 }
             }
+        }
+
+        private Runnable prepareOnMediaScannerConnectedRunnable(final MediaScannerConnection connection, final Collection<File> files) {
+            return new Runnable() {
+                @Override
+                public void run() {
+                    if (files == null || connection == null) {
+                        return;
+                    }
+                    try {
+                        /** should only arrive here on connected state, but let's double check since it's possible */
+                        if (connection.isConnected() && files != null && !files.isEmpty()) {
+                            for (File f : files) {
+                                connection.scanFile(f.getAbsolutePath(), null);
+                            }
+                        }
+                    } catch (IllegalStateException e) {
+                        LOG.warn("Scanner service wasn't really connected or service was null", e);
+                        //should we try to connect again? don't want to end up in endless loop
+                        //maybe destroy connection?
+                    }
+                }
+            };
         }
     }
 
