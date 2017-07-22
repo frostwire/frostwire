@@ -356,8 +356,12 @@ public final class KeywordFilterDrawerView extends LinearLayout {
                 updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
             }
             // un-hide tag in container
-            if (view.getKeywordFilter().getFeature() != null) {
-                ViewGroup container = featureContainer.get(view.getKeywordFilter().getFeature()).container;
+            if (featureContainer != null && view.getKeywordFilter().getFeature() != null) {
+                TagsController tagsController = featureContainer.get(view.getKeywordFilter().getFeature());
+                if (tagsController == null || tagsController.container == null) {
+                    return;
+                }
+                ViewGroup container = tagsController.container;
                 for (int i = 0; i < container.getChildCount(); i++) {
                     KeywordTagView keywordTagView = (KeywordTagView) container.getChildAt(i);
                     if (keywordTagView.getKeywordFilter().getKeyword().equals(view.getKeywordFilter().getKeyword())) {
