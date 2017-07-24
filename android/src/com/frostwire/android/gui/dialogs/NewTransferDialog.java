@@ -126,7 +126,13 @@ public class NewTransferDialog extends AbstractDialog {
                 // see SearchFragment::OnDialogClickListener::onDialogClick(tag,which)
                 owner.performDialogClick(Dialog.BUTTON_POSITIVE);
             }
-            owner.dismiss();
+            try {
+                owner.dismiss();
+            } catch (Throwable t) {
+                // ignore possible IllegalStateException at android.app.FragmentManagerImpl.checkStateLoss(FragmentManager.java:1411)
+                // see https://github.com/frostwire/frostwire/issues/536 for related stacktrace
+            }
+
         }
 
         @Override
