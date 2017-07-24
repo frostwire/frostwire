@@ -357,6 +357,9 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     public void onDrawerSlide(View view, float v) {
+        if ((!isVisible() || currentQuery == null) && view == keywordFilterDrawerView) {
+            drawerLayout.closeDrawer(view);
+        }
     }
 
     @Override
