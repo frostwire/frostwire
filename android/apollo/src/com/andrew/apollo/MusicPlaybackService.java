@@ -598,7 +598,9 @@ public class MusicPlaybackService extends Service {
         mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
         try {
-            mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+            if (mAudioManager != null) {
+                mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+            }
         } catch (SecurityException e) {
             e.printStackTrace();
             // ignore
@@ -665,7 +667,9 @@ public class MusicPlaybackService extends Service {
                         PendingIntent.FLAG_UPDATE_CURRENT));
 
         try {
-            mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+            if (mAudioManager != null) {
+                mAudioManager.registerRemoteControlClient(mRemoteControlClient);
+            }
         } catch (Throwable t) {
             // seems like this doesn't work on some devices where it requires MODIFY_PHONE_STATE
             // which is a permission only given to system apps, not third party apps.
