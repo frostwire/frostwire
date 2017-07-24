@@ -243,7 +243,7 @@ public final class TransferManager {
     public void loadTorrents() {
         bittorrentDownloads.clear();
 
-        BTEngine engine = BTEngine.getInstance();
+        final BTEngine engine = BTEngine.getInstance();
 
         engine.setListener(new BTEngineAdapter() {
             @Override
@@ -283,7 +283,13 @@ public final class TransferManager {
             }
         });
 
-        engine.restoreDownloads();
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                engine.restoreDownloads();
+            }
+        });
+
     }
 
     public boolean remove(Transfer transfer) {
