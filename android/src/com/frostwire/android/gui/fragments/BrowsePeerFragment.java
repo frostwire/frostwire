@@ -220,7 +220,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private void initToolbarSearchFilter(Menu menu) {
         final SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
         searchView.setFocusable(true);
-        searchView.setQueryHint(getResources().getString(R.string.filter_ellipsis));
+        if (isAdded()) {
+            searchView.setQueryHint(getResources().getString(R.string.filter_ellipsis));
+        }
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
