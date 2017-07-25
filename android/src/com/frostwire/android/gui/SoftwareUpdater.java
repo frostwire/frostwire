@@ -390,6 +390,8 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, update.config.onExitThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, update.config.onBackThreshold);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks((Activity) activityContext);
@@ -469,6 +471,8 @@ public final class SoftwareUpdater {
         boolean oguryKillOnExit = false;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
+        int onExitThreshold = 100;
+        int onBackThreshold = 100;
 
         // ux stats
         boolean uxEnabled = false;

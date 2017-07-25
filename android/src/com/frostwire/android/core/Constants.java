@@ -98,6 +98,9 @@ public final class Constants {
     public static final String PREF_KEY_GUI_OGURY_KILL_ON_EXIT = "frostwire.prefs.gui.ogury_kill_on_exit";
     public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
     public static final String PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_transfer_offers_timeout_in_minutes";
+    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD = "frostwire.prefs.gui.interstitial_on_exit_threshold";
+    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD = "frostwire.prefs.gui.interstitial_on_back_threshold";
+
     public static final String PREF_KEY_GUI_OFFERS_WATERFALL = "frostwire.prefs.gui.offers_waterfall";
     public static final String PREF_KEY_GUI_HAPTIC_FEEDBACK_ON = "frostwire.prefs.gui.haptic_feedback_on";
     public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH = "frostwire.prefs.gui.distraction_free_search";

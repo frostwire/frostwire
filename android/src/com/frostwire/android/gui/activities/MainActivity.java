@@ -90,6 +90,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.Random;
 import java.util.Stack;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
@@ -588,11 +589,23 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void onLastDialogButtonPositive() {
-        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
+        final int bannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD);
+        final int r = new Random().nextInt(100) + 1;
+        if (r <= bannerThreshold) {
+            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
+        } else {
+            finish();
+        }
     }
 
     private void onShutdownDialogButtonPositive() {
-        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
+        final int bannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD);
+        final int r = new Random().nextInt(100) + 1;
+        if (r <= bannerThreshold) {
+            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
+        } else {
+            shutdown();
+        }
     }
 
     public void syncNavigationMenu() {

@@ -68,6 +68,8 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
+        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, 100);
+        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, 100);
         defaultValues.put(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT, false);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
