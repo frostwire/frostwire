@@ -267,7 +267,7 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        String playerId = br.getRegex("<script src=\"/yts/jsbin/player-([\\w_\\-]+)/en_US/base.js\" name=\"player/base\"></script>").getMatch(0);
+        String playerId = br.getRegex("<script src=\"/yts/jsbin/player-([\\w_\\-]+)/en_US/base.js\".*?name=\"player/base\".*?></script>").getMatch(0);
         YouTubeSig ytSig = getYouTubeSig("http://www.youtube.com/yts/jsbin/player-" + playerId + "/en_US/base.js");
         currentYTSig = ytSig;
 
