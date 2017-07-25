@@ -70,6 +70,10 @@ public final class AboutFragment extends AbstractFragment {
         Button loveFrostWireButton = findView(rootView, R.id.fragment_about_love_frostwire);
         setupClickUrl(loveFrostWireButton, Constants.FROSTWIRE_GIVE_URL + "plus-about");
 
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            loveFrostWireButton.setVisibility(View.GONE);
+        }
+
         ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
         ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
         ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);

@@ -42,7 +42,6 @@ import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
 
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -191,7 +190,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
 
-            // if you paid for ads, I tell you to go plus
+            // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
             int specialOfferLayout = pickSpecialOfferLayout();
 
             if (position == 0 && specialOfferLayout != NO_SPECIAL_OFFER) {
@@ -202,7 +201,10 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                     }
                 }
                 return View.inflate(getContext(), specialOfferLayout, null);
-            } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
+            } else if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
+                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
+            }
+            else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
                 return super.getView(position - 2, null, parent);
             }
         }
@@ -242,19 +244,10 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         // Optimistic: If we're plus, we can't offer ad removal yet.
         specialOfferLayout = NO_SPECIAL_OFFER;
 
-        // If we're basic and we have not paid to remove ads, we pick the specialOfferLayout randomly.
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            // If we're basic and we paid... you should still know about plus :)
-            specialOfferLayout = R.layout.view_less_results_notification;
-
-            if (Offers.removeAdsOffersEnabled()) {
-                //LOG.info("pickSpecialOfferLayout: removeAdsOffersEnabled.");
-                // offer to remove ads, or offer to upgrade to plus for more results
-                specialOfferLayout = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) % 2 == 0 ?
-                        R.layout.view_remove_ads_notification :
-                        R.layout.view_less_results_notification;
-            }
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
+            specialOfferLayout = R.layout.view_remove_ads_notification;
         }
+
         return specialOfferLayout;
     }
 
@@ -269,13 +262,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             MainActivity mainActivity = (MainActivity) getContext();
             Intent i = new Intent(getContext(), BuyActivity.class);
             mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
-        } else if (specialOfferLayout == R.layout.view_less_results_notification) {
-            Intent i = new Intent("android.intent.action.VIEW", Uri.parse(Constants.HOW_TO_GET_MORE_SEARCH_RESULTS_URL));
-            try {
-                getContext().startActivity(i);
-            } catch (Throwable t) {
-                // some devices incredibly may have no apps to handle this intent.
-            }
         }
     }
 }
