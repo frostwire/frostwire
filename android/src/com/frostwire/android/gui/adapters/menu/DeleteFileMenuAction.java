@@ -33,7 +33,9 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,13 +83,30 @@ public final class DeleteFileMenuAction extends MenuAction {
             }
         }
 
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                byte fileType = (adapter != null) ? adapter.getFileType() : files.get(0).fileType;
-                Librarian.instance().deleteFiles(fileType, new ArrayList<>(files), getContext());
+        Engine.instance().getThreadPool().execute(new DeleteFilesRunnable(getContext(), adapter, files));
+    }
+
+    private static class DeleteFilesRunnable implements Runnable {
+
+        private final WeakReference<Context> contextRef;
+        private final WeakReference<FileListAdapter> adapterRef;
+        private final List<FileDescriptor> files;
+
+        DeleteFilesRunnable(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
+            contextRef = Ref.weak(context);
+            this.adapterRef = Ref.weak(adapter);
+            this.files = files;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(contextRef) || !Ref.alive(adapterRef)) {
+                return;
             }
-        });
+            FileListAdapter fileListAdapter = adapterRef.get();
+            byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
+            Librarian.instance().deleteFiles(fileType, new ArrayList<>(files), contextRef.get());
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
