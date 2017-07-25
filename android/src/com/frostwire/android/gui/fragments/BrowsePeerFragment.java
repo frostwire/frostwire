@@ -471,6 +471,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                         numTotal = finger.numTotalVideoFiles;
                                         break;
                                 }
+                                
                                 if (isAdded()) {
                                     String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
                                     TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
@@ -478,7 +479,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                 }
                                 TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
                                 total.setText("(" + String.valueOf(numTotal) + ")");
+
+                                if (numTotal == 0) {
+                                    checkBoxMenuItem.setVisible(false);
+                                }
+
                             }
+
                             if (adapter == null) {
                                 clickFileTypeTab(lastFileType);
                             }
