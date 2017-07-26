@@ -198,6 +198,7 @@ public final class SearchFragment extends AbstractFragment implements
             }
             searchProgress.setKeywordFiltersApplied(filtersApplied);
             filterButton.updateVisibility();
+            keywordFilterDrawerView.updateAppliedKeywordFilters(adapter.getKeywordFiltersPipeline());
         } else {
             setupPromoSlides();
         }
