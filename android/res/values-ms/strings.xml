@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan ExpressVPN untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Walaupun disyorkan untuk muat turun anda, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>ExpressVPN</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
     <string name="vpn_not_found">Tiada VPN. Pertimbangkan menyulitkan sambungan.</string>
     <string name="azureus_peer_manager_status_finished">Tamat</string>
     <string name="activity_mediaplayer_name">Pemain media</string>
@@ -646,7 +647,20 @@
     <string name="file_information">Maklumat fail</string>
     <string name="use_btjunkie">Gunakan BTJunkie</string>
     <string name="add_transfer">Menambah pemindahan</string>
-    <string name="your_android_wall_paper_will_change">kertas dinding Android anda akan berubah dalam masa beberapa
-        saat
-    </string>
+    <string name="filter_ellipsis">Tapis…</string>
+    <string name="include">Menyertakan</string>
+    <string name="fix_instructions">Lihat support.frostwire.com untuk maklumat dan arahan pembetulan</string>
+    <string name="seeing_less_results">Melihat kurang atau tiada keputusan?</string>
+    <string name="touch_applied_tags_to_include_exclude">Sentuh tag yang digunakan untuk menyertakan/tidak termasuk</string>
+    <string name="exclude">Tidak termasuk</string>
+    <string name="date">Tarikh</string>
+    <string name="filter">Tapis</string>
+    <string name="try_changing_applied_filters">Cuba ubah penapis yang digunakan</string>
+    <string name="file_extensions">Sambungan fail</string>
+    <string name="filter_by_keyword">Tapis mengikut kata kunci…</string>
+    <string name="your_android_wall_paper_will_change">Kertas dinding anda akan berubah dalam beberapa saat</string>
+    <string name="sources_channels">Sumber / Saluran</string>
+    <string name="clear_all">Kosongkan semua</string>
+    <string name="or">atau</string>
+    <string name="file_names">Nama fail</string>
 </resources>
