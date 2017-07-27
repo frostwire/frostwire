@@ -1,4 +1,4 @@
-FrostWire 1.9.8 - JUL/25/2017
+FrostWire 1.9.8 - JUL/26/2017
  - More robust app startup
  - New search filtering tools
  - New jlibtorrent 1.2.0.11-RC2
@@ -11,7 +11,8 @@ FrostWire 1.9.8 - JUL/25/2017
  - Fixed memory leaks and runnaway threadpools causing out of memory errors
  - Translations updated (Finnish, Greek, Danish, Czech, Italian, Arabic, French, 
    Portuguese, Spanish, Hindi, Croatian, Indonesian, Hebrew, Korean, Japanese,
-   Russian, Slovak, Romanian, Serbian, Swedish, Thai, Turkish, Ukranian)
+   Russian, Slovak, Romanian, Serbian, Swedish, Thai, Turkish, Ukranian, Polish,
+   Norwegian, Malay)
  - ogury 2.1.11
  - Music player 'Last Added' now shows album cover art for each song
  - Fixes possible music player freezes
