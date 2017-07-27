@@ -20,6 +20,9 @@
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nie chronione połączenie oznacza że wszystko co robisz na internecie (łącznie z <b>wyszukiwaniami, przesyłaniem wiadomości lub ściąganiem</b>) może być monitorowane przez każdego na twojej sieci, nawet twojego dostawce servisu internetowego. <br><br>Polecamy używanie ExpressVPN aby zaszyfrować twoje połączenie a tym samym<b> zabezpieczyć twoja prywatność</b>.]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>WSKAZÓWKA:</b> Dotchnij dodane tagi aby]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Masz aktywne podłączenie z internetem przez sieć VPN. <br><br> Jeżeli jeszcze nie używasz <b>ExpressVPN</b> aby zabezpieczać swoją prywatność, to gorąco polecamy. ]]></string>
 
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
@@ -636,4 +639,30 @@
     <string name="file_information">Informacje pliku</string>
     <string name="use_btjunkie">Używaj BTJunkie</string>
     <string name="add_transfer">Dodaj transfer</string>
+    <string name="filter_ellipsis">Filtruj…</string>
+    <string name="all_free_downloads">Wszystkie darmowe ściągniecia</string>
+    <string name="include">Załącz</string>
+    <string name="fix_instructions">Wejdź na support.frostwire.com po instrukcje jak naprawić</string>
+    <string name="seeing_less_results">Masz mniej lub zero rezultatów wyszukiwania?</string>
+    <string name="frostwire_sticker_and_more">Naklejki FrostWire i więcej</string>
+    <string name="touch_applied_tags_to_include_exclude">Dotchnij dodane tagi aby dodać/odjąć</string>
+    <string name="exclude">Odejmnij</string>
+    <string name="wifi_networks_only_summary">Oszczędziaj dane mobilne. Ściągaj tylko na Wi-Fi. </string>
+    <string name="notifications_other_settings">Notifikacje i Inne</string>
+    <string name="frostwire_features">PROMOCJE CREATIVE COMMONS od FROSTWIRE</string>
+    <string name="filter">Filtruj</string>
+    <string name="try_changing_applied_filters">Spróbuj zmienić dodane filtry</string>
+    <string name="wifi_networks_only">Tylko sieci Wi-Fi</string>
+    <string name="file_extensions">Rozszerzenia plików</string>
+    <string name="distraction_free_search_results_summary">Chowaj komponenty UI aby pokazać rezultaty. Wymaga zrestartowania aplikacji.</string>
+    <string name="search_preferences">>Ustawienia Wyszukiwania</string>
+    <string name="filter_by_keyword">Filtruj według słów kluczowych…</string>
+    <string name="donate_your_time">Podaruj swój czas</string>
+    <string name="distraction_free_search_results">Wyszukiwanie przeciw roztargnieniowe (beta)</string>
+    <string name="sources_channels">Źródła / Kanały</string>
+    <string name="help_translate_or_proofread_frostwire">Pomóż przetłumaczyć lub ulepszyć FrostWire</string>
+    <string name="changelog">Changelog</string>
+    <string name="clear_all">Wyczyść wszystkie</string>
+    <string name="or">lub</string>
+    <string name="file_names">Nazwy plików</string>
 </resources>
