@@ -212,6 +212,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 return true;
             }
         });
+        checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxListener);
     }
 
@@ -235,7 +236,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 return false;
             }
         });
-
     }
 
     @Override
@@ -383,7 +383,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         }
         reloadFiles(fileType);
         if (checkBoxMenuItem != null) {
-            checkBoxMenuItem.setVisible(fileType != Constants.FILE_TYPE_RINGTONES);
+            checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
         }
         if (selectAllCheckbox != null) {
             selectAllModeOn = false;
@@ -477,15 +477,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                 }
                                 TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
                                 total.setText("(" + String.valueOf(numTotal) + ")");
-
-                                if (numTotal == 0) {
-                                    hideCheckBoxMenuItem();
-                                }
-
                             }
 
                             if (adapter == null) {
                                 clickFileTypeTab(lastFileType);
+                            }
+                            if (checkBoxMenuItem != null) {
+                                checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
                             }
                             MusicUtils.stopSimplePlayer();
                             restoreListViewScrollPosition();
@@ -638,9 +636,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void updateAdapter() {
         list.setAdapter(adapter);
-        if (list.getCount() == 0) {
-            hideCheckBoxMenuItem();
-        }
+        checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
         restoreListViewScrollPosition();
     }
 
@@ -654,10 +650,6 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             });
         }
-    }
-
-    private void hideCheckBoxMenuItem() {
-            checkBoxMenuItem.setVisible(false);
     }
 
     private void saveListViewVisiblePosition(byte fileType) {
