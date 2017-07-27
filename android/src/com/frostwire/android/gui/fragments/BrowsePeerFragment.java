@@ -39,7 +39,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
@@ -55,7 +54,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
@@ -471,6 +469,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                         numTotal = finger.numTotalVideoFiles;
                                         break;
                                 }
+                                
                                 if (isAdded()) {
                                     String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
                                     TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
@@ -478,7 +477,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                 }
                                 TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
                                 total.setText("(" + String.valueOf(numTotal) + ")");
+
+                                if (numTotal == 0) {
+                                    hideCheckBoxMenuItem();
+                                }
+
                             }
+
                             if (adapter == null) {
                                 clickFileTypeTab(lastFileType);
                             }
@@ -633,6 +638,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void updateAdapter() {
         list.setAdapter(adapter);
+        if (list.getCount() == 0) {
+            hideCheckBoxMenuItem();
+        }
         restoreListViewScrollPosition();
     }
 
@@ -646,6 +654,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             });
         }
+    }
+
+    private void hideCheckBoxMenuItem() {
+            checkBoxMenuItem.setVisible(false);
     }
 
     private void saveListViewVisiblePosition(byte fileType) {
