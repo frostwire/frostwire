@@ -22,6 +22,7 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke ExpressVPN å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selv anbefalt for nedlastingene dine, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>ExpressVPN</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
     <string name="vpn_not_found">Ingen VPN. Vurdere å kryptere forbindelsen.</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
     <string name="activity_mediaplayer_name">Mediaspiller</string>
@@ -466,7 +467,7 @@
     <string name="azureus_manager_item_forced">Tvungen</string>
     <string name="failed_to_set_wallpaper">Kunne sette Bakgrunn</string>
     <string name="cancel_delete_menu_action">Stopp og Slett data</string>
-    <string name="seeding_settings_explanation">BitTorrent-brukere på internett vil være i stand til å laste ned filen biter av data til torrents frø.</string>
+    <string name="seeding_settings_explanation">BitTorrent-brukere på Internett vil være i stand til å laste ned filen biter av data til torrents frø.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent overføringer vil ikke starte før du kobler til et Wi-Fi-nettverk. (Kontroller nettverksinnstillingene vedrørende 3G/4G databruk)</string>
     <string name="azureus_discarded">forkastet</string>
     <string name="searching_for">Leter etter</string>
@@ -512,7 +513,7 @@
     <string name="no_interruptions">Ingen Avbrudd</string>
     <string name="fetching_torrent_ellipsis">Henter torrent…</string>
     <string name="error_not_enough_peers">Prøv igjen, ikke nok jevnaldrende</string>
-    <string name="seed_finished_torrents_summary">Del biter av torrent nedlastinger med noen på internett via BitTorrent</string>
+    <string name="seed_finished_torrents_summary">Del biter av torrent nedlastinger med noen på Internett via BitTorrent</string>
     <string name="support_frostwire_summary">Vis annonser for å støtte utviklingen av dette programmet.</string>
     <string name="back">Tilbake</string>
     <string name="searchable_activity_label">Søkbar aktivitet</string>
@@ -568,7 +569,7 @@
     <string name="activity_about">Handle om</string>
     <string name="try_other_keywords">Prøv færre/andre søkeord</string>
     <string name="use_upnp_port_mapping_summary">Lang Trykk her for å stille manuell portnummer</string>
-    <string name="activity_media_player_image_description">Media bilde</string>
+    <string name="activity_media_player_image_description">Medier bilde</string>
     <string name="donate_1">Donere $1</string>
     <string name="donate_5">Donere $5</string>
     <string name="clear_complete_transfers">Dette vil fjerne alle de ferdige overføringer</string>
@@ -584,7 +585,7 @@
     <string name="storage_setting_confirm_dialog_text">Jeg forstår at alle filene er lastet ned til SD-kort med Frostwire vil bli slettet av Android øyeblikket Frostwire programmet er avinstallert fra denne enheten, og jeg vil ikke holde Frostwire LLC ansvarlig for eventuelle filer tapt.</string>
     <string name="simultaneous_uploads">Samtidig Wi-fi opplastinger</string>
     <string name="cant_open_file_does_not_exist">Jeg kan ikke åpne %1$s, filen eksisterer ikke.</string>
-    <string name="internet_discovery">Internet Discovery</string>
+    <string name="internet_discovery">Internett Discovery</string>
     <string name="send_my_geo_location">Send geolocation</string>
     <string name="anonymous_usage_statistics">Anonym brukerstatistikk</string>
     <string name="reconnecting">Koble</string>
@@ -648,4 +649,18 @@
     <string name="file_information">Filinformasjon</string>
     <string name="use_btjunkie">Bruk BTJunkie</string>
     <string name="add_transfer">Legg til overføring</string>
+    <string name="filter_ellipsis">Filtrer…</string>
+    <string name="include">Inkludere</string>
+    <string name="fix_instructions">Se support.frostwire.com for å få informasjon og fikse instruksjoner</string>
+    <string name="seeing_less_results">Ser du mindre eller ingen resultater?</string>
+    <string name="touch_applied_tags_to_include_exclude">Trykk på brukte tagger for å inkludere/ekskludere</string>
+    <string name="exclude">Ekskludere</string>
+    <string name="filter">Filtrer</string>
+    <string name="try_changing_applied_filters">Prøv å endre brukte filtre</string>
+    <string name="file_extensions">Filutvidelser</string>
+    <string name="filter_by_keyword">Filtrer etter søkeord…</string>
+    <string name="sources_channels">Kilder / kanaler</string>
+    <string name="clear_all">Rydd alt</string>
+    <string name="or">eller</string>
+    <string name="file_names">Filnavn</string>
 </resources>
