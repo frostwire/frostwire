@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.dragdrop.DragSortListView;
 import com.andrew.apollo.dragdrop.DragSortListView.DragScrollProfile;
@@ -42,6 +43,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 
 import java.util.List;
 
@@ -91,8 +93,10 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
                 queue.close();
                 return true;
             case R.id.menu_player_clear_queue:
+                long currentAudioId = MusicUtils.getCurrentAudioId();
                 MusicUtils.clearQueue();
-                NavUtils.goHome(getActivity());
+                MusicUtils.playAll(new long[] { currentAudioId }, 0, false );
+                refreshQueue();
                 return true;
             default:
                 break;

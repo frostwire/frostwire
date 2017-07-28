@@ -45,6 +45,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.GestureDetector;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -380,7 +381,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
-        getMenuInflater().inflate(R.menu.player_search, menu);
+        MenuInflater menuInflater = getMenuInflater();
+
+        if (menuInflater == null) {
+            return false;
+        }
+
+        menuInflater.inflate(R.menu.player_search, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         // Add voice search
@@ -405,11 +412,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         });
 
         // Favorite action
-        getMenuInflater().inflate(R.menu.player_favorite, menu);
+        menuInflater.inflate(R.menu.player_favorite, menu);
         // Shuffle all
-        getMenuInflater().inflate(R.menu.player_shuffle, menu);
+        menuInflater.inflate(R.menu.player_shuffle, menu);
         // Share, ringtone, and equalizer
-        getMenuInflater().inflate(R.menu.player_audio_player, menu);
+        menuInflater.inflate(R.menu.player_audio_player, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
