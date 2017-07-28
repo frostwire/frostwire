@@ -22,7 +22,7 @@
 
     <item>
         <shape>
-            <solid android:color="@color/browse_peer_listview_item_inactive_background" />
+            <solid android:color="@color/my_files_listview_item_inactive_background" />
         </shape>
     </item>
     <item

@@ -60,7 +60,7 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
-import com.frostwire.android.gui.fragments.BrowsePeerFragment;
+import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
@@ -117,7 +117,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private NavigationMenu navigationMenu;
     private SearchFragment search;
-    private BrowsePeerFragment library;
+    private MyFilesFragment library;
     private TransfersFragment transfers;
 
     private Fragment currentFragment;
@@ -616,7 +616,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
         search.connectDrawerLayoutFilterView((DrawerLayout) findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
-        library = (BrowsePeerFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_browse_peer);
+        library = (MyFilesFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_my_files);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
 

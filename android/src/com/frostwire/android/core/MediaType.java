@@ -344,17 +344,17 @@ public class MediaType implements Serializable {
             return R.drawable.question_mark;
         }
         if (mt.equals(MediaType.getApplicationsMediaType())) {
-            return R.drawable.browse_peer_application_icon_selector_menu;
+            return R.drawable.my_files_application_icon_selector_menu;
         } else if (mt.equals(MediaType.getAudioMediaType())) {
-            return R.drawable.browse_peer_audio_icon_selector_menu;
+            return R.drawable.my_files_audio_icon_selector_menu;
         } else if (mt.equals(MediaType.getDocumentMediaType())) {
-            return R.drawable.browse_peer_document_icon_selector_menu;
+            return R.drawable.my_files_document_icon_selector_menu;
         } else if (mt.equals(MediaType.getImageMediaType())) {
-            return R.drawable.browse_peer_picture_icon_selector_menu;
+            return R.drawable.my_files_picture_icon_selector_menu;
         } else if (mt.equals(MediaType.getVideoMediaType())) {
-            return R.drawable.browse_peer_video_icon_selector_menu;
+            return R.drawable.my_files_video_icon_selector_menu;
         } else if (mt.equals(MediaType.getTorrentMediaType())) {
-            return R.drawable.browse_peer_torrent_icon_selector_menu;
+            return R.drawable.my_files_torrent_icon_selector_menu;
         } else {
             return R.drawable.question_mark;
         }

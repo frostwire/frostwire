@@ -77,7 +77,7 @@
 
     <!-- Other colors -->
     <color name="tip_tag_blue">#5195ae</color>
-    <color name="browse_peer_listview_item_inactive_background">#ffeff0f1</color>
-    <color name="browse_peer_listview_item_foreground">@color/app_text_primary</color>
-    <color name="browse_peer_listview_item_inactive_foreground">@color/app_text_secondary</color>
+    <color name="my_files_listview_item_inactive_background">#ffeff0f1</color>
+    <color name="my_files_listview_item_foreground">@color/app_text_primary</color>
+    <color name="my_files_listview_item_inactive_foreground">@color/app_text_secondary</color>
 </resources>

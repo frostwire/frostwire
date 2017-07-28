@@ -136,7 +136,7 @@ public final class Constants {
     public static final String EXTRA_REFRESH_FILE_TYPE = "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";
     public static final String EXTRA_FINISH_MAIN_ACTIVITY = "com.frostwire.android.EXTRA_FINISH_MAIN_ACTIVITY";
 
-    public static final String BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
+    public static final String MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 
     public static final String ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS = "frostwire.prefs.gui.asked_for_access_coarse_location_permissions";
 

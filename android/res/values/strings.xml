@@ -30,8 +30,6 @@
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Settings</string>
-    <string name="activity_browse_peer_name">Browse Host</string>
-    <string name="activity_browse_peers_name">People Nearby</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Active Downloads</string>
     <string name="activity_uploads_name">Active Uploads</string>
@@ -61,8 +59,6 @@
     <string name="type_to_filter_results">Type to filter results.</string>
     <string name="fetching_file_list">Fetching list of shared</string>
     <string name="not_sharing_files">is not sharing any files.</string>
-    <string name="browse_peer">Browse Peer</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Copy</string>
     <string name="audio">Audio</string>

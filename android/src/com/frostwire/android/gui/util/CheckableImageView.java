@@ -114,14 +114,14 @@ public final class CheckableImageView<T> extends View implements Checkable {
             LOG.error("initComponents() containerView can't be null");
             return;
         }
-        backgroundView = (ImageButton) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button);
+        backgroundView = (ImageButton) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button);
         backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        fileSizeTextView = (TextView) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_item_filesize);
+        fileSizeTextView = (TextView) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_filesize);
         fileSizeTextView.setVisibility(showFileSize ? View.VISIBLE : View.GONE);
         if (playbackStatusOverlayView != null) {
             playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
-        checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout);
+        checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_my_files_thumbnail_grid_overlay_checkmark_framelayout);
     }
 
     private void initClickListeners() {

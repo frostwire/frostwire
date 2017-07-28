@@ -84,9 +84,9 @@ import java.util.Set;
  * @author gubatron
  * @author marcelinkaaa
  */
-public class BrowsePeerFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
+public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks<Object>, MainFragment {
 
-    private static final Logger LOG = Logger.getLogger(BrowsePeerFragment.class);
+    private static final Logger LOG = Logger.getLogger(MyFilesFragment.class);
     private static final int LOADER_FILES_ID = 0;
     private static final String EXTRA_LAST_FILE_TYPE_CLICKED = "com.frostwire.android.extra.byte.EXTRA_LAST_FILE_TYPE_CLICKED";
 
@@ -143,8 +143,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     private final MyFilesActionModeCallback selectionModeCallback;
     private byte lastFileType = Constants.FILE_TYPE_AUDIO;
 
-    public BrowsePeerFragment() {
-        super(R.layout.fragment_browse_peer);
+    public MyFilesFragment() {
+        super(R.layout.fragment_my_files);
         broadcastReceiver = new LocalBroadcastReceiver();
         setHasOptionsMenu(true);
         this.peer = new Peer();
@@ -197,14 +197,14 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_browse_peer_menu, menu);
+        inflater.inflate(R.menu.fragment_my_files_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
         initToolbarSearchFilter(menu);
         initToolbarCheckbox(menu);
     }
 
     private void initToolbarCheckbox(Menu menu) {
-        checkBoxMenuItem = menu.findItem(R.id.fragment_browse_peer_menu_checkbox);
+        checkBoxMenuItem = menu.findItem(R.id.fragment_my_files_menu_checkbox);
         checkBoxMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -217,7 +217,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     }
 
     private void initToolbarSearchFilter(Menu menu) {
-        final SearchView searchView = (SearchView) menu.findItem(R.id.fragment_browse_peer_menu_filter).getActionView();
+        final SearchView searchView = (SearchView) menu.findItem(R.id.fragment_my_files_menu_filter).getActionView();
         searchView.setFocusable(true);
         if (isAdded()) {
             searchView.setQueryHint(getResources().getString(R.string.filter_ellipsis));
@@ -242,9 +242,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.fragment_browse_peer_menu_filter:
+            case R.id.fragment_my_files_menu_filter:
                 return true;
-            case R.id.fragment_browse_peer_menu_checkbox:
+            case R.id.fragment_my_files_menu_checkbox:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -308,7 +308,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
-        header = inflater.inflate(R.layout.view_browse_peer_header, null, false);
+        header = inflater.inflate(R.layout.view_my_files_header, null, false);
         updateHeader();
         return header;
     }
@@ -319,7 +319,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
-        findView(v, R.id.fragment_browse_peer_select_all_container).setVisibility(View.GONE);
+        findView(v, R.id.fragment_my_files_select_all_container).setVisibility(View.GONE);
         findView(v, R.id.progressContainer).setVisibility(View.GONE);
         selectAllCheckboxListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -327,9 +327,9 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 onSelectAllChecked(isChecked);
             }
         };
-        selectAllCheckbox = findView(v, R.id.fragment_browse_peer_select_all_checkbox);
-        selectAllCheckboxContainer = findView(v, R.id.fragment_browse_peer_select_all_container);
-        swipeRefresh = findView(v, R.id.fragment_browse_peer_swipe_refresh);
+        selectAllCheckbox = findView(v, R.id.fragment_my_files_select_all_checkbox);
+        selectAllCheckboxContainer = findView(v, R.id.fragment_my_files_select_all_container);
+        swipeRefresh = findView(v, R.id.fragment_my_files_swipe_refresh);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -341,8 +341,8 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                 }
             }
         });
-        list = findView(v, R.id.fragment_browse_peer_gridview);
-        SwipeLayout swipe = findView(v, R.id.fragment_browse_peer_swipe);
+        list = findView(v, R.id.fragment_my_files_gridview);
+        SwipeLayout swipe = findView(v, R.id.fragment_my_files_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
             public void onSwipeLeft() {
@@ -355,7 +355,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             }
         });
 
-        tabLayout = findView(v, R.id.fragment_browse_peer_tab_layout_file_type);
+        tabLayout = findView(v, R.id.fragment_my_files_tab_layout_file_type);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -472,10 +472,10 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                                 
                                 if (isAdded()) {
                                     String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-                                    TextView title = (TextView) header.findViewById(R.id.view_browse_peer_header_text_title);
+                                    TextView title = (TextView) header.findViewById(R.id.view_my_files_header_text_title);
                                     title.setText(fileTypeStr);
                                 }
-                                TextView total = (TextView) header.findViewById(R.id.view_browse_peer_header_text_total);
+                                TextView total = (TextView) header.findViewById(R.id.view_my_files_header_text_total);
                                 total.setText("(" + String.valueOf(numTotal) + ")");
                             }
 
@@ -654,12 +654,12 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
 
     private void saveListViewVisiblePosition(byte fileType) {
         int firstVisiblePosition = list.getFirstVisiblePosition();
-        ConfigurationManager.instance().setInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType, firstVisiblePosition);
+        ConfigurationManager.instance().setInt(Constants.MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType, firstVisiblePosition);
     }
 
     private int getSavedListViewVisiblePosition(byte fileType) {
         //will return 0 if not found.
-        return ConfigurationManager.instance().getInt(Constants.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
+        return ConfigurationManager.instance().getInt(Constants.MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION + fileType);
     }
 
     private void switchToThe(boolean right) {
@@ -688,7 +688,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             this.mode = mode;
             this.menu = menu;
-            mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
+            mode.getMenuInflater().inflate(R.menu.fragment_my_files_action_mode_menu, menu);
             return true;
         }
 
@@ -721,25 +721,25 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             FileListAdapter.FileDescriptorItem fileDescriptorItem = fileDescriptorItems[0];
             final FileDescriptor fd = fileDescriptorItem.fd;
             switch (item.getItemId()) {
-                case R.id.fragment_browse_peer_action_mode_menu_delete:
+                case R.id.fragment_my_files_action_mode_menu_delete:
                     new DeleteFileMenuAction(context, adapter, fileDescriptors).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_seed:
+                case R.id.fragment_my_files_action_mode_menu_seed:
                     new SeedAction(context, fd, null).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_open:
+                case R.id.fragment_my_files_action_mode_menu_open:
                     new OpenMenuAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_file_information:
+                case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone:
+                case R.id.fragment_my_files_action_mode_menu_use_as_ringtone:
                     new SetAsRingtoneMenuAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper:
+                case R.id.fragment_my_files_action_mode_menu_use_as_wallpaper:
                     new SetAsWallpaperMenuAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_copy_magnet:
+                case R.id.fragment_my_files_action_mode_menu_copy_magnet:
                     new CopyToClipboardMenuAction(context,
                             R.drawable.contextmenu_icon_magnet,
                             R.string.transfers_context_menu_copy_magnet,
@@ -747,7 +747,7 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                             FileListAdapter.readInfoFromTorrent(fd.filePath, true)
                     ).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_copy_info_hash:
+                case R.id.fragment_my_files_action_mode_menu_copy_info_hash:
                     new CopyToClipboardMenuAction(context,
                             R.drawable.contextmenu_icon_copy,
                             R.string.transfers_context_menu_copy_infohash,
@@ -755,13 +755,13 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
                             FileListAdapter.readInfoFromTorrent(fd.filePath, false)
                     ).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_rename:
+                case R.id.fragment_my_files_action_mode_menu_rename:
                     new RenameFileMenuAction(context, adapter, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_add_to_playlist:
+                case R.id.fragment_my_files_action_mode_menu_add_to_playlist:
                     new AddToPlaylistMenuAction(context, fileDescriptors).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_share:
+                case R.id.fragment_my_files_action_mode_menu_share:
                     new SendFileMenuAction(context, fd).onClick();
                     break;
             }
@@ -789,42 +789,42 @@ public class BrowsePeerFragment extends AbstractFragment implements LoaderCallba
             FileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
             if (numChecked > 1) {
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_file_information);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_seed);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_open);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_file_information);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_ringtone);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_wallpaper);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_rename);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_magnet);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_info_hash);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_share);
             } else {
                 if (numChecked == 1) {
                     if (!canOpenFile) {
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_open);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_open);
                     }
                     if (fd.fileType != Constants.FILE_TYPE_AUDIO) {
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_ringtone);
                     }
                     if (fd.fileType != Constants.FILE_TYPE_PICTURES) {
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_wallpaper);
                     }
                     if (fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_rename);
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_share);
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_delete);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_rename);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_share);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_delete);
                     }
                     if (fd.mime != null && !fd.mime.equals(Constants.MIME_TYPE_BITTORRENT)) {
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
-                        actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_magnet);
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_info_hash);
                     }
                 }
             }
             if (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath))) {
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_seed);
             }
             if (fd.fileType != Constants.FILE_TYPE_AUDIO) {
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_add_to_playlist);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_add_to_playlist);
             }
             if (menu != null && menu.size() > 0) {
                 for (int i = 0; i < menu.size(); i++) {

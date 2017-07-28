@@ -30,7 +30,7 @@
 
     <android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/fragment_browse_peer_tab_layout_file_type"
+        android:id="@+id/fragment_my_files_tab_layout_file_type"
         style="@style/AppTabLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -38,52 +38,52 @@
         app:tabMode="fixed">
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_audio"
+            android:id="@+id/fragment_my_files_tab_audio"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_audio_icon_tab_selector" />
+            android:icon="@drawable/my_files_audio_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_videos"
+            android:id="@+id/fragment_my_files_tab_videos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_ringtone_icon_tab_selector" />
+            android:icon="@drawable/my_files_ringtone_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_pictures"
+            android:id="@+id/fragment_my_files_tab_pictures"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_video_icon_tab_selector" />
+            android:icon="@drawable/my_files_video_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_applications"
+            android:id="@+id/fragment_my_files_tab_applications"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_picture_icon_tab_selector" />
+            android:icon="@drawable/my_files_picture_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_documents"
+            android:id="@+id/fragment_my_files_tab_documents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_document_icon_tab_selector" />
+            android:icon="@drawable/my_files_document_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_browse_peer_tab_torrents"
+            android:id="@+id/fragment_my_files_tab_torrents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:icon="@drawable/browse_peer_torrent_icon_tab_selector" />
+            android:icon="@drawable/my_files_torrent_icon_tab_selector" />
     </android.support.design.widget.TabLayout>
 
-    <!-- Checkbox and Search Box for Browse Peer, see view_browse_peer_search_bar.xml -->
+    <!-- Checkbox and Search Box for Browse Peer, see view_my_files_search_bar.xml -->
     <RelativeLayout
-        android:id="@+id/fragment_browse_peer_select_all_container"
+        android:id="@+id/fragment_my_files_select_all_container"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:background="@color/app_background_white"
         android:minHeight="?android:attr/listPreferredItemHeightSmall">
 
         <CheckBox
-            android:id="@+id/fragment_browse_peer_select_all_checkbox"
+            android:id="@+id/fragment_my_files_select_all_checkbox"
             style="@style/SelectDeselectAllText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -125,25 +125,25 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/fragment_browse_peer_grid_container"
+        android:id="@+id/fragment_my_files_grid_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="1dp">
 
         <com.frostwire.android.gui.views.SwipeLayout
-            android:id="@+id/fragment_browse_peer_swipe"
+            android:id="@+id/fragment_my_files_swipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <android.support.v4.widget.SwipeRefreshLayout
-                android:id="@+id/fragment_browse_peer_swipe_refresh"
+                android:id="@+id/fragment_my_files_swipe_refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <GridView
-                    android:id="@+id/fragment_browse_peer_gridview"
+                    android:id="@+id/fragment_my_files_gridview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/app_background_white"

@@ -22,59 +22,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_delete"
+        android:id="@+id/fragment_my_files_action_mode_menu_delete"
         android:checkable="true"
         android:icon="@drawable/action_bar_delete"
         android:orderInCategory="1"
         android:title="@string/delete"
         app:showAsAction="always" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_seed"
+        android:id="@+id/fragment_my_files_action_mode_menu_seed"
         android:icon="@drawable/contextmenu_icon_play_transfer"
         android:title="@string/seed"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_open"
+        android:id="@+id/fragment_my_files_action_mode_menu_open"
         android:icon="@drawable/contextmenu_icon_open"
         android:title="@string/open"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_file_information"
+        android:id="@+id/fragment_my_files_action_mode_menu_file_information"
         android:icon="@drawable/contextmenu_icon_file"
         android:title="@string/file_information"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_use_as_ringtone"
+        android:id="@+id/fragment_my_files_action_mode_menu_use_as_ringtone"
         android:icon="@drawable/contextmenu_icon_ringtone"
         android:title="@string/context_menu_use_as_ringtone"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_use_as_wallpaper"
+        android:id="@+id/fragment_my_files_action_mode_menu_use_as_wallpaper"
         android:icon="@drawable/contextmenu_icon_picture"
         android:title="@string/set_as_wallpaper"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_copy_magnet"
+        android:id="@+id/fragment_my_files_action_mode_menu_copy_magnet"
         android:icon="@drawable/contextmenu_icon_magnet"
         android:title="@string/transfers_context_menu_copy_magnet"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_copy_info_hash"
+        android:id="@+id/fragment_my_files_action_mode_menu_copy_info_hash"
         android:icon="@drawable/contextmenu_icon_copy"
         android:title="@string/transfers_context_menu_copy_infohash"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_rename"
+        android:id="@+id/fragment_my_files_action_mode_menu_rename"
         android:icon="@drawable/contextmenu_icon_rename"
         android:title="@string/rename"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_add_to_playlist"
+        android:id="@+id/fragment_my_files_action_mode_menu_add_to_playlist"
         android:icon="@drawable/contextmenu_icon_playlist_add_dark"
         android:title="@string/add_to_playlist"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_browse_peer_action_mode_menu_share"
+        android:id="@+id/fragment_my_files_action_mode_menu_share"
         android:icon="@drawable/contextmenu_icon_send"
         android:title="@string/share"
         app:showAsAction="never" />

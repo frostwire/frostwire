@@ -201,7 +201,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             this.mode = mode;
             this.menu = menu;
-            mode.getMenuInflater().inflate(R.menu.fragment_browse_peer_action_mode_menu, menu);
+            mode.getMenuInflater().inflate(R.menu.fragment_my_files_action_mode_menu, menu);
             return true;
         }
 
@@ -216,7 +216,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             Activity context = getActivity();
             switch (item.getItemId()) {
-                case R.id.fragment_browse_peer_action_mode_menu_delete:
+                case R.id.fragment_my_files_action_mode_menu_delete:
                     ArrayList<FileDescriptor> fdList = new ArrayList<>(1);
                     fdList.add(fd);
                     new DeleteFileMenuAction(context, null, fdList, new AbstractDialog.OnDialogClickListener() {
@@ -228,20 +228,20 @@ public final class ImageViewerFragment extends AbstractFragment {
                         }
                     }).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_seed:
+                case R.id.fragment_my_files_action_mode_menu_seed:
                     new SeedAction(context, fd, null).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_open:
+                case R.id.fragment_my_files_action_mode_menu_open:
                     new OpenMenuAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_file_information:
+                case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_use_as_wallpaper:
+                case R.id.fragment_my_files_action_mode_menu_use_as_wallpaper:
                     new SetAsWallpaperMenuAction(context, fd).onClick();
                     mode.finish();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_rename:
+                case R.id.fragment_my_files_action_mode_menu_rename:
                     final ActionMode fMode = mode;
                     new RenameFileMenuAction(context, null, fd, new AbstractDialog.OnDialogClickListener() {
                         @Override
@@ -252,7 +252,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                         }
                     }).onClick();
                     break;
-                case R.id.fragment_browse_peer_action_mode_menu_share:
+                case R.id.fragment_my_files_action_mode_menu_share:
                     new SendFileMenuAction(context, fd).onClick();
                     break;
             }
@@ -269,12 +269,12 @@ public final class ImageViewerFragment extends AbstractFragment {
 
         private void updateMenuActionsVisibility(FileDescriptor fd) {
             List<Integer> actionsToHide = new ArrayList<>();
-            actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_use_as_ringtone);
-            actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_magnet);
-            actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_copy_info_hash);
-            actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_add_to_playlist);
+            actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_ringtone);
+            actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_magnet);
+            actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_info_hash);
+            actionsToHide.add(R.id.fragment_my_files_action_mode_menu_add_to_playlist);
             if (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath))) {
-                actionsToHide.add(R.id.fragment_browse_peer_action_mode_menu_seed);
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_seed);
             }
             if (menu != null && menu.size() > 0) {
                 for (int i = 0; i < menu.size(); i++) {

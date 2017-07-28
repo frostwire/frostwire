@@ -116,13 +116,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     private static int getLayoutId(int fileType) {
         return (fileType == Constants.FILE_TYPE_PICTURES || fileType == Constants.FILE_TYPE_VIDEOS) ?
-                R.layout.view_browse_peer_thumbnail_grid_item :
-                R.layout.view_browse_peer_thumbnail_list_item;
+                R.layout.view_my_files_thumbnail_grid_item :
+                R.layout.view_my_files_thumbnail_list_item;
     }
 
     public View getView(int position, View view, ViewGroup parent) {
         int adapterLayoutId = getViewItemId();
-        if (adapterLayoutId == R.layout.view_browse_peer_thumbnail_list_item) {
+        if (adapterLayoutId == R.layout.view_my_files_thumbnail_list_item) {
             return getListItemView(position, view, parent);
         } else {
             return getGridItemView(position, view);
@@ -135,7 +135,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (item.fd.fileType == Constants.FILE_TYPE_AUDIO || item.fd.fileType == Constants.FILE_TYPE_RINGTONES) {
             initPlaybackStatusOverlayTouchFeedback(view, item);
         }
-        ImageView thumbnailView = findView(view, R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
+        ImageView thumbnailView = findView(view, R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         if (thumbnailView != null) {
             thumbnailView.setTag(item);
             thumbnailView.setOnClickListener(new OnClickListener() {
@@ -164,7 +164,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         if (view == null && ctx != null) {
             // every list view item is wrapped in a generic container which has a hidden checkbox on the left hand side.
-            view = View.inflate(ctx, R.layout.view_browse_peer_thumbnail_grid_item, null);
+            view = View.inflate(ctx, R.layout.view_my_files_thumbnail_grid_item, null);
         }
 
         try {
@@ -205,8 +205,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     private void initPlaybackStatusOverlayTouchFeedback(View view, final FileDescriptorItem item) {
         MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view,
-                inGridMode() ? R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
-                        R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
+                inGridMode() ? R.id.view_my_files_thumbnail_grid_item_playback_overlay_view :
+                        R.id.view_my_files_thumbnail_list_item_playback_overlay_view);
         if (selectAllMode) {
             playbackStatusOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
@@ -230,7 +230,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Uri[] uris = getFileItemThumbnailUris(item);
 
-        MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view, R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view);
+        MediaPlaybackStatusOverlayView playbackStatusOverlayView = findView(view, R.id.view_my_files_thumbnail_grid_item_playback_overlay_view);
         MediaPlaybackOverlayPainter.MediaPlaybackState overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.NONE;
 
         int thumbnailResizeWidth = (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) ? 512 : 196;
@@ -439,13 +439,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         final ImageButton fileThumbnail = findView(view,
                 inGridMode() ?
-                        R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button :
-                        R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
+                        R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button :
+                        R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         fileThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode() ?
-                R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
-                R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
+                R.id.view_my_files_thumbnail_grid_item_playback_overlay_view :
+                R.id.view_my_files_thumbnail_list_item_playback_overlay_view);
 
         boolean inGridMode = inGridMode();
         final int thumbnailDimensions = inGridMode ?
@@ -485,16 +485,16 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         if (!inGridMode) {
-            TextView title = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_file_title);
+            TextView title = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_title);
             title.setText(fd.title);
             if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
-                TextView fileExtra = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_extra_text);
+                TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
                 fileExtra.setText(fd.artist);
             } else {
-                TextView fileExtra = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_extra_text);
+                TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
                 fileExtra.setText(R.string.empty_string);
             }
-            TextView fileSize = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_file_size);
+            TextView fileSize = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_size);
             fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
         }
         fileThumbnail.setTag(fd);
@@ -504,16 +504,16 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     private boolean inGridMode() {
-        return getViewItemId() == R.layout.view_browse_peer_thumbnail_grid_item;
+        return getViewItemId() == R.layout.view_my_files_thumbnail_grid_item;
     }
 
     private void populateViewPlain(View view, FileDescriptorItem item) {
         FileDescriptor fd = item.fd;
 
-        TextView title = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_file_title);
+        TextView title = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_title);
         title.setText(fd.title);
 
-        TextView fileExtra = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_extra_text);
+        TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
         if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
             fileExtra.setText(fd.artist);
         } else if (fd.fileType == Constants.FILE_TYPE_DOCUMENTS) {
@@ -522,16 +522,16 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             fileExtra.setText(R.string.empty_string);
         }
 
-        TextView fileSize = findView(view, R.id.view_browse_peer_thumbnail_list_image_item_file_size);
+        TextView fileSize = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_size);
         fileSize.setText(UIUtils.getBytesInHuman(fd.fileSize));
 
         ImageButton downloadButton = findView(view, inGridMode() ?
-                R.id.view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button :
-                R.id.view_browse_peer_thumbnail_list_item_browse_thumbnail_image_button);
+                R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button :
+                R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
 
         MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode() ?
-                R.id.view_browse_peer_thumbnail_grid_item_playback_overlay_view :
-                R.id.view_browse_peer_thumbnail_list_item_playback_overlay_view);
+                R.id.view_my_files_thumbnail_grid_item_playback_overlay_view :
+                R.id.view_my_files_thumbnail_list_item_playback_overlay_view);
 
         if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
             mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
@@ -550,7 +550,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             // gotta see what to do here
             return;
         }
-        ImageView img = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_sd);
+        ImageView img = findView(v, R.id.view_my_files_thumbnail_list_image_item_sd);
 
         if (item.inSD) {
             if (item.mounted) {
@@ -558,7 +558,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 setNormalTextColors(v);
                 img.setVisibility(View.GONE);
             } else {
-                v.setBackgroundResource(R.drawable.browse_peer_listview_item_inactive_background);
+                v.setBackgroundResource(R.drawable.my_files_listview_item_inactive_background);
                 setInactiveTextColors(v);
                 img.setVisibility(View.VISIBLE);
             }
@@ -573,9 +573,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (inGridMode()) {
             return;
         }
-        TextView title = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_file_title);
-        TextView text = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_extra_text);
-        TextView size = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_file_size);
+        TextView title = findView(v, R.id.view_my_files_thumbnail_list_image_item_file_title);
+        TextView text = findView(v, R.id.view_my_files_thumbnail_list_image_item_extra_text);
+        TextView size = findView(v, R.id.view_my_files_thumbnail_list_image_item_file_size);
 
         Resources res = getContext().getResources();
 
@@ -589,16 +589,16 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (inGridMode()) {
             return;
         }
-        TextView title = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_file_title);
-        TextView text = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_extra_text);
-        TextView size = findView(v, R.id.view_browse_peer_thumbnail_list_image_item_file_size);
+        TextView title = findView(v, R.id.view_my_files_thumbnail_list_image_item_file_title);
+        TextView text = findView(v, R.id.view_my_files_thumbnail_list_image_item_extra_text);
+        TextView size = findView(v, R.id.view_my_files_thumbnail_list_image_item_file_size);
 
         Resources res = getContext().getResources();
 
         // TODO: Fix deprecation warning when we hit API 23
-        title.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
-        text.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
-        size.setTextColor(res.getColor(R.color.browse_peer_listview_item_inactive_foreground));
+        title.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
+        text.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
+        size.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
     }
 
     private boolean showSingleOptions(List<FileDescriptor> checked, FileDescriptor fd) {
@@ -738,7 +738,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     public int getNumColumns() {
-        if (getViewItemId() == R.layout.view_browse_peer_thumbnail_list_item) {
+        if (getViewItemId() == R.layout.view_my_files_thumbnail_list_item) {
             return 1;
         }
         int rotation = ((Activity) getContext()).getWindowManager().getDefaultDisplay().getRotation();

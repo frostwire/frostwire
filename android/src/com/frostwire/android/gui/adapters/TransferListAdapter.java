@@ -460,9 +460,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     //apk.getDrawable(id);
 
                     //in the meantime, just hardcode it
-                    groupIndicator.setImageResource(R.drawable.browse_peer_application_icon_selector_menu);
+                    groupIndicator.setImageResource(R.drawable.my_files_application_icon_selector_menu);
                 } catch (Throwable e) {
-                    groupIndicator.setImageResource(R.drawable.browse_peer_application_icon_selector_menu);
+                    groupIndicator.setImageResource(R.drawable.my_files_application_icon_selector_menu);
                 }
             } else {
                 groupIndicator.setImageResource(MediaType.getFileTypeIconId(extension));

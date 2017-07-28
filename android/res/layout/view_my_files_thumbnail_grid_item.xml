@@ -27,7 +27,7 @@
     android:orientation="vertical">
 
     <ImageButton
-        android:id="@+id/view_browse_peer_thumbnail_grid_item_browse_thumbnail_image_button"
+        android:id="@+id/view_my_files_thumbnail_grid_item_browse_thumbnail_image_button"
         android:layout_width="match_parent"
         android:layout_height="128dp"
         android:layout_centerInParent="true"
@@ -37,7 +37,7 @@
         android:scaleType="centerCrop" />
 
     <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
-        android:id="@+id/view_browse_peer_thumbnail_grid_item_playback_overlay_view"
+        android:id="@+id/view_my_files_thumbnail_grid_item_playback_overlay_view"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerInParent="true"
@@ -53,7 +53,7 @@
         android:layout_alignParentRight="true">
 
         <TextView
-            android:id="@+id/view_browse_peer_thumbnail_grid_item_filesize"
+            android:id="@+id/view_my_files_thumbnail_grid_item_filesize"
             style="@style/GridThumbnailText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
     </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/view_browse_peer_thumbnail_grid_overlay_checkmark_framelayout"
+        android:id="@+id/view_my_files_thumbnail_grid_overlay_checkmark_framelayout"
         android:layout_width="match_parent"
         android:layout_height="128dp"
         android:background="@color/app_grid_selected_background"
@@ -73,6 +73,6 @@
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/browse_peer_grid_check" />
+            android:src="@drawable/my_files_grid_check" />
     </FrameLayout>
 </RelativeLayout>

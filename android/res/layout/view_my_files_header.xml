@@ -26,14 +26,14 @@
     android:paddingRight="30dp">
 
     <TextView
-        android:id="@+id/view_browse_peer_header_text_title"
+        android:id="@+id/view_my_files_header_text_title"
         style="@style/ToolbarMainHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/dummy_title" />
 
     <TextView
-        android:id="@+id/view_browse_peer_header_text_total"
+        android:id="@+id/view_my_files_header_text_total"
         style="@style/ToolbarMainHeaderCounter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
