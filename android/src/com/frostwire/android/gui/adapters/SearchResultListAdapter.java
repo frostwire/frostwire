@@ -238,6 +238,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if ("youtube".equals(extension)) {
                 mt = MediaType.getVideoMediaType();
             } else if (mt != null && mt.equals(MediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
+                // NOTE: this excludes all non .youtube youtube search results (e.g. 3gp, webm) from appearing on results
                 mt = null;
             }
 
@@ -247,7 +248,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                     mediaTypedFiltered.add(sr);
                     keywordFiltered.add(sr);
                 }
-            } else if (passedKeywordFilter) {
+            } else if (mt != null && passedKeywordFilter) {
                 keywordFiltered.add(sr);
             }
             fsr.increment(mt, passedKeywordFilter);
