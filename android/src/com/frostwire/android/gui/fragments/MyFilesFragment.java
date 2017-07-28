@@ -212,7 +212,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                 return true;
             }
         });
-        checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
+        refreshCheckBoxMenuItemVisibility();
         selectAllCheckbox.setOnCheckedChangeListener(selectAllCheckboxListener);
     }
 
@@ -382,9 +382,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             adapter.clearChecked();
         }
         reloadFiles(fileType);
-        if (checkBoxMenuItem != null) {
-            checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
-        }
+        refreshCheckBoxMenuItemVisibility();
         if (selectAllCheckbox != null) {
             selectAllModeOn = false;
             selectAllCheckbox.setChecked(false);
@@ -482,9 +480,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                             if (adapter == null) {
                                 clickFileTypeTab(lastFileType);
                             }
-                            if (checkBoxMenuItem != null) {
-                                checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
-                            }
+                            refreshCheckBoxMenuItemVisibility();
                             MusicUtils.stopSimplePlayer();
                             restoreListViewScrollPosition();
                         }
@@ -636,7 +632,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
     private void updateAdapter() {
         list.setAdapter(adapter);
-        checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
+        refreshCheckBoxMenuItemVisibility();
         restoreListViewScrollPosition();
     }
 
@@ -669,6 +665,12 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             nextTabPosition = 5;
         }
         tabLayout.getTabAt(nextTabPosition).select();
+    }
+
+    private void refreshCheckBoxMenuItemVisibility() {
+        if (checkBoxMenuItem != null) {
+            checkBoxMenuItem.setVisible(lastFileType != Constants.FILE_TYPE_RINGTONES && list.getCount() > 0);
+        }
     }
 
     private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {

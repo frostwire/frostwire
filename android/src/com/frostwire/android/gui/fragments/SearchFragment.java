@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -897,26 +898,40 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            long now = System.currentTimeMillis();
-            if (now - lastUIUpdate < 500 || !isAdded()) {
-                return;
-            }
-            lastUIUpdate = now;
-
-            Runnable uiRunnable = new Runnable() {
+            Runnable notifyLogic = new Runnable() {
                 @Override
                 public void run() {
-                    for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
-                        List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
-                        keywordFilterDrawerView.updateData(
-                                feature,
-                                filteredHistogram);
+                    long timeSinceLastUpdate = System.currentTimeMillis() - lastUIUpdate;
+                    if (timeSinceLastUpdate < 500) {
+                        try {
+                            Thread.sleep(500l - timeSinceLastUpdate);
+                        } catch (InterruptedException e) {
+                        }
                     }
-                    updateVisibility();
-                    keywordFilterDrawerView.requestLayout();
+                    Runnable uiRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            lastUIUpdate = System.currentTimeMillis();
+                            for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+                                List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
+                                keywordFilterDrawerView.updateData(
+                                        feature,
+                                        filteredHistogram);
+                            }
+                            updateVisibility();
+                            keywordFilterDrawerView.requestLayout();
+                        }
+                    };
+                    getActivity().runOnUiThread(uiRunnable);
+
                 }
             };
-            getActivity().runOnUiThread(uiRunnable);
+
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                Engine.instance().getThreadPool().submit(notifyLogic);
+            } else {
+                notifyLogic.run();
+            }
         }
 
         @Override
