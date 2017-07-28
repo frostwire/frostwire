@@ -326,6 +326,16 @@ public final class MusicUtils {
         }
     }
 
+    public static void pause() {
+        if (musicPlaybackService != null) {
+            try {
+                musicPlaybackService.pause();
+            } catch (Throwable ignored) {
+
+            }
+        }
+    }
+
     /**
      * Cycles through the repeat options.
      */
