@@ -244,7 +244,7 @@ public class SearchInputView extends LinearLayout {
     public void updateFileTypeCounter(byte fileType, int numFiles) {
         try {
             String numFilesStr = String.valueOf(numFiles);
-            if (numFiles > 9999) {
+            if (numFiles > 999) {
                 numFilesStr = "+1k";
             }
             tabLayout.getTabAt(toFileTypeTab.get(fileType).position).setText(numFilesStr);
