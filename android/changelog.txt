@@ -1,3 +1,8 @@
+FrostWire 1.9.9 - JUL/28/2017
+ - Filtering bug fixes
+ - Audio Player 'Clear Queue' fix
+ - Crash fixes, performance upgrades
+
 FrostWire 1.9.8 - JUL/26/2017
  - More robust app startup
  - New search filtering tools
