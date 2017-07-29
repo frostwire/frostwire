@@ -22,7 +22,6 @@ package com.frostwire.android.gui.activities;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
@@ -72,7 +71,6 @@ import com.mopub.mobileads.MoPubView;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Random;
 
 /**
  * @author gubatron

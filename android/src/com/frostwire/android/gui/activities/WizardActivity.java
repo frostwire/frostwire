@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,6 +125,7 @@ public class WizardActivity extends AbstractActivity {
             if (!pageView.hasNext()) {
                 ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
                 ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE, true);
+                ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, System.currentTimeMillis());
             } else {
                 viewFlipper.showNext();
                 setupViewPage();

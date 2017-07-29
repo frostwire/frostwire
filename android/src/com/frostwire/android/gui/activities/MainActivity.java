@@ -60,8 +60,8 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.SDPermissionDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
-import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.MainFragment;
+import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
@@ -92,6 +92,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
@@ -352,6 +353,45 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissionsOrBindMusicService();
         }
+
+        tryOnResumeInterstitial();
+    }
+
+    private void tryOnResumeInterstitial() {
+        if (Offers.disabledAds()) {
+            //LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
+            return;
+        }
+        ConfigurationManager CM = ConfigurationManager.instance();
+        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
+        if (installationTimestamp == -1) {
+            //LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
+            return;
+        }
+        if (!UIUtils.diceRollPassesThreshold(CM, Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD)) {
+            //LOG.info("tryOnResumeInterstitial() aborted - threshold not met");
+            return;
+        }
+        long now = System.currentTimeMillis();
+        long lastDisplayTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_LAST_DISPLAY);
+
+        // if it's never been displayed, we check against the first display delay setting
+        if (lastDisplayTimestamp == -1) {
+            int minutesSinceInstallation = (int) TimeUnit.MILLISECONDS.toMinutes(now - installationTimestamp);
+            int firstDisplayDelayInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES);
+            if (minutesSinceInstallation < firstDisplayDelayInMinutes) {
+                //LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
+                return;
+            }
+        }
+        int minutesSinceLastDisplay = (int) TimeUnit.MILLISECONDS.toMinutes(now - lastDisplayTimestamp);
+        int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
+        if (minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
+            //LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
+            return;
+        }
+        CM.setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_LAST_DISPLAY, System.currentTimeMillis());
+        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
     }
 
     @Override

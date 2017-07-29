@@ -94,7 +94,6 @@ import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
-import java.util.Random;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
