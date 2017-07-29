@@ -572,4 +572,23 @@ public final class UIUtils {
     public static boolean isMain() {
         return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
+
+    /**
+     * @param thresholdPreferenceKey - preference key for an int threshold
+     * @return true if the threshold is >= 100, otherwise true if the dice roll is below the threshold
+     */
+    public static boolean diceRollPassesThreshold(ConfigurationManager cm, String thresholdPreferenceKey) {
+        int thresholdValue = cm.getInt(thresholdPreferenceKey);
+        int diceRoll = new Random().nextInt(100)+1; //1-100
+        if (thresholdValue <= 0) {
+            LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> false");
+            return false;
+        }
+        if (thresholdValue >= 100) {
+            LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> true (always)");
+            return true;
+        }
+        LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ", roll=" + diceRoll + ") -> " + (diceRoll <= thresholdValue));
+        return diceRoll <= thresholdValue;
+    }
 }
