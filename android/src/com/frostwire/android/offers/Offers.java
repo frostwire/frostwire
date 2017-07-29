@@ -191,10 +191,8 @@ public final class Offers {
         if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
-        final int b2bThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD);
-        final int r = new Random().nextInt(100) + 1;
-        LOG.info("threshold: " + b2bThreshold + " - dice roll: " + r + " (" + (r < b2bThreshold) + ")");
-        if (r < b2bThreshold) {
+
+        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD)) {
             REMOVE_ADS.showInterstitial(activity, null, false, false);
         }
     }

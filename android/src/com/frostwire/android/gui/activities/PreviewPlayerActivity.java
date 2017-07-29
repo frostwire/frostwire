@@ -56,6 +56,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.InHouseBannerFactory;
@@ -213,12 +214,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             hideHorizontalAdContainer();
             return;
         }
-        final int mopubPreviewBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD);
-        final int r = new Random().nextInt(100)+1;
-        //LOG.info("moPubOnPreviewThreshold: " + mopubPreviewBannerThreshold + " - dice roll: " + r + " - skip moPubOnPreview? " + (r > mopubPreviewBannerThreshold));
-        if (r > mopubPreviewBannerThreshold) {
+
+        if (!UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD)) {
             return;
         }
+
         mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
         advertisementHeaderLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
         fallbackImageView = findView(R.id.activity_preview_fallback_imageview);

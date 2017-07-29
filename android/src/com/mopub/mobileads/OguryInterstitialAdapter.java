@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 
@@ -52,7 +53,8 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         // this class should be created only once by the mopub framework
         // both OGURY_STARTED and OGURY_ENABLED are static to minimize the
         // risks in case of getting in a multithreaded environment
-        OGURY_ENABLED = diceRoll();
+        OGURY_ENABLED = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
+        LOG.info("OGURY_ENABLED=" + OGURY_ENABLED);
     }
 
     @Override
@@ -107,14 +109,6 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
 
     private static Presage presage() {
         return Presage.getInstance();
-    }
-
-    private static boolean diceRoll() {
-        int oguryThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD);
-        int diceRoll = new Random().nextInt(100) + 1;
-        boolean enabled = diceRoll < oguryThreshold;
-        LOG.info("OGURY_ENABLED -> " + enabled + " (dice roll: " + diceRoll + " < threshold: " + oguryThreshold + ")");
-        return enabled;
     }
 
     private static void startOgury(Context context) {

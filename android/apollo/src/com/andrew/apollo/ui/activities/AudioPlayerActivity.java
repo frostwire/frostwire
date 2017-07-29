@@ -79,6 +79,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -655,10 +656,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        final int mopubAlbumArtBannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD);
-        final int r = new Random().nextInt(100) + 1;
-        LOG.info("mopubAlbumArtBannerThreshold: " + mopubAlbumArtBannerThreshold + " - dice roll: " + r + " - skip initAlbumArt? " + (r > mopubAlbumArtBannerThreshold));
-        if (r > mopubAlbumArtBannerThreshold) {
+        if (!UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD)) {
             return;
         }
 
