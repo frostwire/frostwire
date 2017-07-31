@@ -52,7 +52,7 @@ public final class LastAddedFragment extends ApolloFragment<SongAdapter, Song> {
 
     @Override
     protected SongAdapter createAdapter() {
-        return new SongAdapter(getActivity(), R.layout.list_item_simple);
+        return new SongAdapter(getActivity(), R.layout.list_item_simple_image);
     }
 
     @Override
