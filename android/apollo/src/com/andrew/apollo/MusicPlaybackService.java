@@ -1606,14 +1606,11 @@ public class MusicPlaybackService extends Service {
                         getArtistName());
             }
             // Add the track to the recently played list.
-
-            if (mRecentsCache == null) {
-                mRecentsCache = RecentStore.getInstance(this);
+            ExecutorService threadPool = Engine.instance().getThreadPool();
+            if (threadPool != null) {
+                threadPool.submit(new RecentsStoreAddAlbumIdRunnable(this));
             }
 
-            mRecentsCache.addAlbumId(getAlbumId(), getAlbumName(), getArtistName(),
-                    MusicUtils.getSongCountForAlbum(this, getAlbumId()),
-                    MusicUtils.getReleaseDateForAlbum(this, getAlbumId()));
         } else if (what.equals(QUEUE_CHANGED)) {
             saveQueue(true);
             if (isPlaying()) {
@@ -1625,6 +1622,31 @@ public class MusicPlaybackService extends Service {
 
         if (what.equals(PLAYSTATE_CHANGED)) {
             mNotificationHelper.updatePlayState(isPlaying());
+        }
+    }
+
+    private static class RecentsStoreAddAlbumIdRunnable implements Runnable {
+        private WeakReference<MusicPlaybackService> musicPlaybackServiceWeakReference;
+
+        RecentsStoreAddAlbumIdRunnable(MusicPlaybackService musicPlaybackService) {
+            musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(musicPlaybackServiceWeakReference)) {
+                return;
+            }
+            MusicPlaybackService musicPlaybackService = musicPlaybackServiceWeakReference.get();
+            if (musicPlaybackService.mRecentsCache == null) {
+                musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
+            }
+            long albumId = musicPlaybackService.getAlbumId();
+            String albumName = musicPlaybackService.getAlbumName();
+            String artistName = musicPlaybackService.getArtistName();
+            String songCount =  MusicUtils.getSongCountForAlbum(musicPlaybackService, albumId);
+            String releaseDateForAlbum = MusicUtils.getReleaseDateForAlbum(musicPlaybackService, albumId);
+            musicPlaybackService.mRecentsCache.addAlbumId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
         }
     }
 
