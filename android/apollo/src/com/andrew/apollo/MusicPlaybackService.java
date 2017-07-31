@@ -1,5 +1,6 @@
 /*
-* Copyright (C) 2012-2015 Andrew Neal, Angel Leon, Alden Torres Licensed under the Apache License, Version 2.0
+* Copyright (C) 2012-2017 Andrew Neal, Angel Leon, Alden Torres
+* Licensed under the Apache License, Version 2.0
 * (the "License"); you may not use this file except in compliance with the
 * License. You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
@@ -62,6 +63,7 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -1034,11 +1036,37 @@ public class MusicPlaybackService extends Service {
     }
 
     private void cancelShutdown() {
-        if (mAlarmManager != null && mShutdownIntent != null) {
-            if (D)
-                LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + mShutdownScheduled);
-            mAlarmManager.cancel(mShutdownIntent);
-            mShutdownScheduled = false;
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        if (threadPool != null && mAlarmManager != null && mShutdownIntent != null) {
+            threadPool.submit(new CancelShutdownRunnable(this));
+        }
+    }
+
+    private static class CancelShutdownRunnable implements Runnable {
+        private WeakReference<MusicPlaybackService> musicPlaybackServiceRef;
+
+        CancelShutdownRunnable(MusicPlaybackService musicPlaybackService) {
+            musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(musicPlaybackServiceRef)) {
+                return;
+            }
+            MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
+            if (musicPlaybackService != null && musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
+                if (D)
+                    LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
+                try {
+                    musicPlaybackService.mAlarmManager.cancel(musicPlaybackService.mShutdownIntent);
+                    musicPlaybackService.mShutdownScheduled = false;
+                } catch (Throwable ignored) {
+                    if (D) {
+                        LOG.error(ignored.getMessage(), ignored);
+                    }
+                }
+            }
         }
     }
 
