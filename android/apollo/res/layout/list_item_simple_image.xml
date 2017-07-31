@@ -17,11 +17,30 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_normal_height"
-    android:minHeight="@dimen/item_normal_height"
-    android:paddingLeft="@dimen/list_simple_horizontal_padding"
-    android:paddingRight="@dimen/list_simple_horizontal_padding"
     android:background="@drawable/listview_item_background_selector"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/item_normal_height">
+
+    <com.andrew.apollo.widgets.SquareImageView
+        android:id="@+id/list_item_image"
+        android:layout_width="@dimen/item_normal_height"
+        android:layout_height="@dimen/item_normal_height"
+        android:minWidth="@dimen/item_normal_height"
+        android:minHeight="@dimen/item_normal_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="2dp"
+        android:scaleType="fitXY" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_normal_height"
+        android:layout_toRightOf="@+id/list_item_image"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/item_normal_height"
+        android:paddingLeft="@dimen/list_simple_horizontal_padding"
+        android:paddingRight="@dimen/list_simple_horizontal_padding">
 
         <TextView
             android:id="@+id/line_one"
@@ -59,4 +78,5 @@
             android:maxLines="1"
             android:paddingRight="@dimen/list_simple_horizontal_padding" />
 
+    </RelativeLayout>
 </RelativeLayout>
