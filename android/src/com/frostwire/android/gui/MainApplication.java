@@ -19,6 +19,7 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
+import android.content.Context;
 import android.view.ViewConfiguration;
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
@@ -35,11 +36,15 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
+
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
@@ -106,10 +111,9 @@ public class MainApplication extends Application {
     }
 
     private void installHttpCache() {
-        try {
-            HttpResponseCache.install(this);
-        } catch (IOException e) {
-            LOG.error("Unable to install global http cache", e);
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        if (threadPool != null) {
+            threadPool.submit(new InstallHttpCacheRunnable(this));
         }
     }
 
@@ -145,6 +149,26 @@ public class MainApplication extends Application {
             }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
+        }
+    }
+
+    private static class InstallHttpCacheRunnable implements Runnable {
+        private WeakReference<Context> ctxRef;
+
+        InstallHttpCacheRunnable(Context context) {
+            ctxRef = Ref.weak(context);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(ctxRef)) {
+                return;
+            }
+            try {
+                HttpResponseCache.install(ctxRef.get());
+            } catch (IOException e) {
+                LOG.error("Unable to install global http cache", e);
+            }
         }
     }
 }
