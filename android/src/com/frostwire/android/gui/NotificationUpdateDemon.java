@@ -17,11 +17,13 @@
 
 package com.frostwire.android.gui;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -30,6 +32,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -37,6 +40,9 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -49,6 +55,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
     private Context mParentContext;
+    private OnTimeRunnable mOnTimeRunnable;
     private TimerSubscription mTimerSubscription;
 
     private RemoteViews notificationViews;
@@ -56,7 +63,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     public NotificationUpdateDemon(Context parentContext) {
         mParentContext = parentContext;
-
+        mOnTimeRunnable = new OnTimeRunnable(this);
         setupNotification();
     }
 
@@ -161,14 +168,42 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     @Override
     public void onTime() {
-        if (isScreenOn()) {
-            updatePermanentStatusNotification();
-        }
+        Engine.instance().getThreadPool().submit(mOnTimeRunnable);
     }
 
     @SuppressWarnings("deprecation")
     private boolean isScreenOn() {
         PowerManager pm = (PowerManager) mParentContext.getSystemService(Context.POWER_SERVICE);
         return pm.isScreenOn();
+    }
+
+    private static class OnTimeRunnable implements Runnable {
+
+        private WeakReference<NotificationUpdateDemon> updateDemonRef;
+
+        OnTimeRunnable(NotificationUpdateDemon updateDemon) {
+            updateDemonRef = Ref.weak(updateDemon);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(updateDemonRef)) {
+                return;
+            }
+            NotificationUpdateDemon updateDemon = updateDemonRef.get();
+            if (updateDemon.isScreenOn()) {
+                // the context we have is the main app context, not an activity
+                Handler mainHandler = new Handler(updateDemon.mParentContext.getMainLooper());
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (Ref.alive(updateDemonRef)) {
+                            updateDemonRef.get().updatePermanentStatusNotification();
+                            LOG.info("OnTimeRunnable.run() posted updatePermanentStatusNotification()");
+                        }
+                    }
+                });
+            }
+        }
     }
 }
