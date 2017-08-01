@@ -78,10 +78,12 @@ public final class InHouseBannerFactory {
                         R.drawable._320x50_ad_free_2,
                         R.drawable._320x50_ad_free_3
                 });
-        SMALL_320x50_DRAWABLES.put(Message.DONATE,
-                new Integer[]{
-                        R.drawable._320x50_donate_1
-                });
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            SMALL_320x50_DRAWABLES.put(Message.DONATE,
+                    new Integer[]{
+                            R.drawable._320x50_donate_1
+                    });
+        }
         SMALL_320x50_DRAWABLES.put(Message.FROSTCLICK,
                 new Integer[]{
                         R.drawable._320x50_frostclick_1,
@@ -114,11 +116,13 @@ public final class InHouseBannerFactory {
                         R.drawable._300x250_ad_free_1,
                         R.drawable._300x250_ad_free_2
                 });
-        BIG_300x250_DRAWABLES.put(Message.DONATE,
-                new Integer[]{
-                        R.drawable._300x250_donate_1,
-                        R.drawable._300x250_donate_2
-                });
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            BIG_300x250_DRAWABLES.put(Message.DONATE,
+                    new Integer[]{
+                            R.drawable._300x250_donate_1,
+                            R.drawable._300x250_donate_2
+                    });
+        }
         BIG_300x250_DRAWABLES.put(Message.FROSTCLICK,
                 new Integer[]{
                         R.drawable._300x250_frostclick_1,
@@ -157,7 +161,9 @@ public final class InHouseBannerFactory {
                 v.getContext().startActivity(intent);
             }
         });
-        CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));
+        }
         CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("http://www.frostclick.com/?from=android-fallback-ad"));
         CLICK_LISTENERS.put(Message.SHOP_GEAR, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-gear"));
         CLICK_LISTENERS.put(Message.SHOP_HOODIES, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-hoodies"));
@@ -167,20 +173,22 @@ public final class InHouseBannerFactory {
 
     enum Message {
         AD_REMOVAL,
-        DONATE,
         FROSTCLICK,
         SHOP_GEAR,
         SHOP_HOODIES,
         SHOP_TSHIRT,
-        SHOP_STICKERS;
+        SHOP_STICKERS,
+        DONATE;
 
         static Message random() {
-            Message[] messages = values();
+            Message[] messages = new Message[values().length - 1];
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 // don't show ad removal messages if this is plus
                 // ad_removal should be the first element in the values() array.
-                messages = new Message[values().length - 1];
                 System.arraycopy(values(), 1, messages, 0, messages.length);
+            } else {
+                // don't show donate message if this is basic
+                System.arraycopy(values(), 0, messages, 0, messages.length);
             }
             int nMessages = messages.length;
             int randomOffset = new Random().nextInt(nMessages);
