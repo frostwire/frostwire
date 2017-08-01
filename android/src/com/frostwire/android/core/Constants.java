@@ -181,10 +181,14 @@ public final class Constants {
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
     public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
 
-    public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.expressvpn.learnmore";
-    public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
-    public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
-    public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;
+//    public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.expressvpn.learnmore";
+    public static final String VPN_LEARN_MORE_URL = "http://www.frostwire.com/vpn.pia";
+    //    public static final String EXPRESSVPN_URL_BASIC = "http://www.frostwire.com/vpn.expressvpn";
+//    public static final String EXPRESSVPN_URL_PLUS = "http://www.frostwire.com/vpn.expressvpn";
+    public static final String PIA_URL_BASIC = "http://www.frostwire.com/vpn.pia";
+    public static final String PIA_URL_PLUS = "http://www.frostwire.com/vpn.pia";
+//    public static final float EXPRESSVPN_STARTING_USD_PRICE = 8.32f;
+    public static final float PIA_STARTING_USD_PRICE = 3.33f;
 
     public static final String FROSTWIRE_GIVE_URL = "http://www.frostwire.com/give/?from=";
     public static final String STICKERS_SHOP_URL = "http://www.frostwire.com/stickers";
