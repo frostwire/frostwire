@@ -379,16 +379,19 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (lastDisplayTimestamp == -1) {
             int minutesSinceInstallation = (int) TimeUnit.MILLISECONDS.toMinutes(now - installationTimestamp);
             int firstDisplayDelayInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES);
-            if (minutesSinceInstallation < firstDisplayDelayInMinutes) {
+            if (minutesSinceInstallation < firstDisplayDelayInMinutes || firstDisplayDelayInMinutes == 0) {
                 //LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
                 return;
             }
-        }
-        int minutesSinceLastDisplay = (int) TimeUnit.MILLISECONDS.toMinutes(now - lastDisplayTimestamp);
-        int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
-        if (minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
-            //LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
-            return;
+            //LOG.info("tryOnResumeInterstitial() might be ready for first display (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
+        } else {
+            int minutesSinceLastDisplay = (int) TimeUnit.MILLISECONDS.toMinutes(now - lastDisplayTimestamp);
+            int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
+            if (minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
+                //LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
+                return;
+            }
+            //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
         }
         CM.setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_LAST_DISPLAY, System.currentTimeMillis());
         Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
