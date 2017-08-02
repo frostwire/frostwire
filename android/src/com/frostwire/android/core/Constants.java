@@ -103,7 +103,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD = "frostwire.prefs.gui.interstitial_on_resume_threshold";
     public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_first_display_delay_in_minutes";
     public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_timeout_in_minutes";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_LAST_DISPLAY = "frostwire.prefs.gui.interstitial_on_resume_last_display";
+    public static final String PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY = "frostwire.prefs.gui.interstitial_on_resume_last_display";
     public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP = "frostwire.prefs.gui.installation_timestamp";
 
     public static final String PREF_KEY_GUI_OFFERS_WATERFALL = "frostwire.prefs.gui.offers_waterfall";

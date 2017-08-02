@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +44,6 @@ public final class Offers {
     static final boolean DEBUG_MODE = false;
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
     public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
-    private static long lastInterstitialShownTimestamp = -1;
     private static Map<String,AdNetwork> AD_NETWORKS;
     private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
@@ -119,6 +117,7 @@ public final class Offers {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
                     interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
+                        ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
                         return;
                     } else {
@@ -152,15 +151,15 @@ public final class Offers {
         final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
         final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
 
-        long timeSinceLastOffer = System.currentTimeMillis() - Offers.lastInterstitialShownTimestamp;
+        long lastInterstitialShownTimestamp = ConfigurationManager.instance().getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
+        long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
         boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
         boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
-        boolean shouldDisplayFirstOne = (Offers.lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
+        boolean shouldDisplayFirstOne = (lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
 
         if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
             Offers.showInterstitial(ctx, placement, shutdownAfterwards, dismissAfterwards);
             TM.resetStartedTransfers();
-            Offers.lastInterstitialShownTimestamp = System.currentTimeMillis();
         }
     }
 
