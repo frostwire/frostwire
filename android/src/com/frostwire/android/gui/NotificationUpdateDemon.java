@@ -199,7 +199,6 @@ public final class NotificationUpdateDemon implements TimerObserver {
                     public void run() {
                         if (Ref.alive(updateDemonRef)) {
                             updateDemonRef.get().updatePermanentStatusNotification();
-                            LOG.info("OnTimeRunnable.run() posted updatePermanentStatusNotification()");
                         }
                     }
                 });
