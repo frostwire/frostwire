@@ -23,8 +23,10 @@
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_Express_VPN"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using Private Internet Access to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="protected_connections_visibility_bullet_html_Express_VPN"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>Private Internet Access</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touch applied tags to]]></string>
 
     <!-- non HTML tags. -->
@@ -573,16 +575,25 @@
     <string name="protected_connection">VPN-protected</string>
     <string name="protect_my_privacy">Protect my privacy</string>
     <string name="get_express_VPN">Get ExpressVPN</string>
-    <string name="vpn_money_back">30-day money-back guarantee</string>
-    <string name="vpn_price">from $%1$.2f per month</string>
+    <string name="get_PIA">Get Private Internet Access</string>
+    <string name="vpn_money_back_Express_VPN">30-day money-back guarantee</string>
+    <string name="vpn_money_back_PIA">7-day money-back guarantee</string>
+    <string name="vpn_price_Express_VPN">from $%1$.2f per month</string>
+    <string name="vpn_price_PIA">from $%1$.2f per month</string>
     <string name="vpn_what_you_get_with">What do you get with </string>
-    <string name="vpn_client">ExpressVPN</string>
+    <string name="vpn_client_Express_VPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="get_vpn_client">Get ExpressVPN</string>
-    <string name="visit_vpn_client">Visit ExpressVPN</string>
-    <string name="vpn_client_feature_1">Military-grade encryption</string>
-    <string name="vpn_client_feature_2">Unlimited download speed</string>
-    <string name="vpn_client_feature_3">Private and logless browsing</string>
-    <string name="vpn_client_feature_4">24/7 customer support</string>
+    <string name="visit_vpn_client_Express_VPN">Visit ExpressVPN</string>
+    <string name="visit_vpn_client_PIA">Visit Private Internet Access</string>
+    <string name="vpn_client_feature_1_Express_VPN">Military-grade encryption</string>
+    <string name="vpn_client_feature_2_Express_VPN">Unlimited download speed</string>
+    <string name="vpn_client_feature_3_Express_VPN">Private and logless browsing</string>
+    <string name="vpn_client_feature_4_Express_VPN">24/7 customer support</string>
+    <string name="vpn_client_feature_1_PIA">No logging</string>
+    <string name="vpn_client_feature_2_PIA">Really easy to use (we like easy!)</string>
+    <string name="vpn_client_feature_3_PIA">Solid infrastructure: worldwide coverage</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN Support</string>
     <string name="vpn_on_toast_notification">You\'re connected to a VPN.</string>
     <string name="vpn_off_toast_notification">Your connection may not be private.</string>
     <string name="dht_contacts">DHT contacts</string>

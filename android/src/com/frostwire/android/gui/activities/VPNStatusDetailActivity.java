@@ -75,12 +75,15 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
             vpnMoneyBack.setVisibility(View.GONE);
             vpnPrice.setVisibility(View.GONE);
             // Current Status Text
-            vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
+//            vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html_Express_VPN));
+            vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html_PIA));
             // getVPNButtonTop/learnVPNButton
             getVPNButtonTop.setVisibility(View.GONE);
             learnVPNButton.setText(R.string.learn_more);
             // getVPNButtonBottom
-            getVPNButtonBottom.setText(R.string.visit_vpn_client);
+//            getVPNButtonBottom.setText(R.string.visit_vpn_client_Express_VPN);
+            getVPNButtonBottom.setText(R.string.visit_vpn_client_PIA);
+
         } else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
@@ -88,15 +91,21 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
             headerStatus.setText(R.string.unprotected_connection);
             headerStatus.setTextColor(Color.RED);
             // Current Status VPN client price
-            vpnMoneyBack.setText(R.string.vpn_money_back);
-            vpnPrice.setText(getString(R.string.vpn_price, Constants.EXPRESSVPN_STARTING_USD_PRICE));
+//            vpnMoneyBack.setText(R.string.vpn_money_back_Express_VPN);
+            vpnMoneyBack.setText(R.string.vpn_money_back_PIA);
+//            vpnPrice.setText(getString(R.string.vpn_price_Express_VPN, Constants.EXPRESSVPN_STARTING_USD_PRICE));
+            vpnPrice.setText(getString(R.string.vpn_price_PIA, Constants.PIA_STARTING_USD_PRICE));
             // Current Status Text
-            vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html));
+//            vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html_Express_VPN));
+            vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html_PIA));
             // getVPNButtonTop/learnVPNButton
             learnVPNButton.setVisibility(View.GONE);
-            getVPNButtonTop.setText(R.string.get_express_VPN);
+//            getVPNButtonTop.setText(R.string.get_express_VPN);
+            getVPNButtonTop.setText(R.string.get_PIA);
             // getVPNButtonBottom
-            getVPNButtonBottom.setText(R.string.get_express_VPN);
+//            getVPNButtonBottom.setText(R.string.get_express_VPN);
+            getVPNButtonBottom.setText(R.string.get_PIA);
+
         }
 
         OnGetVPNClickListener l = new OnGetVPNClickListener(isProtectedConnection);
@@ -172,8 +181,8 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
                 UIUtils.openURL(v.getContext(), Constants.VPN_LEARN_MORE_URL);
             } else {
                 String vpnUrl = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
-                        Constants.EXPRESSVPN_URL_BASIC :
-                        Constants.EXPRESSVPN_URL_PLUS;
+                        Constants.PIA_URL_BASIC :
+                        Constants.PIA_URL_PLUS;
 
                 UIUtils.openURL(v.getContext(), vpnUrl);
             }
