@@ -593,7 +593,7 @@
     <string name="vpn_client_feature_1_PIA">No logging</string>
     <string name="vpn_client_feature_2_PIA">Really easy to use (we like easy!)</string>
     <string name="vpn_client_feature_3_PIA">Solid infrastructure: worldwide coverage</string>
-    <string name="vpn_client_feature_4_PIA">24/7 North American VPN Support</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN Support</string>
     <string name="vpn_on_toast_notification">You\'re connected to a VPN.</string>
     <string name="vpn_off_toast_notification">Your connection may not be private.</string>
     <string name="dht_contacts">DHT contacts</string>
