@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
     <string name="activity_chat_name">بات چیت</string>
@@ -238,7 +236,6 @@
     <string name="cloud_downloads_coming">معذرت: یہاں سے ڈاؤن لوڈ کی بادل شروع میں مزید اپ ڈیٹ پر دستیاب ہو جائے گا.</string>
     <string name="menu_space_shortcut_label">خلائی</string>
     <string name="connected_using_dataplan">ڈیٹا پلان کا استعمال کرتے ہوئے متصل</string>
-    <string name="vpn_money_back">30 دن منی واپس گارنٹی</string>
     <string name="tip_rename_your_files">نکتہ: وہ پایا جا سکتا ہے تاکہ فائلوں کا نام تبدیل</string>
     <string name="donate_10">عطیہ $10</string>
     <string name="vpn_what_you_get_with"> آپ کے ساتھ کیا ملتا ہے  </string>
@@ -327,7 +324,6 @@
     <string name="files">فائلوں</string>
     <string name="enable_dht_summary"> تلاش سیلاب کے ساتھیوں کا اعلان کرنے ڈسٹریبیوٹڈ ہیش ٹیبل کا استعمال کریں</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">لامحدود ڈاؤن لوڈ کی رفتار</string>
     <string name="no_results_feedback">کوئی نتائج نہیں پائے گئے.</string>
     <string name="paused_song_name">موقوف s%</string>
     <string name="seed">بیجوں</string>
@@ -413,10 +409,7 @@
     <string name="learn_more">اورجانیے</string>
     <string name="save_bandwidth">بینڈوڈتھ بچانے</string>
     <string name="accept_connection_from">سے کنکشن کو قبول کریں</string>
-    <string name="vpn_client_feature_4">24/7 کسٹمر سپورٹ</string>
-    <string name="vpn_client_feature_1">فوجی گریڈ خفیہ کاری</string>
     <string name="transfers_context_resume_all_torrent_transfers">تمام سیلاب کی منتقلی دوبارہ شروع</string>
-    <string name="vpn_client_feature_3">ذاتی اور logless براؤزنگ</string>
     <string name="free_download">مفت ڈاؤنلوڈ</string>
     <string name="internet_discovery_summary">انٹرنیٹ پر ریموٹ ساتھیوں سے منسلک ہوں.</string>
     <string name="couldnt_share_file">فائل کا اشتراک نہیں کر سکا. عجیب راستہ مل گیا.</string>
@@ -466,7 +459,6 @@
     <string name="media_type_applications">درخواستیں</string>
     <string name="invalid_filename">غلط فائل کا نام</string>
     <string name="use_archiveorg">استعمال Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">آپ کے علاقے کو نشان زد</string>
     <string name="wifi_network_unavailable">وائی فائی نیٹ ورک دستیاب نہیں</string>
     <string name="select_all">تمام منتخب کریں</string>
@@ -525,7 +517,6 @@
     <string name="error_not_enough_peers">ایک بار پھر، یہ کافی نہیں ساتھیوں کوشش</string>
     <string name="support_frostwire_summary">اس اپلی کیشن کی ترقی کی حمایت کرنے کے لئے اشتھارات دکھائیں.</string>
     <string name="searchable_activity_label">تلاش سرگرمی</string>
-    <string name="visit_vpn_client">ملاحظہ ExpressVPN</string>
     <string name="media_preview">%s پیش نظارہ</string>
     <string name="home">ہوم</string>
     <string name="view_transfer_item_list_item_icon">فائل کی قسم کے لئے آئکن</string>
@@ -538,7 +529,6 @@
     <string name="networking_preferences">نیٹ ورکنگ ترتیبات</string>
     <string name="view_transfer_list_item_icon_description">فائل کی قسم کا آئکن</string>
     <string name="enable_experimental">تجرباتی خصوصیات</string>
-    <string name="peer">ہمسر</string>
     <string name="file_descriptor_sd_unmounted">یہ فائل ایک ایسڈی کارڈ سے تعلق رکھتا ہے، آپ کے آلے پر یہ داخل کریں براہ مہربانی.</string>
     <string name="download_selected_files">لوڈ منتخب</string>
     <string name="manufacturer">ڈویلپر</string>

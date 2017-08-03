@@ -49,7 +49,6 @@
     <string name="type_to_filter_results">Typ om resultaten te filteren.</string>
     <string name="fetching_file_list">Gedeelde lijsten ophalen</string>
     <string name="not_sharing_files">deelt geen files.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopieer</string>
     <string name="audio">Audio</string>
@@ -404,7 +403,6 @@
     <string name="help">Hulp</string>
     <string name="cloud_downloads_coming">Sorry: vanaf wolk downloads vanaf hier zal beschikbaar zijn op verdere updates zijn.</string>
     <string name="menu_space_shortcut_label">Ruimte</string>
-    <string name="vpn_money_back">30-dagen geld terug garantie</string>
     <string name="donate_10">Schenken $10</string>
     <string name="vpn_what_you_get_with">Wat krijg je met </string>
     <string name="confirm_download">Bevestig downloaden</string>
@@ -424,7 +422,6 @@
     <string name="transfers_select_completed">voltooid</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pauze/Stop alle transfers</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan ExpressVPN om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
     <string name="transfers_select_downloading">downloaden</string>
     <string name="free_apps">Gratis applicaties</string>
     <string name="i_have_read_and_agree_to_the">Ik heb gelezen en ga akkoord met de</string>
@@ -447,7 +444,6 @@
     <string name="transfers_context_menu_clear_finished">Duidelijke alle afgewerkte transfers</string>
     <string name="enable_dht_summary">Gebruik de Distributed Hash Table aan te kondigen/search torrent peers</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Onbeperkte download snelheid</string>
     <string name="no_results_feedback">Er zijn geen resultaten gevonden.</string>
     <string name="paused_song_name">Onderbroken %s</string>
     <string name="seed">Zaad</string>
@@ -492,11 +488,8 @@
     <string name="torrent_transfer_consuming_mobile_data">Waarschuwing: Deze torrent transfer maakt gebruik van uw 3G/4G data. (Controleer uw netwerkinstellingen als u BitTorrent gebruiken alleen WiFi)</string>
     <string name="learn_more">Kom meer te weten</string>
     <string name="save_bandwidth">Save bandbreedte</string>
-    <string name="vpn_client_feature_4">24/7 klantenondersteuning</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
-    <string name="vpn_client_feature_1">Militaire graad van versleuteling</string>
     <string name="transfers_context_resume_all_torrent_transfers">Hervat alle torrent transfers</string>
-    <string name="vpn_client_feature_3">Prive en logless browsing</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kan het bestand niet delen. gevonden raar pad.</string>
     <string name="try_frostwire_plus_for_more_results">Probeer FrostWire Plus voor meer resultaten</string>
@@ -527,7 +520,6 @@
     <string name="why_we_need_storage_permissions">Waarom moeten we de opslag permissies.</string>
     <string name="invalid_filename">Ongeldige bestandsnaam</string>
     <string name="use_archiveorg">Gebruik Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">WiFi-netwerk beschikbaar</string>
     <string name="select_all">Selecteer alles</string>
     <string name="clear_search_cache_summary">Duidelijke zoeken cachevermeldingen</string>
@@ -556,7 +548,6 @@
     <string name="no_interruptions">Geen Onderbrekingen</string>
     <string name="fetching_torrent_ellipsis">Ophalen torrent…</string>
     <string name="error_not_enough_peers">Probeer opnieuw, niet genoeg peers</string>
-    <string name="visit_vpn_client">Bezoek ExpressVPN</string>
     <string name="media_preview">%s preview</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">track</string>
@@ -591,7 +582,6 @@
     <string name="cheaper_than_cigarettes">Goedkoper dan sigaretten</string>
     <string name="days_left">dagen over</string>
     <string name="six_months">6 months</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>ExpressVPN</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">De geselecteerde pad is geen map</string>
     <string name="protect_my_privacy">Bescherm ik mijn levenssfeer</string>
     <string name="your_privacy_is_a_fundamental_right_html">Uw levenssfeer is een fundamenteel mensenrecht.</string>

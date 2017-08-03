@@ -17,10 +17,8 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de ExpressVPN para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toque etiquetas aplicadas para]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso <b>ExpressVPN</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configurações</string>
     <string name="activity_chat_name">Bate-Papo</string>
@@ -51,7 +49,6 @@
     <string name="type_to_filter_results">Digite para filtrar resultados.</string>
     <string name="fetching_file_list">Buscando lista de compartilhados</string>
     <string name="not_sharing_files">Não está compartilhando nenhum arquivo.</string>
-    <string name="peer">Colega</string>
     <string name="peers">Colegas</string>
     <string name="copy">Copiar</string>
     <string name="audio">Audio</string>
@@ -507,7 +504,6 @@
     <string name="the_file_could_not_be_seeded_enable_seeding">O arquivo não pôde ser semeado. Ativar semeadura nas configurações.</string>
     <string name="remove_torrent_and_data">Remover Torrent e Dados</string>
     <string name="love_frostwire">Ame FrostWire</string>
-    <string name="vpn_money_back">Garantia de reembolso de 30 dias</string>
     <string name="vpn_what_you_get_with">O que você ganha com </string>
     <string name="frostwire_shutting_down_no_permissions">Desculpe, FrostWire não pode continuar sem a sua permissão para acessar disco.</string>
     <string name="one_time_purchase">Compra de uma só vez</string>
@@ -521,7 +517,6 @@
     <string name="are_you_sure_delete_playlist">Tem certeza de que deseja deletar a lista de reprodução %s?</string>
     <string name="storage_picker_treeuri_null">No foi selecionado nenhum caminho de armazenamento</string>
     <string name="best_value">Melhor oferta!</string>
-    <string name="vpn_client_feature_2">Velocidade de download ilimitado</string>
     <string name="delete_files">Deletar arquivos</string>
     <string name="vpn_price">de $%1$.2f por mês</string>
     <string name="thirty_days">30 dias</string>
@@ -542,9 +537,6 @@
     <string name="shutting_down">Desligando…</string>
     <string name="learn_more">Saber mais</string>
     <string name="save_bandwidth">Economizar largura de banda</string>
-    <string name="vpn_client_feature_4">Suporte ao cliente 24/7</string>
-    <string name="vpn_client_feature_1">Criptografia de nível militar</string>
-    <string name="vpn_client_feature_3">Navegação privada e logless</string>
     <string name="try_frostwire_plus_for_more_results">Tente FrostWire Plus para mais resultados</string>
     <string name="no_trial_period_included">No período experimental incluiu</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
@@ -559,7 +551,6 @@
     <string name="error_no_internet_connection">Erro: Verifique a conexão de Internet</string>
     <string name="why_we_need_storage_permissions">Por que precisamos de permissões de armazenamento.</string>
     <string name="invalid_filename">Nome de arquivo inválido</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Rede Wifi não está disponível</string>
     <string name="select_all">Selecionar tudo</string>
     <string name="cheaper_than_drinks">Mais barato do que bebidas</string>
@@ -577,7 +568,6 @@
     <string name="terms_of_use">Termos de uso</string>
     <string name="no_interruptions">Sem interrupções</string>
     <string name="fetching_torrent_ellipsis">Buscando torrent…</string>
-    <string name="visit_vpn_client">Visita ExpressVPN</string>
     <string name="media_preview">%s visualização</string>
     <string name="enable_experimental">Características experimentais</string>
     <string name="cheaper_than_beer">Mais barato do que cerveja</string>

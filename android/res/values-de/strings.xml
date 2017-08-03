@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Eine ungeschützte Verbindung bedeutet, alles, was Sie online tun (einschließlich <b>Suchen, Messaging und Downloads</b>) kann von jedem im Netzwerk überwacht werden und sogar von Ihrem Internet-Service-Provider.<br><br>Wir empfehlen die Verwendung von Express-VPN-Verbindung zum Verschlüsseln und <b>Schutz Ihrer Privatsphäre</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Obwohl für Ihre Downloads empfohlen, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>ExpressVPN</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Hinweis:</b> Berühren angewendet Tags]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Einstellungen</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Zum Filtern der Ergebnisse tippen.</string>
     <string name="fetching_file_list">Hole Liste von freigegebenen</string>
     <string name="not_sharing_files">Dateien sind nicht freigegeben.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopieren</string>
     <string name="audio">Audio</string>
@@ -423,7 +420,6 @@
     <string name="or_enter_url">oder geben Sie die URL</string>
     <string name="cloud_downloads_coming">Leider starten Cloud-Downloads von hier auf weitere Updates zur Verfügung stehen.</string>
     <string name="menu_space_shortcut_label">Raum</string>
-    <string name="vpn_money_back">30 Tage Geld-zurück-Garantie</string>
     <string name="vpn_what_you_get_with">Was bekommen Sie mit </string>
     <string name="confirm_download">Bestätigen herunterladen</string>
     <string name="sdcard_storage">SDs Lagerung</string>
@@ -460,7 +456,6 @@
     <string name="best_value">Best Value</string>
     <string name="transfers_context_menu_clear_finished">Löschen Sie alle fertigen Transfers</string>
     <string name="enable_dht_summary">Verwenden Sie die Distributed Hash Table ankündigen/search torrent Gleichaltrigen</string>
-    <string name="vpn_client_feature_2">Unbegrenzte Download-Geschwindigkeit</string>
     <string name="no_results_feedback">Es wurden keine Ergebnisse gefunden.</string>
     <string name="paused_song_name">Pausiert %s</string>
     <string name="seed">Samen</string>
@@ -501,10 +496,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Achtung: Dieser Torrent Transfer wird Ihre 3G/4G-Daten. (Überprüfen Sie Ihre Netzwerkeinstellungen , wenn Sie möchten nur die BitTorrent verwenden, um auf WiFi)</string>
     <string name="learn_more">Mehr erfahren</string>
     <string name="save_bandwidth">Speichern Bandbreite</string>
-    <string name="vpn_client_feature_4">24/7 Kunden-Support</string>
-    <string name="vpn_client_feature_1">Militär-Grad-Verschlüsselung</string>
     <string name="transfers_context_resume_all_torrent_transfers">Lebenslauf alle Torrent-Transfers</string>
-    <string name="vpn_client_feature_3">Privat und logless Browsing</string>
     <string name="free_download">Free Download</string>
     <string name="couldnt_share_file">Die Datei konnte nicht teilen. Weird-Pfad gefunden.</string>
     <string name="try_frostwire_plus_for_more_results">Versuchen Sie Frostwire Plus weitere Ergebnisse</string>
@@ -533,7 +525,6 @@
     <string name="error_no_internet_connection">Fehler: Überprüfen Internetverbindung</string>
     <string name="why_we_need_storage_permissions">Warum brauchen wir Speicherberechtigungen.</string>
     <string name="invalid_filename">Ungültiger Dateiname</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi-Netzwerk nicht verfügbar</string>
     <string name="select_all">Alles auswählen</string>
     <string name="clear_search_cache_summary">Suche löschen Cache-Einträge</string>
@@ -562,7 +553,6 @@
     <string name="no_interruptions">Keine Interruptions</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
     <string name="error_not_enough_peers">Versuchen Sie es erneut, nicht genug Peers</string>
-    <string name="visit_vpn_client">Besuche ExpressVPN</string>
     <string name="media_preview">%s Vorschau</string>
     <string name="menu_enter_shortcut_label">Eingeben</string>
     <string name="track">stück</string>

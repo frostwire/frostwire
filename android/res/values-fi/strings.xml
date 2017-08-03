@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme ExpressVPN salata yhteyden ja <b>turvata yksityisyyttäsi</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Vaikka suositellaan latauksia, <b>sinun ei tarvitse VPN käyttää FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>ExpressVPN</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
     <string name="vpn_not_found">Ei VPN. Mieti salaamalla yhteys.</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
@@ -172,7 +170,6 @@
     <string name="cloud_downloads_coming">Valitettavasti: Alkaen pilvi lataukset täältä on saatavilla uusia päivityksiä.</string>
     <string name="menu_space_shortcut_label">Avaruus</string>
     <string name="connected_using_dataplan">Liitetty Data Plan</string>
-    <string name="vpn_money_back">30 päivän palautusoikeuden</string>
     <string name="tip_rename_your_files">Vihje: Nimeä tiedostot niin niitä löytyy</string>
     <string name="donate_10">Lahjoittaa $10</string>
     <string name="disconnect">Katkaista</string>
@@ -281,7 +278,6 @@
     <string name="files">tiedostot</string>
     <string name="enable_dht_summary">Käytä Distributed Hash Table ilmoittaa/haku torrent ikäisensä</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Rajoittamaton latausnopeus</string>
     <string name="pro">PRO</string>
     <string name="no_results_feedback">Tuloksia ei löytynyt.</string>
     <string name="paused_song_name">Keskeytetty %s</string>
@@ -385,10 +381,7 @@
     <string name="peer_http_download_status_unknown">Tuntematon</string>
     <string name="save_bandwidth">Tallenna kaistanleveys</string>
     <string name="accept_connection_from">Hyväksy yhteys</string>
-    <string name="vpn_client_feature_4">24/7 asiakastuki</string>
-    <string name="vpn_client_feature_1">Military-salausta</string>
     <string name="transfers_context_resume_all_torrent_transfers">Jatka kaikki torrent siirrot</string>
-    <string name="vpn_client_feature_3">Yksityiset ja logless selailu</string>
     <string name="free_download">Ilmainen lataus</string>
     <string name="internet_discovery_summary">Yhdistä kauko ikäisensä Internetissä.</string>
     <string name="couldnt_share_file">Ei voitu jakaa tiedoston. Outo polku löytyy.</string>
@@ -443,7 +436,6 @@
     <string name="media_type_applications">Hakemukset ohjelmistojen</string>
     <string name="invalid_filename">Virheellinen tiedostonimi</string>
     <string name="use_archiveorg">Käytä Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Merkitse alue</string>
     <string name="wifi_network_unavailable">Wifi Verkko ei ole käytettävissä</string>
     <string name="select_all">Valitse kaikki</string>
@@ -514,7 +506,6 @@
     <string name="support_frostwire_summary">Näytä mainoksia tukemaan tämän sovelluksen.</string>
     <string name="back">Takaisin</string>
     <string name="searchable_activity_label">Haettavat aktiivisuus</string>
-    <string name="visit_vpn_client">Käy ExpressVPN</string>
     <string name="media_preview">%s esikatselu</string>
     <string name="home">Kotiin</string>
     <string name="view_transfer_item_list_item_icon">Kuvake tiedostotyyppi</string>
@@ -531,7 +522,6 @@
     <string name="networking_preferences">Verkkoasetukset</string>
     <string name="view_transfer_list_item_icon_description">Tiedostotyyppi kuvake</string>
     <string name="enable_experimental">Kokeellinen Ominaisuudet</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">Tämä tiedosto kuuluu SD-kortille, laita sen laitteeseen.</string>
     <string name="download_selected_files">Lataa valitut</string>
     <string name="manufacturer">Valmistaja</string>

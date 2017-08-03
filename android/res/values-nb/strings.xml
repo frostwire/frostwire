@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke ExpressVPN å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selv anbefalt for nedlastingene dine, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>ExpressVPN</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
     <string name="vpn_not_found">Ingen VPN. Vurdere å kryptere forbindelsen.</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
@@ -172,7 +170,6 @@
     <string name="cloud_downloads_coming">Beklager: Starter cloud nedlastinger herfra vil være tilgjengelig på ytterligere oppdateringer.</string>
     <string name="menu_space_shortcut_label">Plass</string>
     <string name="connected_using_dataplan">Koblet med Data Plan</string>
-    <string name="vpn_money_back">30-dagers pengene-tilbake-garanti</string>
     <string name="tip_rename_your_files">Tips: Gi nytt navn filer slik at de kan bli funnet</string>
     <string name="donate_10">Donere $10</string>
     <string name="disconnect">Frakople</string>
@@ -281,7 +278,6 @@
     <string name="files">filer</string>
     <string name="enable_dht_summary">Bruk Distributed Hash Table å kunn/søke torrent jevnaldrende</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Ubegrenset nedlastingshastighet</string>
     <string name="pro">PRO</string>
     <string name="no_results_feedback">Ingen resultater ble funnet.</string>
     <string name="paused_song_name">Pauset %s</string>
@@ -385,10 +381,7 @@
     <string name="peer_http_download_status_unknown">Ukjent</string>
     <string name="save_bandwidth">Lagre båndbredde</string>
     <string name="accept_connection_from">Godta tilkoblingen fra</string>
-    <string name="vpn_client_feature_4">24/7 kundestøtte</string>
-    <string name="vpn_client_feature_1">Militær-grade kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Gjenoppta alle torrent overføringer</string>
-    <string name="vpn_client_feature_3">Private og logless surfing</string>
     <string name="free_download">Gratis nedlasting</string>
     <string name="internet_discovery_summary">Koble til eksterne jevnaldrende på Internett.</string>
     <string name="couldnt_share_file">Kunne ikke dele filen. Weird banen funnet.</string>
@@ -443,7 +436,6 @@
     <string name="media_type_applications">Applikasjoner</string>
     <string name="invalid_filename">Ugyldig filnavn</string>
     <string name="use_archiveorg">Bruk Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Merk din territorium</string>
     <string name="wifi_network_unavailable">Wifi Nettverk utilgjengelig</string>
     <string name="select_all">Velg alle</string>
@@ -514,7 +506,6 @@
     <string name="support_frostwire_summary">Vis annonser for å støtte utviklingen av dette programmet.</string>
     <string name="back">Tilbake</string>
     <string name="searchable_activity_label">Søkbar aktivitet</string>
-    <string name="visit_vpn_client">Besøk ExpressVPN</string>
     <string name="media_preview">%s forhåndsvisning</string>
     <string name="home">Hjem</string>
     <string name="view_transfer_item_list_item_icon">Ikon for filtype</string>
@@ -531,7 +522,6 @@
     <string name="networking_preferences">Nettverk innstillinger</string>
     <string name="view_transfer_list_item_icon_description">Filtypeikonet</string>
     <string name="enable_experimental">Eksperimentelle funksjoner</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">Denne filen tilhører et SD-kort, sett det på enheten.</string>
     <string name="download_selected_files">Last ned Valgt</string>
     <string name="manufacturer">Produsent</string>

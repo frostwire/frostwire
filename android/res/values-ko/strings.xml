@@ -19,9 +19,7 @@
   */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">결과를 필터하려면 여기에 입력해주세요.</string>
     <string name="fetching_file_list">공유된 목록 가져오는중</string>
     <string name="not_sharing_files">파일을 공유하지 않습니다</string>
-    <string name="peer">친구</string>
     <string name="peers">친구들</string>
     <string name="copy">복사</string>
     <string name="audio">오디오</string>
@@ -400,7 +397,6 @@
     <string name="help">도움</string>
     <string name="cloud_downloads_coming">죄송합니다 : 여기에서 시작하는 클라우드 다운로드는 추가 업데이트에서 제공됩니다.</string>
     <string name="menu_space_shortcut_label">공간</string>
-    <string name="vpn_money_back">30 일 환불 보증</string>
     <string name="donate_10">$10 기부</string>
     <string name="vpn_what_you_get_with">너는 무엇을 얻을 수 있니 </string>
     <string name="confirm_download">다운로드 확인</string>
@@ -445,7 +441,6 @@
     <string name="transfers_context_menu_clear_finished">완료된 모든 전송 취소</string>
     <string name="enable_dht_summary">토런트 피어를 발표/검색하려면 분산 해시 테이블을 사용하십시오.</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">무제한 다운로드 속도</string>
     <string name="no_results_feedback">결과가 없습니다.</string>
     <string name="paused_song_name">일시 중지됨 %s</string>
     <string name="seed">씨</string>
@@ -494,10 +489,7 @@
     <string name="torrent_transfer_consuming_mobile_data">경고 :이 급류 전송은 3G/4G 데이터를 사용하고 있습니다. (Wi-Fi에서만 BitTorrent를 사용하려면 네트워크 설정을 확인하십시오)</string>
     <string name="learn_more">더 알아보기</string>
     <string name="save_bandwidth">대역폭 절약</string>
-    <string name="vpn_client_feature_4">24/7 고객 지원</string>
-    <string name="vpn_client_feature_1">군대 급 암호화</string>
     <string name="transfers_context_resume_all_torrent_transfers">모든 급류 전송 재개</string>
-    <string name="vpn_client_feature_3">비공개 및 로그인 검색</string>
     <string name="free_download">무료 다운로드</string>
     <string name="couldnt_share_file">파일을 공유 할 수 없습니다. 이상한 경로가 발견되었습니다.</string>
     <string name="try_frostwire_plus_for_more_results">더 많은 결과를 얻으려면 FrostWire Plus를 사용해보십시오.</string>
@@ -528,7 +520,6 @@
     <string name="why_we_need_storage_permissions">스토리지 권한이 필요한 이유</string>
     <string name="invalid_filename">잘못된 파일 이름</string>
     <string name="use_archiveorg">Archive.org사용</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wi-Fi 네트워크를 사용할 수 없음</string>
     <string name="select_all">모두 선택</string>
     <string name="clear_search_cache_summary">검색 캐시 항목 지우기</string>
@@ -559,7 +550,6 @@
     <string name="no_interruptions">중단 없음</string>
     <string name="fetching_torrent_ellipsis">급류 가져 오기…</string>
     <string name="error_not_enough_peers">충분한 피어가 아니라 다시 시도하십시오.</string>
-    <string name="visit_vpn_client">ExpressVPN 방문</string>
     <string name="media_preview">%s 시연</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">연속</string>

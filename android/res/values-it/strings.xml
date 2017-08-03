@@ -20,9 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tocca i tag applicati a]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare ExpressVPN per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Anche se consigliata per i download, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>ExpressVPN</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Impostazioni</string>
     <string name="activity_chat_name">Chat</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Scrivi qui per filtrare i risultati.</string>
     <string name="fetching_file_list">Recupero lista condivisioni</string>
     <string name="not_sharing_files">non sta condividendo file.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Copia</string>
     <string name="audio">Audio</string>
@@ -408,7 +405,6 @@
     <string name="help">Aiuto</string>
     <string name="cloud_downloads_coming">Scusate!: Partendo download nube da qui sarà disponibile su ulteriori aggiornamenti.</string>
     <string name="menu_space_shortcut_label">Spazio</string>
-    <string name="vpn_money_back">30-giorni rimborso garantito</string>
     <string name="donate_10">Donare $10</string>
     <string name="vpn_what_you_get_with">Che cosa si ottiene con </string>
     <string name="confirm_download">Conferma download</string>
@@ -450,7 +446,6 @@
     <string name="transfers_context_menu_clear_finished">Cancellare tutti i trasferimenti finiti</string>
     <string name="enable_dht_summary">Utilizzare il Distributed Hash Table di annunciare/ricerca coetanei torrent</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Velocità di download illimitato</string>
     <string name="no_results_feedback">Nessun risultato trovato.</string>
     <string name="paused_song_name">In pausa %s</string>
     <string name="seed">Seminare</string>
@@ -495,10 +490,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Attenzione: Questo trasferimento torrente sta usando i dati 3G/4G. (Controllare le impostazioni di rete, se si desidera utilizzare BitTorrent solo su Wi-Fi)</string>
     <string name="learn_more">Scopri di più</string>
     <string name="save_bandwidth">Risparmiare larghezza di banda</string>
-    <string name="vpn_client_feature_4">Supporto clienti 24/7</string>
-    <string name="vpn_client_feature_1">Crittografia di livello militare</string>
     <string name="transfers_context_resume_all_torrent_transfers">Riprendere tutti i trasferimenti torrent</string>
-    <string name="vpn_client_feature_3">Navigazione privata e logless</string>
     <string name="free_download">Scarica gratis</string>
     <string name="couldnt_share_file">Impossibile condividere il file. Percorso strano trovato.</string>
     <string name="try_frostwire_plus_for_more_results">Prova FrostWire Plus per più risultati</string>
@@ -529,7 +521,6 @@
     <string name="why_we_need_storage_permissions">Perché abbiamo bisogno di permessi di stoccaggio.</string>
     <string name="invalid_filename">Nome del file non valido</string>
     <string name="use_archiveorg">Utilizzare Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi Network non disponibile</string>
     <string name="select_all">Seleziona tutto</string>
     <string name="clear_search_cache_summary">Cancella le voci della cache di ricerca</string>
@@ -558,7 +549,6 @@
     <string name="no_interruptions">Nessuna interruzione</string>
     <string name="fetching_torrent_ellipsis">Recupero torrente…</string>
     <string name="error_not_enough_peers">Prova ancora, non abbastanza coetanei</string>
-    <string name="visit_vpn_client">Visita ExpressVPN</string>
     <string name="media_preview">%s anteprima</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">pista</string>

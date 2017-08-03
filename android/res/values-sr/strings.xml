@@ -22,8 +22,6 @@
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html">Ваша приватност је основно људско право.</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Иако се препоручује за своје преузимања, <b>не треба ВПН за коришћење FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Незаштићена веза значи све што радиш на мрежи (укључујући <b>претраге, поруке и преузимања</b>) може се пратити од било кога на мрежи, па чак и од свог провајдера интернет услуга.<br><br>Препоручујемо да користите ExpressVPN за шифровање везу и <b>заштитили своју приватност</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ви сте повезани са Интернетом помоћу ВПН. <br><br> Ако већ нисте, препоручујемо да користите <b>ExpressVPN</b> за шифрирање везу и <b>заштитили своју приватност</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Инфо:</b> Тоуцх примењене ознаке на]]></string>
 
     <!-- non HTML tags. -->
@@ -58,7 +56,6 @@
     <string name="type_to_filter_results">Типе за филтрирање резултата.</string>
     <string name="fetching_file_list">Преузимање листа деле</string>
     <string name="not_sharing_files">не дели све датотеке.</string>
-    <string name="peer">вршњак</string>
     <string name="peers">вршњаке</string>
     <string name="copy">копија</string>
     <string name="audio">Аудио</string>
@@ -537,16 +534,9 @@
     <string name="protected_connection">ВПН-протецтед</string>
     <string name="protect_my_privacy">Штити моја приватност</string>
     <string name="get_ExpressVPN">Гет ExpressVPN</string>
-    <string name="vpn_money_back">30-дана новац-леђа гаранција</string>
     <string name="vpn_price">од $%1$.2f месечно</string>
     <string name="vpn_what_you_get_with">What do you get with </string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="get_vpn_client">Гет ExpressVPN</string>
-    <string name="visit_vpn_client">Висит ExpressVPN</string>
-    <string name="vpn_client_feature_1">Војно-разред шифровање</string>
-    <string name="vpn_client_feature_2">Неограничен брзина преузимања</string>
-    <string name="vpn_client_feature_3">Приватни и логлесс претраживање</string>
-    <string name="vpn_client_feature_4">подршка 24/7 купац</string>
     <string name="vpn_on_toast_notification">Ви сте повезани са ВПН.</string>
     <string name="vpn_off_toast_notification">Ваша веза не може бити приватна.</string>
     <string name="dht_contacts">ДХТ контакти</string>

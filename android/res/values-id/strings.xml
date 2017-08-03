@@ -20,8 +20,6 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Meskipun dianjurkan untuk download Anda, <b>Anda tidak perlu VPN untuk menggunakan FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Koneksi tanpa kondom berarti semua yang Anda lakukan secara online (termasuk <b>pencarian, pesan, dan download</b>) dapat dipantau oleh siapa saja di jaringan Anda dan bahkan oleh penyedia layanan Internet Anda.<br><br>Kami merekomendasikan menggunakan ExpressVPN untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>ExpressVPN</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Ketik untuk menapis hasil-hasilnya.</string>
     <string name="fetching_file_list">Mengambil daftar arsip yang dibagi</string>
     <string name="not_sharing_files">tidak berbagi arsip apapun</string>
-    <string name="peer">Peer</string>
     <string name="peers">Para Peer</string>
     <string name="copy">Salinan</string>
     <string name="audio">Audio</string>
@@ -399,7 +396,6 @@
     <string name="help">Membantu</string>
     <string name="cloud_downloads_coming">Maaf: Mulai download cloud dari sini akan tersedia pada update lebih lanjut.</string>
     <string name="menu_space_shortcut_label">Spasi</string>
-    <string name="vpn_money_back">Jaminan uang kembali 30-hari</string>
     <string name="donate_10">Menyumbang $10</string>
     <string name="vpn_what_you_get_with">Apa yang Anda dapatkan dengan </string>
     <string name="confirm_download">Konfirmasi Unduh</string>
@@ -444,7 +440,6 @@
     <string name="transfers_context_menu_clear_finished">Menghapus semua transfer selesai</string>
     <string name="enable_dht_summary">Gunakan Distributed Hash Table (DHT) mengumumkan/pencari torrent rekan</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Kecepatan download unlimited</string>
     <string name="no_results_feedback">Tidak ada hasil yang ditemukan.</string>
     <string name="paused_song_name">Berhenti %s</string>
     <string name="seed">Seed</string>
@@ -493,10 +488,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Peringatan: Transfer torrent ini menggunakan data 3G/4G Anda. (Periksa Pengaturan Jaringan Anda jika Anda ingin menggunakan BitTorrent hanya pada WiFi)</string>
     <string name="learn_more">Belajarlah lagi</string>
     <string name="save_bandwidth">Hemat Bandwidth</string>
-    <string name="vpn_client_feature_4">24/7 dukungan pelanggan</string>
-    <string name="vpn_client_feature_1">Enkripsi militer-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Melanjutkan semua transfer torrent</string>
-    <string name="vpn_client_feature_3">Pribadi dan logless penjelajahan</string>
     <string name="free_download">Free Download</string>
     <string name="couldnt_share_file">Tidak bisa berbagi file. jalan aneh ditemukan.</string>
     <string name="try_frostwire_plus_for_more_results">Coba FrostWire Plus untuk hasil yang lebih</string>
@@ -527,7 +519,6 @@
     <string name="why_we_need_storage_permissions">Mengapa kita perlu izin penyimpanan.</string>
     <string name="invalid_filename">Nama file tidak sah</string>
     <string name="use_archiveorg">Gunakan Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi Jaringan Tidak Tersedia</string>
     <string name="select_all">Pilih Semua</string>
     <string name="clear_search_cache_summary">Entri cache search jelas</string>
@@ -558,7 +549,6 @@
     <string name="no_interruptions">Tidak ada Interupsi</string>
     <string name="fetching_torrent_ellipsis">Fetching torrent…</string>
     <string name="error_not_enough_peers">Coba lagi, tidak cukup rekan</string>
-    <string name="visit_vpn_client">Kunjungi ExpressVPN</string>
     <string name="media_preview">%s prapertunjukan</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">lagu</string>

@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Atingeți etichetele aplicate la]]></string>
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
@@ -168,7 +166,6 @@
     <string name="cloud_downloads_coming">Ne pare rău: Pornind de descărcări de nor de aici vor fi disponibile pe actualizări suplimentare.</string>
     <string name="menu_space_shortcut_label">Spaţiu</string>
     <string name="connected_using_dataplan">Conectate folosind un plan de date</string>
-    <string name="vpn_money_back">Garanția returnării banilor în 30 de zile</string>
     <string name="tip_rename_your_files">Sfat: Redenumiți fișierele astfel încât acestea să poată fi găsite</string>
     <string name="donate_10">Doneaza $10</string>
     <string name="disconnect">Deconectare</string>
@@ -272,7 +269,6 @@
     <string name="files">fișiere</string>
     <string name="enable_dht_summary">Utilizați Distributed Hash tabel pentru a anunța/căutare colegii torrent</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Viteza de download nelimitat</string>
     <string name="no_results_feedback">Nu au fost găsite rezultate.</string>
     <string name="paused_song_name">Întrerupt %s</string>
     <string name="seed">Sămânță</string>
@@ -373,10 +369,7 @@
     <string name="peer_http_download_status_unknown">Necunoscut</string>
     <string name="save_bandwidth">Salvați Lățime de bandă</string>
     <string name="accept_connection_from">Accepta conexiunea cu</string>
-    <string name="vpn_client_feature_4">24/7 suport pentru clienți</string>
-    <string name="vpn_client_feature_1">Criptare de grad militar</string>
     <string name="transfers_context_resume_all_torrent_transfers">Relua toate transferurile torrent</string>
-    <string name="vpn_client_feature_3">Navigare privată și logless</string>
     <string name="free_download">Descărcare gratuită</string>
     <string name="internet_discovery_summary">Conectați-vă la colegii de la distanță de pe Internet.</string>
     <string name="couldnt_share_file">Nu a putut împărtăși fișierul. Cale ciudat găsită.</string>
@@ -430,7 +423,6 @@
     <string name="media_type_applications">Aplicatii</string>
     <string name="invalid_filename">Nume invalid</string>
     <string name="use_archiveorg">Utilizați Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Marca teritoriul dvs.</string>
     <string name="wifi_network_unavailable">Wi-Fi de rețea Indisponibil</string>
     <string name="select_all">Selectează tot</string>
@@ -496,7 +488,6 @@
     <string name="support_frostwire_summary">Afișați anunțuri pentru a sprijini dezvoltarea acestei aplicații.</string>
     <string name="back">Înapoi</string>
     <string name="searchable_activity_label">Activitatea interogată</string>
-    <string name="visit_vpn_client">Activitatea interogată. ExpressVPN</string>
     <string name="media_preview">Previzualizare %s</string>
     <string name="home">Acasă</string>
     <string name="view_transfer_item_list_item_icon">Pictograma pentru tipul de fișier</string>
@@ -513,7 +504,6 @@
     <string name="networking_preferences">Setări de rețea</string>
     <string name="view_transfer_list_item_icon_description">Tip de fișier pictogramă</string>
     <string name="enable_experimental">Caracteristici experimentale</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">Acest fisier apartine unui card SD, vă rugăm să-l introduceți pe dispozitiv.</string>
     <string name="download_selected_files">Descărcare selectat</string>
     <string name="manufacturer">Producător</string>

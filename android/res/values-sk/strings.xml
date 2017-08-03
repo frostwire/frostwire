@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechránený spojenie znamená, že všetko, čo robíte on-line (vrátane <b>vyhľadávania, posielanie správ a sťahovanie</b>) môže byť sledovaný kýmkoľvek v sieti a dokonca aj zo strany poskytovateľa pripojenia na Internet.<br><br>Odporúčame používať ExpressVPN na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoci odporúčaná pre sťahovanie, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dotknite sa aplikovaných značiek na]]></string>
     <string name="vpn_not_found">No VPN. Zoberme si šifrovanie spojenia.</string>
     <string name="azureus_peer_manager_status_finished">Dokončené</string>
@@ -170,7 +168,6 @@
     <string name="cloud_downloads_coming">Ospravedlňujeme: Počnúc stiahnutie cloudových odtiaľ budú k dispozícii ďalšie aktualizácie.</string>
     <string name="menu_space_shortcut_label">Miesto</string>
     <string name="connected_using_dataplan">Pripojené pomocou dátový program</string>
-    <string name="vpn_money_back">30-denná záruka vrátenia peňazí</string>
     <string name="tip_rename_your_files">Tip: Premenovanie súborov, takže je možné nájsť</string>
     <string name="donate_10">Darovať $10</string>
     <string name="disconnect">Odpojiť</string>
@@ -276,7 +273,6 @@
     <string name="files">súbory</string>
     <string name="enable_dht_summary">Použite Distributed Hash Table oznamuje/vyhľadávanie torrentov rovesníkmi</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Neobmedzená rýchlosť sťahovania</string>
     <string name="no_results_feedback">Neboli nájdené žiadne výsledky.</string>
     <string name="paused_song_name">Pozastavil %s</string>
     <string name="seed">Osiva</string>
@@ -379,10 +375,7 @@
     <string name="peer_http_download_status_unknown">Neznáme</string>
     <string name="save_bandwidth">Uložiť Bandwidth</string>
     <string name="accept_connection_from">Prijatie pripojenie z</string>
-    <string name="vpn_client_feature_4">24/7 zákaznícka podpora</string>
-    <string name="vpn_client_feature_1">Šifrovanie vojensko-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví všetky prevody torrent</string>
-    <string name="vpn_client_feature_3">Súkromné a logless prehliadanie</string>
     <string name="free_download">Bezplatné stiahnutie</string>
     <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
@@ -437,7 +430,6 @@
     <string name="media_type_applications">Aplikácie</string>
     <string name="invalid_filename">Neplatný názov súboru</string>
     <string name="use_archiveorg">Použiť Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Označiť svoje územie</string>
     <string name="wifi_network_unavailable">WiFi sieť nie je k dispozícii</string>
     <string name="select_all">Vybrať všetko</string>
@@ -506,7 +498,6 @@
     <string name="support_frostwire_summary">Zobrazovať reklamy na podporu rozvoja tejto aplikácie.</string>
     <string name="back">Späť</string>
     <string name="searchable_activity_label">Prehľadávateľný aktivity</string>
-    <string name="visit_vpn_client">Návšteva ExpressVPN</string>
     <string name="media_preview">%s náhľad</string>
     <string name="home">Domov</string>
     <string name="view_transfer_item_list_item_icon">Ikona typu súboru</string>
@@ -523,7 +514,6 @@
     <string name="networking_preferences">Nastavenie siete</string>
     <string name="view_transfer_list_item_icon_description">Súbor ikony typu</string>
     <string name="enable_experimental">Experimentálnych funkcií</string>
-    <string name="peer">Rovesníkmi</string>
     <string name="file_descriptor_sd_unmounted">Tento súbor patrí na SD kartu, vložte ju prosím vo svojom zariadení.</string>
     <string name="download_selected_files">Na stiahnutie vybrané</string>
     <string name="manufacturer">Výrobca</string>

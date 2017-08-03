@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用ExpressVPN加密您的连接和 <b>保护您的隐私</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">打字过滤结果</string>
     <string name="fetching_file_list">读取共享列表</string>
     <string name="not_sharing_files">无共享任何文件</string>
-    <string name="peer">节点</string>
     <string name="peers">节点</string>
     <string name="copy">复制</string>
     <string name="audio">音频</string>
@@ -506,7 +503,6 @@
     <string name="the_file_could_not_be_seeded_enable_seeding">无法为该文件设置种子。 在设置上启用播种。</string>
     <string name="remove_torrent_and_data">删除Torrent和数据</string>
     <string name="love_frostwire">爱FrostWire</string>
-    <string name="vpn_money_back">30天退款保证</string>
     <string name="vpn_what_you_get_with">你得到什么 </string>
     <string name="frostwire_shutting_down_no_permissions">对不起，FrostWire无法在没有您访问磁盘的权限的情况下继续。</string>
     <string name="one_time_purchase">一次性购买</string>
@@ -521,7 +517,6 @@
     <string name="storage_picker_treeuri_null">未选择存储路径</string>
     <string name="best_value">最超值</string>
     <string name="enable_dht_summary">使用分布式哈希表来宣布/搜索洪流对等体</string>
-    <string name="vpn_client_feature_2">无限下载速度</string>
     <string name="delete_files">删除文件</string>
     <string name="vpn_price">从 $%1$.2f 每月</string>
     <string name="thirty_days">30天</string>
@@ -543,9 +538,6 @@
     <string name="shutting_down">正在关闭…</string>
     <string name="learn_more">了解更多</string>
     <string name="save_bandwidth">保存带宽</string>
-    <string name="vpn_client_feature_4">24/7客户支持</string>
-    <string name="vpn_client_feature_1">军用级加密</string>
-    <string name="vpn_client_feature_3">私人和无记录浏览</string>
     <string name="try_frostwire_plus_for_more_results">尝试FrostWire Plus获得更多结果</string>
     <string name="no_trial_period_included">不包括试用期</string>
     <string name="send_bitcoin_tip">发送Bitcoin提示</string>
@@ -564,7 +556,6 @@
     <string name="error_no_internet_connection">错误：检查Internet连接</string>
     <string name="why_we_need_storage_permissions">为什么我们需要存储权限。</string>
     <string name="invalid_filename">无效的文件名</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi网络不可用</string>
     <string name="select_all">全选</string>
     <string name="cheaper_than_drinks">比饮料便宜</string>
@@ -583,7 +574,6 @@
     <string name="terms_of_use">使用条款</string>
     <string name="no_interruptions">无中断</string>
     <string name="fetching_torrent_ellipsis">获取洪流…</string>
-    <string name="visit_vpn_client">访问ExpressVPN</string>
     <string name="media_preview">%s 预习</string>
     <string name="send_tip_donation">发送捐款</string>
     <string name="enable_experimental">实验特征</string>

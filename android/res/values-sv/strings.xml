@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder ExpressVPN att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Även rekommenderas för dina nedladdningar, <b>du behöver inte en VPN att använda Frostwire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>ExpressVPN</b> att kryptera din anslutning och <b>skydda din integritet</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Peka på använda taggar till]]></string>
     <string name="vpn_not_found">Ingen VPN. Överväga att kryptera anslutning.</string>
     <string name="azureus_peer_manager_status_finished">Färdiga</string>
@@ -172,7 +170,6 @@
     <string name="cloud_downloads_coming">Tyvärr: Starta nedladdningar moln härifrån kommer att finnas tillgänglig på ytterligare uppdateringar.</string>
     <string name="menu_space_shortcut_label">Utrymme</string>
     <string name="connected_using_dataplan">Ansluts med dataabonnemang</string>
-    <string name="vpn_money_back">30-dagars pengarna tillbaka garanti</string>
     <string name="tip_rename_your_files">Tips: Byt namn på filer så att de kan hittas</string>
     <string name="donate_10">Donera $10</string>
     <string name="disconnect">Koppla från</string>
@@ -281,7 +278,6 @@
     <string name="files">filer</string>
     <string name="enable_dht_summary">Använd Distributed Hash Table att tillkännage/sök torrent kamrater</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Obegränsad nedladdningshastighet</string>
     <string name="pro">PRO</string>
     <string name="no_results_feedback">Inga resultat hittades.</string>
     <string name="paused_song_name">Pausas %s</string>
@@ -385,10 +381,7 @@
     <string name="peer_http_download_status_unknown">Okänd</string>
     <string name="save_bandwidth">Spara bandbredd</string>
     <string name="accept_connection_from">Acceptera anslutning från</string>
-    <string name="vpn_client_feature_4">24/7 kundsupport</string>
-    <string name="vpn_client_feature_1">Militär kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Återuppta alla torrent överföringar</string>
-    <string name="vpn_client_feature_3">Privata och logless surfning</string>
     <string name="free_download">Gratis nedladdning</string>
     <string name="internet_discovery_summary">Ansluta till fjärr kamrater på Internet.</string>
     <string name="couldnt_share_file">Det gick inte att dela filen. Konstig väg hittas.</string>
@@ -443,7 +436,6 @@
     <string name="media_type_applications">Applikationer</string>
     <string name="invalid_filename">Ogiltigt filnamn</string>
     <string name="use_archiveorg">Använda Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Markera din territorium</string>
     <string name="wifi_network_unavailable">Wifi Nätverk Ej tillgänglig</string>
     <string name="select_all">Välj alla</string>
@@ -514,7 +506,6 @@
     <string name="support_frostwire_summary">Visa annonser för att stödja utvecklingen av denna applikation.</string>
     <string name="back">Tillbaka</string>
     <string name="searchable_activity_label">Sökbar Aktivitet</string>
-    <string name="visit_vpn_client">Besök ExpressVPN</string>
     <string name="media_preview">%s förhandsvisning</string>
     <string name="home">Hem</string>
     <string name="view_transfer_item_list_item_icon">Ikon för filtyp</string>
@@ -531,7 +522,6 @@
     <string name="networking_preferences">Nätverksinställningar</string>
     <string name="view_transfer_list_item_icon_description">Filtypsikonen</string>
     <string name="enable_experimental">Experimentella funktioner</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">Denna fil tillhör ett SD-kort, för in den på enheten.</string>
     <string name="download_selected_files">Hämta vald</string>
     <string name="manufacturer">Tillverkare</string>

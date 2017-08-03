@@ -19,8 +19,6 @@
  */
 -->
 <resources>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ ExpressVPN การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
     <string name="vpn_not_found">ไม่มี VPN พิจารณาการเข้ารหัสการเชื่อมต่อ</string>
@@ -170,7 +168,6 @@
     <string name="cloud_downloads_coming">ขออภัย: เริ่มต้นการดาวน์โหลดเมฆจากที่นี่จะสามารถใช้ได้ในการปรับปรุงต่อไป</string>
     <string name="menu_space_shortcut_label">ช่องว่าง</string>
     <string name="connected_using_dataplan">เชื่อมต่อโดยใช้ข้อมูลแผน</string>
-    <string name="vpn_money_back">30 วันรับประกันคืนเงิน</string>
     <string name="tip_rename_your_files">เคล็ดลับ: เปลี่ยนชื่อไฟล์เพื่อให้พวกเขาสามารถพบได้</string>
     <string name="donate_10">บริจาค $10</string>
     <string name="disconnect">ปลด</string>
@@ -276,7 +273,6 @@
     <string name="files">ไฟล์</string>
     <string name="enable_dht_summary">ใช้ตารางแฮชกระจายจะประกาศเพื่อนฝนตกหนัก/ค้นหา</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">ความเร็วในการดาวน์โหลดได้ไม่ จำกัด</string>
     <string name="no_results_feedback">ไม่พบผลลัพธ์</string>
     <string name="paused_song_name">หยุดชั่วคราว %s</string>
     <string name="seed">เมล็ดพันธุ์</string>
@@ -379,10 +375,7 @@
     <string name="peer_http_download_status_unknown">ไม่ทราบ</string>
     <string name="save_bandwidth">บันทึกแบนด์วิธ</string>
     <string name="accept_connection_from">ยอมรับการเชื่อมต่อจาก</string>
-    <string name="vpn_client_feature_4">การสนับสนุนลูกค้า 24/7</string>
-    <string name="vpn_client_feature_1">การเข้ารหัสทหารชั้น</string>
     <string name="transfers_context_resume_all_torrent_transfers">การถ่ายโอนงานทั้งหมดฝนตกหนัก</string>
-    <string name="vpn_client_feature_3">ภาคเอกชนและการเรียกดู logless</string>
     <string name="free_download">ดาวน์โหลดฟรี</string>
     <string name="internet_discovery_summary">เชื่อมต่อไปยังเพื่อนที่ห่างไกลบนอินเทอร์เน็ต</string>
     <string name="couldnt_share_file">ไม่สามารถแชร์ไฟล์ เส้นทางแปลกพบ</string>
@@ -437,7 +430,6 @@
     <string name="media_type_applications">การประยุกต์ใช้งาน</string>
     <string name="invalid_filename">ชื่อไฟล์ที่ไม่ถูกต้อง</string>
     <string name="use_archiveorg">ใช้ Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">ทำเครื่องหมายอาณาเขตของคุณ</string>
     <string name="wifi_network_unavailable">เครือข่าย Wifi สามารถใช้งานได้</string>
     <string name="select_all">เลือกทั้งหมด</string>
@@ -506,7 +498,6 @@
     <string name="support_frostwire_summary">แสดงโฆษณาเพื่อสนับสนุนการพัฒนาของ app นี้</string>
     <string name="back">กลับ</string>
     <string name="searchable_activity_label">กิจกรรมที่สามารถค้นหาได้</string>
-    <string name="visit_vpn_client">เยี่ยม ExpressVPN</string>
     <string name="media_preview">%s ภาพตัวอย่าง</string>
     <string name="home">บ้าน</string>
     <string name="view_transfer_item_list_item_icon">ไอคอนสำหรับชนิดแฟ้ม</string>
@@ -523,7 +514,6 @@
     <string name="networking_preferences">การตั้งค่าเครือข่าย</string>
     <string name="view_transfer_list_item_icon_description">ไอคอนประเภทไฟล์</string>
     <string name="enable_experimental">คุณลักษณะทดลอง</string>
-    <string name="peer">มองดู</string>
     <string name="file_descriptor_sd_unmounted">ไฟล์นี้เป็นการ์ด SD โปรดใส่บนอุปกรณ์ของคุณ</string>
     <string name="download_selected_files">ดาวน์โหลดที่เลือก</string>
     <string name="manufacturer">ผู้ผลิต</string>

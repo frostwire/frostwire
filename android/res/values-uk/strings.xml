@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати ExpressVPN для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоча рекомендується для завантаження, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>ExpressVPN</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
     <string name="vpn_not_found">Ні VPN. Розглянемо шифрування з\'єднання.</string>
     <string name="azureus_peer_manager_status_finished">Закінчено</string>
@@ -168,7 +166,6 @@
     <string name="cloud_downloads_coming">На жаль: Початок завантаження хмари тут будуть доступні на подальших оновлень.</string>
     <string name="menu_space_shortcut_label">простір</string>
     <string name="connected_using_dataplan">Підключення з використанням планових даних</string>
-    <string name="vpn_money_back">гарантія повернення грошей протягом 30 днів</string>
     <string name="tip_rename_your_files">Порада: Перейменування файлів, таким чином вони можуть бути знайдені</string>
     <string name="donate_10">Внесок $10</string>
     <string name="disconnect">Відключити</string>
@@ -272,7 +269,6 @@
     <string name="files">файли</string>
     <string name="enable_dht_summary">Використовуйте Distributed Hash Table оголосити/Пошук торренти одноліткам</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Немає обмежень по швидкості</string>
     <string name="no_results_feedback">Результати не були знайдені.</string>
     <string name="paused_song_name">Припинено %s</string>
     <string name="seed">Насіння</string>
@@ -373,10 +369,7 @@
     <string name="peer_http_download_status_unknown">Невідомий</string>
     <string name="save_bandwidth">Збереження пропускної здатності</string>
     <string name="accept_connection_from">Приймати з\'єднання з</string>
-    <string name="vpn_client_feature_4">Підтримка клієнтів 24/7</string>
-    <string name="vpn_client_feature_1">шифрування військового класу</string>
     <string name="transfers_context_resume_all_torrent_transfers">Резюме всі трансфери торрент</string>
-    <string name="vpn_client_feature_3">Приватний і logless перегляду</string>
     <string name="free_download">Безкоштовне завантаження</string>
     <string name="internet_discovery_summary">Підключення до віддалених аналогам в мережі Інтернет.</string>
     <string name="couldnt_share_file">Неможливо розділити файл. Дивний шлях знайдений.</string>
@@ -430,7 +423,6 @@
     <string name="media_type_applications">Додатки</string>
     <string name="invalid_filename">Неправильне ім\'я файлу</string>
     <string name="use_archiveorg">користування Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Відзначте свою територію</string>
     <string name="wifi_network_unavailable">Wi-Fi мережа не доступна</string>
     <string name="select_all">Вибрати все</string>
@@ -496,7 +488,6 @@
     <string name="support_frostwire_summary">Показати оголошення, щоб підтримати розвиток цього додатка</string>
     <string name="back">Назад</string>
     <string name="searchable_activity_label">Розшукової діяльності</string>
-    <string name="visit_vpn_client">Відвідування ExpressVPN</string>
     <string name="media_preview">%s превью</string>
     <string name="home">Головна</string>
     <string name="view_transfer_item_list_item_icon">Значок для типу файлу</string>
@@ -513,7 +504,6 @@
     <string name="networking_preferences">Мережеві настройки</string>
     <string name="view_transfer_list_item_icon_description">Файл іконки типу</string>
     <string name="enable_experimental">Експериментальні можливості</string>
-    <string name="peer">рівня</string>
     <string name="file_descriptor_sd_unmounted">Цей файл належить до SD-карті, будь ласка, вставте його на пристрої.</string>
     <string name="download_selected_files">Завантажити вибрані</string>
     <string name="manufacturer">Виробник.</string>

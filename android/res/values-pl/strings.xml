@@ -20,9 +20,7 @@
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nie chronione połączenie oznacza że wszystko co robisz na internecie (łącznie z <b>wyszukiwaniami, przesyłaniem wiadomości lub ściąganiem</b>) może być monitorowane przez każdego na twojej sieci, nawet twojego dostawce servisu internetowego. <br><br>Polecamy używanie ExpressVPN aby zaszyfrować twoje połączenie a tym samym<b> zabezpieczyć twoja prywatność</b>.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>WSKAZÓWKA:</b> Dotchnij dodane tagi aby]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Masz aktywne podłączenie z internetem przez sieć VPN. <br><br> Jeżeli jeszcze nie używasz <b>ExpressVPN</b> aby zabezpieczać swoją prywatność, to gorąco polecamy. ]]></string>
 
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Wpisz aby filtrować wyniki.</string>
     <string name="fetching_file_list">Trwa pobieranie listy udostępnionych</string>
     <string name="not_sharing_files">nie udostępnia żadnych plików.</string>
-    <string name="peer">Host</string>
     <string name="peers">Hosty</string>
     <string name="copy">Kopiuj</string>
     <string name="audio">Audio</string>
@@ -527,7 +524,6 @@
     <string name="cheaper_than_parking">Tańszy niż Parkowanie</string>
     <string name="dummy_price">$ 99.99</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">Plik nie mógł być seedowany. Włącz seedowanie w ustawieniach.</string>
-    <string name="vpn_money_back">30-dniowa gwarancja zwrotu pieniędzy</string>
     <string name="vpn_what_you_get_with">Co dostajesz z </string>
     <string name="one_time_purchase">Zakup jednorazowy</string>
     <string name="activity_VPN">Połączenie</string>
@@ -539,7 +535,6 @@
     <string name="are_you_sure_delete_playlist">Czy na pewno chcesz usunąć playlistę %s</string>
     <string name="storage_picker_treeuri_null">Nie ma wybranej ścieżki zachowywania plików</string>
     <string name="best_value">Najlepsza Cena</string>
-    <string name="vpn_client_feature_2">Nieograniczona prędkość pobierania</string>
     <string name="delete_files">Usuń pliki</string>
     <string name="vpn_price">od $%1$.2f na miesiąc</string>
     <string name="thirty_days">30 dni</string>
@@ -558,9 +553,6 @@
     <string name="haptic_feedback">Wibracja</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent jest wyłączony. Czy mam go włączyć dla ciebie?</string>
     <string name="save_bandwidth">Oszczędzaj Bandwidth</string>
-    <string name="vpn_client_feature_4">24/7 obsługa klienta</string>
-    <string name="vpn_client_feature_1">Zaawansowane szyfrowanie</string>
-    <string name="vpn_client_feature_3">Całkowity brak zapisywania Twoich działań w przeglądarce</string>
     <string name="no_trial_period_included">Nie obejmuje okres próbny</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent wyłączony (Oszczędzacz Danych Włączony)"</string>
     <string name="ad_free">Bez Reklam</string>
@@ -573,7 +565,6 @@
     <string name="use_limetorrents">Używaj Limetorrents</string>
     <string name="error_no_internet_connection">Błąd: Sprawdź połączenie z internetem</string>
     <string name="invalid_filename">Nieprawidłowa nazwa pliku</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Sieć Wi-Fi Jest Niedostępna</string>
     <string name="select_all">Zaznacz Wszystko</string>
     <string name="cheaper_than_drinks">Tańszy niż Drinki</string>
@@ -587,7 +578,6 @@
     <string name="terms_of_use">Warunki Korzystania z Serwisu</string>
     <string name="no_interruptions">Bez Przerw</string>
     <string name="fetching_torrent_ellipsis">Pobieranie torrentu…</string>
-    <string name="visit_vpn_client">Odwiedź ExpressVPN</string>
     <string name="enable_experimental">Funkcje Eksperymentalne</string>
     <string name="cheaper_than_beer">Tańszy niż Sześciopak</string>
     <string name="includes_3_day_free_trial">Zawiera 3-dniową gwarancję zwrotu pieniędzy. Polecamy.</string>

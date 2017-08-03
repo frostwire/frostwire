@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>ExpressVPN</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Nhập vào để lọc kết quả.</string>
     <string name="fetching_file_list">Danh sách chia sẻ mong đợi</string>
     <string name="not_sharing_files">không chia sẻ bất cứ tập tin nào.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Copy</string>
     <string name="audio">Âm thanh</string>
@@ -407,7 +404,6 @@
     <string name="help">Cứu giúp</string>
     <string name="cloud_downloads_coming">Xin lỗi: Bắt đầu tải đám mây từ đây sẽ có sẵn trên bản cập nhật tiếp theo.</string>
     <string name="menu_space_shortcut_label">Không gian</string>
-    <string name="vpn_money_back">tiền bảo lãnh 30 ngày trở lại</string>
     <string name="donate_10">Đóng góp $10</string>
     <string name="vpn_what_you_get_with">Những gì bạn nhận được với </string>
     <string name="confirm_download">Xác nhận Tải về</string>
@@ -450,7 +446,6 @@
     <string name="transfers_context_menu_clear_finished">Xóa tất cả các chuyển thành</string>
     <string name="enable_dht_summary">Sử dụng bảng băm phân tán để công bố đồng nghiệp torrent/tìm kiếm</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Tốc độ download không giới hạn</string>
     <string name="no_results_feedback">Không tim thây kêt quả.</string>
     <string name="paused_song_name">Tạm dừng %s</string>
     <string name="seed">Hạt</string>
@@ -496,10 +491,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Cảnh báo: chuyển torrent này được sử dụng dữ liệu 3G/4G. (Kiểm tra Cài đặt mạng của bạn nếu bạn muốn sử dụng BitTorrent chỉ trên WiFi)</string>
     <string name="learn_more">Tìm hiểu thêm</string>
     <string name="save_bandwidth">Lưu băng thông</string>
-    <string name="vpn_client_feature_4">hỗ trợ khách hàng 24/7</string>
-    <string name="vpn_client_feature_1">mã hóa cấp độ quân sự</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tiếp tục tất cả các chuyển torrent</string>
-    <string name="vpn_client_feature_3">Tin và logless duyệt</string>
     <string name="free_download">Tải xuống miễn phí</string>
     <string name="couldnt_share_file">Không thể chia sẻ các tập tin. con đường kỳ lạ được tìm thấy.</string>
     <string name="try_frostwire_plus_for_more_results">Hãy thử FrostWire Plus cho kết quả hơn</string>
@@ -530,7 +522,6 @@
     <string name="why_we_need_storage_permissions">Tại sao chúng ta cần cho phép lưu trữ.</string>
     <string name="invalid_filename">Tên tập tin không hợp lệ</string>
     <string name="use_archiveorg">Chọn Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Không có mạng Wifi</string>
     <string name="select_all">Chọn tất cả</string>
     <string name="clear_search_cache_summary">mục cache tìm kiếm rõ ràng</string>
@@ -560,7 +551,6 @@
     <string name="no_interruptions">không gián đoạn</string>
     <string name="fetching_torrent_ellipsis">torrent tìm nạp…</string>
     <string name="error_not_enough_peers">Hãy thử một lần nữa, không đủ đồng nghiệp</string>
-    <string name="visit_vpn_client">Ghé thăm ExpressVPN</string>
     <string name="media_preview">%s xem trước</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">bài hát</string>

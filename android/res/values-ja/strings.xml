@@ -20,8 +20,6 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b></p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ 保護されていない接続とは、オンラインで行うすべてのことを意味します (を含む <b>検索、メッセージング、ダウンロード</b>) ネットワーク上の誰でも、インターネットサービスプロバイダによって監視されている可能性があります。<br><br>ExpressVPNを使用して接続を暗号化することをお勧めします <b>あなたのプライバシーを守る</b>.]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>ExpressVPN</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">フィルター結果を入力する。</string>
     <string name="fetching_file_list">共有リストを呼び出し中</string>
     <string name="not_sharing_files">はファイルを共有していません。</string>
-    <string name="peer">仲間</string>
     <string name="peers">仲間</string>
     <string name="copy">コピー</string>
     <string name="audio">オーディオ</string>
@@ -540,7 +537,6 @@
     <string name="dummy_price">$ 99.99</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">ファイルをシードできませんでした。 設定でシードを有効にします。</string>
     <string name="remove_torrent_and_data">トレントとデータを削除する</string>
-    <string name="vpn_money_back">30日間の返金保証</string>
     <string name="vpn_what_you_get_with">あなたは何を手に入れますか </string>
     <string name="one_time_purchase">ワンタイム購入</string>
     <string name="activity_VPN">接続</string>
@@ -551,7 +547,6 @@
     <string name="according_to_settings_i_cant_seed_unless_wifi">あなたの設定によると、Wi-Fiを使用していない限り、私は播種を開始できません。 このファイルは、インターネット対応のWi-Fiネットワークに戻ったときに自動的にシードできる状態になります。</string>
     <string name="are_you_sure_delete_playlist">%s プレイリストを削除してもよろしいですか？</string>
     <string name="best_value">お買い得</string>
-    <string name="vpn_client_feature_2">無制限のダウンロード速度</string>
     <string name="delete_files">ファイルを削除する</string>
     <string name="vpn_price">月額 $%1$.2f  ドルから</string>
     <string name="thirty_days">30日</string>
@@ -567,9 +562,6 @@
     <string name="haptic_feedback">触覚フィードバック</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrentが接続されていません。 私はあなたのためにそれを始めたいですか？</string>
     <string name="save_bandwidth">帯域幅を節約する</string>
-    <string name="vpn_client_feature_4">24時間365日のカスタマーサポート</string>
-    <string name="vpn_client_feature_1">ミリタリーグレードの暗号化</string>
-    <string name="vpn_client_feature_3">プライベートおよびロムレスブラウジング</string>
     <string name="no_trial_period_included">試用期間は含まれていません</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off（データセーバーオン）"</string>
     <string name="ad_free">広告なし</string>
@@ -580,7 +572,6 @@
     <string name="select_option_below">以下のオプションを選択してください：</string>
     <string name="use_limetorrents">Limetorrentsを使用する</string>
     <string name="error_no_internet_connection">エラー：インターネット接続を確認してください</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wi-Fiネットワークを利用できません</string>
     <string name="select_all">すべて選択</string>
     <string name="cheaper_than_drinks">飲み物より安い</string>
@@ -593,7 +584,6 @@
     <string name="terms_of_use">利用規約</string>
     <string name="no_interruptions">中断なし</string>
     <string name="fetching_torrent_ellipsis">トレントを取得する…</string>
-    <string name="visit_vpn_client">ExpressVPNを訪問</string>
     <string name="enable_experimental">実験的な特徴</string>
     <string name="cheaper_than_beer">ビールより安い</string>
     <string name="includes_3_day_free_trial">3日間の無料トライアルを含みます。 おすすめ</string>

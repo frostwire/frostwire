@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць ExpressVPN для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Вы падлучаныя да Інтэрнэту з дапамогай VPN. <br><br> Калі вы не зрабілі, мы рэкамендуем выкарыстоўваць <b>ExpressVPN</b>  каб зашыфраваць злучэнне і <b>абараніць вашу прыватную жыццё</b>. ]]></string>
     <string name="vpn_not_found">Няма VPN. Разгледзім шыфраванне злучэння.</string>
     <string name="azureus_peer_manager_status_finished">Скончана</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -167,7 +165,6 @@
     <string name="cloud_downloads_coming">На жаль: Пачатак загрузкі аблокі тут будуць даступныя на далейшых абнаўленняў.</string>
     <string name="menu_space_shortcut_label">Прастору</string>
     <string name="connected_using_dataplan">Падключэнне з выкарыстаннем планавых дадзеных</string>
-    <string name="vpn_money_back">гарантыя вяртання грошай на працягу 30 дзён</string>
     <string name="tip_rename_your_files">Рада: Перайменаванне файлаў, такім чынам яны могуць быць знойдзены</string>
     <string name="donate_10">Ахвяруйце $10</string>
     <string name="disconnect">Адключыць</string>
@@ -271,7 +268,6 @@
     <string name="files">файлы</string>
     <string name="enable_dht_summary">З дапамогай размеркаванай Хэш-табліцы, каб абвясціць аб/пошуку торэнт аднагодкам</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Няма абмежаванняў па хуткасці</string>
     <string name="no_results_feedback">Вынікі не былі знойдзеныя.</string>
     <string name="paused_song_name">Прыпынена %s</string>
     <string name="seed">Насеньне</string>
@@ -373,10 +369,7 @@
     <string name="peer_http_download_status_unknown">Невядомы</string>
     <string name="save_bandwidth">Захаваць Паласа прапускання</string>
     <string name="accept_connection_from">Прымаць злучэнне з</string>
-    <string name="vpn_client_feature_4">Падтрымка кліентаў 24/7</string>
-    <string name="vpn_client_feature_1">шыфраванне ваеннага класа</string>
     <string name="transfers_context_resume_all_torrent_transfers">Рэзюмэ усе трансферы торэнт</string>
-    <string name="vpn_client_feature_3">Прыватны і logless прагляд</string>
     <string name="free_download">Спампаваць бясплатна</string>
     <string name="internet_discovery_summary">Падключэнне да выдаленых аналагам ў сетцы Інтэрнэт.</string>
     <string name="couldnt_share_file">Не атрымалася падзяліць файл. Дзіўны шлях знойдзены.</string>
@@ -430,7 +423,6 @@
     <string name="media_type_applications">Вобласці прымянення</string>
     <string name="invalid_filename">Няправільнае імя файла</string>
     <string name="use_archiveorg">Выкарыстоўвайце Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Адзначце сваю тэрыторыю</string>
     <string name="wifi_network_unavailable">Wi-Fi сетка не даступная</string>
     <string name="select_all">Абраць усё</string>
@@ -497,7 +489,6 @@
     <string name="support_frostwire_summary">Паказаць аб\'явы, каб падтрымаць развіццё гэтага прыкладання.</string>
     <string name="back">назад</string>
     <string name="searchable_activity_label">Searchable актыўнасць</string>
-    <string name="visit_vpn_client">Наведванне ExpressVPN</string>
     <string name="media_preview">%s прэв\'ю</string>
     <string name="home">дома</string>
     <string name="view_transfer_item_list_item_icon">Значок для тыпу файлаў</string>
@@ -514,7 +505,6 @@
     <string name="networking_preferences">налады Сеткавыя</string>
     <string name="view_transfer_list_item_icon_description">Значок Тып файла</string>
     <string name="enable_experimental">эксперыментальныя магчымасці</string>
-    <string name="peer">ўзірацца</string>
     <string name="file_descriptor_sd_unmounted">Гэты файл належыць да SD-карце, калі ласка, устаўце яго на прыладзе.</string>
     <string name="download_selected_files">Загрузіць абраныя</string>
     <string name="manufacturer">Вытворца</string>

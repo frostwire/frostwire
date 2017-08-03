@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje ExpressVPN za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Piši za filtriranje rezultata.</string>
     <string name="fetching_file_list">Preuzimam popis podijeljenih</string>
     <string name="not_sharing_files">ne dijeli datoteke.</string>
-    <string name="peer">Preuzimatelj</string>
     <string name="peers">Preuzimatelji</string>
     <string name="copy">Kopiraj</string>
     <string name="audio">Zvučni</string>
@@ -525,7 +522,6 @@
     <string name="dummy_price">$ 99.99</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">Datoteka nije mogla biti zasijana. Omogućiti zasijavanja na postavke.</string>
     <string name="wifi_networks_only_summary">Spremanje podataka. Preuzimanje samo ako se utvrdi Wi-Fi veze. </string>
-    <string name="vpn_money_back">30 dana novac-leđa garancija</string>
     <string name="vpn_what_you_get_with">Što dobivate s </string>
     <string name="one_time_purchase">Jednokratne kupnje</string>
     <string name="activity_VPN">priključak</string>
@@ -541,7 +537,6 @@
     <string name="are_you_sure_delete_playlist">Jeste li sigurni da želite obrisati %s popis pjesama</string>
     <string name="storage_picker_treeuri_null">Ne staza za pohranu je izabran</string>
     <string name="best_value">Najbolja cijena</string>
-    <string name="vpn_client_feature_2">Neograničeno download brzina</string>
     <string name="delete_files">Brisanje datoteka</string>
     <string name="vpn_price">od $%1$.2f na mjesec</string>
     <string name="thirty_days">30 dana</string>
@@ -563,9 +558,6 @@
     <string name="search_preferences">Postavke za pretraživanje</string>
     <string name="learn_more">Uči više</string>
     <string name="save_bandwidth">Manji promet</string>
-    <string name="vpn_client_feature_4">24/7 korisničku podršku</string>
-    <string name="vpn_client_feature_1">šifriranje vojno-razred</string>
-    <string name="vpn_client_feature_3">Privatna i logless pregledavanja</string>
     <string name="no_trial_period_included">Ne razdoblje suđenje uključen</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
     <string name="ad_free">Nema oglasa</string>
@@ -579,7 +571,6 @@
     <string name="use_limetorrents">Koristi Limetorrents</string>
     <string name="error_no_internet_connection">Pogreška: Provjerite internetsku vezu</string>
     <string name="invalid_filename">Pogrešan naziv datoteke</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wi-Fi mreža nije dostupna</string>
     <string name="select_all">Odaberi sve</string>
     <string name="cheaper_than_drinks">Jeftinije od pića</string>
@@ -597,7 +588,6 @@
     <string name="terms_of_use">Uvjeti korištenja</string>
     <string name="no_interruptions">Bez prekida</string>
     <string name="fetching_torrent_ellipsis">Dohvaćanje torrent…</string>
-    <string name="visit_vpn_client">Posjetite ExpressVPN</string>
     <string name="enable_experimental">Eksperimentalni Značajke</string>
     <string name="cheaper_than_beer">Jeftinije od piva</string>
     <string name="includes_3_day_free_trial">Uključuje tri dana besplatno suđenje. preporučeno</string>

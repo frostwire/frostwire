@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ חיבור לא מוגן פירושו כל מה שאתה עושה באינטרנט (כולל <b/> חיפושים, הודעות והורדות <b>) יכול להיות מנוטר על ידי כל אחד ברשת שלך ואפילו על ידי ספק שירותי האינטרנט שלך. <br> <br> אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך <b/> לשמור על הפרטיות שלך <b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[ * למרות המומלץ עבור הורדות שלך,אתה לא צריך VPN להשתמש FrostWire ]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[   אתה מחובר לאינטרנט באמצעות VPN. אם אתה כבר לא, אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך ולשמור על הפרטיות שלך. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> גע בתגים שחלים על]]></string>
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
@@ -172,7 +170,6 @@
     <string name="cloud_downloads_coming">מצטער: החל הורדות ענן מכאן יהיה נגיש עדכונים נוספים.</string>
     <string name="menu_space_shortcut_label">מֶרחָב</string>
     <string name="connected_using_dataplan">מחובר באמצעות תוכנית נתונים</string>
-    <string name="vpn_money_back">30 יום הכסף בחזרה להבטיח</string>
     <string name="tip_rename_your_files">טיפ: שינוי שם קבצים, כך שניתן יהיה למצוא</string>
     <string name="donate_10">תרום $10</string>
     <string name="disconnect">לְנַתֵק</string>
@@ -281,7 +278,6 @@
     <string name="files">קבצים</string>
     <string name="enable_dht_summary">השתמש בטבלת חשיש מבוזרת להודיע / עמיתי סיקור חיפוש</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">מהירויות הורדה ללא הגבלה</string>
     <string name="pro">PRO</string>
     <string name="no_results_feedback">לא נמצאו תוצאות.</string>
     <string name="paused_song_name">מושהה s%</string>
@@ -385,10 +381,7 @@
     <string name="peer_http_download_status_unknown">לא ידוע</string>
     <string name="save_bandwidth">שמור רוחב פס</string>
     <string name="accept_connection_from">קבל חיבור בין</string>
-    <string name="vpn_client_feature_4">תמיכת לקוחות 24/7</string>
-    <string name="vpn_client_feature_1">הצפנה ברמה צבאית</string>
     <string name="transfers_context_resume_all_torrent_transfers">חדש את כל העברות הסיקור</string>
-    <string name="vpn_client_feature_3">גלישה פרטית logless</string>
     <string name="free_download">הורדה חינמית</string>
     <string name="internet_discovery_summary">חבר עמיתים מרחוק באינטרנט.</string>
     <string name="couldnt_share_file">לא ניתן לשתף את הקובץ. נתיב מוזר מצא.</string>
@@ -443,7 +436,6 @@
     <string name="media_type_applications">יישומי תוכנה</string>
     <string name="invalid_filename">שם קובץ לא תקין</string>
     <string name="use_archiveorg">השתמש Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">מסמן את הטריטוריה שלך</string>
     <string name="wifi_network_unavailable">Wifi רשת לא זמין</string>
     <string name="select_all">בחר הכל</string>
@@ -514,7 +506,6 @@
     <string name="support_frostwire_summary">הצג מודעות כדי לתמוך בפיתוח של יישום זה.</string>
     <string name="back">חזור</string>
     <string name="searchable_activity_label">פעילות לחיפוש</string>
-    <string name="visit_vpn_client">בקר ExpressVPN</string>
     <string name="media_preview">%s תצוגה מקדימה</string>
     <string name="home">בית</string>
     <string name="view_transfer_item_list_item_icon">אייקון עבור סוג הקובץ</string>
@@ -531,7 +522,6 @@
     <string name="networking_preferences">הגדרות רשת</string>
     <string name="view_transfer_list_item_icon_description">סמל סוג הקובץ</string>
     <string name="enable_experimental">תכונות ניסיוניות</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">קובץ זה שייך לכרטיס SD, הכנס אותו במכשיר שלך.</string>
     <string name="download_selected_files">נבחר להורדה</string>
     <string name="manufacturer">יַצרָן</string>

@@ -20,9 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
     <string name="activity_chat_name">Chat</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Zadejte k filtrování výsledků.</string>
     <string name="fetching_file_list">Načtení seznamu sdílených</string>
     <string name="not_sharing_files">nesdílí souborů.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peery</string>
     <string name="copy">Kopie</string>
     <string name="audio">Zvuk</string>
@@ -408,7 +405,6 @@
     <string name="help">Pomoc</string>
     <string name="cloud_downloads_coming">Omlouváme: Počínaje stažení cloudových odtud budou k dispozici další aktualizace.</string>
     <string name="menu_space_shortcut_label">Místo</string>
-    <string name="vpn_money_back">30-denní záruka vrácení peněz</string>
     <string name="donate_10">Darovat $10</string>
     <string name="vpn_what_you_get_with">Co získáte s </string>
     <string name="confirm_download">Potvrdit stažení</string>
@@ -451,7 +447,6 @@
     <string name="transfers_context_menu_clear_finished">Zrušte všechny hotové transfery</string>
     <string name="enable_dht_summary">Použijte Distributed Hash Table oznamuje/vyhledávání torrentů vrstevníky</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Neomezená rychlost stahování</string>
     <string name="no_results_feedback">Nebyly nalezeny žádné výsledky.</string>
     <string name="paused_song_name">Pozastaveno %s</string>
     <string name="seed">Semínko</string>
@@ -497,10 +492,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Upozornění: Tento převod torrent používá svá data 3G/4G. (Zkontrolujte nastavení sítě, pokud chcete používat BitTorrent jen na WiFi)</string>
     <string name="learn_more">Přečtěte si více</string>
     <string name="save_bandwidth">Uložit šířky pásma</string>
-    <string name="vpn_client_feature_4">24/7 zákaznická podpora</string>
-    <string name="vpn_client_feature_1">Šifrování vojensko-grade</string>
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví veškeré převody torrent</string>
-    <string name="vpn_client_feature_3">Soukromé a logless prohlížení</string>
     <string name="free_download">Stažení zdarma</string>
     <string name="couldnt_share_file">Nemohl sdílení souboru. Divný nalezena cesta.</string>
     <string name="try_frostwire_plus_for_more_results">Zkuste FrostWire Plus pro další výsledky</string>
@@ -531,7 +523,6 @@
     <string name="why_we_need_storage_permissions">Proč potřebujeme oprávnění pro ukládání.</string>
     <string name="invalid_filename">Neplatný název souboru</string>
     <string name="use_archiveorg">Použít Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">WiFi síť není k dispozici</string>
     <string name="select_all">Vybrat vše</string>
     <string name="clear_search_cache_summary">Jasné záznamy mezipaměti vyhledávání</string>
@@ -561,7 +552,6 @@
     <string name="no_interruptions">Zádné Přerušení</string>
     <string name="fetching_torrent_ellipsis">Načítání torrent…</string>
     <string name="error_not_enough_peers">Zkuste to znovu, není dostatek vrstevníky</string>
-    <string name="visit_vpn_client">Navštivte ExpressVPN</string>
     <string name="media_preview">%s náhled</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">píseň</string>

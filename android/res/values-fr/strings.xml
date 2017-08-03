@@ -21,9 +21,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touchez les étiquettes appliqués à]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Un moyen de connexion non protégée tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Paramètres</string>
     <string name="activity_chat_name">Chat</string>
@@ -54,7 +52,6 @@
     <string name="type_to_filter_results">Tapez sur le résultat du filtre.</string>
     <string name="fetching_file_list">Récupération de la liste de partage</string>
     <string name="not_sharing_files">ne partage aucun fichier.</string>
-    <string name="peer">Pair</string>
     <string name="peers">Pairs</string>
     <string name="copy">Copier</string>
     <string name="audio">Audio</string>
@@ -482,7 +479,6 @@
     <string name="the_file_could_not_be_seeded_enable_seeding">Le fichier n\'a pas pu être ensemencée. Activer l\'ensemencement sur les paramètres.</string>
     <string name="remove_torrent_and_data">Supprimer Torrent et données</string>
     <string name="love_frostwire">Aime FrostWire</string>
-    <string name="vpn_money_back">30 jours garantie de remboursement</string>
     <string name="vpn_what_you_get_with">Que ne vous avec vous </string>
     <string name="frostwire_shutting_down_no_permissions">Désolé, FrostWire ne peut pas continuer sans votre permission d\'accéder à disque.</string>
     <string name="one_time_purchase">Acheter une fois</string>
@@ -502,7 +498,6 @@
     <string name="help_translate_frostwire">Aide traduire FrostWire</string>
     <string name="best_value">Meilleure valeur</string>
     <string name="enable_dht_summary">Utilisez la table de hachage distribuée pour annoncer / recherche torrent pairs</string>
-    <string name="vpn_client_feature_2">Illimité vitesse de téléchargement</string>
     <string name="delete_files">Supprimer les fichiers</string>
     <string name="vpn_price">à partir de $%1$.2f par mois</string>
     <string name="thirty_days">30 jours</string>
@@ -527,9 +522,6 @@
     <string name="shutting_down">Éteindre…</string>
     <string name="learn_more">Apprendre encore plus</string>
     <string name="save_bandwidth">Enregistrer la bande passante</string>
-    <string name="vpn_client_feature_4">Appuyer à la clientèle 24/7</string>
-    <string name="vpn_client_feature_1">Chiffrement de niveau militaire</string>
-    <string name="vpn_client_feature_3">Navigation privée et logless</string>
     <string name="free_download">Téléchargement Gratuit</string>
     <string name="couldnt_share_file">Impossible de partager le fichier. Chemin étrange trouvé.</string>
     <string name="try_frostwire_plus_for_more_results">Essayez FrostWire Plus pour plus de résultats</string>
@@ -552,7 +544,6 @@
     <string name="error_no_internet_connection">Erreur: Vérifiez la connexion Internet</string>
     <string name="why_we_need_storage_permissions">Pourquoi nous avons besoin des autorisations de stockage.</string>
     <string name="invalid_filename">Nom de fichier non valide</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi Réseau Non disponible</string>
     <string name="select_all">Sélectionner tout</string>
     <string name="cheaper_than_drinks">Moins cher que les boissons</string>
@@ -574,7 +565,6 @@
     <string name="no_interruptions">Aucun interruptions</string>
     <string name="fetching_torrent_ellipsis">Récupération torrent…</string>
     <string name="error_not_enough_peers">Essayez à nouveau, pas assez de pairs</string>
-    <string name="visit_vpn_client">Visitez ExpressVPN</string>
     <string name="media_preview">%s aperçu</string>
     <string name="send_tip_donation">Envoyer pointe/donation</string>
     <string name="enable_experimental">Caractéristiques expérimentales</string>

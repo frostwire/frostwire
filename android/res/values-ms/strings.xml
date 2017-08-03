@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan ExpressVPN untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Walaupun disyorkan untuk muat turun anda, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>ExpressVPN</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
     <string name="vpn_not_found">Tiada VPN. Pertimbangkan menyulitkan sambungan.</string>
     <string name="azureus_peer_manager_status_finished">Tamat</string>
@@ -170,7 +168,6 @@
     <string name="cloud_downloads_coming">Maaf: Bermula muat turun awan dari sini boleh didapati di kemas kini lagi.</string>
     <string name="menu_space_shortcut_label">Ruang</string>
     <string name="connected_using_dataplan">Disambungkan menggunakan Pelan Data</string>
-    <string name="vpn_money_back">30 hari jaminan wang kembali</string>
     <string name="tip_rename_your_files">Petua: Namakan semula fail supaya mereka boleh didapati</string>
     <string name="donate_10">Menderma $10</string>
     <string name="disconnect">Putuskan sambungan</string>
@@ -276,7 +273,6 @@
     <string name="files">fail</string>
     <string name="enable_dht_summary">Gunakan Hash Jadual Diedarkan mengumumkan/carian rakan-rakan torrent</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">kelajuan muat turun yang tidak terhad</string>
     <string name="no_results_feedback">Tiada keputusan dijumpai.</string>
     <string name="paused_song_name">Dihentikan sementara %s</string>
     <string name="seed">Benih</string>
@@ -379,10 +375,7 @@
     <string name="peer_http_download_status_unknown">Tidak diketahui</string>
     <string name="save_bandwidth">Simpan Bandwidth</string>
     <string name="accept_connection_from">Terima sambungan dari</string>
-    <string name="vpn_client_feature_4">Sokongan pelanggan 24/7</string>
-    <string name="vpn_client_feature_1">Penyulitan gred tentera</string>
     <string name="transfers_context_resume_all_torrent_transfers">Meneruskan semua pemindahan torrent</string>
-    <string name="vpn_client_feature_3">Swasta dan logless melayari</string>
     <string name="free_download">Muat turun percuma</string>
     <string name="internet_discovery_summary">Sambung kepada rakan-rakan jauh di Internet.</string>
     <string name="couldnt_share_file">Tidak boleh berkongsi fail. jalan pelik dijumpai.</string>
@@ -437,7 +430,6 @@
     <string name="media_type_applications">Aplikasi</string>
     <string name="invalid_filename">Nama fail yang tidak sah</string>
     <string name="use_archiveorg">Gunakan Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Menandakan kawasan anda</string>
     <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
     <string name="select_all">Pilih semua</string>
@@ -506,7 +498,6 @@
     <string name="support_frostwire_summary">Memaparkan iklan untuk menyokong pembangunan aplikasi ini.</string>
     <string name="back">Kembali</string>
     <string name="searchable_activity_label">Aktiviti dicari</string>
-    <string name="visit_vpn_client">Lawati ExpressVPN</string>
     <string name="media_preview">%s pratonton</string>
     <string name="home">Laman</string>
     <string name="view_transfer_item_list_item_icon">Ikon untuk jenis fail</string>
@@ -523,7 +514,6 @@
     <string name="networking_preferences">Tetapan Rangkaian</string>
     <string name="view_transfer_list_item_icon_description">Ikon jenis fail</string>
     <string name="enable_experimental">Ciri-ciri eksperimen</string>
-    <string name="peer">Rakan sebaya</string>
     <string name="file_descriptor_sd_unmounted">Fail ini tergolong ke kad SD, sila masukkannya pada peranti anda.</string>
     <string name="download_selected_files">Muat turun Dipilih</string>
     <string name="manufacturer">Pengeluar</string>

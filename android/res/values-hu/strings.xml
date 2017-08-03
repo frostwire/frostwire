@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
@@ -168,7 +166,6 @@
     <string name="cloud_downloads_coming">Sorry: Kezdő felhő letöltések innen elérhető lesz a további frissítéseket.</string>
     <string name="menu_space_shortcut_label">Tér</string>
     <string name="connected_using_dataplan">Kapcsolják adat terv</string>
-    <string name="vpn_money_back">30 napos pénz-visszafizetési garancia</string>
     <string name="tip_rename_your_files">Tipp: Nevezze át a fájlokat, így azok megtalálhatók</string>
     <string name="donate_10">Adományoz $10</string>
     <string name="disconnect">Szétkapcsol</string>
@@ -272,7 +269,6 @@
     <string name="files">fájlok</string>
     <string name="enable_dht_summary">Használja a Distributed Hash Table jelentjük/kereső torrent társaik</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Korlátlan letöltési sebesség</string>
     <string name="no_results_feedback">Nincs találat.</string>
     <string name="paused_song_name">Megáll %s</string>
     <string name="seed">Seed</string>
@@ -373,10 +369,7 @@
     <string name="peer_http_download_status_unknown">Ismeretlen</string>
     <string name="save_bandwidth">Mentés sávszélesség</string>
     <string name="accept_connection_from">Csatlakozásának elfogadásához</string>
-    <string name="vpn_client_feature_4">24/7 ügyfélszolgálat</string>
-    <string name="vpn_client_feature_1">Katonai szintű titkosítást</string>
     <string name="transfers_context_resume_all_torrent_transfers">Folytatás minden torrent transzferek</string>
-    <string name="vpn_client_feature_3">Magán és logless böngészés</string>
     <string name="free_download">Ingyenes letöltés</string>
     <string name="internet_discovery_summary">Csatlakozás távoli társak az interneten.</string>
     <string name="couldnt_share_file">Nem sikerült megosztani a fájlt. Furcsa utat talált.</string>
@@ -430,7 +423,6 @@
     <string name="media_type_applications">Alkalmazások</string>
     <string name="invalid_filename">Érvénytelen fáljnév</string>
     <string name="use_archiveorg">Használja Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="mark_your_territory">Jelölje meg a területén</string>
     <string name="wifi_network_unavailable">Wifi hálózat nem érhető el</string>
     <string name="select_all">Mindet kiválaszt</string>
@@ -496,7 +488,6 @@
     <string name="support_frostwire_summary">Itt található az hirdetéseket, hogy támogassa a ennek kb.</string>
     <string name="back">Hát</string>
     <string name="searchable_activity_label">Kereshető tevékenység</string>
-    <string name="visit_vpn_client">Látogassa ExpressVPN</string>
     <string name="media_preview">%s előnézete</string>
     <string name="home">Otthon</string>
     <string name="view_transfer_item_list_item_icon">Ikon fájltípus</string>
@@ -513,7 +504,6 @@
     <string name="networking_preferences">Hálózati beállítások</string>
     <string name="view_transfer_list_item_icon_description">Fájl típus ikon</string>
     <string name="enable_experimental">Kísérleti Funkciók</string>
-    <string name="peer">Peer</string>
     <string name="file_descriptor_sd_unmounted">Ez a fájl tartozik egy SD kártya, illessze be a készüléken.</string>
     <string name="download_selected_files">Letöltés válogatott</string>
     <string name="manufacturer">Gyártó</string>

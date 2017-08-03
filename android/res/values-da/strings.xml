@@ -20,9 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tryk på anvendte tags til]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ En ubeskyttet forbindelse betyder alt hvad du gør online (inklusive <b>søgninger, messaging, og downloads</b>) kan overvåges af alle på dit netværk og endda af din internetudbyder.<br><br>Vi anbefaler at bruge ExpressVPN at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selvom anbefalet til dine downloads, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>ExpressVPN</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Indstillinger</string>
     <string name="activity_chat_name">Chat</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Skriv for at filtrere resultater.</string>
     <string name="fetching_file_list">Henter liste med delt</string>
     <string name="not_sharing_files">deler ikke nogen filer.</string>
-    <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopier</string>
     <string name="audio">Audio</string>
@@ -408,7 +405,6 @@
     <string name="help">Hjælp</string>
     <string name="cloud_downloads_coming">Undskyld: Fra cloud downloads herfra vil være tilgængelig på yderligere opdateringer.</string>
     <string name="menu_space_shortcut_label">Plads</string>
-    <string name="vpn_money_back">30-dages pengene tilbage garanti</string>
     <string name="donate_10">Doner $10</string>
     <string name="vpn_what_you_get_with">Hvad får du med </string>
     <string name="confirm_download">Bekræft download</string>
@@ -451,7 +447,6 @@
     <string name="transfers_context_menu_clear_finished">Ryd alle færdige overførsler</string>
     <string name="enable_dht_summary">Brug Distributed Hash Table at annoncere / søgning torrent jævnaldrende</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Ubegrænset download hastighed</string>
     <string name="no_results_feedback">Ingen resultater blev fundet.</string>
     <string name="paused_song_name">Midlertidigt afbrudt %s</string>
     <string name="seed">Frø</string>
@@ -497,10 +492,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Advarsel: Denne torrent overførsel ved hjælp af din 3G/4G-data. (Tjek dine netværksindstillinger, hvis du ønsker at bruge BitTorrent kun på WiFi)</string>
     <string name="learn_more">Lær mere</string>
     <string name="save_bandwidth">Gem båndbredde</string>
-    <string name="vpn_client_feature_4">24/7 kundesupport</string>
-    <string name="vpn_client_feature_1">Militær-grade kryptering</string>
     <string name="transfers_context_resume_all_torrent_transfers">Genoptag alle torrent overførsler</string>
-    <string name="vpn_client_feature_3">Private and logless browsing</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kunne ikke dele filen. Weird sti fundet.</string>
     <string name="try_frostwire_plus_for_more_results">Prøv FrostWire Plus for flere resultater</string>
@@ -531,7 +523,6 @@
     <string name="why_we_need_storage_permissions">Hvorfor vi har brug for tilladelser opbevaring.</string>
     <string name="invalid_filename">Ugyldigt filnavn</string>
     <string name="use_archiveorg">Brug Archive.org</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi netværk ikke tilgængelig</string>
     <string name="select_all">Vælg alle</string>
     <string name="clear_search_cache_summary">Ryd cache indgange</string>
@@ -561,7 +552,6 @@
     <string name="no_interruptions">Ingen Afbrydelser</string>
     <string name="fetching_torrent_ellipsis">Henter torrent…</string>
     <string name="error_not_enough_peers">Prøv igen, ikke nok jævnaldrende</string>
-    <string name="visit_vpn_client">Besøg ExpressVPN</string>
     <string name="media_preview">%s forpremiere</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">melodi</string>

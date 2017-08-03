@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">.اكتب لترشيح النتائج</string>
     <string name="fetching_file_list">جاري إحضار قائمة المشاركة</string>
     <string name="not_sharing_files">.لا يشارك أي ملفات</string>
-    <string name="peer">القرين</string>
     <string name="peers">أقران</string>
     <string name="copy">نسخ</string>
     <string name="audio">صوتي</string>
@@ -440,7 +437,6 @@
     <string name="help">مساعدة</string>
     <string name="cloud_downloads_coming">عذرا: لن ابتداء التنزيلات سحابة من هنا تكون متاحة على مزيد من التحديثات.</string>
     <string name="menu_space_shortcut_label">الفضاء</string>
-    <string name="vpn_money_back">ضمان اعادة النقود خلال 30 يوم</string>
     <string name="vpn_what_you_get_with">ماذا يحصل مع </string>
     <string name="confirm_download">تأكيد تحميل</string>
     <string name="sdcard_storage">التخزين SD ل</string>
@@ -476,7 +472,6 @@
     <string name="transfers_context_menu_clear_finished">مسح جميع التحويلات النهائية</string>
     <string name="enable_dht_summary">استخدام جدول تجزئة الموزعة للإعلان عن / بحث الأقران سيل</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">غير محدود سرعة التحميل</string>
     <string name="seed">بذرة</string>
     <string name="delete_files">حذف الملفات</string>
     <string name="vpn_price">$%1$.2f شهريا  من</string>
@@ -510,10 +505,7 @@
     <string name="torrent_transfer_consuming_mobile_data">تحذير: هذا نقل سيل يستخدم بيانات الجيل الثالث 3G / 4G الخاص بك. (راجع إعدادات الشبكة الخاصة بك إذا كنت ترغب في استخدام تورنت فقط على واي فاي)</string>
     <string name="learn_more">أعرف أكثر</string>
     <string name="save_bandwidth">حفظ عرض النطاق الترددي</string>
-    <string name="vpn_client_feature_4">دعم العملاء 24/7</string>
-    <string name="vpn_client_feature_1">التشفير الرتب العسكرية</string>
     <string name="transfers_context_resume_all_torrent_transfers">استئناف جميع عمليات نقل سيل</string>
-    <string name="vpn_client_feature_3">التصفح الخاص وlogless</string>
     <string name="free_download">تحميل مجانا</string>
     <string name="couldnt_share_file">لا يمكن مشاركة الملف. العثور على مسار غريب.</string>
     <string name="try_frostwire_plus_for_more_results">محاولة برنامج FrostWire بلس لمزيد من النتائج</string>
@@ -542,7 +534,6 @@
     <string name="error_no_internet_connection">خطأ: تحقق من اتصال الإنترنت</string>
     <string name="why_we_need_storage_permissions">لماذا نحن بحاجة أذونات التخزين.</string>
     <string name="invalid_filename">اسم الملف غير صالح</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">واي فاي شبكة غير متوفر</string>
     <string name="select_all">اختر الكل</string>
     <string name="cheaper_than_drinks">أرخص من المشروبات</string>
@@ -568,7 +559,6 @@
     <string name="no_interruptions">لا انقطاع</string>
     <string name="fetching_torrent_ellipsis">سيل جلب…</string>
     <string name="error_not_enough_peers">حاول مرة أخرى، وليس ما يكفي من أقرانهم</string>
-    <string name="visit_vpn_client">زيارة ExpressVPN</string>
     <string name="media_preview">%s معاينة</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">أغنية</string>

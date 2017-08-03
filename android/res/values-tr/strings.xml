@@ -19,9 +19,7 @@
  */
 -->
 <resources>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için ExpressVPN\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ayarlar</string>
@@ -53,7 +51,6 @@
     <string name="type_to_filter_results">Sonuçları filtrelemek için yazın.</string>
     <string name="fetching_file_list">Paylaşılanların listesi getiriliyor</string>
     <string name="not_sharing_files">hiçbir dosya paylaşmıyor.</string>
-    <string name="peer">Akran</string>
     <string name="peers">Akranlar</string>
     <string name="copy">Kopyala</string>
     <string name="audio">İşitsel</string>
@@ -440,7 +437,6 @@
     <string name="help">Yardım</string>
     <string name="cloud_downloads_coming">Maalesef: Buradan başlayan bulut yüklemeleri, daha sonraki güncellemelerde kullanılabilir olacaktır.</string>
     <string name="menu_space_shortcut_label">Boşluk</string>
-    <string name="vpn_money_back">30-gün para iade garantisi</string>
     <string name="vpn_what_you_get_with">Ne ile alırsın </string>
     <string name="confirm_download">İndirmeyi Onayla</string>
     <string name="sdcard_storage">SD\'ler Depolama Alanı</string>
@@ -476,7 +472,6 @@
     <string name="transfers_context_menu_clear_finished">Bitirilen tüm transferleri sil</string>
     <string name="enable_dht_summary">Torrent arkadaşlarını duyurmak/aramak için Dağıtılmış Hash Tablosunu kullanın</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Sınırsız indirme hızı</string>
     <string name="seed">Tohum</string>
     <string name="delete_files">Dosyaları sil</string>
     <string name="vpn_price">ayda $%1$.2f dolardan</string>
@@ -510,10 +505,7 @@
     <string name="torrent_transfer_consuming_mobile_data">Uyarı: Bu torrent aktarımı 3G/4G verilerinizi kullanıyor. (BitTorrent\'i yalnızca WiFi üzerinde kullanmak istiyorsanız Ağ Ayarlarınızı kontrol edin)</string>
     <string name="learn_more">Daha fazla bilgi edin</string>
     <string name="save_bandwidth">Bant Genişliğini Kaydet</string>
-    <string name="vpn_client_feature_4">7/24 müşteri desteği</string>
-    <string name="vpn_client_feature_1">Askeri sınıf şifreleme</string>
     <string name="transfers_context_resume_all_torrent_transfers">Tüm torrent transferlerini devam ettirin</string>
-    <string name="vpn_client_feature_3">Özel ve logless tarama</string>
     <string name="free_download">Bedava indir</string>
     <string name="couldnt_share_file">Dosya paylaşılamadı. Garip yol bulundu.</string>
     <string name="try_frostwire_plus_for_more_results">Daha fazla sonuç için FrostWire Plus\'ı deneyin</string>
@@ -542,7 +534,6 @@
     <string name="error_no_internet_connection">Hata: İnternet bağlantısını kontrol et</string>
     <string name="why_we_need_storage_permissions">Neden depolama izinlerine ihtiyacımız var.</string>
     <string name="invalid_filename">Geçersiz dosya adı</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wifi Ağı Kullanılamaz</string>
     <string name="select_all">Hepsini seç</string>
     <string name="cheaper_than_drinks">İçeceklerden daha ucuz</string>
@@ -568,7 +559,6 @@
     <string name="no_interruptions">Kesinti yok</string>
     <string name="fetching_torrent_ellipsis">Getiriliyor torrent…</string>
     <string name="error_not_enough_peers">Tekrar dene, yeterince akran yok</string>
-    <string name="visit_vpn_client">ExpressVPN\'i ziyaret edin</string>
     <string name="media_preview">%s önizleme</string>
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="track">şarkı</string>

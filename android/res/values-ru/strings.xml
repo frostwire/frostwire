@@ -22,7 +22,6 @@
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Ваша приватность является основополагающим правом человека.</b>]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *Вам НЕ ОБЯЗАТЕЛЬНО использовать VPN для FrostWire</b>, но мы НАСТОЯТЕЛЬНО РЕКОМЕНДУЕМ это делать, чтобы защитить свое право на неприкосновенность Вам не нужен VPN использовать FrostWire, но мы настоятельно рекомендуем это, чтобы защитить свое право на неприкосновенность частной жизни. жизни.</p>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Незащищенное соединение делает все, что вы делаете в интернете видным</b> для вашего интернет-провайдер и всех пользователей вашей сети, в том числе когда вы пользуетесь поиском, просматриваете веб-страницы, обмениваетесь сообщениями, а так же электронную почту и загрузки.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Прикоснитесь к приложенным тегам к]]></string>
     <string name="activity_preferences_name">Настройки</string>
     <string name="activity_chat_name">Чат</string>
@@ -53,7 +52,6 @@
     <string name="type_to_filter_results">Введите слово, для фильтрации результатов.</string>
     <string name="fetching_file_list">Получение списка раздачи</string>
     <string name="not_sharing_files">не раздаёт никакие файлы.</string>
-    <string name="peer">Пир</string>
     <string name="peers">Пиры</string>
     <string name="copy">Копировать</string>
     <string name="audio">Аудио</string>
@@ -524,7 +522,6 @@
     <string name="cheaper_than_parking">Дешевле, чем парковка</string>
     <string name="dummy_price">$ 99.99</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">Файл не может быть посеяны. Включение высев о настройках.</string>
-    <string name="vpn_money_back">гарантия возврата денег в течение 30 дней</string>
     <string name="vpn_what_you_get_with">Что вы получаете с </string>
     <string name="one_time_purchase">Один раз Покупка</string>
     <string name="activity_VPN">Cоединение</string>
@@ -536,7 +533,6 @@
     <string name="storage_picker_treeuri_null">Ни один путь хранения не был выбран</string>
     <string name="best_value">Лучшее значение</string>
     <string name="btc">BTC</string>
-    <string name="vpn_client_feature_2">Нет ограничений по скорости</string>
     <string name="delete_files">Удалить файлы</string>
     <string name="vpn_price">ot $%1$.2f в месяц</string>
     <string name="thirty_days">30 дней</string>
@@ -556,9 +552,6 @@
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent отключен. Вы хотите, чтобы я начал это для вас?</string>
     <string name="learn_more">Выучить больше</string>
     <string name="save_bandwidth">Сохранить Полоса пропускания</string>
-    <string name="vpn_client_feature_4">Поддержка клиентов 24/7</string>
-    <string name="vpn_client_feature_1">шифрование военного класса</string>
-    <string name="vpn_client_feature_3">Частный и logless просмотр</string>
     <string name="no_trial_period_included">Нет испытательного срока включен</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent выключен (Data Saver On)"</string>
     <string name="ad_free">Свободный от рекламы</string>
@@ -571,7 +564,6 @@
     <string name="use_limetorrents">Используйте Limetorrents</string>
     <string name="error_no_internet_connection">Ошибка: Проверьте подключение к Интернету</string>
     <string name="invalid_filename">Неверное имя файла</string>
-    <string name="vpn_client">ExpressVPN</string>
     <string name="wifi_network_unavailable">Wi-Fi сеть не доступна</string>
     <string name="select_all">Выбрать все</string>
     <string name="cheaper_than_drinks">Дешевле, чем напитки</string>
@@ -585,7 +577,6 @@
     <string name="terms_of_use">Условия эксплуатации</string>
     <string name="no_interruptions">Нет Перерывы</string>
     <string name="fetching_torrent_ellipsis">Fetching торрент…</string>
-    <string name="visit_vpn_client">Посещение ExpressVPN</string>
     <string name="enable_experimental">Экспериментальные возможности</string>
     <string name="cheaper_than_beer">Дешевле, чем пиво</string>
     <string name="includes_3_day_free_trial">Включает в себя 3-дневную бесплатную пробную версию. рекомендуемые</string>
@@ -596,7 +587,6 @@
     <string name="cheaper_than_cigarettes">Дешевле, чем газ…</string>
     <string name="days_left">дней осталось</string>
     <string name="six_months">6 месяцев</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Вы подключены к Интернету с помощью VPN. <br><br> Если вы не сделали, мы рекомендуем использовать <b>ExpressVPN</b> зашифровать соединение и <b>обеспечения конфиденциальности</b>. ]]></string>
     <string name="storage_picker_treeuri_not_directory">Выбранный путь не является каталогом</string>
     <string name="keep_the_project_alive">Держите проект жив</string>
     <string name="remove_ads">Убрать рекламу</string>
