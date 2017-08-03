@@ -19,6 +19,10 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toque etiquetas aplicadas para]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>ExpressVPN</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.  ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>Private Internet Access</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de ExpressVPN para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de Private Internet Access para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configurações</string>
     <string name="activity_chat_name">Bate-Papo</string>
@@ -648,4 +652,19 @@
     <string name="clear_all">Limpar tudo</string>
     <string name="or">ou</string>
     <string name="file_names">Nomes do arquivo</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Velocidade de download ilimitado</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Navegação privada e sem logs</string>
+    <string name="vpn_money_back_PIA">Garantia de devolução de dinheiro de 7 dias</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Suporte ao cliente 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">Garantia de devolução de dinheiro de 30 dias</string>
+    <string name="visit_vpn_client_PIA">Visite Private Internet Access</string>
+    <string name="get_PIA">Obter Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Infraestrutura sólida: cobertura mundial</string>
+    <string name="visit_vpn_client_ExpressVPN">Visite ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Realmente fácil de usar (nós gostamos fácil!)</string>
+    <string name="vpn_client_feature_4_PIA">Suporte VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Criptografia de nível militar</string>
+    <string name="vpn_client_feature_1_PIA">Sem logar</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

@@ -22,6 +22,10 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touchez les étiquettes appliqués à]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>Private Internet Access</b> pour chiffrer votre connexion et <b>préserver votre vie privée</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Une connexion non protégée signifie tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.r.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Une connexion non protégée signifie tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.r.<br><br>Nous vous recommandons d\'utiliser Private Internet Access pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Paramètres</string>
     <string name="activity_chat_name">Chat</string>
@@ -651,4 +655,19 @@
     <string name="clear_all">Tout effacer</string>
     <string name="or">ou</string>
     <string name="file_names">Nom des fichiers</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Illimité vitesse de téléchargement</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Navigation privée et sans péage</string>
+    <string name="vpn_money_back_PIA">7 jours garantie de remboursement</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Soutien à la clientèle 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">30 jours garantie de remboursement</string>
+    <string name="visit_vpn_client_PIA">Visiter Private Internet Access</string>
+    <string name="get_PIA">Obtenir Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Infrastructure solide: couverture mondiale</string>
+    <string name="visit_vpn_client_ExpressVPN">Visiter ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Vraiment facile à utiliser (nous aimons bien!)</string>
+    <string name="vpn_client_feature_4_PIA">Support VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Cryptage militaire</string>
+    <string name="vpn_client_feature_1_PIA">Pas d\'enregistrement</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
