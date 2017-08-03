@@ -136,6 +136,7 @@
                     android:text="@string/vpn_what_you_get_with" />
 
                 <TextView
+                    android:id="@+id/view_vpn_status_detail_vpn_client"
                     style="@style/VPNTitleSecond.Color"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

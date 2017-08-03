@@ -38,6 +38,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -395,6 +396,7 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, update.config.onExitThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, update.config.onBackThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, update.config.onResumeThreshold);
+        VPNStatusDetailActivity.updateVPNOffer(update.config.vpnOffer);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks((Activity) activityContext);
@@ -479,7 +481,7 @@ public final class SoftwareUpdater {
         int onExitThreshold = 100;
         int onBackThreshold = 100;
         int onResumeThreshold = 100;
-
+        String vpnOffer = VPNStatusDetailActivity.VPNCompanyInfo.ExpressVPN.name();
 
         // ux stats
         boolean uxEnabled = false;

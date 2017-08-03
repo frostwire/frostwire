@@ -40,7 +40,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 public final class VPNStatusDetailActivity extends AbstractActivity {
 
     private static final String UNICODE_BULLET = "&#8226; ";
-    private final VPNCompanyInfo VPN = VPNCompanyInfo.PIA;
+    public static VPNCompanyInfo VPN = VPNCompanyInfo.ExpressVPN;
 
     public VPNStatusDetailActivity() {
         super(R.layout.view_vpn_status_detail);
@@ -53,6 +53,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
         final TextView vpnMoneyBack = findView(R.id.view_vpn_status_money_back);
         final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
+        final TextView vpnClientName = findView(R.id.view_vpn_status_detail_vpn_client);
         final ImageView companyGraphic = findView(R.id.view_vpn_status_company_graphic);
 
         companyGraphic.setImageResource(VPN.view_vpn_status_company_graphic);
@@ -109,6 +110,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         getVPNButtonTop.setOnClickListener(l);
         getVPNButtonBottom.setOnClickListener(l);
         learnVPNButton.setOnClickListener(l);
+        vpnClientName.setText(VPN.companyNameStrResourceId);
     }
 
     @Override
@@ -137,6 +139,14 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         try {
             super.onBackPressed();
         } catch (Throwable ignored) {
+        }
+    }
+
+    public static void updateVPNOffer(String VPNCompanyInfoEnumName) {
+        if ("PIA".equals(VPNCompanyInfoEnumName)) {
+            VPNStatusDetailActivity.VPN = VPNStatusDetailActivity.VPNCompanyInfo.PIA;
+        } else if ("ExpressVPN".equals(VPNCompanyInfoEnumName)) {
+            VPNStatusDetailActivity.VPN = VPNStatusDetailActivity.VPNCompanyInfo.ExpressVPN;
         }
     }
 
@@ -183,7 +193,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         }
     }
 
-    private enum VPNCompanyInfo {
+    public enum VPNCompanyInfo {
         PIA(R.string.vpn_client_PIA, // company name res id
                 "http://www.frostwire.com/vpn.pia", // main url
                 "http://www.frostwire.com/vpn.pia", // learn more url
