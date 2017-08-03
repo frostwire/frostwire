@@ -20,6 +20,10 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام Private Internet Access لتشفير اتصالك وحماية خصوصيتك. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام Private Internet Access لتشفير اتصالك و حماية خصوصيتك. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
@@ -652,4 +656,19 @@
     <string name="clear_all">امسح الكل</string>
     <string name="or">أو</string>
     <string name="file_names">أسماء الملفات</string>
+    <string name="vpn_client_feature_2_ExpressVPN">غير محدود سرعة التحميل</string>
+    <string name="vpn_client_feature_3_ExpressVPN">خاص وتصفح لوغليس</string>
+    <string name="vpn_money_back_PIA">7 أيام ضمان استعادة الاموال</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 دعم العملاء</string>
+    <string name="vpn_money_back_ExpressVPN">ضمان لمدة 30 يوما لاستعادة الأموال</string>
+    <string name="visit_vpn_client_PIA">زيارة Private Internet Access</string>
+    <string name="get_PIA">الحصول على Private Internet Access</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_feature_3_PIA">البنية التحتية الصلبة: تغطية عالمية</string>
+    <string name="visit_vpn_client_ExpressVPN">انتقل إلى ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">حقا سهلة الاستخدام (نحب سهلة!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 دعم فين</string>
+    <string name="vpn_client_feature_1_ExpressVPN">العسكرية الصف التشفير</string>
+    <string name="vpn_client_feature_1_PIA">لا تسجيل</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

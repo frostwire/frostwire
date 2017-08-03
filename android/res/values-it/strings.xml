@@ -21,6 +21,10 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tocca i tag applicati a]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Anche se consigliata per i download, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>ExpressVPN</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>Private Internet Access</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[  Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare ExpressVPN per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare Private Internet Access per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Impostazioni</string>
     <string name="activity_chat_name">Chat</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Cancella tutto</string>
     <string name="or">o</string>
     <string name="file_names">Nomi dei file</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Velocità di download illimitato</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Navigazione privata e nessuna registrazione</string>
+    <string name="vpn_money_back_PIA">7-giorni rimborso garantito</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Supporto clienti 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">30-giorni rimborso garantito</string>
+    <string name="visit_vpn_client_PIA">Visita Private Internet Access</string>
+    <string name="get_PIA">Ottieni Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Infrastrutture solide: copertura mondiale</string>
+    <string name="visit_vpn_client_ExpressVPN">Visita ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Davvero facile da usare (ci piace facile!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 supporto VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Crittografia militare</string>
+    <string name="vpn_client_feature_1_PIA">Nessuna registrazione</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

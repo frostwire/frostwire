@@ -19,6 +19,12 @@
  */
 -->
 <resources>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>ExpressVPN</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>Private Internet Access</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan ExpressVPN om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan Private Internet Access om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste tags aan]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Instellingen</string>
     <string name="activity_chat_name">Chat</string>
@@ -488,7 +494,6 @@
     <string name="torrent_transfer_consuming_mobile_data">Waarschuwing: Deze torrent transfer maakt gebruik van uw 3G/4G data. (Controleer uw netwerkinstellingen als u BitTorrent gebruiken alleen WiFi)</string>
     <string name="learn_more">Kom meer te weten</string>
     <string name="save_bandwidth">Save bandbreedte</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
     <string name="transfers_context_resume_all_torrent_transfers">Hervat alle torrent transfers</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kan het bestand niet delen. gevonden raar pad.</string>
@@ -635,4 +640,33 @@
     <string name="file_information">Bestandsinformatie</string>
     <string name="use_btjunkie">Gebruik BTJunkie</string>
     <string name="add_transfer">Voeg transfer toe</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Onbeperkt download snelheid</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Privé en geen registratie surfen</string>
+    <string name="vpn_money_back_PIA">7-dagen geld-teruggarantie</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 klantenservice</string>
+    <string name="vpn_money_back_ExpressVPN">30-dagen geld-teruggarantie</string>
+    <string name="visit_vpn_client_PIA">Bezoek Private Internet Access</string>
+    <string name="get_PIA">Krijg Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Vaste infrastructuur: wereldwijde dekking</string>
+    <string name="visit_vpn_client_ExpressVPN">Bezoek ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Echt makkelijk te gebruiken (we vinden het makkelijk!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN-ondersteuning</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Militaire kwaliteit encryptie</string>
+    <string name="vpn_client_feature_1_PIA">Geen aanmelden</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="filter_ellipsis">Filter…</string>
+    <string name="include">Voegen</string>
+    <string name="fix_instructions">Zie support.frostwire.com voor informatie en instructies</string>
+    <string name="seeing_less_results">Minder of geen resultaten zien?</string>
+    <string name="touch_applied_tags_to_include_exclude">Raak toegepaste tags aan om toe te voegen of uit te sluiten</string>
+    <string name="exclude">Uitsluiten</string>
+    <string name="filter">Filter</string>
+    <string name="try_changing_applied_filters">Probeer de aangepaste filters te veranderen</string>
+    <string name="file_extensions">Bestandsuitbreidingen</string>
+    <string name="filter_by_keyword">Filter op trefwoord…</string>
+    <string name="sources_channels">Bronnen / Kanalen</string>
+    <string name="clear_all">Wis alles</string>
+    <string name="or">of</string>
+    <string name="file_names">Bestandsnamen</string>
 </resources>

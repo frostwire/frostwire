@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>Private Internet Access</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için ExpressVPN\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Korunmasız bir bağlantı, çevrimiçi yaptığınız her şeyi ifade eder (dahil olmak üzere <b>aramalar, mesajlaşma ve indirmeler</b>) Şebekenizdeki herhangi biri tarafından ve hatta İnternet servis sağlayıcınız tarafından izlenebilir.<br><br>Bağlantınızı şifrelemek için Private Internet Access\'yi kullanmanızı öneririz <b>gizliliğinizi korumak</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ayarlar</string>
     <string name="activity_chat_name">Sohbet</string>
@@ -652,4 +656,19 @@
     <string name="clear_all">Hepsini temizle</string>
     <string name="or">veya</string>
     <string name="file_names">Dosya adları</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Sınırsız indirme hızı</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Özel tarama</string>
+    <string name="vpn_money_back_PIA">7-gün para iade garantisi</string>
+    <string name="vpn_client_feature_4_ExpressVPN">7/24 müşteri desteği</string>
+    <string name="vpn_money_back_ExpressVPN">30-gün para iade garantisi</string>
+    <string name="visit_vpn_client_PIA">Private Internet Access\'i ziyaret edin</string>
+    <string name="get_PIA">Private Internet Access\'i Al</string>
+    <string name="vpn_client_feature_3_PIA">Katı altyapı: dünya çapında kapsam</string>
+    <string name="visit_vpn_client_ExpressVPN">ExpressVPN\'i ziyaret edin</string>
+    <string name="vpn_client_feature_2_PIA">Gerçekten kullanımı kolaydır (kolay olmayı severiz!)</string>
+    <string name="vpn_client_feature_4_PIA">7/24 VPN Desteği</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Askeri sınıf şifreleme</string>
+    <string name="vpn_client_feature_1_PIA">Günlük kaydı yok</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
