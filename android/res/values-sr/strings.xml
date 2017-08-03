@@ -539,7 +539,7 @@
     <string name="unprotected_connection">незаштићен</string>
     <string name="protected_connection">ВПН-протецтед</string>
     <string name="protect_my_privacy">Штити моја приватност</string>
-    <string name="get_express_VPN">Гет ExpressVPN</string>
+    <string name="get_ExpressVPN">Гет ExpressVPN</string>
     <string name="vpn_money_back">30-дана новац-леђа гаранција</string>
     <string name="vpn_price">од $%1$.2f месечно</string>
     <string name="vpn_what_you_get_with">What do you get with </string>

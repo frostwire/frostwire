@@ -184,8 +184,9 @@
                 android:gravity="center_horizontal"
                 android:padding="0dp" />
 
-            <!-- ExpressVPN graphic -->
+            <!-- VPN company graphic -->
             <ImageView
+                android:id="@+id/view_vpn_status_company_graphic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

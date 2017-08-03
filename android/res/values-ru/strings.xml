@@ -592,7 +592,7 @@
     <string name="enable_experimental">Экспериментальные возможности</string>
     <string name="cheaper_than_beer">Дешевле, чем пиво</string>
     <string name="includes_3_day_free_trial">Включает в себя 3-дневную бесплатную пробную версию. рекомендуемые</string>
-    <string name="get_express_VPN">Получить ExpressVPN</string>
+    <string name="get_ExpressVPN">Получить ExpressVPN</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Включить Посев</string>
     <string name="cheaper_than_gas">Дешевле, чем газ</string>

@@ -578,7 +578,7 @@
     <string name="thank_you">תודה רבה לך!</string>
     <string name="use_frostclick">השתמש FrostClick</string>
     <string name="clear_torrent_index">Clear Torrent Index</string>
-    <string name="get_express_VPN">קבל ExpressVPN</string>
+    <string name="get_ExpressVPN">קבל ExpressVPN</string>
     <string name="try_valid_port_next_time">נסה בפעם הבאה כניסה חוקית 1000 ו 65,500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">אפשר מתזמן</string>

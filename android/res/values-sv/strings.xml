@@ -578,7 +578,7 @@
     <string name="thank_you">Tack!</string>
     <string name="use_frostclick">Använda FrostClick</string>
     <string name="clear_torrent_index">Klar Torrent index</string>
-    <string name="get_express_VPN">Få ExpressVPN</string>
+    <string name="get_ExpressVPN">Få ExpressVPN</string>
     <string name="try_valid_port_next_time">Prova en giltig port nästa gång 1000 och 65500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Aktivera sådd</string>

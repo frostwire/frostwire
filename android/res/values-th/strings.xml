@@ -570,7 +570,7 @@
     <string name="thank_you">ขอขอบคุณ!</string>
     <string name="use_frostclick">ใช้ FrostClick</string>
     <string name="clear_torrent_index">ล้างดัชนี Torrent</string>
-    <string name="get_express_VPN">รับ ExpressVPN</string>
+    <string name="get_ExpressVPN">รับ ExpressVPN</string>
     <string name="try_valid_port_next_time">Tลองพอร์ตที่ถูกต้องในครั้งถัดไป 1000 และ 65500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">เปิดใช้เมล็ด</string>

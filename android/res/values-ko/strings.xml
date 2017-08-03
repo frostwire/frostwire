@@ -585,7 +585,7 @@
     <string name="donate_5">$5 기부</string>
     <string name="thank_you">고맙습니다!</string>
     <string name="use_frostclick">FrostClick사용</string>
-    <string name="get_express_VPN">ExpressVPN 받기</string>
+    <string name="get_ExpressVPN">ExpressVPN 받기</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">시딩 사용</string>
     <string name="storage_setting_confirm_dialog_text">FrostWire에서 SD 카드로 다운로드 한 모든 파일은 FrostWire 응용 프로그램이이 장치에서 제거되는 순간 ANDROID로 삭제되며 FrostWire LLC는 파일 손실에 대해 책임지지 않습니다.</string>

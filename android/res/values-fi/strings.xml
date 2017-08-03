@@ -578,7 +578,7 @@
     <string name="thank_you">Kiitos!</string>
     <string name="use_frostclick">Käytä FrostClick</string>
     <string name="clear_torrent_index">Clear Torrent Index</string>
-    <string name="get_express_VPN">Saada ExpressVPN</string>
+    <string name="get_ExpressVPN">Saada ExpressVPN</string>
     <string name="try_valid_port_next_time">Kokeile kelvollinen portti ensi kerran 1000 ja 65500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Ota Seeding</string>

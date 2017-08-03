@@ -597,7 +597,7 @@
     <string name="transfers_context_menu_copy_magnet">复制磁铁</string>
     <string name="try_other_keywords">尝试更少/不同的关键字</string>
     <string name="thank_you">谢谢！</string>
-    <string name="get_express_VPN">获取ExpressVPN</string>
+    <string name="get_ExpressVPN">获取ExpressVPN</string>
     <string name="enable_seeding">启用种子</string>
     <string name="cheaper_than_gas">比气体便宜</string>
     <string name="rate_our_app">为我们的应用程序</string>

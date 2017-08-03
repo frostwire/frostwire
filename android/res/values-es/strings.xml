@@ -554,7 +554,7 @@
     <string name="vpn_off_toast_notification">Tu conexión podría no ser privada.</string>
     <string name="visit_vpn_client">Visita ExpressVPN</string>
     <string name="enable_experimental">Funciones experimentales</string>
-    <string name="get_express_VPN">Obtén ExpressVPN</string>
+    <string name="get_ExpressVPN">Obtén ExpressVPN</string>
     <string name="storage_picker_treeuri_not_directory">La ruta seleccionada no es un directorio</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">El archivo no pudo ser compartido. BitTorrent permanecerá desconectado.</string>
     <string name="the_file_could_not_be_seeded_enable_seeding">El archivo no pudo ser compartido. Habilite la capacidad de Compartir en las preferencias.</string>

@@ -594,7 +594,7 @@
     <string name="transfers_context_menu_copy_magnet">μαγνήτης αντίγραφο</string>
     <string name="try_other_keywords">Δοκιμάστε λιγότερες / διαφορετικές λέξεις-κλειδιά</string>
     <string name="thank_you">Ευχαριστώ!</string>
-    <string name="get_express_VPN">Πάρτε ExpressVPN</string>
+    <string name="get_ExpressVPN">Πάρτε ExpressVPN</string>
     <string name="enable_seeding">Ενεργοποίηση Σπορά</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Φθηνότερο από το φυσικό αέριο</string>

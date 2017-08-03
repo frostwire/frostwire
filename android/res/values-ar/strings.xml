@@ -589,7 +589,7 @@
     <string name="transfers_context_menu_copy_magnet">نسخة مغناطيس</string>
     <string name="try_other_keywords">حاول أقل الكلمات الرئيسية / مختلفة</string>
     <string name="thank_you">شكرا!</string>
-    <string name="get_express_VPN">الحصول على ExpressVPN</string>
+    <string name="get_ExpressVPN">الحصول على ExpressVPN</string>
     <string name="enable_seeding">تمكين البذر</string>
     <string name="storage_setting_confirm_dialog_text">وأنا أفهم أن جميع الملفات التي تم تحميلها على بطاقة الذاكرة الرقمية المؤمنة من قبل برنامج FrostWire سيتم حذف بواسطة الروبوت لحظة إلغاء تثبيت تطبيق برنامج FrostWire من هذا الجهاز وأنا لن يعقد برنامج FrostWire LLC مسؤولة عن أي الملفات المفقودة.</string>
     <string name="cant_open_file_does_not_exist"> %1$s أستطيع أن \ ر فتح ، و عدم وجود الملف.</string>

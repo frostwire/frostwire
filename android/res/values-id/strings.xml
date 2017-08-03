@@ -584,7 +584,7 @@
     <string name="donate_5">Menyumbang $5</string>
     <string name="thank_you">Terima kasih!</string>
     <string name="use_frostclick">Gunakan FrostClick</string>
-    <string name="get_express_VPN">Dapatkan ExpressVPN</string>
+    <string name="get_ExpressVPN">Dapatkan ExpressVPN</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Aktifkan Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Saya memahami bahwa semua file yang didownload ke SD Card dengan FrostWire akan dihapus BY ANDROID saat aplikasi FrostWire uninstall dari perangkat ini dan saya tidak akan terus FrostWire LLC jawab atas file yang hilang.</string>

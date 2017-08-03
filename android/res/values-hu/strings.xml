@@ -560,7 +560,7 @@
     <string name="thank_you">Köszönöm!</string>
     <string name="use_frostclick">Használja FrostClick</string>
     <string name="clear_torrent_index">Tiszta Torrent Index</string>
-    <string name="get_express_VPN">Szerezd ExpressVPN</string>
+    <string name="get_ExpressVPN">Szerezd ExpressVPN</string>
     <string name="try_valid_port_next_time">Próbáld meg egy érvényes port legközelebb 1000 és 65500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Engedélyezze Seeding</string>

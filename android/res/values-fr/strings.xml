@@ -590,7 +590,7 @@
     <string name="transfers_context_menu_copy_magnet">Copie Magnet</string>
     <string name="try_other_keywords">Essayez différents mots-clés</string>
     <string name="thank_you">Merci!</string>
-    <string name="get_express_VPN">Obtenez ExpressVPN</string>
+    <string name="get_ExpressVPN">Obtenez ExpressVPN</string>
     <string name="enable_seeding">Activer Seeding</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Moins cher que le gaz</string>

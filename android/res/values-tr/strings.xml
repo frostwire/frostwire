@@ -589,7 +589,7 @@
     <string name="transfers_context_menu_copy_magnet">Kopyala Magnet</string>
     <string name="try_other_keywords">Daha az/farklı anahtar kelimeler deneyin</string>
     <string name="thank_you">Sağol!</string>
-    <string name="get_express_VPN">ExpressVPN\'yi alın</string>
+    <string name="get_ExpressVPN">ExpressVPN\'yi alın</string>
     <string name="enable_seeding">Yeşillendirmeyi Etkinleştir</string>
     <string name="storage_setting_confirm_dialog_text">FrostWire tarafından SD Karta indirilen tüm dosyaların, FrostWire uygulaması bu cihazdan kaldırıldığı andan ANDROID tarafından silineceğini ve kaybolan dosyalar için FrostWire LLC\'nin sorumluluğunu üstlenmem gerektiğini anlıyorum.</string>
     <string name="cant_open_file_does_not_exist">Açamıyorum %1$s, dosya yok.</string>

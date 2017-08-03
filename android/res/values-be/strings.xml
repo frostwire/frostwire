@@ -561,7 +561,7 @@
     <string name="thank_you">Дзякуй!</string>
     <string name="use_frostclick">Выкарыстоўвайце FrostClick</string>
     <string name="clear_torrent_index">Ачысціць Індэкс торэнт</string>
-    <string name="get_express_VPN">Атрымаць ExpressVPN</string>
+    <string name="get_ExpressVPN">Атрымаць ExpressVPN</string>
     <string name="try_valid_port_next_time">Паспрабуйце наступны раз, калі дзеючы порт 1000 і 65500</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Ўключыць затраўкі</string>

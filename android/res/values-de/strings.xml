@@ -584,7 +584,7 @@
     <string name="transfers_context_menu_copy_magnet">Kopieren Magnet</string>
     <string name="try_other_keywords">Probieren Sie weniger/andere Suchbegriffe</string>
     <string name="thank_you">Danke!</string>
-    <string name="get_express_VPN">Erhalten Sie ExpressVPN</string>
+    <string name="get_ExpressVPN">Erhalten Sie ExpressVPN</string>
     <string name="enable_seeding">Aktivieren Sie Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Ich verstehe, dass alle Dateien auf die SD-Karte von Frostwire heruntergeladen werden, sobald die Frostwire Antrag ANDROID gelöscht werden von diesem Gerät deinstalliert wird, und ich werde nicht von Frostwire LLC haftet für alle Dateien halten verloren.</string>
     <string name="anonymous_usage_statistics">Anonyme Nutzungsstatistiken</string>

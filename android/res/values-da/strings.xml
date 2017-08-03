@@ -585,7 +585,7 @@
     <string name="donate_5">Doner $5</string>
     <string name="thank_you">Tak!</string>
     <string name="use_frostclick">Brug FrostClick</string>
-    <string name="get_express_VPN">Hent ExpressVPN</string>
+    <string name="get_ExpressVPN">Hent ExpressVPN</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Aktivér Seedning</string>
     <string name="storage_setting_confirm_dialog_text">Jeg forstår, at alle filer downloadet til SD-kort af FrostWire vil blive slettet Android det øjeblik FrostWire programmet er afinstalleret fra denne enhed, og jeg vil ikke holde FrostWire LLC ansvarlig for eventuelle filer tabt.</string>

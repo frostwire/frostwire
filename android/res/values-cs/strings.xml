@@ -585,7 +585,7 @@
     <string name="donate_5">Darovat $5</string>
     <string name="thank_you">Děkuji!</string>
     <string name="use_frostclick">Použít FrostClick</string>
-    <string name="get_express_VPN">Zíscat ExpressVPN</string>
+    <string name="get_ExpressVPN">Zíscat ExpressVPN</string>
     <string name="one_dollar">$1</string>
     <string name="enable_seeding">Aktivovat Setí</string>
     <string name="storage_setting_confirm_dialog_text">Chápu, že všechny soubory stažené na kartu SD podle FrostWire budou vymazány operačním systémem Android ve chvíli, kdy aplikace FrostWire se odinstaluje z tohoto zařízení a nebudu držet FrostWire LLC odpovědnost za jakékoli soubory ztracené.</string>
