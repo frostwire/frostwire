@@ -53,6 +53,9 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
         final TextView vpnText = findView(R.id.view_vpn_status_vpn_text);
         final TextView vpnMoneyBack = findView(R.id.view_vpn_status_money_back);
         final TextView vpnPrice = findView(R.id.view_vpn_status_vpn_price);
+        final ImageView companyGraphic = findView(R.id.view_vpn_status_company_graphic);
+
+        companyGraphic.setImageResource(VPN.view_vpn_status_company_graphic);
 
         final TextView vpnBullet = findView(R.id.view_vpn_status_bullet_textview);
         vpnBullet.setText(fromHtml(R.string.you_dont_need_a_vpn_to_use_frostwire_bullet_html));
