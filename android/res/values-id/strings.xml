@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
-    <string name="activity_browse_peer_name">Host Penjelajah Web</string>
-    <string name="activity_browse_peers_name">Orang-orang terdekat</string>
     <string name="activity_chat_name">Percakapan</string>
     <string name="activity_downloads_name">Unduhan-unduhan Aktif</string>
     <string name="activity_uploads_name">Unggahan-unggahan Aktif</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Ketik untuk menapis hasil-hasilnya.</string>
     <string name="fetching_file_list">Mengambil daftar arsip yang dibagi</string>
     <string name="not_sharing_files">tidak berbagi arsip apapun</string>
-    <string name="browse_peer">Peer Jelajah</string>
     <string name="peer">Peer</string>
     <string name="peers">Para Peer</string>
     <string name="copy">Salinan</string>

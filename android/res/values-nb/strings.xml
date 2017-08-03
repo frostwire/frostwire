@@ -138,7 +138,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunne ikke bli seedet. BitTorrent vil forbli frakoblet.</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vil slette filer hvis Frostwire er avinstallert.</string>
-    <string name="activity_browse_peer_name">Bla Host</string>
     <string name="please_connect">Koble å bruke denne funksjonen</string>
     <string name="protected_connection">VPN-beskyttet</string>
     <string name="clear_finished">Klar Ferdig</string>
@@ -205,13 +204,11 @@
     <string name="share_finished_downloads_summary">Ferdige nedlastninger vil være tilgjengelig for andre Frostwire brukere på Wi-Fi-nettverk.</string>
     <string name="use_monova_summary">Monova er magnet basert, fungerer bare på Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Beklager, Frostwire kan ikke fortsette uten din tillatelse til å få tilgang til disken.</string>
-    <string name="activity_browse_peers_name">Folk i nærheten</string>
     <string name="http_download_status_uncompressing">Dekomprimere</string>
     <string name="one_time_purchase">En gang kjøpet</string>
     <string name="send_file_using">Send filen ved hjelp</string>
     <string name="yes_no_cancel_delete_transfer_question">Er du sikker på at du vil avbryte denne nedlastingen (nedlastet data så langt vil bli slettet)?</string>
     <string name="activity_VPN">Forbindelse</string>
-    <string name="browse_peer">Bla Peer</string>
     <string name="downloads_added_to_queue">%s filer vil starte nedlastingen</string>
     <string name="connect">Koble</string>
     <string name="azureus_general_view_yes">Ja</string>

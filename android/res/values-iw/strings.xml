@@ -138,7 +138,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">הקובץ לא להיות זרע. ביטורנט יישאר מנותק.</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ימחק קבצים שהורדו אם FrostWire יוסר.</string>
-    <string name="activity_browse_peer_name">Browse Host</string>
     <string name="please_connect">התחבר להשתמש בתכונה זו</string>
     <string name="protected_connection">VPN-מוגן</string>
     <string name="clear_finished">נקה סיום</string>
@@ -205,13 +204,11 @@
     <string name="share_finished_downloads_summary">הורדות סיום תהיינה זמינות למשתמשי FrostWire אחרים ברשת ה- Wi-Fi.</string>
     <string name="use_monova_summary">Monova הוא מבוסס מגנט, עובד רק על Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">מצטערים, FrostWire לא יכול להמשיך ללא רשותך לגשת לדיסק.</string>
-    <string name="activity_browse_peers_name">אנשים קרובים</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">רכישה חד פעמי</string>
     <string name="send_file_using">שלח קובץ באמצעות</string>
     <string name="yes_no_cancel_delete_transfer_question">האם אתה בטוח שאתה רוצה לבטל הורדה זו (נתונים שהורדו עד כה יימחקו)?</string>
     <string name="activity_VPN">חיבור</string>
-    <string name="browse_peer">פאר עיון</string>
     <string name="downloads_added_to_queue">%s קבצים יתחיל להוריד</string>
     <string name="connect">לְחַבֵּר</string>
     <string name="azureus_general_view_yes">כן</string>

@@ -138,7 +138,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Tiedostoa ei kylvetään. BitTorrent pysyy irti.</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android poistaa ladattuja tiedostoja, jos FrostWire on poistettu.</string>
-    <string name="activity_browse_peer_name">Browse Host</string>
     <string name="please_connect">Muodosta käyttää tätä ominaisuutta</string>
     <string name="protected_connection">VPN-suojattu</string>
     <string name="clear_finished">Kirkas akryyli</string>
@@ -205,13 +204,11 @@
     <string name="share_finished_downloads_summary">Valmiit lataukset ovat saatavilla muille FrostWire käyttäjien kanssa Wi-Fi-verkkoon.</string>
     <string name="use_monova_summary">Monova on magneetti pohjainen, toimii vain Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Valitettavasti FrostWire ei voi jatkua ilman lupaa käyttää levylle.</string>
-    <string name="activity_browse_peers_name">Lähellä olevat ihmiset</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Osta nyt</string>
     <string name="send_file_using">Lähetä tiedosto</string>
     <string name="yes_no_cancel_delete_transfer_question">Oletko varma, että haluat peruuttaa tämän latauksen (ladatut tiedot toistaiseksi poistetaan)?</string>
     <string name="activity_VPN">Liitäntä</string>
-    <string name="browse_peer">Selaa Peer</string>
     <string name="downloads_added_to_queue">%s tiedostot lataaminen alkaa</string>
     <string name="connect">Yhdistä</string>
     <string name="azureus_general_view_yes">Kyllä</string>

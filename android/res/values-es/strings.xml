@@ -28,8 +28,6 @@
     <!-- NON HTML TAGS -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configuración</string>
-    <string name="activity_browse_peer_name">Explorar</string>
-    <string name="activity_browse_peers_name">Usuarios Cercanos</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Descargas Activas</string>
     <string name="activity_uploads_name">Cargas Activas</string>
@@ -58,7 +56,6 @@
     <string name="type_to_filter_results">Escribe para filtrar los resultados.</string>
     <string name="fetching_file_list">Obteniendo los archivos compartidos</string>
     <string name="not_sharing_files">No se está compartiendo ningún archivo.</string>
-    <string name="browse_peer">Explorar Usuario</string>
     <string name="peer">Usuario</string>
     <string name="peers">Usuarios</string>
     <string name="copy">Copia</string>

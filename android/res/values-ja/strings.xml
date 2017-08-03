@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
-    <string name="activity_browse_peer_name">ホスト検索</string>
-    <string name="activity_browse_peers_name">近くの人々</string>
     <string name="activity_chat_name">チャット</string>
     <string name="activity_downloads_name">アクティブダウンロード</string>
     <string name="activity_uploads_name">アクティブアップロード</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">フィルター結果を入力する。</string>
     <string name="fetching_file_list">共有リストを呼び出し中</string>
     <string name="not_sharing_files">はファイルを共有していません。</string>
-    <string name="browse_peer">仲間を検索する</string>
     <string name="peer">仲間</string>
     <string name="peers">仲間</string>
     <string name="copy">コピー</string>

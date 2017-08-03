@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
     <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
-    <string name="activity_browse_peer_name">होस्ट ब्राउज़ करें</string>
-    <string name="activity_browse_peers_name">आसपास के लोग</string>
     <string name="activity_chat_name">बातचीत</string>
     <string name="activity_downloads_name">सक्रिय डाउनलोड</string>
     <string name="activity_uploads_name">सक्रिय अपलोड</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">फ़िल्टर परिणाम टाइप करें.</string>
     <string name="fetching_file_list">साझा की सूची ला रहा है</string>
     <string name="not_sharing_files">किसी भी फाइल को साझा नहीं कर रहें हैं .</string>
-    <string name="browse_peer"> पीर ब्राउज़ करें</string>
     <string name="peer">पीर</string>
     <string name="peers">पीअर्स</string>
     <string name="copy">प्रतिलिपि</string>

@@ -25,8 +25,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>ExpressVPN</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Impostazioni</string>
-    <string name="activity_browse_peer_name">Cerca Host</string>
-    <string name="activity_browse_peers_name">Persone nei paraggi</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Download attivi</string>
     <string name="activity_uploads_name">Upload attivi</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Scrivi qui per filtrare i risultati.</string>
     <string name="fetching_file_list">Recupero lista condivisioni</string>
     <string name="not_sharing_files">non sta condividendo file.</string>
-    <string name="browse_peer">Cerca Peer</string>
     <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Copia</string>

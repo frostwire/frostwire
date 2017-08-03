@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
-    <string name="activity_browse_peer_name">浏览主机</string>
-    <string name="activity_browse_peers_name">附近人群</string>
     <string name="activity_chat_name">聊天</string>
     <string name="activity_downloads_name">主动下载</string>
     <string name="activity_uploads_name">主动上传</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">打字过滤结果</string>
     <string name="fetching_file_list">读取共享列表</string>
     <string name="not_sharing_files">无共享任何文件</string>
-    <string name="browse_peer">浏览节点</string>
     <string name="peer">节点</string>
     <string name="peers">节点</string>
     <string name="copy">复制</string>

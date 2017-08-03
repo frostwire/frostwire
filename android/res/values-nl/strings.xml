@@ -21,8 +21,6 @@
 <resources>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Instellingen</string>
-    <string name="activity_browse_peer_name">Browse Host</string>
-    <string name="activity_browse_peers_name">Mensen in de Buurt</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Actieve Downloads</string>
     <string name="activity_uploads_name">Actieve Uploads</string>
@@ -51,7 +49,6 @@
     <string name="type_to_filter_results">Typ om resultaten te filteren.</string>
     <string name="fetching_file_list">Gedeelde lijsten ophalen</string>
     <string name="not_sharing_files">deelt geen files.</string>
-    <string name="browse_peer">Browse Peer</string>
     <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopieer</string>

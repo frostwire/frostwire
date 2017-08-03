@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
-    <string name="activity_browse_peer_name">호스트 탐색</string>
-    <string name="activity_browse_peers_name">주변 사람들</string>
     <string name="activity_chat_name">채팅</string>
     <string name="activity_downloads_name">진행중인 다운로드</string>
     <string name="activity_uploads_name">진행중인 업로드</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">결과를 필터하려면 여기에 입력해주세요.</string>
     <string name="fetching_file_list">공유된 목록 가져오는중</string>
     <string name="not_sharing_files">파일을 공유하지 않습니다</string>
-    <string name="browse_peer">친구 찾기</string>
     <string name="peer">친구</string>
     <string name="peers">친구들</string>
     <string name="copy">복사</string>

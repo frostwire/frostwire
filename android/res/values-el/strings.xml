@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
-    <string name="activity_browse_peer_name">Περιήγηση στο Διακομιστή</string>
-    <string name="activity_browse_peers_name">Άνθρωποι Κοντά</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Ενεργά Downloads</string>
     <string name="activity_uploads_name">Ενεργά Uploads</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Πληκτρολόγησε για να φιλτράρεις τα αποτελέσματα.</string>
     <string name="fetching_file_list">Φέρνουμε τη λίστα με τα μοιραζόμενα</string>
     <string name="not_sharing_files">δεν μοιράζεται αρχεία.</string>
-    <string name="browse_peer">Περιήγηση στο Χρήστη</string>
     <string name="peer">Χρήστης</string>
     <string name="peers">Χρήστες</string>
     <string name="copy">Αντιγραφή</string>

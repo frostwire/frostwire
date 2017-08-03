@@ -24,7 +24,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
-    <string name="activity_browse_peers_name">قریبی لوگ</string>
     <string name="activity_chat_name">بات چیت</string>
     <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
     <string name="activity_uploads_name">موجودہ اپلوڈ</string>
@@ -208,7 +207,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">فائل کو ترجیح نہیں ہوسکی. BitTorrent کے منقطع رہے گا.</string>
     <string name="toggle_sharing_selected_files">ٹوگل شیئرنگ</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">اگر FrostWire ان انسٹال کیا جاتا ہے لوڈ، اتارنا Android ڈاؤن لوڈ فائلوں کو مٹا دے گا.</string>
-    <string name="activity_browse_peer_name">میزبان براؤز</string>
     <string name="please_connect">اس خصوصیت کو استعمال کرنے کے لئے رابطہ قائم کریں</string>
     <string name="protected_connection">VPN کے ذریعہ محفوظ</string>
     <string name="use_eztv">استعمال Eztv</string>
@@ -269,7 +267,6 @@
     <string name="send_file_using">کا استعمال کرتے ہوئے فائل بھیجیں</string>
     <string name="yes_no_cancel_delete_transfer_question">آپ کو اس ڈاؤن لوڈ، اتارنا (ڈاؤن لوڈ کے اعداد و شمار اب تک مٹا دیا جائے گا) کو منسوخ کرنا چاہتے ہیں؟</string>
     <string name="activity_VPN">کنکشن</string>
-    <string name="browse_peer">براؤز پیر</string>
     <string name="downloads_added_to_queue">%s فائلوں کو ڈاؤن لوڈ شروع ہو جائے گا</string>
     <string name="use_upnp_port_mapping">خود کار طریقے سے بندرگاہ تعریفیں استعمال کریں (UPnP)</string>
     <string name="use_youtube">استعمال YouTube.com</string>

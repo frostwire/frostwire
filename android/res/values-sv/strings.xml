@@ -138,7 +138,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunde inte seedas. BitTorrent förblir frånkopplad.</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android kommer att radera nedladdade filer om FrostWire avinstalleras .</string>
-    <string name="activity_browse_peer_name">Bläddra Host</string>
     <string name="please_connect">Anslut att använda denna funktion</string>
     <string name="protected_connection">VPN-skyddad</string>
     <string name="clear_finished">Klar Färdig</string>
@@ -205,13 +204,11 @@
     <string name="share_finished_downloads_summary">Färdiga nedladdningar kommer att finnas tillgängliga för andra FrostWire användare på din Wi-Fi-nätverk.</string>
     <string name="use_monova_summary">Monova är magnet baserad, fungerar endast på Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Tyvärr, FrostWire kan inte fortsätta utan din tillåtelse att komma åt hårddisken.</string>
-    <string name="activity_browse_peers_name">Folk i närheten</string>
     <string name="http_download_status_uncompressing">Avkomprimering</string>
     <string name="one_time_purchase">En gång köp</string>
     <string name="send_file_using">Skicka fil med</string>
     <string name="yes_no_cancel_delete_transfer_question">Är du säker på att du vill avbryta denna film (hämtade data så långt kommer att raderas)?</string>
     <string name="activity_VPN">Förbindelse</string>
-    <string name="browse_peer">Bläddrings Peer</string>
     <string name="downloads_added_to_queue">%s filer kommer att börja ladda ner</string>
     <string name="connect">Ansluta</string>
     <string name="azureus_general_view_yes">Ja</string>

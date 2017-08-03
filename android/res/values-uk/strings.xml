@@ -135,7 +135,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файл не може бути посіяні. BitTorrent залишатиметься відключений.</string>
     <string name="toggle_sharing_selected_files">Перемикання загального доступу</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android буде стерти завантажені файли, якщо FrostWire видаляється.</string>
-    <string name="activity_browse_peer_name">Огляд хостингу</string>
     <string name="please_connect">Підключайте Щоб скористатися цією функцією</string>
     <string name="protected_connection">VPN-захищений</string>
     <string name="clear_finished">Ясно Закінчено</string>
@@ -200,13 +199,11 @@
     <string name="share_finished_downloads_summary">Завершення завантаження будуть доступні іншим користувачам Frostwire в мережі Wi-Fi.</string>
     <string name="use_monova_summary">Monova є магнітом на основі, працює тільки на Wi-Fi</string>
     <string name="frostwire_shutting_down_no_permissions">На жаль, FrostWire не може тривати без вашої згоди на доступ до диска.</string>
-    <string name="activity_browse_peers_name">Люди поблизу</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Свого часу покупки</string>
     <string name="send_file_using">Відправити файл за допомогою</string>
     <string name="yes_no_cancel_delete_transfer_question">Ви впевнені, що хочете скасувати завантаження (завантажені дані досі будуть видалені)?</string>
     <string name="activity_VPN">З\'єднання</string>
-    <string name="browse_peer">Перегляд Peer</string>
     <string name="downloads_added_to_queue">%s файли будуть почати завантаження</string>
     <string name="connect">Під\'єднання</string>
     <string name="azureus_general_view_yes">Так</string>

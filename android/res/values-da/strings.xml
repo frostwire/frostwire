@@ -25,8 +25,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>ExpressVPN</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Indstillinger</string>
-    <string name="activity_browse_peer_name">Browse Host</string>
-    <string name="activity_browse_peers_name">Mennesker i nærheden</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Active Downloads</string>
     <string name="activity_uploads_name">Active Uploads</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Skriv for at filtrere resultater.</string>
     <string name="fetching_file_list">Henter liste med delt</string>
     <string name="not_sharing_files">deler ikke nogen filer.</string>
-    <string name="browse_peer">Se Peer</string>
     <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopier</string>

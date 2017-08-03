@@ -136,7 +136,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ไฟล์ที่ไม่สามารถเมล็ด BitTorrent จะยังคงตัดการเชื่อมต่อ</string>
     <string name="toggle_sharing_selected_files">สลับการใช้งานร่วมกัน</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android จะลบไฟล์ที่ดาวน์โหลด FrostWire ถ้ายกเลิกการติดตั้ง</string>
-    <string name="activity_browse_peer_name">หมวดโฮสต์</string>
     <string name="please_connect">โปรดเชื่อมต่อเพื่อใช้คุณลักษณะนี้</string>
     <string name="protected_connection">VPN ที่มีการป้องกัน</string>
     <string name="clear_finished">ล้างเสร็จสิ้น</string>
@@ -202,13 +201,11 @@
     <string name="share_finished_downloads_summary">การดาวน์โหลดเสร็จสิ้นจะสามารถใช้ได้กับผู้ใช้งาน FrostWire อื่น ๆ บนเครือข่าย Wi-Fi ของคุณ</string>
     <string name="use_monova_summary">Monova เป็นแม่เหล็กที่ใช้งานได้เฉพาะใน WiFi</string>
     <string name="frostwire_shutting_down_no_permissions">ขออภัย FrostWire ไม่สามารถดำเนินการไม่ได้รับอนุญาตในการเข้าถึงดิสก์</string>
-    <string name="activity_browse_peers_name">คนที่อยู่ใกล้เคียง</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">หนึ่งซื้อเวลา</string>
     <string name="send_file_using">ส่งไฟล์โดยใช้</string>
     <string name="yes_no_cancel_delete_transfer_question">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะยกเลิกการดาวน์โหลดนี้ (ข้อมูลที่ดาวน์โหลดเพื่อให้ห่างไกลจะถูกลบ)?</string>
     <string name="activity_VPN">สัมพันธ์</string>
-    <string name="browse_peer">หมวดเพียร์</string>
     <string name="downloads_added_to_queue">%s ไฟล์ที่จะเริ่มต้นการดาวน์โหลด</string>
     <string name="connect">เชื่อมต่อ</string>
     <string name="azureus_general_view_yes">ใช่</string>

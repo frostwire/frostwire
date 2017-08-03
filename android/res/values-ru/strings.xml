@@ -25,8 +25,6 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[<b> Незащищенное соединение делает все, что вы делаете в интернете видным</b> для вашего интернет-провайдер и всех пользователей вашей сети, в том числе когда вы пользуетесь поиском, просматриваете веб-страницы, обмениваетесь сообщениями, а так же электронную почту и загрузки.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Прикоснитесь к приложенным тегам к]]></string>
     <string name="activity_preferences_name">Настройки</string>
-    <string name="activity_browse_peer_name">Обзор хостов</string>
-    <string name="activity_browse_peers_name">Люди поблизости</string>
     <string name="activity_chat_name">Чат</string>
     <string name="activity_downloads_name">Активные загрузки</string>
     <string name="activity_uploads_name">Активные раздачи</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Введите слово, для фильтрации результатов.</string>
     <string name="fetching_file_list">Получение списка раздачи</string>
     <string name="not_sharing_files">не раздаёт никакие файлы.</string>
-    <string name="browse_peer">Просмотреть пир</string>
     <string name="peer">Пир</string>
     <string name="peers">Пиры</string>
     <string name="copy">Копировать</string>

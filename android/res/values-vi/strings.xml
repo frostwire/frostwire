@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
-    <string name="activity_browse_peer_name">Chọn host</string>
-    <string name="activity_browse_peers_name">Chọn những người ở gần</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Tải về đang hoạt động</string>
     <string name="activity_uploads_name">Tải lên đang hoạt động</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Nhập vào để lọc kết quả.</string>
     <string name="fetching_file_list">Danh sách chia sẻ mong đợi</string>
     <string name="not_sharing_files">không chia sẻ bất cứ tập tin nào.</string>
-    <string name="browse_peer">Chọn Peer</string>
     <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Copy</string>

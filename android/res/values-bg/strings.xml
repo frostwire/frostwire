@@ -135,7 +135,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файлът не може да се засява. BitTorrent ще остане изключен.</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ще изтрие изтеглените файлове, ако FrostWire е деинсталиран.</string>
-    <string name="activity_browse_peer_name">Преглед домакин</string>
     <string name="please_connect">Моля свържете да използвате тази функция</string>
     <string name="protected_connection">VPN-защитени</string>
     <string name="clear_finished">Ясно Завършен</string>
@@ -201,13 +200,11 @@
     <string name="share_finished_downloads_summary">Завършени сваляния ще бъдат достъпни за други потребители FrostWire на вашия Wi-Fi мрежа.</string>
     <string name="use_monova_summary">Монова е магнит на основата, работи само на Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Съжаляваме, FrostWire не може да продължи без ваше разрешение за достъп до диск.</string>
-    <string name="activity_browse_peers_name">Хората Наблизо</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Един закупуване време</string>
     <string name="send_file_using">Изпращане на файл с помощта на</string>
     <string name="yes_no_cancel_delete_transfer_question">Сигурни ли сте че искате да откажете този файл за изтегляне (изтеглени данни до момента, ще бъдат изтрити)?</string>
     <string name="activity_VPN">Връзка</string>
-    <string name="browse_peer">Преглед на партньорска</string>
     <string name="downloads_added_to_queue">%s файлове ще започнат да се изтеглят</string>
     <string name="connect">Свържете</string>
     <string name="azureus_general_view_yes">Да</string>

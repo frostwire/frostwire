@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>Hinweis:</b> Berühren angewendet Tags]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Einstellungen</string>
-    <string name="activity_browse_peer_name">Host durchsuchen</string>
-    <string name="activity_browse_peers_name">Person nahe bei</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Aktive Downloads</string>
     <string name="activity_uploads_name">Aktive Uploads</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Zum Filtern der Ergebnisse tippen.</string>
     <string name="fetching_file_list">Hole Liste von freigegebenen</string>
     <string name="not_sharing_files">Dateien sind nicht freigegeben.</string>
-    <string name="browse_peer">Peer suchen</string>
     <string name="peer">Peer</string>
     <string name="peers">Peers</string>
     <string name="copy">Kopieren</string>

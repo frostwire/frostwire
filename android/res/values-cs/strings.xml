@@ -25,8 +25,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
-    <string name="activity_browse_peer_name">Procházet Hostitelem</string>
-    <string name="activity_browse_peers_name">Lidé v Okolí</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Aktivovat Stažení</string>
     <string name="activity_uploads_name">Aktivovat Odesílání</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">Zadejte k filtrování výsledků.</string>
     <string name="fetching_file_list">Načtení seznamu sdílených</string>
     <string name="not_sharing_files">nesdílí souborů.</string>
-    <string name="browse_peer">Procházet síť Peer</string>
     <string name="peer">Peer</string>
     <string name="peers">Peery</string>
     <string name="copy">Kopie</string>

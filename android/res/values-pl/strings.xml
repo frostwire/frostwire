@@ -27,8 +27,6 @@
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ustawienia</string>
-    <string name="activity_browse_peer_name">Wybierz Hosta</string>
-    <string name="activity_browse_peers_name">Ludzie w Okolicy</string>
     <string name="activity_chat_name">Czat</string>
     <string name="activity_downloads_name">Aktywne Pobieranie</string>
     <string name="activity_uploads_name">Aktywne Wysyłanie</string>
@@ -57,7 +55,6 @@
     <string name="type_to_filter_results">Wpisz aby filtrować wyniki.</string>
     <string name="fetching_file_list">Trwa pobieranie listy udostępnionych</string>
     <string name="not_sharing_files">nie udostępnia żadnych plików.</string>
-    <string name="browse_peer">Przeglądaj Hosta</string>
     <string name="peer">Host</string>
     <string name="peers">Hosty</string>
     <string name="copy">Kopiuj</string>

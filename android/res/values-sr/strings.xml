@@ -29,8 +29,6 @@
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Подешавања</string>
-    <string name="activity_browse_peer_name">бровсе хост</string>
-    <string name="activity_browse_peers_name">У близини људи</string>
     <string name="activity_chat_name">Chat</string>
     <string name="activity_downloads_name">Активни бесплатно</string>
     <string name="activity_uploads_name">Активни Уплоадс</string>
@@ -60,7 +58,6 @@
     <string name="type_to_filter_results">Типе за филтрирање резултата.</string>
     <string name="fetching_file_list">Преузимање листа деле</string>
     <string name="not_sharing_files">не дели све датотеке.</string>
-    <string name="browse_peer">бровсе вршњак</string>
     <string name="peer">вршњак</string>
     <string name="peers">вршњаке</string>
     <string name="copy">копија</string>

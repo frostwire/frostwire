@@ -25,8 +25,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
-    <string name="activity_browse_peer_name">تصفح المُضيف</string>
-    <string name="activity_browse_peers_name">الناس بالقرب</string>
     <string name="activity_chat_name">دردشة</string>
     <string name="activity_downloads_name">التنزيلات النشطة</string>
     <string name="activity_uploads_name">التحميلات النشطة</string>
@@ -55,7 +53,6 @@
     <string name="type_to_filter_results">.اكتب لترشيح النتائج</string>
     <string name="fetching_file_list">جاري إحضار قائمة المشاركة</string>
     <string name="not_sharing_files">.لا يشارك أي ملفات</string>
-    <string name="browse_peer">تصفح القرين</string>
     <string name="peer">القرين</string>
     <string name="peers">أقران</string>
     <string name="copy">نسخ</string>

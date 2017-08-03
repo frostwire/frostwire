@@ -135,7 +135,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">A fájlt nem lehet magot. BitTorrent marad le.</string>
     <string name="toggle_sharing_selected_files">Toggle megosztása</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android törli a letöltött fájlokat, ha FrostWire eltávolításra kerül.</string>
-    <string name="activity_browse_peer_name">Böngésszen host</string>
     <string name="please_connect">Kérjük, csatlakozzon a funkció használatához</string>
     <string name="protected_connection">VPN-védett</string>
     <string name="clear_finished">Tiszta Kész</string>
@@ -200,13 +199,11 @@
     <string name="share_finished_downloads_summary">Kész letöltések lesz elérhető a többi FrostWire felhasználók a Wi-Fi hálózathoz.</string>
     <string name="use_monova_summary">Monova van mágnes alapú, csak akkor működik, Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Sajnos FrostWire nem tudja folytatni az Ön engedélye nélkül hozzáférni lemez.</string>
-    <string name="activity_browse_peers_name">Emberek a közelben</string>
     <string name="http_download_status_uncompressing">Kicsomagolása</string>
     <string name="one_time_purchase">Egy egyszeri vásárlás</string>
     <string name="send_file_using">Küldj fájlt</string>
     <string name="yes_no_cancel_delete_transfer_question">Biztosan törölni szeretné ezt a letöltést (letöltött adatok eddig törlődik)?</string>
     <string name="activity_VPN">Kapcsolat</string>
-    <string name="browse_peer">Böngésszen Peer</string>
     <string name="downloads_added_to_queue">%s fájlok elkezdi letölteni</string>
     <string name="connect">Csatlakozás</string>
     <string name="azureus_general_view_yes">Igen</string>
