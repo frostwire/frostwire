@@ -301,6 +301,12 @@ public final class Offers {
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             Engine.instance().getVibrator().hapticFeedback();
+
+            // dismissAndOrShutdownIfNecessary is invoked on adNetwork listeners when interstitials are dismissed
+            // if a user leaves an ad displayed without interacting with it for too long a second
+            // ad could be displayed on MainActivity's onResume back to back.
+            ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
+
             if (activity != null) {
                 if (shutdownAfter) {
                     if (adNetwork != null) {
