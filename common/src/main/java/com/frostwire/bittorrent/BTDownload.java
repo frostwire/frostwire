@@ -23,6 +23,7 @@ import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
+import com.frostwire.jlibtorrent.swig.torrent_flags_t;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
@@ -125,7 +126,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
-        return th.isValid() && (th.status().isPaused() || engine.isPaused() || !engine.isRunning());
+        return th.isValid() && (isPaused(th.status()) || engine.isPaused() || !engine.isRunning());
     }
 
     public boolean isSeeding() {
@@ -154,16 +155,17 @@ public final class BTDownload implements BittorrentDownload {
         }
 
         final TorrentStatus status = th.status();
+        final boolean isPaused = isPaused(status);
 
-        if (status.isPaused() && status.isFinished()) {
+        if (isPaused && status.isFinished()) {
             return TransferState.FINISHED;
         }
 
-        if (status.isPaused() && !status.isFinished()) {
+        if (isPaused && !status.isFinished()) {
             return TransferState.PAUSED;
         }
 
-        if (!status.isPaused() && status.isFinished()) { // see the docs of isFinished
+        if (!isPaused && status.isFinished()) { // see the docs of isFinished
             return TransferState.SEEDING;
         }
 
@@ -341,7 +343,7 @@ public final class BTDownload implements BittorrentDownload {
 
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
 
-        th.setAutoManaged(false);
+        th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
 
         doResumeData(true);
@@ -354,7 +356,7 @@ public final class BTDownload implements BittorrentDownload {
 
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
 
-        th.setAutoManaged(true);
+        th.setFlags(TorrentFlags.AUTO_MANAGED);
         th.resume();
 
         doResumeData(true);
@@ -376,7 +378,7 @@ public final class BTDownload implements BittorrentDownload {
 
         if (th.isValid()) {
             if (deleteData) {
-                engine.remove(th, SessionHandle.Options.DELETE_FILES);
+                engine.remove(th, SessionHandle.DELETE_FILES);
             } else {
                 engine.remove(th);
             }
@@ -578,12 +580,23 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isSequentialDownload() {
-        return th.isValid() && th.status().isSequentialDownload();
+        if (!th.isValid()) {
+            return false;
+        }
+
+        torrent_flags_t flags = th.status().flags();
+        return flags.and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).nonZero();
     }
 
     public void setSequentialDownload(boolean sequential) {
-        if (th.isValid()) {
-            th.setSequentialDownload(sequential);
+        if (!th.isValid()) {
+            return;
+        }
+
+        if (sequential) {
+            th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+        } else {
+            th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         }
     }
 
@@ -673,6 +686,10 @@ public final class BTDownload implements BittorrentDownload {
             }
         }
         return flag;
+    }
+
+    private static boolean isPaused(TorrentStatus s) {
+        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
     }
 
     private final class InnerListener implements AlertListener {
