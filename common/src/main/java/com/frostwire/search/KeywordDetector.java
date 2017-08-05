@@ -17,7 +17,6 @@
 
 package com.frostwire.search;
 
-import com.frostwire.android.core.MediaType;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
@@ -126,12 +125,12 @@ public final class KeywordDetector {
                 // Check file extensions for YouTubeSearch results.
                 // If we find files with extensions other than ".youtube", we make their mt = null and don't include them
                 // in the keyword detector. IDEA: Make FileSearchResults have a .getMediaType() method and put this logic there.
-                MediaType mt;
+                KeywordMediaType mt;
                 String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
-                mt = MediaType.getMediaTypeForExtension(extension);
+                mt = KeywordMediaType.getMediaTypeForExtension(extension);
                 if ("youtube".equals(extension)) {
-                    mt = MediaType.getVideoMediaType();
-                } else if (mt != null && mt.equals(MediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
+                    mt = KeywordMediaType.getVideoMediaType();
+                } else if (mt != null && mt.equals(KeywordMediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
                     // NOTE: this excludes all non .youtube youtube search results (e.g. 3gp, webm) from appearing on results
                     mt = null;
                 }
