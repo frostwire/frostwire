@@ -86,7 +86,7 @@ public abstract class AbstractFragment extends Fragment {
     protected final <T extends View> T findView(View v, int id) {
         T result = null;
         if (v != null) {
-            result = (T) v.findViewById(id);
+            result = v.findViewById(id);
         }
         return result;
     }

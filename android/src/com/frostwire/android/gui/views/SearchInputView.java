@@ -128,7 +128,7 @@ public class SearchInputView extends LinearLayout {
         }
 
         mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
-        textInput = (ClearableEditTextView) findViewById(R.id.view_search_input_text_input);
+        textInput = findViewById(R.id.view_search_input_text_input);
         textInput.setOnKeyListener(textInputListener);
         textInput.setOnActionListener(textInputListener);
         textInput.setOnItemClickListener(textInputListener);
@@ -139,7 +139,7 @@ public class SearchInputView extends LinearLayout {
 
         updateHint(mediaTypeId);
 
-        tabLayout = (TabLayout) findViewById(R.id.view_search_input_tab_layout_file_type);
+        tabLayout = findViewById(R.id.view_search_input_tab_layout_file_type);
         TabLayout.OnTabSelectedListener tabSelectedListener = new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -254,7 +254,7 @@ public class SearchInputView extends LinearLayout {
     }
 
     public void setFileTypeCountersVisible(boolean fileTypeCountersVisible) {
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.view_search_input_tab_layout_file_type);
+        TabLayout tabLayout = findViewById(R.id.view_search_input_tab_layout_file_type);
         tabLayout.setVisibility(fileTypeCountersVisible ? View.VISIBLE : View.GONE);
     }
 

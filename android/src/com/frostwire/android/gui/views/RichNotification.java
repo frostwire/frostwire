@@ -87,7 +87,7 @@ public class RichNotification extends LinearLayout {
      * and adds the corresponding TextViews.
      */
     public void updateActionLinks(RichNotificationActionLink ... actionLinks) {
-		LinearLayout actionLinksContainer = (LinearLayout) findViewById(R.id.view_rich_notification_action_links);
+		LinearLayout actionLinksContainer = findViewById(R.id.view_rich_notification_action_links);
 		boolean gotActionLinks = false;
         if (actionLinks != null && actionLinks.length > 0) {
 			gotActionLinks = true;
@@ -120,7 +120,7 @@ public class RichNotification extends LinearLayout {
 		super.onFinishInflate();
 		View.inflate(getContext(), R.layout.view_rich_notification, this);
 		
-		ImageView imageViewIcon = (ImageView) findViewById(R.id.view_rich_notification_icon);
+		ImageView imageViewIcon = findViewById(R.id.view_rich_notification_icon);
 		if (imageViewIcon != null && icon != null) {
 			imageViewIcon.setBackground(icon);
 		}
@@ -138,7 +138,7 @@ public class RichNotification extends LinearLayout {
 		textViewTitle.setTypeface(ROBOTO_LIGHT, Typeface.BOLD);
 		textViewDescription.setTypeface(ROBOTO_LIGHT, Typeface.NORMAL);
 		
-		TextView dismissButton = (TextView) findViewById(R.id.view_rich_notification_close_button);
+		TextView dismissButton = findViewById(R.id.view_rich_notification_close_button);
 		dismissButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -146,12 +146,12 @@ public class RichNotification extends LinearLayout {
 			}
 		});
 
-		LinearLayout actionLinksContainer = (LinearLayout) findViewById(R.id.view_rich_notification_action_links);
+		LinearLayout actionLinksContainer = findViewById(R.id.view_rich_notification_action_links);
 		actionLinksContainer.setVisibility(numberOfActionLinks > 0 ? View.VISIBLE : View.GONE);
 	}
 	
 	private TextView updateTextViewText(int textViewId, CharSequence text, OnClickListener onClickNotificationListener) {
-		TextView textView = (TextView) findViewById(textViewId);
+		TextView textView = findViewById(textViewId);
 
 		if (textView != null && (text == null || text.length() == 0)) {
 			textView.setVisibility(View.GONE);

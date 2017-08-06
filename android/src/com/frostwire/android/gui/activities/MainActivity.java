@@ -115,6 +115,8 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
 
+    private ServiceToken mToken;
+
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
     private final MainController controller;
 
@@ -359,6 +361,19 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         tryOnResumeInterstitial();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mainBroadcastReceiver != null) {
+            try {
+                unregisterReceiver(mainBroadcastReceiver);
+            } catch (Throwable ignored) {
+                //oh well (the api doesn't provide a way to know if it's been registered before,
+                //seems like overkill keeping track of these ourselves.)
+            }
+        }
+    }
+
     private void tryOnResumeInterstitial() {
         if (Offers.disabledAds()) {
             LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
@@ -395,7 +410,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
             //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
         }
-        Engine.instance().getThreadPool().submit(new DelayedOnResumeInterstitialRunnable(20000, this));
+        Engine.instance().getThreadPool().submit(new DelayedOnResumeInterstitialRunnable(30000, this));
     }
 
     private static class DelayedOnResumeInterstitialRunnable implements Runnable {
@@ -413,7 +428,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 return;
             }
             try {
-                Thread.currentThread().sleep(delayInMs);
+                Thread.sleep(delayInMs);
             } catch (Throwable ignored) {
                 return;
             }
@@ -427,19 +442,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                     Offers.showInterstitial(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
                 }
             });
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mainBroadcastReceiver != null) {
-            try {
-                unregisterReceiver(mainBroadcastReceiver);
-            } catch (Throwable ignored) {
-                //oh well (the api doesn't provide a way to know if it's been registered before,
-                //seems like overkill keeping track of these ourselves.)
-            }
         }
     }
 
@@ -484,8 +486,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             saveFragmentsStack(outState);
         }
     }
-
-    private ServiceToken mToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

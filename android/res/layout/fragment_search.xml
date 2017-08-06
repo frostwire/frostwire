@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,103 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
+
+    <com.frostwire.android.offers.SearchHeaderBanner
+        android:id="@+id/fragment_search_header_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- advertisement section -->
+    <LinearLayout
+        android:id="@+id/fragment_search_advertisement_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/basic_blue_dark"
+        android:visibility="gone">
+
+        <!-- header with "advertisement" and dismiss button on top -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <ImageButton
+                android:id="@+id/view_search_header_banner_invisible_dismiss_banner_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:background="@null"
+                android:src="@drawable/clearable_edittext_clear_icon"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/view_search_header_banner_advertisement_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1.0"
+                android:gravity="center"
+                android:text="@string/advertisement"
+                android:textColor="@color/basic_blue_dark_highlight"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/view_search_header_banner_dismiss_banner_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:src="@drawable/clearable_edittext_clear_icon"
+                android:visibility="visible" />
+        </LinearLayout>
+        <!-- end of header -->
+
+        <!-- fallback banner on the bottom, mopub banner on top -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!-- fallback banner -->
+            <LinearLayout
+                android:id="@+id/view_search_header_banner_fallback_banner_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/blue_light_button_background_selector_off">
+
+                <TextView
+                    android:id="@+id/view_search_header_banner_fallback_banner_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:textAlignment="center"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:text="@string/remove_ads"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+
+            <!-- mopub banner -->
+            <com.mopub.mobileads.MoPubView
+                android:id="@+id/view_search_header_banner_mopubview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <!-- end of advertisement section -->
 
     <ProgressBar
             android:id="@+id/fragment_search_deepsearch_progress"
@@ -46,16 +144,7 @@
             frostwire:rich_notification_action_links_horizontal_margin="14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-    />
-
-    <LinearLayout
-            android:id="@+id/fragment_search_adview_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/black"
-            android:orientation="horizontal">
-    </LinearLayout>
+            android:visibility="gone"/>
 
     <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_search_swipe"

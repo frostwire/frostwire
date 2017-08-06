@@ -39,6 +39,8 @@
                 android:layout_marginTop="20dp"
                 android:visibility="gone"/>
 
+        <!-- TODO: Add message somewhere in this layout if internet is down -->
+
         <TextView
             android:id="@+id/view_search_progress_try_other_keywords_or_filters"
             android:layout_width="wrap_content"
