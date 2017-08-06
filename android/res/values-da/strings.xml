@@ -21,6 +21,10 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tryk på anvendte tags til]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selvom anbefalet til dine downloads, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>ExpressVPN</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>Private Internet Access</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En ubeskyttet forbindelse betyder alt hvad du gør online (inklusive <b>søgninger, messaging, og downloads</b>) kan overvåges af alle på dit netværk og endda af din internetudbyder.<br><br>Vi anbefaler at bruge ExpressVPN at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En ubeskyttet forbindelse betyder alt hvad du gør online (inklusive <b>søgninger, messaging, og downloads</b>) kan overvåges af alle på dit netværk og endda af din internetudbyder.<br><br>Vi anbefaler at bruge Private Internet Access at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Indstillinger</string>
     <string name="activity_chat_name">Chat</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Slet alt</string>
     <string name="or">eller</string>
     <string name="file_names">Filnavne</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Ubegrænset downloadhastighed</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Privat browsing</string>
+    <string name="vpn_money_back_PIA">7-dages pengene tilbage garanti</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 kundesupport</string>
+    <string name="vpn_money_back_ExpressVPN">30-dages pengene tilbage garanti</string>
+    <string name="visit_vpn_client_PIA">Besøg Private Internet Access</string>
+    <string name="get_PIA">Få Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Solid infrastruktur: verdensomspændende dækning</string>
+    <string name="visit_vpn_client_ExpressVPN">Besøg ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Virkelig let at bruge (vi kan lide nemt!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN support</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Kryptering af militærkvalitet</string>
+    <string name="vpn_client_feature_1_PIA">Ingen registreringer</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
