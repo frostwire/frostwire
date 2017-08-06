@@ -96,28 +96,34 @@ public final class NotificationUpdateDemon implements TimerObserver {
         }
 
         // number of uploads (seeding) and downloads
-        int downloads = TransferManager.instance().getActiveDownloads();
-        int uploads = TransferManager.instance().getActiveUploads();
+        TransferManager transferManager;
 
-        if (downloads == 0 && uploads == 0) {
-            NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (manager != null) {
-                manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
-            }
-            return; // quick return
+        try {
+            transferManager = TransferManager.instance();
+        } catch (IllegalStateException btEngineNotReadyException) {
+            return;
         }
 
-        //  format strings
-        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
-        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
-
-        // Transfers status.
-        notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-        notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
-
-        final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+        if (transferManager != null) {
+            int downloads = transferManager.getActiveDownloads();
+            int uploads = transferManager.getActiveUploads();
+            if (downloads == 0 && uploads == 0) {
+                NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (manager != null) {
+                    manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                }
+                return; // quick return
+            }
+            //  format strings
+            String sDown = UIUtils.rate2speed(transferManager.getDownloadsBandwidth() / 1024);
+            String sUp = UIUtils.rate2speed(transferManager.getUploadsBandwidth() / 1024);
+            // Transfers status.
+            notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+            notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+            final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+            }
         }
     }
 
