@@ -254,6 +254,14 @@ public class IabHelper {
                     new Thread("IabHelper-isBillingSupportedCheck") {
                         @Override
                         public void run() {
+                            if (mService == null) {
+                                if (listener != null) {
+                                    listener.onIabSetupFinished(new IabResult(IABHELPER_UNKNOWN_ERROR,
+                                            "RemoteException while setting up in-app billing."));
+                                }
+                                return;
+                            }
+
                             try {
                                 int response = mService.isBillingSupported(5, packageName, ITEM_TYPE_SUBS);
                                 if (response == BILLING_RESPONSE_RESULT_OK) {
