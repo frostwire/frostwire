@@ -26,6 +26,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -703,7 +704,6 @@ public class IabHelper {
     public void queryInventoryAsync(final boolean querySkuDetails, final List<String> moreItemSkus,
             final List<String> moreSubsSkus, final QueryInventoryFinishedListener listener)
         throws IabAsyncInProgressException {
-        final Handler handler = new Handler();
         checkNotDisposed();
         checkSetupDone("queryInventory");
         flagStartAsync("refresh inventory");
@@ -723,6 +723,7 @@ public class IabHelper {
                 final IabResult result_f = result;
                 final Inventory inv_f = inv;
                 if (!mDisposed && listener != null) {
+                    final Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
                             listener.onQueryInventoryFinished(result_f, inv_f);
