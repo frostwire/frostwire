@@ -19,6 +19,11 @@
  */
 -->
 <resources>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Вы падлучаныя да Інтэрнэту з дапамогай VPN. <br><br> Калі вы не зрабілі, мы рэкамендуем выкарыстоўваць <b>ExpressVPN</b>  каб зашыфраваць злучэнне і <b>абараніць вашу прыватную жыццё</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Вы падлучаныя да Інтэрнэту з дапамогай VPN. <br><br> Калі вы не зрабілі, мы рэкамендуем выкарыстоўваць <b>Private Internet Access</b>  каб зашыфраваць злучэнне і <b>абараніць вашу прыватную жыццё</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць ExpressVPN для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць Private Internet Access для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>інфармацыя:</b> Націсніце ўжытыя тэгі да]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
     <string name="vpn_not_found">Няма VPN. Разгледзім шыфраванне злучэння.</string>
     <string name="azureus_peer_manager_status_finished">Скончана</string>
@@ -634,4 +639,34 @@
     <string name="use_btjunkie">Выкарыстоўвайце BTJunkie</string>
     <string name="add_transfer">дадаць пераклад</string>
     <string name="your_android_wall_paper_will_change">Ваш Android шпалеры зменіцца праз некалькі секунд</string>
+    <string name="filter_ellipsis">Фільтр…</string>
+    <string name="include">ўключаць</string>
+    <string name="fix_instructions">См support.frostwire.com для інфармацыі і выпраўлення інструкцыі</string>
+    <string name="seeing_less_results">Бачачы, менш або няма вынікаў?</string>
+    <string name="touch_applied_tags_to_include_exclude">Націсніце прыкладныя тэг для ўключэння/выключэнне</string>
+    <string name="exclude">выключаць</string>
+    <string name="filter">Фільтр</string>
+    <string name="try_changing_applied_filters">Паспрабуйце змяніць прымяняюцца фільтры</string>
+    <string name="file_extensions">пашырэння файлаў</string>
+    <string name="fullscreen">поуны экран</string>
+    <string name="filter_by_keyword">Фільтр па ключавым слове…</string>
+    <string name="sources_channels">Крыніцы / каналы</string>
+    <string name="clear_all">ачысціць ўсе</string>
+    <string name="or">або</string>
+    <string name="file_names">імёны файлаў</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Няма абмежаванняў па хуткасці</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Прыватныя і ня праглядаюць няма рэгістраў</string>
+    <string name="vpn_money_back_PIA">гарантыя вяртання грошай 7 дзён</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Падтрымка 24/7 кліентаў</string>
+    <string name="vpn_money_back_ExpressVPN">гарантыя вяртання грошай 30 дзён</string>
+    <string name="visit_vpn_client_PIA">візіт Private Internet Access</string>
+    <string name="get_PIA">атрымаць Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Цвёрдая інфраструктура: ва ўсім свеце ахоп</string>
+    <string name="visit_vpn_client_ExpressVPN">візіт ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Вельмі просты ў выкарыстанні (мы, як лёгка!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 Падтрымка VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">шыфраванне ваеннага класа</string>
+    <string name="vpn_client_feature_1_PIA">Няма рэгістрацыі</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

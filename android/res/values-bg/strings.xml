@@ -20,6 +20,11 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Въпреки че се препоръчва за вашите файлове за изтегляне, <b>Вие не се нуждаят от VPN, за да използвате FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Вие сте свързани към Интернет с помощта на VPN. <br><br> Ако не сте вече, ние препоръчваме да използвате <b>ExpressVPN</b> за криптиране на връзката си и <b>защитите личните си данни</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Вие сте свързани към Интернет с помощта на VPN. <br><br> Ако не сте вече, ние препоръчваме да използвате <b>Private Internet Access</b> за криптиране на връзката си и <b>защитите личните си данни</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Един незащитена връзка означава, че всичко, което правите онлайн (включително <b>търсения, съобщения и файлове за изтегляне</b>) може да се наблюдава от някой във вашата мрежа и дори от вашия интернет доставчик.<br><br>Препоръчваме ви да използвате ExpressVPN за криптиране на връзката си и <b>защитите личните си данни</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Един незащитена връзка означава, че всичко, което правите онлайн (включително <b>търсения, съобщения и файлове за изтегляне</b>) може да се наблюдава от някой във вашата мрежа и дори от вашия интернет доставчик.<br><br>Препоръчваме ви да използвате Private Internet Access за криптиране на връзката си и <b>защитите личните си данни</b>.]]></string>
+    <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Докоснете приложените маркери до]]></string>
     <string name="vpn_not_found">Не VPN. Помислете за криптиране на връзката.</string>
     <string name="azureus_peer_manager_status_finished">Завършил</string>
     <string name="activity_mediaplayer_name">Медиен плейър</string>
@@ -633,6 +638,35 @@
     <string name="file_information">Информация за файла</string>
     <string name="use_btjunkie">Използвайте BTJunkie</string>
     <string name="add_transfer">Добавяне на трансфер</string>
-    <string name="your_android_wall_paper_will_change">Вашият тапет за Android ще се промени след няколко секунди
-    </string>
+    <string name="your_android_wall_paper_will_change">Вашият тапет за Android ще се промени след няколко секунди</string>
+    <string name="filter_ellipsis">Филтрирайте…</string>
+    <string name="include">включите</string>
+    <string name="fix_instructions">Вижте support.frostwire.com за информация и поправка на инструкциите</string>
+    <string name="seeing_less_results">Виждате по-малко или никакви резултати?</string>
+    <string name="touch_applied_tags_to_include_exclude">Докоснете приложените маркери, за да включите/изключите</string>
+    <string name="exclude">изключите</string>
+    <string name="date">Дата</string>
+    <string name="filter">Филтрирайте</string>
+    <string name="try_changing_applied_filters">Опитайте да промените приложените филтри</string>
+    <string name="file_extensions">Разширения за файлове</string>
+    <string name="filter_by_keyword">Филтриране по ключова дума…</string>
+    <string name="sources_channels">Източници / канали</string>
+    <string name="clear_all">Изчисти всичко</string>
+    <string name="or">или</string>
+    <string name="file_names">Име на файловете</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Неограничена скорост на изтегляне</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Частен и без регистриране на браузъра</string>
+    <string name="vpn_money_back_PIA">7-дневна гаранция за връщане на парите</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 поддръжка на клиенти</string>
+    <string name="vpn_money_back_ExpressVPN">30-дневна гаранция за връщане на парите</string>
+    <string name="visit_vpn_client_PIA">Посетете Private Internet Access</string>
+    <string name="get_PIA">Купете Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Твърда инфраструктура: покритие по света</string>
+    <string name="visit_vpn_client_ExpressVPN">Посетете ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Наистина лесна за употреба (харесва ни лесно!)</string>
+    <string name="vpn_client_feature_4_PIA">Поддръжка 24/7 VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Военно-ниво на шифроване</string>
+    <string name="vpn_client_feature_1_PIA">Без регистрация</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

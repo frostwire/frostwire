@@ -21,6 +21,10 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>Private Internet Access</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat Private Internet Access k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
     <string name="activity_chat_name">Chat</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Vymazat vše</string>
     <string name="or">nebo</string>
     <string name="file_names">Názvy souborů</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Neomezená rychlost stahování</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Soukromé procházení</string>
+    <string name="vpn_money_back_PIA">7-denní záruka vrácení peněz</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Zákaznická podpora 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">30-denní záruka vrácení peněz</string>
+    <string name="visit_vpn_client_PIA">Navštivte Private Internet Access</string>
+    <string name="get_PIA">Získejte Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Pevná infrastruktura: celosvětové pokrytí</string>
+    <string name="visit_vpn_client_ExpressVPN">Navštivte ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Opravdu snadné použití (máme rádi!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 Podpora VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Vojenské šifrování</string>
+    <string name="vpn_client_feature_1_PIA">Žádné protokolování</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
