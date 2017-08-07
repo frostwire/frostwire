@@ -122,8 +122,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Temporary until I can work out a nice landscape layout
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Get the preferences
         mPreferences = PreferenceUtils.getInstance(this);
