@@ -2255,7 +2255,7 @@ public class MusicPlaybackService extends Service {
                     return -1;
                 }
                 return mCursor.getLong(mCursor.getColumnIndexOrThrow(AudioColumns.ALBUM_ID));
-            } catch (Throwable e) {
+            } catch (IllegalStateException | StaleDataException e) {
                 // this is what happens when a cursor is stored as a state
                 LOG.error("Error using db cursor to get album id", e);
                 mCursor = null;
