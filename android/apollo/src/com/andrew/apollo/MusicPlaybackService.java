@@ -54,6 +54,7 @@ import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -71,7 +72,7 @@ import java.util.concurrent.ExecutorService;
  */
 public class MusicPlaybackService extends Service {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
-    private static final boolean D = true;
+    private static final boolean D = BuildConfig.DEBUG;
 
     /**
      * Indicates that the music has paused or resumed
@@ -1569,56 +1570,85 @@ public class MusicPlaybackService extends Service {
     /**
      * Notify the change-receivers that something has changed.
      */
-    private void notifyChange(final String what) {
-        if (D) LOG.info("notifyChange: what = " + what);
-
-        // Update the lock screen controls
-        updateRemoteControlClient(what);
-
-        if (what.equals(POSITION_CHANGED)) {
-            return;
-        }
-
-        final Intent intent = new Intent(what);
-        intent.putExtra("id", getAudioId());
-        intent.putExtra("artist", getArtistName());
-        intent.putExtra("album", getAlbumName());
-        intent.putExtra("track", getTrackName());
-        intent.putExtra("playing", isPlaying());
-        intent.putExtra("isfavorite", isFavorite());
-        sendStickyBroadcast(intent);
-
-        final Intent musicIntent = new Intent(intent);
-        musicIntent.setAction(what.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
-        sendStickyBroadcast(musicIntent);
-
-        if (what.equals(META_CHANGED)) {
-            // Increase the play count for favorite songs.
-            if (mFavoritesCache == null) {
-                mFavoritesCache = FavoritesStore.getInstance(this);
-            }
-
-            if (mFavoritesCache.getSongId(getAudioId()) != null) {
-                mFavoritesCache.addSongId(getAudioId(), getTrackName(), getAlbumName(),
-                        getArtistName());
-            }
-            // Add the track to the recently played list.
-            ExecutorService threadPool = Engine.instance().getThreadPool();
-            if (threadPool != null) {
-                threadPool.submit(new RecentsStoreAddAlbumIdRunnable(this));
-            }
-
-        } else if (what.equals(QUEUE_CHANGED)) {
-            saveQueue(true);
-            if (isPlaying()) {
-                setNextTrack();
-            }
+    private void notifyChange(final String change) {
+        NotifyChangeRunnable runnable = new NotifyChangeRunnable(this, change);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Engine.instance().getThreadPool().submit(runnable);
         } else {
-            saveQueue(false);
+            runnable.run();
+        }
+    }
+
+    private final static class NotifyChangeRunnable implements Runnable {
+
+        WeakReference<MusicPlaybackService> musicPlaybackServiceRef;
+        final String change;
+
+        NotifyChangeRunnable(MusicPlaybackService musicPlaybackService, String change) {
+            musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
+            this.change = change;
         }
 
-        if (what.equals(PLAYSTATE_CHANGED)) {
-            mNotificationHelper.updatePlayState(isPlaying());
+        @Override
+        public void run() {
+            if (!Ref.alive(musicPlaybackServiceRef)) {
+                return;
+            }
+            MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
+            if (D) LOG.info("notifyChange: what = " + change);
+
+            // Update the lock screen controls
+            musicPlaybackService.updateRemoteControlClient(change);
+
+            if (POSITION_CHANGED.equals(change)) {
+                return;
+            }
+
+            final Intent intent = new Intent(change);
+            long audioId = musicPlaybackService.getAudioId();
+            String artistName = musicPlaybackService.getArtistName();
+            String albumName = musicPlaybackService.getAlbumName();
+            String trackName = musicPlaybackService.getTrackName();
+            boolean isPlaying = musicPlaybackService.isPlaying();
+            boolean favorite = musicPlaybackService.isFavorite();
+            intent.putExtra("id", audioId);
+            intent.putExtra("artist", artistName);
+            intent.putExtra("album", albumName);
+            intent.putExtra("track", trackName);
+            intent.putExtra("playing", isPlaying);
+            intent.putExtra("isfavorite", favorite);
+            musicPlaybackService.sendStickyBroadcast(intent);
+
+            final Intent musicIntent = new Intent(intent);
+            musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
+            musicPlaybackService.sendStickyBroadcast(musicIntent);
+
+            if (META_CHANGED.equals(change)) {
+                // Increase the play count for favorite songs.
+                if (musicPlaybackService.mFavoritesCache == null) {
+                    musicPlaybackService.mFavoritesCache = FavoritesStore.getInstance(musicPlaybackService);
+                }
+                if (musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
+                    musicPlaybackService.mFavoritesCache.addSongId(audioId, trackName, albumName, artistName);
+                }
+                // Add the track to the recently played list.
+                ExecutorService threadPool = Engine.instance().getThreadPool();
+                if (threadPool != null) {
+                    threadPool.submit(new RecentsStoreAddAlbumIdRunnable(musicPlaybackService));
+                }
+
+            } else if (QUEUE_CHANGED.equals(change)) {
+                musicPlaybackService.saveQueue(true);
+                if (isPlaying) {
+                    musicPlaybackService.setNextTrack();
+                }
+            } else {
+                musicPlaybackService.saveQueue(false);
+            }
+
+            if (PLAYSTATE_CHANGED.equals(change)) {
+                musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
+            }
         }
     }
 
