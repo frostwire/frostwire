@@ -294,29 +294,29 @@ public abstract class BaseActivity extends AbstractActivity
         boolean isPlaying = !MusicUtils.isStopped();
         if (isPlaying) {
             // Play and pause button
-            mPlayPauseButton = (PlayPauseButton) findViewById(R.id.action_button_play);
+            mPlayPauseButton = findViewById(R.id.action_button_play);
             mPlayPauseButton.setPlayDrawable(R.drawable.btn_playback_play_bottom);
             mPlayPauseButton.setPauseDrawable(R.drawable.btn_playback_pause_bottom);
 
-            RepeatingImageButton prevButton = (RepeatingImageButton) findViewById(R.id.action_button_previous);
-            RepeatingImageButton nextButton = (RepeatingImageButton) findViewById(R.id.action_button_next);
+            RepeatingImageButton prevButton = findViewById(R.id.action_button_previous);
+            RepeatingImageButton nextButton = findViewById(R.id.action_button_next);
             prevButton.setPreviousDrawable(R.drawable.btn_playback_previous_bottom);
             nextButton.setNextDrawable(R.drawable.btn_playback_next_bottom);
 
             // Shuffle button
-            mShuffleButton = (ShuffleButton) findViewById(R.id.action_button_shuffle);
+            mShuffleButton = findViewById(R.id.action_button_shuffle);
             // Repeat button
-            mRepeatButton = (RepeatButton) findViewById(R.id.action_button_repeat);
+            mRepeatButton = findViewById(R.id.action_button_repeat);
             // Track name
-            mTrackName = (TextView) findViewById(R.id.bottom_action_bar_line_one);
+            mTrackName = findViewById(R.id.bottom_action_bar_line_one);
             // Artist name
-            mArtistName = (TextView) findViewById(R.id.bottom_action_bar_line_two);
+            mArtistName = findViewById(R.id.bottom_action_bar_line_two);
             // Album art
-            mAlbumArt = (ImageView) findViewById(R.id.bottom_action_bar_album_art);
+            mAlbumArt = findViewById(R.id.bottom_action_bar_album_art);
             // Open to the currently playing album profile
             mAlbumArt.setOnClickListener(mOpenCurrentAlbumProfile);
             // Bottom action bar
-            final LinearLayout bottomActionBar = (LinearLayout) findViewById(R.id.bottom_action_bar);
+            final LinearLayout bottomActionBar = findViewById(R.id.bottom_action_bar);
             // Display the now playing screen or shuffle if this isn't anything
             // playing
             bottomActionBar.setOnClickListener(mOpenNowPlaying);
@@ -341,7 +341,7 @@ public abstract class BaseActivity extends AbstractActivity
     }
 
     private void setBottomActionBarVisible(boolean visible) {
-        final BottomActionBar bottomActionBar = (BottomActionBar) findViewById(R.id.bottom_action_bar_parent);
+        final BottomActionBar bottomActionBar = findViewById(R.id.bottom_action_bar_parent);
         bottomActionBar.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 

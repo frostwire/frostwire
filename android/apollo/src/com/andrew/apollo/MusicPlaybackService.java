@@ -1083,7 +1083,6 @@ public class MusicPlaybackService extends Service {
         closeCursor();
         if (scheduleShutdown) {
             scheduleDelayedShutdown();
-            mIsSupposedToBePlaying = false;
             updateRemoteControlClient(PLAYSTATE_STOPPED);
         } else {
             stopForeground(false);
@@ -1094,6 +1093,7 @@ public class MusicPlaybackService extends Service {
         if (mPlayer != null && mPlayer.isInitialized()) {
             LOG.info("stopPlayer()");
             mPlayer.stop();
+            mIsSupposedToBePlaying = false;
         }
     }
 

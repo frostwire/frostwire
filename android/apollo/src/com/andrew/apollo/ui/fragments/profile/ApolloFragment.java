@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -135,6 +136,16 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     public abstract void onItemClick(final AdapterView<?> parent, final View view, final int position,
                                      final long id);
 
+    protected void onSongItemClick(int position) {
+        if (mAdapter != null) {
+            if (mAdapter instanceof ArrayAdapter) {
+                MusicUtils.playAllFromUserItemClick((ArrayAdapter) mAdapter, position);
+            }
+            mAdapter.notifyDataSetChanged();
+            NavUtils.openAudioPlayer(getActivity());
+        }
+    }
+
     protected ApolloFragment(int groupId, int loaderId) {
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
@@ -144,7 +155,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
-        mProfileTabCarousel = (ProfileTabCarousel) activity.findViewById(R.id.activity_profile_base_tab_carousel);
+        mProfileTabCarousel = activity.findViewById(R.id.activity_profile_base_tab_carousel);
 
         if (activity instanceof BaseActivity) {
             // Register the music status listener
@@ -438,7 +449,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mAdapter.notifyDataSetChanged();
 
             // Set the empty text
-            final TextView empty = (TextView) mRootView.findViewById(R.id.empty);
+            final TextView empty = mRootView.findViewById(R.id.empty);
             if (empty != null) {
                 empty.setText(getString(R.string.empty_music));
                 if (isSimpleLayout()) {
@@ -567,7 +578,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             throw new RuntimeException("initGridView(): mRootView == null");
         }
         // Initialize the grid
-        mGridView = (GridView) mRootView.findViewById(R.id.grid_base);
+        mGridView = mRootView.findViewById(R.id.grid_base);
 
         if (mGridView != null && mAdapter != null) {
             // Set the data behind the grid
@@ -627,7 +638,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             throw new RuntimeException("initListView(): mRootView == null");
         }
         // Initialize the grid
-        mListView = (ListView) mRootView.findViewById(R.id.list_base);
+        mListView = mRootView.findViewById(R.id.list_base);
         // Set the data behind the list
         if (mAdapter != null) {
             mListView.setAdapter(mAdapter);

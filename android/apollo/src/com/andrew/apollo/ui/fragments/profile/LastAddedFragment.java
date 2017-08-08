@@ -20,19 +20,14 @@ package com.andrew.apollo.ui.fragments.profile;
 
 import android.content.Loader;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.andrew.apollo.adapters.ProfileSongAdapter;
 import com.andrew.apollo.loaders.LastAddedLoader;
-import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
-import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
@@ -68,7 +63,7 @@ public final class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, 
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
-        MusicUtils.playAllFromUserItemClick(mAdapter, position);
+        onSongItemClick(position);
     }
 
 
@@ -78,7 +73,7 @@ public final class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, 
         if (data.isEmpty()) {
             // Set the empty text
             if (mRootView != null) {
-                final TextView empty = (TextView) mRootView.findViewById(R.id.empty);
+                final TextView empty = mRootView.findViewById(R.id.empty);
                 empty.setText(getString(R.string.empty_last_added));
                 mListView.setEmptyView(empty);
             }

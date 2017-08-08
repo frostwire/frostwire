@@ -41,7 +41,6 @@ import com.andrew.apollo.loaders.PlaylistSongLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
-import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
@@ -104,7 +103,7 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
-        MusicUtils.playAllFromUserItemClick(mAdapter, position);
+        onSongItemClick(position);
     }
 
     @Override

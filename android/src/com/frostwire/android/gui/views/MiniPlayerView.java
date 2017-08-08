@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
+import com.andrew.apollo.utils.NavUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
@@ -66,9 +68,9 @@ public class MiniPlayerView extends LinearLayout {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_miniplayer, this);
 
-        titleText = (TextView) findViewById(R.id.view_miniplayer_title);
-        artistText = (TextView) findViewById(R.id.view_miniplayer_artist);
-        coverImage = (ImageView) findViewById(R.id.view_miniplayer_cover);
+        titleText = findViewById(R.id.view_miniplayer_title);
+        artistText = findViewById(R.id.view_miniplayer_artist);
+        coverImage = findViewById(R.id.view_miniplayer_cover);
 
         if (isInEditMode()) {
             return; // skip component logic
@@ -83,14 +85,15 @@ public class MiniPlayerView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 openAudioPlayerActivity();
+                NavUtils.openAudioPlayer((Activity) getContext());
             }
         };
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
 
-        LinearLayout statusContainer = (LinearLayout) findViewById(R.id.view_miniplayer_status_container);
+        LinearLayout statusContainer = findViewById(R.id.view_miniplayer_status_container);
         statusContainer.setOnClickListener(goToAudioPlayerActivityListener);
 
-        ImageView previous = (ImageView) findViewById(R.id.view_miniplayer_previous);
+        ImageView previous = findViewById(R.id.view_miniplayer_previous);
         previous.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +101,7 @@ public class MiniPlayerView extends LinearLayout {
             }
         });
 
-        playPauseButton = (ImageView) findViewById(R.id.view_miniplayer_play_pause);
+        playPauseButton = findViewById(R.id.view_miniplayer_play_pause);
         playPauseButton.setClickable(true);
         playPauseButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -113,7 +116,7 @@ public class MiniPlayerView extends LinearLayout {
                 return true;
             }
         });
-        ImageView next = (ImageView) findViewById(R.id.view_miniplayer_next);
+        ImageView next = findViewById(R.id.view_miniplayer_next);
         next.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

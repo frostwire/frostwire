@@ -28,7 +28,6 @@ import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.loaders.LastAddedLoader;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
-import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
@@ -63,10 +62,7 @@ public final class LastAddedFragment extends ApolloFragment<SongAdapter, Song> {
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int position,
                             final long id) {
-        if (mAdapter != null) {
-            MusicUtils.playAllFromUserItemClick(mAdapter, position);
-            mAdapter.notifyDataSetChanged();
-        }
+        onSongItemClick(position);
     }
 
     @Override

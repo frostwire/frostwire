@@ -112,7 +112,6 @@ public final class NavUtils {
         final Intent intent = new Intent(activity, AudioPlayerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
-        activity.finish();
     }
 
     /**

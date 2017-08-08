@@ -60,7 +60,7 @@ class StopListener implements View.OnLongClickListener {
             public void run() {
                 try {
                     MusicUtils.musicPlaybackService.stop();
-                } catch (RemoteException e) {
+                } catch (Throwable e) {
                     e.printStackTrace();
                 }
                 v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
