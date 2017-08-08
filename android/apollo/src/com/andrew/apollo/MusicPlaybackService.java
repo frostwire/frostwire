@@ -1305,67 +1305,64 @@ public class MusicPlaybackService extends Service {
      *                 otherwise.
      */
     private void openCurrentAndMaybeNext(final boolean openNext, final Runnable onOpenedCallback) {
-        synchronized (this) {
-            closeCursor();
-            if (mPlayListLen == 0 || mPlayList == null) {
-                return;
+        closeCursor();
+        if (mPlayListLen == 0 || mPlayList == null) {
+            return;
+        }
+        stop(false);
+        mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
+        updateCursor(mPlayList[mPlayPos]);
+        boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
+        if (!hasOpenCursor) {
+            if (openNext) {
+                setNextTrack();
             }
-            stop(false);
-            mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
-            updateCursor(mPlayList[mPlayPos]);
-            boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
-            if (!hasOpenCursor) {
-                if (openNext) {
-                    setNextTrack();
-                }
-            } else {
-                final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
-                openFile(path, new OpenFileResultCallback() {
-                    @Override
-                    public void openFileResult(boolean result) {
-                        if (!result) {
-                            // if we get here then opening the file failed. We can close the
-                            // cursor now, because
-                            // we're either going to create a new one next, or stop trying
-                            closeCursor();
-                            if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
-                                final int pos = getNextPosition(false);
-                                if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
-                                mPlayPos = pos;
-                                stop(false);
-                                mPlayPos = pos;
-                                updateCursor(mPlayList[mPlayPos]);
-
-                                boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
-                                if (!hasOpenCursor) {
-                                    if (openNext) {
-                                        setNextTrack();
-                                    }
-                                } else {
-                                    final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
-                                    openFile(path, this); // try again
+        } else {
+            final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
+            openFile(path, new OpenFileResultCallback() {
+                @Override
+                public void openFileResult(boolean result) {
+                    if (!result) {
+                        // if we get here then opening the file failed. We can close the
+                        // cursor now, because
+                        // we're either going to create a new one next, or stop trying
+                        closeCursor();
+                        if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
+                            final int pos = getNextPosition(false);
+                            if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
+                            mPlayPos = pos;
+                            stop(false);
+                            mPlayPos = pos;
+                            updateCursor(mPlayList[mPlayPos]);
+                            boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
+                            if (!hasOpenCursor) {
+                                if (openNext) {
+                                    setNextTrack();
                                 }
                             } else {
-                                mOpenFailedCounter = 0;
-                                LOG.warn("Failed to open file for playback");
-                                scheduleDelayedShutdown();
-                                if (mIsSupposedToBePlaying) {
-                                    mIsSupposedToBePlaying = false;
-                                    notifyChange(PLAYSTATE_CHANGED);
-                                }
-                                return;
+                                final String path = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
+                                openFile(path, this); // try again
                             }
                         } else {
-                            if (openNext) {
-                                setNextTrack();
+                            mOpenFailedCounter = 0;
+                            LOG.warn("Failed to open file for playback");
+                            scheduleDelayedShutdown();
+                            if (mIsSupposedToBePlaying) {
+                                mIsSupposedToBePlaying = false;
+                                notifyChange(PLAYSTATE_CHANGED);
                             }
-                            if (onOpenedCallback != null) {
-                                onOpenedCallback.run();
-                            }
+                            return;
+                        }
+                    } else {
+                        if (openNext) {
+                            setNextTrack();
+                        }
+                        if (onOpenedCallback != null) {
+                            onOpenedCallback.run();
                         }
                     }
-                });
-            }
+                }
+            });
         }
     }
 
