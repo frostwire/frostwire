@@ -159,7 +159,7 @@ public class NotificationHelper {
         }
         try {
             mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
-        } catch (Throwable t) {
+        } catch (SecurityException t) {
             // java.lang.SecurityException
         }
     }

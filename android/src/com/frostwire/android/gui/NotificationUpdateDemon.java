@@ -83,7 +83,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
         if (manager != null) {
             try {
                 manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
-            } catch (Throwable t) {
+            } catch (SecurityException t) {
                 // possible java.lang.SecurityException
             }
         }
@@ -116,7 +116,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
                 if (manager != null) {
                     try {
                         manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
-                    } catch (Throwable ignored) {
+                    } catch (SecurityException ignored) {
                         // possible java.lang.SecurityException
                     }
                 }
@@ -132,7 +132,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
             if (notificationManager != null) {
                 try {
                     notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
-                } catch (Throwable ignored) {
+                } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
                 }
             }
