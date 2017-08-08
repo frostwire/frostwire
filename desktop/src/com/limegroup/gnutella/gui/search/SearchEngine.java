@@ -19,7 +19,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -65,7 +64,6 @@ public abstract class SearchEngine {
     private static final int EZTV_ID = 15;
 
     private static final int YIFI_ID = 17;
-    public static final int BTJUNKIE_ID = 18;
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
@@ -156,13 +154,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine BTJUNKIE = new SearchEngine(BTJUNKIE_ID, "BTJunkie", SearchEnginesSettings.BTJUNKIE_SEARCH_ENABLED, "btjunkie.eu") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new BtjunkieSearchPerformer(BTJUNKIE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -198,9 +189,21 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        List<SearchEngine>  list = Arrays.asList(YOUTUBE, ZOOQLE, TPB, SOUNDCLOUD, FROSTCLICK, BTJUNKIE, MONOVA, ARCHIVEORG, TORLOCK, YIFY, EZTV, TORRENTDOWNLOADS, LIMETORRENTS);
+        List<SearchEngine>  list = Arrays.asList(
+                YOUTUBE,
+                ZOOQLE,
+                TPB,
+                SOUNDCLOUD,
+                FROSTCLICK,
+                MONOVA,
+                ARCHIVEORG,
+                TORLOCK,
+                YIFY,
+                EZTV,
+                TORRENTDOWNLOADS,
+                LIMETORRENTS);
 
-        // ensure that at leas one is enable
+        // ensure that at least one is enabled
         boolean oneEnabled = false;
         for (SearchEngine se : list) {
             if (se.isEnabled()) {

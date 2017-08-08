@@ -1,7 +1,8 @@
 frostwire (6.5.5) stable; urgency=high
   * New jlibtorrent 1.2.0.11-RC5
+  * Search: BTJunkie removed
 	
- -- FrostWire Team <contact@frostwire.com>  Sun, 06 Aug 2017 07:59:16 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 08 Aug 2017 15:33:56 -0600
 
 frostwire (6.5.4) stable; urgency=high
   * YT search fixed

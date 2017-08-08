@@ -19,7 +19,6 @@ package com.frostwire.search;
 
 import com.frostwire.platform.AppSettings;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.btjunkie.BtjunkieSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
@@ -37,7 +36,11 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -417,13 +420,18 @@ public final class SearchManager {
         }
     };
 
-    static final SearchEngine BTJUNKIE = new SearchEngine("Btjunkie", AppSettings.SEARCH_BTJUNKIE_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new BtjunkieSearchPerformer("btjunkie.eu", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
     @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(YIFY, YOUTUBE, FROSTCLICK, BTJUNKIE, TPB, MONOVA, ZOOQLE, SOUNCLOUD, ARCHIVE, LIMETORRENTS, TORLOCK, TORRENTDOWNLOADS, EZTV);
+    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
+            YIFY,
+            YOUTUBE,
+            FROSTCLICK,
+            TPB,
+            MONOVA,
+            ZOOQLE,
+            SOUNCLOUD,
+            ARCHIVE,
+            LIMETORRENTS,
+            TORLOCK,
+            TORRENTDOWNLOADS,
+            EZTV);
 }

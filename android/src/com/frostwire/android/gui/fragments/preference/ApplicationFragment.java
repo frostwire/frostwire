@@ -28,6 +28,7 @@ import android.support.v7.preference.TwoStatePreference;
 import android.widget.Toast;
 
 import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -58,7 +59,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
 
     private static final Logger LOG = Logger.getLogger(ApplicationFragment.class);
 
-    private static final boolean INTERNAL_BUILD = false;
+    private static final boolean INTERNAL_BUILD = BuildConfig.DEBUG;
     private static final int MILLISECONDS_IN_A_DAY = 86400000;
     private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationFragment.DIALOG.stop.http";
 
