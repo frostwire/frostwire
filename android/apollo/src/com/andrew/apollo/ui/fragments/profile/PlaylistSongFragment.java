@@ -145,10 +145,12 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
         try {
             mItem = mAdapter.getItem(realFrom);
             mAdapter.remove(mItem);
-            mAdapter.insert(mItem, realTo);
+            int count = mAdapter.getCount();
+            int adjustedTo = (realTo >= count) ? count-1 : realTo;
+            mAdapter.insert(mItem, adjustedTo);
             mAdapter.notifyDataSetChanged();
             final ContentResolver resolver = getActivity().getContentResolver();
-            MediaStore.Audio.Playlists.Members.moveItem(resolver, mPlaylistId, realFrom, realTo);
+            MediaStore.Audio.Playlists.Members.moveItem(resolver, mPlaylistId, realFrom, adjustedTo);
         } catch (Throwable ignored) {
         }
     }

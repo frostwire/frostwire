@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.dragdrop.DragSortListView;
 import com.andrew.apollo.dragdrop.DragSortListView.DragScrollProfile;
@@ -40,10 +39,8 @@ import com.andrew.apollo.menu.CreateNewPlaylist;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
 
 import java.util.List;
 
@@ -152,12 +149,17 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     }
 
     public void drop(final int from, final int to) {
-        mItem = mAdapter.getItem(from);
-        mAdapter.remove(mItem);
-        mAdapter.insert(mItem, to);
-        mAdapter.notifyDataSetChanged();
-        MusicUtils.moveQueueItem(from, to);
-        mAdapter.buildCache();
+        try {
+            mItem = mAdapter.getItem(from);
+            mAdapter.remove(mItem);
+            int count = mAdapter.getCount();
+            int adjustedTo = (to >= count) ? count-1 : to;
+            mAdapter.insert(mItem, adjustedTo);
+            mAdapter.notifyDataSetChanged();
+            MusicUtils.moveQueueItem(from, adjustedTo);
+            mAdapter.buildCache();
+        } catch (Throwable ignored) {
+        }
     }
 
     /**
