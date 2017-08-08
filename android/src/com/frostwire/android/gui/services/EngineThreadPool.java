@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.services;
 
+import android.os.Build;
+
 import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
@@ -33,7 +35,7 @@ final class EngineThreadPool extends ThreadPool {
 
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
-    private static final int MAXIMUM_POOL_SIZE = 4;
+    private static final int MAXIMUM_POOL_SIZE = (Build.VERSION.SDK_INT >= 17 && Runtime.getRuntime() != null) ? Runtime.getRuntime().availableProcessors() : 4;
 
     EngineThreadPool() {
         super("Engine", MAXIMUM_POOL_SIZE, new LinkedBlockingQueue<Runnable>(), false);
