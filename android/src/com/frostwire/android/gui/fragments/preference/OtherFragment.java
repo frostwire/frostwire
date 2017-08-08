@@ -63,7 +63,11 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                         Context ctx = getActivity();
                         NotificationManager notificationService = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
                         if (notificationService != null) {
-                            notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                            try {
+                                notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                            } catch (Throwable t) {
+                                // possible java.lang.SecurityException
+                            }
                         }
                     }
                     return true;

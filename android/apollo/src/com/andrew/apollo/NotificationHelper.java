@@ -157,7 +157,11 @@ public class NotificationHelper {
             mExpandedView.setImageViewResource(R.id.notification_expanded_base_play,
                     isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
         }
-        mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
+        try {
+            mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
+        } catch (Throwable t) {
+            // java.lang.SecurityException
+        }
     }
 
     /**

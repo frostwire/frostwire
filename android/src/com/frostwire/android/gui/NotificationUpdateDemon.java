@@ -81,7 +81,11 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
-            manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+            try {
+                manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+            } catch (Throwable t) {
+                // possible java.lang.SecurityException
+            }
         }
     }
 
@@ -110,7 +114,11 @@ public final class NotificationUpdateDemon implements TimerObserver {
             if (downloads == 0 && uploads == 0) {
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
-                    manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                    try {
+                        manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                    } catch (Throwable ignored) {
+                        // possible java.lang.SecurityException
+                    }
                 }
                 return; // quick return
             }
@@ -122,7 +130,11 @@ public final class NotificationUpdateDemon implements TimerObserver {
             notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
-                notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+                try {
+                    notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+                } catch (Throwable ignored) {
+                    // possible java.lang.SecurityException
+                }
             }
         }
     }

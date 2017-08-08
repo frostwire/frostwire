@@ -35,7 +35,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -49,13 +48,11 @@ import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.OKHTTPClient;
 
-import okhttp3.ConnectionPool;
-
 import java.io.File;
-import java.util.concurrent.ExecutorService;
+
+import okhttp3.ConnectionPool;
 
 /**
  * @author gubatron
@@ -140,7 +137,11 @@ public class EngineService extends Service implements IEngineService {
         LOG.debug("shutdownSupport");
         enableComponents(false);
         stopPermanentNotificationUpdates();
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+        try {
+            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
+        } catch (Throwable t) {
+            // possible java.lang.SecurityException
+        }
         stopServices(false);
         LOG.debug("onDestroy, stopping BTEngine...");
         BTEngine.getInstance().stop();
