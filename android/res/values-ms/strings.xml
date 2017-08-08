@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Walaupun disyorkan untuk muat turun anda, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>ExpressVPN</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>Private Internet Access</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan ExpressVPN untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan Private Internet Access untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
     <string name="vpn_not_found">Tiada VPN. Pertimbangkan menyulitkan sambungan.</string>
     <string name="azureus_peer_manager_status_finished">Tamat</string>
     <string name="activity_mediaplayer_name">Pemain media</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Kosongkan semua</string>
     <string name="or">atau</string>
     <string name="file_names">Nama fail</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Kelajuan muat turun tanpa had</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Penjelajahan peribadi</string>
+    <string name="vpn_money_back_PIA">Jaminan wang balik 7 hari</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 sokongan pelanggan</string>
+    <string name="vpn_money_back_ExpressVPN">Jaminan wang balik 30 hari</string>
+    <string name="visit_vpn_client_PIA">Lawati Private Internet Access</string>
+    <string name="get_PIA">Dapatkan Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Infrastruktur pepejal: liputan di seluruh dunia</string>
+    <string name="visit_vpn_client_ExpressVPN">Lawati ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Sangat mudah digunakan (kami suka mudah!)</string>
+    <string name="vpn_client_feature_4_PIA">Sokongan VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Penyulitan gred ketenteraan</string>
+    <string name="vpn_client_feature_1_PIA">Tiada pembalakan</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

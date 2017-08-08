@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Även rekommenderas för dina nedladdningar, <b>du behöver inte en VPN att använda Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Peka på använda taggar till]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>ExpressVPN</b> att kryptera din anslutning och <b>skydda din integritet</b>.  ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>Private Internet Access</b> att kryptera din anslutning och <b>skydda din integritet</b>.  ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder ExpressVPN att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder Private Internet Access att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
     <string name="vpn_not_found">Ingen VPN. Överväga att kryptera anslutning.</string>
     <string name="azureus_peer_manager_status_finished">Färdiga</string>
     <string name="activity_mediaplayer_name">Mediaspelare</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Rensa alla</string>
     <string name="or">eller</string>
     <string name="file_names">Filnamn</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Obegränsad nedladdningshastighet</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Privat internetsurfning</string>
+    <string name="vpn_money_back_PIA">7-dagars pengarna tillbaka garanti</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 kundsupport</string>
+    <string name="vpn_money_back_ExpressVPN">30-dagars pengarna tillbaka garantie</string>
+    <string name="visit_vpn_client_PIA">Besök Private Internet Access</string>
+    <string name="get_PIA">Hämta Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Solid infrastruktur: världsomfattande täckning</string>
+    <string name="visit_vpn_client_ExpressVPN">Besök ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Verkligen lätt att använda (vi gillar det enkelt!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN-support</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Kryptering av militär kvalitet</string>
+    <string name="vpn_client_feature_1_PIA">Ingen loggning</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

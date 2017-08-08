@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>Private Internet Access</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ ExpressVPN การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ Private Internet Access การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
     <string name="vpn_not_found">ไม่มี VPN พิจารณาการเข้ารหัสการเชื่อมต่อ</string>
     <string name="azureus_peer_manager_status_finished">เสร็จ</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">ลบทั้งหมด</string>
     <string name="or">หรือ</string>
     <string name="file_names">ชื่อไฟล์</string>
+    <string name="vpn_client_feature_2_ExpressVPN">ความเร็วในการดาวน์โหลดไม่ จำกัด</string>
+    <string name="vpn_client_feature_3_ExpressVPN">การท่องแบบส่วนตัว</string>
+    <string name="vpn_money_back_PIA">การรับประกันคืนเงิน 7 วัน</string>
+    <string name="vpn_client_feature_4_ExpressVPN">ฝ่ายสนับสนุนลูกค้าตลอด 24 ชั่วโมงทุกวัน</string>
+    <string name="vpn_money_back_ExpressVPN">การรับประกันคืนเงิน 30 วัน</string>
+    <string name="visit_vpn_client_PIA">ไปที่ Private Internet Access</string>
+    <string name="get_PIA">รับ Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">โครงสร้างพื้นฐานที่แข็งแกร่ง: ครอบคลุมทั่วโลก</string>
+    <string name="visit_vpn_client_ExpressVPN">ไปที่ ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">ใช้งานได้ง่ายจริงๆ (ชอบง่าย!)</string>
+    <string name="vpn_client_feature_4_PIA">การสนับสนุน VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">การเข้ารหัสระดับประเทศ</string>
+    <string name="vpn_client_feature_1_PIA">ไม่มีการบันทึก</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

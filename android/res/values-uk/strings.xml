@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоча рекомендується для завантаження, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>ExpressVPN</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>Private Internet Access</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати ExpressVPN для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати Private Internet Access для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
     <string name="vpn_not_found">Ні VPN. Розглянемо шифрування з\'єднання.</string>
     <string name="azureus_peer_manager_status_finished">Закінчено</string>
     <string name="activity_mediaplayer_name">Медіа плеєр</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Очистити все</string>
     <string name="or">Або</string>
     <string name="file_names">Імена файлів</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Необмежена швидкість завантаження</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Приватний перегляд</string>
+    <string name="vpn_money_back_PIA">7-денна гарантія повернення грошей</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Клієнтська підтримка 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">30-денна гарантія повернення грошей</string>
+    <string name="visit_vpn_client_PIA">Відвідайте Private Internet Access</string>
+    <string name="get_PIA">Отримати Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Тверда інфраструктура: охоплення по всьому світу</string>
+    <string name="visit_vpn_client_ExpressVPN">Відвідайте ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Дійсно проста у використанні (нам подобається легко!)</string>
+    <string name="vpn_client_feature_4_PIA">Підтримка VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Військовий клас шифрування</string>
+    <string name="vpn_client_feature_1_PIA">Немає ведення журналу</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

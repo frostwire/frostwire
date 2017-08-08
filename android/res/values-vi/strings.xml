@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>ExpressVPN</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>Private Internet Access</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[  Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng Private Internet Access để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
     <string name="activity_chat_name">Chat</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Làm sạch tất cả</string>
     <string name="or">hoặc là</string>
     <string name="file_names">Tên tệp</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Tốc độ tải xuống không giới hạn</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Duyệt web riêng tư</string>
+    <string name="vpn_money_back_PIA">Bảo lãnh hoàn lại tiền trong 7 ngày</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Hỗ trợ khách hàng 24/7</string>
+    <string name="vpn_money_back_ExpressVPN">Bảo lãnh hoàn lại tiền 30 ngày</string>
+    <string name="visit_vpn_client_PIA">Truy cập Private Internet Access</string>
+    <string name="get_PIA">Nhận Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Cơ sở hạ tầng vững chắc: bao phủ toàn cầu</string>
+    <string name="visit_vpn_client_ExpressVPN">Truy cập ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Thực sự dễ sử dụng (chúng tôi thích dễ dàng!)</string>
+    <string name="vpn_client_feature_4_PIA">Hỗ trợ 24/7 VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Mã hóa cấp quân đội</string>
+    <string name="vpn_client_feature_1_PIA">Không có sổ đăng ký</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

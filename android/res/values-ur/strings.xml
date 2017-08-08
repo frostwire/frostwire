@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>ExpressVPN</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>Private Internet Access</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ ایک غیر متوقع کنکشن کا مطلب یہ ہے کہ آپ آن لائن سب کچھ کرتے ہیں (<b> تلاش، پیغام رسانی اور ڈاؤن لوڈز </b> سمیت) بھی آپ کے نیٹ ورک پر کسی اور کی طرف سے بھی آپ کے انٹرنیٹ سروس فراہم کرنے والے کی طرف سے نگرانی کی جا سکتی ہے. <br> <br> ہم  ExpressVPN کو اپنے کنکشن کو خفیہ کرنے اور <b> اپنی رازداری کی حفاظت </b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ ایک غیر متوقع کنکشن کا مطلب یہ ہے کہ آپ آن لائن سب کچھ کرتے ہیں (<b> تلاش، پیغام رسانی اور ڈاؤن لوڈز </b> سمیت) بھی آپ کے نیٹ ورک پر کسی اور کی طرف سے بھی آپ کے انٹرنیٹ سروس فراہم کرنے والے کی طرف سے نگرانی کی جا سکتی ہے. <br> <br> ہم  Private Internet Access کو اپنے کنکشن کو خفیہ کرنے اور <b> اپنی رازداری کی حفاظت </b>.]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
     <string name="activity_chat_name">بات چیت</string>
     <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">تمام کو صاف کریں</string>
     <string name="or">یا</string>
     <string name="file_names">فائل نام</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Unlimited download speed</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Private browsing</string>
+    <string name="vpn_money_back_PIA">7-day money-back guarantee</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 customer support</string>
+    <string name="vpn_money_back_ExpressVPN">30-day money-back guarantee</string>
+    <string name="visit_vpn_client_PIA">Visit Private Internet Access</string>
+    <string name="get_PIA">Get Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Solid infrastructure: worldwide coverage</string>
+    <string name="visit_vpn_client_ExpressVPN">Visit ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Really easy to use (we like easy!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN Support</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Military-grade encryption</string>
+    <string name="vpn_client_feature_1_PIA">No logging</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

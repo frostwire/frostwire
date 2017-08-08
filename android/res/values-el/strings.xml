@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Αν και συνιστάται για τις λήψεις σας, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>Private Internet Access</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε ExpressVPN να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε Private Internet Access να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="activity_chat_name">Chat</string>
@@ -652,4 +656,19 @@
     <string name="clear_all">Διαγραφή όλων</string>
     <string name="or">ή</string>
     <string name="file_names">Ονόματα αρχείων</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Απεριόριστη ταχύτητα λήψης</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Ιδιωτική περιήγηση στο διαδίκτυο</string>
+    <string name="vpn_money_back_PIA">Εγγύηση επιστροφής χρημάτων 7 ημερών</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 υποστήριξη πελατών</string>
+    <string name="vpn_money_back_ExpressVPN">Εγγύηση επιστροφής χρημάτων 30 ημερών</string>
+    <string name="visit_vpn_client_PIA">Επισκεφθείτε το Private Internet Access</string>
+    <string name="get_PIA">Αποκτήστε το Private Internet Access</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_feature_3_PIA">Στερεά υποδομή: παγκόσμια κάλυψη</string>
+    <string name="visit_vpn_client_ExpressVPN">Επισκεφθείτε το ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Πραγματικά εύκολο στη χρήση (μας αρέσει!)</string>
+    <string name="vpn_client_feature_4_PIA">Υποστήριξη VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Στρατιωτική κρυπτογράφηση</string>
+    <string name="vpn_client_feature_1_PIA">Χωρίς καταγραφή</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

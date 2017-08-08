@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Vaikka suositellaan latauksia, <b>sinun ei tarvitse VPN käyttää FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>ExpressVPN</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>Private Internet Access</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme ExpressVPN salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme Private Internet Access salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
     <string name="vpn_not_found">Ei VPN. Mieti salaamalla yhteys.</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
     <string name="activity_mediaplayer_name">Mediasoitin</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Poista kaikki</string>
     <string name="or">tai</string>
     <string name="file_names">Tiedostonimet</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Rajaton latausnopeus</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Yksityinen selaaminen</string>
+    <string name="vpn_money_back_PIA">7 päivän palautusoikeuden</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 asiakastuki</string>
+    <string name="vpn_money_back_ExpressVPN">30 päivän palautusoikeuden</string>
+    <string name="visit_vpn_client_PIA">Käy Private Internet Access</string>
+    <string name="get_PIA">Hanki Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Vankka infrastruktuuri: maailmanlaajuinen kattavuus</string>
+    <string name="visit_vpn_client_ExpressVPN">Käy ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Todella helppokäyttöinen (pidämme helposti!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN-tuki</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Sotilasluokan salaus</string>
+    <string name="vpn_client_feature_1_PIA">Ei kirjautumista</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

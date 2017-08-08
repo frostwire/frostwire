@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Atingeți etichetele aplicate la]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>Private Internet Access</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați Private Internet Access pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Curata tot</string>
     <string name="or">sau</string>
     <string name="file_names">Numele fișierelor</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Viteză de descărcare nelimitat</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Navigare privată</string>
+    <string name="vpn_money_back_PIA">Garanție de 7 de zile de returnare a banilor</string>
+    <string name="vpn_client_feature_4_ExpressVPN">Suport 24/7 pentru clienți</string>
+    <string name="vpn_money_back_ExpressVPN">Garanție de 30 de zile de returnare a banilor</string>
+    <string name="visit_vpn_client_PIA">Vizitați Private Internet Access</string>
+    <string name="get_PIA">Obțineți Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Infrastructură solidă: acoperire la nivel mondial</string>
+    <string name="visit_vpn_client_ExpressVPN">Vizitați ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Foarte ușor de utilizat (ne place foarte ușor!)</string>
+    <string name="vpn_client_feature_4_PIA">Suport VPN 24/7</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Criptare militară</string>
+    <string name="vpn_client_feature_1_PIA">Fără înregistrare</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

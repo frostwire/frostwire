@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>Private Internet Access</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a Private Internet Access hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
     <string name="activity_mediaplayer_name">Médialejátszó</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Kitörölni mindent</string>
     <string name="or">vagy</string>
     <string name="file_names">Fájlnevek</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Korlátlan letöltési sebesség</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Privát böngészés</string>
+    <string name="vpn_money_back_PIA">7 napos pénzvisszafizetési garancia</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 ügyfélszolgálat</string>
+    <string name="vpn_money_back_ExpressVPN">30 napos pénzvisszafizetési garancia</string>
+    <string name="visit_vpn_client_PIA">Látogasson Private Internet Access</string>
+    <string name="get_PIA">Szerezd meg a Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Szilárd infrastruktúra: világméretű lefedettség</string>
+    <string name="visit_vpn_client_ExpressVPN">Látogasson ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Igazán könnyű használni (szeretünk könnyűnek!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN Support</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Katonai szintű titkosítás</string>
+    <string name="vpn_client_feature_1_PIA">Nincs naplózás</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
