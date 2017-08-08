@@ -18,9 +18,13 @@
 
 package com.frostwire.search.eztv;
 
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -72,7 +76,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/search/";
+        return "https://" + getDomainName() + "/search/" + encodedKeywords;
     }
 
     @Override
@@ -108,34 +112,52 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     }
 
     /**
-     public static void main(String[] args) throws Throwable {
+    public static void main(String[] args) throws Throwable {
+        String TEST_SEARCH_TERM = "foobar";
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        String fileStr = httpClient.get("https://eztv.ag/search/" + TEST_SEARCH_TERM);
 
-     byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/eztv5.html"));
-     String fileStr = new String(readAllBytes,"utf-8");
+        Pattern searchResultsDetailURLPattern = Pattern.compile(REGEX);
+        Pattern detailPagePattern = Pattern.compile(HTML_REGEX);
 
-     //Pattern pattern = Pattern.compile(REGEX);
-     Pattern pattern = Pattern.compile(HTML_REGEX);
+        Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
 
-     Matcher matcher = pattern.matcher(fileStr);
+        int found = 0;
+        while (searchResultsMatcher.find()) {
+            found++;
+            System.out.println("\nfound " + found);
+            System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
 
-     int found = 0;
-     while (matcher.find()) {
-     found++;
-     System.out.println("\nfound " + found);
-     System.out.println("magneturl: [" + matcher.group("magneturl") + "]");
-     System.out.println("torrenturl: [" + matcher.group("torrenturl") + "]");
-     System.out.println("displayname: [" + matcher.group("displayname") + "]");
-     System.out.println("displayname2: [" + matcher.group("displayname2") + "]");
-     System.out.println("displaynamefallback: [" + matcher.group("displaynamefallback") + "]");
-     System.out.println("infohash: [" + matcher.group("infohash") + "]");
-     System.out.println("filesize: [" + matcher.group("filesize") + "]");
-     System.out.println("creationtime: [" + matcher.group("creationtime") + "]");
-     System.out.println("===");
+            String detailUrl = "https://eztv.ag" + searchResultsMatcher.group(1);
+            System.out.println("Fetching details from " + detailUrl + " ....");
+            long start = System.currentTimeMillis();
+            String detailPage = httpClient.get(detailUrl, 5000);
+            if (detailPage == null) {
+                System.out.println("Error fetching from " + detailUrl);
+                continue;
+            }
+            long downloadTime = System.currentTimeMillis() - start;
+            System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
+            SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
 
-     SearchMatcher sm = new SearchMatcher(matcher);
-     EztvSearchResult sr = new EztvSearchResult("http://someurl.com", sm);
-     }
-     System.out.println("-done-");
-     }
-     */
+            if (sm.find()) {
+                System.out.println("magneturl: [" + sm.group("magneturl") + "]");
+                System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");
+                System.out.println("displayname: [" + sm.group("displayname") + "]");
+                System.out.println("displayname2: [" + sm.group("displayname2") + "]");
+                System.out.println("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
+                System.out.println("infohash: [" + sm.group("infohash") + "]");
+                System.out.println("filesize: [" + sm.group("filesize") + "]");
+                System.out.println("creationtime: [" + sm.group("creationtime") + "]");
+                EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
+                System.out.println(sr);
+            } else {
+                System.out.println("Detail page search matcher failed, check HTML_REGEX");
+            }
+            System.out.println("===");
+            System.out.println("Sleeping 5 seconds...");
+            Thread.sleep(5000);
+        }
+        System.out.println("-done-");
+    } */
 }
