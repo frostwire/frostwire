@@ -674,7 +674,12 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             // a possible inconsistent (but probably right) version.
             // in the future with a higher API, commitNow should be considered
             LOG.warn("Error running commit in fragment transaction, using weaker option", e);
-            tx.commitAllowingStateLoss();
+            try {
+                tx.commitAllowingStateLoss();
+            } catch (IllegalStateException e2) {
+                // ¯\_(ツ)_/¯
+                LOG.warn("Error running commit in fragment transaction, weaker option also failed (commit already called - mCommited=true)", e2);
+            }
         }
     }
 
