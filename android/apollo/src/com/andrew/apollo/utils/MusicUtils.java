@@ -1353,18 +1353,24 @@ public final class MusicUtils {
             return sEmptyList;
         }
 
-        final String[] projection = new String[]{
-                MediaStore.Audio.Playlists.Members.AUDIO_ID
-        };
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Audio.Playlists.Members.getContentUri("external",
-                        playlistId), projection, null, null,
-                MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
-
-        if (cursor != null) {
-            final long[] list = getSongListForCursor(cursor);
-            cursor.close();
-            return list;
+        try {
+            final String[] projection = new String[]{
+                    MediaStore.Audio.Playlists.Members.AUDIO_ID
+            };
+            Cursor cursor = context.getContentResolver().query(
+                        MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
+                        projection,
+                        null,
+                        null,
+                        MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
+            if (cursor != null) {
+                final long[] list = getSongListForCursor(cursor);
+                cursor.close();
+                return list;
+            }
+        } catch (Throwable t) {
+            LOG.warn(t.getMessage(), t);
+            return sEmptyList;
         }
         return sEmptyList;
     }
