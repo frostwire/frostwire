@@ -664,6 +664,11 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     }
 
     private void hideFragments() {
+        try {
+            getFragmentManager().executePendingTransactions();
+        } catch (Throwable t) {
+            LOG.warn(t.getMessage(), t);
+        }
         FragmentTransaction tx = getFragmentManager().beginTransaction();
         tx.hide(search).hide(library).hide(transfers);
         try {
