@@ -3053,6 +3053,16 @@ public class MusicPlaybackService extends Service {
 
         private boolean mIsInitialized = false;
 
+        private final Runnable startMediaPlayerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mCurrentMediaPlayer.start();
+                } catch (Throwable ignored) {
+                }
+            }
+        };
+
         private interface OnPlayerPrepareCallback {
             void onPrepared(boolean result);
         }
@@ -3236,10 +3246,10 @@ public class MusicPlaybackService extends Service {
          * Starts or resumes playback.
          */
         public void start() {
-            try {
-                mCurrentMediaPlayer.start();
-            } catch (Throwable ignored) {
-
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                Engine.instance().getThreadPool().submit(startMediaPlayerRunnable);
+            } else {
+                startMediaPlayerRunnable.run();
             }
         }
 
