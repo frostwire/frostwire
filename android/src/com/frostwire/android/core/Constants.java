@@ -18,7 +18,6 @@
 package com.frostwire.android.core;
 
 import com.frostwire.android.BuildConfig;
-import com.frostwire.android.R;
 
 /**
  * Static class containing all constants in one place.
@@ -76,7 +75,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_MONOVA = "frostwire.prefs.search.use_monova";
     public static final String PREF_KEY_SEARCH_USE_YIFY = "frostwire.prefs.search.use_yify";
     public static final String PREF_KEY_SEARCH_USE_TORRENTSFM = "frostwire.prefs.search.use_torrentsfm";
-    public static final String PREF_KEY_SEARCH_USE_BTJUNKIE = "frostwire.prefs.search.use_btjunkie";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
