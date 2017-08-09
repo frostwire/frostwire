@@ -18,13 +18,9 @@
 
 package com.frostwire.search.eztv;
 
-import com.frostwire.regex.Matcher;
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
