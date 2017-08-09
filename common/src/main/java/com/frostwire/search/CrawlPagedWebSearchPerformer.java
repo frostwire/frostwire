@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,7 +142,11 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         if (data != null) {
                             List<? extends SearchResult> results = crawlResult(obj, data);
                             if (results != null) {
-                                onResults(results);
+                                if (!results.isEmpty()) {
+                                    onResults(results);
+                                } else {
+                                    cachePut("failed:" + url, long2array(System.currentTimeMillis()));
+                                }
                             }
                         }
                     } catch (Throwable e) {
