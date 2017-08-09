@@ -1,9 +1,9 @@
 frostwire (6.5.5) stable; urgency=high
   * New jlibtorrent 1.2.0.11-RC5
-  * Search: EZTV fixed
+  * Search: EZTV, Torlock fixed
   * Search: BTJunkie removed
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 08 Aug 2017 17:12:05 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 08 Aug 2017 18:47:11 -0600
 
 frostwire (6.5.4) stable; urgency=high
   * YT search fixed

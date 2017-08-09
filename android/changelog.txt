@@ -1,5 +1,5 @@
 FrostWire 1.9.9 - AUG/08/2017
- - Search: EZTV fixed
+ - Search: EZTV, Torlock fixed
  - Search: BTJunkie removed
  - New jlibtorrent 1.2.0.11-RC5
  - Filtering bug fixes
