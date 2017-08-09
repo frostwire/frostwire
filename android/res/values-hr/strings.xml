@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>Private Internet Access</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje ExpressVPN za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje Private Internet Access za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
     <string name="activity_chat_name">Razgovor</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">Očistiti sve</string>
     <string name="or">ili</string>
     <string name="file_names">Nazivi datoteka</string>
+    <string name="vpn_client_feature_2_ExpressVPN">Neograničena brzina preuzimanja</string>
+    <string name="vpn_client_feature_3_ExpressVPN">Privatno pretraživanje</string>
+    <string name="vpn_money_back_PIA">7-dnevno jamstvo za novac</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 korisničku podršku</string>
+    <string name="vpn_money_back_ExpressVPN">30-dnevno jamstvo za novac</string>
+    <string name="visit_vpn_client_PIA">Posjetite Private Internet Access</string>
+    <string name="get_PIA">Nabavite Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">Čvrsta infrastruktura: globalno pokrivenost</string>
+    <string name="visit_vpn_client_ExpressVPN">Posjetite ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">Vrlo jednostavan za upotrebu (volimo se!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN podrška</string>
+    <string name="vpn_client_feature_1_ExpressVPN">Šifriranje na vojnoj razini</string>
+    <string name="vpn_client_feature_1_PIA">Nema zapisivanja</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

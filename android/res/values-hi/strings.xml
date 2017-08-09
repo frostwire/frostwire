@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>Private Internet Access</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश ExpressVPN अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश Private Internet Access अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>.]]></string>
     <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
     <string name="activity_chat_name">बातचीत</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">सभी साफ करें</string>
     <string name="or">या</string>
     <string name="file_names">फ़ाइल नाम</string>
+    <string name="vpn_client_feature_2_ExpressVPN">असीमित डाउनलोड गति</string>
+    <string name="vpn_client_feature_3_ExpressVPN">निजी ब्राउज़िंग</string>
+    <string name="vpn_money_back_PIA">7 दिन की पैसे वापस गारंटी</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 ग्राहक सहायता</string>
+    <string name="vpn_money_back_ExpressVPN">30 दिन की पैसे वापस गारंटी</string>
+    <string name="visit_vpn_client_PIA">Private Internet Accessजाएँ</string>
+    <string name="get_PIA">Private Internet Accessजाओ</string>
+    <string name="vpn_client_feature_3_PIA">ठोस अवसंरचना: दुनिया भर में कवरेज</string>
+    <string name="visit_vpn_client_ExpressVPN">ExpressVPNजाएँ</string>
+    <string name="vpn_client_feature_2_PIA">वास्तव में उपयोग करना आसान (हम आसान पसंद करते हैं!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 वीपीएन सहायता</string>
+    <string name="vpn_client_feature_1_ExpressVPN">सैन्य-ग्रेड एन्क्रिप्शन</string>
+    <string name="vpn_client_feature_1_PIA">कोई लॉगिंग नहीं</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>Private Internet Access</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>Private Internet Access 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
     <string name="activity_chat_name">채팅</string>
@@ -650,4 +654,19 @@
     <string name="clear_all">모두 지우기</string>
     <string name="or">또는</string>
     <string name="file_names">파일 이름</string>
+    <string name="vpn_client_feature_2_ExpressVPN">무제한 다운로드 속도</string>
+    <string name="vpn_client_feature_3_ExpressVPN">비공개 브라우징</string>
+    <string name="vpn_money_back_PIA">7 일 환불 보장</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7 고객 지원</string>
+    <string name="vpn_money_back_ExpressVPN">30 일 환불 보증</string>
+    <string name="visit_vpn_client_PIA">Private Internet Access방문</string>
+    <string name="get_PIA">Private Internet Access얻기</string>
+    <string name="vpn_client_feature_3_PIA">견고한 인프라 : 전세계 보험</string>
+    <string name="visit_vpn_client_ExpressVPN">ExpressVPN방문</string>
+    <string name="vpn_client_feature_2_PIA">정말 사용하기 쉽습니다 (우리는 쉽게 좋아합니다!)</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPN 지원</string>
+    <string name="vpn_client_feature_1_ExpressVPN">군대 급 암호화</string>
+    <string name="vpn_client_feature_1_PIA">로깅 없음</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

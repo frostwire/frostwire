@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b></p>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>ExpressVPN</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>Private Internet Access</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 保護されていない接続とは、オンラインで行うすべてのことを意味します (を含む <b>検索、メッセージング、ダウンロード</b>) ネットワーク上の誰でも、インターネットサービスプロバイダによって監視されている可能性があります。<br><br>ExpressVPNを使用して接続を暗号化することをお勧めします <b>あなたのプライバシーを守る</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 保護されていない接続とは、オンラインで行うすべてのことを意味します (を含む <b>検索、メッセージング、ダウンロード</b>) ネットワーク上の誰でも、インターネットサービスプロバイダによって監視されている可能性があります。<br><br>Private Internet Access <b>あなたのプライバシーを守る</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
     <string name="activity_chat_name">チャット</string>
@@ -653,4 +657,19 @@
     <string name="clear_all">すべてクリア</string>
     <string name="or">または</string>
     <string name="file_names">ファイル名</string>
+    <string name="vpn_client_feature_2_ExpressVPN">無制限のダウンロード速度</string>
+    <string name="vpn_client_feature_3_ExpressVPN">プライベートブラウジング</string>
+    <string name="vpn_money_back_PIA">7日間の返金保証</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24時間365日のカスタマーサポート</string>
+    <string name="vpn_money_back_ExpressVPN">30日間の返金保証</string>
+    <string name="visit_vpn_client_PIA">Private Internet Accessを訪問する</string>
+    <string name="get_PIA">Private Internet Accessを入手する</string>
+    <string name="vpn_client_feature_3_PIA">堅実なインフラ：世界中で</string>
+    <string name="visit_vpn_client_ExpressVPN">ExpressVPNを訪問する</string>
+    <string name="vpn_client_feature_2_PIA">本当に使いやすい（私たちは簡単です！）</string>
+    <string name="vpn_client_feature_4_PIA">24/7 VPNサポート</string>
+    <string name="vpn_client_feature_1_ExpressVPN">ミリタリーグレードの暗号化</string>
+    <string name="vpn_client_feature_1_PIA">ロギングなし</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>

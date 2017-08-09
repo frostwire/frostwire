@@ -21,6 +21,10 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
+    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>Private Internet Access</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用ExpressVPN加密您的连接和 <b>保护您的隐私</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用Private Internet Access加密您的连接和 <b>保护您的隐私</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
     <string name="activity_chat_name">聊天</string>
@@ -394,8 +398,7 @@
     <string name="free_apps">免費 App</string>
     <string name="checking_ellipsis">檢查&#8230;</string>
     <string name="playlist">播放清單</string>
-    <string name="torrent_transfer_enqueued_on_mobile_data">在連接上 Wi-Fi 網絡後，Torrent 傳輸會自動開始下載。（檢查您的網絡設置，了解 3G/4G 數據使用）
-    </string>
+    <string name="torrent_transfer_enqueued_on_mobile_data">在連接上 Wi-Fi 網絡後，Torrent 傳輸會自動開始下載。（檢查您的網絡設置，了解 3G/4G 數據使用）</string>
     <string name="error_wrong_md5_hash">錯誤：MD5 雜湊 (MD5 hash) 錯誤</string>
     <string name="error_wrong_signature">錯誤：簽章錯誤</string>
     <string name="error_no_space_left_on_device">錯誤：無多餘空間儲存檔案</string>
@@ -413,12 +416,10 @@
     <string name="desktop_transfer_status_cancelled">取消</string>
     <string name="donation_thanks">多謝您支持 FrostWire</string>
     <string name="crawl_cache_size">爬行緩存 %1$.2fMB</string>
-    <string name="wifi_sharing_disabled">Wi-Fi 共享關閉了。\n\nWi-Fi 共享可以用來在本地和連接相同 Wi-Fi 網絡，配備 FrostWire 的裝置分享檔案。\n\n&lt;a
-        href=\"http://bit.ly/1tVReSt\"&gt;了解詳情。&lt;/a&gt;</string>
+    <string name="wifi_sharing_disabled">Wi-Fi 共享關閉了。\n\nWi-Fi 共享可以用來在本地和連接相同 Wi-Fi 網絡，配備 FrostWire 的裝置分享檔案。\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;了解詳情。&lt;/a&gt;</string>
     <string name="pausing">暫停</string>
     <string name="azureus_manager_not_created">如果裝載了 SD 卡，即不能下載。</string>
-    <string name="anonymous_usage_statistics_summary">發送匿名使用統計數據。所進行的內容搜索、分享或播放，以及能識別您的所有資料，都不會儲存在磁盤上，亦不會通過網絡傳送。
-    </string>
+    <string name="anonymous_usage_statistics_summary">發送匿名使用統計數據。所進行的內容搜索、分享或播放，以及能識別您的所有資料，都不會儲存在磁盤上，亦不會通過網絡傳送。</string>
     <string name="my_music">音樂文件夾</string>
     <string name="error_moving_incomplete">錯誤：移動未完成</string>
     <string name="torrent_url_added">Torrent 鏈接已添加到傳輸。</string>
@@ -433,9 +434,7 @@
     <string name="yes_no_cancel_transfer_question_cloud">您確定要停止此下載並將之從清單上移除？</string>
     <string name="desktop_transfer_status_transferring">傳輸中</string>
     <string name="donate">捐款</string>
-    <string name="torrent_transfer_consuming_mobile_data">警告：此 Torrent 傳輸使用您的 3G/4G 數據。（如果您只想在 WiFi 使用
-        BitTorrent，請檢查網絡設置）
-    </string>
+    <string name="torrent_transfer_consuming_mobile_data">警告：此 Torrent 傳輸使用您的 3G/4G 數據。（如果您只想在 WiFi 使用BitTorrent，請檢查網絡設置</string>
     <string name="transfers_context_resume_all_torrent_transfers">恢復全部 Torrent 傳輸</string>
     <string name="free_download">免費下載</string>
     <string name="couldnt_share_file">檔案無法分享。路徑怪異。</string>
@@ -471,9 +470,7 @@
     <string name="donate_5">捐贈 $5 美元</string>
     <string name="use_frostclick">使用 FrostClick</string>
     <string name="one_dollar">$1 美元</string>
-    <string name="storage_setting_confirm_dialog_text">我明白，通過 FrostWire 下載到 SD 卡的所有檔案，都會在本裝置卸載 FrostWire 應用程式後被 ANDROID
-        刪除，而我不會就任何的檔案損失要求 FrostWire LLC 負責。
-    </string>
+    <string name="storage_setting_confirm_dialog_text">我明白，通過 FrostWire 下載到 SD 卡的所有檔案，都會在本裝置卸載 FrostWire 應用程式後被 ANDROID刪除，而我不會就任何的檔案損失要求 FrostWire LLC 負責。</string>
     <string name="cant_open_file_does_not_exist">我無法打開 %1$s。該檔案不存在。</string>
     <string name="anonymous_usage_statistics">匿名使用統計數據</string>
     <string name="saving_to_sd_card">儲存到 SD 卡中。</string>
@@ -657,4 +654,19 @@
     <string name="clear_all">全部清除</string>
     <string name="or">要么</string>
     <string name="file_names">文件名</string>
+    <string name="vpn_client_feature_2_ExpressVPN">无限下载速度</string>
+    <string name="vpn_client_feature_3_ExpressVPN">私人浏览</string>
+    <string name="vpn_money_back_PIA">7天退款保证</string>
+    <string name="vpn_client_feature_4_ExpressVPN">24/7客户支持</string>
+    <string name="vpn_money_back_ExpressVPN">30天退款保证</string>
+    <string name="visit_vpn_client_PIA">访问Private Internet Access</string>
+    <string name="get_PIA">获取Private Internet Access</string>
+    <string name="vpn_client_feature_3_PIA">坚实的基础设施：全球覆盖</string>
+    <string name="visit_vpn_client_ExpressVPN">访问ExpressVPN</string>
+    <string name="vpn_client_feature_2_PIA">真的很容易使用（我们很容易！）</string>
+    <string name="vpn_client_feature_4_PIA">全天候支持VPN</string>
+    <string name="vpn_client_feature_1_ExpressVPN">军级加密</string>
+    <string name="vpn_client_feature_1_PIA">没有记录</string>
+    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
+    <string name="vpn_client_PIA">Private Internet Access</string>
 </resources>
