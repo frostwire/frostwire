@@ -35,7 +35,7 @@ public final class PerformersHelper {
 
     private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
 
-    private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
+    private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]{40})");
 
     private PerformersHelper() {
     }
