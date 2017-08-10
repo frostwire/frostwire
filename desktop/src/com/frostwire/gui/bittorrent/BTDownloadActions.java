@@ -310,6 +310,7 @@ final class BTDownloadActions {
                 BTDownload d = downloaders[i];
                 if (d instanceof BittorrentDownload) {
                     BittorrentDownload btDownload = (BittorrentDownload) d;
+
                     String magnetUri = btDownload.makeMagnetUri();
                     str += magnetUri;
                     str += BTEngine.getInstance().magnetPeers();
@@ -317,9 +318,12 @@ final class BTDownloadActions {
                     if (i < downloaders.length - 1) {
                         str += System.lineSeparator();
                     }
+                } else if (d instanceof TorrentFetcherDownload) {
+                    TorrentFetcherDownload tfd = (TorrentFetcherDownload) d;
+                    if (tfd.getUri().startsWith("magnet")) {
+                        str = tfd.getUri();
+                    }
                 }
-
-
             }
 
             GUIMediator.setClipboardContent(str);

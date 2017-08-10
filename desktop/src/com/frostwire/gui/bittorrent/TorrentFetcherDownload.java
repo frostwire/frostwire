@@ -29,6 +29,7 @@ import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
@@ -57,6 +58,7 @@ public class TorrentFetcherDownload implements BTDownload {
     private final String displayName;
     private final boolean partial;
     private final String relativePath;
+    private final String hash;
 
     private final Date dateCreated;
 
@@ -64,6 +66,13 @@ public class TorrentFetcherDownload implements BTDownload {
 
     public TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath) {
         this.uri = uri;
+
+        if (uri.startsWith("magnet")) {
+            hash = PerformersHelper.parseInfoHash(uri);
+        } else {
+            hash = "";
+        }
+
         this.referer = referrer;
         this.cookie = cookie;
         this.displayName = displayName;
@@ -94,6 +103,10 @@ public class TorrentFetcherDownload implements BTDownload {
 
     public TorrentFetcherDownload(String uri, boolean partial) {
         this(uri, null, getDownloadNameFromMagnetURI(uri), partial);
+    }
+
+    public String getUri() {
+        return uri;
     }
 
     public long getSize() {
@@ -186,7 +199,7 @@ public class TorrentFetcherDownload implements BTDownload {
     }
 
     public String getHash() {
-        return null;
+        return hash;
     }
 
     public String getSeedToPeerRatio() {
