@@ -94,7 +94,7 @@ public class PromotionsView extends LinearLayout {
             return;
         }
 
-        gridview = (GridView) findViewById(R.id.view_promotions_gridview);
+        gridview = findViewById(R.id.view_promotions_gridview);
 
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {

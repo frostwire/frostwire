@@ -174,8 +174,8 @@ public final class SearchFragment extends AbstractFragment implements
         // mainly in a functional style, but it is ill suited to extract from
         // it a mutable state, like filterButton.
         // As a result, you will get multiple NPE during the normal lifestyle
-        // of the fragment, since getHeader is not guaranteed to be called
-        // at the right time during a full resume of the fragment.
+        // of the fragmentRef, since getHeader is not guaranteed to be called
+        // at the right time during a full resume of the fragmentRef.
         // TODO: refactor this
         if (filterButton == null && getActivity() != null) { // best effort
             // this will happen due to the call to onTabReselected on full resume
@@ -769,10 +769,10 @@ public final class SearchFragment extends AbstractFragment implements
 
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
 
-        private final WeakReference<SearchFragment> fragment;
+        private final WeakReference<SearchFragment> fragmentRef;
 
         LoadSlidesTask(SearchFragment fragment) {
-            this.fragment = new WeakReference<>(fragment);
+            this.fragmentRef = new WeakReference<>(fragment);
         }
 
         @Override
@@ -804,11 +804,19 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         protected void onPostExecute(List<Slide> result) {
-            SearchFragment f;
-            if (result != null && !result.isEmpty() && (f = fragment.get()) != null) {
-                f.slides = result;
-                f.promotions.setSlides(result);
+            if (!Ref.alive(fragmentRef)) {
+                return;
             }
+
+            SearchFragment f = fragmentRef.get();
+
+            if (result != null && !result.isEmpty()) {
+                f.slides = result;
+            } else {
+                f.slides = new ArrayList<>(0);
+            }
+
+            f.promotions.setSlides(f.slides);
         }
     }
 

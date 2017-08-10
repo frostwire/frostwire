@@ -177,7 +177,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         // "ALL FREE DOWNLOADS" button shown last
         if (position == getCount() - 1) {
-            return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
+            } else {
+                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
+            }
         }
         return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) :
                 getLandscapeView(position, convertView, parent);
@@ -210,7 +214,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         }
         // "FROSTWIRE FEATURES" title view
         if (position == offsetFeaturesTitleHeader) {
-            return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
+            } else {
+                return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
+            }
         }
         return super.getView(position - 1, null, parent);
     }
