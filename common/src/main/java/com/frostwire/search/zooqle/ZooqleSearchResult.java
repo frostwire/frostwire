@@ -50,6 +50,26 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
+    public String toString() {
+        return String.format("{\n\tdetailsUrl: %s,\n\t" +
+                "filename: %s,\n\t" +
+                "displayName: %s,\n\t" +
+                "seeds: %d,\n\t" +
+                "torrentUrl: %s,\n\t" +
+                "infoHash: %s,\n\t" +
+                "size: %d,\n\t" +
+                "creationTime: %d\n}",
+                detailsUrl,
+                filename,
+                displayName,
+                seeds,
+                torrentUrl,
+                infoHash,
+                size,
+                creationTime);
+    }
+
+    @Override
     public String getDisplayName() {
         return displayName;
     }
