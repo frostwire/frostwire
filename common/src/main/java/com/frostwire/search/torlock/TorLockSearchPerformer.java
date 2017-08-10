@@ -69,7 +69,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
         return new TorLockSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
-/**
+ /*
  public static void main(String[] args) throws Exception {
      String TEST_SEARCH_TERM = "foo bar";
      String URL_PREFIX = "https://www.torlock.com";
@@ -90,7 +90,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
              return;
          } else {
              System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
-             System.out.println("File name: " + detailMatcher.group("filename"));
+             System.out.println("File name: " + detailMatcher.group("filename").replaceAll("<font color=\".*?\">|</font>",""));
              System.out.println("Size: " + detailMatcher.group("filesize"));
              System.out.println("Date: " + detailMatcher.group("time"));
              System.out.println("Seeds: " + detailMatcher.group("seeds"));
@@ -99,6 +99,5 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
          System.out.println("resting 3 seconds...");
          Thread.sleep(3000);
      }
- }
- */
+ }*/
 }
