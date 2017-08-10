@@ -18,12 +18,9 @@
 
 package com.frostwire.search.yify;
 
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
 
 /**
  * Search Performer for torrents.com / torrents.fm
@@ -34,17 +31,8 @@ import com.frostwire.util.http.HttpClient;
 public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
 
     private static final int MAX_RESULTS = 21;
-    private static final String HTML_REGEX = "(?is)<div class=\"minfo\">.*?<div class=\"cover\"><img src='(.*?)' /></div>.*?<div class=\"name\"><h1>(.*?)</h1>.*?<li><b>Size:</b> (.*?)</li>.*?<li><b>Language:</b> (.*?)</li>.*?li><b>Peers/Seeds:</b> (\\d*?) / (\\d*?)</li>.*?<div class=\"attr\"><a class=\"large button orange\" href=\"(.*?)\">Download Ma";
-    // matcher groups: 1 -> cover (url contains date)
-    //                 2 -> display name
-    //                 3 -> size
-    //                 4 -> language
-    //                 5 -> peers
-    //                 6 -> seeds
-    //                 7 -> magnet    
-
-    private static final String REGEX = "(?is)<div class=\"mv\">.*?<h3><a href=['\"]/movie/([0-9]*)/(.*?)['\"] target=\"_blank\" title=\"(.*?)\">";
-
+    private static final String HTML_REGEX = "(?is)<div class=\"minfo\">.*?<div class=\"cover\"><img src='(?<cover>.*?)' /></div>.*?<div class=\"name\"><h1>(?<displayName>.*?)</h1>.*?<li><b>Size:</b> (?<size>.*?)</li>.*?<li><b>Language:</b> (?<language>.*?)</li>.*?li><b>Peers/Seeds:</b> (?<peers>\\d*?) / (?<seeds>\\d*?)</li>.*?<div class=\"attr\"><a class=\"large button orange\" href=\"(?<magnet>.*?)\">Download Ma";
+    private static final String REGEX = "(?is)<div class=\"mv\">.*?<h3><a href=['\"]/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)['\"] target=\"_blank\" title=\"(?<displayName>.*?)\">";
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -57,19 +45,19 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String itemId = matcher.group(1);
-        String htmlFileName = matcher.group(2);
-        String displayName = matcher.group(3);
+        String itemId = matcher.group("itemId");
+        String htmlFileName = matcher.group("htmlFileName");
+        String displayName = matcher.group("displayName");
         
         return new YifyTempSearchResult(getDomainName(), itemId, htmlFileName, displayName);
     }
 
     @Override
     protected YifySearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-         return new YifySearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
+         return new YifySearchResult(sr.getDetailsUrl(), matcher);
     }
 
-    /**
+    /*
     public static void main(String[] args) throws Throwable {
         String TEST_SEARCH_TERM = "foobar";
         String URL_PREFIX = "https://www.yify-torrent.org";

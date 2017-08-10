@@ -62,24 +62,15 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    public YifySearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
-        // matcher groups: 1 -> cover (url may contains date)
-        //                 2 -> display name
-        //                 3 -> size
-        //                 4 -> language
-        //                 5 -> peers
-        //                 6 -> seeds
-        //                 7 -> magnet    
-        this.thumbnailUrl = matcher.group(1);
+    YifySearchResult(String detailsUrl, SearchMatcher matcher) {
+        this.thumbnailUrl = matcher.group("cover");
         this.detailsUrl = detailsUrl;
         this.filename = parseFileName(detailsUrl);
-        this.size = parseSize(matcher.group(3));
+        this.size = parseSize(matcher.group("size"));
         this.creationTime = System.currentTimeMillis();
-        this.seeds = Integer.parseInt(matcher.group(6));
-
-        //a magnet
-        this.torrentUrl = matcher.group(7);
-        this.displayName = matcher.group(2) + " ("+ matcher.group(4) +")";
+        this.seeds = Integer.parseInt(matcher.group("seeds"));
+        this.torrentUrl = matcher.group("magnet");
+        this.displayName = matcher.group("displayName") + " ("+ matcher.group("language") +")";
         this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
     }
 
