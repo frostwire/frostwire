@@ -1,10 +1,11 @@
-frostwire (6.5.5) stable; urgency=high
+frostwire (6.5.6) stable; urgency=high
   * New jlibtorrent 1.2.0.11-RC5
   * Search: EZTV, Torlock, Zooqle engines fixed
   * Search: BTJunkie removed
   * Download: Yify magnets can now be found in DHT
+  * Fixes OTA update system bug
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 09 Aug 2017 20:05:21 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 10 Aug 2017 11:53:00 -0600
 
 frostwire (6.5.4) stable; urgency=high
   * YT search fixed
