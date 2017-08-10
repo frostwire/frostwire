@@ -42,7 +42,7 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
     private static final Pattern sizePattern;
 
     static {
-        UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
+        UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<>();
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("K", 1);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("M", 2);
@@ -81,6 +81,21 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
         this.torrentUrl = matcher.group(7);
         this.displayName = matcher.group(2) + " ("+ matcher.group(4) +")";
         this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("{\n\tthumbnailUrl: '%s',\n\tdetailsUrl: '%s',\n\tfilename: '%s',\n\tsize: %d," +
+                "\n\tcreationTime: %d,\n\tseeds: %d,\n\ttorrentUrl: '%s',\n\tdisplayName: '%s',\n\tinfoHash: '%s'\n}",
+                thumbnailUrl,
+                detailsUrl,
+                filename,
+                size,
+                creationTime,
+                seeds,
+                torrentUrl,
+                displayName,
+                infoHash);
     }
 
     private String parseFileName(String detailsUrl) {
@@ -149,7 +164,7 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
             //integer based size
             else {
                 int intAmount = Integer.parseInt(amount);
-                result = (long) (intAmount * multiplier);
+                result = intAmount * multiplier;
             }
         }
         return result;

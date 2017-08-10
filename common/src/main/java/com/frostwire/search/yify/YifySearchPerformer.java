@@ -18,9 +18,12 @@
 
 package com.frostwire.search.yify;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
 
 /**
  * Search Performer for torrents.com / torrents.fm
@@ -66,36 +69,39 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
          return new YifySearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
+    /**
     public static void main(String[] args) throws Throwable {
-        /**
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/love2.html"));
-        String fileStr = new String(readAllBytes,"utf-8");
+        String TEST_SEARCH_TERM = "foobar";
+        String URL_PREFIX = "https://www.yify-torrent.org";
+        String DETAIL_URL_PREFIX = URL_PREFIX + "/movie/";
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        String resultsHTML = httpClient.get(URL_PREFIX + "/search/" + TEST_SEARCH_TERM + "/", 10000);
 
         Pattern pattern = Pattern.compile(REGEX);
-        //Pattern pattern = Pattern.compile(HTML_REGEX);
-        
-        Matcher matcher = pattern.matcher(fileStr);
-        
+        SearchMatcher sm = SearchMatcher.from(pattern.matcher(resultsHTML));
+        resultsHTML = null;
+        System.gc();
         int found = 0;
-        while (matcher.find()) {
-            found++;
-            System.out.println("\nfound " + found);
-            
-            System.out.println("group 1: " + matcher.group(1));
-            System.out.println("group 2: " + matcher.group(2));
-            System.out.println("group 3: " + matcher.group(3));
-            
-            /**
-            //test HTML_REGEX
-            System.out.println("group 4: " + matcher.group(4));
-            System.out.println("group 5: " + matcher.group(5));
-            System.out.println("group 6: " + matcher.group(6));
-            System.out.println("group 7: " + matcher.group(7));
-            */
-        /**
-            System.out.println("===");
+        while (sm.find()) {
+            System.out.println("group 1: " + sm.group(1));
+            System.out.println("group 2: " + sm.group(2));
+            System.out.println("group 3: " + sm.group(3));
+            String detailsUrl = DETAIL_URL_PREFIX + sm.group(1) + "/" + sm.group(2);
+            String detailHTML = httpClient.get(detailsUrl);
+            Pattern detailPattern = Pattern.compile(HTML_REGEX);
+            SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(detailHTML));
+
+            if (!detailMatcher.find()) {
+                System.out.println("Check HTML_REGEX, matcher failed.");
+                return;
+            }
+            System.out.println(new YifySearchResult("www.yifi-torrent.org",detailsUrl,detailMatcher));
+            System.out.println("====================================\n");
+            Thread.sleep(3000);
         }
-        //System.out.println("-done-");
-        */
-    }
+
+        if (found == 0) {
+            System.out.println("No results in search page, check REGEX");
+        }
+    }*/
 }
