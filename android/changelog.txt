@@ -1,5 +1,5 @@
 FrostWire 1.9.9 - AUG/09/2017
- - Search: EZTV, Torlock fixed
+ - Search: EZTV, Torlock, Zooqle fixed
  - Search: BTJunkie removed
  - Download: Yify magnets can now be found in DHT
  - New jlibtorrent 1.2.0.11-RC5
