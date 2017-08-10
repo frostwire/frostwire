@@ -382,7 +382,13 @@ public class InstallerUpdater implements Runnable {
 
     private void cleanupOldUpdates() {
         if (_updateMessage.getSaveAs() != null) {
+            if (!UpdateSettings.UPDATES_DIR.exists()) {
+                UpdateSettings.UPDATES_DIR.mkdirs();
+                return;
+            }
+
             File[] files = UpdateSettings.UPDATES_DIR.listFiles();
+
             String latestUpdateFileName = _updateMessage.getSaveAs();
             for (File f : files) {
                 if (!f.getName().equals(latestUpdateFileName)) {
