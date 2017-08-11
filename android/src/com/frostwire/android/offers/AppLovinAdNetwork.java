@@ -51,8 +51,8 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                         AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
                         AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
                         LOG.info("AppLovin initialized.");
-                        loadNewInterstitial(activity);
                         start();
+                        loadNewInterstitial(activity);
                     }
                 } catch (Throwable e) {
                     LOG.error(e.getMessage(), e);

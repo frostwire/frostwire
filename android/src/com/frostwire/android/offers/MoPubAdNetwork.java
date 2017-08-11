@@ -19,8 +19,10 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Looper;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubInterstitial;
@@ -103,21 +105,33 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             LOG.info("loadMoPubInterstitial(placement="+placement+") aborted. Network not started or not enabled");
             return;
         }
-        activity.runOnUiThread(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                LOG.info("Loading " + placement + " interstitial");
-                MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
+                final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
                 MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(MoPubAdNetwork.this, placement);
                 moPubInterstitial.setInterstitialAdListener(moPubListener);
                 interstitials.put(placement, moPubInterstitial);
-                try {
-                    moPubInterstitial.load();
-                } catch (Throwable e) {
-                    LOG.warn("Mopub Interstitial couldn't be loaded", e);
-                }
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LOG.info("Loading " + placement + " interstitial");
+                        try {
+                            moPubInterstitial.load();
+                        } catch (Throwable e) {
+                            LOG.warn("Mopub Interstitial couldn't be loaded", e);
+                        }
+                    }
+                });
+
             }
-        });
+        };
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Engine.instance().getThreadPool().submit(runnable);
+        } else {
+            runnable.run();
+        }
+
     }
 
     @Override
