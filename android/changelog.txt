@@ -8,7 +8,7 @@ FrostWire 1.9.9 - AUG/11/2017
  - Audio Player 'Clear Queue' fix
  - Crash fixes, performance upgrades
  - ogury 2.1.13
- - compileSDK 26, gms 11.0.4, gradle 4.0.2
+ - compileSDK 26, gms 11.0.4, gradle 4.0.2, android support 26.0.1
  - Update in VPN offering
  - Less ads
 
