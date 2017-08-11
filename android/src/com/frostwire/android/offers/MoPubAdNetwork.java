@@ -25,8 +25,10 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.mopub.mobileads.MoPubInterstitial;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -105,33 +107,47 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             LOG.info("loadMoPubInterstitial(placement="+placement+") aborted. Network not started or not enabled");
             return;
         }
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
-                MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(MoPubAdNetwork.this, placement);
-                moPubInterstitial.setInterstitialAdListener(moPubListener);
-                interstitials.put(placement, moPubInterstitial);
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LOG.info("Loading " + placement + " interstitial");
-                        try {
-                            moPubInterstitial.load();
-                        } catch (Throwable e) {
-                            LOG.warn("Mopub Interstitial couldn't be loaded", e);
-                        }
-                    }
-                });
-
-            }
-        };
+        LoadMoPubInterstitialRunnable runnable = new LoadMoPubInterstitialRunnable(this, activity, placement);
         if (Looper.myLooper() == Looper.getMainLooper()) {
             Engine.instance().getThreadPool().submit(runnable);
         } else {
             runnable.run();
         }
+    }
 
+    private final static class LoadMoPubInterstitialRunnable implements Runnable {
+        private final WeakReference<Activity> activityRef;
+        private final MoPubAdNetwork moPubAdNetwork;
+        private final String placement;
+
+        LoadMoPubInterstitialRunnable(MoPubAdNetwork moPubAdNetwork, Activity activity, String placement) {
+            this.moPubAdNetwork = moPubAdNetwork;
+            activityRef = Ref.weak(activity);
+            this.placement = placement;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(activityRef)) {
+                return;
+            }
+            Activity activity = activityRef.get();
+            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, moPubAdNetwork.placements.get(placement));
+            MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(moPubAdNetwork, placement);
+            moPubInterstitial.setInterstitialAdListener(moPubListener);
+            moPubAdNetwork.interstitials.put(placement, moPubInterstitial);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LOG.info("Loading " + placement + " interstitial");
+                    try {
+                        moPubInterstitial.load();
+                    } catch (Throwable e) {
+                        LOG.warn("Mopub Interstitial couldn't be loaded", e);
+                    }
+                }
+            });
+        }
     }
 
     @Override
