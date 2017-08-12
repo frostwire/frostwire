@@ -44,6 +44,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -124,9 +126,14 @@ public class MainApplication extends Application {
         ctx.homeDir = paths.libtorrent();
         ctx.torrentsDir = paths.torrents();
         ctx.dataDir = paths.data();
-        ctx.interfaces = "0.0.0.0:0,[::]:0";
-        ctx.retries = 0;
         ctx.optimizeMemory = true;
+
+        // port range [37000, 57000]
+        int port0 = 37000 + new Random().nextInt(20000);
+        int port1 = port0 + 10; // 10 retries
+        String iface = "0.0.0.0:%1$d,[::]:%1$d";
+        ctx.interfaces = String.format(Locale.US, iface, port0);
+        ctx.retries = port1 - port0;
 
         BTEngine.ctx = ctx;
         BTEngine.getInstance().start();
