@@ -29,7 +29,7 @@ public class MediaPlayerOSX extends MediaPlayer {
         //System.out.println("MediaPlayerOSX: getFrostWireJarPath() -> " + FrostWireUtils.getFrostWireJarPath());
         // Path running from command line:  .../frostwire/build/libs
         // Path running from IntelliJ:      .../frostwire/build/classes
-        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/desktop/build");
+        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/desktop");
         return (isRelease) ? getReleasePlayerPath() : getNonReleasePlayerPath();
     }
 
