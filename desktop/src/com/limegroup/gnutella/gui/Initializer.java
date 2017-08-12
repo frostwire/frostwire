@@ -40,6 +40,7 @@ import javax.swing.plaf.basic.BasicHTML;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
 
 /**
  * Initializes (creates, starts, & displays) the LimeWire Core & UI.
@@ -443,8 +444,9 @@ public final class Initializer {
             homeDir.mkdirs();
         }
 
-        int port0 = 0;
-        int port1 = 0;
+        // port range [37000, 57000]
+        int port0 = 37000 + new Random().nextInt(20000);
+        int port1 = port0 + 10; // 10 retries
 
         if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
             port0 = ConnectionSettings.PORT_RANGE_0.getValue();
