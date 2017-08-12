@@ -56,7 +56,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Finger;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
-import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
+import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
@@ -742,20 +742,18 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                     new SetAsWallpaperMenuAction(context, fd).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_copy_magnet:
-                    new CopyToClipboardMenuAction(context,
+                    new CopyMagnetMenuAction(context,
                             R.drawable.contextmenu_icon_magnet,
                             R.string.transfers_context_menu_copy_magnet,
                             R.string.transfers_context_menu_copy_magnet_copied,
-                            FileListAdapter.readInfoFromTorrent(fd.filePath, true)
-                    ).onClick();
+                            fd.filePath).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_copy_info_hash:
-                    new CopyToClipboardMenuAction(context,
+                    new CopyMagnetMenuAction(context,
                             R.drawable.contextmenu_icon_copy,
                             R.string.transfers_context_menu_copy_infohash,
                             R.string.transfers_context_menu_copy_infohash_copied,
-                            FileListAdapter.readInfoFromTorrent(fd.filePath, false)
-                    ).onClick();
+                            fd.filePath, false).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_rename:
                     new RenameFileMenuAction(context, adapter, fd).onClick();

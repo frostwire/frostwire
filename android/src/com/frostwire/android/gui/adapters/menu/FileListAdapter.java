@@ -344,19 +344,17 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if (fd.mime != null && fd.mime.equals(Constants.MIME_TYPE_BITTORRENT) && numChecked <= 1) {
-                items.add(new CopyToClipboardMenuAction(context,
+                items.add(new CopyMagnetMenuAction(context,
                         R.drawable.contextmenu_icon_magnet,
                         R.string.transfers_context_menu_copy_magnet,
                         R.string.transfers_context_menu_copy_magnet_copied,
-                        readInfoFromTorrent(fd.filePath, true)
-                ));
+                        fd.filePath));
 
-                items.add(new CopyToClipboardMenuAction(context,
+                items.add(new CopyMagnetMenuAction(context,
                         R.drawable.contextmenu_icon_copy,
                         R.string.transfers_context_menu_copy_infohash,
                         R.string.transfers_context_menu_copy_infohash_copied,
-                        readInfoFromTorrent(fd.filePath, false)
-                ));
+                        fd.filePath, false));
             }
         }
 
@@ -713,28 +711,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
 
         return false;
-    }
-
-    public static String readInfoFromTorrent(String torrent, boolean magnet) {
-        if (torrent == null) {
-            return "";
-        }
-
-        String result = "";
-
-        try {
-            TorrentInfo ti = new TorrentInfo(new File(torrent));
-
-            if (magnet) {
-                result = ti.makeMagnetUri() + BTEngine.getInstance().magnetPeers();
-            } else {
-                result = ti.infoHash().toString();
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error trying read torrent: " + torrent, e);
-        }
-
-        return result;
     }
 
     public int getNumColumns() {
