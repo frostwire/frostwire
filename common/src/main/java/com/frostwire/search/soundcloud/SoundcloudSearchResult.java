@@ -169,7 +169,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
             downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
         }
 
-        return downloadUrl.replace("https://", "http://");
+        return downloadUrl;
     }
 
     @Override
