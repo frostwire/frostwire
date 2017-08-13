@@ -1,3 +1,9 @@
+frostwire (6.5.7) stable; urgency=high
+  * New jlibtorrent 1.2.0.12-RC1
+  * Fixes issue with SoundCloud audio preview
+	
+ -- FrostWire Team <contact@frostwire.com>  Tue, 10 Aug 2017 11:53:00 -0600
+
 frostwire (6.5.6) stable; urgency=high
   * New jlibtorrent 1.2.0.11-RC5
   * Search: EZTV, Torlock, Zooqle engines fixed

@@ -1,15 +1,16 @@
-FrostWire 1.9.9 - AUG/11/2017
+FrostWire 1.9.9 - AUG/13/2017
  - Creative Commons Features removed for Google Play users, available on FrostWire Plus
  - Search: EZTV, Torlock, Zooqle fixed
  - Search: BTJunkie removed
  - Download: Yify magnets can now be found in DHT
- - New jlibtorrent 1.2.0.11-RC5
+ - New jlibtorrent 1.2.0.12-RC1
  - Filtering bug fixes
  - Audio Player 'Clear Queue' fix
  - Crash fixes, performance upgrades
  - ogury 2.1.13
  - compileSDK 26, gms 11.0.4, gradle 4.0.2, android support 26.0.1
  - Update in VPN offering
+ - Fixes freeze copying magnets to clipboard
  - Less ads
 
 FrostWire 1.9.8 - JUL/26/2017
