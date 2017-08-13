@@ -2284,10 +2284,8 @@ public class MusicPlaybackService extends Service {
      * @return The current track ID
      */
     private long getAudioId() {
-        synchronized (this) {
-            if (mPlayPos >= 0 && mPlayer != null && mPlayer.isInitialized()) {
-                return mPlayList[mPlayPos];
-            }
+        if (mPlayPos >= 0 && mPlayer != null && mPlayer.isInitialized()) {
+            return mPlayList[mPlayPos];
         }
         return -1;
     }
