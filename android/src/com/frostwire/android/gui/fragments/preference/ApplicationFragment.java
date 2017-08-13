@@ -161,6 +161,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                 Engine e = Engine.instance();
                 if (e.isStarted() && !newStatus) {
                     disconnect();
+                    UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
                 } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
                     if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
                             !NetworkManager.instance().isTunnelUp()) {
@@ -231,7 +232,6 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     private void disconnect() {
         Engine.instance().stopServices(true); // internally this is an async call in libtorrent
         updateConnectSwitchStatus();
-        UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
     }
 
     private void updateStorageOptionSummary(String newPath) {
