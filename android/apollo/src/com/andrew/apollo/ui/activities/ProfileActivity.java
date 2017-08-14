@@ -22,7 +22,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -122,8 +121,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Temporary until I can work out a nice landscape layout
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Get the preferences
         mPreferences = PreferenceUtils.getInstance(this);
@@ -141,14 +138,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // Get the artist name
         if (isArtist() || isAlbum()) {
             mArtistName = mArguments.getString(Config.ARTIST_NAME);
-            if (isArtist()) {
-                //mArtistId = mArguments.getLong(Config.ID);
-            }
         }
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
         // Initialize the carousel
-        mTabCarousel = (ProfileTabCarousel) findViewById(R.id.activity_profile_base_tab_carousel);
+        mTabCarousel = findViewById(R.id.activity_profile_base_tab_carousel);
         mTabCarousel.reset();
         mTabCarousel.getPhoto().setOnClickListener(new View.OnClickListener() {
 
@@ -225,7 +219,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         }
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager) findViewById(R.id.activity_profile_base_pager);
+        mViewPager = findViewById(R.id.activity_profile_base_pager);
         // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen limit
@@ -313,7 +307,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
                     if (playlistId != -1) {
                         long[] tracks = mArguments.getLongArray(Config.TRACKS);
-                        if (playlistId != -1 && tracks != null && tracks.length > 0) {
+                        if (tracks != null && tracks.length > 0) {
                             MusicUtils.addToPlaylist(this, tracks, playlistId);
                         }
                     }
@@ -475,8 +469,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         if (mViewPager.isFakeDragging()) {
             try {
                 mViewPager.endFakeDrag();
-            } catch (Throwable t) {
-
+            } catch (Throwable ignored) {
             }
         }
     }
