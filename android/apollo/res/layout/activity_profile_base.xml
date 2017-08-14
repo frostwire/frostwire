@@ -44,10 +44,6 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true" />
 
-            <!-- @dimen/profile_carousel_view_height defined in both
-                 apollo/res/values/dimens.xml and (wrap_content)
-                 apollo/res/values-land/dimens.xml (110.0dp)
-                 -->
             <include
                 android:id="@+id/activity_profile_base_tab_carousel"
                 layout="@layout/profile_tab_carousel"

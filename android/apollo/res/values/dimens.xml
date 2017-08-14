@@ -79,7 +79,7 @@
 
     <!-- WRAP_CONTENT=-2, MATCH_PARENT=-1 -->
     <integer name="custom_wrap_content">-2</integer>
-    <dimen name="profile_carousel_view_height">custom_wrap_content</dimen>
+    <dimen name="profile_carousel_view_height">@integer/custom_wrap_content</dimen>
 
     <!-- Audio player -->
     <dimen name="audio_player_header_height">60.0dp</dimen>
