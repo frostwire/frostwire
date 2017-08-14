@@ -2,8 +2,8 @@
 <!--
 /*
  * Copyright (C) 2012 Andrew Neal
- * Modified by Marcelina Knitter (@marcelinkaaa),
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Modified by Marcelina Knitter (@marcelinkaaa), Angel Leon (@gubatron), Alden Torres (@aldenml)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 -->
 <view xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="0dp"
-    android:layout_height="match_parent"
+    android:layout_height="@dimen/profile_carousel_view_height"
     android:layout_weight="1"
     class="com.andrew.apollo.widgets.CarouselTab" >
 

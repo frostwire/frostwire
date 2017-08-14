@@ -77,8 +77,9 @@
     <dimen name="profile_indicator_height">5.0dp</dimen>
     <dimen name="profile_label_padding">16.0dp</dimen>
 
-    <!-- Height of the carousel in horizontal layouts -->
-    <dimen name="profile_carousel_view_height">110.0dp</dimen>
+    <!-- WRAP_CONTENT=-2, MATCH_PARENT=-1 -->
+    <integer name="custom_wrap_content">-2</integer>
+    <dimen name="profile_carousel_view_height">custom_wrap_content</dimen>
 
     <!-- Audio player -->
     <dimen name="audio_player_header_height">60.0dp</dimen>
