@@ -44,6 +44,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -164,7 +165,6 @@ public final class SearchFragment extends AbstractFragment implements
 
         return header;
     }
-
 
     @Override
     public void onResume() {
@@ -901,7 +901,11 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(currentQuery != null);
+            if ( currentQuery == null || NetworkManager.instance().isInternetDown() || adapter.getCount() <= 0) {
+                filterButton.setVisible(false);
+            } else {
+                filterButton.setVisible(true);
+            }
         }
 
         @Override
