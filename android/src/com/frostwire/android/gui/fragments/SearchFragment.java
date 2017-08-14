@@ -901,7 +901,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         // self determine if it should be hidden or not
         public void updateVisibility() {
-            setVisible(currentQuery != null);
+            setVisible(currentQuery != null && adapter != null && adapter.getTotalCount() > 0);
         }
 
         @Override
