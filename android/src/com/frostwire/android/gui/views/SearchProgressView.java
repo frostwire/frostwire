@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -29,6 +30,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
@@ -42,6 +45,8 @@ public class SearchProgressView extends LinearLayout {
     private TextView textNoResults;
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
+    private TextView textNoWiFiConnection;
+    private TextView textNoDataConnection;
     private String stringTryOtherKeywords;
     private String stringTryChangingAppliedFilters;
 
@@ -74,20 +79,26 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void showRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null) {
+        if (textTryOtherKeywordsOrFilters != null && (NetworkManager.instance().isDataMobileUp() || NetworkManager.instance().isDataWIFIUp())) {
             textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && (NetworkManager.instance().isDataMobileUp() || NetworkManager.instance().isDataWIFIUp())) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
+        }
+        if (NetworkManager.instance().isInternetDown()) {
+            textNoDataConnection.setVisibility(VISIBLE);
         }
     }
 
     public void hideRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null) {
+        if (textTryOtherKeywordsOrFilters != null || !NetworkManager.instance().isDataMobileUp() || !NetworkManager.instance().isDataWIFIUp()) {
             textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
-        if (textTryFrostWirePlus != null) {
+        if (textTryFrostWirePlus != null || !NetworkManager.instance().isDataMobileUp() || !NetworkManager.instance().isDataWIFIUp()) {
             textTryFrostWirePlus.setVisibility(View.GONE);
+        }
+        if (!NetworkManager.instance().isInternetDown()) {
+            textNoDataConnection.setVisibility(GONE);
         }
     }
 
@@ -101,15 +112,19 @@ public class SearchProgressView extends LinearLayout {
             return;
         }
 
-        progressbar = (ProgressBar) findViewById(R.id.view_search_progress_progressbar);
-        buttonCancel = (Button) findViewById(R.id.view_search_progress_button_cancel);
-        textNoResults = (TextView) findViewById(R.id.view_search_progress_text_no_results_feedback);
-        textTryOtherKeywordsOrFilters = (TextView) findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+        progressbar = findViewById(R.id.view_search_progress_progressbar);
+        buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
+        textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
+        textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+        textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
         stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
         stringTryChangingAppliedFilters = getResources().getString(R.string.try_changing_applied_filters);
 
-        textTryFrostWirePlus = (TextView) findViewById(R.id.view_search_progress_try_frostwire_plus);
+        textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+        textNoDataConnection.setText(R.string.no_data_check_internet_connection);
+        textNoDataConnection.setGravity(Gravity.CENTER_HORIZONTAL);
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
