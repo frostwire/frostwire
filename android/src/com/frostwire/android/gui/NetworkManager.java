@@ -19,8 +19,15 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 
@@ -29,10 +36,11 @@ import java.io.File;
  * @author aldenml
  */
 public final class NetworkManager {
-
+    private static final Logger LOG = Logger.getLogger(NetworkManager.class);
     private final Application context;
-
     private boolean tunnelUp;
+    private final ConnectivityActionReceiver connectivityActionBroadcastReceiver;
+    private NetworkStatusListener networkStatusListener;
 
     private static NetworkManager instance;
 
@@ -52,9 +60,16 @@ public final class NetworkManager {
 
     private NetworkManager(Application context) {
         this.context = context;
+        this.connectivityActionBroadcastReceiver = new ConnectivityActionReceiver(this);
+        this.networkStatusListener = null;
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
+        registerBroadcastReceiver();
         detectTunnel();
+    }
+
+    private void registerBroadcastReceiver() {
+        this.context.registerReceiver(connectivityActionBroadcastReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     public boolean isInternetDown() {
@@ -62,24 +77,46 @@ public final class NetworkManager {
     }
 
     public boolean isDataUp() {
+        return isDataUp(null);
+    }
+
+    public boolean isDataUp(ConnectivityManager connectivityManager) {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
-        return (isDataWIFIUp() != isDataMobileUp()) || isDataWiMAXUp();
+        return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager)) || isDataWiMAXUp(connectivityManager);
     }
 
     public boolean isDataMobileUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
+        return isDataMobileUp(null);
+    }
+
+    private boolean isDataMobileUp(ConnectivityManager connectivityManager) {
+        if (connectivityManager == null) {
+            connectivityManager = getConnectivityManager();
+        }
         NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
     public boolean isDataWIFIUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
+        return isDataWIFIUp(null);
+    }
+
+    private boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
+        if (connectivityManager == null) {
+            connectivityManager = getConnectivityManager();
+        }
         NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
     public boolean isDataWiMAXUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
+        return isDataWiMAXUp(null);
+    }
+
+    private boolean isDataWiMAXUp(ConnectivityManager connectivityManager) {
+        if (connectivityManager == null) {
+            connectivityManager = getConnectivityManager();
+        }
         NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
@@ -100,7 +137,6 @@ public final class NetworkManager {
         if (!up) {
             up = interfaceNameExists("tun0") || interfaceNameExists("tun1");
         }
-
         tunnelUp = up;
     }
 
@@ -119,7 +155,6 @@ public final class NetworkManager {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -130,7 +165,65 @@ public final class NetworkManager {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
         return false;
+    }
+
+    public void shutdown() {
+        networkStatusListener = null;
+        context.unregisterReceiver(this.connectivityActionBroadcastReceiver);
+    }
+
+    public void setNetworkStatusListener(NetworkStatusListener networkStatusListener) {
+        this.networkStatusListener = networkStatusListener;
+    }
+
+    public void notifyNetworkStatusListeners() {
+        LOG.info("notifyNetworkStatusListeners() on thread " + Thread.currentThread().getName() + ":" + Thread.currentThread().getId());
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                ConnectivityManager connectivityManager = getConnectivityManager();
+                boolean isDataUp = isDataUp(connectivityManager);
+                boolean isDataWIFIUp = isDataWIFIUp(connectivityManager);
+                boolean isDataMobileUp = isDataMobileUp(connectivityManager);
+                if (networkStatusListener != null) {
+                    try {
+                        networkStatusListener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
+                    } catch (Throwable t) {
+                        LOG.error(t.getMessage(), t);
+                    }
+                }
+
+            }
+        });
+    }
+
+    public interface NetworkStatusListener {
+        /** Called from background thread, listener must do UI changes on UI thread */
+        void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp);
+    }
+
+    private final static class ConnectivityActionReceiver extends BroadcastReceiver {
+
+        NetworkManager networkManager;
+
+        ConnectivityActionReceiver(NetworkManager networkManager) {
+            this.networkManager = networkManager;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                NetworkInfo.DetailedState detailedState = networkInfo.getDetailedState();
+                if (detailedState == NetworkInfo.DetailedState.DISCONNECTED ||
+                        detailedState == NetworkInfo.DetailedState.CONNECTED ||
+                        detailedState == NetworkInfo.DetailedState.DISCONNECTING ||
+                        detailedState == NetworkInfo.DetailedState.CONNECTING) {
+                    networkManager.notifyNetworkStatusListeners();
+                }
+            }
+        }
     }
 }

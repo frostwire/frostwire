@@ -22,36 +22,36 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SearchProgressView extends LinearLayout {
+public class SearchProgressView extends LinearLayout implements NetworkManager.NetworkStatusListener {
 
     private ProgressBar progressbar;
     private Button buttonCancel;
     private TextView textNoResults;
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
-    private TextView textNoWiFiConnection;
     private TextView textNoDataConnection;
     private String stringTryOtherKeywords;
     private String stringTryChangingAppliedFilters;
 
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
+    private boolean isDataUp;
+
 
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -79,13 +79,13 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void showRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null && (NetworkManager.instance().isDataMobileUp() || NetworkManager.instance().isDataWIFIUp())) {
+        if (textTryOtherKeywordsOrFilters != null && isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && (NetworkManager.instance().isDataMobileUp() || NetworkManager.instance().isDataWIFIUp())) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
         }
-        if (NetworkManager.instance().isInternetDown()) {
+        if (!isDataUp) {
             textNoDataConnection.setVisibility(VISIBLE);
         }
     }
@@ -97,7 +97,7 @@ public class SearchProgressView extends LinearLayout {
         if (textTryFrostWirePlus != null || !NetworkManager.instance().isDataMobileUp() || !NetworkManager.instance().isDataWIFIUp()) {
             textTryFrostWirePlus.setVisibility(View.GONE);
         }
-        if (!NetworkManager.instance().isInternetDown()) {
+        if (isDataUp) {
             textNoDataConnection.setVisibility(GONE);
         }
     }
@@ -123,12 +123,14 @@ public class SearchProgressView extends LinearLayout {
         textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-        textNoDataConnection.setText(R.string.no_data_check_internet_connection);
-        textNoDataConnection.setGravity(Gravity.CENTER_HORIZONTAL);
-
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
         }
+
+        NetworkManager networkManager = NetworkManager.instance();
+        networkManager.setNetworkStatusListener(this);
+        // potentially expensive
+        networkManager.notifyNetworkStatusListeners();
     }
 
     private void initTryFrostWirePlusListener() {
@@ -174,6 +176,11 @@ public class SearchProgressView extends LinearLayout {
 
     public void setKeywordFiltersApplied(boolean filtersApplied) {
         textTryOtherKeywordsOrFilters.setText(filtersApplied ? stringTryChangingAppliedFilters : stringTryOtherKeywords);
+    }
+
+    @Override
+    public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
+        this.isDataUp = isDataUp;
     }
 
     public interface CurrentQueryReporter {
