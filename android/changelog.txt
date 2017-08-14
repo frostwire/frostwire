@@ -1,4 +1,4 @@
-FrostWire 1.9.9 - AUG/13/2017
+FrostWire 1.9.9 - AUG/14/2017
  - Creative Commons Features removed for Google Play users, available on FrostWire Plus
  - Search: EZTV, Torlock, Zooqle fixed
  - Search: BTJunkie removed
@@ -12,6 +12,7 @@ FrostWire 1.9.9 - AUG/13/2017
  - Update in VPN offering
  - Fixes freeze copying magnets to clipboard
  - Less ads
+ - Music player has all horizontal layouts
 
 FrostWire 1.9.8 - JUL/26/2017
  - More robust app startup
