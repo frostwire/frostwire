@@ -49,7 +49,7 @@ public final class Offers {
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
-    private static long lastInitAdnetworksInvocationTimestamp;
+    private static long lastInitAdnetworksInvocationTimestamp = 0;
 
     private Offers() {
     }
@@ -60,7 +60,7 @@ public final class Offers {
             return;
         }
         long now = System.currentTimeMillis();
-        if (now - lastInitAdnetworksInvocationTimestamp < 5000) {
+        if ((now - lastInitAdnetworksInvocationTimestamp) < 5000) {
             LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
             return;
         }
@@ -70,6 +70,7 @@ public final class Offers {
                 adNetwork.initialize(activity);
             }
         }
+        LOG.info("Offers.initAdNetworks() sucess");
     }
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
