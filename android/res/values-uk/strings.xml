@@ -377,7 +377,7 @@
     <string name="free_download">Безкоштовне завантаження</string>
     <string name="internet_discovery_summary">Підключення до віддалених аналогам в мережі Інтернет.</string>
     <string name="couldnt_share_file">Неможливо розділити файл. Дивний шлях знайдений.</string>
-    <string name="try_frostwire_plus_for_more_results">Спробуйте FrostWire Plus для більшої кількості результатів</string>
+    <string name="learn_how_to_get_more_results">Спробуйте FrostWire Plus для більшої кількості результатів</string>
     <string name="use_mobile_data">Використання 3G/4G для BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">Насіння тільки при використанні Wi-Fi з\'єднання. Уникайте додаткових витрат вашого оператора мобільного зв\'язку.</string>
     <string name="storage_setting_confirm_dialog_title">SD карта</string>

@@ -18,8 +18,10 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -27,26 +29,31 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SearchProgressView extends LinearLayout {
+public class SearchProgressView extends LinearLayout implements NetworkManager.NetworkStatusListener {
 
     private ProgressBar progressbar;
     private Button buttonCancel;
     private TextView textNoResults;
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
+    private TextView textNoDataConnection;
     private String stringTryOtherKeywords;
     private String stringTryChangingAppliedFilters;
 
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
+    private boolean isDataUp;
+
 
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -74,20 +81,26 @@ public class SearchProgressView extends LinearLayout {
     }
 
     public void showRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null) {
+        if (textTryOtherKeywordsOrFilters != null && isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && isDataUp) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
+        }
+        if (!isDataUp) {
+            textNoDataConnection.setVisibility(VISIBLE);
         }
     }
 
     public void hideRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null) {
+        if (textTryOtherKeywordsOrFilters != null || !isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
-        if (textTryFrostWirePlus != null) {
+        if (textTryFrostWirePlus != null || !isDataUp) {
             textTryFrostWirePlus.setVisibility(View.GONE);
+        }
+        if (isDataUp) {
+            textNoDataConnection.setVisibility(GONE);
         }
     }
 
@@ -101,26 +114,32 @@ public class SearchProgressView extends LinearLayout {
             return;
         }
 
-        progressbar = (ProgressBar) findViewById(R.id.view_search_progress_progressbar);
-        buttonCancel = (Button) findViewById(R.id.view_search_progress_button_cancel);
-        textNoResults = (TextView) findViewById(R.id.view_search_progress_text_no_results_feedback);
-        textTryOtherKeywordsOrFilters = (TextView) findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+        progressbar = findViewById(R.id.view_search_progress_progressbar);
+        buttonCancel = findViewById(R.id.view_search_progress_button_cancel);
+        textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
+        textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
+        textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
         stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
         stringTryChangingAppliedFilters = getResources().getString(R.string.try_changing_applied_filters);
 
-        textTryFrostWirePlus = (TextView) findViewById(R.id.view_search_progress_try_frostwire_plus);
+        textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
         }
+
+        NetworkManager networkManager = NetworkManager.instance();
+        networkManager.setNetworkStatusListener(this);
+        // potentially expensive
+        networkManager.notifyNetworkStatusListeners();
     }
 
     private void initTryFrostWirePlusListener() {
         textTryFrostWirePlus.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                UIUtils.openURL(getContext(), Constants.FROSTWIRE_PLUS_URL + "&context=retryNoSearchResults");
+                UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS);
             }
         });
     }
@@ -159,6 +178,27 @@ public class SearchProgressView extends LinearLayout {
 
     public void setKeywordFiltersApplied(boolean filtersApplied) {
         textTryOtherKeywordsOrFilters.setText(filtersApplied ? stringTryChangingAppliedFilters : stringTryOtherKeywords);
+    }
+
+    @Override
+    public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
+        this.isDataUp = isDataUp;
+        if (!isDataUp) {
+            Runnable uiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        UIUtils.showDismissableMessage(SearchProgressView.this, R.string.no_data_check_internet_connection);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            };
+            if (Looper.getMainLooper() == Looper.myLooper()) {
+                uiRunnable.run();
+            } else {
+                ((Activity) getContext()).runOnUiThread(uiRunnable);
+            }
+        }
     }
 
     public interface CurrentQueryReporter {

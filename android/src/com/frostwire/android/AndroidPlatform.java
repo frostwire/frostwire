@@ -19,6 +19,7 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 
@@ -67,15 +68,18 @@ public final class AndroidPlatform extends AbstractPlatform {
 
     @Override
     public NetworkType networkType() {
-        if (NetworkManager.instance().isDataMobileUp()) {
+        NetworkManager networkManager = NetworkManager.instance();
+        ConnectivityManager connectivityManager = networkManager.getConnectivityManager();
+
+        if (networkManager.isDataMobileUp(connectivityManager)) {
             return NetworkType.MOBILE;
         }
 
-        if (NetworkManager.instance().isDataWIFIUp()) {
+        if (networkManager.isDataWIFIUp(connectivityManager)) {
             return NetworkType.WIFI;
         }
 
-        if (NetworkManager.instance().isDataWiMAXUp()) {
+        if (networkManager.isDataWiMAXUp(connectivityManager)) {
             return NetworkType.WIMAX;
         }
 

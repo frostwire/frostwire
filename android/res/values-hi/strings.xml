@@ -492,7 +492,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">सभी धार स्थानान्तरण फिर से शुरू</string>
     <string name="free_download">मुफ्त डाउनलोड</string>
     <string name="couldnt_share_file">फ़ाइल का हिस्सा नहीं हो सका। अजीब पथ पाया।</string>
-    <string name="try_frostwire_plus_for_more_results">अधिक परिणामों के लिए प्रयास करें FrostWire प्लस</string>
+    <string name="learn_how_to_get_more_results">अधिक परिणामों के लिए प्रयास करें FrostWire प्लस</string>
     <string name="storage_setting_confirm_dialog_title">एसडी कार्ड</string>
     <string name="no_trial_period_included">कोई परीक्षण अवधि शामिल</string>
     <string name="cant_resume_torrent_transfers">धार स्थानान्तरण फिर से शुरू नहीं कर सकते। की स्थिति की जाँच "सेटिंग्स" > "BitTorrent कनेक्शन स्थिति"</string>

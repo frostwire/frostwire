@@ -349,7 +349,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
             } else {
-                boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
+                NetworkManager networkManager = NetworkManager.instance();
+                boolean wifiIsUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
                 boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
                 boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
 
@@ -510,8 +511,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
 
         final String downloadStatus = TRANSFER_STATE_STRING_MAP.get(download.getState());
         status.setText(downloadStatus);
-
-        if (NetworkManager.instance().isInternetDown()) {
+        NetworkManager networkManager = NetworkManager.instance();
+        if (!networkManager.isDataUp(networkManager.getConnectivityManager())) {
             status.setText(downloadStatus + " (" + view.getResources().getText(R.string.check_internet_connection) + ")");
             seeds.setText("");
             peers.setText("");

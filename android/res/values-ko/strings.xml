@@ -496,7 +496,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">모든 급류 전송 재개</string>
     <string name="free_download">무료 다운로드</string>
     <string name="couldnt_share_file">파일을 공유 할 수 없습니다. 이상한 경로가 발견되었습니다.</string>
-    <string name="try_frostwire_plus_for_more_results">더 많은 결과를 얻으려면 FrostWire Plus를 사용해보십시오.</string>
+    <string name="learn_how_to_get_more_results">더 많은 결과를 얻으려면 FrostWire Plus를 사용해보십시오.</string>
     <string name="storage_setting_confirm_dialog_title">SD 카드</string>
     <string name="no_trial_period_included">평가판 기간 없음</string>
     <string name="cant_resume_torrent_transfers">토런트 전송을 재개 할 수 없습니다. "설정" > "비트 토 런트 연결 상태"상태 확인</string>

@@ -22,6 +22,8 @@ import android.app.Application;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.frostwire.android.gui.services.Engine;
+
 import java.io.File;
 
 /**
@@ -29,10 +31,9 @@ import java.io.File;
  * @author aldenml
  */
 public final class NetworkManager {
-
     private final Application context;
-
     private boolean tunnelUp;
+    private NetworkStatusListener networkStatusListener;
 
     private static NetworkManager instance;
 
@@ -52,39 +53,40 @@ public final class NetworkManager {
 
     private NetworkManager(Application context) {
         this.context = context;
+        this.networkStatusListener = null;
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
         detectTunnel();
     }
 
-    public boolean isInternetDown() {
-        return !isDataWIFIUp() && !isDataMobileUp() && !isDataWiMAXUp();
-    }
-
-    public boolean isDataUp() {
+    /** aka -> isInternetUp */
+    public boolean isDataUp(ConnectivityManager connectivityManager) {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
-        return (isDataWIFIUp() != isDataMobileUp()) || isDataWiMAXUp();
+        return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager)) || isDataWiMAXUp(connectivityManager);
     }
 
-    public boolean isDataMobileUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+    public boolean isDataMobileUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public boolean isDataWIFIUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    public boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public boolean isDataWiMAXUp() {
-        ConnectivityManager connectivityManager = getConnectivityManager();
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
+    public boolean isDataWiMAXUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    private ConnectivityManager getConnectivityManager() {
+    public ConnectivityManager getConnectivityManager() {
         return (ConnectivityManager) context.getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
@@ -100,7 +102,6 @@ public final class NetworkManager {
         if (!up) {
             up = interfaceNameExists("tun0") || interfaceNameExists("tun1");
         }
-
         tunnelUp = up;
     }
 
@@ -119,7 +120,6 @@ public final class NetworkManager {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -130,7 +130,39 @@ public final class NetworkManager {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
         return false;
+    }
+
+    public void shutdown() {
+        networkStatusListener = null;
+    }
+
+    public void setNetworkStatusListener(NetworkStatusListener networkStatusListener) {
+        this.networkStatusListener = networkStatusListener;
+    }
+
+    public void notifyNetworkStatusListeners() {
+        Engine.instance().getThreadPool().submit(new Runnable() {
+            @Override
+            public void run() {
+                ConnectivityManager connectivityManager = getConnectivityManager();
+                boolean isDataUp = isDataUp(connectivityManager);
+                boolean isDataWIFIUp = isDataWIFIUp(connectivityManager);
+                boolean isDataMobileUp = isDataMobileUp(connectivityManager);
+                if (networkStatusListener != null) {
+                    try {
+                        networkStatusListener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+
+            }
+        });
+    }
+
+    public interface NetworkStatusListener {
+        /** Called from background thread, listener must do UI changes on UI thread */
+        void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp);
     }
 }

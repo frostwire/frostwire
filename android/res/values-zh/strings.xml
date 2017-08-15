@@ -535,7 +535,7 @@
     <string name="shutting_down">正在关闭…</string>
     <string name="learn_more">了解更多</string>
     <string name="save_bandwidth">保存带宽</string>
-    <string name="try_frostwire_plus_for_more_results">尝试FrostWire Plus获得更多结果</string>
+    <string name="learn_how_to_get_more_results">尝试FrostWire Plus获得更多结果</string>
     <string name="no_trial_period_included">不包括试用期</string>
     <string name="send_bitcoin_tip">发送Bitcoin提示</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent关闭（数据节省器打开）"</string>

@@ -528,7 +528,7 @@
     <string name="save_bandwidth">Enregistrer la bande passante</string>
     <string name="free_download">Téléchargement Gratuit</string>
     <string name="couldnt_share_file">Impossible de partager le fichier. Chemin étrange trouvé.</string>
-    <string name="try_frostwire_plus_for_more_results">Essayez FrostWire Plus pour plus de résultats</string>
+    <string name="learn_how_to_get_more_results">Essayez FrostWire Plus pour plus de résultats</string>
     <string name="no_trial_period_included">Pas de période d\'essai inclus</string>
     <string name="send_bitcoin_tip">Envoyer Bitcoin pointe</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>

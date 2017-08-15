@@ -499,7 +499,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Obnoví veškeré převody torrent</string>
     <string name="free_download">Stažení zdarma</string>
     <string name="couldnt_share_file">Nemohl sdílení souboru. Divný nalezena cesta.</string>
-    <string name="try_frostwire_plus_for_more_results">Zkuste FrostWire Plus pro další výsledky</string>
+    <string name="learn_how_to_get_more_results">Zkuste FrostWire Plus pro další výsledky</string>
     <string name="storage_setting_confirm_dialog_title">SD KARTA</string>
     <string name="no_trial_period_included">Žádné zkušební doba zahrnuty</string>
     <string name="cant_resume_torrent_transfers">Nelze obnovit torrent převody. Kontrola stavu "Nastavení"> "BitTorrent Connection Status"</string>

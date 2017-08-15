@@ -383,7 +383,7 @@
     <string name="free_download">Безплатно сваляне</string>
     <string name="internet_discovery_summary">Се свързва с отдалечени връстници в интернет.</string>
     <string name="couldnt_share_file">Не може да споделите файла. Странни път намери.</string>
-    <string name="try_frostwire_plus_for_more_results">Опитайте FrostWire Plus за по-добри резултати</string>
+    <string name="learn_how_to_get_more_results">Опитайте FrostWire Plus за по-добри резултати</string>
     <string name="use_mobile_data">Използвайте 3G/4G за BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">Семе само при използване на безжична връзка. Избягвайте допълнителни такси от оператора си.</string>
     <string name="storage_setting_confirm_dialog_title">SD карта</string>

@@ -21,7 +21,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#fff6f6f6"
+              android:background="@color/app_background_body_light"
               android:gravity="center_horizontal|center_vertical"
               android:orientation="vertical"
               android:clickable="true">
@@ -46,14 +46,29 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
-            android:singleLine="true"
+            android:maxLines="1"
             android:text="@string/try_other_keywords"
             android:textSize="20sp"
             android:textStyle="bold"
             android:visibility="gone"/>
 
+        <TextView
+            android:id="@+id/view_search_progress_no_data_connection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:maxLines="2"
+            android:text="@string/no_data_check_internet_connection"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
         <TextView android:id="@+id/view_search_progress_try_frostwire_plus"
-                  android:text="@string/try_frostwire_plus_for_more_results"
+                  android:text="@string/learn_how_to_get_more_results"
                   style="@style/NoSearchResultsLink"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

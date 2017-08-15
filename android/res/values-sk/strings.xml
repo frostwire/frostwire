@@ -383,7 +383,7 @@
     <string name="free_download">Bezplatné stiahnutie</string>
     <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
-    <string name="try_frostwire_plus_for_more_results">Skúste FrostWire Plus pre ďalšie výsledky</string>
+    <string name="learn_how_to_get_more_results">Skúste FrostWire Plus pre ďalšie výsledky</string>
     <string name="use_mobile_data">Použite 3G/4G pre BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">Seed iba pri použití WiFi pripojenie k internetu. Vyhnúť sa ďalším poplatkom od svojho operátora.</string>
     <string name="storage_setting_confirm_dialog_title">SD KARTA</string>

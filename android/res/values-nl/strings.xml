@@ -497,7 +497,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Hervat alle torrent transfers</string>
     <string name="free_download">Gratis download</string>
     <string name="couldnt_share_file">Kan het bestand niet delen. gevonden raar pad.</string>
-    <string name="try_frostwire_plus_for_more_results">Probeer FrostWire Plus voor meer resultaten</string>
+    <string name="learn_how_to_get_more_results">Probeer FrostWire Plus voor meer resultaten</string>
     <string name="storage_setting_confirm_dialog_title">SD-KAART</string>
     <string name="no_trial_period_included">Geen proefperiode inbegrepen</string>
     <string name="cant_resume_torrent_transfers">Kan niet hervatten torrent transfers. Controleer de status van "Instellingen" > "BitTorrent Connection Status"</string>

@@ -426,7 +426,8 @@ public final class TransferManager {
     }
 
     public boolean isMobileAndDataSavingsOn() {
-        return NetworkManager.instance().isDataMobileUp() &&
+        NetworkManager networkManager = NetworkManager.instance();
+        return networkManager.isDataMobileUp(networkManager.getConnectivityManager()) &&
                 ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
     }
 
@@ -460,7 +461,8 @@ public final class TransferManager {
             }
             boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.instance().isSeedingEnabledOnlyForWifi();
             // TODO: find a better way to express relationship with isSeedingEnabled
-            if (isSeedingEnabledOnlyForWifi && !NetworkManager.instance().isDataWIFIUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            if (isSeedingEnabledOnlyForWifi && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
                 return false;
             }
         }

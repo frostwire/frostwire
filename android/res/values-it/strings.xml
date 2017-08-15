@@ -497,7 +497,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Riprendere tutti i trasferimenti torrent</string>
     <string name="free_download">Scarica gratis</string>
     <string name="couldnt_share_file">Impossibile condividere il file. Percorso strano trovato.</string>
-    <string name="try_frostwire_plus_for_more_results">Prova FrostWire Plus per più risultati</string>
+    <string name="learn_how_to_get_more_results">Prova FrostWire Plus per più risultati</string>
     <string name="storage_setting_confirm_dialog_title">SD CARD</string>
     <string name="no_trial_period_included">Nessun periodo di prova incluso</string>
     <string name="cant_resume_torrent_transfers">Non è possibile riprendere i trasferimenti torrent. Controllare lo stato di "Preferenze" > "BitTorrent Connection Status"</string>

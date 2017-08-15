@@ -47,7 +47,8 @@ public final class ResumeDownloadMenuAction extends MenuAction {
         if (bittorrentDisconnected) {
             UIUtils.showLongMessage(context, R.string.cant_resume_torrent_transfers);
         } else {
-            if (NetworkManager.instance().isDataUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            if (networkManager.isDataUp(networkManager.getConnectivityManager())) {
                 if (download.isPaused()) {
                     download.resume();
                     UXStats.instance().log(UXAction.DOWNLOAD_RESUME);

@@ -502,7 +502,7 @@
     <string name="torrent_transfer_aborted_on_mobile_data">Transfery Torrentów nie zostaną wznowione dopóki nie połączysz się z siecią Wi-Fi. (Sprawdź twoje Ustawienia Sieci aby zobaczyć zużycie danych mobilnych)</string>
     <string name="keep_in_touch">Bądź w kontakcie!</string>
     <string name="action_menu_overflow_description">Więcej opcji</string>
-    <string name="try_frostwire_plus_for_more_results">Spróbuj FrostWire Plus dla większej ilości rezultatów</string>
+    <string name="learn_how_to_get_more_results">Spróbuj FrostWire Plus dla większej ilości rezultatów</string>
     <string name="media_preview">%s podgląd</string>
     <string name="rating_reminder_description">Jeżeli lubisz FrostWire, prosimy o ocenę aplikacji.</string>
     <string name="transfers_context_menu_copy_magnet">Skopiuj Magnet</string>

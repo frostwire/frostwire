@@ -495,7 +495,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Melanjutkan semua transfer torrent</string>
     <string name="free_download">Free Download</string>
     <string name="couldnt_share_file">Tidak bisa berbagi file. jalan aneh ditemukan.</string>
-    <string name="try_frostwire_plus_for_more_results">Coba FrostWire Plus untuk hasil yang lebih</string>
+    <string name="learn_how_to_get_more_results">Coba FrostWire Plus untuk hasil yang lebih</string>
     <string name="storage_setting_confirm_dialog_title">KARTU SD</string>
     <string name="no_trial_period_included">Tidak ada masa percobaan termasuk</string>
     <string name="cant_resume_torrent_transfers">Tidak dapat melanjutkan transfer torrent. Memeriksa status "Preferensi" > "BitTorrent Connection Status"</string>

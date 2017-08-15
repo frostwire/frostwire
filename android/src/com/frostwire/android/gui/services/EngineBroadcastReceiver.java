@@ -59,7 +59,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         try {
             String action = intent.getAction();
 
-            if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+            if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
                 handleMediaMounted(context, intent);
 
                 if (Engine.instance().isDisconnected()) {
@@ -75,19 +75,30 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                         });
                     }
                 }
-            } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+            } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
                 handleMediaUnmounted(intent);
-            } else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+            } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 handleActionPhoneStateChanged(intent);
-            } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
+            } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
                 Librarian.instance().syncMediaStore();
-            } else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-
-                if (networkInfo.getDetailedState() == DetailedState.DISCONNECTED) {
-                    handleDisconnectedNetwork(networkInfo);
-                } else if (networkInfo.getDetailedState() == DetailedState.CONNECTED) {
-                    handleConnectedNetwork(networkInfo);
+                DetailedState detailedState = networkInfo.getDetailedState();
+                switch (detailedState) {
+                    case CONNECTED:
+                        handleConnectedNetwork(networkInfo);
+                        handleNetworkStatusChange();
+                        break;
+                    case DISCONNECTED:
+                        handleDisconnectedNetwork(networkInfo);
+                        handleNetworkStatusChange();
+                        break;
+                    case CONNECTING:
+                    case DISCONNECTING:
+                        handleNetworkStatusChange();
+                        break;
+                    default:
+                        break;
                 }
 
                 handleVPNDetection();
@@ -112,6 +123,15 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info(msg);
     }
 
+    private void handleNetworkStatusChange() {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                NetworkManager.instance().notifyNetworkStatusListeners();
+            }
+        });
+    }
+
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
         LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
 
@@ -131,9 +151,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
     private void handleConnectedNetwork(NetworkInfo networkInfo) {
         PlayStore.getInstance().refresh();
-
-        if (NetworkManager.instance().isDataUp()) {
-
+        NetworkManager networkManager = NetworkManager.instance();
+        if (networkManager.isDataUp(networkManager.getConnectivityManager())) {
             boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
@@ -157,13 +176,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //
             // mobile up means only mobile data is up and wifi is down.
 
-            if (!NetworkManager.instance().isDataMobileUp() || useTorrentsOnMobileData) {
+            if (!networkManager.isDataMobileUp(networkManager.getConnectivityManager()) || useTorrentsOnMobileData) {
                 LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
 
                     if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                            !(NetworkManager.instance().isTunnelUp() || isNetworkVPN(networkInfo))) {
+                            !(networkManager.isTunnelUp() || isNetworkVPN(networkInfo))) {
                         //don't start
                         return;
                     }
@@ -186,7 +205,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private boolean shouldStopSeeding() {
-        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) || (!NetworkManager.instance().isDataWIFIUp() && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
+        NetworkManager networkManager = NetworkManager.instance();
+        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) ||
+                (!networkManager.isDataWIFIUp(networkManager.getConnectivityManager()) &&
+                        ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
     }
 
     private void handleMediaMounted(final Context context, Intent intent) {
