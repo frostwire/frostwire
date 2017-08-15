@@ -18,8 +18,10 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -182,7 +184,20 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
         this.isDataUp = isDataUp;
         if (!isDataUp) {
-            // TODO: on UI thread, snackbar letting user know connection is down
+            Runnable uiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        UIUtils.showDismissableMessage(SearchProgressView.this, R.string.no_data_check_internet_connection);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            };
+            if (Looper.getMainLooper() == Looper.myLooper()) {
+                uiRunnable.run();
+            } else {
+                ((Activity) getContext()).runOnUiThread(uiRunnable);
+            }
         }
     }
 

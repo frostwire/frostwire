@@ -23,7 +23,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Logger;
 
 import java.io.File;
 
@@ -32,7 +31,6 @@ import java.io.File;
  * @author aldenml
  */
 public final class NetworkManager {
-    private static final Logger LOG = Logger.getLogger(NetworkManager.class);
     private final Application context;
     private boolean tunnelUp;
     private NetworkStatusListener networkStatusListener;
@@ -166,7 +164,6 @@ public final class NetworkManager {
     }
 
     public void notifyNetworkStatusListeners() {
-        LOG.info("notifyNetworkStatusListeners() on thread " + Thread.currentThread().getName() + ":" + Thread.currentThread().getId());
         Engine.instance().getThreadPool().submit(new Runnable() {
             @Override
             public void run() {
@@ -178,7 +175,7 @@ public final class NetworkManager {
                     try {
                         networkStatusListener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
                     } catch (Throwable t) {
-                        LOG.error(t.getMessage(), t);
+                        t.printStackTrace();
                     }
                 }
 
