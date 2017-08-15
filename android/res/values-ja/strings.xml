@@ -671,4 +671,5 @@
     <string name="vpn_client_feature_1_PIA">ロギングなし</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">ネットワークが利用できない場合は、インターネット接続を確認してください。</string>
 </resources>

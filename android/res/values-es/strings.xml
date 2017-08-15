@@ -671,5 +671,6 @@
     <string name="vpn_client_feature_1_ExpressVPN">Encripción nivel militar</string>
     <string name="vpn_client_feature_1_PIA">Sin registro</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Red no disponible, compruebe su conexión a Internet.</string>
 
 </resources>

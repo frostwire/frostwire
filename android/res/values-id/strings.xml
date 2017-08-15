@@ -668,4 +668,5 @@
     <string name="vpn_client_feature_1_PIA">Tidak ada penebangan</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Jaringan tidak tersedia, periksa koneksi internet Anda.</string>
 </resources>

@@ -666,4 +666,5 @@
     <string name="vpn_client_feature_1_PIA">Sem logar</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Rede indisponível, verifique sua conexão com a Internet.</string>
 </resources>

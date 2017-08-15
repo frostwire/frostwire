@@ -670,4 +670,5 @@
     <string name="vpn_client_feature_1_ExpressVPN">العسكرية الصف التشفير</string>
     <string name="vpn_client_feature_1_PIA">لا تسجيل</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">الشبكة غير متوفرة، يرجى التحقق من اتصالك بالإنترنت.</string>
 </resources>

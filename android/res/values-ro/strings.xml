@@ -668,4 +668,6 @@
     <string name="vpn_client_feature_1_PIA">Fără înregistrare</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Rețeaua nu este disponibilă, verificați conexiunea la Internet.
+    </string>
 </resources>
