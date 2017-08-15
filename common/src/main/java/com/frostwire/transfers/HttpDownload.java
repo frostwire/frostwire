@@ -36,4 +36,9 @@ public class HttpDownload extends BaseHttpDownload {
     protected void onFinishing() {
         moveAndComplete(tempPath, savePath);
     }
+
+    @Override
+    public boolean isSeeding() {
+        return false;
+    }
 }

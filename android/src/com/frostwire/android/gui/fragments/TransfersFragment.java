@@ -111,9 +111,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         setHasOptionsMenu(true);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler();
-        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.COMPLETED};
+        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
     }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -144,6 +143,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
+
         updateMenuItemVisibility(menu);
         super.onPrepareOptionsMenu(menu);
     }
@@ -153,28 +155,110 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
 
-        if (transfers != null && transfers.size() > 0) {
-            if (someTransfersComplete(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-            }
+        if (tabLayout.getTabAt(0).isSelected()) {
+            if (transfers != null && transfers.size() > 0) {
+                if (someTransfersComplete(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+                }
 
-            if (!bittorrentDisconnected) {
-                if (someTransfersActive(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+                if (!bittorrentDisconnected) {
+                    if (someTransfersActive(transfers)) {
+                        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+                    }
+                }
+
+                //let's show it even if bittorrent is disconnected
+                //user should get a message telling them to check why they can't resume.
+                //Preferences > Connectivity is disconnected.
+                if (someTransfersInactive(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+                }
+
+                if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+                }
+
+                if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+                    menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+                }
+
+                if (someTransfersSeeding(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
                 }
             }
 
-            //let's show it even if bittorrent is disconnected
-            //user should get a message telling them to check why they can't resume.
-            //Preferences > Connectivity is disconnected.
-            if (someTransfersInactive(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+        }
+        else if (tabLayout.getTabAt(1).isSelected()) {
+            if (transfers != null && transfers.size() > 0) {
+                if (!bittorrentDisconnected) {
+                    if (someTransfersActive(transfers)) {
+                        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+                    }
+                }
+                if (someTransfersInactive(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+                }
             }
+        } else if (tabLayout.getTabAt(2).isSelected()) {
+            if (someTransfersSeeding(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            }
+        } else if (tabLayout.getTabAt(3).isSelected()) {
+            if (transfers != null && transfers.size() > 0) {
+                if (someTransfersComplete(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+                }
+            }
+            if ((!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) || (someTransfersSeeding(transfers) && someTransfersComplete(transfers))) {
+                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+            }
+
         }
     }
 
+//    private void updateMenuItemVisibility(Menu menu) {
+//        TransferManager tm = TransferManager.instance();
+//        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
+//        final List<Transfer> transfers = tm.getTransfers();
+//
+//        if (transfers != null && transfers.size() > 0) {
+//            if (someTransfersComplete(transfers)) {
+//                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+//            }
+//
+//            if (!bittorrentDisconnected) {
+//                if (someTransfersActive(transfers)) {
+//                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
+//                }
+//            }
+//
+//            //let's show it even if bittorrent is disconnected
+//            //user should get a message telling them to check why they can't resume.
+//            //Preferences > Connectivity is disconnected.
+//            if (someTransfersInactive(transfers)) {
+//                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
+//            }
+//
+//            if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+//                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+//            }
+//
+//            if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+//                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+//                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+//            }
+//
+//            if (someTransfersSeeding(transfers)) {
+//                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+//            }
+//        }
+//    }
+
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+
         // Handle item selection
         setupAdapter();
         switch (item.getItemId()) {
@@ -191,7 +275,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 TransferManager.instance().pauseTorrents();
                 return true;
             case R.id.fragment_transfers_menu_resume_all:
-                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
                 if (bittorrentDisconnected) {
                     UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                 } else {
@@ -202,6 +285,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
                     }
                 }
+                return true;
+            case R.id.fragment_transfers_menu_seed_all:
+                if (bittorrentDisconnected) {
+                    UIUtils.showLongMessage(getActivity(), R.string.cant_seed_torrent_transfers);
+                } else {
+                    TransferManager.instance().seedFinishedTransfers();
+                }
+                return true;
+            case R.id.fragment_transfers_menu_stop_seeding_all:
+                TransferManager.instance().stopSeedingTorrents();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -480,17 +573,24 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
         Iterator<Transfer> it;
+        it = transfers.iterator();
         switch (status) { // replace this filter by a more functional style
             case DOWNLOADING:
-                it = transfers.iterator();
                 while (it.hasNext()) {
-                    if (it.next().isComplete()) {
+                    if (it.next().isComplete() || it.next().isSeeding()) {
+                        it.remove();
+                    }
+                }
+                return transfers;
+            //HERE
+            case SEEDING:
+                while (it.hasNext()) {
+                    if (!it.next().isSeeding()) {
                         it.remove();
                     }
                 }
                 return transfers;
             case COMPLETED:
-                it = transfers.iterator();
                 while (it.hasNext()) {
                     if (!it.next().isComplete()) {
                         it.remove();
@@ -506,7 +606,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (TransferManager.isResumable(bt)) {
+                if (TransferManager.isResumable(bt) && !bt.isFinished()) {
                     return true;
                 }
             }
@@ -542,12 +642,20 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return false;
     }
 
+    private boolean someTransfersSeeding(List<Transfer> transfers) {
+        for (Transfer t : transfers) {
+            if (t.getState() == TransferState.SEEDING) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean someTransfersActive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
                 if (bt.isDownloading() ||
-                        bt.getState() == TransferState.SEEDING ||
                         bt.getState() == TransferState.DOWNLOADING) {
                     return true;
                 }
@@ -706,7 +814,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     public enum TransferStatus {
-        ALL, DOWNLOADING, COMPLETED
+        ALL, DOWNLOADING, COMPLETED, SEEDING
     }
 
 

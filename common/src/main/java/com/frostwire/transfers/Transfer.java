@@ -66,6 +66,8 @@ public interface Transfer {
 
     public boolean isComplete();
 
+    public boolean isSeeding();
+
     public List<TransferItem> getItems();
 
     void remove(boolean deleteData);

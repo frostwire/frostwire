@@ -79,7 +79,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                        FileDescriptor fd,
                        BittorrentDownload existingBittorrentDownload,
                        Transfer transferToClear) {
-        super(context, R.drawable.contextmenu_icon_play_transfer, R.string.seed);
+        super(context, R.drawable.contextmenu_icon_seed, R.string.seed);
         this.fd = fd;
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;

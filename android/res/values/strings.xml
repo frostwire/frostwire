@@ -460,6 +460,7 @@
     <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
     <string name="transfers_select_downloading">downloading</string>
+    <string name="transfers_select_seeding">seeding</string>
     <string name="transfers_select_completed">completed</string>
     <string name="transfers_context_menu_clear_finished">Clear all finished transfers</string>
     <string name="transfers_context_menu_stop_delete_data">Stop and delete data</string>
@@ -487,12 +488,14 @@
     <string name="torrent_url_added">Torrent URL added to transfers.</string>
     <string name="cloud_downloads_coming">Sorry: Starting cloud downloads from here will be available on further updates.</string>
     <string name="seed">Seed</string>
+    <string name="seed_stop">Stop seeding</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">The transfer has been paused because you are Disconnected. (Check your BitTorrent connection in Settings)</string>
     <string name="remove_from_recent">Remove from recent</string>
     <string name="now_playing">Now playing</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="install_bitcoin_wallet">Install Bitcoin Wallet</string>
     <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
+    <string name="cant_seed_torrent_transfers">Cannot seed torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
     <string name="or_enter_url">or enter URL</string>
     <string name="confirm_download">Confirm Download</string>
     <string name="track">track</string>
@@ -613,7 +616,7 @@
     <string name="error_no_internet_connection">Error: Check Internet connection</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Pick the files you want to download from this torrent</string>
     <string name="enable_seeding">Enable Seeding</string>
-    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">BitTorrent is disconnected. Would you like me to start it for you?</string>
+    <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Can\'t perform selected action as BitTorrent is currently disconnected. Would you like me to start it for you?</string>
     <string name="seeding_is_currently_disabled">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
     <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
     <string name="mobile_data_saving">Mobile Data Saving</string>
@@ -702,4 +705,7 @@
     <string name="try_changing_applied_filters">Try changing applied filters</string>
     <string name="no_data_check_internet_connection">Network unavailable, please check your Internet connection.</string>
     <string name="use_pixabay">Use Pixabay</string>
+    <string name="transfers_context_seed_all_transfers">Seed all transfers</string>
+    <string name="transfers_context_seed_all_transfers">Seed all finished transfers</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Stop seeding all transfers</string>
 </resources>

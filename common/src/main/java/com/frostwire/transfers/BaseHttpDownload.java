@@ -144,6 +144,11 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
+    public boolean isSeeding() {
+        return state == TransferState.SEEDING;
+    }
+
+    @Override
     public long getETA() {
         return !complete ? stat.eta(info.size()) : 0;
     }
