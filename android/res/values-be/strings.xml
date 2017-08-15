@@ -378,7 +378,7 @@
     <string name="free_download">Спампаваць бясплатна</string>
     <string name="internet_discovery_summary">Падключэнне да выдаленых аналагам ў сетцы Інтэрнэт.</string>
     <string name="couldnt_share_file">Не атрымалася падзяліць файл. Дзіўны шлях знойдзены.</string>
-    <string name="try_frostwire_plus_for_more_results">Паспрабуйце FrostWire Plus для большай колькасці вынікаў</string>
+    <string name="learn_how_to_get_more_results">Паспрабуйце FrostWire Plus для большай колькасці вынікаў</string>
     <string name="use_mobile_data">Выкарыстанне 3G/4G для BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">Насеньне толькі пры выкарыстанні Wi-Fi злучэнне. Пазбягайце дадатковых выдаткаў вашага аператара мабільнай сувязі.</string>
     <string name="storage_setting_confirm_dialog_title">SD-КАРТЫ</string>

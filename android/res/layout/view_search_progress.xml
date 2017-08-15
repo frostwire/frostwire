@@ -68,7 +68,7 @@
             android:visibility="gone"/>
 
         <TextView android:id="@+id/view_search_progress_try_frostwire_plus"
-                  android:text="@string/try_frostwire_plus_for_more_results"
+                  android:text="@string/learn_how_to_get_more_results"
                   style="@style/NoSearchResultsLink"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

@@ -498,7 +498,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Tiếp tục tất cả các chuyển torrent</string>
     <string name="free_download">Tải xuống miễn phí</string>
     <string name="couldnt_share_file">Không thể chia sẻ các tập tin. con đường kỳ lạ được tìm thấy.</string>
-    <string name="try_frostwire_plus_for_more_results">Hãy thử FrostWire Plus cho kết quả hơn</string>
+    <string name="learn_how_to_get_more_results">Hãy thử FrostWire Plus cho kết quả hơn</string>
     <string name="storage_setting_confirm_dialog_title">THẺ SD</string>
     <string name="no_trial_period_included">Không có thời gian dùng thử bao gồm</string>
     <string name="cant_resume_torrent_transfers">Không thể tiếp tục chuyển torrent. Kiểm tra tình trạng của "Cài đặt"> "BitTorrent kết nối Status"</string>

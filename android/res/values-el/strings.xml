@@ -532,7 +532,7 @@
     <string name="save_bandwidth">Αποθήκευση εύρος ζώνης</string>
     <string name="free_download">Δωρεάν κατέβασμα</string>
     <string name="couldnt_share_file">Δεν ήταν δυνατή η κοινή χρήση του αρχείου. Περίεργο πορεία βρέθηκε.</string>
-    <string name="try_frostwire_plus_for_more_results">Δοκιμάστε FrostWire Plus για περισσότερα αποτελέσματα</string>
+    <string name="learn_how_to_get_more_results">Δοκιμάστε FrostWire Plus για περισσότερα αποτελέσματα</string>
     <string name="no_trial_period_included">Δεν δοκιμαστική περίοδο περιλαμβάνονται</string>
     <string name="send_bitcoin_tip">Αποστολή Bitcoin Συμβουλή</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>

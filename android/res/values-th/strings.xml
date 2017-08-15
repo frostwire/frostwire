@@ -383,7 +383,7 @@
     <string name="free_download">ดาวน์โหลดฟรี</string>
     <string name="internet_discovery_summary">เชื่อมต่อไปยังเพื่อนที่ห่างไกลบนอินเทอร์เน็ต</string>
     <string name="couldnt_share_file">ไม่สามารถแชร์ไฟล์ เส้นทางแปลกพบ</string>
-    <string name="try_frostwire_plus_for_more_results">ลอง FrostWire Plus สำหรับผลการค้นหาเพิ่มเติม</string>
+    <string name="learn_how_to_get_more_results">ลอง FrostWire Plus สำหรับผลการค้นหาเพิ่มเติม</string>
     <string name="use_mobile_data">ใช้ 3G/4G สำหรับ BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">เมล็ดพันธุ์เฉพาะเมื่อใช้การเชื่อมต่อ WiFi หลีกเลี่ยงค่าใช้จ่ายเพิ่มเติมจากผู้ให้บริการของคุณ</string>
     <string name="storage_setting_confirm_dialog_title">SD CARD</string>

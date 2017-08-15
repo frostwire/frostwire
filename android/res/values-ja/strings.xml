@@ -493,7 +493,7 @@
     <string name="basic">基本</string>
     <string name="plus">プラス</string>
     <string name="try_other_keywords">キーワードを減らすが、他のキーワードを試してください</string>
-    <string name="try_frostwire_plus_for_more_results">追加の結果はFrostWireプラスを試してください</string>
+    <string name="learn_how_to_get_more_results">追加の結果はFrostWireプラスを試してください</string>
     <string name="action_menu_overflow_description">追加のオプション</string>
     <string name="rate_our_app">アプリを評価する</string>
     <string name="rating_reminder_description">FrostWireを気に入っていただけた場合は、評価する時間を少しください。</string>

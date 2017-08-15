@@ -377,7 +377,7 @@
     <string name="free_download">Ingyenes letöltés</string>
     <string name="internet_discovery_summary">Csatlakozás távoli társak az interneten.</string>
     <string name="couldnt_share_file">Nem sikerült megosztani a fájlt. Furcsa utat talált.</string>
-    <string name="try_frostwire_plus_for_more_results">Próbálja FrostWire Plus további találatok</string>
+    <string name="learn_how_to_get_more_results">Próbálja FrostWire Plus további találatok</string>
     <string name="use_mobile_data">Használja 3G/4G BitTorrent</string>
     <string name="seeding_wifi_settings_explanation">Seed csak Wi-Fi kapcsolattal. Extra költségek elkerülése érdekében a fuvarozó.</string>
     <string name="storage_setting_confirm_dialog_title">SD KÁRTYA</string>

@@ -512,7 +512,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">Tüm torrent transferlerini devam ettirin</string>
     <string name="free_download">Bedava indir</string>
     <string name="couldnt_share_file">Dosya paylaşılamadı. Garip yol bulundu.</string>
-    <string name="try_frostwire_plus_for_more_results">Daha fazla sonuç için FrostWire Plus\'ı deneyin</string>
+    <string name="learn_how_to_get_more_results">Daha fazla sonuç için FrostWire Plus\'ı deneyin</string>
     <string name="storage_setting_confirm_dialog_title">SD KARTI</string>
     <string name="no_trial_period_included">Deneme süresi dahil değil</string>
     <string name="cant_resume_torrent_transfers">Torrent aktarımlarına devam edilemiyor. "Ayarlar"> "BitTorrent Bağlantı Durumu" durumunu kontrol edin</string>

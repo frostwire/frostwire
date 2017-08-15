@@ -512,7 +512,7 @@
     <string name="transfers_context_resume_all_torrent_transfers">استئناف جميع عمليات نقل سيل</string>
     <string name="free_download">تحميل مجانا</string>
     <string name="couldnt_share_file">لا يمكن مشاركة الملف. العثور على مسار غريب.</string>
-    <string name="try_frostwire_plus_for_more_results">محاولة برنامج FrostWire بلس لمزيد من النتائج</string>
+    <string name="learn_how_to_get_more_results">محاولة برنامج FrostWire بلس لمزيد من النتائج</string>
     <string name="storage_setting_confirm_dialog_title">بطاقة الذاكرة</string>
     <string name="no_trial_period_included">لا فترة تجريبية شملت</string>
     <string name="cant_resume_torrent_transfers">لا يمكن استئناف تحويل سيل. التحقق من حالة من "إعدادات"> "تورنت حالة الاتصال"</string>
