@@ -59,7 +59,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         try {
             String action = intent.getAction();
 
-            if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+            if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
                 handleMediaMounted(context, intent);
 
                 if (Engine.instance().isDisconnected()) {
@@ -75,13 +75,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                         });
                     }
                 }
-            } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+            } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
                 handleMediaUnmounted(intent);
-            } else if (action.equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+            } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 handleActionPhoneStateChanged(intent);
-            } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
+            } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
                 Librarian.instance().syncMediaStore();
-            } else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
                 DetailedState detailedState = networkInfo.getDetailedState();
                 switch (detailedState) {
@@ -96,6 +96,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     case CONNECTING:
                     case DISCONNECTING:
                         handleNetworkStatusChange();
+                        break;
+                    default:
                         break;
                 }
 
