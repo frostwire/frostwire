@@ -668,4 +668,5 @@
     <string name="vpn_client_feature_1_PIA">Ingen loggning</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Nätverk otillgängligt, kolla din Internetanslutning.</string>
 </resources>

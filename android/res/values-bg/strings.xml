@@ -668,4 +668,6 @@
     <string name="vpn_client_feature_1_PIA">Без регистрация</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">Мрежата не е налична, моля, проверете връзката си с интернет.
+    </string>
 </resources>

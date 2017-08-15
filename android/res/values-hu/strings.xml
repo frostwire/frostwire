@@ -668,4 +668,5 @@
     <string name="vpn_client_feature_1_PIA">Nincs naplózás</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="no_data_check_internet_connection">A hálózat nem érhető el, ellenőrizze az internetkapcsolatot.</string>
 </resources>
