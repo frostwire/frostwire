@@ -668,7 +668,5 @@
     <string name="vpn_client_feature_1_PIA">ไม่มีการบันทึก</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
-    <string name="no_data_check_internet_connection">
-        ไม่สามารถใช้งานเครือข่ายได้โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ
-    </string>
+    <string name="no_data_check_internet_connection">ไม่สามารถใช้งานเครือข่ายได้โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ</string>
 </resources>

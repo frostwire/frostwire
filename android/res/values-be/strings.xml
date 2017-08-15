@@ -668,6 +668,5 @@
     <string name="vpn_client_feature_1_PIA">Няма рэгістрацыі</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
-    <string name="no_data_check_internet_connection">Сетка недаступная, калі ласка, праверце падлучэнне да Інтэрнэту.
-    </string>
+    <string name="no_data_check_internet_connection">Сетка недаступная, калі ласка, праверце падлучэнне да Інтэрнэту.</string>
 </resources>
