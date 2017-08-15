@@ -84,7 +84,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
         if (textTryOtherKeywordsOrFilters != null && isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null && isDataUp) {
             textTryFrostWirePlus.setVisibility(View.VISIBLE);
         }
         if (!isDataUp) {
@@ -93,10 +93,10 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     }
 
     public void hideRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null || !NetworkManager.instance().isDataMobileUp() || !NetworkManager.instance().isDataWIFIUp()) {
+        if (textTryOtherKeywordsOrFilters != null || !isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
-        if (textTryFrostWirePlus != null || !NetworkManager.instance().isDataMobileUp() || !NetworkManager.instance().isDataWIFIUp()) {
+        if (textTryFrostWirePlus != null || !isDataUp) {
             textTryFrostWirePlus.setVisibility(View.GONE);
         }
         if (isDataUp) {
@@ -139,7 +139,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
         textTryFrostWirePlus.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                UIUtils.openURL(getContext(), Constants.FROSTWIRE_PLUS_URL + "&context=retryNoSearchResults");
+                UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS);
             }
         });
     }

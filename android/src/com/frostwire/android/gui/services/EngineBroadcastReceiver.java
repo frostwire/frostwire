@@ -151,8 +151,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
     private void handleConnectedNetwork(NetworkInfo networkInfo) {
         PlayStore.getInstance().refresh();
-
-        if (NetworkManager.instance().isDataUp()) {
+        NetworkManager networkManager = NetworkManager.instance();
+        if (networkManager.isDataUp(networkManager.getConnectivityManager())) {
             boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
@@ -176,13 +176,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //
             // mobile up means only mobile data is up and wifi is down.
 
-            if (!NetworkManager.instance().isDataMobileUp() || useTorrentsOnMobileData) {
+            if (!networkManager.isDataMobileUp(networkManager.getConnectivityManager()) || useTorrentsOnMobileData) {
                 LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
 
                     if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                            !(NetworkManager.instance().isTunnelUp() || isNetworkVPN(networkInfo))) {
+                            !(networkManager.isTunnelUp() || isNetworkVPN(networkInfo))) {
                         //don't start
                         return;
                     }
@@ -205,7 +205,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private boolean shouldStopSeeding() {
-        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) || (!NetworkManager.instance().isDataWIFIUp() && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
+        NetworkManager networkManager = NetworkManager.instance();
+        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) ||
+                (!networkManager.isDataWIFIUp(networkManager.getConnectivityManager()) &&
+                        ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
     }
 
     private void handleMediaMounted(final Context context, Intent intent) {

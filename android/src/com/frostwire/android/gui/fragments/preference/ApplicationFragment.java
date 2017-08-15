@@ -86,7 +86,8 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             @Override
             public boolean onPreferenceChange(final Preference preference, Object newValue) {
                 boolean newVal = (Boolean) newValue;
-                if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
+                NetworkManager networkManager = NetworkManager.instance();
+                if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
                     if (TransferManager.instance().isHttpDownloadInProgress()) {
                         YesNoDialog dlg = YesNoDialog.newInstance(
                                 CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG,
@@ -162,12 +163,13 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                 if (e.isStarted() && !newStatus) {
                     disconnect();
                 } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
+                    NetworkManager networkManager = NetworkManager.instance();
                     if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
-                            !NetworkManager.instance().isTunnelUp()) {
+                            !networkManager.isTunnelUp()) {
                         UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
                         return false;
                     } else if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false) &&
-                            NetworkManager.instance().isDataMobileUp()) {
+                            networkManager.isDataMobileUp(networkManager.getConnectivityManager())) {
                         UIUtils.showShortMessage(getView(), R.string.wifi_network_unavailable);
                         return false;
                     } else {

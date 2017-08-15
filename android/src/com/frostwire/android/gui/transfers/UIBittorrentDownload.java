@@ -21,6 +21,7 @@ package com.frostwire.android.gui.transfers;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.MediaStore;
+
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -33,11 +34,11 @@ import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -306,7 +307,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         private void pauseSeedingIfNecessary(BTDownload dl) {
             boolean seedFinishedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
             boolean seedFinishedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-            boolean isDataWIFIUp = NetworkManager.instance().isDataWIFIUp();
+            NetworkManager networkManager = NetworkManager.instance();
+            boolean isDataWIFIUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
             if (!seedFinishedTorrents || (!isDataWIFIUp && seedFinishedTorrentsOnWifiOnly)) {
                 dl.pause();
             }

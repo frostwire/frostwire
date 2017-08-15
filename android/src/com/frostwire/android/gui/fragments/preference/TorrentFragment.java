@@ -74,7 +74,8 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
             preferenceSeedingWifiOnly.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     boolean newVal = (Boolean) newValue;
-                    if (newVal && !NetworkManager.instance().isDataWIFIUp()) { // not seeding on mobile data
+                    NetworkManager networkManager = NetworkManager.instance();
+                    if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) { // not seeding on mobile data
                         TransferManager.instance().stopSeedingTorrents();
                         UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
                     }

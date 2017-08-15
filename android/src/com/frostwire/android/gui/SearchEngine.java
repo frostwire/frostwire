@@ -196,7 +196,8 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             TPBSearchPerformer performer = null;
-            if (NetworkManager.instance().isDataWIFIUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
                 performer = new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_TIMEOUT);
             } else {
                 LOG.info("No TPBSearchPerformer, WiFi not up");
@@ -209,7 +210,8 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             MonovaSearchPerformer performer = null;
-            if (NetworkManager.instance().isDataWIFIUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
                 performer = new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_TIMEOUT);
             } else {
                 LOG.info("No MonovaSearchPerformer, WiFi not up");
@@ -222,7 +224,8 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             YifySearchPerformer performer = null;
-            if (NetworkManager.instance().isDataWIFIUp()) {
+            NetworkManager networkManager = NetworkManager.instance();
+            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
                 performer = new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_TIMEOUT);
             } else {
                 LOG.info("No YifySearchPerformer, WiFi not up");

@@ -59,56 +59,34 @@ public final class NetworkManager {
         detectTunnel();
     }
 
-    public boolean isInternetDown() {
-        return !isDataWIFIUp() && !isDataMobileUp() && !isDataWiMAXUp();
-    }
-
-    public boolean isDataUp() {
-        return isDataUp(null);
-    }
-
+    /** aka -> isInternetUp */
     public boolean isDataUp(ConnectivityManager connectivityManager) {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
         return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager)) || isDataWiMAXUp(connectivityManager);
     }
 
-    public boolean isDataMobileUp() {
-        return isDataMobileUp(null);
-    }
-
-    private boolean isDataMobileUp(ConnectivityManager connectivityManager) {
-        if (connectivityManager == null) {
-            connectivityManager = getConnectivityManager();
-        }
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+    public boolean isDataMobileUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public boolean isDataWIFIUp() {
-        return isDataWIFIUp(null);
-    }
-
-    private boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
-        if (connectivityManager == null) {
-            connectivityManager = getConnectivityManager();
-        }
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    public boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public boolean isDataWiMAXUp() {
-        return isDataWiMAXUp(null);
-    }
-
-    private boolean isDataWiMAXUp(ConnectivityManager connectivityManager) {
-        if (connectivityManager == null) {
-            connectivityManager = getConnectivityManager();
-        }
-        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
+    public boolean isDataWiMAXUp(ConnectivityManager connectivityManager) {
+        NetworkInfo networkInfo = (connectivityManager != null) ?
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX) :
+                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    private ConnectivityManager getConnectivityManager() {
+    public ConnectivityManager getConnectivityManager() {
         return (ConnectivityManager) context.getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
