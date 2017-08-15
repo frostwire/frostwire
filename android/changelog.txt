@@ -13,6 +13,7 @@ FrostWire 1.9.9 - AUG/14/2017
  - Fixes freeze copying magnets to clipboard
  - Less ads
  - Music player has all horizontal layouts
+ - Warn user about Internet Connection dropped
 
 FrostWire 1.9.8 - JUL/26/2017
  - More robust app startup
