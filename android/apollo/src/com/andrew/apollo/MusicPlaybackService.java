@@ -784,7 +784,11 @@ public class MusicPlaybackService extends Service {
 
         // Release the wake lock
         if (mWakeLock != null) {
-            mWakeLock.release();
+            try {
+                mWakeLock.release();
+            } catch (RuntimeException ignored) {
+                // might be underlocked and otherwise causing a crash on shutdown
+            }
         }
     }
 
