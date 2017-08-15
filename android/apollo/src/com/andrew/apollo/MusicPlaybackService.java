@@ -2289,7 +2289,11 @@ public class MusicPlaybackService extends Service {
      */
     private long getAudioId() {
         if (mPlayPos >= 0 && mPlayer != null && mPlayer.isInitialized()) {
-            return mPlayList[mPlayPos];
+            try {
+                return mPlayList[mPlayPos];
+            } catch (IndexOutOfBoundsException ioob) {
+                return -1;
+            }
         }
         return -1;
     }

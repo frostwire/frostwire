@@ -236,7 +236,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         String pitch = getContext().getString(UIUtils.randomPitchResId(true));
         if (pitch != null) {
             View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
-            TextView pitchTitle = (TextView) specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
+            TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
             if (pitchTitle != null) {
                 pitchTitle.setText(pitch);
                 return specialOfferView;
