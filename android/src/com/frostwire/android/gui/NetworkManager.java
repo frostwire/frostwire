@@ -19,10 +19,6 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -39,7 +35,6 @@ public final class NetworkManager {
     private static final Logger LOG = Logger.getLogger(NetworkManager.class);
     private final Application context;
     private boolean tunnelUp;
-    private final ConnectivityActionReceiver connectivityActionBroadcastReceiver;
     private NetworkStatusListener networkStatusListener;
 
     private static NetworkManager instance;
@@ -60,16 +55,10 @@ public final class NetworkManager {
 
     private NetworkManager(Application context) {
         this.context = context;
-        this.connectivityActionBroadcastReceiver = new ConnectivityActionReceiver(this);
         this.networkStatusListener = null;
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
-        registerBroadcastReceiver();
         detectTunnel();
-    }
-
-    private void registerBroadcastReceiver() {
-        this.context.registerReceiver(connectivityActionBroadcastReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     public boolean isInternetDown() {
@@ -170,7 +159,6 @@ public final class NetworkManager {
 
     public void shutdown() {
         networkStatusListener = null;
-        context.unregisterReceiver(this.connectivityActionBroadcastReceiver);
     }
 
     public void setNetworkStatusListener(NetworkStatusListener networkStatusListener) {
@@ -201,29 +189,5 @@ public final class NetworkManager {
     public interface NetworkStatusListener {
         /** Called from background thread, listener must do UI changes on UI thread */
         void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp);
-    }
-
-    private final static class ConnectivityActionReceiver extends BroadcastReceiver {
-
-        NetworkManager networkManager;
-
-        ConnectivityActionReceiver(NetworkManager networkManager) {
-            this.networkManager = networkManager;
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                NetworkInfo.DetailedState detailedState = networkInfo.getDetailedState();
-                if (detailedState == NetworkInfo.DetailedState.DISCONNECTED ||
-                        detailedState == NetworkInfo.DetailedState.CONNECTED ||
-                        detailedState == NetworkInfo.DetailedState.DISCONNECTING ||
-                        detailedState == NetworkInfo.DetailedState.CONNECTING) {
-                    networkManager.notifyNetworkStatusListeners();
-                }
-            }
-        }
     }
 }

@@ -181,6 +181,9 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     @Override
     public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
         this.isDataUp = isDataUp;
+        if (!isDataUp) {
+            // TODO: on UI thread, snackbar letting user know connection is down
+        }
     }
 
     public interface CurrentQueryReporter {

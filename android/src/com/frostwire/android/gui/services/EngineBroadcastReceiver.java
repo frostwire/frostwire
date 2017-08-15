@@ -83,11 +83,20 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 Librarian.instance().syncMediaStore();
             } else if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-
-                if (networkInfo.getDetailedState() == DetailedState.DISCONNECTED) {
-                    handleDisconnectedNetwork(networkInfo);
-                } else if (networkInfo.getDetailedState() == DetailedState.CONNECTED) {
-                    handleConnectedNetwork(networkInfo);
+                DetailedState detailedState = networkInfo.getDetailedState();
+                switch (detailedState) {
+                    case CONNECTED:
+                        handleConnectedNetwork(networkInfo);
+                        handleNetworkStatusChange();
+                        break;
+                    case DISCONNECTED:
+                        handleDisconnectedNetwork(networkInfo);
+                        handleNetworkStatusChange();
+                        break;
+                    case CONNECTING:
+                    case DISCONNECTING:
+                        handleNetworkStatusChange();
+                        break;
                 }
 
                 handleVPNDetection();
@@ -112,6 +121,15 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info(msg);
     }
 
+    private void handleNetworkStatusChange() {
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                NetworkManager.instance().notifyNetworkStatusListeners();
+            }
+        });
+    }
+
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
         LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
 
@@ -133,7 +151,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         PlayStore.getInstance().refresh();
 
         if (NetworkManager.instance().isDataUp()) {
-
             boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
