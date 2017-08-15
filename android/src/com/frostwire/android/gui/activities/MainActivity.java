@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -89,6 +90,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.Stack;
@@ -359,28 +361,28 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
     private void tryOnResumeInterstitial() {
         if (Offers.disabledAds()) {
-            //LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
+            LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
             return;
         }
         ConfigurationManager CM = ConfigurationManager.instance();
         long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
         if (installationTimestamp == -1) {
-            //LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
+            LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
             return;
         }
         if (!UIUtils.diceRollPassesThreshold(CM, Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD)) {
-            //LOG.info("tryOnResumeInterstitial() aborted - threshold not met");
+            LOG.info("tryOnResumeInterstitial() aborted - threshold not met");
             return;
         }
         long now = System.currentTimeMillis();
         long lastDisplayTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
 
-        // if it's never been displayed, we check against the first display delay setting
+        // if it's never been displayed, we check against the first display delayInMs setting
         if (lastDisplayTimestamp == -1) {
             int minutesSinceInstallation = (int) TimeUnit.MILLISECONDS.toMinutes(now - installationTimestamp);
             int firstDisplayDelayInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES);
             if (minutesSinceInstallation < firstDisplayDelayInMinutes || firstDisplayDelayInMinutes == 0) {
-                //LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
+                LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
                 return;
             }
             //LOG.info("tryOnResumeInterstitial() might be ready for first display (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
@@ -393,8 +395,39 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
             //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
         }
-        CM.setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
-        Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+        Engine.instance().getThreadPool().submit(new DelayedOnResumeInterstitialRunnable(20000, this));
+    }
+
+    private static class DelayedOnResumeInterstitialRunnable implements Runnable {
+        private final WeakReference<Activity> activityRef;
+        private final long delayInMs;
+
+        DelayedOnResumeInterstitialRunnable(long delayInMs, Activity activity) {
+            activityRef = Ref.weak(activity);
+            this.delayInMs = delayInMs;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(activityRef)) {
+                return;
+            }
+            try {
+                Thread.currentThread().sleep(delayInMs);
+            } catch (Throwable ignored) {
+                return;
+            }
+            if (!Ref.alive(activityRef)) {
+                return;
+            }
+            final Activity activity = activityRef.get();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Offers.showInterstitial(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                }
+            });
+        }
     }
 
     @Override
