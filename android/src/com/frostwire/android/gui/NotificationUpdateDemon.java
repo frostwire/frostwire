@@ -153,7 +153,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
 
-        Notification notification = new NotificationCompat.Builder(mParentContext).
+        Notification notification = new NotificationCompat.Builder(mParentContext, "").
                 setSmallIcon(R.drawable.frostwire_notification_flat).
                 setContentIntent(showFrostWireIntent).
                 setContent(remoteViews).
