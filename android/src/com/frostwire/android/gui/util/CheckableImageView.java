@@ -22,7 +22,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -39,11 +38,10 @@ import com.frostwire.android.util.ImageLoader;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class CheckableImageView<T> extends View implements Checkable {
+public final class CheckableImageView<T> extends View {
 
     private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
     private final Uri[] imageUris;
-    private boolean checked;
     private ImageButton backgroundView;
     private TextView fileSizeTextView;
     private FrameLayout checkedOverlayView;
@@ -81,9 +79,7 @@ public final class CheckableImageView<T> extends View implements Checkable {
         fileSizeTextView.setText(UIUtils.getBytesInHuman(fileSize));
     }
 
-    @Override
     public void setChecked(boolean checked) {
-        this.checked = checked;
         backgroundView.setVisibility(View.VISIBLE);
         checkedOverlayView.setVisibility(checked ? View.VISIBLE : View.GONE);
         if (this.onCheckedChangeListener != null && this.onCheckedChangeListener.isEnabled()) {
@@ -91,29 +87,19 @@ public final class CheckableImageView<T> extends View implements Checkable {
         }
     }
 
-    @Override
-    public boolean isChecked() {
-        return this.checked;
-    }
-
-    @Override
-    public void toggle() {
-        setChecked(!checked);
-    }
-
     private void initComponents(ViewGroup containerView,
                                 MediaPlaybackStatusOverlayView playbackStatusOverlayView,
                                 MediaPlaybackOverlayPainter.MediaPlaybackState overlayState,
                                 boolean checked,
                                 boolean showFileSize) {
-        backgroundView = (ImageButton) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button);
+        backgroundView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button);
         backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        fileSizeTextView = (TextView) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_filesize);
+        fileSizeTextView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_filesize);
         fileSizeTextView.setVisibility(showFileSize ? View.VISIBLE : View.GONE);
         if (playbackStatusOverlayView != null) {
             playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
-        checkedOverlayView = (FrameLayout) containerView.findViewById(R.id.view_my_files_thumbnail_grid_overlay_checkmark_framelayout);
+        checkedOverlayView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_overlay_checkmark_framelayout);
     }
 
     private void initClickListeners() {
