@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,18 +33,14 @@ import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
 import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.util.Logger;
 
 /**
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 4/27/17.
  */
-
-
 public final class CheckableImageView<T> extends View implements Checkable {
-    private static final Logger LOG = Logger.getLogger(CheckableImageView.class);
+
     private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
     private final Uri[] imageUris;
     private boolean checked;
@@ -110,10 +106,6 @@ public final class CheckableImageView<T> extends View implements Checkable {
                                 MediaPlaybackOverlayPainter.MediaPlaybackState overlayState,
                                 boolean checked,
                                 boolean showFileSize) {
-        if (containerView == null) {
-            LOG.error("initComponents() containerView can't be null");
-            return;
-        }
         backgroundView = (ImageButton) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button);
         backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         fileSizeTextView = (TextView) containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_filesize);
