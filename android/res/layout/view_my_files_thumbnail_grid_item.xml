@@ -50,6 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true">
 
         <TextView
@@ -57,7 +58,7 @@
             style="@style/GridThumbnailText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="123.5 KB"
+            android:text="@string/dummy_size"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -73,6 +74,7 @@
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:contentDescription="@null"
             android:src="@drawable/my_files_grid_check" />
     </FrameLayout>
 </RelativeLayout>
