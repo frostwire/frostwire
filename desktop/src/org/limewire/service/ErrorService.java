@@ -63,7 +63,7 @@ public final class ErrorService {
         /**
          * Takes a {@link PrintStream} which is used for error output. 
          */
-        public PrintStreamErrorCallback(PrintStream out) {
+		PrintStreamErrorCallback(PrintStream out) {
             this.out = out;
         }
         

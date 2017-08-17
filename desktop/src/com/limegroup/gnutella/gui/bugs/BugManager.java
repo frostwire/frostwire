@@ -1,60 +1,28 @@
 package com.limegroup.gnutella.gui.bugs;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadFactory;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.UISettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import org.apache.commons.io.IOUtils;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
-import org.limewire.util.Version;
-import org.limewire.util.VersionFormatException;
 
-import com.frostwire.util.Logger;
-import com.frostwire.util.HttpClientFactory;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.LimeWireModule;
-import com.limegroup.gnutella.gui.LocalClientInfoFactory;
-import com.limegroup.gnutella.gui.MessageService;
-import com.limegroup.gnutella.gui.MultiLineLabel;
-import com.limegroup.gnutella.settings.BugSettings;
-import com.limegroup.gnutella.util.FrostWireUtils;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Interface for reporting bugs.
@@ -96,16 +64,8 @@ public final class BugManager {
                         return t;
                     }
                 });
-	
-	/**
-	 * A mapping of stack traces (String) to next allowed time (long)
-	 * that the bug can be reported.
-	 *
-	 * Used only if reporting the bug to the servlet.
-	 */
-	private final Map<String, Long> BUG_TIMES = Collections.synchronizedMap(new HashMap<String, Long>());
-	
-	/**
+
+    /**
 	 * A lock to be used when writing to the logfile, if the log is to be
 	 * recorded locally.
 	 */
@@ -115,7 +75,7 @@ public final class BugManager {
 	 * A separator between bug reports.
 	 */
 	private final byte[] SEPARATOR = "-----------------\n".getBytes();
-	
+
 	/**
 	 * The next time we're allowed to send any bug.
 	 *
@@ -127,13 +87,8 @@ public final class BugManager {
 	 * The number of bug dialogs currently showing.
 	 */
 	private int _dialogsShowing = 0;
-	
-	/**
-	 * The maximum number of dialogs we're allowed to show.
-	 */
-	private final int MAX_DIALOGS = 3;
-	
-	public static synchronized BugManager instance() {
+
+    public static synchronized BugManager instance() {
 	    if(INSTANCE == null)
 	        INSTANCE = new BugManager();
 	    return INSTANCE;
@@ -174,15 +129,15 @@ public final class BugManager {
         }
         
         //Get the classpath
-        String classPath = "";
+        StringBuilder classPath = new StringBuilder();
         ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
         URL[] urls = ((URLClassLoader)sysClassLoader).getURLs();
-        for(int i=0; i< urls.length; i++) {
-            classPath += "  " + urls[i].getFile() + "\n";
+        for (URL url : urls) {
+            classPath.append("  ").append(url.getFile()).append("\n");
         }       
           
         // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
-        detail = detail + "\nCLASSPATH:\n" + classPath + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
+        detail = detail + "\nCLASSPATH:\n" + classPath.toString() + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
                "    ALPHA FEATURES: " + UISettings.ALPHA_FEATURES_ENABLED.getValue() + "\n" +
                "    BETA FEATURES: " + UISettings.BETA_FEATURES_ENABLED.getValue() + "\n";
 	    
@@ -192,32 +147,23 @@ public final class BugManager {
         final LocalClientInfo info = localClientInfoFactory.createLocalClientInfo(bug, threadName, detail, false);
 
         if( BugSettings.LOG_BUGS_LOCALLY.getValue() ) {
-            logBugLocally(info);
+            logBugToDisk(info);
         }
-                    
-        boolean sent = false;
+
         if (BugSettings.IGNORE_ALL_BUGS.getValue()) {
             return; // ignore.
         }
 
-        // If we have already sent information about this bug, leave.
-        if (!shouldInform(info)) {
-            return; // ignore.
-        }
-
-        // If the user wants to automatically send to the servlet, do so.
-        // Otherwise, display it for review.
-        if (isSendableVersion()) {
-            if (BugSettings.USE_AUTOMATIC_BUG.getValue()) {
-                sent = true;
-            }
-        }
-
-        if (sent) {
+        if (BugSettings.USE_AUTOMATIC_BUG.getValue()) {
             sendToServlet(info);
+            return;
         }
-        
-        if (!sent &&  _dialogsShowing < MAX_DIALOGS ) {
+
+        /*
+	    The maximum number of dialogs we're allowed to show.
+	    */
+        int MAX_DIALOGS = 3;
+        if (!BugSettings.USE_AUTOMATIC_BUG.getValue() &&  _dialogsShowing < MAX_DIALOGS) {
             GUIMediator.safeInvokeLater(new Runnable() {
                 public void run() {
                     reviewBug(info);
@@ -230,14 +176,15 @@ public final class BugManager {
      * Logs the bug report to a local file.
      * If the file reaches a certain size it is erased.
      */
-    private void logBugLocally(LocalClientInfo info) {
+    private void logBugToDisk(LocalClientInfo info) {
         File f = BugSettings.BUG_LOG_FILE.getValue();
         FileUtils.setWriteable(f);
         OutputStream os = null;
         try {
             synchronized(WRITE_LOCK) {
-                if ( f.length() > BugSettings.MAX_BUGFILE_SIZE.getValue() )
+                if (f.length() > BugSettings.MAX_BUGFILE_SIZE.getValue()) {
                     f.delete();
+                }
                 os = new BufferedOutputStream(
                         new FileOutputStream(f.getPath(), true));
                 os.write((new Date().toString() + "\n").getBytes());
@@ -250,50 +197,9 @@ public final class BugManager {
             IOUtils.closeQuietly(os);
         }
     }
-    
-    /**
-     * Determines if the bug has already been reported enough.
-     * If it has, this returns false.  Otherwise (if the bug should
-     * be reported) this returns true.
-     */
-    private boolean shouldInform(LocalClientInfo info) {
-        long now = System.currentTimeMillis();
-        
-        // If we aren't allowed to report a bug, exit.
-        if( now < _nextAllowedTime )
-            return false;
 
-        Long allowed = BUG_TIMES.get(info.getParsedBug());
-        return allowed == null || now >= allowed.longValue();
-    }
-    
-    /**
-     * Determines if we're allowed to send a bug report.
-     */
-    private boolean isSendableVersion() {
-        Version myVersion;
-        Version lastVersion;
-        try {
-            myVersion = new Version(FrostWireUtils.getFrostWireVersion());
-            lastVersion = new Version(BugSettings.LAST_ACCEPTABLE_VERSION.getValue());
-        } catch(VersionFormatException vfe) {
-            return false;
-        }
-        
-        return myVersion.compareTo(lastVersion) >= 0;
-    }
-    
     private static String warning() {
-        //String msg = "Ui" + "jt!j" + "t!Mjn" + "fXjs" + "f/!U" + "if!pg"+
-        //             "gjdjbm!xfc" + "tjuf!j" + "t!xx" + "x/mj" + "nfxjs" + "f/d" + "pn/";
-        //StringBuilder ret = new StringBuilder(msg.length());
-        //for(int i = 0; i < msg.length(); i++) {
-        //    ret.append((char)(msg.charAt(i) - 1));
-   	//
-        //}
-	//System.out.println("Bug Manager message: "+ ret.toString());	
-        //return ret.toString();
-	return "You are using FrostWire. www.frostwire.com";
+        return "You are using FrostWire. www.frostwire.com";
     }
     
     /**
@@ -313,22 +219,14 @@ public final class BugManager {
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         mainPanel.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-		
-		boolean sendable = isSendableVersion();
 
-        String msg;
-        if(sendable)
-            msg = I18n.tr("FrostWire has encountered an internal error. It is possible for FrostWire to recover and continue running normally. To aid with debugging, please click \'Send\' to notify FrostWire about the problem. If desired, you can click \'Review\' to look at the information that will be sent. Thank you.");
-        else
-            msg = I18n.tr("FrostWire has encountered an internal error. It is possible for FrostWire to recover and continue running normally. To continue using FrostWire, click \'Discard\'. If desired, you can click \'Review\' to look at the information about the error.");
-        
-        msg = warning() + "\n\n" + msg;
+        String msg = warning() + "\n\n" +
+                I18n.tr("FrostWire has encountered an internal error. It is possible for FrostWire to recover and continue running normally. To aid with debugging, please click \'Send\' to notify FrostWire about the problem. If desired, you can click \'Review\' to look at the information that will be sent. Thank you.");
        
         MultiLineLabel label = new MultiLineLabel(msg, 400);        
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new GridBagLayout());
-        constraints = new GridBagConstraints();
+        GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -337,13 +235,7 @@ public final class BugManager {
         constraints.weighty = 1.0;        
         labelPanel.add(label, constraints); 
                 
-        String textAreaDescription;
-        if(sendable)
-            textAreaDescription = I18n.tr("Please add any comments you may have (e.g what caused the error).\nThank you and please use English.");
-        else
-            textAreaDescription = " ";
-        
-        final JTextArea userCommentsTextArea = new JTextArea(textAreaDescription);        
+        final JTextArea userCommentsTextArea = new JTextArea(I18n.tr("Please add any comments you may have (e.g what caused the error).\nThank you and please use English."));
         userCommentsTextArea.setLineWrap(true);
         userCommentsTextArea.setWrapStyleWord(true);                        
         
@@ -389,11 +281,9 @@ public final class BugManager {
 		        _dialogsShowing--;
 		    }
 		});
-		if(sendable)
-            buttonPanel.add(sendButton);
-        buttonPanel.add(reviewButton);
+        buttonPanel.add(sendButton);
+		buttonPanel.add(reviewButton);
         buttonPanel.add(discardButton);
-        
         JPanel optionsPanel = new JPanel();
         JPanel innerPanel = new JPanel();
         ButtonGroup bg = new ButtonGroup();
@@ -402,10 +292,8 @@ public final class BugManager {
         final JRadioButton alwaysSend = new JRadioButton(I18n.tr("Always Send Immediately"));
         final JRadioButton alwaysReview = new JRadioButton(I18n.tr("Always Ask For Review"));
         final JRadioButton alwaysDiscard = new JRadioButton(I18n.tr("Always Discard All Errors"));
-		innerPanel.add(Box.createVerticalStrut(6));        
-        if (sendable) {
-            innerPanel.add(alwaysSend);
-        }
+		innerPanel.add(Box.createVerticalStrut(6));
+        innerPanel.add(alwaysSend);
         innerPanel.add(alwaysReview);
         innerPanel.add(alwaysDiscard);
         innerPanel.add(Box.createVerticalStrut(6));        
@@ -434,20 +322,17 @@ public final class BugManager {
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
-        mainPanel.add(labelPanel, constraints);              
-        
-        if(sendable)
-        {
-            constraints = new GridBagConstraints();
-            constraints.gridx = 0;
-            constraints.gridy = 1;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.weightx = 1.0;            
-            constraints.weighty = 1.0;
-            constraints.insets = new Insets(20, 0, 6, 0);
-            mainPanel.add(userCommentsScrollPane, constraints);
-        }
-            
+        mainPanel.add(labelPanel, constraints);
+
+        constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1.0;
+        constraints.weighty = 1.0;
+        constraints.insets = new Insets(20, 0, 6, 0);
+        mainPanel.add(userCommentsScrollPane, constraints);
+
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 2;
@@ -474,9 +359,7 @@ public final class BugManager {
 
 		try {
 		    DIALOG.setVisible(true);
-        } catch(InternalError ie) {
-            //happens occasionally, ignore.
-        } catch(ArrayIndexOutOfBoundsException npe) {
+        } catch(InternalError | ArrayIndexOutOfBoundsException ie) {
             //happens occasionally, ignore.
         }
     }
@@ -593,9 +476,22 @@ public final class BugManager {
         }
 
         public void run() {
+            long now = System.currentTimeMillis();
+
+            if (now < _nextAllowedTime) {
+                LOG.info("ServletSender.run() aborted");
+                return;
+            }
+
             String response = null;
             try {
-                response = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).post(BugSettings.BUG_REPORT_SERVER.getValue(), 6000, "FrostWire-"+FrostWireUtils.getFrostWireVersion(), INFO.toBugReport(), "text/plain", false);
+                response = HttpClientFactory.getInstance(
+                        HttpClientFactory.HttpContext.MISC).post(
+                                BugSettings.BUG_REPORT_SERVER.getValue(),
+                        6000,
+                        "FrostWire-"+FrostWireUtils.getFrostWireVersion(),
+                        INFO.toBugReport(),
+                        "text/plain", false);
             } catch (Exception e) {
                 LOG.error("Error sending bug report", e);
             }
@@ -609,31 +505,25 @@ public final class BugManager {
                 return;
             }
 
-            long now = System.currentTimeMillis();
-            long thisNextTime = 1000;
-
             synchronized (WRITE_LOCK) {
-                _nextAllowedTime = now + thisNextTime;
-
-                if (thisNextTime != 0) {
-                    BUG_TIMES.put(INFO.getParsedBug(), new Long(now + 10 * thisNextTime));
-                }
+                _nextAllowedTime = now + 30000;
+                LOG.info("ServletSender.run() success _nextAllowedTime=" + _nextAllowedTime);
             }
         }
     }
     
-    public static enum ErrorType {
-        GENERIC, DOWNLOAD;
+    public enum ErrorType {
+        GENERIC, DOWNLOAD
     }
     
-    private static enum DetailErrorType {
-        DISK_FULL, FILE_LOCKED, NO_PRIVS, BAD_CHARS;
+    private enum DetailErrorType {
+        DISK_FULL, FILE_LOCKED, NO_PRIVS, BAD_CHARS
     }
     
     private static final EnumMap<ErrorType, EnumMap<DetailErrorType, String>> errorDescs;
     
     static {
-        errorDescs = new EnumMap<ErrorType, EnumMap<DetailErrorType,String>>(ErrorType.class);
+        errorDescs = new EnumMap<>(ErrorType.class);
         for(ErrorType type : ErrorType.values())
             errorDescs.put(type, new EnumMap<DetailErrorType, String>(DetailErrorType.class));
         
@@ -672,7 +562,7 @@ public final class BugManager {
      *
      * @return true if we could handle the error.
      */
-    public static boolean handleException(IOException ioe, ErrorType errorType) {
+    private static boolean handleException(IOException ioe, ErrorType errorType) {
         Throwable e = ioe;
         
         while(e != null) {
@@ -696,7 +586,7 @@ public final class BugManager {
                    StringUtils.contains(msg, "permission denied") ) {
                     detailType = DetailErrorType.NO_PRIVS;
                 }
-                // If characterset is faulty...
+                // If character set is faulty...
                 else if(StringUtils.contains(msg, "invalid argument")) {
                     detailType = DetailErrorType.BAD_CHARS;
                 }

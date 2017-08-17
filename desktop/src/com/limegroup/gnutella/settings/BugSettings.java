@@ -46,11 +46,6 @@ public class BugSettings extends LimeProps {
      */
     public static final IntSetting MAX_BUGFILE_SIZE = FACTORY.createIntSetting("MAX_BUGFILE_SIZE", 1024 * 1024); // 1MB
 
-    /**
-     * Setting for the last version that should send bugs.
-     */
-    public static final StringSetting LAST_ACCEPTABLE_VERSION = FACTORY.createStringSetting("LAST_ACCEPTABLE_BUG_VERSION", "5.2.9");
-
     /** Setting for whether or not deadlock bugs should be sent. */
     public static final BooleanSetting SEND_DEADLOCK_BUGS = FACTORY.createBooleanSetting("SEND_DEADLOCK_BUGS", true);
 }

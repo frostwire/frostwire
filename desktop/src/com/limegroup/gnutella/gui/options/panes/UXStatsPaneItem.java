@@ -23,6 +23,7 @@ import javax.swing.JCheckBox;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.BugSettings;
 
 /**
  * @author gubatron
@@ -52,6 +53,11 @@ public final class UXStatsPaneItem extends AbstractPaneItem {
 
     public boolean applyOptions() {
         ApplicationSettings.UX_STATS_ENABLED.setValue(CHECK_BOX.isSelected());
+        if (ApplicationSettings.UX_STATS_ENABLED.getValue()) {
+            BugSettings.IGNORE_ALL_BUGS.setValue(false);
+            BugSettings.SEND_DEADLOCK_BUGS.setValue(true);
+            BugSettings.USE_AUTOMATIC_BUG.setValue(true);
+        }
         return true;
     }
 

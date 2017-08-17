@@ -27,6 +27,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.limegroup.gnutella.settings.BugSettings;
 import org.limewire.util.OSUtils;
 
 import com.frostwire.gui.theme.ThemeMediator;
@@ -113,7 +114,7 @@ final class MiscWindow extends SetupWindow {
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridy = GridBagConstraints.RELATIVE;
             gbc.weightx = 1.0;
-            
+
             mainPanel.add(panelUXStats, gbc);
 
             panelUXStats.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
@@ -135,19 +136,20 @@ final class MiscWindow extends SetupWindow {
      * Applies the settings handled in this window.
      */
     public void applySettings(boolean loadCoreComponents) {
-
         // System Startup
         if (GUIUtils.shouldShowStartOnStartupWindow()) {
             boolean allow = _startup.isSelected();
-
             if (OSUtils.isMacOSX())
                 MacOSXUtils.setLoginStatus(allow);
             else if (WindowsUtils.isLoginStatusAvailable())
                 WindowsUtils.setLoginStatus(allow);
-
             StartupSettings.RUN_ON_STARTUP.setValue(allow);
         }
-
         ApplicationSettings.UX_STATS_ENABLED.setValue(checkBoxUXStats.isSelected());
+        if (ApplicationSettings.UX_STATS_ENABLED.getValue()) {
+            BugSettings.IGNORE_ALL_BUGS.setValue(false);
+            BugSettings.SEND_DEADLOCK_BUGS.setValue(true);
+            BugSettings.USE_AUTOMATIC_BUG.setValue(true);
+        }
     }
 }

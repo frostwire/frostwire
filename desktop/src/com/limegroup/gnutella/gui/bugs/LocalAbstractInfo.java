@@ -20,50 +20,50 @@ abstract class LocalAbstractInfo {
     /**
      * Constant for the LimeWire version.
      */
-    protected static final String LIMEWIRE_VERSION = "1";
-    protected String _limewireVersion;
+    static final String LIMEWIRE_VERSION = "1";
+    String _limewireVersion;
     
     /**
      * Constant for the Java version.
      */
-    protected static final String JAVA_VERSION = "2";
-    protected String _javaVersion;
+    static final String JAVA_VERSION = "2";
+    String _javaVersion;
     
     /**
      * Constant for the OS.
      */
     protected static final String OS = "3";
-    protected String _os;
+    String _os;
     
     /**
      * Constant for the OS version.
      */
-    protected static final String OS_VERSION = "4";
-    protected String _osVersion;
+    static final String OS_VERSION = "4";
+    String _osVersion;
     
     /**
      * Constant for the architecture.
      */
-    protected static final String ARCHITECTURE = "5";
-    protected String _architecture;
+    static final String ARCHITECTURE = "5";
+    String _architecture;
     
     /**
      * Constant for the free memory.
      */
-    protected static final String FREE_MEMORY = "6";
-    protected String _freeMemory;
+    static final String FREE_MEMORY = "6";
+    String _freeMemory;
     
     /**
      * Constant for the total memory.
      */
-    protected static final String TOTAL_MEMORY = "7";
-    protected String _totalMemory;
+    static final String TOTAL_MEMORY = "7";
+    String _totalMemory;
     
     /**
      * Constant for the exception to report.
      */
-    protected static final String BUG = "8";
-    protected String _bug;
+    static final String BUG = "8";
+    String _bug;
     
     /**
      * Constant for the current thread name.
@@ -414,7 +414,7 @@ abstract class LocalAbstractInfo {
      * Returns the parsed version of the stack trace, without the message
      * between the exception and the stack trace.
      */
-    public final String getParsedBug() {
+    final String getParsedBug() {
         int colon = _bug.indexOf(':');
         // If no ':', just use the bug as we read it.
         if(colon == -1)
@@ -432,9 +432,8 @@ abstract class LocalAbstractInfo {
             
         //Now that we know where the message begins and where the message ends
         //put the bug back together without the message.
-        final String parsedBug = _bug.substring(0, colon) + 
+        return _bug.substring(0, colon) +
                                  _bug.substring(ntat);
-        return parsedBug;
     }   
         
 	/**
@@ -450,7 +449,7 @@ abstract class LocalAbstractInfo {
     /**
      * Determines if this was a fatal error.
      */
-    public boolean isFatalError() {
+    private boolean isFatalError() {
         return _fatalError != null && _fatalError.equalsIgnoreCase("true");
     }
 }
