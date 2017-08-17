@@ -22,6 +22,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,7 +39,7 @@ import com.frostwire.android.util.ImageLoader;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class CheckableImageView<T> extends View {
+public final class CheckableImageView<T> extends View implements Checkable {
 
     private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
     private final Uri[] imageUris;
@@ -85,6 +86,16 @@ public final class CheckableImageView<T> extends View {
         if (this.onCheckedChangeListener != null && this.onCheckedChangeListener.isEnabled()) {
             this.onCheckedChangeListener.onCheckedChanged(CheckableImageView.this, checked);
         }
+    }
+
+    @Override
+    public boolean isChecked() {
+        throw new UnsupportedOperationException("To be removed");
+    }
+
+    @Override
+    public void toggle() {
+        throw new UnsupportedOperationException("To be removed");
     }
 
     private void initComponents(ViewGroup containerView,
