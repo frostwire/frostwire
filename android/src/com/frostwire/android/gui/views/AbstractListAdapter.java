@@ -596,30 +596,10 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         }
     }
 
-    public class CheckboxOnCheckedChangeListener implements OnCheckedChangeListener {
-        private boolean enabled = true;
-
-        public CheckboxOnCheckedChangeListener() {
-        }
-
-        public boolean isEnabled() {
-            return this.enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
+    private final class CheckboxOnCheckedChangeListener implements OnCheckedChangeListener {
+        @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (enabled) {
-                onItemChecked(buttonView, isChecked);
-            }
-        }
-
-        public void onCheckedChanged(View view, boolean isChecked) {
-            if (enabled) {
-                onItemChecked(view, isChecked);
-            }
+            onItemChecked(buttonView, isChecked);
         }
     }
 
