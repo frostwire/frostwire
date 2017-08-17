@@ -65,7 +65,6 @@ public final class CheckableImageView<T> extends View implements Checkable {
         this.onCheckedChangeListener.setEnabled(false);
         setChecked(checked);
         this.onCheckedChangeListener.setEnabled(true);
-        initClickListeners();
         this.imageUris = imageUris;
         this.width = width;
         this.height = height;
@@ -111,31 +110,6 @@ public final class CheckableImageView<T> extends View implements Checkable {
             playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
         checkedOverlayView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_overlay_checkmark_framelayout);
-    }
-
-    private void initClickListeners() {
-        backgroundView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackgroundViewClick();
-            }
-        });
-        checkedOverlayView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOverlayCheckedViewClick(v);
-            }
-        });
-    }
-
-    private void onBackgroundViewClick() {
-        if (checkableMode) {
-            setChecked(true);
-        }
-    }
-
-    private void onOverlayCheckedViewClick(View v) {
-        setChecked(false);
     }
 
     public void setCheckableMode(boolean checkableMode) {
