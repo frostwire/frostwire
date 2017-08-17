@@ -247,12 +247,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 showFileSize);
 
         checkableView.setCheckableMode(selectAllMode);
-        checkableView.setTag(item);
         checkableView.loadImages();
         if (showFileSize) {
             checkableView.setFileSize(item.fd.fileSize);
         }
-        checkableView.setVisibility(View.VISIBLE);
     }
 
     private Uri[] getFileItemThumbnailUris(FileDescriptorItem item) {

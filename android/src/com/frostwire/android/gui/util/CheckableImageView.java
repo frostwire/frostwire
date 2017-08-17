@@ -22,7 +22,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Checkable;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,8 +37,9 @@ import com.frostwire.android.util.ImageLoader;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class CheckableImageView<T> extends View {
+public final class CheckableImageView {
 
+    private final Context context;
     private final Uri[] imageUris;
     private ImageButton backgroundView;
     private TextView fileSizeTextView;
@@ -54,8 +54,7 @@ public final class CheckableImageView<T> extends View {
                               int width, int height,
                               Uri[] imageUris,
                               boolean checked, boolean showFileSize) {
-        super(context);
-        setClickable(true);
+        this.context = context;
         initComponents(containerView, playbackStatusOverlayView, mediaPlaybackOverlayState, checked, showFileSize);
         setChecked(checked);
         this.imageUris = imageUris;
@@ -64,7 +63,7 @@ public final class CheckableImageView<T> extends View {
     }
 
     public void loadImages() {
-        ImageLoader imageLoader = ImageLoader.getInstance(getContext());
+        ImageLoader imageLoader = ImageLoader.getInstance(context);
         imageLoader.load(imageUris[0], imageUris[1], backgroundView, width, height);
     }
 
