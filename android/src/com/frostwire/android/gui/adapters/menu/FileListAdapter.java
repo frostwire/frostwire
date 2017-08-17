@@ -235,6 +235,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             overlayPlaybackState = MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY;
             showFileSize = true;
         }
+        // TODO: why CheckableImageView needs to exist is hard to explain, I (aldenml) think that
+        // it's better to move the logic to use in place and improve code locality
         final CheckableImageView checkableView = new CheckableImageView(
                 view.getContext(),
                 view,
