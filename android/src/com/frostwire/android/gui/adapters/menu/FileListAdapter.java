@@ -57,8 +57,6 @@ import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -224,7 +222,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) throws Throwable {
-        final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         boolean isChecked = getChecked().contains(item);
         boolean showFileSize = false;
 
@@ -247,10 +244,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 0,
                 uris,
                 isChecked,
-                showFileSize,
-                checkboxOnCheckedChangeListener);
+                showFileSize);
 
-        checkboxOnCheckedChangeListener.setEnabled(false);
         checkableView.setCheckableMode(selectAllMode);
         checkableView.setTag(item);
         checkableView.loadImages();
@@ -258,7 +253,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             checkableView.setFileSize(item.fd.fileSize);
         }
         checkableView.setVisibility(View.VISIBLE);
-        checkboxOnCheckedChangeListener.setEnabled(true);
     }
 
     private Uri[] getFileItemThumbnailUris(FileDescriptorItem item) {

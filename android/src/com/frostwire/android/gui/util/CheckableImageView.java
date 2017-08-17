@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.MediaPlaybackOverlayPainter;
 import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.util.ImageLoader;
@@ -39,14 +38,12 @@ import com.frostwire.android.util.ImageLoader;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class CheckableImageView<T> extends View implements Checkable {
+public final class CheckableImageView<T> extends View {
 
-    private final AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener;
     private final Uri[] imageUris;
     private ImageButton backgroundView;
     private TextView fileSizeTextView;
     private FrameLayout checkedOverlayView;
-    private boolean checkableMode;
     private int width;
     private int height;
 
@@ -56,15 +53,11 @@ public final class CheckableImageView<T> extends View implements Checkable {
                               MediaPlaybackOverlayPainter.MediaPlaybackState mediaPlaybackOverlayState,
                               int width, int height,
                               Uri[] imageUris,
-                              boolean checked, boolean showFileSize,
-                              AbstractListAdapter<T>.CheckboxOnCheckedChangeListener onCheckedChangeListener) {
+                              boolean checked, boolean showFileSize) {
         super(context);
         setClickable(true);
-        this.onCheckedChangeListener = onCheckedChangeListener;
         initComponents(containerView, playbackStatusOverlayView, mediaPlaybackOverlayState, checked, showFileSize);
-        this.onCheckedChangeListener.setEnabled(false);
         setChecked(checked);
-        this.onCheckedChangeListener.setEnabled(true);
         this.imageUris = imageUris;
         this.width = width;
         this.height = height;
@@ -82,19 +75,6 @@ public final class CheckableImageView<T> extends View implements Checkable {
     public void setChecked(boolean checked) {
         backgroundView.setVisibility(View.VISIBLE);
         checkedOverlayView.setVisibility(checked ? View.VISIBLE : View.GONE);
-        if (this.onCheckedChangeListener != null && this.onCheckedChangeListener.isEnabled()) {
-            this.onCheckedChangeListener.onCheckedChanged(CheckableImageView.this, checked);
-        }
-    }
-
-    @Override
-    public boolean isChecked() {
-        throw new UnsupportedOperationException("To be removed");
-    }
-
-    @Override
-    public void toggle() {
-        throw new UnsupportedOperationException("To be removed");
     }
 
     private void initComponents(ViewGroup containerView,
@@ -113,7 +93,6 @@ public final class CheckableImageView<T> extends View implements Checkable {
     }
 
     public void setCheckableMode(boolean checkableMode) {
-        this.checkableMode = checkableMode;
         if (!checkableMode) {
             setChecked(false);
         }
