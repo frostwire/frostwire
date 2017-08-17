@@ -30,6 +30,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -46,7 +47,6 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.CheckableImageView;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ListAdapterFilter;
@@ -768,6 +768,67 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         @Override
         public int hashCode() {
             return fd.id;
+        }
+    }
+
+    private static final class CheckableImageView {
+
+        private final Context context;
+        private final Uri[] imageUris;
+        private ImageButton backgroundView;
+        private TextView fileSizeTextView;
+        private FrameLayout checkedOverlayView;
+        private int width;
+        private int height;
+
+        public CheckableImageView(Context context,
+                                  ViewGroup containerView,
+                                  MediaPlaybackStatusOverlayView playbackStatusOverlayView,
+                                  MediaPlaybackOverlayPainter.MediaPlaybackState mediaPlaybackOverlayState,
+                                  int width, int height,
+                                  Uri[] imageUris,
+                                  boolean checked, boolean showFileSize) {
+            this.context = context;
+            initComponents(containerView, playbackStatusOverlayView, mediaPlaybackOverlayState, checked, showFileSize);
+            setChecked(checked);
+            this.imageUris = imageUris;
+            this.width = width;
+            this.height = height;
+        }
+
+        public void loadImages() {
+            ImageLoader imageLoader = ImageLoader.getInstance(context);
+            imageLoader.load(imageUris[0], imageUris[1], backgroundView, width, height);
+        }
+
+        public void setFileSize(long fileSize) {
+            fileSizeTextView.setText(UIUtils.getBytesInHuman(fileSize));
+        }
+
+        public void setChecked(boolean checked) {
+            backgroundView.setVisibility(View.VISIBLE);
+            checkedOverlayView.setVisibility(checked ? View.VISIBLE : View.GONE);
+        }
+
+        private void initComponents(ViewGroup containerView,
+                                    MediaPlaybackStatusOverlayView playbackStatusOverlayView,
+                                    MediaPlaybackOverlayPainter.MediaPlaybackState overlayState,
+                                    boolean checked,
+                                    boolean showFileSize) {
+            backgroundView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_browse_thumbnail_image_button);
+            backgroundView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            fileSizeTextView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_item_filesize);
+            fileSizeTextView.setVisibility(showFileSize ? View.VISIBLE : View.GONE);
+            if (playbackStatusOverlayView != null) {
+                playbackStatusOverlayView.setPlaybackState(!checked ? overlayState : MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
+            }
+            checkedOverlayView = containerView.findViewById(R.id.view_my_files_thumbnail_grid_overlay_checkmark_framelayout);
+        }
+
+        public void setCheckableMode(boolean checkableMode) {
+            if (!checkableMode) {
+                setChecked(false);
+            }
         }
     }
 }
