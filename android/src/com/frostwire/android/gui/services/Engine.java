@@ -18,7 +18,11 @@
 package com.frostwire.android.gui.services;
 
 import android.app.Application;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
@@ -31,7 +35,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 
-import java.io.*;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 
 /**
