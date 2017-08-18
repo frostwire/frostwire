@@ -32,6 +32,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 /**
  * Created on Nov/8/16 (2016 US election day)
@@ -131,22 +132,29 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             if (!Ref.alive(activityRef)) {
                 return;
             }
-            Activity activity = activityRef.get();
-            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, moPubAdNetwork.placements.get(placement));
-            MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(moPubAdNetwork, placement);
-            moPubInterstitial.setInterstitialAdListener(moPubListener);
-            moPubAdNetwork.interstitials.put(placement, moPubInterstitial);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    LOG.info("Loading " + placement + " interstitial");
-                    try {
-                        moPubInterstitial.load();
-                    } catch (Throwable e) {
-                        LOG.warn("Mopub Interstitial couldn't be loaded", e);
+
+            try {
+                final Activity activity = activityRef.get();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        LOG.info("Loading " + placement + " interstitial");
+                        try {
+                            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, moPubAdNetwork.placements.get(placement));
+                            MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(moPubAdNetwork, placement);
+                            moPubInterstitial.setInterstitialAdListener(moPubListener);
+                            if (Ref.alive(activityRef)) {
+                                moPubAdNetwork.interstitials.put(placement, moPubInterstitial);
+                                moPubInterstitial.load();
+                            }
+                        } catch (Throwable e) {
+                            LOG.warn("Mopub Interstitial couldn't be loaded", e);
+                        }
                     }
-                }
-            });
+                });
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
         }
     }
 
