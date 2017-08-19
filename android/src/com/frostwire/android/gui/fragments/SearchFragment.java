@@ -97,6 +97,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -152,13 +153,13 @@ public final class SearchFragment extends AbstractFragment implements
         LayoutInflater inflater = LayoutInflater.from(activity);
 
         LinearLayout header = (LinearLayout) inflater.inflate(R.layout.view_search_header, null, false);
-        TextView title = (TextView) header.findViewById(R.id.view_search_header_text_title);
+        TextView title = header.findViewById(R.id.view_search_header_text_title);
         title.setText(R.string.search);
 
         title.setOnClickListener(getHeaderClickListener());
 
-        ImageButton filterButtonIcon = (ImageButton) header.findViewById(R.id.view_search_header_search_filter_button);
-        TextView filterCounter = (TextView) header.findViewById(R.id.view_search_header_search_filter_counter);
+        ImageButton filterButtonIcon = header.findViewById(R.id.view_search_header_search_filter_button);
+        TextView filterCounter = header.findViewById(R.id.view_search_header_search_filter_counter);
         filterButton = new FilterToolbarButton(filterButtonIcon, filterCounter);
         filterButton.updateVisibility();
 
@@ -607,17 +608,17 @@ public final class SearchFragment extends AbstractFragment implements
         final ConfigurationManager CM = ConfigurationManager.instance();
         boolean alreadyRated = CM.getBoolean(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET);
         if (alreadyRated || ratingReminder.wasDismissed()) {
+            //LOG.info("SearchFragment.showRatingsReminder() aborted. alreadyRated="+alreadyRated + " wasDismissed=" + ratingReminder.wasDismissed());
             return;
         }
-        // TODO: restore the logic, but with some sort of module operation, otherwise it will always show
-        //final int finishedDownloads = Engine.instance().getNotifiedDownloadsBloomFilter().count();
-        //final int intervalFactor = Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 4 : 1;
-        //final int REMINDER_INTERVAL = intervalFactor * CM.getInt(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER);
-        //LOG.info("successful finishedDownloads: " + finishedDownloads);
-        //if (finishedDownloads < REMINDER_INTERVAL) {
-        //    return;
-        //}
-        if (true) return;
+
+        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
+        long daysInstalled = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installationTimestamp);
+        if (daysInstalled < 5) {
+            //LOG.info("SearchFragment.showRatingsReminder() aborted. Too soon to show ratings reminder. daysInstalled=" + daysInstalled);
+            return;
+        }
+
         ClickAdapter<SearchFragment> onRateAdapter = createOnRateClickAdapter(ratingReminder, CM);
         ratingReminder.setOnClickListener(onRateAdapter);
         RichNotificationActionLink rateFrostWireActionLink =
@@ -912,8 +913,8 @@ public final class SearchFragment extends AbstractFragment implements
                     long timeSinceLastUpdate = System.currentTimeMillis() - lastUIUpdate;
                     if (timeSinceLastUpdate < 500) {
                         try {
-                            Thread.sleep(500l - timeSinceLastUpdate);
-                        } catch (InterruptedException e) {
+                            Thread.sleep(500L - timeSinceLastUpdate);
+                        } catch (InterruptedException ignored) {
                         }
                     }
                     Runnable uiRunnable = new Runnable() {
