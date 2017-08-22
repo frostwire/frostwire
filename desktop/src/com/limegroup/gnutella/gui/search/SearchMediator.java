@@ -21,6 +21,7 @@ import com.frostwire.gui.filters.SearchFilterFactoryImpl;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.*;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
+import com.frostwire.search.pixabay.PixabayItemSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
@@ -85,6 +86,8 @@ public final class SearchMediator {
     static final String SOUNDCLOUD_DETAILS_STRING = I18n.tr("View in Soundcloud");
 
     static final String ARCHIVEORG_DETAILS_STRING = I18n.tr("View in Archive.org");
+
+    static final String PIXABAY_DETAILS_STRING = I18n.tr("View in Pixabay");
 
     static final String CLOSE_TAB_STRING = I18n.tr("Close Tab");
 
@@ -395,6 +398,8 @@ public final class SearchMediator {
                 ui = new TorrentUISearchResult((TorrentSearchResult) sr, engine, query);
             } else if (sr instanceof ArchiveorgCrawledSearchResult) {
                 ui = new ArchiveorgUISearchResult((ArchiveorgCrawledSearchResult) sr, engine, query);
+            } else if (sr instanceof PixabayItemSearchResult) {
+                ui = new PixabayUISearchResult((PixabayItemSearchResult) sr, engine, query);
             }
 
             if (ui != null) {
