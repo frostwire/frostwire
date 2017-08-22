@@ -182,6 +182,9 @@ public final class SoftwareUpdater {
 
                     SearchEngine scSE = SearchEngine.SOUNCLOUD;
                     scSE.setActive(false);
+
+                    SearchEngine pixabaySE = SearchEngine.PIXABAY;
+                    pixabaySE.setActive(false);
                 }
 
                 //nav menu or other components always needs to be updated after we read the config.
