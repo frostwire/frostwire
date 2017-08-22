@@ -54,4 +54,5 @@ public interface AppSettings {
     String SEARCH_YIFY_ENABLED = "search_yify_enabled";
     String SEARCH_TORRENTDOWNLOADS_ENABLED = "search_torrentdownloads_enabled";
     String SEARCH_LIMETORRENTS_ENABLED = "search_limetorrents_enabled";
+    String SEARCH_PIXABAY_ENABLED = "search_pixabay_enabled";
 }

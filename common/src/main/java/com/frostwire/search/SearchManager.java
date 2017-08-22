@@ -24,6 +24,7 @@ import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.monova.MonovaSearchPerformer;
+import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -420,11 +421,19 @@ public final class SearchManager {
         }
     };
 
+    static final SearchEngine PIXABAY = new SearchEngine("Pixabay", AppSettings.SEARCH_PIXABAY_ENABLED, false) {
+        @Override
+        public SearchPerformer newPerformer(long token, String keywords) {
+            return new PixabaySearchPerformer(token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+        }
+    };
+
     @SuppressWarnings("unused")
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
             YIFY,
             YOUTUBE,
             FROSTCLICK,
+            PIXABAY,
             TPB,
             MONOVA,
             ZOOQLE,
