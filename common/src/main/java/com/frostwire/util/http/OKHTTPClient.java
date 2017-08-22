@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -281,6 +282,12 @@ public class OKHTTPClient extends AbstractHttpClient {
         });
         searchClient.sslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY, new AllX509TrustManager());
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+
+        ConnectionSpec.Builder allSpecBuilder = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS);
+        allSpecBuilder = allSpecBuilder.allEnabledCipherSuites().allEnabledTlsVersions();
+        ConnectionSpec allSpec = allSpecBuilder.build();
+        searchClient.connectionSpecs(Arrays.asList(allSpec));
+
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);
         return searchClient;
