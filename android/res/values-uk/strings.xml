@@ -669,4 +669,5 @@
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Мережа недоступна, будь ласка, перевірте підключення доІнтернету.</string>
+    <string name="use_pixabay">користування Pixabay</string>
 </resources>

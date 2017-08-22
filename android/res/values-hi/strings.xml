@@ -669,4 +669,5 @@
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">नेटवर्क अनुपलब्ध है, कृपया अपने इंटरनेट कनेक्शन की जांच करें।</string>
+    <string name="use_pixabay">उपयोग Pixabay</string>
 </resources>

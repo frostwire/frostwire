@@ -671,4 +671,5 @@
     <string name="vpn_client_feature_1_PIA">Χωρίς καταγραφή</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Το δίκτυο δεν είναι διαθέσιμο, ελέγξτε τη σύνδεση στο Internet.</string>
+    <string name="use_pixabay">Χρήση Pixabay</string>
 </resources>

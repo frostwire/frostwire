@@ -673,4 +673,5 @@
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Мрежа недоступна, молимо проверите вашу интернетску везу.</string>
+    <string name="use_pixabay">Користе Pixabay</string>
 </resources>
