@@ -283,14 +283,24 @@ public class OKHTTPClient extends AbstractHttpClient {
         searchClient.sslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY, new AllX509TrustManager());
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        ConnectionSpec.Builder allSpecBuilder = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS);
-        allSpecBuilder = allSpecBuilder.allEnabledCipherSuites().allEnabledTlsVersions();
-        ConnectionSpec allSpec = allSpecBuilder.build();
-        searchClient.connectionSpecs(Arrays.asList(allSpec));
+        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
+        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
+        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
+        searchClient.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
 
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);
         return searchClient;
+    }
+
+    private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
+        ConnectionSpec.Builder b = new ConnectionSpec.Builder(spec);
+        if (spec.isTls()) {
+            b = b.allEnabledCipherSuites();
+            b = b.allEnabledTlsVersions();
+            b = b.supportsTlsExtensions(true);
+        }
+        return b.build();
     }
 
     /**
