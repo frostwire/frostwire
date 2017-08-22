@@ -669,4 +669,5 @@
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">הרשת אינה זמינה, בדוק את חיבור האינטרנט שלך.</string>
+    <string name="use_pixabay">השתמש Pixabay</string>
 </resources>

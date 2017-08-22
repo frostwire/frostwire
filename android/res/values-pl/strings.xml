@@ -652,4 +652,5 @@
     <string name="or">lub</string>
     <string name="file_names">Nazwy plików</string>
     <string name="no_data_check_internet_connection">Sieć jest niedostępna, sprawdź połączenie internetowe.</string>
+    <string name="use_pixabay">Używaj Pixabay</string>
 </resources>

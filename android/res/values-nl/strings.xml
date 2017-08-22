@@ -669,4 +669,5 @@
     <string name="or">of</string>
     <string name="file_names">Bestandsnamen</string>
     <string name="no_data_check_internet_connection">Netwerk niet beschikbaar, controleer alstublieft uw internetverbinding.</string>
+    <string name="use_pixabay">Gebruik Pixabay</string>
 </resources>
