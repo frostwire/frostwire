@@ -51,8 +51,10 @@ import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -68,6 +70,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private final FileDescriptor fd;
     private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
+    private final OnBitorrentConnectRunnable onBitorrentConnectRunnable;
 
     // TODO: Receive extra metadata that could be put/used in the torrent for
     // enriched announcement.
@@ -80,6 +83,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         this.fd = fd;
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
+        this.onBitorrentConnectRunnable = new OnBitorrentConnectRunnable(this);
     }
 
     // Reminder: Currently disabled when using SD Card.
@@ -285,21 +289,32 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
             }
         } else {
-            Engine.instance().getThreadPool().execute(new Runnable() {
+            Engine.instance().getThreadPool().execute(onBitorrentConnectRunnable);
+        }
+    }
+
+    private static final class OnBitorrentConnectRunnable implements Runnable {
+        private WeakReference<SeedAction> seedActionRef;
+
+        OnBitorrentConnectRunnable(SeedAction seedAction) {
+            seedActionRef = Ref.weak(seedAction);
+        }
+
+        public void run() {
+            Engine.instance().startServices();
+            while (!Engine.instance().isStarted()) {
+                SystemClock.sleep(1000);
+            }
+            if (!Ref.alive(seedActionRef)) {
+                return;
+            }
+            final SeedAction seedAction = seedActionRef.get();
+            final Looper mainLooper = seedAction.getContext().getMainLooper();
+            Handler h = new Handler(mainLooper);
+            h.post(new Runnable() {
                 @Override
                 public void run() {
-                    Engine.instance().startServices();
-                    while (!Engine.instance().isStarted()) {
-                        SystemClock.sleep(1000);
-                    }
-                    final Looper mainLooper = getContext().getMainLooper();
-                    Handler h = new Handler(mainLooper);
-                    h.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onClick(getContext());
-                        }
-                    });
+                    seedAction.onClick(seedAction.getContext());
                 }
             });
         }
@@ -307,7 +322,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
     @SuppressWarnings("WeakerAccess")
-    public static class ShowNoWifiInformationDialog extends AbstractDialog {
+    public static final class ShowNoWifiInformationDialog extends AbstractDialog {
 
         public static ShowNoWifiInformationDialog newInstance() {
             return new ShowNoWifiInformationDialog();

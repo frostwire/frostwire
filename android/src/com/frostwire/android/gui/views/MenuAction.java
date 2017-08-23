@@ -35,7 +35,7 @@ public abstract class MenuAction {
     private final String text;
 
     public MenuAction(Context context, Drawable image, String text) {
-        this.contextRef = new WeakReference<Context>(context);
+        this.contextRef = new WeakReference<>(context);
         this.image = image;
         this.text = text;
     }
