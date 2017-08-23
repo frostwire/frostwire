@@ -175,8 +175,8 @@ dependencies {
     compile('com.mopub:mopub-sdk-banner:4.15.0@aar') { transitive = true }
     compile('com.mopub:mopub-sdk-interstitial:4.15.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.12-RC2'
-    compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.12-RC2'
+    compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.12'
+    compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.12'
     compile 'com.google.android:flexbox:0.3.0'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
