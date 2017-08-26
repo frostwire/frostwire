@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-
-import javax.swing.JTable;
-
 import com.limegroup.gnutella.gui.GUIUtils;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Simple renderer for speeds.

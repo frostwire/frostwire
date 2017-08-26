@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.mplayer;
 
-import java.awt.Toolkit;
+import java.awt.*;
 
 /**
  * @author aldenml

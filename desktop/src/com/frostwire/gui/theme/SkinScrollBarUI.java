@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.theme;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthScrollBarUI;
 

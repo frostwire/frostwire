@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.search;
 
-import java.util.Map;
-
-import javax.swing.JCheckBox;
-
 import com.frostwire.gui.filters.TableLineFilter;
+
+import javax.swing.*;
+import java.util.Map;
 
 class SearchEngineFilter implements TableLineFilter<SearchResultDataLine> {
 

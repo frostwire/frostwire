@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.notify;
 
-import java.awt.Dimension;
-
-import javax.swing.SwingUtilities;
-
 import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class handles user notifications for platform that do not support JDIC.

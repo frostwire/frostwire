@@ -29,17 +29,14 @@
  */
 package com.frostwire.gui.theme;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicFileChooserUI;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UI for file chooser in <b>Substance</b> look and feel. The

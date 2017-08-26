@@ -15,28 +15,13 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
+import com.limegroup.gnutella.gui.MultilineToolTip;
+import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
+import org.limewire.util.OSUtils;
 
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.TableCellRenderer;
@@ -44,13 +29,11 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.Position;
-
-import org.limewire.util.OSUtils;
-
-import com.frostwire.gui.theme.ThemeMediator;
-import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.MultilineToolTip;
-import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.util.*;
 
 /**
  * A specialized JTable for use with special Lime functions.

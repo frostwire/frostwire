@@ -1,9 +1,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.util.Comparator;
-
 import javax.swing.table.TableModel;
+import java.util.Comparator;
 
 /**
  * Interface for the model of a DataLineTable

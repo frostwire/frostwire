@@ -1,11 +1,10 @@
 package com.limegroup.gnutella.gui.search;
 
+import com.limegroup.gnutella.gui.dnd.LimeTransferHandler;
+
+import javax.swing.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
-
-import javax.swing.JComponent;
-
-import com.limegroup.gnutella.gui.dnd.LimeTransferHandler;
 
 class ResultPanelTransferHandler extends LimeTransferHandler {
 

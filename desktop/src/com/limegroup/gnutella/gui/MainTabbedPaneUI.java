@@ -1,8 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Insets;
-
 import javax.swing.plaf.metal.MetalTabbedPaneUI;
+import java.awt.*;
 
 /**
  * This class tweaks the tabbed pane UI to provide a little bit more room for

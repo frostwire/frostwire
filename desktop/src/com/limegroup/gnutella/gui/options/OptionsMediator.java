@@ -15,17 +15,15 @@
 
 package com.limegroup.gnutella.gui.options;
 
-import java.io.IOException;
-
-import javax.swing.JDialog;
-
 import com.frostwire.bittorrent.BTEngine;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.setting.SettingsGroupManager;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.LibrarySettings;
+import org.limewire.setting.SettingsGroupManager;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * This class acts as a mediator for the different components of the options

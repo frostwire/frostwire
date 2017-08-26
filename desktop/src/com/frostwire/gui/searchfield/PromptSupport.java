@@ -1,9 +1,7 @@
 package com.frostwire.gui.searchfield;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 
 /**
  * <p>

@@ -15,9 +15,9 @@
 
 package com.limegroup.gnutella.gui.actions;
 
-import java.awt.event.ActionEvent;
-
 import com.limegroup.gnutella.gui.GUIMediator;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Opens the given url in a browser.

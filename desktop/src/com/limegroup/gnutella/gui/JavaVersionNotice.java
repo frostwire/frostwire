@@ -1,25 +1,16 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import com.limegroup.gnutella.settings.QuestionsHandler;
+import com.limegroup.gnutella.util.Launcher;
 import org.limewire.util.Version;
 import org.limewire.util.VersionFormatException;
 import org.limewire.util.VersionUtils;
 
-import com.limegroup.gnutella.settings.QuestionsHandler;
-import com.limegroup.gnutella.util.Launcher;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 class JavaVersionNotice {
    

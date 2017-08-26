@@ -1,26 +1,18 @@
 package com.limegroup.gnutella.gui.notify;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.MenuItem;
-import java.awt.Point;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
+import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.UISettings;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Field;
-
-import javax.swing.SwingUtilities;
-
-import org.limewire.util.OSUtils;
-
-import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.UISettings;
 
 /**
  * Puts an icon and menu in the system tray.

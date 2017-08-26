@@ -15,7 +15,7 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import javax.swing.JMenu;
+import javax.swing.*;
 
 /**
  * Defines the minimal necessary methods for menus in the main application

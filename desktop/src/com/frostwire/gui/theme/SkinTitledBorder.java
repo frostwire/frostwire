@@ -18,21 +18,12 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import sun.swing.SwingUtilities2;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-
-
-import sun.swing.SwingUtilities2;
+import java.awt.*;
 
 /**
  * 

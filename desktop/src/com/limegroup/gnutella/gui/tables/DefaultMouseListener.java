@@ -1,9 +1,8 @@
 package com.limegroup.gnutella.gui.tables;
 
+import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
-import javax.swing.SwingUtilities;
 
 /**
  * This class handles mouse input to the component.

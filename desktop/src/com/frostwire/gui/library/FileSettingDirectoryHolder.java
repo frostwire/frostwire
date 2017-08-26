@@ -17,9 +17,9 @@
  */
 package com.frostwire.gui.library;
 
-import java.io.File;
-
 import org.limewire.setting.FileSetting;
+
+import java.io.File;
 
 
 

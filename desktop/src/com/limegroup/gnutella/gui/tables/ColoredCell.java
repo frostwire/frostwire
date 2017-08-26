@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Color;
+import java.awt.*;
 
 public interface ColoredCell {
     public Object getValue();

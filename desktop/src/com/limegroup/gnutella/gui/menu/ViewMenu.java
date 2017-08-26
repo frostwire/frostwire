@@ -16,7 +16,10 @@
 package com.limegroup.gnutella.gui.menu;
 
 import com.frostwire.gui.theme.ThemeMediator;
-import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.LanguageWindow;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.ToggleSettingAction;
 import com.limegroup.gnutella.settings.UISettings;

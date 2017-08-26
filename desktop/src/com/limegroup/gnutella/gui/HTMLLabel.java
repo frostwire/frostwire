@@ -1,10 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Font;
-import java.awt.Insets;
-
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
+import javax.swing.*;
+import java.awt.*;
 
 public class HTMLLabel extends JEditorPane {
     

@@ -15,29 +15,19 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import com.limegroup.gnutella.settings.BugSettings;
-import org.limewire.util.OSUtils;
-
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.WindowsUtils;
 import com.limegroup.gnutella.gui.options.panes.UXStatsPaneItem;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.MacOSXUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class displays a window to the user allowing them to specify

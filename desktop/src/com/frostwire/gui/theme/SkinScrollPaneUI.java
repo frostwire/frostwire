@@ -18,13 +18,10 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Dimension;
-
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthScrollPaneUI;
+import java.awt.*;
 
 /**
  * 

@@ -1,16 +1,10 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DropTargetContext;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
-
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
+import java.awt.dnd.*;
 
 /**
  * Listener used by LimeDropTarget to enable better LimeTransferHandler methods.

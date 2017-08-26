@@ -18,9 +18,8 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Color;
-
 import javax.swing.plaf.ColorUIResource;
+import java.awt.*;
 
 /**
  * 

@@ -18,16 +18,10 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Color;
-import java.awt.Image;
-import java.awt.LinearGradientPaint;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.geom.Rectangle2D;
-import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.plaf.nimbus.AbstractRegionPainter;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * 

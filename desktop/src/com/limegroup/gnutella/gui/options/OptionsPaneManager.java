@@ -15,19 +15,17 @@
 
 package com.limegroup.gnutella.gui.options;
 
-import java.awt.CardLayout;
-import java.awt.Component;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.SettingsWarningManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JPanel;
-
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.SettingsWarningManager;
 
 /**
  * Manages the main options window that displays the various options 

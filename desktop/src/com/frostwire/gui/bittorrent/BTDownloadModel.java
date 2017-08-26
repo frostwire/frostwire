@@ -15,11 +15,10 @@
 
 package com.frostwire.gui.bittorrent;
 
-import java.util.HashSet;
-
 import com.frostwire.transfers.TransferState;
-
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
+
+import java.util.HashSet;
 
 /**
  * This class provides access to the <tt>ArrayList</tt> that stores all of the

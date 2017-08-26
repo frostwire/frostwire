@@ -17,7 +17,6 @@ package com.frostwire.gui.updates;
 
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;

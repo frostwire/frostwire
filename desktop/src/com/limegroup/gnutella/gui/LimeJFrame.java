@@ -15,21 +15,15 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.GraphicsConfiguration;
-import java.awt.HeadlessException;
+import org.limewire.util.OSUtils;
+import org.limewire.util.SystemUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPopupMenu;
-import javax.swing.MenuElement;
-import javax.swing.MenuSelectionManager;
-
-import org.limewire.util.OSUtils;
-import org.limewire.util.SystemUtils;
 
 /**
  * A JFrame that uses LimeWire's icon.

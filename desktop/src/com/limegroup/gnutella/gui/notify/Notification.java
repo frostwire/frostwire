@@ -1,7 +1,6 @@
 package com.limegroup.gnutella.gui.notify;
 
-import javax.swing.Action;
-import javax.swing.Icon;
+import javax.swing.*;
 
 /**
  * Represents a notification. A notification must have a message and can

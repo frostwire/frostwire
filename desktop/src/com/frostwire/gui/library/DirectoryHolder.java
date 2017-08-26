@@ -17,10 +17,9 @@
  */
 package com.frostwire.gui.library;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileFilter;
-
-import javax.swing.Icon;
 
 /**
  * Interface for the directory data model behind a node in the library tree.

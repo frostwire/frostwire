@@ -1,14 +1,11 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.Image;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
-
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
 
 /**
  * A listener for drag gesture events.

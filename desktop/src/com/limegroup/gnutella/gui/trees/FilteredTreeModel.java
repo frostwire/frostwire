@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.trees;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
+import org.limewire.collection.CharSequenceKeyAnalyzer;
+import org.limewire.collection.PatriciaTrie;
+import org.limewire.util.I18NConvert;
+import org.limewire.util.StringUtils;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -12,11 +11,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-
-import org.limewire.collection.CharSequenceKeyAnalyzer;
-import org.limewire.collection.PatriciaTrie;
-import org.limewire.util.I18NConvert;
-import org.limewire.util.StringUtils;
+import java.util.*;
 
 /**
  * This class provides a filtered view on an underlying {@link TreeModel}.

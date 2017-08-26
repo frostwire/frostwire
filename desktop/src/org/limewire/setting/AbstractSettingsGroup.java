@@ -1,11 +1,11 @@
 package org.limewire.setting;
 
+import org.limewire.setting.evt.SettingsGroupEvent;
+import org.limewire.setting.evt.SettingsGroupEvent.EventType;
+import org.limewire.setting.evt.SettingsGroupListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.limewire.setting.evt.SettingsGroupEvent;
-import org.limewire.setting.evt.SettingsGroupListener;
-import org.limewire.setting.evt.SettingsGroupEvent.EventType;
 
 /**
  * An abstract implementation of SettingsGroup

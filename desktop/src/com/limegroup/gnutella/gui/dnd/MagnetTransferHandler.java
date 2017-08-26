@@ -15,17 +15,16 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-
-import javax.swing.JComponent;
-
 import com.limegroup.gnutella.ExternalControl;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
+
+import javax.swing.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 
 /**
  * Transferhandler that handles drags of magnet links onto limewire by

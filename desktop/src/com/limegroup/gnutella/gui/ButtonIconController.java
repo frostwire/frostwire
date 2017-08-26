@@ -1,5 +1,9 @@
 package com.limegroup.gnutella.gui;
 
+import com.limegroup.gnutella.settings.UISettings;
+import org.apache.commons.io.IOUtils;
+
+import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,13 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
-import org.apache.commons.io.IOUtils;
-
-import com.limegroup.gnutella.settings.UISettings;
 
 public class ButtonIconController {
 

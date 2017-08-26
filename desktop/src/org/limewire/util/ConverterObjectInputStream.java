@@ -1,14 +1,10 @@
 package org.limewire.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamClass;
-import java.io.Serializable;
+import com.frostwire.util.Logger;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.frostwire.util.Logger;
 
 /**
  * Converts older package and class names to the new equivalent name and is useful 

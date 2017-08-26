@@ -1,7 +1,6 @@
 package com.frostwire.gui.player;
 
-import java.awt.AWTException;
-import java.awt.Robot;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class ScreenSaverDisabler implements Runnable {

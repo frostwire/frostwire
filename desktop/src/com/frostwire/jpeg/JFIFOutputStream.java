@@ -10,14 +10,14 @@
  */
 package com.frostwire.jpeg;
 
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Stack;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 
 /**
  * {@code JFIFOutputStream}.

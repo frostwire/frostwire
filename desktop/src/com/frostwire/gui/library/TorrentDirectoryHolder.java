@@ -17,14 +17,13 @@
  */
 package com.frostwire.gui.library;
 
-import java.io.File;
-
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.MediaType;
+import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.settings.SharingSettings;
-import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import java.io.File;
 
 public class TorrentDirectoryHolder extends FileSettingDirectoryHolder {
 

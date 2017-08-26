@@ -15,13 +15,13 @@
 
 package com.limegroup.gnutella.gui.options;
 
-import java.awt.Container;
+import com.limegroup.gnutella.gui.BoxPanel;
+import com.limegroup.gnutella.gui.options.panes.PaneItem;
+
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.limegroup.gnutella.gui.BoxPanel;
-import com.limegroup.gnutella.gui.options.panes.PaneItem;
 
 /**
  * This class provides a skeletal implementation of the <tt>OptionsPane</tt>

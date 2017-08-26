@@ -1,7 +1,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 
-import java.awt.Point;
+import java.awt.*;
 
 /**
  * Simple interface that designates something as handling

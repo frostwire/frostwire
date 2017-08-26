@@ -18,13 +18,11 @@
 
 package com.frostwire.gui.tabs;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.frostwire.gui.library.LibraryMediator;
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class handles access to the tab that contains the library

@@ -1,7 +1,6 @@
 package com.frostwire.gui.theme;
 
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.*;
 
 public class SkinCheckBoxMenuItem extends JCheckBoxMenuItem {
 

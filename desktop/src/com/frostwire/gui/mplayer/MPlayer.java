@@ -18,7 +18,13 @@
 
 package com.frostwire.gui.mplayer;
 
-import java.awt.Dimension;
+import com.frostwire.mplayer.*;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
+import org.gudy.azureus2.core3.util.Debug;
+import org.gudy.azureus2.core3.util.MessageText;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,22 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
-import org.gudy.azureus2.core3.util.MessageText;
-import org.gudy.azureus2.core3.util.Debug;
-
-import com.frostwire.mplayer.BaseMediaPlayer;
-import com.frostwire.mplayer.IcyInfoListener;
-import com.frostwire.mplayer.Language;
-import com.frostwire.mplayer.LanguageSource;
-import com.frostwire.mplayer.MediaPlaybackState;
-import com.frostwire.mplayer.MetaDataListener;
-import com.frostwire.mplayer.PlayerPreferences;
-import com.frostwire.mplayer.PositionListener;
-import com.frostwire.mplayer.StateListener;
-import com.frostwire.mplayer.VolumeListener;
 
 public class MPlayer extends BaseMediaPlayer {
 

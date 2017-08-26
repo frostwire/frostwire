@@ -15,15 +15,12 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Color;
-import java.awt.Component;
+import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.swing.JComponent;
-import javax.swing.JTable;
-import javax.swing.table.TableCellRenderer;
 
 /**
  * Draws a cell with it's default renderer, but the foreground

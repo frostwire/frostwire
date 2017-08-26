@@ -1,12 +1,12 @@
 package org.limewire.setting;
 
+import org.limewire.setting.evt.SettingEvent;
+import org.limewire.setting.evt.SettingEvent.EventType;
+import org.limewire.setting.evt.SettingListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
-
-import org.limewire.setting.evt.SettingEvent;
-import org.limewire.setting.evt.SettingListener;
-import org.limewire.setting.evt.SettingEvent.EventType;
 
 
 /**

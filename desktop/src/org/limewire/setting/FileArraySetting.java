@@ -1,13 +1,13 @@
 package org.limewire.setting;
 
+import org.limewire.util.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-
-import org.limewire.util.FileUtils;
 
 
 /**

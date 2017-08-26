@@ -1,10 +1,10 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.IllegalComponentStateException;
+import org.limewire.service.ErrorService;
+
+import java.awt.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import org.limewire.service.ErrorService;
 
 
 /**

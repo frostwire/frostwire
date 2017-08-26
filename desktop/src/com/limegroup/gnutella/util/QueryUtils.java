@@ -1,15 +1,10 @@
 package com.limegroup.gnutella.util;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
-
+import com.limegroup.gnutella.settings.SearchSettings;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.StringUtils;
 
-import com.limegroup.gnutella.settings.SearchSettings;
+import java.util.*;
 
 public class QueryUtils {
     

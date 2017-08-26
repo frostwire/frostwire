@@ -1,10 +1,9 @@
 package com.frostwire.gui.searchfield;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.swing.JComponent;
 
 public abstract class AbstractUIChangeHandler implements PropertyChangeListener {
 	//prevent double installation.

@@ -15,26 +15,15 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
 import com.frostwire.gui.theme.ThemeMediator;
-import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.Line;
-import com.limegroup.gnutella.gui.MultiLineLabel;
-import com.limegroup.gnutella.gui.URLLabel;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.DitherPanel;
 import com.limegroup.gnutella.gui.search.Ditherer;
 import com.limegroup.gnutella.util.FrostWireUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class IntentPanel extends JPanel {
 

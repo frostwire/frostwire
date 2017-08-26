@@ -15,11 +15,10 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.table.AbstractTableModel;
 
 
 /**

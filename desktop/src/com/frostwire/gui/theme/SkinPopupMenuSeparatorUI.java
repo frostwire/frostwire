@@ -18,16 +18,13 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.JComponent;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.basic.BasicPopupMenuSeparatorUI;
-
+import com.apple.laf.AquaPopupMenuSeparatorUI;
 import org.limewire.util.OSUtils;
 
-import com.apple.laf.AquaPopupMenuSeparatorUI;
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicPopupMenuSeparatorUI;
+import java.awt.*;
 
 /**
  * 

@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.JLabel;
+import javax.swing.*;
 
 /**
  * Simple renderer that centers the data.

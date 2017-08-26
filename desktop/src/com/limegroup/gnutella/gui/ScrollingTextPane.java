@@ -15,16 +15,10 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Extend <tt>JScrollPane</tt> so that a scrolled html file is shown

@@ -1,13 +1,10 @@
 package com.limegroup.gnutella.gui;
 
-import java.io.File;
-
-import javax.swing.Icon;
-
-import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.FileUtils;
-
 import com.limegroup.gnutella.gui.search.NamedMediaType;
+import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
+import java.io.File;
 
 /**
  * A FileIconController based off NamedMediaType's default icons.

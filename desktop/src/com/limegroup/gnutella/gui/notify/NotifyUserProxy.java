@@ -1,10 +1,7 @@
 package com.limegroup.gnutella.gui.notify;
 
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.settings.UISettings;
-
-import java.io.IOException;
+import org.limewire.util.OSUtils;
 
 /**
  * This class acts as a proxy for a platform-specific user notification class.

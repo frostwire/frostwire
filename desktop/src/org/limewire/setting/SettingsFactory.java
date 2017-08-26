@@ -15,20 +15,14 @@
 
 package org.limewire.setting;
 
-import java.awt.Color;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import org.apache.commons.io.IOUtils;
+import org.limewire.util.FileUtils;
+
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
-
-import org.apache.commons.io.IOUtils;
-import org.limewire.util.FileUtils;
 
 
 /**

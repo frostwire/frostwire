@@ -1,19 +1,10 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.limegroup.gnutella.settings.ApplicationSettings;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class LanguageButton extends JPanel {
 

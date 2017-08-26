@@ -1,32 +1,21 @@
 package com.frostwire.gui.searchfield;
 
-import java.awt.Component.BaselineResizeBehavior;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.TextComponent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.lang.reflect.Method;
+import com.frostwire.gui.searchfield.PromptSupport.FocusBehavior;
+import com.frostwire.gui.theme.SkinTextFieldBackgroundPainter;
 
 import javax.accessibility.Accessible;
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.synth.SynthTextFieldUI;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
+import javax.swing.text.*;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.EditorKit;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
 import javax.swing.text.Position.Bias;
-import javax.swing.text.View;
-
-import com.frostwire.gui.searchfield.PromptSupport.FocusBehavior;
-import com.frostwire.gui.theme.SkinTextFieldBackgroundPainter;
+import java.awt.Component.BaselineResizeBehavior;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.lang.reflect.Method;
 
 /**
  * <p>

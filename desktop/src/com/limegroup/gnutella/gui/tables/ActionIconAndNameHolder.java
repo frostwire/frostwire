@@ -18,9 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
+import javax.swing.*;
 import java.awt.event.ActionListener;
-
-import javax.swing.Icon;
 
 
 /**

@@ -15,10 +15,8 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.GraphicsConfiguration;
-import java.awt.HeadlessException;
-
-import javax.swing.JDialog;
+import javax.swing.*;
+import java.awt.*;
 
 public class FramedDialog extends LimeJFrame {
 

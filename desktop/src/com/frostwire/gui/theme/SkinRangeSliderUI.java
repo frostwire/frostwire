@@ -17,14 +17,9 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
+import com.limegroup.gnutella.gui.search.RangeSlider;
 
-import javax.swing.JComponent;
-import javax.swing.JSlider;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -32,8 +27,8 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthConstants;
 import javax.swing.plaf.synth.SynthContext;
 import javax.swing.plaf.synth.SynthSliderUI;
-
-import com.limegroup.gnutella.gui.search.RangeSlider;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 // adapted from http://www.java2s.com/Code/Java/Swing-Components/ThumbSliderExample2.htm
 /**

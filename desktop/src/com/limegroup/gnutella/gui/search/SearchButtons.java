@@ -1,9 +1,9 @@
 package com.limegroup.gnutella.gui.search;
 
-import java.util.EventListener;
-
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.I18n;
+
+import java.util.EventListener;
 
 /**
  * This class contains the buttons in the download window, allowing

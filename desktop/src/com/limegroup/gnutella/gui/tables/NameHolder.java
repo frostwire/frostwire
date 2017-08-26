@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.gui.LocaleLabel.LocaleString;
-import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 
 /**
  * 

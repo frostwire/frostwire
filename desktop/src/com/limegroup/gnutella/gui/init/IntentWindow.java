@@ -15,7 +15,13 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.BorderLayout;
+import com.frostwire.gui.theme.ThemeMediator;
+import com.limegroup.gnutella.gui.I18n;
+import org.apache.commons.io.IOUtils;
+import org.limewire.util.CommonUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,15 +29,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import javax.swing.JPanel;
-
-import org.apache.commons.io.IOUtils;
-import org.limewire.util.CommonUtils;
-
-import com.limegroup.gnutella.gui.I18n;
-
-import com.frostwire.gui.theme.ThemeMediator;
 
 /** State Your Intent. */
 final class IntentWindow extends SetupWindow {

@@ -18,12 +18,11 @@
 
 package com.frostwire.gui.library;
 
-import java.io.File;
-
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import java.io.File;
 
 /**
  * 

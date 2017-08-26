@@ -27,7 +27,6 @@ import com.frostwire.jlibtorrent.TcpEndpoint;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.transfers.TransferState;

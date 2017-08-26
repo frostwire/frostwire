@@ -10,12 +10,12 @@
  */
 package com.frostwire.jpeg;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
 
 
 /**

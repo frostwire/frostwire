@@ -18,13 +18,10 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-
-import javax.swing.JComponent;
-
 import com.frostwire.gui.theme.ShapeGenerator.CornerSize;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * 

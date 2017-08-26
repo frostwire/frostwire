@@ -10,20 +10,25 @@
  */
 package com.frostwire.jpeg;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
-//import ch.randelshofer.media.io.ByteArrayImageInputStream;
-//import ch.randelshofer.media.io.ImageInputStreamAdapter;
-//import com.sun.imageio.plugins.jpeg.JPEGImageReader;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.image.*;
 import java.io.*;
-import javax.imageio.*;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.stream.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+//import ch.randelshofer.media.io.ByteArrayImageInputStream;
+//import ch.randelshofer.media.io.ImageInputStreamAdapter;
+//import com.sun.imageio.plugins.jpeg.JPEGImageReader;
 
 /**
  * Reads a JPEG image with colors in the CMYK color space.

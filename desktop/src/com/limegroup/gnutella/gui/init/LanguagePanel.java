@@ -15,36 +15,24 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.apache.commons.io.IOUtils;
-import org.limewire.util.OSUtils;
-import org.limewire.util.SystemUtils;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LanguageFlagFactory;
 import com.limegroup.gnutella.gui.LanguageUtils;
 import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import org.apache.commons.io.IOUtils;
+import org.limewire.util.OSUtils;
+import org.limewire.util.SystemUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class LanguagePanel extends JPanel {
 

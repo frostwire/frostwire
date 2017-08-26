@@ -11,7 +11,7 @@
 package com.frostwire.jpeg;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashSet;
 
 /**
  * JFIFInputStream.

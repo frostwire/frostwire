@@ -17,9 +17,7 @@
 
 package com.frostwire.gui.library.tags;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-
+import com.frostwire.util.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
@@ -28,7 +26,8 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 
-import com.frostwire.util.Logger;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * 

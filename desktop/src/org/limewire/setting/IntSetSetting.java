@@ -1,10 +1,6 @@
 package org.limewire.setting;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class IntSetSetting extends AbstractSetting {
 

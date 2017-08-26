@@ -1,13 +1,9 @@
 package com.frostwire.gui.searchfield;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
-
-import javax.swing.JComponent;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.TextUI;
+import java.awt.*;
 
 /**
  * <p>

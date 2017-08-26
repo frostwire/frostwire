@@ -1,8 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import org.limewire.service.ErrorCallback;
-
 import com.limegroup.gnutella.gui.bugs.BugManager;
+import org.limewire.service.ErrorCallback;
 
 /** Forwards error messages to the BugManager on the Swing thread. */
 public final class ErrorHandler implements ErrorCallback {

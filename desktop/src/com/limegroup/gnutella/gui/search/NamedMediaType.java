@@ -15,21 +15,14 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.IconAndNameHolder;
+
+import javax.swing.*;
+import java.util.*;
 
 /**
  * Associates a MediaType with a LimeXMLSchema.

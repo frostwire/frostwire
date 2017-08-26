@@ -18,16 +18,12 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthOptionPaneUI;
+import java.awt.*;
 
 /**
  * 

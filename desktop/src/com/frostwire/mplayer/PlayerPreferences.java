@@ -1,6 +1,6 @@
 package com.frostwire.mplayer;
 
-import java.awt.Point;
+import java.awt.*;
 
 public interface PlayerPreferences {
 	

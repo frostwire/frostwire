@@ -15,16 +15,11 @@
 
 package com.limegroup.gnutella.settings;
 
-import java.io.File;
-
-import org.limewire.setting.BooleanSetting;
-import org.limewire.setting.CharArraySetting;
-import org.limewire.setting.FileSetting;
-import org.limewire.setting.IntSetting;
-import org.limewire.setting.StringSetting;
+import com.limegroup.gnutella.MediaType;
+import org.limewire.setting.*;
 import org.limewire.util.CommonUtils;
 
-import com.limegroup.gnutella.MediaType;
+import java.io.File;
 
 /**
  * Settings for searches.

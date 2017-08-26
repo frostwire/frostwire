@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.library;
 
-import javax.swing.Icon;
+import javax.swing.*;
 
 /**
  * 

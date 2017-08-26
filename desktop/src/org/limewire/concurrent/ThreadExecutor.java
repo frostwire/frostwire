@@ -1,9 +1,9 @@
 package org.limewire.concurrent;
 
+import org.limewire.service.ErrorService;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
-
-import org.limewire.service.ErrorService;
 
 /**
  * Creates {@link ManagedThread} daemon threads and executes {@link Runnable 

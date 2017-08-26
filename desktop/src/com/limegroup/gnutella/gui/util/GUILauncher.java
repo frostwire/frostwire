@@ -1,10 +1,10 @@
 package com.limegroup.gnutella.gui.util;
 
-import java.awt.Cursor;
-import java.io.File;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
+
+import java.awt.*;
+import java.io.File;
 
 /**
  * Static utility class that handles launching of downloaders and

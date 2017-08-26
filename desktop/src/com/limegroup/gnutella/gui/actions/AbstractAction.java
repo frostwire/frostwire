@@ -15,10 +15,10 @@
 
 package com.limegroup.gnutella.gui.actions;
 
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
+
+import javax.swing.*;
 
 /**
  * Abstract class that allows the name of the action to have an ampersand to 

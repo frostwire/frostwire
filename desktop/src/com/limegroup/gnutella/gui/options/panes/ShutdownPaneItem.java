@@ -15,19 +15,14 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.io.IOException;
-
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JRadioButton;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * This class defines the panel in the options

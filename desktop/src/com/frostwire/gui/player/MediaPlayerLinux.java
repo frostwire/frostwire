@@ -1,11 +1,10 @@
 package com.frostwire.gui.player;
 
-import java.io.File;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import org.limewire.util.OSUtils;
+
+import java.io.File;
 
 public class MediaPlayerLinux extends MediaPlayer {
 

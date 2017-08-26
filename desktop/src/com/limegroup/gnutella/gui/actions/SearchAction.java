@@ -1,16 +1,15 @@
 package com.limegroup.gnutella.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.text.MessageFormat;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
+
+import javax.swing.AbstractAction;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.text.MessageFormat;
 
 /**
  * Provides a search action.

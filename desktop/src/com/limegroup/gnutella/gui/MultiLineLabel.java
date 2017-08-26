@@ -15,17 +15,13 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.FontMetrics;
+import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.StringTokenizer;
-
-import javax.swing.JTextArea;
-import javax.swing.LookAndFeel;
-
-import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 
 /** 
  * This class uses a <tt>JTextArea</tt> to simulate a <tt>JLabel</tt> that 

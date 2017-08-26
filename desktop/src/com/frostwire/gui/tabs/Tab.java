@@ -1,9 +1,7 @@
 package com.frostwire.gui.tabs;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
 
 /**
  * This interface outlines the required functionality of any of the

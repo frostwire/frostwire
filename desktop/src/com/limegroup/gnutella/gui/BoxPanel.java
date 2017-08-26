@@ -15,13 +15,8 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class is simply a JPanel that uses a BoxLayout with the orientation 

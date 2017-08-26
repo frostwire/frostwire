@@ -1,12 +1,12 @@
 package com.limegroup.gnutella.settings;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.limewire.setting.BooleanSetting;
 import org.limewire.setting.IntSetting;
 import org.limewire.setting.Setting;
 import org.limewire.setting.SettingsFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles preferences for tables.  Stored settings include

@@ -1,29 +1,14 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import com.limegroup.gnutella.gui.actions.AbstractAction;
+import com.limegroup.gnutella.settings.StatusBarSettings;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Locale;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
-import com.limegroup.gnutella.gui.actions.AbstractAction;
-import com.limegroup.gnutella.settings.StatusBarSettings;
 
 public class LanguageWindow extends JDialog {
 

@@ -18,53 +18,26 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Transparency;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.MultiLineLabel;
+import com.limegroup.gnutella.gui.trees.FileTreeModel;
+import com.limegroup.gnutella.settings.LibrarySettings;
+import com.limegroup.gnutella.settings.SharingSettings;
+import org.limewire.util.FileUtils;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.metal.MetalIconFactory;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import org.limewire.util.FileUtils;
-
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.MultiLineLabel;
-import com.limegroup.gnutella.gui.trees.FileTreeModel;
-import com.limegroup.gnutella.settings.LibrarySettings;
-import com.limegroup.gnutella.settings.SharingSettings;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
+import java.util.List;
 
 /**
  * Provides a tree panel of a partial view of the filesystem. Folders in the

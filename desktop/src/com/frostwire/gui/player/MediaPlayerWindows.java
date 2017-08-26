@@ -18,11 +18,11 @@
 
 package com.frostwire.gui.player;
 
+import com.limegroup.gnutella.util.FrostWireUtils;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-
-import com.limegroup.gnutella.util.FrostWireUtils;
 
 public class MediaPlayerWindows extends MediaPlayer {
 

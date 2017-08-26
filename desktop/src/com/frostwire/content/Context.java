@@ -18,9 +18,9 @@
 
 package com.frostwire.content;
 
-import java.io.File;
-
 import com.limegroup.gnutella.settings.ApplicationSettings;
+
+import java.io.File;
 
 /**
  * @author gubatron

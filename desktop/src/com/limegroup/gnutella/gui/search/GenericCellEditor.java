@@ -18,12 +18,10 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Component;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 
 /**
  * @author gubatron

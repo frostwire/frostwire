@@ -15,15 +15,15 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
+import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
-import javax.swing.JComponent;
-
-import com.limegroup.gnutella.gui.GUIMediator;
 
 /**
  * TransferHandler that handles uris pointing to http urls of torrent files.

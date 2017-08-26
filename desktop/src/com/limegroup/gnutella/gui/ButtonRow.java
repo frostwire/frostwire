@@ -1,19 +1,12 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import com.limegroup.gnutella.gui.actions.LimeAction;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.util.EventListener;
-
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
-import com.limegroup.gnutella.gui.actions.LimeAction;
 
 
 /** 

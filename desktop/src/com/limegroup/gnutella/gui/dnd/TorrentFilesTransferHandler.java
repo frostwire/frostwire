@@ -15,15 +15,14 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
+import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-
-import javax.swing.JComponent;
-
-import com.limegroup.gnutella.gui.GUIMediator;
 
 /**
  * FileTransferHandler that imports drags of local torrent files into frostwire

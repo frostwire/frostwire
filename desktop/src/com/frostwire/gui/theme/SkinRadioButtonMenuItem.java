@@ -1,7 +1,6 @@
 package com.frostwire.gui.theme;
 
-import javax.swing.Action;
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.*;
 
 public class SkinRadioButtonMenuItem extends JRadioButtonMenuItem {
 

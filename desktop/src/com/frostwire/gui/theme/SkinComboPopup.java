@@ -29,13 +29,9 @@
  */
 package com.frostwire.gui.theme;
 
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-
-import javax.swing.JComboBox;
+import javax.swing.*;
 import javax.swing.plaf.basic.BasicComboPopup;
+import java.awt.*;
 
 /**
  * Combo popup implementation in <b>Substance</b> look-and-feel. This class is

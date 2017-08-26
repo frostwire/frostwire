@@ -15,7 +15,7 @@
 
 package com.frostwire.gui.searchfield;
 
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.JTextComponent;
 

@@ -15,13 +15,13 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.filters.TableLineFilter;
+import com.limegroup.gnutella.settings.SearchSettings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.frostwire.gui.filters.TableLineFilter;
-import com.limegroup.gnutella.settings.SearchSettings;
 
 /**
  * Filters out certain rows from the data model.

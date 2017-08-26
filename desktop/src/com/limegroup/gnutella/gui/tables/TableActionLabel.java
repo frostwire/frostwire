@@ -18,11 +18,9 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import com.frostwire.gui.AlphaIcon;
+
+import javax.swing.*;
 
 /**
  * Use these Label buttons next time you need to add a button on a custom

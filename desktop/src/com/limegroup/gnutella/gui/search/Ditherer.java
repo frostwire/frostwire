@@ -1,7 +1,6 @@
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 
 /**

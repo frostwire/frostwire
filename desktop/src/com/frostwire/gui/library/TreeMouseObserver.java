@@ -17,13 +17,11 @@
  */
 package com.frostwire.gui.library;
 
-import java.awt.event.MouseEvent;
-
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
 import com.limegroup.gnutella.gui.tables.MouseObserver;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.MouseEvent;
 
 final class TreeMouseObserver implements MouseObserver {
 

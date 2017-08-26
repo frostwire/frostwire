@@ -1,8 +1,7 @@
 package com.frostwire.gui.theme;
 
+import javax.swing.*;
 import java.lang.reflect.Field;
-
-import javax.swing.JMenu;
 
 public class SkinMenu extends JMenu {
 

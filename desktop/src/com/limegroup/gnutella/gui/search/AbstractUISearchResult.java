@@ -18,8 +18,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
@@ -29,6 +27,7 @@ import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.PlayerSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * 

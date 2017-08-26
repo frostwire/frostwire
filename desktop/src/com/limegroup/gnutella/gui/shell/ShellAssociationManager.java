@@ -1,12 +1,12 @@
 package com.limegroup.gnutella.gui.shell;
 
-import java.util.Collection;
-
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
 import com.limegroup.gnutella.settings.QuestionsHandler;
+
+import java.util.Collection;
 
 
 /**

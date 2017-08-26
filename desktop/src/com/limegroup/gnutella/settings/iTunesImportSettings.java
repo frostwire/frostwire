@@ -1,9 +1,9 @@
 package com.limegroup.gnutella.settings;
 
-import java.io.File;
-
 import org.limewire.setting.FileSetSetting;
 import org.limewire.setting.SettingsFactory;
+
+import java.io.File;
 
 /**
  * Handles installation preferences.

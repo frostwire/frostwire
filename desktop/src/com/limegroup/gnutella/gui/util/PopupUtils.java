@@ -15,15 +15,12 @@
 
 package com.limegroup.gnutella.gui.util;
 
-import java.awt.event.ActionListener;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+
+import javax.swing.*;
+import java.awt.event.ActionListener;
 
 /**
  * Utilities relating to JPopupMenu & JMenus.

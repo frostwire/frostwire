@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.notify;
 
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * Used by {@link NotificationWindow} to render notifications.

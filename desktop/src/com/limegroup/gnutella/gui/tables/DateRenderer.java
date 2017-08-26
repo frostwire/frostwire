@@ -1,11 +1,10 @@
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-import java.util.Date;
-
-import javax.swing.JTable;
-
 import com.limegroup.gnutella.gui.GUIUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Date;
 
 public class DateRenderer extends DefaultTableBevelledCellRenderer {
 

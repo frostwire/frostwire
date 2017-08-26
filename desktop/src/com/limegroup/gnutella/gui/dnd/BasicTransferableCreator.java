@@ -1,11 +1,10 @@
 package com.limegroup.gnutella.gui.dnd;
 
+import javax.swing.*;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.JComponent;
 
 /**
  * A simple transferable creator that can created a FileTransferable

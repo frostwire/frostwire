@@ -18,16 +18,15 @@
 
 package com.frostwire.gui.library;
 
+import com.limegroup.gnutella.MediaType;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.search.NamedMediaType;
+
+import javax.swing.*;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.Icon;
-
-import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.search.NamedMediaType;
 
 /**
  *

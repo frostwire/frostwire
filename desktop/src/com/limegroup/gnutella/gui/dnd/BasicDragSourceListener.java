@@ -1,13 +1,7 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.dnd.DragSourceContext;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
+import javax.swing.*;
+import java.awt.dnd.*;
 
 /**
  * The default drag source listener, signifies to the TransferHandler

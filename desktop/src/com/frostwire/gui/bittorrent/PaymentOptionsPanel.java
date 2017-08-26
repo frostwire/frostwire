@@ -15,9 +15,9 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.bittorrent.CryptoCurrencyTextField.CurrencyURIPrefix;
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.bittorrent.PaymentOptions;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LimeTextField;

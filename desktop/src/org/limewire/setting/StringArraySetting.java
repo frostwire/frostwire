@@ -1,9 +1,9 @@
 
 package org.limewire.setting;
 
-import java.util.Properties;
-
 import org.limewire.util.StringUtils;
+
+import java.util.Properties;
 
 
 /**

@@ -15,7 +15,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 
 /**
  * The search result menu.

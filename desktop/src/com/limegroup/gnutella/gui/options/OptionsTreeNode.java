@@ -15,9 +15,9 @@
 
 package com.limegroup.gnutella.gui.options;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * This class acts as a proxy and as a "decorator" for an underlying instance 

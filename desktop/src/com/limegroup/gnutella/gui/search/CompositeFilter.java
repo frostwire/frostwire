@@ -15,10 +15,10 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.filters.TableLineFilter;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.frostwire.gui.filters.TableLineFilter;
 
 /**
  * A filter that takes multiple other filters.

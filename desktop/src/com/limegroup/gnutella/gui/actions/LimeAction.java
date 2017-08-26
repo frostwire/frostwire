@@ -1,7 +1,8 @@
 package com.limegroup.gnutella.gui.actions;
-import javax.swing.Action;
 
 import com.limegroup.gnutella.gui.IconButton;
+
+import javax.swing.*;
 
 /**
  * Extends Swing's action interface to provide more specific keys.

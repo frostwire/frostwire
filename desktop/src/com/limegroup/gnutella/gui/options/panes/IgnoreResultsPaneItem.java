@@ -1,16 +1,14 @@
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ListEditor;
+import com.limegroup.gnutella.settings.FilterSettings;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-
-import javax.swing.JCheckBox;
-
-
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.ListEditor;
-import com.limegroup.gnutella.settings.FilterSettings;
 
 /**
  * This class defines the panel in the options window that allows the user

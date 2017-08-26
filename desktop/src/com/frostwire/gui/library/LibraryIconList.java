@@ -18,20 +18,14 @@
 
 package com.frostwire.gui.library;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-
-import javax.swing.JList;
-import javax.swing.ListModel;
-
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.gui.library.LibraryPlaylists.LibraryPlaylistsListCell;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * 

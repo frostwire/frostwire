@@ -11,9 +11,9 @@
 
 package com.frostwire.jpeg;
 
+import javax.imageio.stream.ImageInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
-import javax.imageio.stream.ImageInputStream;
 
 /**
  * ImageInputStreamAdapter.

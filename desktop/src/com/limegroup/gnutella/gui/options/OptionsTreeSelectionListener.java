@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.options;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;

@@ -1,8 +1,7 @@
 package com.limegroup.gnutella.gui;
 
+import javax.swing.*;
 import java.io.File;
-
-import javax.swing.Icon;
 
 public interface FileIconController {
     /**

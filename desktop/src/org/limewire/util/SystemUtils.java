@@ -15,11 +15,11 @@
 
 package org.limewire.util;
 
-import java.awt.Component;
+import com.frostwire.util.Logger;
+
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-
-import com.frostwire.util.Logger;
 
 
 /**

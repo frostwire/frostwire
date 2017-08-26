@@ -1,9 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
-
-import javax.swing.BoundedRangeModel;
-import javax.swing.JProgressBar;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A JProgressBar that doesn't NPE when retrieving the preferredSize.

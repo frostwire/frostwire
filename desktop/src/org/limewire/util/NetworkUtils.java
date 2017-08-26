@@ -15,8 +15,10 @@
 
 package org.limewire.util;
 
-import java.net.*;
-import java.util.Enumeration;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 
 /**
  * Provides methods for network programming. 

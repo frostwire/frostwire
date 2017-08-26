@@ -1,5 +1,12 @@
 package com.limegroup.gnutella.gui;
 
+import com.limegroup.gnutella.settings.ApplicationSettings;
+import org.apache.commons.io.FilenameUtils;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -8,16 +15,6 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.JFileChooser;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileFilter;
-
-import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-
-import com.limegroup.gnutella.settings.ApplicationSettings;
 
 /**
  * This is a utility class that displays a file chooser dialog to the user,

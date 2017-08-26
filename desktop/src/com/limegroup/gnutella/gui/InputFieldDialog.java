@@ -1,12 +1,9 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Container;
-import java.awt.Frame;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.Box;
-import javax.swing.JDialog;
 
 
 /**

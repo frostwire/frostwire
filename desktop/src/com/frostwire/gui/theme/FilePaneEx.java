@@ -1,16 +1,9 @@
 package com.frostwire.gui.theme;
 
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
 
 public class FilePaneEx extends FilePane {
 

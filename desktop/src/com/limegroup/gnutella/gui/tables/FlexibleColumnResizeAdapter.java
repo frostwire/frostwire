@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.tables;
 
+import javax.swing.*;
+import javax.swing.table.JTableHeader;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JTable;
-import javax.swing.table.JTableHeader;
 
 /**
  * Created by IntelliJ IDEA.

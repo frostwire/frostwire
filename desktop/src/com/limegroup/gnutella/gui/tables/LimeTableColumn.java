@@ -15,7 +15,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.Icon;
+import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 

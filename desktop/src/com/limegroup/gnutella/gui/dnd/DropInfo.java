@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.Point;
+import java.awt.*;
 import java.awt.datatransfer.Transferable;
 
 /**

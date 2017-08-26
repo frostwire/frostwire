@@ -17,14 +17,13 @@
  */
 package com.frostwire.gui.library;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.io.File;
-
 import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.I18n;
-import com.frostwire.gui.library.RecursiveLibraryDirectoryPanel;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /** 
  * This class shows the <tt>JFileChooser</tt> when the user presses 

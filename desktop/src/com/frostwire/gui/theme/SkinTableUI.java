@@ -18,13 +18,12 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthTableUI;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * 

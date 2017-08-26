@@ -18,29 +18,10 @@
 
 package com.frostwire.gui.components.slides;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.UIDefaults;
-import javax.swing.plaf.FontUIResource;
-
-import com.frostwire.util.JsonUtils;
-import com.frostwire.util.UrlUtils;
-import net.miginfocom.swing.MigLayout;
-
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -48,6 +29,14 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @author gubatron

@@ -1,9 +1,9 @@
 package com.limegroup.gnutella.gui.search;
 
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
+
+import javax.swing.*;
 
 /**
  * Extends LimeTableColumn to store current width/order/visibility information.

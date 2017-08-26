@@ -1,18 +1,11 @@
 package com.limegroup.gnutella;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.limegroup.gnutella.gui.I18n;
 import org.limewire.collection.Comparators;
 import org.limewire.util.FileUtils;
 
-import com.limegroup.gnutella.gui.I18n;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * A generic type of media, i.e., "video" or "audio".

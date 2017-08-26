@@ -1,15 +1,11 @@
 package com.frostwire.gui.searchfield;
 
-import java.awt.Component;
-import java.awt.Insets;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicTextUI;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import javax.swing.plaf.basic.BasicTextUI;
 
 public class BuddySupport {
 	public enum Position {

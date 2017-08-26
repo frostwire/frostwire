@@ -18,11 +18,11 @@
 
 package com.frostwire.database;
 
+import com.frostwire.util.Logger;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import com.frostwire.util.Logger;
 
 /**
  * @author gubatron

@@ -1,11 +1,11 @@
 package com.limegroup.gnutella.gui.search;
 
 
+import com.limegroup.gnutella.MediaType;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.limegroup.gnutella.MediaType;
 
 /**
  * Simple struct-like class containing information about a search.

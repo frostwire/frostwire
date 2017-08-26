@@ -18,13 +18,13 @@
 
 package com.frostwire.database.sqlite;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 import com.frostwire.content.Context;
 import com.frostwire.database.sqlite.SQLiteDatabase.CursorFactory;
 import com.frostwire.util.Logger;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * @author gubatron

@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.awt.Container;
+import java.awt.*;
 import java.io.IOException;
 
 /**

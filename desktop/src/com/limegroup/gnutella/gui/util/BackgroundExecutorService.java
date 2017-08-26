@@ -15,11 +15,11 @@
 
 package com.limegroup.gnutella.gui.util;
 
+import org.limewire.concurrent.ExecutorsHelper;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-
-import org.limewire.concurrent.ExecutorsHelper;
 
 /**
  * Static helper class that allows background tasks to be scheduled from the GUI.

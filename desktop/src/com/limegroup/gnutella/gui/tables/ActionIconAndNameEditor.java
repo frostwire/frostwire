@@ -18,19 +18,15 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import com.frostwire.util.Logger;
+
+import javax.swing.*;
+import javax.swing.table.TableCellEditor;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.JTable;
-import javax.swing.table.TableCellEditor;
-
-import com.frostwire.util.Logger;
 
 /**
  * @author gubatron

@@ -15,21 +15,14 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.KeyStroke;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.ToggleSettingAction;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import java.awt.event.ActionEvent;
 
 /**
  * Provides a skeletal implementation of the <tt>Menu</tt> interface to 

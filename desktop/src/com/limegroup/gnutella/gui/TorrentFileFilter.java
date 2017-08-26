@@ -1,9 +1,8 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.io.File;
-
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
 
 public class TorrentFileFilter extends FileFilter {
     public static final TorrentFileFilter INSTANCE = new TorrentFileFilter();

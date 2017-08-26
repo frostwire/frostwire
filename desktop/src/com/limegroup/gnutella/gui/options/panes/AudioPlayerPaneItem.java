@@ -1,14 +1,13 @@
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.io.IOException;
-
-import javax.swing.JTextField;
-
+import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.gui.SizedTextField;
-import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
 import com.limegroup.gnutella.settings.URLHandlerSettings;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * This class defines the panel in the options

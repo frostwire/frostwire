@@ -18,9 +18,9 @@
 
 package com.frostwire.gui.player;
 
-import java.io.File;
-
 import com.limegroup.gnutella.util.FrostWireUtils;
+
+import java.io.File;
 
 public class MediaPlayerOSX extends MediaPlayer {
 

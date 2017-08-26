@@ -15,14 +15,11 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import javax.swing.Box;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
 
 /**
  * Wraps a {@link CheckBoxList} into a scroll pane and shows its 

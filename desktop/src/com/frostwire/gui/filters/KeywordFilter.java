@@ -18,11 +18,11 @@
 
 package com.frostwire.gui.filters;
 
+import com.limegroup.gnutella.gui.search.UISearchResult;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import com.limegroup.gnutella.gui.search.UISearchResult;
 
 /** 
  * A spam filter that removes certain "bad" keywords. 

@@ -17,12 +17,11 @@
  */
 package com.frostwire.gui.library;
 
+import com.frostwire.gui.bittorrent.TorrentUtil;
+
+import javax.swing.*;
 import java.io.File;
 import java.util.Set;
-
-import javax.swing.Icon;
-
-import com.frostwire.gui.bittorrent.TorrentUtil;
 
 /**
  * Abstract implementation of the DirectoryHolder interface, providing a filtered

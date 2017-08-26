@@ -15,7 +15,14 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Font;
+import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
+import com.limegroup.gnutella.settings.ApplicationSettings;
+import org.limewire.util.OSUtils;
+import org.limewire.util.StringUtils;
+
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,19 +30,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.LookAndFeel;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-import javax.swing.plaf.ComponentUI;
-
-import org.limewire.util.OSUtils;
-import org.limewire.util.StringUtils;
-
-import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
-import com.limegroup.gnutella.settings.ApplicationSettings;
 
 /**
  * Manages application resources, including the custom <tt>LookAndFeel</tt>,

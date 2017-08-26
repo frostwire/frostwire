@@ -15,20 +15,12 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.io.IOException;
-
-import javax.swing.Box;
-import javax.swing.JComponent;
-
-import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.MultiLineLabel;
-import com.limegroup.gnutella.gui.TitledPaddedPanel;
-import com.limegroup.gnutella.gui.URLLabel;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * This class provides a skeletal implementation of the <tt>PaneItem</tt>

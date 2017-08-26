@@ -1,12 +1,9 @@
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-
 import com.frostwire.gui.theme.ThemeMediator;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Renders an icon along with a label.

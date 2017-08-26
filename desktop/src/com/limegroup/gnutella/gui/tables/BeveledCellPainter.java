@@ -18,8 +18,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
 public final class BeveledCellPainter {
     private static final Color CELL_UPPER_BORDER_COLOR = Color.WHITE;

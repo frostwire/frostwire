@@ -1,9 +1,9 @@
 package org.limewire.setting;
 
+import org.limewire.setting.evt.SettingsGroupEvent.EventType;
+
 import java.io.File;
 import java.util.Properties;
-
-import org.limewire.setting.evt.SettingsGroupEvent.EventType;
 
 
 /**

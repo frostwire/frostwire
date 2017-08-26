@@ -1,19 +1,9 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
-import java.awt.image.RGBImageFilter;
-
-import javax.swing.GrayFilter;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.*;
 import javax.swing.plaf.IconUIResource;
+import java.awt.*;
+import java.awt.image.*;
 
 /**
  * Utility class for manipulating images & icons.

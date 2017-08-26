@@ -30,9 +30,7 @@ import org.limewire.util.OSUtils;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * The Transfer Handler on the left hand side tree node that help us navigate downloaded files by media type.

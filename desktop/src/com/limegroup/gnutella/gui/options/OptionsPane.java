@@ -1,9 +1,9 @@
 package com.limegroup.gnutella.gui.options;
 
-import java.awt.Container;
-import java.io.IOException;
-
 import com.limegroup.gnutella.gui.options.panes.PaneItem;
+
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * An object that defines the basic functionality of an <i>OptionsPane</i>,

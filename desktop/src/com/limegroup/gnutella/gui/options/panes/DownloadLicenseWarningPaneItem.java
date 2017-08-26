@@ -1,14 +1,12 @@
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.io.IOException;
-
-import javax.swing.JCheckBox;
-
-
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.QuestionsHandler;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * This class defines the pane in the options window that allows

@@ -19,13 +19,8 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.StringUtils;
 
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class is really just a hack to make it easier to get the media player 

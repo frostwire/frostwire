@@ -1,15 +1,11 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
 
 
 /**

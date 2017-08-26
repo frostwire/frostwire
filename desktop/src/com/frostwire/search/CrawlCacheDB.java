@@ -18,19 +18,18 @@
 
 package com.frostwire.search;
 
-import java.io.IOException;
-
-import com.frostwire.util.Logger;
-import org.apache.commons.io.FileUtils;
-
 import com.frostwire.content.ContentValues;
 import com.frostwire.content.Context;
 import com.frostwire.database.Cursor;
 import com.frostwire.database.sqlite.SQLiteDatabase;
 import com.frostwire.database.sqlite.SQLiteOpenHelper;
 import com.frostwire.database.sqlite.SQLiteQueryBuilder;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.SearchSettings;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
 
 /**
  * @author gubatron

@@ -15,9 +15,9 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
-
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+
+import java.awt.*;
 
 /**
  * This class creates a <tt>JTextField</tt> with a standardized size.<p>

@@ -1,6 +1,6 @@
 package com.frostwire.gui.theme;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class SkinHandler {
 

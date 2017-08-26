@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.Icon;
+import javax.swing.*;
 
 
 /**

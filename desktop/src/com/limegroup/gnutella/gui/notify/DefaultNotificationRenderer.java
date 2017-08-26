@@ -1,18 +1,10 @@
 package com.limegroup.gnutella.gui.notify;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.Font;
-
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.URLLabel;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Displays the notification icon and message in a <code>JLabel</code>. The

@@ -15,16 +15,15 @@
 
 package com.limegroup.gnutella.gui.shell;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.ApplicationSettings;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class FrostAssociations {
 

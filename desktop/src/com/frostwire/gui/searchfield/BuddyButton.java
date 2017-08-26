@@ -1,11 +1,8 @@
 package com.frostwire.gui.searchfield;
 
-import java.awt.Cursor;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
+import javax.swing.*;
 import javax.swing.border.Border;
+import java.awt.*;
 
 /**
  * Non focusable, no border, no margin and insets button with no content area

@@ -1,10 +1,8 @@
 package com.frostwire.gui.searchfield;
 
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
-
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 
 /**
  * TODO: comment

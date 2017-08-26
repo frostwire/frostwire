@@ -25,10 +25,12 @@
 
 package com.frostwire.gui.theme;
 
+import javax.swing.*;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.*;
-import javax.swing.SwingConstants;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Michael Martak

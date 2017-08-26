@@ -17,9 +17,7 @@
 
 package com.frostwire.gui.library.tags;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-
+import com.frostwire.util.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.MP3FileReader;
@@ -27,7 +25,8 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
 import org.jaudiotagger.tag.images.Artwork;
 
-import com.frostwire.util.Logger;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * 

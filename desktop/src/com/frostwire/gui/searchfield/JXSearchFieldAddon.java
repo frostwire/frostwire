@@ -15,13 +15,12 @@
 
 package com.frostwire.gui.searchfield;
 
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-import javax.swing.plaf.IconUIResource;
-import javax.swing.plaf.InsetsUIResource;
-
 import com.frostwire.gui.searchfield.JXSearchField.LayoutStyle;
 import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import javax.swing.plaf.IconUIResource;
+import javax.swing.plaf.InsetsUIResource;
 
 public class JXSearchFieldAddon {
 

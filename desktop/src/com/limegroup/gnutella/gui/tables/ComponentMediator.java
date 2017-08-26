@@ -1,9 +1,9 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import javax.swing.JComponent;
-
 import com.limegroup.gnutella.gui.RefreshListener;
+
+import javax.swing.*;
 
 /**
  * A common interface for GUI components

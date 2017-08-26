@@ -15,13 +15,11 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import javax.swing.Action;
-import javax.swing.JMenuItem;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.FileMenuActions;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
 
 /**
  * Handles all of the contents of the file menu in the menu bar.

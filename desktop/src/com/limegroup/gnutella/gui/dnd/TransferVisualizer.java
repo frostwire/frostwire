@@ -1,7 +1,9 @@
 package com.limegroup.gnutella.gui.dnd;
 
-import java.awt.Graphics;
-import java.awt.Image;
+import com.limegroup.gnutella.gui.IconManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -10,13 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.CellRendererPane;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-
-import com.limegroup.gnutella.gui.IconManager;
 
 /**
  * A simple visualizer for displaying drags.

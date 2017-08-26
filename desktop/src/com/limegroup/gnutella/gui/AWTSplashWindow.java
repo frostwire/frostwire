@@ -11,14 +11,8 @@
  * provided this copyright notice is retained on all copies.
  */
 package com.limegroup.gnutella.gui;
- 
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.Window;
+
+import java.awt.*;
 
 /**
  * Splash Window to show an image during startup of an application.<p>

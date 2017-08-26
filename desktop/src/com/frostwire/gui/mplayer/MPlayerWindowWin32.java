@@ -1,10 +1,9 @@
 package com.frostwire.gui.mplayer;
 
-import java.awt.peer.ComponentPeer;
-
 import org.limewire.util.SystemUtils;
-
 import sun.awt.windows.WComponentPeer;
+
+import java.awt.peer.ComponentPeer;
 
 public class MPlayerWindowWin32 extends MPlayerWindow {
 

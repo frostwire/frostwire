@@ -18,29 +18,21 @@
 
 package com.frostwire.gui.updates;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
-
 import com.frostwire.util.Logger;
 import com.frostwire.util.ZipUtils;
 import com.frostwire.util.ZipUtils.ZipListener;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ResourceManager;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.limewire.util.CommonUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
+import java.io.*;
+import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * @author gubatron

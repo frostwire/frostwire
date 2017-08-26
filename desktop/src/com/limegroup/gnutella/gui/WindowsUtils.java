@@ -1,11 +1,10 @@
 package com.limegroup.gnutella.gui;
 
-import java.io.File;
-
+import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
-import com.limegroup.gnutella.util.FrostWireUtils;
+import java.io.File;
 
 /**
  * A collection of Windows-related GUI utility methods.

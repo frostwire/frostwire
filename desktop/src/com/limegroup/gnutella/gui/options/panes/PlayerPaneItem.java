@@ -18,13 +18,12 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.io.IOException;
-
-import javax.swing.JCheckBox;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.PlayerSettings;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * @author gubatron

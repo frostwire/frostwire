@@ -17,11 +17,9 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JSlider;
-
 import com.frostwire.gui.theme.SkinRangeSliderUI;
+
+import javax.swing.*;
 
 /**
  * 

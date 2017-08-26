@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.components.slides;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * 

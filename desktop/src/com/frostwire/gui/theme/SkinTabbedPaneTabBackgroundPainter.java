@@ -18,11 +18,9 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Graphics2D;
-import java.awt.Shape;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Path2D;
-
-import javax.swing.JComponent;
 
 /**
  * 

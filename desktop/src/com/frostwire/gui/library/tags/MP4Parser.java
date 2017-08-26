@@ -17,22 +17,18 @@
 
 package com.frostwire.gui.library.tags;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
+import com.frostwire.mp4.*;
+import com.frostwire.util.Logger;
+import org.apache.commons.io.IOUtils;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
-
-import com.frostwire.mp4.*;
-import org.apache.commons.io.IOUtils;
-
-import com.frostwire.util.Logger;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
 
 /**
  * @author aldenml

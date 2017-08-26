@@ -4,11 +4,8 @@ package com.frostwire.gui;
  * @(#)AlphaIcon.java   1.0 08/16/10
  */
 
-import java.awt.AlphaComposite;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import javax.swing.Icon;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * An Icon wrapper that paints the contained icon with a specified transparency.

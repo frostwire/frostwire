@@ -15,28 +15,16 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+import com.limegroup.gnutella.settings.ConnectionSettings;
+import org.limewire.util.NetworkUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
-import org.limewire.util.NetworkUtils;
-
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.GUIUtils;
-import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.SizedWholeNumberField;
-import com.limegroup.gnutella.gui.WholeNumberField;
-import com.limegroup.gnutella.settings.ConnectionSettings;
 
 /**
  * This class defines the panel in the options window that allows the user

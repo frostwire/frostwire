@@ -1,13 +1,10 @@
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.text.Position;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * Listener to key-typed events, to move focus to the closest possible match

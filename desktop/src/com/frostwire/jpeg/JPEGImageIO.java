@@ -13,13 +13,14 @@
  */
 package com.frostwire.jpeg;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.image.*;
 import java.io.*;
-import javax.imageio.*;
-import javax.imageio.stream.*;
 
 /**
  * JPEGImageIO supports reading of JPEG images with YUV, CMYK and YCCK color 

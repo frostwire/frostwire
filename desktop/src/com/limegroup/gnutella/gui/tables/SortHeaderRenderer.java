@@ -18,18 +18,14 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
+import org.limewire.util.OSUtils;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-
-import org.limewire.util.OSUtils;
+import java.awt.*;
 
 public final class SortHeaderRenderer extends DefaultTableCellRenderer {
 

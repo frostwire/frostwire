@@ -15,11 +15,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Renders the column in the search window that displays an icon for

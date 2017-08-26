@@ -15,12 +15,11 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.util.Date;
-
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+
+import javax.swing.*;
+import java.util.Date;
 
 /**
  * Simple collection of table columns.

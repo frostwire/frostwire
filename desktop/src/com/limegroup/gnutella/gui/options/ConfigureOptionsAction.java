@@ -1,10 +1,10 @@
 package com.limegroup.gnutella.gui.options;
 
-import java.awt.event.ActionEvent;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
+
+import java.awt.event.ActionEvent;
 
 public class ConfigureOptionsAction extends AbstractAction {
 

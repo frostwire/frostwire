@@ -17,15 +17,11 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.event.ChangeListener;
-
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
  * 

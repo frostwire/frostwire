@@ -18,11 +18,8 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Component;
-
-import javax.swing.Icon;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Renders an icon along with a label.

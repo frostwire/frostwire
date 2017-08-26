@@ -1,12 +1,10 @@
 package com.limegroup.gnutella.gui.dnd;
 
+import javax.swing.*;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragGestureRecognizer;
 import java.awt.dnd.DragSource;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JComponent;
-import javax.swing.TransferHandler;
 
 /**
  * A simple DragGestureRecognizer that can be immediately triggered to start a drag.

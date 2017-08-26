@@ -1,8 +1,8 @@
 package com.limegroup.gnutella.gui.notify;
 
-import java.util.EventObject;
-
 import com.limegroup.gnutella.gui.notify.AnimatedWindow.AnimationType;
+
+import java.util.EventObject;
 
 public class AnimatedWindowEvent extends EventObject {
 

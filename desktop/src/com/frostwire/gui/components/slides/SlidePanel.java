@@ -18,21 +18,16 @@
 
 package com.frostwire.gui.components.slides;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.frostwire.gui.components.slides.ImageCache.OnLoadedListener;
+import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JPanel;
-
-import com.frostwire.gui.components.slides.ImageCache.OnLoadedListener;
-import com.limegroup.gnutella.gui.GUIMediator;
 
 /**
  * The Slide panel which has the image and controls.

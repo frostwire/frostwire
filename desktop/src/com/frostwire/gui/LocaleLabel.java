@@ -17,14 +17,11 @@
 
 package com.frostwire.gui;
 
-import java.awt.Font;
-
-import javax.swing.JLabel;
-import javax.swing.UIManager;
-
+import com.frostwire.gui.theme.ThemeMediator;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.gui.theme.ThemeMediator;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * 

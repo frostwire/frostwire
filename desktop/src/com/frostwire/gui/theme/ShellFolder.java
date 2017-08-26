@@ -25,7 +25,7 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Image;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

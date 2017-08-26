@@ -18,12 +18,11 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Graphics;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthPanelUI;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
 
 /**
  * 

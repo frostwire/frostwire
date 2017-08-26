@@ -8,17 +8,11 @@
  */
 package com.frostwire.gui.library;
 
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import java.text.Collator;
+import java.util.*;
 
 /**
  * SortedListModel decorates an unsorted ListModel to provide

@@ -15,15 +15,14 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import java.awt.event.ActionEvent;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.TipOfTheDayMediator;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.OpenLinkAction;
+import org.limewire.util.OSUtils;
+
+import java.awt.event.ActionEvent;
 
 /**
  * Handles all of the contents of the help menu in the menu bar.  This

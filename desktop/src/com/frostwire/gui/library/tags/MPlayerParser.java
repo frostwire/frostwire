@@ -17,12 +17,12 @@
 
 package com.frostwire.gui.library.tags;
 
+import com.frostwire.gui.mplayer.MPlayer;
+import com.frostwire.util.Logger;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Map;
-
-import com.frostwire.gui.mplayer.MPlayer;
-import com.frostwire.util.Logger;
 
 /**
  * 

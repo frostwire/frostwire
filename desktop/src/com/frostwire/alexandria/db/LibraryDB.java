@@ -1,7 +1,8 @@
 package com.frostwire.alexandria.db;
 
-import java.util.List;
 import com.frostwire.alexandria.Library;
+
+import java.util.List;
 
 public class LibraryDB {
 

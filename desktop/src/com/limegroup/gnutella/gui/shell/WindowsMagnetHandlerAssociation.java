@@ -1,8 +1,8 @@
 package com.limegroup.gnutella.gui.shell;
 
-import java.io.IOException;
-
 import org.limewire.util.SystemUtils;
+
+import java.io.IOException;
 
 
 public class WindowsMagnetHandlerAssociation extends WindowsAssociation {

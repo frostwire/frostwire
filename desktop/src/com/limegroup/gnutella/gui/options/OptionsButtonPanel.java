@@ -1,16 +1,14 @@
 package com.limegroup.gnutella.gui.options;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
-import javax.swing.Box;
-import javax.swing.JPanel;
-
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.I18n;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * This class contains the <tt>ButtonRow</tt> instance for the options

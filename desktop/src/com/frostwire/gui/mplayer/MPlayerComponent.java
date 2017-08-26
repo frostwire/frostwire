@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.mplayer;
 
-import java.awt.Component;
+import java.awt.*;
 
 /**
  * 

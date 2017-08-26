@@ -1,8 +1,8 @@
 package com.limegroup.gnutella.gui.shell;
 
-import java.io.IOException;
-
 import org.limewire.util.SystemUtils;
+
+import java.io.IOException;
 
 
 /** A registration in the Windows Registry that sets a program as the default viewer for a custom Web link protocol. */

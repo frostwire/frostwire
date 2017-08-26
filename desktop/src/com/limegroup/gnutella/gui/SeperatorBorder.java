@@ -1,11 +1,8 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
+import java.awt.*;
 
 /**
  * Defines the "border" line that is used to separate the "My Extensions" item in a CheckBoxList.

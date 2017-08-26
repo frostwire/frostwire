@@ -17,15 +17,14 @@
 
 package com.frostwire.gui.library.tags;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-
+import com.frostwire.util.Logger;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.ogg.OggFileReader;
 import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
 
-import com.frostwire.util.Logger;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * 

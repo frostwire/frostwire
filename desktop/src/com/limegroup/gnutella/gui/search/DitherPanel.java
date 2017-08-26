@@ -1,9 +1,7 @@
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Color;
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /** Simple extension of JPanel that makes a FlowLayout.LEADING JPanel that
  *  has a background image which is painted.

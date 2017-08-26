@@ -1,14 +1,14 @@
 package org.limewire.setting;
 
+import org.limewire.concurrent.ExecutorsHelper;
+import org.limewire.setting.evt.SettingsGroupManagerEvent;
+import org.limewire.setting.evt.SettingsGroupManagerEvent.EventType;
+import org.limewire.setting.evt.SettingsGroupManagerListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Executor;
-
-import org.limewire.concurrent.ExecutorsHelper;
-import org.limewire.setting.evt.SettingsGroupManagerEvent;
-import org.limewire.setting.evt.SettingsGroupManagerListener;
-import org.limewire.setting.evt.SettingsGroupManagerEvent.EventType;
 
 
 /**

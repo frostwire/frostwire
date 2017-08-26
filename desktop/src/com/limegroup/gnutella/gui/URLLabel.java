@@ -15,19 +15,15 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Color;
+import com.limegroup.gnutella.gui.actions.LimeAction;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URI;
 import java.net.URL;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.UIManager;
-
-import com.limegroup.gnutella.gui.actions.LimeAction;
 
 /**
  * A label that has a clickable text. The text is rendered as an HTML link and

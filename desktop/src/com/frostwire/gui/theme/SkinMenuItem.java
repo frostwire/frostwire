@@ -18,8 +18,7 @@
 
 package com.frostwire.gui.theme;
 
-import javax.swing.Action;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 /**
  * 

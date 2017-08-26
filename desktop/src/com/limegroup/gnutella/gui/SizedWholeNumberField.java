@@ -15,9 +15,9 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
-
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
+
+import java.awt.*;
 
 /**
  * A <code>WholeNumberField</code> with a standard size.

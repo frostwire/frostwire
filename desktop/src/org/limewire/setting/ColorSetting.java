@@ -1,6 +1,6 @@
 package org.limewire.setting;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Properties;
 
 

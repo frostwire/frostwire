@@ -22,16 +22,12 @@
  */
 package com.limegroup.gnutella.gui.trees;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.List;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
 
 /**
  * Taken from the XNap Commons project and slightly adapted to use File objects

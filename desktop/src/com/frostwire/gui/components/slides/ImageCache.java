@@ -18,21 +18,19 @@
 
 package com.frostwire.gui.components.slides;
 
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
+import com.frostwire.util.http.HttpClient;
+import com.limegroup.gnutella.settings.SharingSettings;
+import org.limewire.concurrent.ThreadExecutor;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.imageio.ImageIO;
-
-import org.limewire.concurrent.ThreadExecutor;
-
-import com.frostwire.util.Logger;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.HttpClientFactory;
-import com.limegroup.gnutella.settings.SharingSettings;
 
 /**
  * @author gubatron

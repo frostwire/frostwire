@@ -18,27 +18,18 @@
 
 package com.frostwire.gui.theme;
 
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineBreakMeasurer;
-import java.beans.PropertyChangeEvent;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
-
-import javax.swing.CellRendererPane;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.JToolTip;
+import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTextAreaUI;
 import javax.swing.plaf.synth.ColorType;
 import javax.swing.plaf.synth.SynthContext;
 import javax.swing.plaf.synth.SynthToolTipUI;
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.beans.PropertyChangeEvent;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 
 /**
  * 

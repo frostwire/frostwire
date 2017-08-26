@@ -1,9 +1,8 @@
 package com.limegroup.gnutella.gui.options;
 
-import java.io.IOException;
-
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import java.io.IOException;
 
 /**
  * This class creates the <tt>TreeModel</tt> used in the <tt>JTree</tt> of 

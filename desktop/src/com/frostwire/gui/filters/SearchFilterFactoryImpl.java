@@ -18,9 +18,9 @@
 
 package com.frostwire.gui.filters;
 
-import java.util.Vector;
-
 import com.limegroup.gnutella.settings.FilterSettings;
+
+import java.util.Vector;
 
 /**
  * 

@@ -1,14 +1,13 @@
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.limegroup.gnutella.gui.I18n;
+
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
-import com.limegroup.gnutella.gui.I18n;
 
 /**
  * This consumes a String template for describing how to save a file and returns a valid file path.  

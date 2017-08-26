@@ -15,13 +15,11 @@
 
 package com.frostwire.gui.tabs;
 
+import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
-import javax.swing.Icon;
-import javax.swing.JComponent;
-
-import com.limegroup.gnutella.gui.GUIMediator;
 
 
 /**

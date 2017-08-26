@@ -18,11 +18,10 @@
 
 package com.frostwire.gui.library;
 
-import java.io.File;
-
-import javax.swing.JTable;
-
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
+
+import javax.swing.*;
+import java.io.File;
 
 /**
  * Library specific DataLineModel.

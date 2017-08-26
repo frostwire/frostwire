@@ -18,16 +18,13 @@
 
 package com.frostwire.gui.components.slides;
 
+import com.frostwire.gui.components.slides.SlideshowPanel.SlideshowListener;
+
+import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
-import com.frostwire.gui.components.slides.SlideshowPanel.SlideshowListener;
 
 /**
  * 

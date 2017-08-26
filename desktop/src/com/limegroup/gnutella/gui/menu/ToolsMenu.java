@@ -15,20 +15,18 @@
 
 package com.limegroup.gnutella.gui.menu;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JOptionPane;
-
+import com.frostwire.gui.updates.UpdateMediator;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import com.limegroup.gnutella.gui.DialogOption;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.actions.AbstractAction;
+import com.limegroup.gnutella.gui.iTunesMediator;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.gui.updates.UpdateMediator;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.DialogOption;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.iTunesMediator;
-import com.limegroup.gnutella.gui.actions.AbstractAction;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Contains all of the menu items for the tools menu.

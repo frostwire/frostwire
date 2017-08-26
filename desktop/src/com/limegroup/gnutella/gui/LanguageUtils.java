@@ -15,26 +15,18 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
+import com.frostwire.util.Logger;
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
-import com.frostwire.util.Logger;
-import com.limegroup.gnutella.settings.ApplicationSettings;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This class provides utility methods retrieving supported languages and

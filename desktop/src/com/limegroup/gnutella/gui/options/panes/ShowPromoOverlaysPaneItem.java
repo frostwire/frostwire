@@ -18,14 +18,12 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import java.io.IOException;
-
-import javax.swing.JCheckBox;
-
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.UpdateManagerSettings;
+
+import javax.swing.*;
+import java.io.IOException;
 
 /**
  * Pane to let the user decide wether or not to see the FrostClick promotions.

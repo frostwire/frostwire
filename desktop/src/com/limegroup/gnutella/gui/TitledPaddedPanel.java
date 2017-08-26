@@ -15,17 +15,12 @@
 
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
-import java.awt.LayoutManager;
+import com.frostwire.gui.theme.ThemeMediator;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-
-import com.frostwire.gui.theme.ThemeMediator;
+import java.awt.*;
 
 /** 
  * This is a reusable class that creates a titled panel with the specified 

@@ -18,13 +18,12 @@
 
 package com.frostwire.gui.theme;
 
-import javax.swing.JComponent;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.plaf.synth.SynthMenuUI;
-
+import com.apple.laf.AquaMenuUI;
 import org.limewire.util.OSUtils;
 
-import com.apple.laf.AquaMenuUI;
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.synth.SynthMenuUI;
 
 /**
  * 

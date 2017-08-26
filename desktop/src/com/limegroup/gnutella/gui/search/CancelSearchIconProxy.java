@@ -15,13 +15,11 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.Component;
-import java.awt.Graphics;
-import java.util.MissingResourceException;
-
-import javax.swing.Icon;
-
 import com.limegroup.gnutella.gui.GUIMediator;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.MissingResourceException;
 
 /**
  * This class acts as a wrapper around the "kill" icon displayed in the

@@ -1,14 +1,13 @@
 package com.limegroup.gnutella.gui.options.panes;
 
-import javax.swing.JCheckBox;
-
-import org.limewire.util.OSUtils;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.gui.WindowsUtils;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.MacOSXUtils;
+import org.limewire.util.OSUtils;
+
+import javax.swing.*;
 
 /**
  * This class defines the panel in the options window that allows the user

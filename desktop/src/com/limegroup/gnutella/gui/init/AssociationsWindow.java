@@ -15,25 +15,17 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.Line;
-import com.limegroup.gnutella.gui.shell.LimeAssociationOption;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
+import com.limegroup.gnutella.gui.shell.LimeAssociationOption;
 import com.limegroup.gnutella.settings.QuestionsHandler;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssociationsWindow extends SetupWindow {
     /**

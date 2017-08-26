@@ -15,17 +15,16 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Iterator;
+import com.limegroup.gnutella.settings.TablesHandlerSettings;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumnModel;
-
-import com.limegroup.gnutella.settings.TablesHandlerSettings;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Iterator;
 
 /**
  * Handles column preferences through a settings file.

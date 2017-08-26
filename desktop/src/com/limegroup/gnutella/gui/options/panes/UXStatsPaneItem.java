@@ -18,12 +18,12 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
-import javax.swing.JCheckBox;
-
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.BugSettings;
+
+import javax.swing.*;
 
 /**
  * @author gubatron

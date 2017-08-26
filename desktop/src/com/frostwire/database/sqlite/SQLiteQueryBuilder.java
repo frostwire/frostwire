@@ -16,14 +16,14 @@
 
 package com.frostwire.database.sqlite;
 
+import com.frostwire.database.Cursor;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import com.frostwire.database.Cursor;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This is a convience class that helps build SQL queries to be sent to

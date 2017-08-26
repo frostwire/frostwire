@@ -20,9 +20,10 @@
 
 package com.frostwire.util.filetypes;
 
+import org.limewire.util.OSUtils;
+
 import java.util.Iterator;
 import java.util.List;
-import org.limewire.util.OSUtils;
 //import org.jdesktop.jdic.filetypes.Association;
 //import org.jdesktop.jdic.filetypes.RegisterFailedException;
 

@@ -1,10 +1,9 @@
 package com.limegroup.gnutella.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.AbstractButton;
-
 import org.limewire.setting.BooleanSetting;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Toggles a boolean setting.

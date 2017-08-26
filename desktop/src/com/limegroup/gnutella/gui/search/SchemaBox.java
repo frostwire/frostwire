@@ -15,14 +15,19 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.Shape;
+import com.frostwire.gui.theme.AbstractSkinPainter;
+import com.frostwire.uxstats.UXAction;
+import com.frostwire.uxstats.UXStats;
+import com.limegroup.gnutella.MediaType;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.ImageManipulator;
+import com.limegroup.gnutella.settings.SearchSettings;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import javax.swing.plaf.synth.SynthContext;
+import javax.swing.plaf.synth.SynthRadioButtonUI;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,28 +36,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
-import javax.swing.border.Border;
-import javax.swing.plaf.synth.SynthContext;
-import javax.swing.plaf.synth.SynthRadioButtonUI;
-
-import net.miginfocom.swing.MigLayout;
-
-import com.frostwire.gui.theme.AbstractSkinPainter;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
-import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.ImageManipulator;
-import com.limegroup.gnutella.settings.SearchSettings;
 
 /**
  * A group of radio buttons for each schema.

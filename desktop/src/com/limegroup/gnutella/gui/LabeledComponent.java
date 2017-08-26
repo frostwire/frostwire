@@ -1,11 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This class creates a standardized <tt>JPanel</tt> that includes a 

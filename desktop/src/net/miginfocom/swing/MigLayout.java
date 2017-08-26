@@ -36,12 +36,14 @@ package net.miginfocom.swing;
 import net.miginfocom.layout.*;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /** A very flexible layout manager.
  * <p>

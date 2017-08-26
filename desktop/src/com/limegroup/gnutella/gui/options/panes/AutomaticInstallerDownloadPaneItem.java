@@ -1,13 +1,12 @@
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.UpdateSettings;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
-import javax.swing.JCheckBox;
-
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.UpdateSettings;
 
 public class AutomaticInstallerDownloadPaneItem extends AbstractPaneItem {
 

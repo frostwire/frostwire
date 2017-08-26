@@ -1,22 +1,13 @@
 package com.limegroup.gnutella;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.util.URIUtils;
 import com.limegroup.gnutella.util.URLDecoder;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * Contains information fields extracted from a magnet link.

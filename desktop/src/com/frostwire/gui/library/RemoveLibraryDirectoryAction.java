@@ -17,14 +17,13 @@
  */
 package com.frostwire.gui.library;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.actions.AbstractAction;
 
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-
-import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.actions.AbstractAction;
+import java.awt.event.ActionEvent;
+import java.io.File;
 
 /**
  * Removes selected root folders from a {@link RecursiveLibraryDirectoryPanel}.

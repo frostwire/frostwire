@@ -18,9 +18,9 @@
 
 package com.limegroup.gnutella.gui;
 
-import javax.swing.JToolTip;
-
 import com.frostwire.gui.theme.SkinMultilineToolTipUI;
+
+import javax.swing.*;
 
 /**
  * 

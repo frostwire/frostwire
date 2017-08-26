@@ -18,7 +18,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * 

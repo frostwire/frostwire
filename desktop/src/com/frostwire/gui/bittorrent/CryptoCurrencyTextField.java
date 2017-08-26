@@ -15,10 +15,10 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.limegroup.gnutella.gui.LimeTextField;
+
 import java.util.HashMap;
 import java.util.Set;
-
-import com.limegroup.gnutella.gui.LimeTextField;
 
 public class CryptoCurrencyTextField extends LimeTextField {
     

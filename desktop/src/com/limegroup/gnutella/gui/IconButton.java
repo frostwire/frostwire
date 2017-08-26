@@ -1,16 +1,12 @@
 package com.limegroup.gnutella.gui;
 
-import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.SwingConstants;
-
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.settings.UISettings;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * A JButton that uses an Icon.

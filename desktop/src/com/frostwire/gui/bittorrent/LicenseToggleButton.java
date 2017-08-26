@@ -18,20 +18,14 @@
 
 package com.frostwire.gui.bittorrent;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import net.miginfocom.swing.MigLayout;
-
 import com.frostwire.gui.AlphaIcon;
 import com.limegroup.gnutella.gui.GUIMediator;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class LicenseToggleButton extends JPanel {
     private boolean selected;
