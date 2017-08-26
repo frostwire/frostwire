@@ -18,54 +18,45 @@
  * limitations under the License.
  */
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_search_advertisement_header_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/basic_blue_dark"
+    android:background="@color/app_background_dark"
     android:orientation="vertical"
     android:visibility="gone">
 
     <!-- header with "advertisement" and dismiss button on top -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="visible">
-
-        <ImageButton
-            android:id="@+id/view_search_header_banner_invisible_dismiss_banner_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="10dp"
-            android:background="@null"
-            android:src="@drawable/clearable_edittext_clear_icon"
-            android:visibility="invisible"/>
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
 
         <TextView
             android:id="@+id/view_search_header_banner_advertisement_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1.0"
-            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
             android:text="@string/advertisement"
-            android:textColor="@color/basic_blue_dark_highlight"
-            android:visibility="visible"/>
+            android:textColor="@color/app_text_light"
+            android:textSize="@dimen/text_micro" />
 
         <ImageButton
             android:id="@+id/view_search_header_banner_dismiss_banner_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="14dp"
+            android:layout_marginEnd="14dp"
             android:background="@null"
-            android:src="@drawable/clearable_edittext_clear_icon"
-            android:visibility="visible"/>
-    </LinearLayout>
+            android:src="@drawable/keyword_tag_close_clear_cancel_full"
+            android:tint="@color/basic_gray_text_light"
+            android:contentDescription="@null"/>
+    </RelativeLayout>
     <!-- end of header -->
 
     <!-- fallback banner on the bottom, mopub banner on top -->
@@ -75,23 +66,23 @@
         <!-- fallback banner -->
         <LinearLayout
             android:id="@+id/view_search_header_banner_fallback_banner_linear_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="320dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="2dp"
             android:background="@drawable/blue_light_button_background_selector_off">
 
             <TextView
                 android:id="@+id/view_search_header_banner_fallback_banner_textview"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/remove_ads"
-                android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="18dp"
-                android:textStyle="bold"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -103,6 +94,6 @@
             android:layout_centerInParent="true"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="2dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>
