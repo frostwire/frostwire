@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,11 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
+
+    <com.frostwire.android.offers.SearchHeaderBanner
+        android:id="@+id/fragment_search_header_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <ProgressBar
             android:id="@+id/fragment_search_deepsearch_progress"
@@ -46,16 +52,7 @@
             frostwire:rich_notification_action_links_horizontal_margin="14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-    />
-
-    <LinearLayout
-            android:id="@+id/fragment_search_adview_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/black"
-            android:orientation="horizontal">
-    </LinearLayout>
+            android:visibility="gone"/>
 
     <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_search_swipe"

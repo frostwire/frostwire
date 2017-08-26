@@ -387,10 +387,15 @@ public final class SoftwareUpdater {
 
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL, update.config.waterfall);
+
+        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD, update.config.mopubAlbumArtBannerThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD, update.config.mopubPreviewBannerThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, update.config.mopubSearchHeaderBannerThreshold);
+        CM.setLong(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, update.config.mopubSearchHeaderBannerIntervalInMs);
+
         CM.setInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD, update.config.oguryThreshold);
         CM.setBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT, update.config.oguryKillOnExit);
-        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD, update.config.mopubAlbumArtBannerThreshold);
+
         CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
@@ -491,6 +496,8 @@ public final class SoftwareUpdater {
         int uxPeriod = 3600;
         int uxMinEntries = 10;
         int uxMaxEntries = 10000;
+        int mopubSearchHeaderBannerThreshold = 80;
+        long mopubSearchHeaderBannerIntervalInMs = 300000L; // 5 mins
     }
 
     public void removeConfigurationUpdateListener(Object slideMenuFragment) {

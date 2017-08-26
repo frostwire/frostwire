@@ -674,16 +674,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mMopubAd != null && mDismissAlbumArtAdButton != null) {
             mDismissAlbumArtAdButton.setOnClickListener(onDismissAlbumArtAdButtonClickListener);
 
-            setBannerViewVisibility(mMopubAd, false);
-            setBannerViewVisibility(mFallbackAd, false);
+            loadFallbackBanner();
 
             //mMopubAd.setTesting(true);
             mMopubAd.setAutorefreshEnabled(true);
             mMopubAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
             mMopubAd.setKeywords(keywords.toString());
             mMopubAd.setBannerAdListener(moPubBannerListener);
+
             try {
-                loadFallbackBanner();
                 mMopubAd.loadAd();
             } catch (Throwable e) {
                 LOG.warn("AudioPlayer Mopub banner could not be loaded", e);

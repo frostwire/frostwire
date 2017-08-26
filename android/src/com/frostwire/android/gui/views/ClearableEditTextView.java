@@ -158,7 +158,7 @@ public class ClearableEditTextView extends RelativeLayout {
 
         View.inflate(getContext(), R.layout.view_clearable_edittext, this);
 
-        input = (FWAutoCompleteTextView) findViewById(R.id.view_clearable_edit_text_input);
+        input = findViewById(R.id.view_clearable_edit_text_input);
         input.setHint(hint);
         input.setTransformationMethod(new SingleLineTransformationMethod());
         input.addTextChangedListener(new TextWatcher() {
@@ -192,10 +192,10 @@ public class ClearableEditTextView extends RelativeLayout {
             }
         });
 
-        imageSearch = (ImageView) findViewById(R.id.view_clearable_edit_text_image_search);
+        imageSearch = findViewById(R.id.view_clearable_edit_text_image_search);
         imageSearch.setVisibility(RelativeLayout.VISIBLE);
 
-        buttonClear = (ImageButton) findViewById(R.id.view_clearable_edit_text_button_clear);
+        buttonClear = findViewById(R.id.view_clearable_edit_text_button_clear);
         buttonClear.setVisibility(RelativeLayout.GONE);
         buttonClear.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {

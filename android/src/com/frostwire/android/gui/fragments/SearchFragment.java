@@ -70,6 +70,7 @@ import com.frostwire.android.gui.views.SearchInputView;
 import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.SearchHeaderBanner;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -124,6 +125,7 @@ public final class SearchFragment extends AbstractFragment implements
     private DrawerLayout drawerLayout;
     private KeywordFilterDrawerView keywordFilterDrawerView;
     private OnClickListener headerClickListener;
+    private SearchHeaderBanner searchHeaderBanner;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -151,18 +153,14 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
-
         LinearLayout header = (LinearLayout) inflater.inflate(R.layout.view_search_header, null, false);
         TextView title = header.findViewById(R.id.view_search_header_text_title);
         title.setText(R.string.search);
-
         title.setOnClickListener(getHeaderClickListener());
-
         ImageButton filterButtonIcon = header.findViewById(R.id.view_search_header_search_filter_button);
         TextView filterCounter = header.findViewById(R.id.view_search_header_search_filter_counter);
         filterButton = new FilterToolbarButton(filterButtonIcon, filterCounter);
         filterButton.updateVisibility();
-
         return header;
     }
 
@@ -170,7 +168,6 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public void onResume() {
         super.onResume();
-
         // getHeader was conceived for quick update of main fragments headers,
         // mainly in a functional style, but it is ill suited to extract from
         // it a mutable state, like filterButton.
@@ -178,7 +175,7 @@ public final class SearchFragment extends AbstractFragment implements
         // of the fragmentRef, since getHeader is not guaranteed to be called
         // at the right time during a full resume of the fragmentRef.
         // TODO: refactor this
-        if (filterButton == null && getActivity() != null) { // best effort
+        if (filterButton == null && isAdded() && getActivity() != null) { // best effort
             // this will happen due to the call to onTabReselected on full resume
             // and this is only solving the NPE, the drawback is that it will
             // create a few orphan view objects to be GC'ed soon.
@@ -186,11 +183,9 @@ public final class SearchFragment extends AbstractFragment implements
             // a big refactor.
             getHeader(getActivity());
         }
-
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
             searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
-
             filterButton.reset(false);
             boolean filtersApplied = !adapter.getKeywordFiltersPipeline().isEmpty();
             if (filtersApplied) {
@@ -210,12 +205,35 @@ public final class SearchFragment extends AbstractFragment implements
                             createScrollDirectionListener(),
                             Engine.instance().getThreadPool()));
         }
+        if (searchHeaderBanner != null) {
+            //searchHeaderBanner.onResume();
+            searchHeaderBanner.setSearchFragmentReference(this);
+            if (getCurrentQuery() == null || Offers.disabledAds()){
+                searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
+            }
+        }
+        if (getCurrentQuery() == null) {
+            searchInput.setFileTypeCountersVisible(false);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (searchHeaderBanner != null) {
+            searchHeaderBanner.setSearchFragmentReference(this);
+            searchHeaderBanner.onDestroy();
+        }
+        super.onPause();
     }
 
     @Override
     public void onDestroy() {
         LocalSearchEngine.instance().setListener(null);
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
+        if (searchHeaderBanner != null) {
+            searchHeaderBanner.setSearchFragmentReference(this);
+            searchHeaderBanner.onDestroy();
+        }
         super.onDestroy();
     }
 
@@ -225,10 +243,11 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     protected void initComponents(final View view, Bundle savedInstanceState) {
+        searchHeaderBanner = findView(view, R.id.fragment_search_header_banner);
+        searchHeaderBanner.setSearchFragmentReference(this);
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
-
         deepSearchProgress = findView(view, R.id.fragment_search_deepsearch_progress);
         deepSearchProgress.setVisibility(View.GONE);
         promotions = findView(view, R.id.fragment_search_promos);
@@ -264,6 +283,7 @@ public final class SearchFragment extends AbstractFragment implements
         showRatingsReminder(view);
     }
 
+
     private void startMagnetDownload(String magnet) {
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
         TransferManager.instance().downloadTorrent(magnet,
@@ -288,7 +308,6 @@ public final class SearchFragment extends AbstractFragment implements
                     startTransfer(sr, getString(R.string.download_added_to_queue));
                 }
             };
-
             LocalSearchEngine.instance().setListener(new SearchListener() {
                 @Override
                 public void onResults(long token, final List<? extends SearchResult> results) {
@@ -326,13 +345,11 @@ public final class SearchFragment extends AbstractFragment implements
         if (adapter.getCount() == 0 && adapter.getKeywordFiltersPipeline().size() == 0) {
             resetKeywordDetector();
         }
-
         if (adapter.getKeywordFiltersPipeline().isEmpty()) {
             updateKeywordDetector(results);
         } else {
             updateKeywordDetector(keywordFiltered);
         }
-
         if (isAdded()) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -453,6 +470,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible) {
+        searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
         boolean keywordFiltersApplied = adapter.getKeywordFiltersPipeline().size() > 0;
         FilteredSearchResults fsr = fileTypeCounter.fsr;
         int applications = keywordFiltersApplied ? fsr.numFilteredApplications : fsr.numApplications;
@@ -467,7 +485,6 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_PICTURES, pictures);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_TORRENTS, torrents);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, videos);
-        searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
     }
 
     public void performYTSearch(String query) {
@@ -486,7 +503,6 @@ public final class SearchFragment extends AbstractFragment implements
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
         resetKeywordDetector();
-
         currentQuery = query;
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
         LocalSearchEngine.instance().performSearch(query);
@@ -498,6 +514,7 @@ public final class SearchFragment extends AbstractFragment implements
     private void cancelSearch() {
         adapter.clear();
         searchInput.selectTabByMediaType(Constants.FILE_TYPE_AUDIO);
+        searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
         resetKeywordDetector();
@@ -506,11 +523,11 @@ public final class SearchFragment extends AbstractFragment implements
         searchProgress.setProgressEnabled(false);
         showSearchView(getView());
         filterButton.reset(true); // hide=true
+        searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
     }
 
     private void showSearchView(View view) {
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
-
         if (LocalSearchEngine.instance().isSearchStopped()) {
             switchView(view, R.id.fragment_search_promos);
             deepSearchProgress.setVisibility(View.GONE);
@@ -611,15 +628,13 @@ public final class SearchFragment extends AbstractFragment implements
             //LOG.info("SearchFragment.showRatingsReminder() aborted. alreadyRated="+alreadyRated + " wasDismissed=" + ratingReminder.wasDismissed());
             return;
         }
-
         long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
         long daysInstalled = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installationTimestamp);
         if (daysInstalled < 5) {
             //LOG.info("SearchFragment.showRatingsReminder() aborted. Too soon to show ratings reminder. daysInstalled=" + daysInstalled);
             return;
         }
-
-        ClickAdapter<SearchFragment> onRateAdapter = createOnRateClickAdapter(ratingReminder, CM);
+        ClickAdapter<SearchFragment> onRateAdapter = new OnRateClickAdapter(SearchFragment.this, ratingReminder, CM);
         ratingReminder.setOnClickListener(onRateAdapter);
         RichNotificationActionLink rateFrostWireActionLink =
                 new RichNotificationActionLink(ratingReminder.getContext(),
@@ -628,20 +643,9 @@ public final class SearchFragment extends AbstractFragment implements
         RichNotificationActionLink sendFeedbackActionLink =
                 new RichNotificationActionLink(ratingReminder.getContext(),
                         getString(R.string.send_feedback),
-                        createOnFeedbackClickAdapter(ratingReminder, CM));
+                        new OnFeedbackClickAdapter(this, ratingReminder, CM));
         ratingReminder.updateActionLinks(rateFrostWireActionLink, sendFeedbackActionLink);
         ratingReminder.setVisibility(View.VISIBLE);
-    }
-
-    // takes user to Google Play store so it can rate the app.
-    private ClickAdapter<SearchFragment> createOnRateClickAdapter(final RichNotification ratingReminder, final ConfigurationManager CM) {
-        return new OnRateClickAdapter(SearchFragment.this, ratingReminder, CM);
-    }
-
-    // opens default email client and pre-fills email to support@frostwire.com
-    // with some information about the app and environment.
-    private OnFeedbackClickAdapter createOnFeedbackClickAdapter(final RichNotification ratingReminder, final ConfigurationManager CM) {
-        return new OnFeedbackClickAdapter(SearchFragment.this, ratingReminder, CM);
     }
 
     public void startPromotionDownload(Slide slide) {
@@ -724,19 +728,29 @@ public final class SearchFragment extends AbstractFragment implements
         keywordDetector.requestHistogramsUpdateAsync(null);
     }
 
-    private static class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
-        private final LinearLayout parentView;
-        private final SearchFragment fragment;
+    private void resetKeywordDetector() {
+        keywordDetector.reset();
+        keywordFilterDrawerView.reset();
+    }
 
-        SearchInputOnSearchListener(LinearLayout parentView, SearchFragment fragment) {
-            this.parentView = parentView;
-            this.fragment = fragment;
+    private static final class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
+        private final WeakReference<LinearLayout> rootViewRef;
+        private final WeakReference<SearchFragment> fragmentRef;
+
+        SearchInputOnSearchListener(LinearLayout rootView, SearchFragment fragment) {
+            this.rootViewRef = Ref.weak(rootView);
+            this.fragmentRef = Ref.weak(fragment);
         }
 
         public void onSearch(View v, String query, int mediaTypeId) {
+            if (!Ref.alive(fragmentRef) || !Ref.alive(rootViewRef)) {
+                return;
+            }
+            SearchFragment fragment = fragmentRef.get();
+            fragment.searchHeaderBanner.setSearchFragmentReference(fragment);
+            fragment.searchHeaderBanner.updateComponents();
             fragment.resetKeywordDetector();
             fragment.searchInput.selectTabByMediaType((byte) mediaTypeId);
-
             if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
                 fragment.cancelSearch();
                 new DownloadSoundcloudFromUrlTask(fragment.getActivity(), query).execute();
@@ -753,23 +767,25 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         public void onMediaTypeSelected(View view, int mediaTypeId) {
+            if (!Ref.alive(fragmentRef)) {
+                return;
+            }
+            SearchFragment fragment = fragmentRef.get();
             ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
             fragment.adapter.setFileType(mediaTypeId);
-            fragment.showSearchView(parentView);
+            fragment.showSearchView(rootViewRef.get());
         }
 
         public void onClear(View v) {
+            if (!Ref.alive(fragmentRef)) {
+                return;
+            }
+            SearchFragment fragment = fragmentRef.get();
             fragment.cancelSearch();
         }
     }
 
-    private void resetKeywordDetector() {
-        keywordDetector.reset();
-        keywordFilterDrawerView.reset();
-    }
-
     private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
-
         private final WeakReference<SearchFragment> fragmentRef;
 
         LoadSlidesTask(SearchFragment fragment) {
@@ -808,21 +824,18 @@ public final class SearchFragment extends AbstractFragment implements
             if (!Ref.alive(fragmentRef)) {
                 return;
             }
-
             SearchFragment f = fragmentRef.get();
-
             if (result != null && !result.isEmpty()) {
                 f.slides = result;
             } else {
                 f.slides = new ArrayList<>(0);
             }
-
             f.promotions.setSlides(f.slides);
+            f.promotions.invalidate();
         }
     }
 
     private static final class FileTypeCounter {
-
         private final FilteredSearchResults fsr = new FilteredSearchResults();
 
         public void add(FilteredSearchResults fsr) {
@@ -832,7 +845,6 @@ public final class SearchFragment extends AbstractFragment implements
             this.fsr.numPictures += fsr.numPictures;
             this.fsr.numTorrents += fsr.numTorrents;
             this.fsr.numVideo += fsr.numVideo;
-
             this.fsr.numFilteredAudio += fsr.numFilteredAudio;
             this.fsr.numFilteredApplications += fsr.numFilteredApplications;
             this.fsr.numFilteredDocuments += fsr.numFilteredDocuments;
@@ -857,7 +869,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private static class OnRateClickAdapter extends ClickAdapter<SearchFragment> {
+    private final static class OnRateClickAdapter extends ClickAdapter<SearchFragment> {
         private final WeakReference<RichNotification> ratingReminderRef;
         private final ConfigurationManager CM;
 
@@ -935,7 +947,6 @@ public final class SearchFragment extends AbstractFragment implements
 
                 }
             };
-
             if (Looper.myLooper() == Looper.getMainLooper()) {
                 Engine.instance().getThreadPool().submit(notifyLogic);
             } else {
@@ -967,7 +978,6 @@ public final class SearchFragment extends AbstractFragment implements
             // this will make the adapter filter
             FilteredSearchResults filteredSearchResults = adapter.setKeywordFiltersPipeline(pipeline);
             updateFileTypeCounter(filteredSearchResults);
-
             if (pipeline != null) {
                 if (pipeline.isEmpty()) {
                     counterTextView.setText("");
@@ -977,7 +987,6 @@ public final class SearchFragment extends AbstractFragment implements
             }
             updateVisibility();
             keywordFilterDrawerView.showIndeterminateProgressViews();
-
             List<SearchResult> results = adapter.getKeywordFiltersPipeline().isEmpty() ? adapter.getList() : filteredSearchResults.keywordFiltered;
             keywordDetector.reset();
             keywordDetector.requestHistogramsUpdateAsync(results);
@@ -1007,7 +1016,6 @@ public final class SearchFragment extends AbstractFragment implements
         private void setVisible(boolean visible) {
             int visibility = visible ? View.VISIBLE : View.GONE;
             int oldVisibility = imageButton.getVisibility();
-
             imageButton.setVisibility(visibility);
             if (visible) {
                 if (oldVisibility == View.GONE && !filterButtonClickedBefore) {

@@ -65,6 +65,8 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_MOPUB, true);
+        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 80);
+        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, 300000L); // 5 mins
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);

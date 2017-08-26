@@ -34,6 +34,9 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created on 9/29/16 in Denver, CO.
+ * Opens default email client and pre-fills email to support@frostwire.com
+ * with some information about the app and environment.
+ *
  * @author gubatron
  * @author aldenml
  */

@@ -71,6 +71,7 @@ public class PromotionsView extends LinearLayout {
                 removeAds(slides);
             }
             gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides, promotionDownloader));
+            gridview.invalidate();
         }
     }
 

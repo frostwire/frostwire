@@ -512,15 +512,6 @@ public final class UIUtils {
         return false;
     }
 
-    public static boolean isTablet(Activity activity) {
-        DisplayMetrics metrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        float yInches = metrics.heightPixels / metrics.ydpi;
-        float xInches = metrics.widthPixels / metrics.xdpi;
-        double diagonalInches = Math.sqrt(xInches * xInches + yInches * yInches);
-        return diagonalInches >= 6.5;
-    }
-
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
     public static class IntentByteExtra {
         public String name;
@@ -559,6 +550,16 @@ public final class UIUtils {
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
         // pitagoras
         return Math.sqrt(x_sq + y_sq);
+    }
+
+    public static boolean isTablet(Activity activity) {
+        return getScreenInches(activity) >= 6.5;
+    }
+
+    public static boolean isPortrait(Activity activity) {
+        DisplayMetrics dm = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        return dm.heightPixels > dm.widthPixels;
     }
 
     public static Uri getUriFromResourceId(Context context, int resourceId) {
