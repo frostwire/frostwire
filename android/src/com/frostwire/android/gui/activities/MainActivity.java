@@ -439,7 +439,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Offers.showInterstitial(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                    Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
                 }
             });
         }
