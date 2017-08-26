@@ -52,10 +52,10 @@ public class AdMenuItemView extends RelativeLayout {
 
         View.inflate(getContext(), R.layout.view_ad_menuitem, this);
 
-        textHeadline = (TextView) findViewById(R.id.view_ad_menu_item_headline);
-        textSubtitle = (TextView) findViewById(R.id.view_ad_menu_item_subtitle);
-        textThumbnail = (TextView) findViewById(R.id.view_ad_menu_item_thumbnail);
-        imageThumbnail = (ImageView) findViewById(R.id.view_ad_menu_item_thumbnail_image);
+        textHeadline = findViewById(R.id.view_ad_menu_item_headline);
+        textSubtitle = findViewById(R.id.view_ad_menu_item_subtitle);
+        textThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail);
+        imageThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
         textHeadline.setText(R.string.support_frostwire);
 

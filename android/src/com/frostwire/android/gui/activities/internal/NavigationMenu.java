@@ -99,7 +99,7 @@ public final class NavigationMenu {
     private NavigationView initNavigationView(final Activity activity) {
         NavigationView resultNavView = navView;
         if (navView == null) {
-            resultNavView = (NavigationView) activity.findViewById(R.id.activity_main_nav_view);
+            resultNavView = activity.findViewById(R.id.activity_main_nav_view);
             resultNavView.setNavigationItemSelectedListener(
                     new NavigationView.OnNavigationItemSelectedListener() {
                         @Override
@@ -110,7 +110,7 @@ public final class NavigationMenu {
                     });
             View navViewHeader = resultNavView.getHeaderView(0);
             // Logo
-            ImageView navLogo = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
+            ImageView navLogo = navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
             navLogo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -119,12 +119,12 @@ public final class NavigationMenu {
             });
 
             // Prep title and version
-            TextView title = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_title);
-            TextView version = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_version);
+            TextView title = navViewHeader.findViewById(R.id.nav_view_header_main_title);
+            TextView version = navViewHeader.findViewById(R.id.nav_view_header_main_version);
             String basicOrPlus = (String) activity.getText(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
             title.setText("FrostWire " + basicOrPlus);
             version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
-            TextView build = (TextView) navViewHeader.findViewById(R.id.nav_view_header_main_build);
+            TextView build = navViewHeader.findViewById(R.id.nav_view_header_main_build);
             build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
             View.OnClickListener aboutActivityLauncher = new View.OnClickListener() {
                 @Override
@@ -138,7 +138,7 @@ public final class NavigationMenu {
             build.setOnClickListener(aboutActivityLauncher);
 
             // Prep update button
-            ImageView updateButton = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_update);
+            ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
             updateButton.setVisibility(View.GONE);
             updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -190,8 +190,8 @@ public final class NavigationMenu {
     }
 
     private AdMenuItemView initAdMenuItemListener(final Activity activity) {
-        AdMenuItemView adMenuItemView = (AdMenuItemView) activity.findViewById(R.id.slidermenu_ad_menuitem);
-        RelativeLayout menuAd = (RelativeLayout) activity.findViewById(R.id.view_ad_menu_item_ad);
+        AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
+        RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -212,7 +212,7 @@ public final class NavigationMenu {
 
     public void onUpdateAvailable() {
         View navViewHeader = navView.getHeaderView(0);
-        ImageView updateButton = (ImageView) navViewHeader.findViewById(R.id.nav_view_header_main_update);
+        ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
         updateButton.setVisibility(View.VISIBLE);
     }
 

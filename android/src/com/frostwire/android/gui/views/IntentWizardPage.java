@@ -87,12 +87,12 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_intent_wizard_page, this);
-        checkCopyrightAccept = (CheckBox) findViewById(R.id.view_intent_wizard_page_check_accept_copyright);
+        checkCopyrightAccept = findViewById(R.id.view_intent_wizard_page_check_accept_copyright);
         checkCopyrightAccept.setOnCheckedChangeListener(checkAcceptListener);
-        checkTOUAccept = (CheckBox) findViewById(R.id.view_intent_wizard_page_check_accept_tou);
+        checkTOUAccept = findViewById(R.id.view_intent_wizard_page_check_accept_tou);
         checkTOUAccept.setOnCheckedChangeListener(checkAcceptListener);
         Resources r = getResources();
-        TextView tosTextView = (TextView) findViewById(R.id.view_intent_wizard_page_text_tos);
+        TextView tosTextView = findViewById(R.id.view_intent_wizard_page_text_tos);
         tosTextView.setMovementMethod(LinkMovementMethod.getInstance());
         final String tou = r.getString(R.string.terms_of_use);
         tosTextView.setText(Html.fromHtml("<a href='" + Constants.TERMS_OF_USE_URL + "'>" + tou + "</a>"));

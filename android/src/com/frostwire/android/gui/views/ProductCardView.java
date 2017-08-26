@@ -101,7 +101,7 @@ public class ProductCardView extends RelativeLayout {
     }
 
     private void initTextView(int id, String value, boolean visible) {
-        TextView textView = (TextView) findViewById(id);
+        TextView textView = findViewById(id);
         if (visible && value != null) {
             textView.setText(value);
             textView.setVisibility(View.VISIBLE);

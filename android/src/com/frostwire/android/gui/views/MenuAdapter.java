@@ -62,7 +62,7 @@ public class MenuAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        MenuAction item = (MenuAction) getItem(position);
+        MenuAction item = getItem(position);
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.view_menu_list_item, parent, false);

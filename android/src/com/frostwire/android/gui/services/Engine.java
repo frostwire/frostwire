@@ -88,7 +88,7 @@ public final class Engine implements IEngineService {
     }
 
     public boolean isStarted() {
-        return service != null ? service.isStarted() : false;
+        return service != null && service.isStarted();
     }
 
     public boolean isStarting() {

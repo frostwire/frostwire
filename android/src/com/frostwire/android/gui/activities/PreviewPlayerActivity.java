@@ -217,10 +217,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        mopubView = (MoPubView) findViewById(R.id.activity_preview_player_mopubview);
-        advertisementHeaderLayout = (LinearLayout) findViewById(R.id.activity_preview_advertisement_header_layout);
+        mopubView = findViewById(R.id.activity_preview_player_mopubview);
+        advertisementHeaderLayout = findViewById(R.id.activity_preview_advertisement_header_layout);
         fallbackImageView = findView(R.id.activity_preview_fallback_imageview);
-        final ImageButton dismissButton = (ImageButton) findViewById(R.id.audio_player_dismiss_mopubview_button);
+        final ImageButton dismissButton = findViewById(R.id.audio_player_dismiss_mopubview_button);
         if (mopubView == null || advertisementHeaderLayout == null || dismissButton == null) {
             return;
         }

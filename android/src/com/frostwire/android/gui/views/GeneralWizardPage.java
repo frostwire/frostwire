@@ -92,11 +92,11 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         super.onFinishInflate();
 
         View.inflate(getContext(), R.layout.view_general_wizard_page, this);
-        final TextView textWifiOnly = (TextView) findViewById(R.id.view_general_wizard_page_wifi_only_text);
+        final TextView textWifiOnly = findViewById(R.id.view_general_wizard_page_wifi_only_text);
 
-        TextView textStoragePathTitle = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_title);
-        textStoragePath = (TextView) findViewById(R.id.view_general_wizard_page_storage_path_textview);
-        TextView titleHorizontalBreak = (TextView) findViewById(R.id.view_general_wizard_page_title_horizontal_break);
+        TextView textStoragePathTitle = findViewById(R.id.view_general_wizard_page_storage_path_title);
+        textStoragePath = findViewById(R.id.view_general_wizard_page_storage_path_textview);
+        TextView titleHorizontalBreak = findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
         if (AndroidPlatform.saf()) {
             textStoragePath.setOnClickListener(new OnClickListener() {
@@ -111,7 +111,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
             textStoragePath.setVisibility(View.GONE);
         }
 
-        checkSeedFinishedTorrents = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
+        checkSeedFinishedTorrents = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
@@ -122,21 +122,21 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         });
 
 
-        checkSeedFinishedTorrentsWifiOnly = (CheckBox) findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents_wifi_only);
+        checkSeedFinishedTorrentsWifiOnly = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents_wifi_only);
         checkSeedFinishedTorrentsWifiOnly.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 validate();
             }
         });
 
-        checkUXStats = (CheckBox) findViewById(R.id.view_general_wizard_page_check_ux_stats);
+        checkUXStats = findViewById(R.id.view_general_wizard_page_check_ux_stats);
         checkUXStats.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 validate();
             }
         });
 
-        final TextView welcome_to_frostwire = (TextView) findViewById(R.id.view_general_wizard_page_welcome_to_frostwire);
+        final TextView welcome_to_frostwire = findViewById(R.id.view_general_wizard_page_welcome_to_frostwire);
         final String basicOrPlus = getContext().getString(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
         welcome_to_frostwire.setText(getContext().getString(R.string.welcome_to_frostwire, basicOrPlus));
     }

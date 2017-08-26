@@ -194,7 +194,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
         @Override
         protected void onBindDialogView(View view) {
             super.onBindDialogView(view);
-            mSeekbar = (SeekBar) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
+            mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
 
             int previousValue = (int) getPreference().getSharedPreferences().getLong(getKey(), mDefault);
@@ -219,8 +219,8 @@ public final class CustomSeekBarPreference extends DialogPreference {
                 public void onStopTrackingTouch(SeekBar seekBar) {
                 }
             });
-            mCurrentValueTextView = (TextView) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
-            mUnlimitedCheckbox = (CheckBox) view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
+            mCurrentValueTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
+            mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
             Bundle arguments = getArguments();
             mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
             mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {

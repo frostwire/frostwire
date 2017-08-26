@@ -470,10 +470,10 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                                 
                                 if (isAdded()) {
                                     String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
-                                    TextView title = (TextView) header.findViewById(R.id.view_my_files_header_text_title);
+                                    TextView title = header.findViewById(R.id.view_my_files_header_text_title);
                                     title.setText(fileTypeStr);
                                 }
-                                TextView total = (TextView) header.findViewById(R.id.view_my_files_header_text_total);
+                                TextView total = header.findViewById(R.id.view_my_files_header_text_total);
                                 total.setText("(" + String.valueOf(numTotal) + ")");
                             }
 

@@ -128,15 +128,15 @@ public final class DeleteFileMenuAction extends MenuAction {
 
         @Override
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-            TextView title = (TextView) dlg.findViewById(R.id.dialog_default_title);
+            TextView title = dlg.findViewById(R.id.dialog_default_title);
             title.setText(R.string.delete_files);
 
-            TextView text = (TextView) dlg.findViewById(R.id.dialog_default_text);
+            TextView text = dlg.findViewById(R.id.dialog_default_text);
             text.setText(R.string.are_you_sure_delete_files);
 
-            Button noButton = (Button) dlg.findViewById(R.id.dialog_default_button_no);
+            Button noButton = dlg.findViewById(R.id.dialog_default_button_no);
             noButton.setText(R.string.cancel);
-            Button yesButton = (Button) dlg.findViewById(R.id.dialog_default_button_yes);
+            Button yesButton = dlg.findViewById(R.id.dialog_default_button_yes);
             yesButton.setText(R.string.delete);
 
             noButton.setOnClickListener(new ButtonOnClickListener(dlg, false));

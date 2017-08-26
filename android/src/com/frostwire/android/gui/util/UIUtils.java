@@ -458,9 +458,9 @@ public final class UIUtils {
         final AlertDialog socialLinksDialog = builder.create();
         socialLinksDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         socialLinksDialog.setOnDismissListener(dismissListener);
-        ImageButton fbButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_facebook_button);
-        ImageButton twitterButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_twitter_button);
-        ImageButton redditButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_reddit_button);
+        ImageButton fbButton = customView.findViewById(R.id.view_social_buttons_facebook_button);
+        ImageButton twitterButton = customView.findViewById(R.id.view_social_buttons_twitter_button);
+        ImageButton redditButton = customView.findViewById(R.id.view_social_buttons_reddit_button);
         final String referrerParam = "?ref=android_" + ((referrerContextSuffix != null) ? referrerContextSuffix.trim() : "");
         fbButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -482,9 +482,9 @@ public final class UIUtils {
         });
         if (showInstallationCompleteSection) {
             LinearLayout installationCompleteLayout =
-                    (LinearLayout) customView.findViewById(R.id.view_social_buttons_installation_complete_layout);
+                    customView.findViewById(R.id.view_social_buttons_installation_complete_layout);
             installationCompleteLayout.setVisibility(View.VISIBLE);
-            ImageButton dismissCheckButton = (ImageButton) customView.findViewById(R.id.view_social_buttons_dismiss_check);
+            ImageButton dismissCheckButton = customView.findViewById(R.id.view_social_buttons_dismiss_check);
             dismissCheckButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

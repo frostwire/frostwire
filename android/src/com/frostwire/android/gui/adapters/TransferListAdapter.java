@@ -279,9 +279,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         } else if (transfer instanceof HttpDownload) {
             populateHttpDownload(view, (HttpDownload) transfer);
         } else if (transfer instanceof YouTubeDownload) {
-            populateCloudDownload(view, (YouTubeDownload) transfer);
+            populateCloudDownload(view, transfer);
         } else if (transfer instanceof SoundcloudDownload) {
-            populateCloudDownload(view, (SoundcloudDownload) transfer);
+            populateCloudDownload(view, transfer);
         }
     }
 
@@ -441,7 +441,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     path = transferItem.getFile().getAbsolutePath();
                 }
             } else if (item instanceof Transfer) {
-                Transfer transferItem = (Transfer) item;
+                Transfer transferItem = item;
                 if (transferItem.getSavePath() != null) {
                     path = transferItem.getSavePath().getAbsolutePath();
                 }
