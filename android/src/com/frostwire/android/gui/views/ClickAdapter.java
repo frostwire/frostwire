@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CompoundButton;
+
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;

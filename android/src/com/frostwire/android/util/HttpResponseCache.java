@@ -18,6 +18,8 @@
 
 package com.frostwire.android.util;
 
+import android.content.Context;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +30,6 @@ import java.net.URI;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
-
-import android.content.Context;
 
 /**
  * @author gubatron

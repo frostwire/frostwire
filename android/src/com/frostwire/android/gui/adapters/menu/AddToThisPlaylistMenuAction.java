@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.MenuAction;

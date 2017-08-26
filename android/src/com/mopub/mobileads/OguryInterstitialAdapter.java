@@ -17,9 +17,7 @@
 
 package com.mopub.mobileads;
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -28,7 +26,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 
 import java.util.Map;
-import java.util.Random;
 
 import io.presage.IADHandler;
 import io.presage.Presage;

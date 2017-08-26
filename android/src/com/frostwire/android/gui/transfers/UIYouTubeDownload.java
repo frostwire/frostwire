@@ -18,8 +18,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.net.Uri;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.YouTubeDownload;

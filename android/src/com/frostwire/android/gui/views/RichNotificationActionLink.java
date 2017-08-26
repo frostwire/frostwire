@@ -18,15 +18,13 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 

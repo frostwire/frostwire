@@ -19,7 +19,6 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**

@@ -21,6 +21,7 @@ package com.frostwire.android.gui;
 import android.app.Application;
 import android.content.Context;
 import android.view.ViewConfiguration;
+
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.core.ConfigurationManager;

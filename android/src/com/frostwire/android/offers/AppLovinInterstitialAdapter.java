@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.app.Application;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;

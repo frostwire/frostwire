@@ -28,8 +28,8 @@ import android.support.v4.provider.DocumentFile;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.util.Logger;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 
 import java.lang.reflect.Method;
 

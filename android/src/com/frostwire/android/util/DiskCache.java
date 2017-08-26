@@ -19,6 +19,12 @@
 package com.frostwire.android.util;
 
 import com.frostwire.util.Logger;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 import okhttp3.internal.cache.DiskLruCache;
 import okhttp3.internal.cache.DiskLruCache.Editor;
 import okhttp3.internal.cache.DiskLruCache.Snapshot;
@@ -27,11 +33,6 @@ import okio.BufferedSink;
 import okio.ByteString;
 import okio.Okio;
 import okio.Source;
-
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author gubatron

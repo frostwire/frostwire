@@ -18,6 +18,7 @@
 package com.frostwire.android.gui.util;
 
 import android.app.Activity;
+
 import com.andrew.apollo.utils.MusicUtils;
 
 /**

@@ -24,8 +24,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;

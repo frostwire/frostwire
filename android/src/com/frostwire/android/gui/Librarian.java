@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -38,10 +39,16 @@ import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * The Librarian is in charge of:

@@ -20,6 +20,7 @@ package com.frostwire.android.core.providers;
 
 import android.database.Cursor;
 import android.net.Uri;
+
 import com.frostwire.android.core.FileDescriptor;
 
 /**

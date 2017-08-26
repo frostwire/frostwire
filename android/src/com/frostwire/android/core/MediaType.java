@@ -19,7 +19,11 @@ import com.frostwire.android.R;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A generic type of media, i.e., "video" or "audio".

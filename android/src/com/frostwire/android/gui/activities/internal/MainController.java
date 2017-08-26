@@ -19,7 +19,7 @@ package com.frostwire.android.gui.activities.internal;
 
 import android.app.Fragment;
 import android.content.Intent;
-import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -27,7 +27,6 @@ import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;

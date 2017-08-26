@@ -19,6 +19,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;

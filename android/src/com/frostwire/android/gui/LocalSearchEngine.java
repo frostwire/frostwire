@@ -18,14 +18,31 @@
 package com.frostwire.android.gui;
 
 import android.text.Html;
+
 import com.frostwire.android.gui.views.AbstractListAdapter;
-import com.frostwire.search.*;
+import com.frostwire.search.CrawlPagedWebSearchPerformer;
+import com.frostwire.search.CrawledSearchResult;
+import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
+import com.frostwire.search.SearchError;
+import com.frostwire.search.SearchListener;
+import com.frostwire.search.SearchManager;
+import com.frostwire.search.SearchPerformer;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
 
 import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author gubatron

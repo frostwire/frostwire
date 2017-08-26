@@ -22,6 +22,7 @@ package com.frostwire.android.gui.dialogs;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Context;
+
 import com.frostwire.android.gui.transfers.TorrentFetcherListener;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.util.Logger;

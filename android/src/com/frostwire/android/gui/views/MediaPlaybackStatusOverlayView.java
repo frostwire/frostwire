@@ -25,7 +25,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * @author aldenml

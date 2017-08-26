@@ -18,14 +18,14 @@
 
 package com.frostwire.android.gui.views;
 
-import java.lang.ref.WeakReference;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * 

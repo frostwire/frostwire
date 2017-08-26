@@ -18,12 +18,12 @@
 
 package com.frostwire.android.core.player;
 
+import com.frostwire.android.core.FileDescriptor;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.frostwire.android.core.FileDescriptor;
 
 /**
  * Playlist based on a given list of file descriptors.

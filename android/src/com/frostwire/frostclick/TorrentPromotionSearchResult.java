@@ -21,6 +21,7 @@ package com.frostwire.frostclick;
 import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.torrent.TorrentSearchResult;
+
 import org.apache.commons.io.FilenameUtils;
 
 /**

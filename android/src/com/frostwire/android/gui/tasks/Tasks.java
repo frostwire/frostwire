@@ -20,6 +20,7 @@ package com.frostwire.android.gui.tasks;
 
 import android.os.AsyncTask;
 import android.os.Build;
+
 import com.frostwire.util.Logger;
 
 /**

@@ -20,7 +20,12 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import com.android.vending.billing.*;
+
+import com.android.vending.billing.IabHelper;
+import com.android.vending.billing.IabResult;
+import com.android.vending.billing.Inventory;
+import com.android.vending.billing.Purchase;
+import com.android.vending.billing.SkuDetails;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;

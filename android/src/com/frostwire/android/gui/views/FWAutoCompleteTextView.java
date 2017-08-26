@@ -1,10 +1,10 @@
 package com.frostwire.android.gui.views;
 
-import com.frostwire.android.gui.util.UIUtils;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.AutoCompleteTextView;
+
+import com.frostwire.android.gui.util.UIUtils;
 
 public class FWAutoCompleteTextView extends AutoCompleteTextView {
     private boolean showKeyboardOnPaste;

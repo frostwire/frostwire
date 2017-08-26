@@ -21,6 +21,7 @@ package com.frostwire.android.gui.adapters.menu;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;

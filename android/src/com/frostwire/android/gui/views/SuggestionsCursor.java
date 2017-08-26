@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import android.database.AbstractCursor;
+
 import org.json.JSONArray;
 
 /**

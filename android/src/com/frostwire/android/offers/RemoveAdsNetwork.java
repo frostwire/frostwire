@@ -18,8 +18,8 @@
 package com.frostwire.android.offers;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;

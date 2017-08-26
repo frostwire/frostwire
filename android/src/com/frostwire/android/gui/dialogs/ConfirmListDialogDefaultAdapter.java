@@ -27,6 +27,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode;
 import com.frostwire.android.gui.util.UIUtils;

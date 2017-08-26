@@ -19,6 +19,7 @@
 package com.frostwire.android;
 
 import android.app.Application;
+
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.platform.SystemPaths;

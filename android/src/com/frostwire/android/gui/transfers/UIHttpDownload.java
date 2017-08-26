@@ -18,12 +18,11 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.net.Uri;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.transfers.HttpDownload;
+
 import org.apache.commons.io.FilenameUtils;
 
 /**
