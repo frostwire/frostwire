@@ -124,7 +124,7 @@ public class SearchHeaderBanner extends LinearLayout {
         boolean screenTallEnough = UIUtils.getScreenInches(activity) >= 4.33;
         boolean isPortrait = UIUtils.isPortrait(activity);
         boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
-        boolean bannerVisible = !adsDisabled && screenTallEnough && isPortrait && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
+        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || (!isPortrait && UIUtils.isTablet(activity))) && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
         if (!bannerVisible) {
             LOG.info("updateComponents() not eligible for search banner display. adsDisabled=" + adsDisabled +
                     ", screenTallEnough=" + screenTallEnough +
