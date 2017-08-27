@@ -95,7 +95,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_album_art_banner_threshold";
     public static final String PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_preview_banner_threshold";
     public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_search_header_banner_threshold";
-    public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS = "frostwire.prefs.gui.mopub_search_header_banner_dismiss_interval_in_ms";
+    public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS = "frostwire.prefs.gui.mopub_search_header_banner_dismiss_interval_in_ms_int";
     public static final String PREF_KEY_GUI_OGURY_THRESHOLD = "frostwire.prefs.gui.ogury_threshold";
     public static final String PREF_KEY_GUI_OGURY_KILL_ON_EXIT = "frostwire.prefs.gui.ogury_kill_on_exit";
 
