@@ -391,7 +391,7 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD, update.config.mopubAlbumArtBannerThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD, update.config.mopubPreviewBannerThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, update.config.mopubSearchHeaderBannerThreshold);
-        CM.setLong(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, update.config.mopubSearchHeaderBannerIntervalInMs);
+        CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, update.config.mopubSearchHeaderBannerIntervalInMs);
 
         CM.setInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD, update.config.oguryThreshold);
         CM.setBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT, update.config.oguryKillOnExit);
@@ -497,7 +497,7 @@ public final class SoftwareUpdater {
         int uxMinEntries = 10;
         int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
-        long mopubSearchHeaderBannerIntervalInMs = 300000L; // 5 mins
+        int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
     }
 
     public void removeConfigurationUpdateListener(Object slideMenuFragment) {

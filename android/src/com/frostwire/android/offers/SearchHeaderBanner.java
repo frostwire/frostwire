@@ -123,12 +123,14 @@ public class SearchHeaderBanner extends LinearLayout {
         // check how long getting display metrics twice is, if expensive gotta refactor these methods
         boolean screenTallEnough = UIUtils.getScreenInches(activity) >= 4.33;
         boolean isPortrait = UIUtils.isPortrait(activity);
+        boolean isTablet = UIUtils.isTablet(activity);
         boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
-        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || (!isPortrait && UIUtils.isTablet(activity))) && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
+        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || isTablet) && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
         if (!bannerVisible) {
             LOG.info("updateComponents() not eligible for search banner display. adsDisabled=" + adsDisabled +
                     ", screenTallEnough=" + screenTallEnough +
                     ", isPortrait=" + isPortrait +
+                    ", isTablet=" + isTablet +
                     ", diceRollPassed=" + diceRollPassed +
                     ", tooEarlyToDisplay=" + moPubBannerListener.tooEarlyToDisplay());
             setBannerViewVisibility(BannerType.ALL, false);
@@ -222,15 +224,15 @@ public class SearchHeaderBanner extends LinearLayout {
     private static final class HeaderBannerListener implements MoPubView.BannerAdListener {
         private final WeakReference<SearchHeaderBanner> searchHeaderBannerRef;
         private long lastDismissed = 0L;
-        private final long dismissInterval;
+        private final int dismissIntervalInMs;
 
         HeaderBannerListener(SearchHeaderBanner searchFragment) {
             searchHeaderBannerRef = Ref.weak(searchFragment);
-            dismissInterval = ConfigurationManager.instance().getLong(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS);
+            dismissIntervalInMs = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS);
         }
 
         public boolean tooEarlyToDisplay() {
-            return (System.currentTimeMillis() - lastDismissed) < dismissInterval;
+            return (System.currentTimeMillis() - lastDismissed) < dismissIntervalInMs;
         }
 
         public void onBannerDismissed(BannerType bannerType) {
@@ -267,7 +269,7 @@ public class SearchHeaderBanner extends LinearLayout {
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed");
             long timeSinceDismissal = System.currentTimeMillis() - lastDismissed;
-            if (timeSinceDismissal < dismissInterval) {
+            if (timeSinceDismissal < dismissIntervalInMs) {
                 LOG.info("onBannerFailed() fallback loading aborted, too early after dismissal");
                 return;
             }
