@@ -303,7 +303,7 @@ public final class TransferManager {
 
     public void pauseTorrents() {
         for (BittorrentDownload d : bittorrentDownloads) {
-            if (!d.isSeeding() && d.isDownloading()) {
+            if (!d.isSeeding()) {
                 d.pause();
             }
         }
