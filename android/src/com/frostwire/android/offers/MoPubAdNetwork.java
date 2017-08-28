@@ -51,13 +51,12 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         if (abortInitialize(activity)) {
             return;
         }
-        initPlacementMappings(activity);
+        initPlacementMappings(UIUtils.isTablet(activity.getResources()));
         start();
         loadNewInterstitial(activity);
     }
 
-    private void initPlacementMappings(Activity activity) {
-        boolean isTablet = UIUtils.isTablet(activity);
+    private void initPlacementMappings(boolean isTablet) {
         placements = new HashMap<>();
 
         if (!isTablet) {

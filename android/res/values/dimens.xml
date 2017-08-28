@@ -19,6 +19,8 @@
  */
 -->
 <resources>
+    <bool name="isTablet">false</bool>
+
     <dimen name="mainmenu_width">250dp</dimen>
     <dimen name="mainmenu_shadow_width">15dp</dimen>
     

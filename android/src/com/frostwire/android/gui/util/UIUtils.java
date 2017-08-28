@@ -552,8 +552,8 @@ public final class UIUtils {
         return Math.sqrt(x_sq + y_sq);
     }
 
-    public static boolean isTablet(Activity activity) {
-        return getScreenInches(activity) >= 6.5;
+    public static boolean isTablet(Resources res) {
+        return res.getBoolean(R.bool.isTablet);
     }
 
     public static boolean isPortrait(Activity activity) {
