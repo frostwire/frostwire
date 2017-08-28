@@ -145,7 +145,7 @@ public abstract class BaseHttpDownload implements Transfer {
 
     @Override
     public boolean isSeeding() {
-        return state == TransferState.SEEDING;
+        return false;
     }
 
     @Override
