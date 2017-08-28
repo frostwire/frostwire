@@ -272,19 +272,26 @@ public class OKHTTPClient extends AbstractHttpClient {
         searchClient.dispatcher(new Dispatcher(pool));
         searchClient.connectionPool(CONNECTION_POOL);
         searchClient.followRedirects(true);
-        searchClient.followSslRedirects(true);
-        searchClient.hostnameVerifier(Ssl.nullHostnameVerifier());
-        searchClient.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
-        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
-        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
-        searchClient.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
+        searchClient = configNullSsl(searchClient);
 
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);
         return searchClient;
+    }
+
+    public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
+        b.followSslRedirects(true);
+        b.hostnameVerifier(Ssl.nullHostnameVerifier());
+        b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
+
+        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
+        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
+        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
+        b.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
+
+        return b;
     }
 
     private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
