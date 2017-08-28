@@ -18,6 +18,7 @@
 package com.frostwire.util.http;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import okhttp3.*;
@@ -26,8 +27,6 @@ import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -274,12 +273,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         searchClient.connectionPool(CONNECTION_POOL);
         searchClient.followRedirects(true);
         searchClient.followSslRedirects(true);
-        searchClient.hostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
+        searchClient.hostnameVerifier(Ssl.nullHostnameVerifier());
         searchClient.sslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY, new AllX509TrustManager());
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 

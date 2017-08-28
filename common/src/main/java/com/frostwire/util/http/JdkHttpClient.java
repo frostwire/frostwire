@@ -18,10 +18,9 @@
 package com.frostwire.util.http;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ssl;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -397,12 +396,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
     }
 
     private void setHostnameVerifier(HttpsURLConnection conn) {
-        conn.setHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
+        conn.setHostnameVerifier(Ssl.nullHostnameVerifier());
         setSSLSocketFactory(conn);
     }
 
