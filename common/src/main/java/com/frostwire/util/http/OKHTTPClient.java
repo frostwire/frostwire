@@ -274,7 +274,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         searchClient.followRedirects(true);
         searchClient.followSslRedirects(true);
         searchClient.hostnameVerifier(Ssl.nullHostnameVerifier());
-        searchClient.sslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY, Ssl.nullTrustManager());
+        searchClient.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
 
         ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);

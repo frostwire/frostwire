@@ -40,7 +40,6 @@ public abstract class AbstractHttpClient implements HttpClient {
     private static final Logger LOG = Logger.getLogger(AbstractHttpClient.class);
     protected static final int DEFAULT_TIMEOUT = 10000;
     protected static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
-    protected static final SSLSocketFactory CUSTOM_SSL_SOCKET_FACTORY = createCustomSSLSocketFactory();
     protected HttpClientListener listener;
     protected boolean canceled = false;
 
@@ -205,19 +204,6 @@ public abstract class AbstractHttpClient implements HttpClient {
         } catch (IOException ioe) {
             // ignore
         }
-    }
-
-    protected static SSLSocketFactory createCustomSSLSocketFactory() {
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{Ssl.nullTrustManager()}, new SecureRandom());
-            SSLSocketFactory d = sc.getSocketFactory();
-            return new WrapSSLSocketFactory(d);
-        } catch (Throwable e) {
-            LOG.error("Unable to create custom SSL socket factory", e);
-        }
-
-        return null;
     }
 
     protected static void copyMultiMap(Map<String, List<String>> origin, Map<String, List<String>> destination) {

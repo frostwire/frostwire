@@ -17,9 +17,11 @@
 
 package com.frostwire.util;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 /**
@@ -32,6 +34,8 @@ public final class Ssl {
 
     private static final HostnameVerifier NULL_HOSTNAME_VERIFIER = new NullHostnameVerifier();
     private static final X509TrustManager NULL_TRUST_MANAGER = new NullTrustManager();
+
+    private static final SSLSocketFactory NULL_SOCKET_FACTORY = buildNullSSLSocketFactory();
 
     private Ssl() {
     }
@@ -60,6 +64,29 @@ public final class Ssl {
         return NULL_TRUST_MANAGER;
     }
 
+    /**
+     * Returns a SSLSocketFactory instance that simply accepts all certificates
+     * as valid.
+     * <p>
+     * The instance returned is always the same and it's thread safe.
+     *
+     * @return the hostname verifier.
+     */
+    public static SSLSocketFactory nullSocketFactory() {
+        return NULL_SOCKET_FACTORY;
+    }
+
+    private static SSLSocketFactory buildNullSSLSocketFactory() {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{nullTrustManager()}, new SecureRandom());
+            SSLSocketFactory d = sc.getSocketFactory();
+            return new WrapSSLSocketFactory(d);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static final class NullHostnameVerifier implements HostnameVerifier {
 
         @Override
@@ -78,6 +105,54 @@ public final class Ssl {
         }
 
         public void checkServerTrusted(X509Certificate[] certs, String authType) {
+        }
+    }
+
+    /**
+     * This class is a trivial wrapper of a real SSLSocketFactory as a
+     * workaround to a bug in android
+     */
+    private static final class WrapSSLSocketFactory extends SSLSocketFactory {
+
+        private final SSLSocketFactory d;
+
+        WrapSSLSocketFactory(SSLSocketFactory d) {
+            this.d = d;
+        }
+
+        @Override
+        public Socket createSocket(String s, int i) throws IOException {
+            return d.createSocket(s, i);
+        }
+
+        @Override
+        public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) throws IOException {
+            return d.createSocket(s, i, inetAddress, i1);
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+            return d.createSocket(inetAddress, i);
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) throws IOException {
+            return d.createSocket(inetAddress, i, inetAddress1, i1);
+        }
+
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return d.getDefaultCipherSuites();
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return d.getSupportedCipherSuites();
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String s, int i, boolean b) throws IOException {
+            return d.createSocket(socket, s, i, b);
         }
     }
 }
