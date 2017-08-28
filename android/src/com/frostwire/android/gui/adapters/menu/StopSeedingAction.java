@@ -35,7 +35,7 @@ import com.frostwire.util.Logger;
  * @author gubatron
  * @author aldenml
  */
-public class StopSeedingAction extends MenuAction implements AbstractDialog.OnDialogClickListener {
+public class StopSeedingAction extends MenuAction {
     private static final Logger LOG = Logger.getLogger(StopSeedingAction.class);
     private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
@@ -75,9 +75,4 @@ public class StopSeedingAction extends MenuAction implements AbstractDialog.OnDi
             LOG.warn("stopSeedingBTDownload() could not find torrentHandle for existing torrent.");
         }
     }
-
-    @Override
-    public void onDialogClick(String tag, int which) {
-
     }
-}
