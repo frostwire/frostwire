@@ -130,7 +130,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isSeeding() {
-        return th.isValid() && th.status().isSeeding() && !isPaused();
+        return th.isValid() && th.status().isSeeding();
     }
 
     public boolean isFinished() {
@@ -241,7 +241,7 @@ public final class BTDownload implements BittorrentDownload {
 
     @Override
     public boolean isComplete() {
-        return getProgress() == 100 && !isSeeding();
+        return getProgress() == 100;
     }
 
     public long getBytesReceived() {
