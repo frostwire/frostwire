@@ -82,11 +82,6 @@ public class YouTubeDownload extends BaseHttpDownload {
     }
 
     @Override
-    public boolean isSeeding() {
-        return false;
-    }
-
-    @Override
     protected void onHttpComplete() throws Throwable {
         boolean callSuper = true;
         if (downloadType == DownloadType.DASH) {

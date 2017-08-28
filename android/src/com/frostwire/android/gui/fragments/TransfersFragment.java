@@ -64,6 +64,7 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
@@ -577,22 +578,30 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         switch (status) { // replace this filter by a more functional style
             case DOWNLOADING:
                 while (it.hasNext()) {
-                    if (it.next().isComplete() || it.next().isSeeding()) {
+                    Transfer transfer = it.next();
+                    boolean isTorrent = transfer instanceof BTDownload;
+                    if (isTorrent && ((BTDownload) transfer).isSeeding()) {
+                        it.remove();
+                    } else if (transfer.isComplete()) {
                         it.remove();
                     }
                 }
                 return transfers;
-            //HERE
             case SEEDING:
                 while (it.hasNext()) {
-                    if (!it.next().isSeeding()) {
+                    Transfer transfer = it.next();
+                    boolean isTorrent = transfer instanceof BTDownload;
+                    if (!isTorrent || !((BTDownload) transfer).isSeeding()) {
                         it.remove();
                     }
                 }
                 return transfers;
             case COMPLETED:
                 while (it.hasNext()) {
-                    if (!it.next().isComplete()) {
+                    Transfer transfer = it.next();
+                    boolean isTorrent = transfer instanceof BTDownload;
+                    if ((!isTorrent  && !transfer.isComplete()) ||
+                        (isTorrent && ((BTDownload) transfer).isSeeding())) {
                         it.remove();
                     }
                 }
@@ -600,6 +609,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             default:
                 return transfers;
         }
+
     }
 
     private boolean someTransfersInactive(List<Transfer> transfers) {

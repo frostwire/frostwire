@@ -100,11 +100,6 @@ public class InvalidDownload implements Transfer, InvalidTransfer {
     }
 
     @Override
-    public boolean isSeeding() {
-        return false;
-    }
-
-    @Override
     public boolean isDownloading() {
         return false;
     }
