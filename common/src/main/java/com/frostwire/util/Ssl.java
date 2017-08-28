@@ -19,6 +19,8 @@ package com.frostwire.util;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 
 /**
  * Util class to provide SSL/TLS specific features.
@@ -29,12 +31,16 @@ import javax.net.ssl.SSLSession;
 public final class Ssl {
 
     private static final HostnameVerifier NULL_HOSTNAME_VERIFIER = new NullHostnameVerifier();
+    private static final X509TrustManager NULL_TRUST_MANAGER = new NullTrustManager();
 
     private Ssl() {
     }
 
     /**
-     * Returns a hostname verifier instance that simply accepts all hostnames as valid.
+     * Returns a hostname verifier instance that simply accepts all hostnames
+     * as valid.
+     * <p>
+     * The instance returned is always the same and it's thread safe.
      *
      * @return the hostname verifier.
      */
@@ -42,11 +48,36 @@ public final class Ssl {
         return NULL_HOSTNAME_VERIFIER;
     }
 
+    /**
+     * Returns a X509TrustManager instance that simply accepts all certificates
+     * as valid.
+     * <p>
+     * The instance returned is always the same and it's thread safe.
+     *
+     * @return the hostname verifier.
+     */
+    public static X509TrustManager nullTrustManager() {
+        return NULL_TRUST_MANAGER;
+    }
+
     private static final class NullHostnameVerifier implements HostnameVerifier {
 
         @Override
         public boolean verify(String s, SSLSession sslSession) {
             return true;
+        }
+    }
+
+    private static final class NullTrustManager implements X509TrustManager {
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+        }
+
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
         }
     }
 }

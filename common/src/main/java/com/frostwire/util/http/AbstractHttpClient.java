@@ -18,6 +18,7 @@
 package com.frostwire.util.http;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ssl;
 import com.frostwire.util.UserAgentGenerator;
 
 import javax.net.ssl.SSLContext;
@@ -209,7 +210,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     protected static SSLSocketFactory createCustomSSLSocketFactory() {
         try {
             SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
+            sc.init(null, new TrustManager[]{Ssl.nullTrustManager()}, new SecureRandom());
             SSLSocketFactory d = sc.getSocketFactory();
             return new WrapSSLSocketFactory(d);
         } catch (Throwable e) {
