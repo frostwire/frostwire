@@ -156,6 +156,7 @@ public final class ImageLoader {
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 memoryCache(cache).
+                downloader(new ImageLoaderDownloader(context.getApplicationContext())).
                 executor(threadPool);
         if (DEBUG_ERRORS) {
             picassoBuilder.listener(new Picasso.Listener() {
