@@ -2,7 +2,8 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,70 +22,85 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rich_notification_background"
-    android:gravity="center_vertical|left"
-    android:orientation="horizontal"
-    android:paddingBottom="12dp"
-    android:paddingLeft="12dp"
-    android:paddingRight="18dp"
-    android:paddingTop="12dp">
-
-    <ImageView
-        android:id="@+id/view_rich_notification_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_marginRight="12dp"
-        android:scaleType="fitCenter" />
+    android:background="@color/app_rich_notification_background"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1.0"
         android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:paddingBottom="10dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="12dp">
 
-        <TextView
-            android:id="@+id/view_rich_notification_title"
-            style="@style/RichNotificationTitle"
+        <ImageView
+            android:id="@+id/view_rich_notification_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="@string/dummy_title" />
-
-        <TextView
-            android:id="@+id/view_rich_notification_description"
-            style="@style/RichNotificationDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="@string/dummy_content_description" />
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter" />
 
         <LinearLayout
-            android:id="@+id/view_rich_notification_action_links"
-            android:layout_width="fill_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical|right"
-            android:orientation="horizontal">
+            android:layout_marginEnd="12dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical|start"
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/view_rich_notification_title"
+                style="@style/RichNotificationTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="@string/dummy_extra"
-                android:textAppearance="@android:style/TextAppearance.Small"
-                android:textColor="@color/basic_blue"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:text="@string/dummy_title" />
+
+            <TextView
+                android:id="@+id/view_rich_notification_description"
+                style="@style/RichNotificationDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dummy_extra" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/view_rich_notification_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:src="@drawable/keyword_tag_close_clear_cancel_full"
+            android:tint="@color/basic_gray_text_dark" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/view_rich_notification_close_button"
-        style="@style/RichNotificationButtonText"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/view_rich_notification_action_links"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:text="@android:string/ok" />
+        android:gravity="center_vertical|end"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp"
+        android:paddingEnd="12dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingStart="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/dummy_extra"
+            android:textAppearance="@android:style/TextAppearance.Small"
+            android:textColor="@color/basic_blue"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>

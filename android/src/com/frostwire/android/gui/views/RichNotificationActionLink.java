@@ -66,7 +66,7 @@ public class RichNotificationActionLink {
             tv.setText(text);
             tv.setTextColor(contextReference.get().getResources().getColor(R.color.basic_blue));
             tv.setOnClickListener(getClickAdapter());
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14.0f);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15.0f);
             result = tv;
         }
 
