@@ -340,13 +340,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new OpenMenuAction(context.get(), path, mimeType));
         }
 
-//        LOG.info("download.isComplete(): " + download.isComplete());
-//        LOG.info("download.isDownloading(): " + download.isDownloading());
-//        LOG.info("download.isFinished(): " + download.isFinished());
-//        LOG.info("download.isPaused(): " + download.isPaused());
-//        LOG.info("download.isSeeding(): " + download.isSeeding());
-
-
         if (!download.isComplete() && !download.isSeeding()) {
             if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
@@ -363,11 +356,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        if ((download.isFinished() || download.isSeeding()) && (download.isPaused())) {
+        if (download.getState() == TransferState.FINISHED) {
             items.add(new SeedAction(context.get(), download));
         }
 
-        if (download.isSeeding()) {
+        if (download.getState() == TransferState.SEEDING) {
             items.add(new StopSeedingAction(context.get(), download));
         }
 

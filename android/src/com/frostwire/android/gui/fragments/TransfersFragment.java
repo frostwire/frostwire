@@ -76,9 +76,9 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -572,59 +572,43 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
-        Iterator<Transfer> it;
-        it = transfers.iterator();
-        switch (status) { // replace this filter by a more functional style
-            case DOWNLOADING:
-                while (it.hasNext()) {
-                    Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BittorrentDownload;
-                    if (isTorrent && ((BittorrentDownload) transfer).isSeeding()) {
-                        it.remove();
-                    } else if (transfer.isComplete()) {
-                        it.remove();
-                    }
-                }
-                return transfers;
-            case SEEDING:
-                while (it.hasNext()) {
-                    Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BittorrentDownload;
-                    if (!isTorrent ||
-                        !transfer.isComplete() || // incomplete are seeding the pieces they have
-                        (!isTorrent && transfer.isComplete())) // complete http transfers
-                    {
-                        it.remove();
-                    } else {
-                        BittorrentDownload torrentTransfer = (BittorrentDownload) transfer;
-                        // Finished = seeding + complete + paused
-                        if (torrentTransfer.isSeeding() &&
-                            torrentTransfer.isComplete() &&
-                            torrentTransfer.isPaused()) {
-                            it.remove();
-                        }
-                    }
-                }
-                return transfers;
-            case COMPLETED:
-                while (it.hasNext()) {
-                    Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BittorrentDownload;
-                    if (!isTorrent && !transfer.isComplete()) {
-                        it.remove();
-                    } else if (isTorrent) {
-                        BittorrentDownload torrentTransfer = (BittorrentDownload) transfer;
-                        if (!torrentTransfer.isComplete() ||
-                            (torrentTransfer.isComplete() && !torrentTransfer.isPaused())) {
-                            it.remove();
-                        }
-                    }
-                }
-                return transfers;
-            default:
-                return transfers;
+        if (status == TransferStatus.ALL) {
+            return transfers;
         }
 
+        ArrayList<Transfer> filtered = new ArrayList<>(0);
+        for (Transfer transfer : transfers) {
+            if ( (status == TransferStatus.DOWNLOADING && isDownloading(transfer)) ||
+                 (status == TransferStatus.SEEDING && isSeeding(transfer) ||
+                 (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
+                filtered.add(transfer);
+            }
+        }
+        return filtered;
+    }
+
+    private boolean isDownloading(Transfer transfer) {
+        TransferState state = transfer.getState();
+        return state == TransferState.CHECKING ||
+               state == TransferState.DOWNLOADING ||
+               state == TransferState.DEMUXING ||
+               state == TransferState.ALLOCATING ||
+               state == TransferState.DOWNLOADING ||
+               state == TransferState.DOWNLOADING_METADATA ||
+               state == TransferState.DOWNLOADING_TORRENT ||
+               state == TransferState.FINISHING ||
+               state == TransferState.PAUSING ||
+               state == TransferState.PAUSED;
+    }
+
+    private boolean isSeeding(Transfer transfer) {
+        return transfer.getState() == TransferState.SEEDING;
+    }
+
+    private boolean isCompleted(Transfer transfer) {
+        TransferState state = transfer.getState();
+        return state == TransferState.FINISHED ||
+               state == TransferState.COMPLETE;
     }
 
     private boolean someTransfersInactive(List<Transfer> transfers) {
