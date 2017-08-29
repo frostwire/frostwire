@@ -90,7 +90,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
                             //if the failed request is still fresh we stop
                             //LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
-                            onResults(Collections.EMPTY_LIST);
+                            onResults(Collections.<SearchResult>emptyList());
                             return;
                         } else {
                             cacheRemove("failed:" + url);

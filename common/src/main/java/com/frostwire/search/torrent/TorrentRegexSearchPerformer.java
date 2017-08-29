@@ -81,6 +81,9 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
         } else {
             String unreducedHtml = new String(data, "UTF-8");
+            if (!isValidHtml(unreducedHtml)) {
+                return list;
+            }
             String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));
 
             if (html != null) {
@@ -105,6 +108,19 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
         }
 
         return list;
+    }
+
+    /**
+     * Give the opportunity to an implementor to specify if the unreduced HTML
+     * that is about to be crawled is a valid one, and not report errors when
+     * there is none.
+     *
+     * @param html the unreduced html
+     * @return {@code true} is valid and allowed to be processed, {@code false}
+     * otherwise.
+     */
+    protected boolean isValidHtml(String html) {
+        return true;
     }
 
     /**

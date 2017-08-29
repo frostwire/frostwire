@@ -59,6 +59,14 @@ public final class MonovaSearchPerformer extends TorrentRegexSearchPerformer<Mon
     }
 
     @Override
+    protected boolean isValidHtml(String html) {
+        if (html.contains("Torrent Removed")) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
         return page.indexOf("<div class=\"nav-wrapper\">");
     }
