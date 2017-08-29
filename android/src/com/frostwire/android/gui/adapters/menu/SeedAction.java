@@ -48,8 +48,10 @@ import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -78,19 +80,41 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
     }
 
-    // Reminder: Currently disabled when using SD Card.
+    /**
+     * Seeds a file that's not a torrent yet.
+     * Reminder: Currently disabled when using SD Card.
+     */
     SeedAction(Context context, FileDescriptor fd) {
         this(context, fd, null, null);
     }
 
-    // Reminder: Currently disabled when using SD Card.
+    /**
+     * Seeds a file that's not a torrent yet but was an existing transfer. Pass the transfer
+     * object so we're able to replace it with the new BittorrentDownload that will be created
+     * <p>
+     * Reminder: Currently disabled when using SD Card.
+     *
+     * @param context
+     * @param fd
+     * @param transferToClear
+     */
     public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
         this(context, fd, null, transferToClear);
     }
 
-    // This one is not disabled as it's meant for existing torrent transfers.
+    /**
+     * Seed an existing torrent transfer that's finished and paused.
+     * It's not disabled since it exists for existing torrent transfers.
+     *
+     * @param context
+     * @param download
+     */
     public SeedAction(Context context, BittorrentDownload download) {
         this(context, null, download, null);
+    }
+
+    public SeedAction(Context context) {
+        this(context, null, null, null);
     }
 
     @Override
@@ -105,13 +129,11 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         // we've added the TorrentInfo to the session.
         // Note: Let's try Merkle torrents to keep them small and use less
         // storage on the android device.
-
         // if BitTorrent is turned off
         if (TransferManager.instance().isBittorrentDisconnected()) {
             showBittorrentDisconnectedDialog();
             return;
         }
-
         // in case user seeds only on wifi and there's no wifi, we let them know what will occur.
         if (seedingOnlyOnWifiButNoWifi()) {
             showNoWifiInformationDialog();
@@ -119,7 +141,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         } else if (TransferManager.instance().isMobileAndDataSavingsOn()) {
             showMobileDataProtectionInformationDialog();
         }
-
         // 1. If Seeding is turned off let's ask the user if they want to
         //    turn seeding on, or else cancel this.
         if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
@@ -168,7 +189,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 onSeedingEnabled();
             }
         }
-
         if (tag.equals(DLG_TURN_BITTORRENT_BACK_ON)) {
             if (which == Dialog.BUTTON_NEGATIVE) {
                 UIUtils.showLongMessage(getContext(),
@@ -188,12 +208,13 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
 
     private void seedEm() {
         if (!TransferManager.instance().isMobileAndDataSavingsOn()) {
-            if (fd != null) {
+            if (fd == null && btDownload == null) {
+                TransferManager.instance().seedFinishedTransfers();
+            } else if (fd != null && btDownload == null) {
                 seedFileDescriptor(fd);
-            } else if (btDownload != null) {
+            } else if (btDownload != null && fd == null) {
                 seedBTDownload();
             }
-
             if (transferToClear != null) {
                 TransferManager.instance().remove(transferToClear);
             }
@@ -249,13 +270,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
                 ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
                 ct.set_priv(false);
-
                 final error_code ec = new error_code();
                 libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
-
                 final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
                 final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
-
                 // so the TorrentHandle object is created and added to the libtorrent session.
                 BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
             } catch (Throwable e) {
@@ -271,38 +289,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         UIUtils.showTransfersOnDownloadStart(getContext());
     }
 
-    /**
-    private static final class OnBitorrentConnectRunnable implements Runnable {
-        private WeakReference<SeedAction> seedActionRef;
-
-        OnBitorrentConnectRunnable(SeedAction seedAction) {
-            seedActionRef = Ref.weak(seedAction);
-        }
-
-        public void run() {
-            Engine.instance().startServices();
-            while (!Engine.instance().isStarted()) {
-                SystemClock.sleep(1000);
-            }
-            if (!Ref.alive(seedActionRef)) {
-                return;
-            }
-            final SeedAction seedAction = seedActionRef.get();
-            final Looper mainLooper = seedAction.getContext().getMainLooper();
-            Handler h = new Handler(mainLooper);
-            h.post(new Runnable() {
-                @Override
-                public void run() {
-                    seedAction.onClick(seedAction.getContext());
-                }
-            });
-        }
-    }
-     */
-
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
     @SuppressWarnings("WeakerAccess")
-    public static final class ShowNoWifiInformationDialog extends AbstractDialog {
+    public final static class ShowNoWifiInformationDialog extends AbstractDialog {
 
         public static ShowNoWifiInformationDialog newInstance() {
             return new ShowNoWifiInformationDialog();
@@ -320,14 +309,13 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             title.setText(R.string.wifi_network_unavailable);
             TextView text = findView(dlg, R.id.dialog_default_info_text);
             text.setText(R.string.according_to_settings_i_cant_seed_unless_wifi);
-
             Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
             okButton.setText(android.R.string.ok);
             okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
         }
     }
 
-    public static class ShowMobileDataProtectionInformationDialog extends AbstractDialog {
+    public final static class ShowMobileDataProtectionInformationDialog extends AbstractDialog {
 
         public static ShowMobileDataProtectionInformationDialog newInstance() {
             return new ShowMobileDataProtectionInformationDialog();
@@ -345,23 +333,24 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             title.setText(R.string.mobile_data_saving);
             TextView text = findView(dlg, R.id.dialog_default_info_text);
             text.setText(R.string.according_to_settings_i_cant_seed_due_to_data_savings);
-
             Button okButton = findView(dlg, R.id.dialog_default_info_button_ok);
             okButton.setText(android.R.string.ok);
             okButton.setOnClickListener(new OkButtonOnClickListener(dlg));
         }
     }
 
-    private static class OkButtonOnClickListener implements View.OnClickListener {
-        private final Dialog newNoWifiInformationDialog;
+    private final static class OkButtonOnClickListener implements View.OnClickListener {
+        private final WeakReference<Dialog> newNoWifiInformationDialogRef;
 
         OkButtonOnClickListener(Dialog newNoWifiInformationDialog) {
-            this.newNoWifiInformationDialog = newNoWifiInformationDialog;
+            this.newNoWifiInformationDialogRef = Ref.weak(newNoWifiInformationDialog);
         }
 
         @Override
         public void onClick(View view) {
-            newNoWifiInformationDialog.dismiss();
+            if (Ref.alive(newNoWifiInformationDialogRef)) {
+                newNoWifiInformationDialogRef.get().dismiss();
+            }
         }
     }
 }

@@ -48,6 +48,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
+import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.fragments.preference.TorrentFragment;
@@ -220,11 +221,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 }
                 return true;
             case R.id.fragment_transfers_menu_seed_all:
-                if (bittorrentDisconnected) {
-                    UIUtils.showLongMessage(getActivity(), R.string.cant_seed_torrent_transfers);
-                } else {
-                    TransferManager.instance().seedFinishedTransfers();
-                }
+                new SeedAction(getActivity()).onClick();
                 return true;
             case R.id.fragment_transfers_menu_stop_seeding_all:
                 TransferManager.instance().stopSeedingTorrents();
