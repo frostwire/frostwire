@@ -75,5 +75,5 @@ public abstract class MenuAction {
         return result;
     }
 
-    protected abstract void onClick(Context context);
+    public abstract void onClick(Context context);
 }

@@ -28,45 +28,45 @@ import java.util.List;
  */
 public interface Transfer {
 
-    public String getName();
+    String getName();
 
-    public String getDisplayName();
+    String getDisplayName();
 
-    public File getSavePath();
+    File getSavePath();
 
     File previewFile();
 
-    public long getSize();
+    long getSize();
 
-    public Date getCreated();
+    Date getCreated();
 
-    public TransferState getState();
+    TransferState getState();
 
-    public long getBytesReceived();
+    long getBytesReceived();
 
-    public long getBytesSent();
+    long getBytesSent();
 
-    public long getDownloadSpeed();
+    long getDownloadSpeed();
 
-    public long getUploadSpeed();
+    long getUploadSpeed();
 
     boolean isDownloading();
 
     // TODO: add this method in the future
     //boolean isUploading();
 
-    public long getETA();
+    long getETA();
 
     /**
      * [0..100]
      *
      * @return
      */
-    public int getProgress();
+    int getProgress();
 
-    public boolean isComplete();
+    boolean isComplete();
 
-    public List<TransferItem> getItems();
+    List<TransferItem> getItems();
 
     void remove(boolean deleteData);
 }

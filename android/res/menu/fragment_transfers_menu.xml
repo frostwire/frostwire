@@ -44,5 +44,16 @@
         android:orderInCategory="2"
         android:title="@string/transfers_context_resume_all_torrent_transfers"
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/fragment_transfers_menu_seed_all"
+        android:icon="@drawable/contextmenu_icon_seed"
+        android:orderInCategory="3"
+        android:title="@string/transfers_context_seed_all_transfers"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/fragment_transfers_menu_stop_seeding_all"
+        android:icon="@drawable/contextmenu_icon_seed"
+        android:orderInCategory="3"
+        android:title="@string/transfers_context_stop_seeding_all_transfers"
+        app:showAsAction="never" />
 </menu>

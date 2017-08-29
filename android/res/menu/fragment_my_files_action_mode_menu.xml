@@ -30,7 +30,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/fragment_my_files_action_mode_menu_seed"
-        android:icon="@drawable/contextmenu_icon_play_transfer"
+        android:icon="@drawable/contextmenu_icon_seed"
         android:title="@string/seed"
         app:showAsAction="never" />
     <item

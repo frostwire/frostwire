@@ -44,7 +44,7 @@ public class SetAsWallpaperMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(final Context context) {
+    public void onClick(final Context context) {
         if (fd.fileType != Constants.FILE_TYPE_PICTURES) {
             return;
         }

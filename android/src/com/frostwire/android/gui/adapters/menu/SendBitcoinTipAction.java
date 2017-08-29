@@ -47,7 +47,7 @@ public class SendBitcoinTipAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         if (Ref.alive(poRef)) {
             final PaymentOptions paymentOptions = poRef.get();
             final String bitcoinAddress = paymentOptions.bitcoin;

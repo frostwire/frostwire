@@ -76,9 +76,9 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -111,9 +111,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         setHasOptionsMenu(true);
         selectedStatus = TransferStatus.ALL;
         vpnRichToastHandler = new Handler();
-        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.COMPLETED};
+        tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
     }
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -144,6 +143,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
+        menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
+
         updateMenuItemVisibility(menu);
         super.onPrepareOptionsMenu(menu);
     }
@@ -170,11 +172,26 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (someTransfersInactive(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
             }
+
+            if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+            }
+
+            if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            }
+
+            if (someTransfersSeeding(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            }
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
+
         // Handle item selection
         setupAdapter();
         switch (item.getItemId()) {
@@ -191,7 +208,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 TransferManager.instance().pauseTorrents();
                 return true;
             case R.id.fragment_transfers_menu_resume_all:
-                boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
                 if (bittorrentDisconnected) {
                     UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                 } else {
@@ -202,6 +218,16 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
                     }
                 }
+                return true;
+            case R.id.fragment_transfers_menu_seed_all:
+                if (bittorrentDisconnected) {
+                    UIUtils.showLongMessage(getActivity(), R.string.cant_seed_torrent_transfers);
+                } else {
+                    TransferManager.instance().seedFinishedTransfers();
+                }
+                return true;
+            case R.id.fragment_transfers_menu_stop_seeding_all:
+                TransferManager.instance().stopSeedingTorrents();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -241,6 +267,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
             Collections.sort(transfers, transferComparator);
             adapter.updateList(transfers);
+
+            int i=0;
+            for (TransferStatus transferStatus : tabPositionToTransferStatus) {
+                if (transferStatus == selectedStatus) {
+                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    if (!tab.isSelected()) {
+                        tab.select();
+                    }
+                    break;
+                }
+                i++;
+            }
+
         } else if (this.getActivity() != null) {
             setupAdapter();
         }
@@ -479,34 +518,50 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private List<Transfer> filter(List<Transfer> transfers, TransferStatus status) {
-        Iterator<Transfer> it;
-        switch (status) { // replace this filter by a more functional style
-            case DOWNLOADING:
-                it = transfers.iterator();
-                while (it.hasNext()) {
-                    if (it.next().isComplete()) {
-                        it.remove();
-                    }
-                }
-                return transfers;
-            case COMPLETED:
-                it = transfers.iterator();
-                while (it.hasNext()) {
-                    if (!it.next().isComplete()) {
-                        it.remove();
-                    }
-                }
-                return transfers;
-            default:
-                return transfers;
+        if (status == TransferStatus.ALL) {
+            return transfers;
         }
+
+        ArrayList<Transfer> filtered = new ArrayList<>(0);
+        for (Transfer transfer : transfers) {
+            if ( (status == TransferStatus.DOWNLOADING && isDownloading(transfer)) ||
+                 (status == TransferStatus.SEEDING && isSeeding(transfer) ||
+                 (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
+                filtered.add(transfer);
+            }
+        }
+        return filtered;
+    }
+
+    private boolean isDownloading(Transfer transfer) {
+        TransferState state = transfer.getState();
+        return state == TransferState.CHECKING ||
+               state == TransferState.DOWNLOADING ||
+               state == TransferState.DEMUXING ||
+               state == TransferState.ALLOCATING ||
+               state == TransferState.DOWNLOADING ||
+               state == TransferState.DOWNLOADING_METADATA ||
+               state == TransferState.DOWNLOADING_TORRENT ||
+               state == TransferState.FINISHING ||
+               state == TransferState.PAUSING ||
+               state == TransferState.PAUSED;
+    }
+
+    private boolean isSeeding(Transfer transfer) {
+        return transfer.getState() == TransferState.SEEDING;
+    }
+
+    private boolean isCompleted(Transfer transfer) {
+        TransferState state = transfer.getState();
+        return state == TransferState.FINISHED ||
+               state == TransferState.COMPLETE;
     }
 
     private boolean someTransfersInactive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
-                if (TransferManager.isResumable(bt)) {
+                if (TransferManager.isResumable(bt) && !bt.isFinished()) {
                     return true;
                 }
             }
@@ -542,12 +597,20 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return false;
     }
 
+    private boolean someTransfersSeeding(List<Transfer> transfers) {
+        for (Transfer t : transfers) {
+            if (t.getState() == TransferState.SEEDING) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean someTransfersActive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t instanceof BittorrentDownload) {
                 BittorrentDownload bt = (BittorrentDownload) t;
                 if (bt.isDownloading() ||
-                        bt.getState() == TransferState.SEEDING ||
                         bt.getState() == TransferState.DOWNLOADING) {
                     return true;
                 }
@@ -706,7 +769,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     public enum TransferStatus {
-        ALL, DOWNLOADING, COMPLETED
+        ALL, DOWNLOADING, COMPLETED, SEEDING
     }
 
 

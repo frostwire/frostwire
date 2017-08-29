@@ -46,7 +46,7 @@ public class SendFileMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         try {
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType(fd.mime);

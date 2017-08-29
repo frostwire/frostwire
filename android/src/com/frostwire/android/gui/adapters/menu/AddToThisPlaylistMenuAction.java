@@ -45,7 +45,7 @@ public final class AddToThisPlaylistMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         try {
             MusicUtils.addToPlaylist(context, fileDescriptors, playlistId);
         } catch (Throwable e) {

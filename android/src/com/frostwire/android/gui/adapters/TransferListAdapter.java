@@ -49,6 +49,7 @@ import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
+import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
@@ -339,31 +340,28 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             items.add(new OpenMenuAction(context.get(), path, mimeType));
         }
 
-//        LOG.info("download.isComplete(): " + download.isComplete());
-//        LOG.info("download.isDownloading(): " + download.isDownloading());
-//        LOG.info("download.isFinished(): " + download.isFinished());
-//        LOG.info("download.isPaused(): " + download.isPaused());
-//        LOG.info("download.isSeeding(): " + download.isSeeding());
-
-        if (!download.isComplete() || ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS)) {
+        if (!download.isComplete() && !download.isSeeding()) {
             if (!download.isPaused()) {
                 items.add(new PauseDownloadMenuAction(context.get(), download));
             } else {
                 NetworkManager networkManager = NetworkManager.instance();
                 boolean wifiIsUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
                 boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
-                boolean bittorrentOff = Engine.instance().isStopped() || Engine.instance().isDisconnected();
 
                 if (wifiIsUp || bittorrentOnMobileData) {
-                    if (!download.isComplete() && !bittorrentOff) {
+                    if (!download.isComplete()) {
                         items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
                     }
                 }
             }
         }
 
-        if ((download.isFinished() || download.isSeeding()) && (download.isPaused())) {
+        if (download.getState() == TransferState.FINISHED) {
             items.add(new SeedAction(context.get(), download));
+        }
+
+        if (download.getState() == TransferState.SEEDING) {
+            items.add(new StopSeedingAction(context.get(), download));
         }
 
         items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));

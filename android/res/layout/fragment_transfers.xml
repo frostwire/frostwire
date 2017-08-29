@@ -64,9 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/basic_blue"
-        app:tabMaxWidth="0dp"
-        app:tabGravity="fill"
-        app:tabMode="fixed">
+        app:tabMode="scrollable">
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_transfers_tab_all"
@@ -79,6 +77,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_downloading" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/fragment_transfers_tab_seeding"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/transfers_select_seeding" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/fragment_transfers_tab_completed"

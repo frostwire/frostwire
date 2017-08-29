@@ -303,7 +303,9 @@ public final class TransferManager {
 
     public void pauseTorrents() {
         for (BittorrentDownload d : bittorrentDownloads) {
-            d.pause();
+            if (!d.isSeeding()) {
+                d.pause();
+            }
         }
     }
 
@@ -482,7 +484,34 @@ public final class TransferManager {
                         continue;
                     }
 
-                    if (bt.isPaused()) {
+                    if (bt.isPaused() && !bt.isFinished()) {
+                        bt.resume();
+                    }
+                } else if (t instanceof HttpDownload) {
+                    // TODO: review this feature taking care of the SD limitations
+                /*if (t.getName().contains("archive.org")) {
+                    if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
+                        ((HttpDownload) t).start(true);
+                    }
+                }*/
+                }
+            }
+        }
+    }
+
+    public void seedFinishedTransfers() {
+        List<Transfer> transfers = getTransfers();
+
+        if (!isMobileAndDataSavingsOn()) {
+            for (Transfer t : transfers) {
+                if (t instanceof BittorrentDownload) {
+                    BittorrentDownload bt = (BittorrentDownload) t;
+
+                    if (!isResumable(bt)) {
+                        continue;
+                    }
+
+                    if (bt.isFinished()) {
                         bt.resume();
                     }
                 } else if (t instanceof HttpDownload) {
