@@ -267,6 +267,19 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
             Collections.sort(transfers, transferComparator);
             adapter.updateList(transfers);
+
+            int i=0;
+            for (TransferStatus transferStatus : tabPositionToTransferStatus) {
+                if (transferStatus == selectedStatus) {
+                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    if (!tab.isSelected()) {
+                        tab.select();
+                    }
+                    break;
+                }
+                i++;
+            }
+
         } else if (this.getActivity() != null) {
             setupAdapter();
         }
