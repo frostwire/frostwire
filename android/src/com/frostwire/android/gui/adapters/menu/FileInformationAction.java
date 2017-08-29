@@ -53,7 +53,7 @@ public final class FileInformationAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         FileInformationDialog.newInstance(fd).show(((Activity) getContext()).getFragmentManager());
     }
 

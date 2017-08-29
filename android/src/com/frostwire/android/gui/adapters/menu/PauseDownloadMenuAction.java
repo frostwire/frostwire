@@ -41,7 +41,7 @@ public final class PauseDownloadMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         if (!download.isPaused()) {
             download.pause();
             UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);

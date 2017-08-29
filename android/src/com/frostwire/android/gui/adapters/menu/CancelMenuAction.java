@@ -70,7 +70,7 @@ public final class CancelMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(final Context context) {
+    public void onClick(final Context context) {
         CancelMenuActionDialog.newInstance(
                 transfer,
                 deleteData, deleteTorrent, this).

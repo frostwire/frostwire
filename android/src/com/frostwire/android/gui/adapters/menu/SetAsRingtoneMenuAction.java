@@ -41,7 +41,7 @@ public class SetAsRingtoneMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         if (DangerousPermissionsChecker.hasPermissionToWriteSettings(context)) {
             MusicUtils.setRingtone(context, fd.id, fd.fileType);
         } else {

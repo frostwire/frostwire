@@ -21,9 +21,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -51,10 +48,8 @@ import com.frostwire.jlibtorrent.swig.set_piece_hashes_listener;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -70,10 +65,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private final FileDescriptor fd;
     private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
-    private final OnBitorrentConnectRunnable onBitorrentConnectRunnable;
-
-    // TODO: Receive extra metadata that could be put/used in the torrent for
-    // enriched announcement.
+    private final OnBittorrentConnectRunnable onBittorrentConnectRunnable;
 
     private SeedAction(Context context,
                        FileDescriptor fd,
@@ -83,7 +75,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         this.fd = fd;
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
-        this.onBitorrentConnectRunnable = new OnBitorrentConnectRunnable(this);
+        this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
     }
 
     // Reminder: Currently disabled when using SD Card.
@@ -102,7 +94,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         // NOTES.
         // Performance note: (specially when creating a .torrent of a big video)
         // wish we could know in advance if we've already created it
@@ -182,7 +174,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 UIUtils.showLongMessage(getContext(),
                         R.string.the_file_could_not_be_seeded_bittorrent_will_remain_disconnected);
             } else if (which == Dialog.BUTTON_POSITIVE) {
-                onBittorrentConnect();
+                onBittorrentConnectRunnable.onBittorrentConnect(getContext());
             }
         }
     }
@@ -279,20 +271,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         UIUtils.showTransfersOnDownloadStart(getContext());
     }
 
-    private void onBittorrentConnect() {
-
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                !NetworkManager.instance().isTunnelUp()) {
-            if (getContext() instanceof Activity) {
-                UIUtils.showShortMessage(((Activity) getContext()).getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
-            } else {
-                UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
-            }
-        } else {
-            Engine.instance().getThreadPool().execute(onBitorrentConnectRunnable);
-        }
-    }
-
+    /**
     private static final class OnBitorrentConnectRunnable implements Runnable {
         private WeakReference<SeedAction> seedActionRef;
 
@@ -319,6 +298,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             });
         }
     }
+     */
 
     // important to keep class public so it can be instantiated when the dialog is re-created on orientation changes.
     @SuppressWarnings("WeakerAccess")

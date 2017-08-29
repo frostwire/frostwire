@@ -39,7 +39,7 @@ public final class SendFiatTipAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(paypalUrl));

@@ -49,7 +49,7 @@ public class StopSeedingAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         stopSeedingEm();
         UIUtils.showTransfersOnDownloadStart(getContext());
     }
@@ -75,4 +75,4 @@ public class StopSeedingAction extends MenuAction {
             LOG.warn("stopSeedingBTDownload() could not find torrentHandle for existing torrent.");
         }
     }
-    }
+}

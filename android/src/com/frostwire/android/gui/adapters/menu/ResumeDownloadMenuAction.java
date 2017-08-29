@@ -20,16 +20,10 @@ package com.frostwire.android.gui.adapters.menu;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -45,15 +39,18 @@ import com.frostwire.uxstats.UXStats;
 public final class ResumeDownloadMenuAction extends MenuAction implements AbstractDialog.OnDialogClickListener {
 
     private final BittorrentDownload download;
-    private static final String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
+    private final OnBittorrentConnectRunnable onBittorrentConnectRunnable;
+    private static final String DLG_TURN_BITTORRENT_BACK_ON = "0";
+
 
     public ResumeDownloadMenuAction(Context context, BittorrentDownload download, int stringId) {
         super(context, R.drawable.contextmenu_icon_play_transfer, stringId);
         this.download = download;
+        this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
         if (bittorrentDisconnected) {
             showBittorrentDisconnectedDialog();
@@ -77,10 +74,11 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
                 UIUtils.showLongMessage(getContext(),
                         R.string.the_file_could_not_be_seeded_bittorrent_will_remain_disconnected);
             } else if (which == Dialog.BUTTON_POSITIVE) {
-                onBittorrentConnect();
+                onBittorrentConnectRunnable.onBittorrentConnect(getContext());
             }
         }
     }
+
     private void showBittorrentDisconnectedDialog() {
         YesNoDialog dlg = YesNoDialog.newInstance(
                 DLG_TURN_BITTORRENT_BACK_ON,
@@ -89,35 +87,5 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
         dlg.show(((Activity) getContext()).getFragmentManager());
-    }
-
-    private void onBittorrentConnect() {
-
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                !NetworkManager.instance().isTunnelUp()) {
-            if (getContext() instanceof Activity) {
-                UIUtils.showShortMessage(((Activity) getContext()).getWindow().getDecorView().getRootView(), R.string.cannot_start_engine_without_vpn);
-            } else {
-                UIUtils.showShortMessage(getContext(), R.string.cannot_start_engine_without_vpn);
-            }
-        } else {
-            Engine.instance().getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    Engine.instance().startServices();
-                    while (!Engine.instance().isStarted()) {
-                        SystemClock.sleep(1000);
-                    }
-                    final Looper mainLooper = getContext().getMainLooper();
-                    Handler h = new Handler(mainLooper);
-                    h.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            onClick(getContext());
-                        }
-                    });
-                }
-            });
-        }
     }
 }

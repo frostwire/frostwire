@@ -56,7 +56,7 @@ public final class AddToPlaylistMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         MenuBuilder menuBuilder = new MenuBuilder(new MenuAdapter(getContext(),
                 R.string.add_to_playlist,
                 getMenuActions()));

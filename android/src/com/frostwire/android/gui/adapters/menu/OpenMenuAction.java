@@ -75,7 +75,7 @@ public class OpenMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         if (fileType == Constants.FILE_TYPE_PICTURES && fd != null) {
             Intent intent = new Intent(context, ImageViewerActivity.class);
             intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR, fd.toBundle());

@@ -66,7 +66,7 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     @Override
-    protected void onClick(Context context) {
+    public void onClick(Context context) {
         showDeleteFilesDialog();
     }
 
