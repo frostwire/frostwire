@@ -64,7 +64,6 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
-import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
@@ -579,8 +578,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             case DOWNLOADING:
                 while (it.hasNext()) {
                     Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BTDownload;
-                    if (isTorrent && ((BTDownload) transfer).isSeeding()) {
+                    boolean isTorrent = transfer instanceof BittorrentDownload;
+                    if (isTorrent && ((BittorrentDownload) transfer).isSeeding()) {
                         it.remove();
                     } else if (transfer.isComplete()) {
                         it.remove();
@@ -590,19 +589,35 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             case SEEDING:
                 while (it.hasNext()) {
                     Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BTDownload;
-                    if (!isTorrent || !((BTDownload) transfer).isSeeding()) {
+                    boolean isTorrent = transfer instanceof BittorrentDownload;
+                    if (!isTorrent ||
+                        !transfer.isComplete() || // incomplete are seeding the pieces they have
+                        (!isTorrent && transfer.isComplete())) // complete http transfers
+                    {
                         it.remove();
+                    } else {
+                        BittorrentDownload torrentTransfer = (BittorrentDownload) transfer;
+                        // Finished = seeding + complete + paused
+                        if (torrentTransfer.isSeeding() &&
+                            torrentTransfer.isComplete() &&
+                            torrentTransfer.isPaused()) {
+                            it.remove();
+                        }
                     }
                 }
                 return transfers;
             case COMPLETED:
                 while (it.hasNext()) {
                     Transfer transfer = it.next();
-                    boolean isTorrent = transfer instanceof BTDownload;
-                    if ((!isTorrent  && !transfer.isComplete()) ||
-                        (isTorrent && ((BTDownload) transfer).isSeeding())) {
+                    boolean isTorrent = transfer instanceof BittorrentDownload;
+                    if (!isTorrent && !transfer.isComplete()) {
                         it.remove();
+                    } else if (isTorrent) {
+                        BittorrentDownload torrentTransfer = (BittorrentDownload) transfer;
+                        if (!torrentTransfer.isComplete() ||
+                            (torrentTransfer.isComplete() && !torrentTransfer.isPaused())) {
+                            it.remove();
+                        }
                     }
                 }
                 return transfers;
