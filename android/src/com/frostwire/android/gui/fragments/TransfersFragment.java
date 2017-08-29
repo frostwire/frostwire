@@ -155,105 +155,38 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
 
-        if (tabLayout.getTabAt(0).isSelected()) {
-            if (transfers != null && transfers.size() > 0) {
-                if (someTransfersComplete(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-                }
+        if (transfers != null && transfers.size() > 0) {
+            if (someTransfersComplete(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
+            }
 
-                if (!bittorrentDisconnected) {
-                    if (someTransfersActive(transfers)) {
-                        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
-                    }
-                }
-
-                //let's show it even if bittorrent is disconnected
-                //user should get a message telling them to check why they can't resume.
-                //Preferences > Connectivity is disconnected.
-                if (someTransfersInactive(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
-                }
-
-                if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-                }
-
-                if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-                    menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-                }
-
-                if (someTransfersSeeding(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            if (!bittorrentDisconnected) {
+                if (someTransfersActive(transfers)) {
+                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
                 }
             }
 
-        }
-        else if (tabLayout.getTabAt(1).isSelected()) {
-            if (transfers != null && transfers.size() > 0) {
-                if (!bittorrentDisconnected) {
-                    if (someTransfersActive(transfers)) {
-                        menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
-                    }
-                }
-                if (someTransfersInactive(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
-                }
+            //let's show it even if bittorrent is disconnected
+            //user should get a message telling them to check why they can't resume.
+            //Preferences > Connectivity is disconnected.
+            if (someTransfersInactive(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
             }
-        } else if (tabLayout.getTabAt(2).isSelected()) {
-            if (someTransfersSeeding(transfers)) {
-                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-            }
-        } else if (tabLayout.getTabAt(3).isSelected()) {
-            if (transfers != null && transfers.size() > 0) {
-                if (someTransfersComplete(transfers)) {
-                    menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-                }
-            }
-            if ((!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) || (someTransfersSeeding(transfers) && someTransfersComplete(transfers))) {
+
+            if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
             }
 
+            if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            }
+
+            if (someTransfersSeeding(transfers)) {
+                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
+            }
         }
     }
-
-//    private void updateMenuItemVisibility(Menu menu) {
-//        TransferManager tm = TransferManager.instance();
-//        boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
-//        final List<Transfer> transfers = tm.getTransfers();
-//
-//        if (transfers != null && transfers.size() > 0) {
-//            if (someTransfersComplete(transfers)) {
-//                menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
-//            }
-//
-//            if (!bittorrentDisconnected) {
-//                if (someTransfersActive(transfers)) {
-//                    menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
-//                }
-//            }
-//
-//            //let's show it even if bittorrent is disconnected
-//            //user should get a message telling them to check why they can't resume.
-//            //Preferences > Connectivity is disconnected.
-//            if (someTransfersInactive(transfers)) {
-//                menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
-//            }
-//
-//            if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-//                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-//            }
-//
-//            if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
-//                menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
-//                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-//            }
-//
-//            if (someTransfersSeeding(transfers)) {
-//                menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
-//            }
-//        }
-//    }
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
