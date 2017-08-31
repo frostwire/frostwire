@@ -114,6 +114,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnRichToastHandler = new Handler();
         tabPositionToTransferStatus = new TransferStatus[]{TransferStatus.ALL, TransferStatus.DOWNLOADING, TransferStatus.SEEDING, TransferStatus.COMPLETED};
     }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -146,7 +147,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(false);
         menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(false);
-
         updateMenuItemVisibility(menu);
         super.onPrepareOptionsMenu(menu);
     }
@@ -155,34 +155,28 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         TransferManager tm = TransferManager.instance();
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
-
         if (transfers != null && transfers.size() > 0) {
             if (someTransfersComplete(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
             }
-
             if (!bittorrentDisconnected) {
                 if (someTransfersActive(transfers)) {
                     menu.findItem(R.id.fragment_transfers_menu_pause_stop_all).setVisible(true);
                 }
             }
-
             //let's show it even if bittorrent is disconnected
             //user should get a message telling them to check why they can't resume.
             //Preferences > Connectivity is disconnected.
             if (someTransfersInactive(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_resume_all).setVisible(true);
             }
-
             if (!someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
             }
-
             if (someTransfersSeeding(transfers) && someTransfersComplete(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_seed_all).setVisible(true);
                 menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
             }
-
             if (someTransfersSeeding(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_stop_seeding_all).setVisible(true);
             }
@@ -192,7 +186,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
-
         // Handle item selection
         setupAdapter();
         switch (item.getItemId()) {
@@ -264,12 +257,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
             Collections.sort(transfers, transferComparator);
             adapter.updateList(transfers);
-
-            int i=0;
+            int i = 0;
             for (TransferStatus transferStatus : tabPositionToTransferStatus) {
                 if (transferStatus == selectedStatus) {
                     TabLayout.Tab tab = tabLayout.getTabAt(i);
-                    if (!tab.isSelected()) {
+                    if (tab != null && !tab.isSelected()) {
                         tab.select();
                     }
                     break;
@@ -362,7 +354,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (nextTabPosition == -1) {
             nextTabPosition = tabPositionToTransferStatus.length - 1;
         }
-        tabLayout.getTabAt(nextTabPosition).select();
+        TabLayout.Tab tab = tabLayout.getTabAt(nextTabPosition);
+        if (tab != null) {
+            tab.select();
+        }
     }
 
     public void selectStatusTab(TransferStatus status) {
@@ -518,12 +513,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (status == TransferStatus.ALL) {
             return transfers;
         }
-
         ArrayList<Transfer> filtered = new ArrayList<>(0);
         for (Transfer transfer : transfers) {
-            if ( (status == TransferStatus.DOWNLOADING && isDownloading(transfer)) ||
-                 (status == TransferStatus.SEEDING && isSeeding(transfer) ||
-                 (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
+            if ((status == TransferStatus.DOWNLOADING && isDownloading(transfer)) ||
+                    (status == TransferStatus.SEEDING && isSeeding(transfer) ||
+                            (status == TransferStatus.COMPLETED && isCompleted(transfer)))) {
                 filtered.add(transfer);
             }
         }
@@ -533,15 +527,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private boolean isDownloading(Transfer transfer) {
         TransferState state = transfer.getState();
         return state == TransferState.CHECKING ||
-               state == TransferState.DOWNLOADING ||
-               state == TransferState.DEMUXING ||
-               state == TransferState.ALLOCATING ||
-               state == TransferState.DOWNLOADING ||
-               state == TransferState.DOWNLOADING_METADATA ||
-               state == TransferState.DOWNLOADING_TORRENT ||
-               state == TransferState.FINISHING ||
-               state == TransferState.PAUSING ||
-               state == TransferState.PAUSED;
+                state == TransferState.DOWNLOADING ||
+                state == TransferState.DEMUXING ||
+                state == TransferState.ALLOCATING ||
+                state == TransferState.DOWNLOADING_METADATA ||
+                state == TransferState.DOWNLOADING_TORRENT ||
+                state == TransferState.FINISHING ||
+                state == TransferState.PAUSING ||
+                state == TransferState.PAUSED;
     }
 
     private boolean isSeeding(Transfer transfer) {
@@ -551,7 +544,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private boolean isCompleted(Transfer transfer) {
         TransferState state = transfer.getState();
         return state == TransferState.FINISHED ||
-               state == TransferState.COMPLETE;
+                state == TransferState.COMPLETE;
     }
 
     private boolean someTransfersInactive(List<Transfer> transfers) {
@@ -770,7 +763,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
 
-    public void onClick(TransfersFragment f, View v) {
+    public void onClick(TransfersFragment f) {
         f.toggleAddTransferControls();
     }
 
