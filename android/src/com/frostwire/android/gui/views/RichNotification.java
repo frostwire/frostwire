@@ -139,7 +139,7 @@ public class RichNotification extends LinearLayout {
 		textViewTitle.setTypeface(ROBOTO_LIGHT, Typeface.BOLD);
 		textViewDescription.setTypeface(ROBOTO_LIGHT, Typeface.NORMAL);
 		
-		TextView dismissButton = findViewById(R.id.view_rich_notification_close_button);
+		ImageView dismissButton = findViewById(R.id.view_rich_notification_close_button);
 		dismissButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
