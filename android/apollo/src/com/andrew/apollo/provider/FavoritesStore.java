@@ -20,10 +20,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * This class is used to to create the database used to make the Favorites
  * playlist.
- * 
- * @author Andrew Neal (andrewdneal@gmail.com)
- */
-/**
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class FavoritesStore extends SQLiteOpenHelper {
@@ -32,17 +29,23 @@ public class FavoritesStore extends SQLiteOpenHelper {
     private static final int VERSION = 1;
 
     /* Name of database file */
-    public static final String DATABASENAME = "favorites.db";
+    public static final String DATABASE_NAME = "favorites.db";
 
     private static FavoritesStore sInstance = null;
 
+    private final SQLiteDatabase writeableDatabase;
+    private final SQLiteDatabase readableDatabase;
+
     /**
      * Constructor of <code>FavoritesStore</code>
-     * 
+     *
      * @param context The {@link Context} to use
      */
     public FavoritesStore(final Context context) {
-        super(context, DATABASENAME, null, VERSION);
+        super(context, DATABASE_NAME, null, VERSION);
+        writeableDatabase = getWritableDatabase();
+        writeableDatabase.enableWriteAheadLogging(); // parallel queries, writes don't block reads
+        readableDatabase = getReadableDatabase();
     }
 
     /**
@@ -78,42 +81,38 @@ public class FavoritesStore extends SQLiteOpenHelper {
 
     /**
      * Used to store song Ids in our database
-     * 
-     * @param songId The album's ID
-     * @param songName The song name
-     * @param albumName The album name
+     *
+     * @param songId     The album's ID
+     * @param songName   The song name
+     * @param albumName  The album name
      * @param artistName The artist name
      */
     public void addSongId(final Long songId, final String songName, final String albumName,
-            final String artistName) {
+                          final String artistName) {
         if (songId == null || songName == null || albumName == null || artistName == null) {
             return;
         }
-
         final Long playCount = getPlayCount(songId);
-        final SQLiteDatabase database = getWritableDatabase();
         final ContentValues values = new ContentValues(5);
-
-        database.beginTransaction();
-
         values.put(FavoriteColumns.ID, songId);
         values.put(FavoriteColumns.SONGNAME, songName);
         values.put(FavoriteColumns.ALBUMNAME, albumName);
         values.put(FavoriteColumns.ARTISTNAME, artistName);
         values.put(FavoriteColumns.PLAYCOUNT, playCount != 0 ? playCount + 1 : 1);
-
-        database.delete(FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[] {
-            String.valueOf(songId)
-        });
-        database.insert(FavoriteColumns.NAME, null, values);
-        database.setTransactionSuccessful();
-        database.endTransaction();
+        writeableDatabase.beginTransaction();
+        writeableDatabase.delete(FavoriteColumns.NAME,
+                FavoriteColumns.ID + " = ?", new String[]{
+                        String.valueOf(songId)
+                });
+        writeableDatabase.insert(FavoriteColumns.NAME, null, values);
+        writeableDatabase.setTransactionSuccessful();
+        writeableDatabase.endTransaction();
 
     }
 
     /**
      * Used to retrieve a single song Id from our database
-     * 
+     *
      * @param songId The song Id to reference
      * @return The song Id
      */
@@ -121,9 +120,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
         if (songId <= -1) {
             return null;
         }
-
         try {
-            final SQLiteDatabase database = getReadableDatabase();
             final String[] projection = new String[]{
                     FavoriteColumns.ID, FavoriteColumns.SONGNAME, FavoriteColumns.ALBUMNAME,
                     FavoriteColumns.ARTISTNAME, FavoriteColumns.PLAYCOUNT
@@ -132,7 +129,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
             final String[] having = new String[]{
                     String.valueOf(songId)
             };
-            Cursor cursor = database.query(FavoriteColumns.NAME, projection, selection, having, null,
+            Cursor cursor = readableDatabase.query(FavoriteColumns.NAME, projection, selection, having, null,
                     null, null, null);
             if (cursor != null && cursor.moveToFirst()) {
                 final Long id = cursor.getLong(cursor.getColumnIndexOrThrow(FavoriteColumns.ID));
@@ -150,7 +147,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
 
     /**
      * Used to retrieve the play count
-     * 
+     *
      * @param songId The song Id to reference
      * @return The play count for a song
      */
@@ -158,17 +155,15 @@ public class FavoritesStore extends SQLiteOpenHelper {
         if (songId <= -1) {
             return null;
         }
-
-        final SQLiteDatabase database = getReadableDatabase();
-        final String[] projection = new String[] {
+        final String[] projection = new String[]{
                 FavoriteColumns.ID, FavoriteColumns.SONGNAME, FavoriteColumns.ALBUMNAME,
                 FavoriteColumns.ARTISTNAME, FavoriteColumns.PLAYCOUNT
         };
         final String selection = FavoriteColumns.ID + "=?";
-        final String[] having = new String[] {
-            String.valueOf(songId)
+        final String[] having = new String[]{
+                String.valueOf(songId)
         };
-        Cursor cursor = database.query(FavoriteColumns.NAME, projection, selection, having, null,
+        Cursor cursor = readableDatabase.query(FavoriteColumns.NAME, projection, selection, having, null,
                 null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             final Long playCount = cursor.getLong(cursor
@@ -179,7 +174,6 @@ public class FavoritesStore extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.close();
         }
-
         return (long) 0;
     }
 
@@ -187,7 +181,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
      * Toggle the current song as favorite
      */
     public void toggleSong(final Long songId, final String songName, final String albumName,
-            final String artistName) {
+                           final String artistName) {
         if (getSongId(songId) == null) {
             addSongId(songId, songName, albumName, artistName);
         } else {
@@ -199,9 +193,8 @@ public class FavoritesStore extends SQLiteOpenHelper {
      * @param songId The song Id to remove
      */
     public void removeItem(final Long songId) {
-        final SQLiteDatabase database = getReadableDatabase();
-        database.delete(FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[] {
-            String.valueOf(songId)
+        writeableDatabase.delete(FavoriteColumns.NAME, FavoriteColumns.ID + " = ?", new String[]{
+                String.valueOf(songId)
         });
 
     }
