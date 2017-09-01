@@ -130,6 +130,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
+    private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -372,25 +373,40 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 //seems like overkill keeping track of these ourselves.)
             }
         }
+
+        if (delayedOnResumeInterstitialRunnable != null) {
+            LOG.info("onPause() cancelling delayedOnResumeInterstitialRunnable");
+            delayedOnResumeInterstitialRunnable.cancel();
+        }
     }
 
     private void tryOnResumeInterstitial() {
         if (Offers.disabledAds()) {
             LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
+            delayedOnResumeInterstitialRunnable = null;
             return;
         }
         ConfigurationManager CM = ConfigurationManager.instance();
-        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
+
+        // TEST. Uncomment below
+        // CM.setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, (long) (System.currentTimeMillis() - 8.64e+7));
+
+        long installationTimestamp = System.currentTimeMillis() - CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
         if (installationTimestamp == -1) {
             LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
+            delayedOnResumeInterstitialRunnable = null;
             return;
         }
         if (!UIUtils.diceRollPassesThreshold(CM, Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD)) {
             LOG.info("tryOnResumeInterstitial() aborted - threshold not met");
+            delayedOnResumeInterstitialRunnable = null;
             return;
         }
         long now = System.currentTimeMillis();
         long lastDisplayTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
+
+        // TEST. Uncomment below
+        // lastDisplayTimestamp = (long) (System.currentTimeMillis() - 8.64e+7);
 
         // if it's never been displayed, we check against the first display delayInMs setting
         if (lastDisplayTimestamp == -1) {
@@ -398,6 +414,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             int firstDisplayDelayInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES);
             if (minutesSinceInstallation < firstDisplayDelayInMinutes || firstDisplayDelayInMinutes == 0) {
                 LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
+                delayedOnResumeInterstitialRunnable = null;
                 return;
             }
             //LOG.info("tryOnResumeInterstitial() might be ready for first display (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
@@ -406,20 +423,26 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
             if (minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
                 LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
+                delayedOnResumeInterstitialRunnable = null;
                 return;
             }
             //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
         }
-        Engine.instance().getThreadPool().submit(new DelayedOnResumeInterstitialRunnable(30000, this));
+
+        LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable");
+        delayedOnResumeInterstitialRunnable = new DelayedOnResumeInterstitialRunnable(20000, this);
+        Engine.instance().getThreadPool().submit(delayedOnResumeInterstitialRunnable);
     }
 
     private static class DelayedOnResumeInterstitialRunnable implements Runnable {
-        private final WeakReference<Activity> activityRef;
+        private final WeakReference<MainActivity> activityRef;
         private final long delayInMs;
+        private boolean cancelled;
 
-        DelayedOnResumeInterstitialRunnable(long delayInMs, Activity activity) {
+        DelayedOnResumeInterstitialRunnable(long delayInMs, MainActivity activity) {
             activityRef = Ref.weak(activity);
             this.delayInMs = delayInMs;
+            cancelled = false;
         }
 
         @Override
@@ -428,20 +451,48 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 return;
             }
             try {
+                if (cancelled) {
+                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 1).");
+                    activityRef.get().delayedOnResumeInterstitialRunnable = null;
+                    return;
+                }
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") sleeping " + delayInMs + "ms");
                 Thread.sleep(delayInMs);
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") done sleeping");
             } catch (Throwable ignored) {
                 return;
             }
             if (!Ref.alive(activityRef)) {
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") lost MainActivity reference");
+                return;
+            }
+            if (cancelled) {
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 2).");
+                activityRef.get().delayedOnResumeInterstitialRunnable = null;
                 return;
             }
             final Activity activity = activityRef.get();
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                    if (cancelled) {
+                        //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 3).");
+                        activityRef.get().delayedOnResumeInterstitialRunnable = null;
+                        return;
+                    }
+                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") showing interstitial");
+                    Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false, true);
                 }
             });
+        }
+
+        public void cancel() {
+            //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel()");
+            cancelled = true;
+            if (Ref.alive(activityRef)) {
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel() clearing runnable reference from MainActivity");
+                activityRef.get().delayedOnResumeInterstitialRunnable = null;
+            }
         }
     }
 

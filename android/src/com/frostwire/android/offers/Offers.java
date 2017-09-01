@@ -145,6 +145,13 @@ public final class Offers {
     public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
                                                         final boolean shutdownAfterwards,
                                                         final boolean dismissAfterwards) {
+        showInterstitialOfferIfNecessary(ctx, placement, shutdownAfterwards, dismissAfterwards, false);
+    }
+
+    public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
+                                                        final boolean shutdownAfterwards,
+                                                        final boolean dismissAfterwards,
+                                                        final boolean ignoreStartedTransfers) {
         TransferManager TM = TransferManager.instance();
         int startedTransfers = TM.incrementStartedTransfers();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -156,6 +163,11 @@ public final class Offers {
         long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
         boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
         boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
+
+        if (ignoreStartedTransfers) {
+            startedEnoughTransfers = true;
+        }
+
         boolean shouldDisplayFirstOne = (lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
 
         if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
