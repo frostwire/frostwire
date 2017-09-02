@@ -238,7 +238,12 @@ public class OKHTTPClient extends AbstractHttpClient {
             builder.header("User-Agent", userAgent);
         }
         if (!StringUtils.isNullOrEmpty(referrer)) {
-            builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
+            try {
+                builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
+            } catch (IllegalArgumentException illegalEx) {
+                LOG.info("Referer value: " + referrer);
+                LOG.warn(illegalEx.getMessage(), illegalEx);
+            }
         }
         if (!StringUtils.isNullOrEmpty(cookie)) {
             builder.header("Cookie", cookie);
