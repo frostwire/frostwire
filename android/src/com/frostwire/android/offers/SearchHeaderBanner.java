@@ -115,9 +115,6 @@ public class SearchHeaderBanner extends LinearLayout {
         if (Offers.disabledAds() || getSearchFragment() == null) {
             return;
         }
-        if (bannerHeaderLayout == null) {
-            onFinishInflate();
-        }
         boolean adsDisabled = Offers.disabledAds();
         Activity activity = (Activity) getContext();
         // check how long getting display metrics twice is, if expensive gotta refactor these methods
