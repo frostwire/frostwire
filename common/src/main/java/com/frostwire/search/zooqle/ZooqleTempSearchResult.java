@@ -20,6 +20,8 @@ package com.frostwire.search.zooqle;
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
+import java.nio.charset.Charset;
+
 /**
  * @author aldenml
  * @author gubatron
@@ -29,7 +31,7 @@ class ZooqleTempSearchResult extends AbstractSearchResult implements CrawlableSe
     private final String detailUrl;
 
     ZooqleTempSearchResult(String domainName, String detailPath) {
-        this.detailUrl = "https://" + domainName + "/" + detailPath;
+        this.detailUrl = "https://" + domainName + "/" + new String(detailPath.getBytes(), Charset.forName("UTF-8"));
     }
 
     @Override
