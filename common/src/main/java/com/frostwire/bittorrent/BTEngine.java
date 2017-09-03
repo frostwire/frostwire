@@ -787,7 +787,7 @@ public final class BTEngine extends SessionManager {
         sb.append("router.bittorrent.com:6881").append(",");
         sb.append("dht.transmissionbt.com:6881").append(",");
         // for DHT IPv6
-        sb.append("outer.silotis.us:6881");
+        sb.append("router.silotis.us:6881");
 
         return sb.toString();
     }
