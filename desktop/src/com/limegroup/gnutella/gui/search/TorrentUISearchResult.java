@@ -44,6 +44,10 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
         this.sr = sr;
     }
 
+    public String getTorrentUrl() {
+        return sr.getTorrentUrl();
+    }
+
     @Override
     public String getHash() {
         return sr.getHash();

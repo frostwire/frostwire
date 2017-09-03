@@ -30,6 +30,8 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.VPNDropGuard;
+import com.limegroup.gnutella.gui.search.TorrentUISearchResult;
+import com.limegroup.gnutella.gui.search.UISearchResult;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
@@ -101,6 +103,17 @@ public final class TorrentUtil {
 
     public static String getMagnet(String hash) {
         return "magnet:?xt=urn:btih:" + hash;
+    }
+
+    public static String getMagnet(UISearchResult sr) {
+        if (sr instanceof TorrentUISearchResult) {
+            String torrentUrl = ((TorrentUISearchResult) sr).getTorrentUrl();
+            if (torrentUrl.startsWith("magnet:?")) {
+                return torrentUrl;
+            }
+        }
+
+        return getMagnet(sr.getHash());
     }
 
     static String getMagnetURLParameters(TorrentInfo torrent) {

@@ -253,7 +253,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 SearchResultDataLine[] lines = getAllSelectedLines();
                 StringBuilder sb = new StringBuilder();
                 for (SearchResultDataLine line : lines) {
-                    sb.append(TorrentUtil.getMagnet(line.getInitializeObject().getHash()));
+                    sb.append(TorrentUtil.getMagnet(line.getInitializeObject()));
                     sb.append("\n");
                 }
                 GUIMediator.setClipboardContent(sb.toString());
