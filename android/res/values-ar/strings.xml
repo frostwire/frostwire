@@ -672,4 +672,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">الشبكة غير متوفرة، يرجى التحقق من اتصالك بالإنترنت.</string>
     <string name="use_pixabay">استخدام Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">وقف البذر جميع التحويلات</string>
+    <string name="seed_stop">وقف البذر</string>
+    <string name="cant_seed_torrent_transfers">لا يمكن نقل البذور سيل. تحقق من حالة "إعدادات"> "حالة اتصال تورنت"</string>
+    <string name="transfers_select_seeding">زراعة</string>
+    <string name="transfers_context_seed_all_transfers">البذور جميع التحويلات النهائية</string>
 </resources>

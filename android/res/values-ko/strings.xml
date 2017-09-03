@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">네트워크를 사용할 수 없으므로 인터넷 연결을 확인하십시오.</string>
     <string name="use_pixabay">Pixabay사용</string>
+    <string name="transfers_context_stop_seeding_all_transfers">모든 전송 시딩 중지</string>
+    <string name="seed_stop">시딩 중지</string>
+    <string name="cant_seed_torrent_transfers">토런트 전송을 시드 할 수 없습니다. "설정" > "BitTorrent 연결 상태"상태 확인</string>
+    <string name="transfers_select_seeding">시딩</string>
+    <string name="transfers_context_seed_all_transfers">모든 완료 전송 시드 씨앗</string>
 </resources>

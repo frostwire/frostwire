@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Síť není k dispozici, zkontrolujte prosím připojení k Internetu.</string>
     <string name="use_pixabay">Použijte Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Zastavte všechny přenosy</string>
+    <string name="seed_stop">Zastavte zasetí</string>
+    <string name="cant_seed_torrent_transfers">Nelze přenést torentní přenosy. Zkontrolujte stav "Nastavení" > "Stav připojení BitTorrent"</string>
+    <string name="transfers_select_seeding">zasetí</string>
+    <string name="transfers_context_seed_all_transfers">Nasadit všechny hotové transfery</string>
 </resources>

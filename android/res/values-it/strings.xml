@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">La rete non è disponibile, controllare la connessione a Internet.</string>
     <string name="use_pixabay">Utilizzare Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Smettere di seminare tutti i trasferimenti</string>
+    <string name="seed_stop">Smettere di seminare</string>
+    <string name="cant_seed_torrent_transfers">Non è possibile filtrare i torrent. Verifica dello stato di "Impostazioni" > "Stato di connessione BitTorrent"</string>
+    <string name="transfers_select_seeding">semina</string>
+    <string name="transfers_context_seed_all_transfers">Seme tutti i trasferimenti finiti</string>
 </resources>

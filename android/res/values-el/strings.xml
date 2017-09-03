@@ -672,4 +672,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Το δίκτυο δεν είναι διαθέσιμο, ελέγξτε τη σύνδεση στο Internet.</string>
     <string name="use_pixabay">Χρήση Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Διακόψτε όλες τις λήψεις και τις μεταφορτώσεις</string>
+    <string name="seed_stop">Σταματήστε τη σπορά</string>
+    <string name="cant_seed_torrent_transfers">Δεν είναι δυνατή η στείρωση μεταβιβάσεων torrent. Ελέγξτε την κατάσταση "Ρυθμίσεις" > "Κατάσταση σύνδεσης BitTorrent"</string>
+    <string name="transfers_select_seeding">σπορά</string>
+    <string name="transfers_context_seed_all_transfers">Τοποθετήστε όλες τις τελικές μεταφορές</string>
 </resources>

@@ -22,9 +22,9 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selv anbefalt for nedlastingene dine, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>ExpressVPN</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>Private Internet Access</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>Private Internett Access</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke ExpressVPN å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke Private Internet Access å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke Private Internett Access å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
     <string name="vpn_not_found">Ingen VPN. Vurdere å kryptere forbindelsen.</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
     <string name="activity_mediaplayer_name">Mediaspiller</string>
@@ -658,8 +658,8 @@
     <string name="vpn_money_back_PIA">7-dagers pengene-tilbake-garanti</string>
     <string name="vpn_client_feature_4_ExpressVPN">24/7 kundestøtte</string>
     <string name="vpn_money_back_ExpressVPN">30-dagers pengene tilbake garanti</string>
-    <string name="visit_vpn_client_PIA">Besøk Private Internet Access</string>
-    <string name="get_PIA">Få Private Internet Access</string>
+    <string name="visit_vpn_client_PIA">Besøk Private Internett Access</string>
+    <string name="get_PIA">Få Private Internett Access</string>
     <string name="vpn_client_feature_3_PIA">Solid infrastruktur: verdensomspennende dekning</string>
     <string name="visit_vpn_client_ExpressVPN">Besøk ExpressVPN</string>
     <string name="vpn_client_feature_2_PIA">Virkelig enkel å bruke (vi liker det lett!)</string>
@@ -667,7 +667,12 @@
     <string name="vpn_client_feature_1_ExpressVPN">Kryptering av militær klasse</string>
     <string name="vpn_client_feature_1_PIA">Ingen logging</string>
     <string name="vpn_client_ExpressVPN">ExpressVPN</string>
-    <string name="vpn_client_PIA">Private Internet Access</string>
+    <string name="vpn_client_PIA">Private Internett Access</string>
     <string name="no_data_check_internet_connection">Nettverk utilgjengelig, vennligst sjekk Internett-tilkoblingendin.</string>
     <string name="use_pixabay">Bruk Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Stopp såing alle overføringer</string>
+    <string name="seed_stop">Stopp såing</string>
+    <string name="cant_seed_torrent_transfers">Kan ikke frøe overføringer av torrent. Kontroller status for "Innstillinger" > "BitTorrent-tilkoblingsstatus"</string>
+    <string name="transfers_select_seeding">såing</string>
+    <string name="transfers_context_seed_all_transfers">Sæd alle ferdige overføringer</string>
 </resources>
