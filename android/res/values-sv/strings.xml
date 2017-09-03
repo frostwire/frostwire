@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Nätverk otillgängligt, kolla din Internetanslutning.</string>
     <string name="use_pixabay">Använda Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Sluta såga alla överföringar</string>
+    <string name="seed_stop">Sluta sådd</string>
+    <string name="cant_seed_torrent_transfers">Kan inte utsända torrentöverföringar. Kontrollera status för "Inställningar" > "BitTorrent-anslutningsstatus"</string>
+    <string name="transfers_select_seeding">sådd</string>
+    <string name="transfers_context_seed_all_transfers">Dela alla färdiga överföringar</string>
 </resources>

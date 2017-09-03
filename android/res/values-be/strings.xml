@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Сетка недаступная, калі ласка, праверце падлучэнне да Інтэрнэту.</string>
     <string name="use_pixabay">выкарыстанне Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Стоп высеву усе трансферы</string>
+    <string name="seed_stop">стоп высеву</string>
+    <string name="cant_seed_torrent_transfers">Не можа насенне торэнта пераклады. Праверыць статус «Настройкі» > «BitTorrent Стан злучэння»</string>
+    <string name="transfers_select_seeding">засеивание</string>
+    <string name="transfers_context_seed_all_transfers">Насеннай ўсе скончаныя пераклады</string>
 </resources>

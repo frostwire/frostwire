@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">نیٹ ورک دستیاب نہیں، براہ مہربانی اپنے انٹرنیٹ کنکشن کی جانچ پڑتالکریں.</string>
     <string name="use_pixabay">استعمال Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">تمام ٹرانسفروں کو بنو بند کرو</string>
+    <string name="seed_stop">بیجنگ بند کرو</string>
+    <string name="cant_seed_torrent_transfers">بیج ٹرانسمیشن نہیں بن سکتا. "ترتیبات" کی حیثیت کی جانچ پڑتال کریں> "BitTorrent Connection Status"</string>
+    <string name="transfers_select_seeding">بوائ</string>
+    <string name="transfers_context_seed_all_transfers">تمام مکمل ٹرانسفر کا اشتراک کریں</string>
 </resources>

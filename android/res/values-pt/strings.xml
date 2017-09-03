@@ -668,4 +668,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Rede indisponível, verifique sua conexão com a Internet.</string>
     <string name="use_pixabay">Usar Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Pare de semear todas as transferências</string>
+    <string name="seed_stop">Pare de semear</string>
+    <string name="cant_seed_torrent_transfers">Não é possível gerar transferências de torrent. Verifique o status de "Configurações" > "Status da Conexão BitTorrent"</string>
+    <string name="transfers_select_seeding">semeadura</string>
+    <string name="transfers_context_seed_all_transfers">Semente todas as transferências acabados</string>
 </resources>

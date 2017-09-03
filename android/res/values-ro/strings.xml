@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Rețeaua nu este disponibilă, verificați conexiunea la Internet.</string>
     <string name="use_pixabay">Utilizați Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Opriți însămânțarea tuturor transferurilor</string>
+    <string name="seed_stop">Opriți însămânțarea</string>
+    <string name="cant_seed_torrent_transfers">Nu pot fi transferate transferurile torrent. Verificați starea "Setări" > "Starea conexiunii BitTorrent"</string>
+    <string name="transfers_select_seeding">însămânțare</string>
+    <string name="transfers_context_seed_all_transfers">Semănați toate transferurile finalizate</string>
 </resources>

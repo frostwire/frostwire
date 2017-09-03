@@ -50,7 +50,7 @@
     <string name="no_network_connection">No hay conexión a la red</string>
     <string name="leaving_already">¿Ya te vas?</string>
     <string name="search_label">Buscar</string>
-    <string name="settings_description">Ajustes de Búsqueda</string>
+    <string name="settings_description">Preferencias de Búsqueda</string>
     <string name="clear_finished">Borrar las descargas finalizadas</string>
     <string name="support_free_software">Apoya el Software Gratuito</string>
     <string name="show_love">¿Te gusta Frostwire?</string>
@@ -174,7 +174,7 @@
     <string name="wants_to_share_a_file">quiere compartir un archivo</string>
     <string name="translators">Traductores</string>
     <string name="tip_rename_your_files">Consejo: renombra los archivos para que los encuentren</string>
-    <string name="other_settings">Otros Ajustes</string>
+    <string name="other_settings">Otras preferencias</string>
     <string name="vibrate_on_finished_download">Vibrar cuando termine una descarga</string>
     <string name="use_mobile_data">Utilizar 3G/4G</string>
     <string name="use_mobile_data_summary">Puede haber cargos por el sobreuso de la cobertura de datos. Úsalo con precaución.</string>
@@ -226,7 +226,7 @@
     <string name="mobile_data">Datos Móviles</string>
     <string name="media_player_failed">El Reproductor Multimedia ha fallado</string>
     <string name="activity_media_player_name">Reproductor Multimedia</string>
-    <string name="search_settings">Ajustes de Búsqueda</string>
+    <string name="search_settings">Preferencias de Búsqueda</string>
     <string name="use_zooqle">Usar Zooqle.com</string>
     <string name="use_tpb">Usar TPB</string>
     <string name="activity_media_player_image_description">Imagen</string>
@@ -321,7 +321,7 @@
     <string name="welcome_to_frostwire">Bienvenido a FrostWire %s</string>
     <string name="let_apos_s_set_you_up_before_we_begin_">Vamos a configurar antes de comenzar.</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Cómo te ven los demás en la red local. (Wi-Fi)</string>
-    <string name="seeding_settings">Ajustes para Compartir</string>
+    <string name="seeding_settings">Preferencias para Compartir</string>
     <string name="seeding_settings_explanation">Los usuarios de BitTorrent en Internet podrán descargar trozos del archivo de los datos que tus torrents comparten.</string>
     <string name="seeding_wifi_settings_explanation">Comparte únicamente cuando uses una conexión de Wi-Fi. Así evitarás más cargos de la compañía telefónica. </string>
     <string name="intent_text">FrostWire es un programa de usuario a usuario para compartir archivos autorizados. La instalación y utilización del programa no constituye una licencia para la obtención y distribución del contenido no autorizado.</string>
@@ -673,4 +673,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Red no disponible, compruebe su conexión a Internet.</string>
     <string name="use_pixabay">Usar Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Dejar de compartir todas las transferencias</string>
+    <string name="seed_stop">Dejar de compartir</string>
+    <string name="cant_seed_torrent_transfers">No se pueden compartir transferencias de torrents. Chequea el estado de "Preferencias" > "BitTorrent Estado de Conexión"</string>
+    <string name="transfers_select_seeding">compartiendo</string>
+    <string name="transfers_context_seed_all_transfers">Compartiendo todas las transferencias finalizadas</string>
 </resources>

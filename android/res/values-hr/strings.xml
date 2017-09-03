@@ -670,4 +670,9 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Mreža nije dostupna, provjerite internetsku vezu.</string>
     <string name="use_pixabay">Koristi Pixabay</string>
+    <string name="transfers_context_stop_seeding_all_transfers">Zaustavite sjetvu svih prijenosa</string>
+    <string name="seed_stop">Zaustavite zasijavanje</string>
+    <string name="cant_seed_torrent_transfers">Nije moguće sjemena prijenosa s torrentima. Provjerite status "Postavke" > "Status BitTorrent veze"</string>
+    <string name="transfers_select_seeding">sijanje</string>
+    <string name="transfers_context_seed_all_transfers">Sjeme sve gotove prijenose</string>
 </resources>
