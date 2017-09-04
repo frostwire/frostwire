@@ -17,6 +17,8 @@
 
 package com.frostwire.search.zooqle;
 
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
@@ -38,15 +40,37 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
+    private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)<span class=\"small pad-l2\">";
+    private static Pattern FILE_SIZE_PATTERN = null;
+
     ZooqleSearchResult(String detailsUrl, String urlPrefix, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.filename = matcher.group("filename") + ".torrent";
         this.displayName = matcher.group("filename");
         this.seeds = Integer.valueOf(matcher.group("seeds").trim());
-        this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
+        if (matcher.group("torrent") != null) {
+            this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
+        } else {
+            this.torrentUrl = null;
+        }
         this.infoHash = matcher.group("infohash");
-        this.size = calculateSize(matcher.group("size").replace(",", ""), matcher.group("sizeUnit"));
+        this.size = calculateSize(matcher.group("sizedata"));
         this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
+    }
+
+    private long calculateSize(String sizedata) {
+        if (sizedata.contains("unknown")) {
+            return -1;
+        }
+        if (FILE_SIZE_PATTERN == null) {
+            FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
+        }
+        Matcher matcher = FILE_SIZE_PATTERN.matcher(sizedata);
+        if (matcher.find()) {
+            return calculateSize(matcher.group("size"), matcher.group("sizeUnit"));
+        } else {
+            return -1;
+        }
     }
 
     @Override

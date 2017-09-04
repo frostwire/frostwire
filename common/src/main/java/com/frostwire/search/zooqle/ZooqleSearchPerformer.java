@@ -17,9 +17,14 @@
 
 package com.frostwire.search.zooqle;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.http.HttpClient;
+
+import java.nio.charset.Charset;
 
 /**
  * @author aldenml
@@ -30,12 +35,16 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
     private static final int MAX_RESULTS = 30;
     private static final String PRELIMINARY_RESULTS_REGEX =
             "(?is)<i class=\".*?text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\" href=\"/(?<detailPath>.*?).html\">.*?</a>";
-    private static final String HTML_DETAIL_REGEX = "(?is)<h4 id=\"torname\">(?<filename>.*?)<span.*?" +
-            "Seeders: (?<seeds>\\d*).*?" +
-            "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.*?)<span class.*?" +
-            "title=\"Date indexed\"></i>(?<month>.*?) (?<day>[\\d]*), (?<year>[\\d]*) <span.*?" +
-            "urn:btih:(?<infohash>.*?)&.*?" +
-            "href=\"/download/(?<torrent>.*?)\\.torrent\"";
+
+    private static final String HTML_DETAIL_REGEX =
+            "(?is)" +
+                    "<h4 id=\"torname\">(?<filename>.*?)<span class=\"text-muted4 pad-r2\">.torrent</span>.*" +
+                    "title=\"Torrent cloud statistics\"></i><div class=\"progress prog trans..\" title=\"Seeders: (?<seeds>\\d+) .*<div class=\"progress-bar smaller.*" +
+                    "<i class=\"zqf zqf-files text-muted3 pad-r2 trans80\"(?<sizedata>.*)<span class=\"spacer\"></span>.*?" + // could be a size, or unknown size, managed on the search result class
+                    "<i class=\"zqf zqf-time text-muted3 pad-r2 trans80\" title=\"Date indexed\"></i>(?<month>.{3}) (?<day>\\d{1,2}), (?<year>\\d{4}) <span class=\"small pad-l\".*?" +
+                    "<a rel=\"nofollow\" href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)\\&.*?<i class=\\\"spr dl-magnet pad-r2\\\"></i>Magnet.*?" +
+                    "(.*href=\"/download/(?<torrent>.*?)\\.torrent\".*?)?";
+
 
     public ZooqleSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, PRELIMINARY_RESULTS_REGEX, HTML_DETAIL_REGEX);
@@ -68,7 +77,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     @Override
     protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("id=torrent><div class=panel-body");
+        int offset = html.indexOf("id=\"torrent\"><div class=\"panel-body\"");
         if (offset == -1) {
             return super.htmlPrefixOffset(html);
         }
@@ -77,19 +86,25 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     @Override
     protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("Contact & Info");
+        int offset = html.indexOf("Related torrents");
         if (offset == -1) {
             return super.htmlSuffixOffset(html);
         }
         return offset;
     }
 
-/*
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && !html.contains("Cloudflare");
+    }
+
+    /**
     public static void main(String[] args) throws Throwable {
         String TEST_QUERY_TERM = "foobar";
         String URL_PREFIX = "https://zooqle.com/";
+
         HttpClient client = HttpClientFactory.newInstance();
-        String preliminaryResultsString = client.get(URL_PREFIX+"search?q="+TEST_QUERY_TERM+"&s=ns&v=t&sd=d");
+        String preliminaryResultsString = client.get(URL_PREFIX + "search?q=" + TEST_QUERY_TERM + "&s=ns&v=t&sd=d");
         Pattern preliminaryResultsPattern = Pattern.compile(PRELIMINARY_RESULTS_REGEX);
         SearchMatcher preliminaryMatcher = SearchMatcher.from(preliminaryResultsPattern.matcher(preliminaryResultsString));
         int found = 0;
@@ -97,24 +112,38 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
             found++;
             String detailsUrl = URL_PREFIX + preliminaryMatcher.group("detailPath") + ".html";
             System.out.println("Fetching " + detailsUrl + " ...");
-            String htmlDetailsString = client.get(detailsUrl);
+            String htmlDetailsString = client.get(new String(detailsUrl.getBytes(), Charset.forName("UTF-8")));
 
             Pattern htmlDetailPattern = Pattern.compile(HTML_DETAIL_REGEX);
+            System.out.println("REGEX: " + htmlDetailPattern.toString());
             SearchMatcher detailMatcher = SearchMatcher.from(htmlDetailPattern.matcher(htmlDetailsString));
 
             if (detailMatcher.find()) {
                 System.out.println("filename: [" + detailMatcher.group("filename") + "]");
                 System.out.println("seeds: [" + detailMatcher.group("seeds") + "]");
-                System.out.println("infohash: [" + detailMatcher.group("infohash") + "]");
-                System.out.println("torrent: [" + detailMatcher.group("torrent") + "]");
-                System.out.println("size: [" + detailMatcher.group("size") + "]");
-                System.out.println("sizeUnit: [" + detailMatcher.group("sizeUnit") + "]");
-                System.out.print("creationtime: [");
+                if (detailMatcher.group("sizedata") != null) {
+                    System.out.println("sizedata: " + detailMatcher.group("sizedata"));
+                } else {
+                    System.out.println("warning <sizedata> group not found");
+                }
+                System.out.println("month: " + detailMatcher.group("month"));
+                System.out.println("day: " + detailMatcher.group("day"));
+                System.out.println("year: " + detailMatcher.group("year"));
 
-                ZooqleSearchResult sr = new ZooqleSearchResult("https://zooqle.com/blabla.html", "http://zooqle.com", detailMatcher);
-                System.out.println(sr.getCreationTime() + "]");
-                System.out.println("size in bytes: [" + sr.getSize() + "]");
-                System.out.println("ZooqleSearchResult -> " + sr);
+                System.out.println("infohash: [" + detailMatcher.group("infohash") + "]");
+                if (detailMatcher.group("torrent") != null) {
+                    System.out.println("torrent: [" + detailMatcher.group("torrent") + "]");
+                } else {
+                    System.out.println("torrent: [no torrent]");
+                }
+                //System.out.println("size: [" + detailMatcher.group("size") + "]");
+                //System.out.println("sizeUnit: [" + detailMatcher.group("sizeUnit") + "]");
+                //System.out.print("creationtime: [");
+
+                //ZooqleSearchResult sr = new ZooqleSearchResult("https://zooqle.com/blabla.html", "http://zooqle.com", detailMatcher);
+                //System.out.println(sr.getCreationTime() + "]");
+                //System.out.println("size in bytes: [" + sr.getSize() + "]");
+                //System.out.println("ZooqleSearchResult -> " + sr);
                 System.out.println("===");
             } else {
                 System.out.println("HTML_DETAIL_REGEX failed on " + detailsUrl);
@@ -127,6 +156,5 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
             System.out.println("========================================================\n");
         }
-    }
-    */
+    } */
 }
