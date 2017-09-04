@@ -21,6 +21,7 @@ package com.frostwire.android.gui.fragments.preference;
 import android.app.DialogFragment;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.SwitchPreferenceCompat;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -90,6 +91,20 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
     }
 
     private void setupTorrentOptions() {
+        SwitchPreferenceCompat pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+        pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean newStatus = (boolean) newValue;
+                if (newStatus) {
+                    BTEngine.getInstance().startDht();
+                } else {
+                    BTEngine.getInstance().stopDht();
+                }
+                return true;
+            }
+        });
+
         final BTEngine e = BTEngine.getInstance();
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED, e);

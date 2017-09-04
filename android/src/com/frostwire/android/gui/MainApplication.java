@@ -136,17 +136,10 @@ public class MainApplication extends Application {
         ctx.interfaces = String.format(Locale.US, iface, port0);
         ctx.retries = port1 - port0;
 
+        ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+
         BTEngine.ctx = ctx;
         BTEngine.getInstance().start();
-
-        boolean enable_dht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        if (!enable_dht) {
-            BTEngine.getInstance().stopDht();
-        } else {
-            // just make sure it's started otherwise.
-            // (we could be coming back from a crash on an unstable state)
-            //dht.start();
-        }
     }
 
     private void cleanTemp() {
