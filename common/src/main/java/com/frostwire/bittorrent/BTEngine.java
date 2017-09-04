@@ -58,6 +58,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
+import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
 import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
 import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
 import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
@@ -79,6 +80,7 @@ public final class BTEngine extends SessionManager {
             LISTEN_FAILED.swig(),
             EXTERNAL_IP.swig(),
             FASTRESUME_REJECTED.swig(),
+            DHT_BOOTSTRAP.swig(),
             TORRENT_LOG.swig(),
             PEER_LOG.swig(),
             AlertType.LOG.swig()
@@ -723,6 +725,9 @@ public final class BTEngine extends SessionManager {
                 case FASTRESUME_REJECTED:
                     onFastresumeRejected((FastresumeRejectedAlert) alert);
                     break;
+                case DHT_BOOTSTRAP:
+                    onDhtBootstrap();
+                    break;
                 case TORRENT_LOG:
                 case PEER_LOG:
                 case LOG:
@@ -750,6 +755,11 @@ public final class BTEngine extends SessionManager {
         } catch (Throwable e) {
             LOG.error("Error logging fastresume rejected alert", e);
         }
+    }
+
+    private void onDhtBootstrap() {
+        long nodes = stats().dhtNodes();
+        LOG.info("DHT bootstrap, total nodes=" + nodes);
     }
 
     private void printAlert(Alert alert) {
