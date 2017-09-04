@@ -31,11 +31,12 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.frostwire.util.Logger;
+
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Provides convenience methods for in-app billing. You can create one instance of this
@@ -71,6 +72,7 @@ import java.util.List;
  *
  */
 public class IabHelper {
+    private static Logger LOG = Logger.getLogger(IabHelper.class);
     // Is debug logging enabled?
     boolean mDebugLog = false;
     String mDebugTag = "IabHelper";
@@ -714,7 +716,12 @@ public class IabHelper {
             final List<String> moreSubsSkus, final QueryInventoryFinishedListener listener)
         throws IabAsyncInProgressException {
         checkNotDisposed();
-        checkSetupDone("queryInventory");
+        try {
+            checkSetupDone("queryInventory");
+        } catch (IllegalStateException illegalState) {
+            LOG.warn("queryInventoryAsync() aborted. " + illegalState.getMessage());
+            return;
+        }
         flagStartAsync("refresh inventory");
         (new Thread(new Runnable() {
             public void run() {
