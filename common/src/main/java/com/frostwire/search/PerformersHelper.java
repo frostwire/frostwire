@@ -41,7 +41,7 @@ public final class PerformersHelper {
     }
 
     public static List<? extends SearchResult> searchPageHelper(RegexSearchPerformer<?> performer, String page, int regexMaxResults) {
-        List<SearchResult> result = new LinkedList<SearchResult>();
+        List<SearchResult> result = new LinkedList<>();
 
         if (page == null) {
             LOG.warn(performer.getClass().getSimpleName() + " returning null page. Issue fetching page or issue getting page prefix/suffix offsets. Notify developers at contact@frostwire.com");
