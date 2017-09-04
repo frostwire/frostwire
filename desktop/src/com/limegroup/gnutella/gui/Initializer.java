@@ -474,13 +474,11 @@ public final class Initializer {
         ctx.interfaces = if_string;
         ctx.retries = port1 - port0;
 
+        ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
+
         BTEngine.ctx = ctx;
         BTEngine btEngine = BTEngine.getInstance();
         btEngine.start();
-
-        if (!SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue()) {
-            BTEngine.getInstance().stopDht();
-        }
 
         VPNStatusRefresher.getInstance().addRefreshListener(new VPNDropGuard());
     }
