@@ -173,7 +173,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         YesNoDialog dlg = YesNoDialog.newInstance(
                 DLG_SEEDING_OFF_TAG,
                 R.string.enable_seeding,
-                R.string.seeding_is_currently_disabled,
+                R.string.seeding_is_currently_disabled_in_settings,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
         dlg.show(((Activity) getContext()).getFragmentManager());
