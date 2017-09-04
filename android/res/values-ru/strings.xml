@@ -573,7 +573,7 @@
     <string name="cheaper_than_drinks">Дешевле, чем напитки</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Выберите файлы, которые вы хотите загрузить с этого торрент</string>
     <string name="automatic_renewal">Автоматическое продление</string>
-    <string name="seeding_is_currently_disabled">Посев в настоящее время отключена в настройках. Вы хотите, чтобы я включить затравку для вас разделить этот файл?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Посев в настоящее время отключена в настройках. Вы хотите, чтобы я включить затравку для вас разделить этот файл?</string>
     <string name="cheaper_than_lattes">Дешевле, чем Латте</string>
     <string name="vpn_off_toast_notification">Ваше соединение не может быть частным.</string>
     <string name="notify_frostwire_is_running">Сообщите, если FrostWire работает</string>

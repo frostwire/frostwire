@@ -467,7 +467,7 @@
     <string name="azureus_manager_item_queued">На опашка</string>
     <string name="enable_dht">Включи DHT</string>
     <string name="keep_in_touch">Поддържаме връзка!</string>
-    <string name="seeding_is_currently_disabled">Сеене в момента е забранено в настройките си. Искате ли да се даде възможност на засяване, за да споделиш този файл?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Сеене в момента е забранено в настройките си. Искате ли да се даде възможност на засяване, за да споделиш този файл?</string>
     <string name="azureus_manager_item_stopping">Спирането</string>
     <string name="cheaper_than_lattes">По-евтини, отколкото лате</string>
     <string name="hints_by_google">Съвети от Google</string>

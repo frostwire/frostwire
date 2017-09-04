@@ -65,13 +65,10 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.android.gui.views.TransfersNoSeedsView;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.transfers.HttpDownload;
-import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferState;
-import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
@@ -105,6 +102,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private static boolean firstTimeShown = true;
     private Handler vpnRichToastHandler;
     private boolean showTorrentSettingsOnClick;
+    private TransfersNoSeedsView transfersNoSeedsView;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -254,9 +252,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onTime() {
         if (adapter != null) {
-            List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
-            Collections.sort(transfers, transferComparator);
-            adapter.updateList(transfers);
+            List<Transfer> allTransfers = TransferManager.instance().getTransfers();
+            List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
+            Collections.sort(selectedStatusTransfers, transferComparator);
+            adapter.updateList(selectedStatusTransfers);
             int i = 0;
             for (TransferStatus transferStatus : tabPositionToTransferStatus) {
                 if (transferStatus == selectedStatus) {
@@ -268,7 +267,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 }
                 i++;
             }
-
+            if (selectedStatus == TransferStatus.SEEDING) {
+                handlePossibleSeedingSuggestions(allTransfers);
+            } else {
+                transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+            }
         } else if (this.getActivity() != null) {
             setupAdapter();
         }
@@ -365,6 +368,21 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         onTime();
     }
 
+    private void handlePossibleSeedingSuggestions(final List<Transfer> transfers) {
+        if (transfers.isEmpty()) {
+            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+            return;
+        }
+        boolean isNotSeeding = !ConfigurationManager.instance().isSeedFinishedTorrents();
+        if (isNotSeeding) {
+            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.SEEDING_DISABLED);
+        } else if (someTransfersFinished(transfers) && noTransfersSeeding(transfers)) {
+            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.SEED_ALL_FINISHED);
+        } else {
+            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+        }
+    }
+
     @Override
     public void onShow() {
         if (firstTimeShown) {
@@ -442,7 +460,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 vpnRichToast.setVisibility(View.GONE);
             }
         });
+
         initVPNStatusButton(v);
+
+        transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
     }
 
     private void initVPNStatusButton(View v) {
@@ -547,38 +568,47 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 state == TransferState.COMPLETE;
     }
 
-    private boolean someTransfersInactive(List<Transfer> transfers) {
+    private boolean someTransfersFinished(final List<Transfer> transfers) {
+        if (transfers == null || transfers.isEmpty()) {
+            return false;
+        }
         for (Transfer t : transfers) {
-            if (t instanceof BittorrentDownload) {
-                BittorrentDownload bt = (BittorrentDownload) t;
-                if (TransferManager.isResumable(bt) && !bt.isFinished()) {
-                    return true;
-                }
+            if (t.getState() == TransferState.FINISHED) {
+                return true;
             }
-            // TODO: restore part of this logic
-            // when HTTP can pause/resume
-            /*else if (t instanceof HttpDownload) {
-                HttpDownload ht = (HttpDownload) t;
-                if (ht.isComplete() || !ht.isDownloading()) {
-                    return true;
-                }
-            } else if (t instanceof YouTubeDownload) {
-                YouTubeDownload yt = (YouTubeDownload) t;
-                if (yt.isComplete() || !yt.isDownloading()) {
-                    return true;
-                }
-
-            } else if (t instanceof SoundcloudDownload) {
-                SoundcloudDownload sd = (SoundcloudDownload) t;
-                if (sd.isComplete() || !sd.isDownloading()) {
-                    return true;
-                }
-            }*/
         }
         return false;
     }
 
-    private boolean someTransfersComplete(List<Transfer> transfers) {
+    private boolean noTransfersSeeding(final List<Transfer> transfers) {
+        if (transfers == null || transfers.isEmpty()) {
+            return true;
+        }
+        for (Transfer t : transfers) {
+            if (t.getState() == TransferState.SEEDING) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private boolean someTransfersInactive(final List<Transfer> transfers) {
+        for (Transfer t : transfers) {
+            TransferState state = t.getState();
+            switch (state) {
+                case PAUSED:
+                case FINISHED:
+                case ERROR:
+                case CANCELED:
+                case STOPPED:
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean someTransfersComplete(final List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t.isComplete()) {
                 return true;
@@ -587,7 +617,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return false;
     }
 
-    private boolean someTransfersSeeding(List<Transfer> transfers) {
+    private boolean someTransfersSeeding(final List<Transfer> transfers) {
         for (Transfer t : transfers) {
             if (t.getState() == TransferState.SEEDING) {
                 return true;
@@ -598,27 +628,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private boolean someTransfersActive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
-            if (t instanceof BittorrentDownload) {
-                BittorrentDownload bt = (BittorrentDownload) t;
-                if (bt.isDownloading() ||
-                        bt.getState() == TransferState.DOWNLOADING) {
-                    return true;
-                }
-            } else if (t instanceof HttpDownload) {
-                HttpDownload ht = (HttpDownload) t;
-                if (ht.isDownloading()) {
-                    return true;
-                }
-            } else if (t instanceof YouTubeDownload) {
-                YouTubeDownload yt = (YouTubeDownload) t;
-                if (yt.isDownloading()) {
-                    return true;
-                }
-            } else if (t instanceof SoundcloudDownload) {
-                SoundcloudDownload sd = (SoundcloudDownload) t;
-                if (sd.isDownloading()) {
-                    return true;
-                }
+            TransferState state = t.getState();
+            if (state == TransferState.DOWNLOADING) {
+                return true;
             }
         }
         return false;

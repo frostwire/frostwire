@@ -562,7 +562,7 @@
     <string name="automatic_renewal">自动续订</string>
     <string name="enable_dht">启用DHT</string>
     <string name="keep_in_touch">保持联系！</string>
-    <string name="seeding_is_currently_disabled">播种功能目前在您的设置中已停用。 您要我为您启用种子分享此文件吗？</string>
+    <string name="seeding_is_currently_disabled_in_settings">播种功能目前在您的设置中已停用。 您要我为您启用种子分享此文件吗？</string>
     <string name="cheaper_than_lattes">比Lattes便宜</string>
     <string name="vpn_off_toast_notification">您的连接可能不是私人的。</string>
     <string name="notify_frostwire_is_running">通知FrostWire是否正在运行</string>

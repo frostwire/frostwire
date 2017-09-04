@@ -473,7 +473,7 @@
     <string name="azureus_manager_item_queued">Jonossa</string>
     <string name="enable_dht">Ota DHT</string>
     <string name="keep_in_touch">Olla yhteydessä!</string>
-    <string name="seeding_is_currently_disabled">Kylvö on tällä hetkellä käytössä asetuksista. Haluatko minut mahdollistaa kylvö voit jakaa tämän tiedoston?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Kylvö on tällä hetkellä käytössä asetuksista. Haluatko minut mahdollistaa kylvö voit jakaa tämän tiedoston?</string>
     <string name="azureus_manager_item_stopping">Lopettaminen</string>
     <string name="cheaper_than_lattes">Halvempi kuin lattes</string>
     <string name="hints_by_google">Vihjeet Googlen</string>

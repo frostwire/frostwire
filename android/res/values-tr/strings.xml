@@ -549,7 +549,7 @@
     <string name="automatic_renewal">Otomatik Yenileme</string>
     <string name="enable_dht">DHT\'yi etkinleştir</string>
     <string name="keep_in_touch">İrtibatta olalım!</string>
-    <string name="seeding_is_currently_disabled">Seeding, şu anda ayarlarınızda devre dışı bırakılmıştır. Bu dosyayı paylaşmanız için tohumlamayı etkinleştirmemi ister misiniz?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Seeding, şu anda ayarlarınızda devre dışı bırakılmıştır. Bu dosyayı paylaşmanız için tohumlamayı etkinleştirmemi ister misiniz?</string>
     <string name="cheaper_than_lattes">Lattes\'den daha ucuz</string>
     <string name="vpn_off_toast_notification">Bağlantınız özel olmayabilir.</string>
     <string name="downloading_metadata">Meta veriler indiriliyor</string>

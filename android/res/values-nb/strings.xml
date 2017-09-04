@@ -473,7 +473,7 @@
     <string name="azureus_manager_item_queued">I kø</string>
     <string name="enable_dht">Aktiver DHT</string>
     <string name="keep_in_touch">Hold kontakten!</string>
-    <string name="seeding_is_currently_disabled">Seeding er deaktivert i innstillingene. Vil du at jeg skal gjøre det mulig seeding for deg å dele denne filen?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Seeding er deaktivert i innstillingene. Vil du at jeg skal gjøre det mulig seeding for deg å dele denne filen?</string>
     <string name="azureus_manager_item_stopping">Stoppe</string>
     <string name="cheaper_than_lattes">Billigere enn Lattes</string>
     <string name="hints_by_google">Tips fra Google</string>

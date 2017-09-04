@@ -531,7 +531,7 @@
     <string name="automatic_renewal">स्वचालित नवीकरण</string>
     <string name="enable_dht">DHT सक्षम करें</string>
     <string name="keep_in_touch">संपर्क में रहना!</string>
-    <string name="seeding_is_currently_disabled">सीडिंग वर्तमान में अपनी सेटिंग्स में अक्षम है। क्या आप इस फ़ाइल को साझा करने के लिए मुझे बोने सक्षम करने के लिए करना चाहते हैं?</string>
+    <string name="seeding_is_currently_disabled_in_settings">सीडिंग वर्तमान में अपनी सेटिंग्स में अक्षम है। क्या आप इस फ़ाइल को साझा करने के लिए मुझे बोने सक्षम करने के लिए करना चाहते हैं?</string>
     <string name="cheaper_than_lattes">लैटेस की तुलना में सस्ता</string>
     <string name="vpn_off_toast_notification">आपका कनेक्शन निजी नहीं हो सकता है।</string>
     <string name="loading">लोड हो रहा है</string>

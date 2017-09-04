@@ -467,7 +467,7 @@
     <string name="azureus_manager_item_queued">Vo fronte</string>
     <string name="enable_dht">Povoliť DHT</string>
     <string name="keep_in_touch">Zostaňte v kontakte!</string>
-    <string name="seeding_is_currently_disabled">Siatie je v súčasnej dobe zakázaný v nastavení. Chceš, aby som na to, aby siatie pre vás zdieľať tento súbor?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Siatie je v súčasnej dobe zakázaný v nastavení. Chceš, aby som na to, aby siatie pre vás zdieľať tento súbor?</string>
     <string name="azureus_manager_item_stopping">Zastavenie</string>
     <string name="cheaper_than_lattes">Lacnejšie ako latte</string>
     <string name="hints_by_google">Rady od Googlu</string>

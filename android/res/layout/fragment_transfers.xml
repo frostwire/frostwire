@@ -3,7 +3,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,14 @@
         frostwire:rich_notification_icon="@drawable/internal_memory_notification"
         frostwire:rich_notification_title="@string/saving_to_internal_memory"
         frostwire:rich_notification_title_underlined="true" />
+
+
+    <com.frostwire.android.gui.views.TransfersNoSeedsView
+        android:id="@+id/fragment_transfers_no_seeds_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"

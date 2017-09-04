@@ -473,7 +473,7 @@
     <string name="azureus_manager_item_queued">Kö</string>
     <string name="enable_dht">Aktivera DHT</string>
     <string name="keep_in_touch">Hålla kontakten!</string>
-    <string name="seeding_is_currently_disabled">Sådd är inaktiverad i inställningarna. Vill du att jag ska göra det möjligt för sådd för dig att dela den här filen?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Sådd är inaktiverad i inställningarna. Vill du att jag ska göra det möjligt för sådd för dig att dela den här filen?</string>
     <string name="azureus_manager_item_stopping">Stoppa</string>
     <string name="cheaper_than_lattes">Billigare än Lattes</string>
     <string name="hints_by_google">Tips by Google</string>

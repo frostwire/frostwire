@@ -536,7 +536,7 @@
     <string name="automatic_renewal">자동 갱신</string>
     <string name="enable_dht">DHT 사용</string>
     <string name="keep_in_touch">계속 연락하십시오!</string>
-    <string name="seeding_is_currently_disabled">설정에서 씨앗 뿌리기가 현재 사용 중지되었습니다. 이 파일을 공유하기 위해 시드를 사용할 수있게 하시겠습니까?</string>
+    <string name="seeding_is_currently_disabled_in_settings">설정에서 씨앗 뿌리기가 현재 사용 중지되었습니다. 이 파일을 공유하기 위해 시드를 사용할 수있게 하시겠습니까?</string>
     <string name="cheaper_than_lattes">라떼보다 쌉니다.</string>
     <string name="vpn_off_toast_notification">귀하의 연결은 사적이지 않을 수 있습니다.</string>
     <string name="loading">로드 중</string>

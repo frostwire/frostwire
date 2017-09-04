@@ -561,7 +561,7 @@
     <string name="automatic_renewal">αυτόματη ανανέωση</string>
     <string name="enable_dht">Ενεργοποίηση DHT</string>
     <string name="keep_in_touch">Κρατάω επαφή!</string>
-    <string name="seeding_is_currently_disabled">Σπορά είναι απενεργοποιημένη στις ρυθμίσεις σας. Θα θέλατε να ενεργοποιήσετε τη σπορά για να μπορείτε να μοιραστείτε αυτό το αρχείο;</string>
+    <string name="seeding_is_currently_disabled_in_settings">Σπορά είναι απενεργοποιημένη στις ρυθμίσεις σας. Θα θέλατε να ενεργοποιήσετε τη σπορά για να μπορείτε να μοιραστείτε αυτό το αρχείο;</string>
     <string name="cheaper_than_lattes">Φθηνότερο από καφέ με γάλα</string>
     <string name="vpn_off_toast_notification">Η σύνδεσή σας δεν μπορεί να είναι ιδιωτικό.</string>
     <string name="downloading_metadata">Κατεβάζοντας μεταδεδομένα</string>

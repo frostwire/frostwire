@@ -539,7 +539,7 @@
     <string name="automatic_renewal">Automatisk fornyelse</string>
     <string name="enable_dht">Aktivér DHT</string>
     <string name="keep_in_touch">Hold kontakten!</string>
-    <string name="seeding_is_currently_disabled">Seedning er i øjeblikket deaktiveret i dine indstillinger. Vil du have mig til at gøre det muligt for såning for dig at dele denne fil?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Seedning er i øjeblikket deaktiveret i dine indstillinger. Vil du have mig til at gøre det muligt for såning for dig at dele denne fil?</string>
     <string name="cheaper_than_lattes">Billigere end latte</string>
     <string name="vpn_off_toast_notification">Din forbindelse kan ikke være privat.</string>
     <string name="loading">Ilægning</string>

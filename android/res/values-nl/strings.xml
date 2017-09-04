@@ -536,7 +536,7 @@
     <string name="automatic_renewal">Automatische verlenging</string>
     <string name="enable_dht">Inschakelen DHT</string>
     <string name="keep_in_touch">Contact houden!</string>
-    <string name="seeding_is_currently_disabled">Zaaien is momenteel uitgeschakeld in uw instellingen. Wil je dat ik zaaien in staat voor u om dit bestand te delen?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Zaaien is momenteel uitgeschakeld in uw instellingen. Wil je dat ik zaaien in staat voor u om dit bestand te delen?</string>
     <string name="cheaper_than_lattes">Goedkoper dan lattes</string>
     <string name="vpn_off_toast_notification">Uw verbinding kan niet privé zijn.</string>
     <string name="loading">Het laden</string>

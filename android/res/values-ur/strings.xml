@@ -493,7 +493,7 @@
     <string name="azureus_manager_item_queued">قطار بند</string>
     <string name="enable_dht">DHT فعال</string>
     <string name="keep_in_touch">رابطے میں رہنا!</string>
-    <string name="seeding_is_currently_disabled">بوائ فی الحال آپ کی ترتیبات میں غیر فعال ہے. کیا آپ اس فائل کا اشتراک کرنے کے لئے مجھ سے بوائ چالو کرنے کے لئے پسند کریں گے؟</string>
+    <string name="seeding_is_currently_disabled_in_settings">بوائ فی الحال آپ کی ترتیبات میں غیر فعال ہے. کیا آپ اس فائل کا اشتراک کرنے کے لئے مجھ سے بوائ چالو کرنے کے لئے پسند کریں گے؟</string>
     <string name="cheaper_than_lattes">Lattes سے سستا</string>
     <string name="hints_by_google">گوگل کی طرف اشارہ</string>
     <string name="ringtone">رنگ ٹونز</string>

@@ -467,7 +467,7 @@
     <string name="azureus_manager_item_queued">จัดคิว</string>
     <string name="enable_dht">เปิดใช้งาน DHT</string>
     <string name="keep_in_touch">ในการติดต่อ!</string>
-    <string name="seeding_is_currently_disabled">เมล็ดถูกปิดใช้งานในการตั้งค่าของคุณ คุณต้องการให้ผมช่วยให้การเพาะเพื่อให้คุณแชร์ไฟล์นี้หรือไม่?</string>
+    <string name="seeding_is_currently_disabled_in_settings">เมล็ดถูกปิดใช้งานในการตั้งค่าของคุณ คุณต้องการให้ผมช่วยให้การเพาะเพื่อให้คุณแชร์ไฟล์นี้หรือไม่?</string>
     <string name="azureus_manager_item_stopping">การหยุด</string>
     <string name="cheaper_than_lattes">ราคาถูกกว่าลาเต้</string>
     <string name="hints_by_google">คำแนะนำโดย Google</string>

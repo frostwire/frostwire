@@ -459,7 +459,7 @@
     <string name="azureus_manager_item_queued">Sta la coadă</string>
     <string name="enable_dht">Activaţi DHT</string>
     <string name="keep_in_touch">Păstrăm legătura!</string>
-    <string name="seeding_is_currently_disabled">Însămânțarea este dezactivat în setările. Vrei să activați semănat pentru tine să împărtășiți acest fișier?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Însămânțarea este dezactivat în setările. Vrei să activați semănat pentru tine să împărtășiți acest fișier?</string>
     <string name="azureus_manager_item_stopping">Oprire</string>
     <string name="cheaper_than_lattes">Mai ieftin decât Lattes</string>
     <string name="hints_by_google">Indicii de la Google</string>

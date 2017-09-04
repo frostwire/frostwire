@@ -461,7 +461,7 @@
     <string name="azureus_manager_item_queued">Queued</string>
     <string name="enable_dht">Ўключыць DHT</string>
     <string name="keep_in_touch">Заставайцеся на сувязі!</string>
-    <string name="seeding_is_currently_disabled">Пасеў ў цяперашні час адключаная ў наладах. Вы хочаце, каб я ўключыць затраўкі для вас падзяліць гэты файл?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Пасеў ў цяперашні час адключаная ў наладах. Вы хочаце, каб я ўключыць затраўкі для вас падзяліць гэты файл?</string>
     <string name="azureus_manager_item_stopping">Прыпынак</string>
     <string name="cheaper_than_lattes">Танней, чым латте</string>
     <string name="hints_by_google">Парады па Google</string>

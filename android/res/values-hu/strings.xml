@@ -459,7 +459,7 @@
     <string name="azureus_manager_item_queued">Sorban álló</string>
     <string name="enable_dht">Engedélyezze a DHT</string>
     <string name="keep_in_touch">Maradj kapcsolatban!</string>
-    <string name="seeding_is_currently_disabled">Vetés jelenleg le van tiltva a beállítások között. Szeretnéd, hogy vetés számára, hogy megosszák ezt a fájlt?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Vetés jelenleg le van tiltva a beállítások között. Szeretnéd, hogy vetés számára, hogy megosszák ezt a fájlt?</string>
     <string name="azureus_manager_item_stopping">Megállítás</string>
     <string name="cheaper_than_lattes">Olcsóbb, mint a latte</string>
     <string name="hints_by_google">Tippek a Google</string>

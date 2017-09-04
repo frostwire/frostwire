@@ -459,7 +459,7 @@
     <string name="azureus_manager_item_queued">Чергу</string>
     <string name="enable_dht">Включити DHT</string>
     <string name="keep_in_touch">Підтримувати зв\'язок!</string>
-    <string name="seeding_is_currently_disabled">Посів в даний час відключена в налаштуваннях. Ви хочете, щоб я включити приманку для вас розділити цей файл?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Посів в даний час відключена в налаштуваннях. Ви хочете, щоб я включити приманку для вас розділити цей файл?</string>
     <string name="azureus_manager_item_stopping">Зупинка</string>
     <string name="cheaper_than_lattes">Дешевше, ніж латте</string>
     <string name="hints_by_google">Поради по Google</string>

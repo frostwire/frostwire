@@ -473,7 +473,7 @@
     <string name="azureus_manager_item_queued">שבתור</string>
     <string name="enable_dht">אפשר DHT</string>
     <string name="keep_in_touch">שמור על קשר!</string>
-    <string name="seeding_is_currently_disabled">מתזמן מושבת כרגע בהגדרות שלך. האם אתה אוהב אותי כדי לאפשר זריעה בשבילך לשתף קובץ זה?</string>
+    <string name="seeding_is_currently_disabled_in_settings">מתזמן מושבת כרגע בהגדרות שלך. האם אתה אוהב אותי כדי לאפשר זריעה בשבילך לשתף קובץ זה?</string>
     <string name="azureus_manager_item_stopping">סְתִימָה</string>
     <string name="cheaper_than_lattes">זול יותר מאשר Lattes</string>
     <string name="hints_by_google">רמזים על ידי Google</string>

@@ -538,7 +538,7 @@
     <string name="automatic_renewal">Tự động gia hạn</string>
     <string name="enable_dht">Kích hoạt tính DHT</string>
     <string name="keep_in_touch">Giữ liên lạc!</string>
-    <string name="seeding_is_currently_disabled">Gieo hạt hiện đang bị vô hiệu hóa trong cài đặt của bạn. Bạn có muốn tôi để cho phép seeding để bạn chia sẻ tập tin này?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Gieo hạt hiện đang bị vô hiệu hóa trong cài đặt của bạn. Bạn có muốn tôi để cho phép seeding để bạn chia sẻ tập tin này?</string>
     <string name="cheaper_than_lattes">Rẻ hơn so với latte</string>
     <string name="vpn_off_toast_notification">Kết nối của bạn có thể không tin.</string>
     <string name="loading">Tải</string>

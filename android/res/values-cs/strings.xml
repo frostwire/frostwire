@@ -539,7 +539,7 @@
     <string name="automatic_renewal">Automatické obnovení</string>
     <string name="enable_dht">Povolit DHT</string>
     <string name="keep_in_touch">Zůstaňte v kontaktu!</string>
-    <string name="seeding_is_currently_disabled">Setí je v současné době zakázán v nastavení. Chceš, abych k tomu, aby setí pro vás sdílet tento soubor?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Setí je v současné době zakázán v nastavení. Chceš, abych k tomu, aby setí pro vás sdílet tento soubor?</string>
     <string name="cheaper_than_lattes">Levnější než latte</string>
     <string name="vpn_off_toast_notification">Vaše spojení nemusí být soukromé.</string>
     <string name="loading">Nakládání</string>

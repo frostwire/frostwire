@@ -467,7 +467,7 @@
     <string name="azureus_manager_item_queued">Beratur</string>
     <string name="enable_dht">Membolehkan DHT</string>
     <string name="keep_in_touch">Sentiasa berhubung!</string>
-    <string name="seeding_is_currently_disabled">Pembenihan dilumpuhkan dalam tetapan anda. Adakah anda ingin saya untuk membolehkan pembenihan untuk anda berkongsi fail ini?</string>
+    <string name="seeding_is_currently_disabled_in_settings">Pembenihan dilumpuhkan dalam tetapan anda. Adakah anda ingin saya untuk membolehkan pembenihan untuk anda berkongsi fail ini?</string>
     <string name="azureus_manager_item_stopping">Menghentikan</string>
     <string name="cheaper_than_lattes">Lebih murah daripada Lattes</string>
     <string name="hints_by_google">Petua oleh Google</string>
