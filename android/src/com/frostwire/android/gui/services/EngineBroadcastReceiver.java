@@ -124,12 +124,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleNetworkStatusChange() {
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                NetworkManager.instance().notifyNetworkStatusListeners();
-            }
-        });
+        NetworkManager.instance().notifyNetworkStatusListeners();
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {

@@ -129,9 +129,9 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
             initTryFrostWirePlusListener();
         }
 
+        // TODO: refactor this, since the single listener pattern does not look good here
         NetworkManager networkManager = NetworkManager.instance();
         networkManager.setNetworkStatusListener(this);
-        // potentially expensive
         networkManager.notifyNetworkStatusListeners();
     }
 

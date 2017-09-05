@@ -142,27 +142,34 @@ public final class NetworkManager {
     }
 
     public void notifyNetworkStatusListeners() {
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                ConnectivityManager connectivityManager = getConnectivityManager();
-                boolean isDataUp = isDataUp(connectivityManager);
-                boolean isDataWIFIUp = isDataWIFIUp(connectivityManager);
-                boolean isDataMobileUp = isDataMobileUp(connectivityManager);
-                if (networkStatusListener != null) {
-                    try {
-                        networkStatusListener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                }
-
-            }
-        });
+        Engine.instance().getThreadPool().execute(new NotifyNetworkStatusTask());
     }
 
     public interface NetworkStatusListener {
         /** Called from background thread, listener must do UI changes on UI thread */
         void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp);
+    }
+
+    private static final class NotifyNetworkStatusTask implements Runnable {
+
+        @Override
+        public void run() {
+            NetworkManager manager = NetworkManager.instance();
+            NetworkStatusListener listener = manager.networkStatusListener;
+
+            if (listener == null) { // early return
+                return;
+            }
+
+            ConnectivityManager connectivityManager = manager.getConnectivityManager();
+            boolean isDataUp = manager.isDataUp(connectivityManager);
+            boolean isDataWIFIUp = manager.isDataWIFIUp(connectivityManager);
+            boolean isDataMobileUp = manager.isDataMobileUp(connectivityManager);
+            try {
+                listener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 }
