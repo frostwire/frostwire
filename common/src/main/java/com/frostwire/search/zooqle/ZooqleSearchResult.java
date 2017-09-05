@@ -48,11 +48,11 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         this.filename = matcher.group("filename") + ".torrent";
         this.displayName = matcher.group("filename");
         this.seeds = Integer.valueOf(matcher.group("seeds").trim());
-        if (matcher.group("torrent") != null) {
-            this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
-        } else {
+        //if (matcher.group("torrent") != null) {
+        //    this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
+        //} else {
             this.torrentUrl = null;
-        }
+        //}
         this.infoHash = matcher.group("infohash");
         this.size = calculateSize(matcher.group("sizedata"));
         this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
