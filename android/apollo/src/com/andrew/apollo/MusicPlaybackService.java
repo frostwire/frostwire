@@ -3111,45 +3111,73 @@ public class MusicPlaybackService extends Service {
          * @return True if the <code>player</code> has been prepared and is
          * ready to play, false otherwise
          */
-        private void setDataSourceImpl(final MediaPlayer player, final String path, final OnPlayerPrepareCallback callback) {
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        player.reset();
-                        if (Ref.alive(mService) && mService.get().launchPlayerActivity) {
-                            player.setOnPreparedListener(new AudioOnPreparedListener(mService));
-                        }
-                        if (path.startsWith("content://")) {
-                            player.setDataSource(mService.get(), Uri.parse(path));
-                        } else {
-                            player.setDataSource(path);
-                        }
-                        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        player.prepare();
-                    } catch (final IOException todo) {
-                        // TODO: notify the user why the file couldn't be opened
-                        callback.onPrepared(false);
-                        return;
-                    } catch (final IllegalArgumentException todo) {
-                        // TODO: notify the user why the file couldn't be opened
-                        callback.onPrepared(false);
-                        return;
-                    } catch (Throwable e) {
-                        // TODO: notify the user why the file couldn't be opened due to an unknown error
-                        callback.onPrepared(false);
-                        return;
-                    }
-                    player.setOnCompletionListener(MultiPlayer.this);
-                    player.setOnErrorListener(MultiPlayer.this);
-                    final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
-                    intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, getAudioSessionId());
-                    intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.get().getPackageName());
-                    mService.get().sendBroadcast(intent);
-                    callback.onPrepared(true);
+        private void setDataSourceImpl(MediaPlayer player, String path, OnPlayerPrepareCallback callback) {
+            Engine.instance().getThreadPool().execute(new SetDataSourceTask(mService,
+                    player, path, callback, this));
+        }
+
+        private static final class SetDataSourceTask implements Runnable {
+
+            private final WeakReference<MusicPlaybackService> mService;
+            private final WeakReference<MediaPlayer> playerRef;
+            private final String path;
+            private final WeakReference<OnPlayerPrepareCallback> callbackRef;
+            private final WeakReference<MultiPlayer> multiPlayerRef;
+
+            SetDataSourceTask(WeakReference<MusicPlaybackService> mService,
+                              MediaPlayer player, String path,
+                              OnPlayerPrepareCallback callback, MultiPlayer multiPlayer) {
+                this.mService = mService;
+                this.playerRef = Ref.weak(player);
+                this.path = path;
+                this.callbackRef = Ref.weak(callback);
+                this.multiPlayerRef = Ref.weak(multiPlayer);
+            }
+
+            @Override
+            public void run() {
+                if (!Ref.alive(mService) || !Ref.alive(playerRef) ||
+                        !Ref.alive(callbackRef) || !Ref.alive(multiPlayerRef)) {
+                    return; // early return
                 }
-            };
-            Engine.instance().getThreadPool().submit(r);
+
+                MediaPlayer player = playerRef.get();
+                OnPlayerPrepareCallback callback = callbackRef.get();
+                MultiPlayer multiPlayer = multiPlayerRef.get();
+
+                try {
+                    player.reset();
+                    if (Ref.alive(mService) && mService.get().launchPlayerActivity) {
+                        player.setOnPreparedListener(new AudioOnPreparedListener(mService));
+                    }
+                    if (path.startsWith("content://")) {
+                        player.setDataSource(mService.get(), Uri.parse(path));
+                    } else {
+                        player.setDataSource(path);
+                    }
+                    player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    player.prepare();
+                } catch (final IOException todo) {
+                    // TODO: notify the user why the file couldn't be opened
+                    callback.onPrepared(false);
+                    return;
+                } catch (final IllegalArgumentException todo) {
+                    // TODO: notify the user why the file couldn't be opened
+                    callback.onPrepared(false);
+                    return;
+                } catch (Throwable e) {
+                    // TODO: notify the user why the file couldn't be opened due to an unknown error
+                    callback.onPrepared(false);
+                    return;
+                }
+                player.setOnCompletionListener(multiPlayer);
+                player.setOnErrorListener(multiPlayer);
+                final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+                intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mService.get().getAudioSessionId());
+                intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.get().getPackageName());
+                mService.get().sendBroadcast(intent);
+                callback.onPrepared(true);
+            }
         }
 
         /**
