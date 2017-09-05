@@ -930,20 +930,42 @@ public class MusicPlaybackService extends Service {
      * Asynchronous bitmap fetching for building the notification
      */
     private void updateNotificationAsync() {
-        Runnable task = new Runnable() {
-            public void run() {
-                // background portion
-                final Bitmap bitmap = getAlbumArt();
+        Engine.instance().getThreadPool().execute(new UpdateNotificationTask(this));
+    }
 
-                Runnable postExecute = new Runnable() {
-                    public void run() {
-                        mNotificationHelper.buildNotification(getAlbumName(), getArtistName(), getTrackName(), getAlbumId(), bitmap, isPlaying());
-                    }
-                };
-                mPlayerHandler.post(postExecute);
+    private static final class UpdateNotificationTask implements Runnable {
+
+        private final WeakReference<MusicPlaybackService> serviceRef;
+
+        UpdateNotificationTask(MusicPlaybackService service) {
+            this.serviceRef = Ref.weak(service);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(serviceRef)) {
+                return; // early return
             }
-        };
-        Engine.instance().getThreadPool().submit(task);
+
+            final MusicPlaybackService service = serviceRef.get();
+
+            // background portion
+            final Bitmap bitmap = service.getAlbumArt();
+
+            // TODO: refactor this really bad code
+            Runnable postExecute = new Runnable() {
+                public void run() {
+                    service.mNotificationHelper.buildNotification(
+                            service.getAlbumName(),
+                            service.getArtistName(),
+                            service.getTrackName(),
+                            service.getAlbumId(),
+                            bitmap,
+                            service.isPlaying());
+                }
+            };
+            service.mPlayerHandler.post(postExecute);
+        }
     }
 
 
@@ -1043,7 +1065,7 @@ public class MusicPlaybackService extends Service {
     private void cancelShutdown() {
         ExecutorService threadPool = Engine.instance().getThreadPool();
         if (threadPool != null && mAlarmManager != null && mShutdownIntent != null) {
-            threadPool.submit(new CancelShutdownRunnable(this));
+            threadPool.execute(new CancelShutdownRunnable(this));
         }
     }
 
@@ -1577,7 +1599,7 @@ public class MusicPlaybackService extends Service {
     private void notifyChange(final String change) {
         NotifyChangeRunnable runnable = new NotifyChangeRunnable(this, change);
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            Engine.instance().getThreadPool().submit(runnable);
+            Engine.instance().getThreadPool().execute(runnable);
         } else {
             runnable.run();
         }
@@ -1638,7 +1660,7 @@ public class MusicPlaybackService extends Service {
                 // Add the track to the recently played list.
                 ExecutorService threadPool = Engine.instance().getThreadPool();
                 if (threadPool != null) {
-                    threadPool.submit(new RecentsStoreAddAlbumIdRunnable(musicPlaybackService));
+                    threadPool.execute(new RecentsStoreAddAlbumIdRunnable(musicPlaybackService));
                 }
 
             } else if (QUEUE_CHANGED.equals(change)) {
@@ -1737,7 +1759,7 @@ public class MusicPlaybackService extends Service {
      * @param playState update RemoteControlClient to that state
      */
     private void changeQueueAsync(final int playState) {
-        Engine.instance().getThreadPool().submit(new ChangeRemoteControlClient(this, playState));
+        Engine.instance().getThreadPool().execute(new ChangeRemoteControlClient(this, playState));
     }
 
     private final static class ChangeRemoteControlClient implements Runnable {
@@ -3284,7 +3306,7 @@ public class MusicPlaybackService extends Service {
          */
         public void start() {
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().submit(startMediaPlayerRunnable);
+                Engine.instance().getThreadPool().execute(startMediaPlayerRunnable);
             } else {
                 startMediaPlayerRunnable.run();
             }
