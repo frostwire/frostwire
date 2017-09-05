@@ -20,6 +20,8 @@ package com.frostwire.android.gui.services;
 import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -41,15 +43,30 @@ final class EngineThreadPool extends ThreadPool {
 
     @Override
     public void execute(Runnable command) {
-        if (Debug.hasContext(command)) {
-            throw new RuntimeException("Runnable contains context, possible context leak");
+        verifyTask(command);
+        super.execute(command);
+    }
+
+    @Override
+    public Future<?> submit(Runnable task) {
+        verifyTask(task);
+        return super.submit(task);
+    }
+
+    @Override
+    public <T> Future<T> submit(Callable<T> task) {
+        verifyTask(task);
+        return super.submit(task);
+    }
+
+    private void verifyTask(Object task) {
+        if (Debug.hasContext(task)) {
+            throw new RuntimeException("Runnable/task contains context, possible context leak");
         }
 
         // if debug/development, allow only 20 tasks in the queue
         if (Debug.isEnable() && getQueue().size() > 20) {
             throw new RuntimeException("Too many tasks in the queue");
         }
-
-        super.execute(command);
     }
 }
