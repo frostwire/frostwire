@@ -210,7 +210,7 @@ public final class ApolloUtils {
                 }
             }
         };
-        Engine.instance().getThreadPool().submit(task);
+        Engine.instance().getThreadPool().execute(task);
     }
 
 

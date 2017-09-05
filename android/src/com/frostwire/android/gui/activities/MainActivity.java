@@ -431,7 +431,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
 
         LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable");
         delayedOnResumeInterstitialRunnable = new DelayedOnResumeInterstitialRunnable(20000, this);
-        Engine.instance().getThreadPool().submit(delayedOnResumeInterstitialRunnable);
+        Engine.instance().getThreadPool().execute(delayedOnResumeInterstitialRunnable);
     }
 
     private static class DelayedOnResumeInterstitialRunnable implements Runnable {

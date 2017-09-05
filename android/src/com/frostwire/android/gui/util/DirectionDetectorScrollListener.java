@@ -107,7 +107,7 @@ public final class DirectionDetectorScrollListener {
                     }
                 }
                 if (threadPool != null) {
-                    threadPool.submit(r);
+                    threadPool.execute(r);
                 } else {
                     new Thread(r).start();
                 }

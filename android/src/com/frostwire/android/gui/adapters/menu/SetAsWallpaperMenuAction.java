@@ -49,7 +49,7 @@ public class SetAsWallpaperMenuAction extends MenuAction {
             return;
         }
         UIUtils.showShortMessage(context, R.string.your_android_wall_paper_will_change);
-        Engine.instance().getThreadPool().submit(new Runnable() {
+        Engine.instance().getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
                 try {

@@ -413,7 +413,7 @@ public final class SearchFragment extends AbstractFragment implements
     private static class KeywordDetectorFeeder {
         private static void submitSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
             final WeakReference<SearchFragment> fragmentRef = Ref.weak(fragment);
-            Engine.instance().getThreadPool().submit(new Runnable() {
+            Engine.instance().getThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {
                     if (!Ref.alive(fragmentRef)) {
@@ -948,7 +948,7 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             };
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().submit(notifyLogic);
+                Engine.instance().getThreadPool().execute(notifyLogic);
             } else {
                 notifyLogic.run();
             }

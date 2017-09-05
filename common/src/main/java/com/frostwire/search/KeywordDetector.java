@@ -290,7 +290,7 @@ public final class KeywordDetector {
                         // submit next task if there is any left
                         if (histogramUpdateRequestTask != null && running.get() && threadPool != null) {
                             try {
-                                threadPool.submit(histogramUpdateRequestTask);
+                                threadPool.execute(histogramUpdateRequestTask);
                             } catch (Throwable t) {
                                 LOG.error(t.getMessage(), t);
                             }

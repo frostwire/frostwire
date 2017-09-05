@@ -98,7 +98,7 @@ final class UniversalScanner {
 
             // do not do this on main thread, causing ANRs
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().submit(onMediaScannerConnectedRunnable);
+                Engine.instance().getThreadPool().execute(onMediaScannerConnectedRunnable);
             } else {
                 onMediaScannerConnectedRunnable.run();
             }

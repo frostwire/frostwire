@@ -63,7 +63,7 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         if (mImageFetcher != null && dataHolder != null && Ref.alive(musicViewHolder.mImage)) {
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
-                Engine.instance().getThreadPool().submit(new GetAlbumIdRunnable(getContext(), dataHolder, new Runnable() {
+                Engine.instance().getThreadPool().execute(new GetAlbumIdRunnable(getContext(), dataHolder, new Runnable() {
                     @Override
                     public void run() {
                         mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());

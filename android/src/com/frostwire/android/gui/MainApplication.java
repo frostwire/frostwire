@@ -116,7 +116,7 @@ public class MainApplication extends Application {
     private void installHttpCache() {
         ExecutorService threadPool = Engine.instance().getThreadPool();
         if (threadPool != null) {
-            threadPool.submit(new InstallHttpCacheRunnable(this));
+            threadPool.execute(new InstallHttpCacheRunnable(this));
         }
     }
 

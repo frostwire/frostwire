@@ -185,7 +185,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     @Override
     public void onTime() {
-        Engine.instance().getThreadPool().submit(mOnTimeRunnable);
+        Engine.instance().getThreadPool().execute(mOnTimeRunnable);
     }
 
     @SuppressWarnings("deprecation")

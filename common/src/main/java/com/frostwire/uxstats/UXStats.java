@@ -159,7 +159,7 @@ public final class UXStats {
         this.data = newData();
 
         if (executor != null) { // remember, not thread safe
-            executor.submit(r);
+            executor.execute(r);
         } else {
             new Thread(r, "UXStats-sendData").start();
         }

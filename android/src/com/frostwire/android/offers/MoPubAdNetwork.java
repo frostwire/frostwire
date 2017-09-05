@@ -108,7 +108,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         }
         LoadMoPubInterstitialRunnable runnable = new LoadMoPubInterstitialRunnable(this, activity, placement);
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            Engine.instance().getThreadPool().submit(runnable);
+            Engine.instance().getThreadPool().execute(runnable);
         } else {
             runnable.run();
         }
