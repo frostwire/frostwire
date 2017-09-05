@@ -49,8 +49,7 @@ final class EngineThreadPool extends ThreadPool {
 
     @Override
     public Future<?> submit(Runnable task) {
-        // TODO: restore context leak check
-        //verifyTask(task);
+        verifyTask(task);
         return super.submit(task);
     }
 
