@@ -21,7 +21,9 @@ package com.frostwire.android.gui;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -55,18 +57,7 @@ public final class Peer {
     }
 
     public void finger(final Finger.FingerCallback callback) {
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Finger finger = Librarian.instance().finger();
-                    callback.onFinger(finger);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    // TODO: fix this the right way!!
-                }
-            }
-        });
+        Engine.instance().getThreadPool().execute(new FingerTask(callback));
     }
 
     public List<FileDescriptor> browse(byte fileType) {
@@ -94,5 +85,27 @@ public final class Peer {
 
     public String getKey() {
         return key;
+    }
+
+    private static final class FingerTask implements Runnable {
+
+        private final WeakReference<Finger.FingerCallback> cb;
+
+        FingerTask(Finger.FingerCallback cb) {
+            this.cb = Ref.weak(cb);
+        }
+
+        @Override
+        public void run() {
+            if (Ref.alive(cb)) {
+                try {
+                    Finger finger = Librarian.instance().finger();
+                    cb.get().onFinger(finger);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    // TODO: fix this the right way!!
+                }
+            }
+        }
     }
 }
