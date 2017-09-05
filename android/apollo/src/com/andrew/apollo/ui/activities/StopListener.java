@@ -20,7 +20,6 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.RemoteException;
 import android.view.View;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
@@ -54,17 +53,32 @@ class StopListener implements View.OnLongClickListener {
         return true;
     }
 
-    private void stopMusicAsync(final View v) {
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MusicUtils.musicPlaybackService.stop();
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-                v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
+    private void stopMusicAsync(View v) {
+        Engine.instance().getThreadPool().execute(new StopMusicAsyncTask(v));
+    }
+
+    private static final class StopMusicAsyncTask implements Runnable {
+
+        private final WeakReference<View> vRef;
+
+        StopMusicAsyncTask(View v) {
+            this.vRef = Ref.weak(v);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(vRef)) {
+                return; // early return
             }
-        });
+
+            View v = vRef.get();
+
+            try {
+                MusicUtils.musicPlaybackService.stop();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
+        }
     }
 }
