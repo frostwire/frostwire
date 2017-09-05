@@ -283,13 +283,7 @@ public final class TransferManager {
             }
         });
 
-        Engine.instance().getThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                engine.restoreDownloads();
-            }
-        });
-
+        Engine.instance().getThreadPool().execute(new RestoreDownloadsTask());
     }
 
     public boolean remove(Transfer transfer) {
@@ -593,5 +587,13 @@ public final class TransferManager {
             }
         };
         ConfigurationManager.instance().registerOnPreferenceChange(preferenceListener);
+    }
+
+    private static final class RestoreDownloadsTask implements Runnable {
+
+        @Override
+        public void run() {
+            BTEngine.getInstance().restoreDownloads();
+        }
     }
 }
