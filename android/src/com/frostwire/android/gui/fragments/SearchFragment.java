@@ -308,30 +308,7 @@ public final class SearchFragment extends AbstractFragment implements
                     startTransfer(sr, getString(R.string.download_added_to_queue));
                 }
             };
-            LocalSearchEngine.instance().setListener(new SearchListener() {
-                @Override
-                public void onResults(long token, final List<? extends SearchResult> results) {
-                    onSearchResults((List<SearchResult>) results);
-                }
-
-                @Override
-                public void onError(long token, SearchError error) {
-                    LOG.error("Some error in search stream: " + error);
-                }
-
-                @Override
-                public void onStopped(long token) {
-                    if (isAdded()) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                searchProgress.setProgressEnabled(false);
-                                deepSearchProgress.setVisibility(View.GONE);
-                            }
-                        });
-                    }
-                }
-            });
+            LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
         }
         list.setAdapter(adapter);
     }
@@ -733,6 +710,46 @@ public final class SearchFragment extends AbstractFragment implements
         keywordFilterDrawerView.reset();
     }
 
+    private static class LocalSearchEngineListener implements SearchListener {
+
+        private final WeakReference<SearchFragment> searchFragmentRef;
+
+        LocalSearchEngineListener(SearchFragment searchFragment) {
+            searchFragmentRef = Ref.weak(searchFragment);
+        }
+
+        @Override
+        public void onResults(long token, final List<? extends SearchResult> results) {
+            if (Ref.alive(searchFragmentRef)) {
+                searchFragmentRef.get().onSearchResults((List<SearchResult>) results);
+            }
+        }
+
+        @Override
+        public void onError(long token, SearchError error) {
+            LOG.error("Some error in search stream: " + error);
+        }
+
+        @Override
+        public void onStopped(long token) {
+            if (Ref.alive(searchFragmentRef)) {
+                SearchFragment searchFragment = searchFragmentRef.get();
+                if (searchFragment.isAdded()) {
+                    searchFragment.getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (Ref.alive(searchFragmentRef)) {
+                                SearchFragment searchFragment = searchFragmentRef.get();
+                                searchFragment.searchProgress.setProgressEnabled(false);
+                                searchFragment.deepSearchProgress.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     private static final class SearchInputOnSearchListener implements SearchInputView.OnSearchListener {
         private final WeakReference<LinearLayout> rootViewRef;
         private final WeakReference<SearchFragment> fragmentRef;
@@ -919,34 +936,8 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            Runnable notifyLogic = new Runnable() {
-                @Override
-                public void run() {
-                    long timeSinceLastUpdate = System.currentTimeMillis() - lastUIUpdate;
-                    if (timeSinceLastUpdate < 500) {
-                        try {
-                            Thread.sleep(500L - timeSinceLastUpdate);
-                        } catch (InterruptedException ignored) {
-                        }
-                    }
-                    Runnable uiRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            lastUIUpdate = System.currentTimeMillis();
-                            for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
-                                List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
-                                keywordFilterDrawerView.updateData(
-                                        feature,
-                                        filteredHistogram);
-                            }
-                            updateVisibility();
-                            keywordFilterDrawerView.requestLayout();
-                        }
-                    };
-                    getActivity().runOnUiThread(uiRunnable);
+            NotifyLogicRunnable notifyLogic = new NotifyLogicRunnable(getActivity(), this, keywordFilterDrawerView, filteredHistograms);
 
-                }
-            };
             if (Looper.myLooper() == Looper.getMainLooper()) {
                 Engine.instance().getThreadPool().execute(notifyLogic);
             } else {
@@ -1050,6 +1041,68 @@ public final class SearchFragment extends AbstractFragment implements
         private void openKeywordFilterDrawerView() {
             keywordFilterDrawerView.setKeywordFiltersPipelineListener(this);
             openKeywordFilterDrawer();
+        }
+    }
+
+    private final static class NotifyLogicRunnable implements Runnable {
+        private final WeakReference<Activity> activityRef;
+        private final WeakReference<FilterToolbarButton> filterToolbarButtonRef;
+        private final WeakReference<KeywordFilterDrawerView> keywordFilterDrawerViewRef;
+        private final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms;
+
+        NotifyLogicRunnable(Activity activity,
+                            FilterToolbarButton filterToolbarButton,
+                            KeywordFilterDrawerView keywordFilterDrawerView,
+                            Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filtered_histograms) {
+            activityRef = Ref.weak(activity);
+            filterToolbarButtonRef = Ref.weak(filterToolbarButton);
+            keywordFilterDrawerViewRef = Ref.weak(keywordFilterDrawerView);
+            filteredHistograms = filtered_histograms;
+        }
+
+        private boolean referencesAlive() {
+            return Ref.alive(activityRef) &&
+                    Ref.alive(filterToolbarButtonRef) &&
+                    Ref.alive(keywordFilterDrawerViewRef);
+        }
+
+        @Override
+        public void run() {
+            if (!referencesAlive()) {
+                return;
+            }
+            FilterToolbarButton filterToolbarButton = filterToolbarButtonRef.get();
+            long timeSinceLastUpdate = System.currentTimeMillis() - filterToolbarButton.lastUIUpdate;
+            if (timeSinceLastUpdate < 500) {
+                try {
+                    Thread.sleep(500L - timeSinceLastUpdate);
+                } catch (InterruptedException ignored) {
+                }
+            }
+            Runnable uiRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (!referencesAlive()) {
+                        return;
+                    }
+                    FilterToolbarButton filterToolbarButton = filterToolbarButtonRef.get();
+                    KeywordFilterDrawerView keywordFilterDrawerView = keywordFilterDrawerViewRef.get();
+                    filterToolbarButton.lastUIUpdate = System.currentTimeMillis();
+                    // should be safe from concurrent modification exception as new list with filtered elements
+                    for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+                        List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
+                        keywordFilterDrawerView.updateData(
+                                feature,
+                                filteredHistogram);
+                    }
+                    filterToolbarButton.updateVisibility();
+                    keywordFilterDrawerView.requestLayout();
+                }
+            };
+            Activity activity = activityRef.get();
+            if (activity != null) {
+                activity.runOnUiThread(uiRunnable);
+            }
         }
     }
 }
