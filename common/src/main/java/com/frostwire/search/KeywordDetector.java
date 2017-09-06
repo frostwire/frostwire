@@ -113,7 +113,8 @@ public final class KeywordDetector {
     }
 
     public void feedSearchResults(final List<? extends SearchResult> results) {
-        for (SearchResult sr : results) {
+        LinkedList<SearchResult> copiedResults = new LinkedList<>(results);
+        for (SearchResult sr : copiedResults) {
             addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
             if (sr instanceof FileSearchResult) {
                 String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
