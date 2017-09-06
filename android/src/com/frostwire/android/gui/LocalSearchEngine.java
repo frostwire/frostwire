@@ -193,7 +193,7 @@ public final class LocalSearchEngine {
     }
 
     private List<SearchResult> filter2(List<? extends SearchResult> results) {
-        List<SearchResult> list = new LinkedList<SearchResult>();
+        List<SearchResult> list = new LinkedList<>();
 
         try {
             for (SearchResult sr : results) {
@@ -201,7 +201,7 @@ public final class LocalSearchEngine {
                     if (((TorrentSearchResult) sr).getSeeds() == -1) {
                         long creationTime = sr.getCreationTime();
                         long age = System.currentTimeMillis() - creationTime;
-                        if (age > 31536000000l) {
+                        if (age > 31536000000L) {
                             continue;
                         }
                     } else if (sr instanceof ScrapedTorrentFileSearchResult) {
@@ -222,7 +222,7 @@ public final class LocalSearchEngine {
                         }
                     } else if (sr instanceof ScrapedTorrentFileSearchResult) {
                         list.add(sr);
-                    } else if (filter(new LinkedList<String>(currentSearchTokens), sr)) {
+                    } else if (filter(new LinkedList<>(currentSearchTokens), sr)) {
                         list.add(sr);
                     }
                 } else {
@@ -280,7 +280,7 @@ public final class LocalSearchEngine {
     }
 
     private Set<String> normalizeTokens(Set<String> tokens) {
-        Set<String> normalizedTokens = new HashSet<String>();
+        Set<String> normalizedTokens = new HashSet<>(0);
 
         for (String token : tokens) {
             String norm = normalize(token);
@@ -293,8 +293,8 @@ public final class LocalSearchEngine {
     private List<String> tokenize(String keywords) {
         keywords = sanitize(keywords);
 
-        Set<String> tokens = new HashSet<String>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
+        Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
 
-        return new ArrayList<String>(normalizeTokens(tokens));
+        return new ArrayList<>(normalizeTokens(tokens));
     }
 }
