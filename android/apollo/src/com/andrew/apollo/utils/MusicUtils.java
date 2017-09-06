@@ -28,6 +28,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.IBinder;
@@ -681,8 +682,16 @@ public final class MusicUtils {
         );
         if (cursor != null) {
             cursor.moveToFirst();
-            albumId = cursor.getLong(0);
-            cursor.close();
+            try {
+                albumId = cursor.getLong(0);
+            } catch (CursorIndexOutOfBoundsException oob) {
+                return -1;
+            } finally {
+                if (cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+
         }
         return albumId;
     }
