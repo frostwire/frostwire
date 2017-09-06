@@ -148,8 +148,12 @@ public final class KeywordDetector {
      */
     private void updateHistogramTokenCount(Feature feature, String token) {
         HistoHashMap<String> histogram = histoHashMaps.get(feature);
-        if (histogram != null) {
-            histogram.update(token);
+        if (histogram != null && token != null) {
+            try {
+                histogram.update(token);
+            } catch (NullPointerException npe) {
+                LOG.warn(npe.getMessage(), npe);
+            }
         }
     }
 
