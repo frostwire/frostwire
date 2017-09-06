@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">بیج ٹرانسمیشن نہیں بن سکتا. "ترتیبات" کی حیثیت کی جانچ پڑتال کریں> "BitTorrent Connection Status"</string>
     <string name="transfers_select_seeding">بوائ</string>
     <string name="transfers_context_seed_all_transfers">تمام مکمل ٹرانسفر کا اشتراک کریں</string>
+    <string name="the_more_you_give_the_more_you_receive">اور جو کچھ آپ زیادہ حاصل کرتے ہیں وہ زیادہ دیتے ہیں</string>
+    <string name="seed_all_finished">سب ختم کریں اشتراک کریں</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">کیا آپ اپنی مکمل ٹرانسمیشن ٹرانسفارمرز کا اشتراک کرنا چاہیں گے؟</string>
+    <string name="nothing_is_currently_seeding">فی الحال اشتراک نہیں کیا جا رہا ہے</string>
+    <string name="seeding_keeps_the_network_healthy">حصول میں نیٹ ورک کو صحت مند رکھنے میں مدد ملتی ہے</string>
+    <string name="seeding_is_currently_disabled">شیئرنگ اب غیر فعال ہے</string>
 </resources>

@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Kann nicht stürzen torrent transfers Überprüfen Sie den Status "Einstellungen" > "BitTorrent-Verbindungsstatus"</string>
     <string name="transfers_select_seeding">seeding</string>
     <string name="transfers_context_seed_all_transfers">Samen alle fertigen Transfers</string>
+    <string name="the_more_you_give_the_more_you_receive">Je mehr Sie geben, desto mehr erhalten Sie</string>
+    <string name="seed_all_finished">Teilen Alle fertig</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Möchten Sie Ihre fertigen torrent transfers teilen?</string>
+    <string name="nothing_is_currently_seeding">Im Moment teilt sich nichts</string>
+    <string name="seeding_keeps_the_network_healthy">Zu teilen hilft hält das Netzwerk gesund</string>
+    <string name="seeding_is_currently_disabled">Die Freigabe ist derzeit deaktiviert</string>
 </resources>

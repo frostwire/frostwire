@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">A torrent átvitelét nem lehet elvetni. A "Beállítások" > "BitTorrent kapcsolat állapota" állapotának ellenőrzése</string>
     <string name="transfers_select_seeding">vetés</string>
     <string name="transfers_context_seed_all_transfers">Minden befejezett átutalást el kell vetni</string>
+    <string name="the_more_you_give_the_more_you_receive">Minél többet adsz, annál többet kapsz</string>
+    <string name="seed_all_finished">Megosztása Befejezettek</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Szeretné megosztani a kész torrent transzferek?</string>
+    <string name="nothing_is_currently_seeding">Nincs jelenleg vetés</string>
+    <string name="seeding_keeps_the_network_healthy">A megosztás segít fenntartani a hálózatot</string>
+    <string name="seeding_is_currently_disabled">A megosztás jelenleg ki van kapcsolva</string>
 </resources>

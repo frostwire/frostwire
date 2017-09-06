@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Не мога да прехвърля торент трансфери. Проверете състоянието на "Настройки" > "Състояние на връзката BitTorrent"</string>
     <string name="transfers_select_seeding">посев</string>
     <string name="transfers_context_seed_all_transfers">Заредете всички завършени трансфери</string>
+    <string name="the_more_you_give_the_more_you_receive">Колкото повече давате, толкова повече получавате</string>
+    <string name="seed_all_finished">Семената Всички завършени</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Искате ли да заредите завършените торентни трансфери?</string>
+    <string name="nothing_is_currently_seeding">В момента нищо не се засява</string>
+    <string name="seeding_keeps_the_network_healthy">Семенето помага да поддържа мрежата здрава</string>
+    <string name="seeding_is_currently_disabled">Сеене понастоящем е деактивиран</string>
 </resources>

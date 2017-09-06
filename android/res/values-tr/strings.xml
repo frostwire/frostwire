@@ -677,4 +677,10 @@
     <string name="cant_seed_torrent_transfers">Torrent transferlerini tohumlayamazsın. "Ayarlar" > "BitTorrent Bağlantı Durumu" durumunu kontrol edin</string>
     <string name="transfers_select_seeding">paylaşım</string>
     <string name="transfers_context_seed_all_transfers">Bitirilen tüm transferleri paylaş</string>
+    <string name="the_more_you_give_the_more_you_receive">Ne kadar çok verirsen alırsın</string>
+    <string name="seed_all_finished">Tümünü Paylaş Bitirildi</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Biten torrent transferlerinizi paylaşmak ister misiniz?</string>
+    <string name="nothing_is_currently_seeding">Şu anda bir şey paylaşmıyor</string>
+    <string name="seeding_keeps_the_network_healthy">Paylaşım, şebekenin sağlıklı kalmasını sağlar</string>
+    <string name="seeding_is_currently_disabled">Paylaşım şu anda devre dışı</string>
 </resources>

@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Kan geen torrentoverdrachten zaaien. Controleer de status van "Instellingen" > "BitTorrent Connection Status"</string>
     <string name="transfers_select_seeding">zaaien</string>
     <string name="transfers_context_seed_all_transfers">Zaad alle afgewerkte overdrachten</string>
+    <string name="the_more_you_give_the_more_you_receive">Hoe meer u geeft, hoe meer u ontvangt</string>
+    <string name="seed_all_finished">Deel alles voltooid</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Wilt u uw voltooide torrentoverdrachten delen?</string>
+    <string name="nothing_is_currently_seeding">Niets is momenteel aan het delen</string>
+    <string name="seeding_keeps_the_network_healthy">Delen helpt houdt het netwerk gezond</string>
+    <string name="seeding_is_currently_disabled">Delen is momenteel uitgeschakeld</string>
 </resources>

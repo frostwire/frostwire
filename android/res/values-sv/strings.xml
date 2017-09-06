@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Kan inte utsända torrentöverföringar. Kontrollera status för "Inställningar" > "BitTorrent-anslutningsstatus"</string>
     <string name="transfers_select_seeding">sådd</string>
     <string name="transfers_context_seed_all_transfers">Dela alla färdiga överföringar</string>
+    <string name="the_more_you_give_the_more_you_receive">Ju mer du ger ju mer du får</string>
+    <string name="seed_all_finished">Dela alla färdiga</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Vill du dela dina färdiga torrentöverföringar?</string>
+    <string name="nothing_is_currently_seeding">Ingenting delas för närvarande</string>
+    <string name="seeding_keeps_the_network_healthy">Delning hjälper till att hålla nätverket hälsosamt</string>
+    <string name="seeding_is_currently_disabled">Delning är för närvarande inaktiverad</string>
 </resources>

@@ -674,10 +674,15 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="no_data_check_internet_connection">Мрежа недоступна, молимо проверите вашу интернетску везу.</string>
     <string name="use_pixabay">Користе Pixabay</string>
-
     <string name="transfers_context_stop_seeding_all_transfers">Престани сјести све преносе</string>
     <string name="seed_stop">Престани сјеме</string>
     <string name="cant_seed_torrent_transfers">Не могу се преносити торрент трансфери. Проверите статус "Сеттингс" > "БитТоррент Цоннецтион Статус"</string>
     <string name="transfers_select_seeding">сјеме</string>
     <string name="transfers_context_seed_all_transfers">Подијелите све завршене трансфере</string>
+    <string name="the_more_you_give_the_more_you_receive">Што више дајете више што примате</string>
+    <string name="seed_all_finished">Делите све завршене</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Желите ли поделити своје завршене торрент преносе?</string>
+    <string name="nothing_is_currently_seeding">Ништа тренутно не дели</string>
+    <string name="seeding_keeps_the_network_healthy">Дељење помаже да мрежа буде здрава</string>
+    <string name="seeding_is_currently_disabled">Дељење је тренутно онемогућено</string>
 </resources>

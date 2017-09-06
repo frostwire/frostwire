@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Nu pot fi transferate transferurile torrent. Verificați starea "Setări" > "Starea conexiunii BitTorrent"</string>
     <string name="transfers_select_seeding">însămânțare</string>
     <string name="transfers_context_seed_all_transfers">Semănați toate transferurile finalizate</string>
+    <string name="the_more_you_give_the_more_you_receive">Cu cât dai mai mult pe cât primești</string>
+    <string name="seed_all_finished">Distribuiți-le pe toate terminate</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Doriți să împărtășiți transferurile torrent finite?</string>
+    <string name="nothing_is_currently_seeding">În prezent, nu se face nicio schimbare</string>
+    <string name="seeding_keeps_the_network_healthy">Partajarea ajută la menținerea rețelei sănătoase</string>
+    <string name="seeding_is_currently_disabled">Partajarea este dezactivată în prezent</string>
 </resources>

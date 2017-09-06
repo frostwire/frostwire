@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Nije moguće sjemena prijenosa s torrentima. Provjerite status "Postavke" > "Status BitTorrent veze"</string>
     <string name="transfers_select_seeding">sijanje</string>
     <string name="transfers_context_seed_all_transfers">Sjeme sve gotove prijenose</string>
+    <string name="the_more_you_give_the_more_you_receive">Što više dajete više što primate</string>
+    <string name="seed_all_finished">Sjeme sve završeno</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Želite li sjetiti svoje gotove torrent transfere?</string>
+    <string name="nothing_is_currently_seeding">Trenutno ništa ne zasijava</string>
+    <string name="seeding_keeps_the_network_healthy">Sjetva pomaže održavanju mreže zdravom</string>
+    <string name="seeding_is_currently_disabled">Sjetva je trenutno onemogućena</string>
 </resources>

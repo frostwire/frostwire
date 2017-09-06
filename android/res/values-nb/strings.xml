@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Kan ikke frøe overføringer av torrent. Kontroller status for "Innstillinger" > "BitTorrent-tilkoblingsstatus"</string>
     <string name="transfers_select_seeding">såing</string>
     <string name="transfers_context_seed_all_transfers">Sæd alle ferdige overføringer</string>
+    <string name="the_more_you_give_the_more_you_receive">Jo mer du gir det mer du mottar</string>
+    <string name="seed_all_finished">Del alle ferdige</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Vil du dele dine ferdige torrentoverføringer?</string>
+    <string name="nothing_is_currently_seeding">Ingenting deles for tiden</string>
+    <string name="seeding_keeps_the_network_healthy">Deling bidrar til å holde nettverket sunt</string>
+    <string name="seeding_is_currently_disabled">Deling er for øyeblikket deaktivert</string>
 </resources>

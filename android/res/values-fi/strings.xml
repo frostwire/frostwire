@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Ei voi siemata torrent-siirtoja. Tarkista asetukset "Asetukset" > "BitTorrent-yhteystila"</string>
     <string name="transfers_select_seeding">kylvö</string>
     <string name="transfers_context_seed_all_transfers">Siemen nyt kaikki valmiit lataukset ja lataukset</string>
+    <string name="the_more_you_give_the_more_you_receive">Mitä enemmän annat enemmän saitte</string>
+    <string name="seed_all_finished">Siemen kaikki valmiiksi</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Haluatko siemata valmiit torrent -siirrot?</string>
+    <string name="nothing_is_currently_seeding">Mikään parhaillaan kylvö</string>
+    <string name="seeding_keeps_the_network_healthy">Kylvö auttaa pitämään verkon terveinä</string>
+    <string name="seeding_is_currently_disabled">Kylvö on tällä hetkellä poissa käytöstä</string>
 </resources>

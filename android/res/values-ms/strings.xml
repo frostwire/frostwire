@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Tidak boleh pemindahan biji benih. Semak status "Tetapan" > "Status Sambungan BitTorrent"</string>
     <string name="transfers_select_seeding">pembenihan</string>
     <string name="transfers_context_seed_all_transfers">Benih semua pemindahan selesai</string>
+    <string name="the_more_you_give_the_more_you_receive">Semakin banyak anda memberi lebih banyak yang anda terima</string>
+    <string name="seed_all_finished">Berkongsi Semua Tamat</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Adakah anda ingin berkongsi pemindahan torrent siap anda?</string>
+    <string name="nothing_is_currently_seeding">Tiada sesiapa yang sedang berkongsi</string>
+    <string name="seeding_keeps_the_network_healthy">Perkongsian membantu mengekalkan rangkaian yang sihat</string>
+    <string name="seeding_is_currently_disabled">Perkongsian kini dilumpuhkan</string>
 </resources>

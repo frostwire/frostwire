@@ -677,4 +677,10 @@
     <string name="cant_seed_torrent_transfers">لا يمكن نقل البذور سيل. تحقق من حالة "إعدادات"> "حالة اتصال تورنت"</string>
     <string name="transfers_select_seeding">زراعة</string>
     <string name="transfers_context_seed_all_transfers">البذور جميع التحويلات النهائية</string>
+    <string name="the_more_you_give_the_more_you_receive">وكلما كنت تعطي، وأكثر تتلقاها</string>
+    <string name="seed_all_finished">مشاركة جميع تشطيب</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">هل ترغب في مشاركة نقل سيل الخاص بك؟</string>
+    <string name="nothing_is_currently_seeding">لا شيء حاليا البذر</string>
+    <string name="seeding_keeps_the_network_healthy">يساعد البذر على الحفاظ على صحة الشبكة</string>
+    <string name="seeding_is_currently_disabled">يتم تعطيل البذر حاليا</string>
 </resources>

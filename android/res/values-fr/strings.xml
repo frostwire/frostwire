@@ -676,4 +676,10 @@
     <string name="cant_seed_torrent_transfers">Impossible de générer des transferts torrent. Vérifiez l\'état de "Paramètres" > "Etat de la connexion BitTorrent"</string>
     <string name="transfers_select_seeding">ensemencement</string>
     <string name="transfers_context_seed_all_transfers">Graine tous les transferts finis</string>
+    <string name="the_more_you_give_the_more_you_receive">Plus vous donnez plus vous recevez</string>
+    <string name="seed_all_finished">Semences toutes finies</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Voulez-vous semer vos transferts torrent finis?</string>
+    <string name="nothing_is_currently_seeding">Rien n'est actuellement semé</string>
+    <string name="seeding_keeps_the_network_healthy">Le semis aide à maintenir le réseau en bonne santé</string>
+    <string name="seeding_is_currently_disabled">L'ensemencement est actuellement désactivé</string>
 </resources>

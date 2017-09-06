@@ -678,4 +678,10 @@
     <string name="cant_seed_torrent_transfers">No se pueden compartir transferencias de torrents. Chequea el estado de "Preferencias" > "BitTorrent Estado de Conexión"</string>
     <string name="transfers_select_seeding">compartiendo</string>
     <string name="transfers_context_seed_all_transfers">Compartiendo todas las transferencias finalizadas</string>
+    <string name="the_more_you_give_the_more_you_receive">Cuanto más das, más recibes</string>
+    <string name="seed_all_finished">Compartir todo lo finalizado</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">¿Quieres compartir tus transferencias de torrent terminadas?</string>
+    <string name="nothing_is_currently_seeding">Nada se está compartiendo actualmente</string>
+    <string name="seeding_keeps_the_network_healthy">Compartir ayuda a mantener la red sana</string>
+    <string name="seeding_is_currently_disabled">Compartir está actualmente inactivo</string>
 </resources>

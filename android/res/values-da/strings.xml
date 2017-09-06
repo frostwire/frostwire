@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Kan ikke udsende torrent overførsler. Kontroller status for "Settings" > "BitTorrent Connection Status"</string>
     <string name="transfers_select_seeding">såning</string>
     <string name="transfers_context_seed_all_transfers">Sæt alle færdige overførsler</string>
+    <string name="the_more_you_give_the_more_you_receive">Jo mere du giver jo mere du modtager</string>
+    <string name="seed_all_finished">Frø alle færdige</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Vil du frøde dine færdige torrentoverførsler?</string>
+    <string name="nothing_is_currently_seeding">Intet er i øjeblikket såning</string>
+    <string name="seeding_keeps_the_network_healthy">Frø hjælper med at holde netværket sund</string>
+    <string name="seeding_is_currently_disabled">Deling er for øjeblikket deaktiveret</string>
 </resources>

@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Không thể truyền tải torrent hạt giống. Kiểm tra tình trạng của "Cài đặt" > "Trạng thái Kết nối BitTorrent"</string>
     <string name="transfers_select_seeding">gieo hột</string>
     <string name="transfers_context_seed_all_transfers">Chia sẻ tất cả các chuyển hoàn thành</string>
+    <string name="the_more_you_give_the_more_you_receive">Bạn càng nhận được càng nhiều</string>
+    <string name="seed_all_finished">Chia sẻ Tất cả Đã Hoàn thành</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Bạn có muốn chia sẻ hoàn thành torrent của bạn?</string>
+    <string name="nothing_is_currently_seeding">Không có gì hiện đang chia sẻ</string>
+    <string name="seeding_keeps_the_network_healthy">Chia sẻ giúp giữ cho mạng khỏe mạnh</string>
+    <string name="seeding_is_currently_disabled">Chia sẻ hiện bị tắt</string>
 </resources>

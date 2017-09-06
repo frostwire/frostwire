@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">לא יכול זרע העברות מבול. בדוק את מצב "הגדרות" > "מצב חיבור BitTorrent"</string>
     <string name="transfers_select_seeding">זריעה</string>
     <string name="transfers_context_seed_all_transfers">זרע כל העברות סיים</string>
+    <string name="the_more_you_give_the_more_you_receive">ככל שתיתן יותר, כך תקבל יותר</string>
+    <string name="seed_all_finished">שתף את כל אלה שהסתיימו</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">האם אתה רוצה לשתף את העברות סיים סיים שלך?</string>
+    <string name="nothing_is_currently_seeding">שום דבר לא משתף כעת</string>
+    <string name="seeding_keeps_the_network_healthy">שיתוף מסייע לשמור על בריאות הרשת</string>
+    <string name="seeding_is_currently_disabled">השיתוף מושבת כעת</string>
 </resources>

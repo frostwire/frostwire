@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">ไม่สามารถถ่ายโอนไฟล์ torrent ได้ ตรวจสอบสถานะของ "การตั้งค่า" > "สถานะการเชื่อมต่อ BitTorrent"</string>
     <string name="transfers_select_seeding">การเพาะ</string>
     <string name="transfers_context_seed_all_transfers">แบ่งปันการโอนเงินทั้งหมด</string>
+    <string name="the_more_you_give_the_more_you_receive">ยิ่งให้คุณยิ่งได้รับมากเท่าไร</string>
+    <string name="seed_all_finished">แชร์เสร็จสิ้นทั้งหมด</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">คุณต้องการแชร์การส่งข้อมูล torrent เสร็จสิ้นหรือไม่?</string>
+    <string name="nothing_is_currently_seeding">ไม่มีการแบ่งปันในขณะนี้</string>
+    <string name="seeding_keeps_the_network_healthy">การแชร์จะช่วยให้เครือข่ายมีสุขภาพดี</string>
+    <string name="seeding_is_currently_disabled">การแบ่งปันกำลังถูกปิดใช้งานอยู่</string>
 </resources>

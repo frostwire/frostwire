@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Tidak bisa seed torrent transfer. Periksa status "Pengaturan" > "BitTorrent Connection Status"</string>
     <string name="transfers_select_seeding">penyemaian</string>
     <string name="transfers_context_seed_all_transfers">Benih semua transfer selesai</string>
+    <string name="the_more_you_give_the_more_you_receive">Semakin banyak Anda memberi lebih banyak yang Anda terima</string>
+    <string name="seed_all_finished">Benih Semua Selesai</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Apakah Anda ingin mendapatkan transfer torrent selesai?</string>
+    <string name="nothing_is_currently_seeding">Saat ini tidak ada penyemaian</string>
+    <string name="seeding_keeps_the_network_healthy">Berbagi membantu menjaga jaringan tetap sehat</string>
+    <string name="seeding_is_currently_disabled">Berbagi saat ini dinonaktifkan</string>
 </resources>
