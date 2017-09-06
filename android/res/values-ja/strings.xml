@@ -678,4 +678,10 @@
     <string name="cant_seed_torrent_transfers">急流を撒くことはできません。 [設定]> [BitTorrent接続ステータス]のステータスを確認する</string>
     <string name="transfers_select_seeding">播種</string>
     <string name="transfers_context_seed_all_transfers">すべての完了した転送をシード</string>
+    <string name="the_more_you_give_the_more_you_receive">より多くを与えるほど、より多くを受け取る</string>
+    <string name="seed_all_finished">すべての仕上げを共有</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">あなたの完成したトレントの転送を共有しますか？</string>
+    <string name="nothing_is_currently_seeding">現在共有しているものはありません</string>
+    <string name="seeding_keeps_the_network_healthy">共有はネットワークの健全性を維持します</string>
+    <string name="seeding_is_currently_disabled">共有は現在無効です</string>
 </resources>

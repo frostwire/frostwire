@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Неможливо перенесення торрентів. Перевірте статус "Налаштування" > "Стан BitTorrent-з'єднання"</string>
     <string name="transfers_select_seeding">посів</string>
     <string name="transfers_context_seed_all_transfers">Поділіться всім готові перекази</string>
+    <string name="the_more_you_give_the_more_you_receive">The more you give the more you receive</string>
+    <string name="seed_all_finished">Поділитися всім готово</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Хочете поділитися своїми готовими торрент-трансферами?</string>
+    <string name="nothing_is_currently_seeding">Наразі нічого не ділиться</string>
+    <string name="seeding_keeps_the_network_healthy">Спільний доступ допомагає зберегти мережу здоровою</string>
+    <string name="seeding_is_currently_disabled">Спільний доступ в даний момент вимкнено</string>
 </resources>

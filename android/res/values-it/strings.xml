@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Non è possibile filtrare i torrent. Verifica dello stato di "Impostazioni" > "Stato di connessione BitTorrent"</string>
     <string name="transfers_select_seeding">semina</string>
     <string name="transfers_context_seed_all_transfers">Seme tutti i trasferimenti finiti</string>
+    <string name="the_more_you_give_the_more_you_receive">Più si dà, più si riceve</string>
+    <string name="seed_all_finished">Condividi tutto finito</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Vuoi condividere i tuoi trasferimenti torrent finiti?</string>
+    <string name="nothing_is_currently_seeding">Niente è attualmente in condivisione</string>
+    <string name="seeding_keeps_the_network_healthy">La condivisione aiuta a mantenere la rete in buona salute</string>
+    <string name="seeding_is_currently_disabled">La condivisione è attualmente disattivata</string>
 </resources>

@@ -677,4 +677,10 @@
     <string name="cant_seed_torrent_transfers">Δεν είναι δυνατή η στείρωση μεταβιβάσεων torrent. Ελέγξτε την κατάσταση "Ρυθμίσεις" > "Κατάσταση σύνδεσης BitTorrent"</string>
     <string name="transfers_select_seeding">σπορά</string>
     <string name="transfers_context_seed_all_transfers">Τοποθετήστε όλες τις τελικές μεταφορές</string>
+    <string name="the_more_you_give_the_more_you_receive">Όσο περισσότερο δίνετε, τόσο περισσότερο λαμβάνετε</string>
+    <string name="seed_all_finished">Σπόροι όλοι τελειωμένοι</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Θα θέλατε να σποράτε τις ολοκληρωμένες μεταφορές torrent;</string>
+    <string name="nothing_is_currently_seeding">Τώρα δεν υπάρχει τίποτα για σπορά</string>
+    <string name="seeding_keeps_the_network_healthy">Η σπορά βοηθάει να διατηρείται το δίκτυο υγιές</string>
+    <string name="seeding_is_currently_disabled">Η σπορά είναι αυτή τη στιγμή απενεργοποιημένη</string>
 </resources>

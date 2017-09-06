@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">不能种子洪流转移。 检查“设置”>“BitTorrent连接状态”的状态</string>
     <string name="transfers_select_seeding">播种</string>
     <string name="transfers_context_seed_all_transfers">分享所有完成的转账</string>
+    <string name="the_more_you_give_the_more_you_receive">你得到的收益越多</string>
+    <string name="seed_all_finished">分享全部完成</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">你想分享你完成的洪流传输吗？</string>
+    <string name="nothing_is_currently_seeding">目前没有任何分享</string>
+    <string name="seeding_keeps_the_network_healthy">分享有助于保持网络健康</string>
+    <string name="seeding_is_currently_disabled">共享目前已被禁用</string>
 </resources>

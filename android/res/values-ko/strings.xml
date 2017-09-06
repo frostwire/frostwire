@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">토런트 전송을 시드 할 수 없습니다. "설정" > "BitTorrent 연결 상태"상태 확인</string>
     <string name="transfers_select_seeding">시딩</string>
     <string name="transfers_context_seed_all_transfers">모든 완료 전송 시드 씨앗</string>
+    <string name="the_more_you_give_the_more_you_receive">더 많이 줄수록 더 많이 받게됩니다.</string>
+    <string name="seed_all_finished">모든 완료 종자</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">완성 된 토런트 전송을 시드 하시겠습니까?</string>
+    <string name="nothing_is_currently_seeding">아무것도 현재 시딩 중입니다.</string>
+    <string name="seeding_keeps_the_network_healthy">시딩은 네트워크를 건강하게 유지합니다.</string>
+    <string name="seeding_is_currently_disabled">시드는 현재 사용할 수 없습니다.</string>
 </resources>

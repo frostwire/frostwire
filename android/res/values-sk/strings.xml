@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Nemožno nasadiť torrent prenosy. Skontrolujte stav položky "Nastavenia" > "Stav pripojenia BitTorrent"</string>
     <string name="transfers_select_seeding">siatie</string>
     <string name="transfers_context_seed_all_transfers">Zdieľajte všetky hotové prevody</string>
+    <string name="the_more_you_give_the_more_you_receive">Čím viac dáte, tým viac dostanete</string>
+    <string name="seed_all_finished">Zdieľať všetko dokončené</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Chcete zdieľať svoje hotové torrentové prevody?</string>
+    <string name="nothing_is_currently_seeding">V súčasnosti nie je nič zdieľané</string>
+    <string name="seeding_keeps_the_network_healthy">Zdieľanie pomáha udržiavať sieť zdravú</string>
+    <string name="seeding_is_currently_disabled">Zdieľanie je momentálne zakázané</string>
 </resources>

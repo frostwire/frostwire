@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">बीज धार स्थानान्तरण नहीं कर सकते "सेटिंग्स" > "बिटटॉरेंट कनेक्शन स्थिति" की स्थिति की जांच करें</string>
     <string name="transfers_select_seeding">बीज बोने की क्रिया</string>
     <string name="transfers_context_seed_all_transfers">बीज सभी समाप्त हस्तांतरण</string>
+    <string name="the_more_you_give_the_more_you_receive">जितना अधिक आप प्राप्त करते हैं जितना अधिक आप प्राप्त करते हैं</string>
+    <string name="seed_all_finished">सभी समाप्त साझा करें</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">क्या आप अपने तैयार हुए ट्रॉन्फरर्स को बीज पसंद कर सकते हैं?</string>
+    <string name="nothing_is_currently_seeding">वर्तमान में कुछ भी नहीं है</string>
+    <string name="seeding_keeps_the_network_healthy">सेडिंग नेटवर्क को स्वस्थ रखने में मदद करता है</string>
+    <string name="seeding_is_currently_disabled">सीडिंग वर्तमान में अक्षम है</string>
 </resources>

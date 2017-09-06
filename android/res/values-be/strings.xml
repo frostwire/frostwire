@@ -675,4 +675,10 @@
     <string name="cant_seed_torrent_transfers">Не можа насенне торэнта пераклады. Праверыць статус «Настройкі» > «BitTorrent Стан злучэння»</string>
     <string name="transfers_select_seeding">засеивание</string>
     <string name="transfers_context_seed_all_transfers">Насеннай ўсе скончаныя пераклады</string>
+    <string name="the_more_you_give_the_more_you_receive">Чым больш вы даяце больш вы атрымаеце</string>
+    <string name="seed_all_finished">Насеннай Усе Закончанае</string>
+    <string name="would_you_like_to_seed_your_finished_torrent_transfers">Вы хочаце, каб вашыя насенне гатовых перакладаў торэнта?</string>
+    <string name="nothing_is_currently_seeding">Нішто не ў цяперашні час высеву</string>
+    <string name="seeding_keeps_the_network_healthy">Пасеў дапамагае трымае сетку здаровым</string>
+    <string name="seeding_is_currently_disabled">Пасеў у цяперашні час адключаны</string>
 </resources>
