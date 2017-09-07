@@ -22,6 +22,7 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -68,7 +69,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
 
         this.filename = parseFileName(detailsUrl);
         this.size = parseSize(matcher.group("size"));
-        this.creationTime = System.currentTimeMillis();
+        this.creationTime = buildCreationTime(thumbnailUrl);
         this.seeds = Integer.parseInt(matcher.group("seeds"));
         this.torrentUrl = matcher.group("magnet");
         this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
@@ -154,5 +155,16 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
 
     private static String buildThumbnailUrl(String str) {
         return str.startsWith("//") ? "https:" + str : str;
+    }
+
+    private static long buildCreationTime(String url) {
+        try {
+            int idx = url.indexOf("/", 9) + 1;
+            String str = url.substring(idx, idx + 8);
+            return new SimpleDateFormat("YYYYMMdd").parse(str).getTime();
+        } catch (Throwable e) {
+            // not that important
+            return System.currentTimeMillis();
+        }
     }
 }
