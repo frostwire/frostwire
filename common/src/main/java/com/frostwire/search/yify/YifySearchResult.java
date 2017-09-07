@@ -69,9 +69,12 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.size = buildSize(matcher.group("size"));
         this.creationTime = buildCreationTime(thumbnailUrl);
         this.seeds = Integer.parseInt(matcher.group("seeds"));
-        this.torrentUrl = matcher.group("magnet");
         this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
-        this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
+
+        String magnetUrl = matcher.group("magnet");
+        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
+        // TODO: create a fallback to magnet
+        this.torrentUrl = buildTorrentUrl(thumbnailUrl, infoHash);
     }
 
     @Override
@@ -163,5 +166,10 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
             }
         }
         return result;
+    }
+
+    private String buildTorrentUrl(String thumbnailUrl, String infoHash) {
+        String prefix = FilenameUtils.getPath(thumbnailUrl);
+        return prefix + infoHash + ".torrent";
     }
 }
