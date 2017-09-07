@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,8 @@ public abstract class SearchEngine {
     }
 
     public final boolean localEnabled() {
-        if (!Platforms.appSettings().bool(settingKey)) {
-            return false;
-        }
-
-        return mobile || Platforms.get().networkType() != Platform.NetworkType.MOBILE;
+        return Platforms.appSettings().bool(settingKey) &&
+                (mobile || Platforms.get().networkType() != Platform.NetworkType.MOBILE);
     }
 
     public final boolean remoteEnabled() {
@@ -67,5 +64,6 @@ public abstract class SearchEngine {
         return localEnabled() && remoteEnabled();
     }
 
+    @SuppressWarnings("unused") // used anonymously in SearchManager
     public abstract SearchPerformer newPerformer(long token, String keywords);
 }
