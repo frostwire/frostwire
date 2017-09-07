@@ -209,14 +209,7 @@ public abstract class SearchEngine {
     public static final SearchEngine YIFY = new SearchEngine("Yify", Constants.PREF_KEY_SEARCH_USE_YIFY) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            YifySearchPerformer performer = null;
-            NetworkManager networkManager = NetworkManager.instance();
-            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
-                performer = new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_TIMEOUT);
-            } else {
-                LOG.info("No YifySearchPerformer, WiFi not up");
-            }
-            return performer;
+            return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
