@@ -1,4 +1,4 @@
-FrostWire 1.9.9 - SEP/05/2017
+FrostWire 1.9.9 - SEP/06/2017
  - Creative Commons Features removed for Google Play users, available on FrostWire Plus
  - Search: New Pixabay image search
  - Search: EZTV, Torlock, Yify, Zooqle fixed
@@ -11,7 +11,7 @@ FrostWire 1.9.9 - SEP/05/2017
  - Filtering bug fixes
  - Audio Player 'Clear Queue' fix
  - Crash fixes, performance upgrades
- - ogury 2.1.14
+ - ogury 2.2.1
  - compileSDK 26, gms 11.0.4, gradle 4.0.2, android support 26.0.1, applovin-sdk 7.3.2
  - Update in VPN offering
  - Fixes freeze copying magnets to clipboard
