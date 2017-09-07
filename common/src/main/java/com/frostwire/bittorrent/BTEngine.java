@@ -759,8 +759,8 @@ public final class BTEngine extends SessionManager {
     }
 
     private void onDhtBootstrap() {
-        long nodes = stats().dhtNodes();
-        LOG.info("DHT bootstrap, total nodes=" + nodes);
+        //long nodes = stats().dhtNodes();
+        //LOG.info("DHT bootstrap, total nodes=" + nodes);
     }
 
     private void printAlert(Alert alert) {
