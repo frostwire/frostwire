@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Sambung kepada rakan-rakan Wifi tempatan melalui multicast (disyorkan)</string>
     <string name="max_concurrent_uploads">Tambahan Serentak maksimum</string>
     <string name="use_torlock">Gunakan TorLock</string>
-    <string name="use_monova">Gunakan Monova</string>
     <string name="tos_title">Syarat-syarat Penggunaan</string>
     <string name="activity_downloads_name">Muat turun aktif</string>
     <string name="wait">Tunggu</string>
@@ -200,7 +199,6 @@
     <string name="menu_delete_shortcut_label">Padam</string>
     <string name="magnet_url_added">URL Magnet ditambah kepada pemindahan. (Magnet bekerja terbaik pada Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Muat turun selesai akan disalurkan ke bahagian FrostWire lain pada rangkaian Wi-Fi anda.</string>
-    <string name="use_monova_summary">Monova berasaskan magnet, hanya berfungsi pada Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Maaf, FrostWire tidak boleh terus tanpa kebenaran anda untuk mengakses cakera.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Satu Masa Pembelian</string>

@@ -236,8 +236,6 @@
     <string name="search_settings">Подешавања претраге</string>
     <string name="use_tpb">Користе TPB</string>
     <string name="use_tpb_summary">TPB је магнет за базиран, ради само на Вифи</string>
-    <string name="use_monova">Користе Monova</string>
-    <string name="use_monova_summary">Monova је магнет за базиран, ради само на Вифи</string>
     <string name="use_zooqle">Користе Zooqle.com</string>
     <string name="use_yify">Користе Yify</string>
     <string name="use_yify_summary">Yify је магнет за базиран, ради само на Вифи</string>

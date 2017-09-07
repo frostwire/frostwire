@@ -27,7 +27,6 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -207,20 +206,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine MONOVA = new SearchEngine("Monova", Constants.PREF_KEY_SEARCH_USE_MONOVA) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            MonovaSearchPerformer performer = null;
-            NetworkManager networkManager = NetworkManager.instance();
-            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
-                performer = new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_TIMEOUT);
-            } else {
-                LOG.info("No MonovaSearchPerformer, WiFi not up");
-            }
-            return performer;
-        }
-    };
-
     public static final SearchEngine YIFY = new SearchEngine("Yify", Constants.PREF_KEY_SEARCH_USE_YIFY) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -246,7 +231,6 @@ public abstract class SearchEngine {
             YIFY,
             YOUTUBE,
             FROSTCLICK,
-            MONOVA,
             ZOOQLE,
             TPB,
             SOUNCLOUD,

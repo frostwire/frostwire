@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Свържете се с местните Wifi връстници чрез мултикаст (препоръчително)</string>
     <string name="max_concurrent_uploads">Максимални едновременни качени</string>
     <string name="use_torlock">Използвайте TorLock</string>
-    <string name="use_monova">Използвайте Monova</string>
     <string name="tos_title">Условия за ползване</string>
     <string name="activity_downloads_name">Активни изтегляния</string>
     <string name="wait">Изчакайте</string>
@@ -200,7 +199,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Магнит URL добавя към трансфери. (Магнити работят най-добре на Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Завършени сваляния ще бъдат достъпни за други потребители FrostWire на вашия Wi-Fi мрежа.</string>
-    <string name="use_monova_summary">Монова е магнит на основата, работи само на Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Съжаляваме, FrostWire не може да продължи без ваше разрешение за достъп до диск.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Един закупуване време</string>

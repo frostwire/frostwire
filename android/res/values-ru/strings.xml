@@ -443,8 +443,6 @@
     <string name="file_descriptor_sd_unmounted">Этот файл находиться на SD-карте, пожалуйста вставьте её.</string>
     <string name="help_translate_frostwire">Помогите перевести FrostWire</string>
     <string name="use_tpb_summary">TPB основан на magnet-ссылках, работает только по Wi-Fi</string>
-    <string name="use_monova">Использовать Monova</string>
-    <string name="use_monova_summary">Monova основан на magnet-ссылках, работает только по Wi-Fi</string>
     <string name="use_yify">Использовать Yify</string>
     <string name="use_yify_summary">Yify основан на magnet-ссылках, работает только по Wi-Fi</string>
     <string name="yes_no_cancel_transfer_question_cloud">Вы уверены, что хотите остановить и удалить эту загрузку из списка?</string>

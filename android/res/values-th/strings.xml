@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">เชื่อมต่อไปยังเพื่อนร่วมงาน Wifi ท้องถิ่นผ่านหลายผู้รับ (แนะนำ)</string>
     <string name="max_concurrent_uploads">อัปโหลดพร้อมกันสูงสุด</string>
     <string name="use_torlock">ใช้ TorLock</string>
-    <string name="use_monova">ใช้ Monova</string>
     <string name="tos_title">ข้อกำหนดการใช้งาน</string>
     <string name="activity_downloads_name">ดาวน์โหลดที่ใช้งาน</string>
     <string name="wait">รอ</string>
@@ -200,7 +199,6 @@
     <string name="menu_delete_shortcut_label">ลบ</string>
     <string name="magnet_url_added">URL แม่เหล็กเพิ่มให้กับการถ่ายโอน (แม่เหล็กทำงานได้ดีที่สุดบน Wi-Fi)</string>
     <string name="share_finished_downloads_summary">การดาวน์โหลดเสร็จสิ้นจะสามารถใช้ได้กับผู้ใช้งาน FrostWire อื่น ๆ บนเครือข่าย Wi-Fi ของคุณ</string>
-    <string name="use_monova_summary">Monova เป็นแม่เหล็กที่ใช้งานได้เฉพาะใน WiFi</string>
     <string name="frostwire_shutting_down_no_permissions">ขออภัย FrostWire ไม่สามารถดำเนินการไม่ได้รับอนุญาตในการเข้าถึงดิสก์</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">หนึ่งซื้อเวลา</string>

@@ -178,7 +178,6 @@
     <string name="torrent_fetcher_download_status_canceled">Prekinuto</string>
     <string name="use_tpb">Koristi TPB</string>
     <string name="use_tpb_summary">TPB je baziran na magnet poveznicama i radi samo na Wi-Fiu</string>
-    <string name="use_monova">Koristi Monova</string>
     <string name="use_zooqle">Koristi Zooqle.com</string>
     <string name="use_yify">Koristi Yify</string>
     <string name="ringtone_set">Zvonjava postavljena</string>
@@ -336,7 +335,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL dodan u prijenose. (magneti najbolje rade na Wi-Fiu)</string>
     <string name="share_finished_downloads_summary">Završena preuzimanja će biti dostupna ostalim FrostWire korisnicima na vašoj Wi-Fi mreži.</string>
-    <string name="use_monova_summary">Monova je baziran na magnet poveznicama i radi samo na Wi-Fiu</string>
     <string name="or_enter_url">ili unesite URL</string>
     <string name="http_download_status_uncompressing">Dekompresiram</string>
     <string name="yes_no_cancel_delete_transfer_question">Jeste li sigurni da želite odbaciti ovo preuzimanje (preuzete datoteke će biti izbrisane)?</string>

@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Conectați-vă la colegii WiFi locale prin intermediul multicast (recomandat)</string>
     <string name="max_concurrent_uploads">Încărcările simultane maxime</string>
     <string name="use_torlock">Utilizați TorLock</string>
-    <string name="use_monova">Utilizați Monova</string>
     <string name="tos_title">Termeni de utilizare</string>
     <string name="activity_downloads_name">Descărcări active</string>
     <string name="wait">Aștepta</string>
@@ -198,7 +197,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">URL-ul magnet adăugat la transferuri. (Magneți funcționează cel mai bine pe Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Download-uri terminate vor fi disponibile altor utilizatori Frostwire în rețeaua Wi-Fi.</string>
-    <string name="use_monova_summary">Monova este pe bază de magnet, funcționează numai pe Wi-Fi</string>
     <string name="frostwire_shutting_down_no_permissions">Ne pare rău, FrostWire nu poate continua fără permisiunea dvs. pentru a avea acces pe disc.</string>
     <string name="http_download_status_uncompressing">Decomprimare</string>
     <string name="one_time_purchase">Timp de o achiziție</string>

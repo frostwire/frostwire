@@ -72,7 +72,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_EZTV = "frostwire.prefs.search.use_eztv";
     public static final String PREF_KEY_SEARCH_USE_APPIA = "frostwire.prefs.search.use_appia";
     public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
-    public static final String PREF_KEY_SEARCH_USE_MONOVA = "frostwire.prefs.search.use_monova";
     public static final String PREF_KEY_SEARCH_USE_YIFY = "frostwire.prefs.search.use_yify";
     public static final String PREF_KEY_SEARCH_USE_TORRENTSFM = "frostwire.prefs.search.use_torrentsfm";
     public static final String PREF_KEY_SEARCH_USE_PIXABAY = "frostwire.prefs.search.use_pixabay";

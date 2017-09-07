@@ -377,7 +377,6 @@
     <string name="add_transfer_label">Indsæt en magnet eller torrent URL</string>
     <string name="drawer_open">Åbent navigation skuffe</string>
     <string name="use_torlock">Brug TorLock</string>
-    <string name="use_monova">Brug Monova</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="delete_this_track">Slet dette sang</string>
     <string name="five_dollars">$5</string>
@@ -419,7 +418,6 @@
     <string name="player_paused_press_and_hold_to_stop">Player sat på pause. (Tip: Tryk og hold for at stoppe)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL tilføjet til overførsler. (Magneter virker bedst på Wi-Fi)</string>
-    <string name="use_monova_summary">Monova er magnet baseret, fungerer kun på Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Beklager, FrostWire kan ikke fortsætte uden din tilladelse til at få adgang disk.</string>
     <string name="one_time_purchase">Køb nu!</string>
     <string name="activity_VPN">Forbindelse</string>

@@ -78,7 +78,6 @@
     <string name="multicast_discovery_summary">חבר עמיתי Wifi מקומית באמצעות שידור (מומלץ)</string>
     <string name="max_concurrent_uploads">העלאות מקסימום סימולטני</string>
     <string name="use_torlock">השתמש TorLock</string>
-    <string name="use_monova">השתמש Monova</string>
     <string name="tos_title">תנאי שימוש</string>
     <string name="activity_downloads_name">הורדות הפעיל</string>
     <string name="wait">לַחֲכוֹת</string>
@@ -203,7 +202,6 @@
     <string name="menu_delete_shortcut_label">לִמְחוֹק</string>
     <string name="magnet_url_added">כתובת אתר מגנט הוסיף להעברות. (מגנטים פועלים בצורה הטובה ביותר על ה- Wi-Fi)</string>
     <string name="share_finished_downloads_summary">הורדות סיום תהיינה זמינות למשתמשי FrostWire אחרים ברשת ה- Wi-Fi.</string>
-    <string name="use_monova_summary">Monova הוא מבוסס מגנט, עובד רק על Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">מצטערים, FrostWire לא יכול להמשיך ללא רשותך לגשת לדיסק.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">רכישה חד פעמי</string>

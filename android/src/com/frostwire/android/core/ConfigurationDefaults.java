@@ -105,7 +105,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_APPIA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MONOVA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YIFY, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTSFM, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_PIXABAY, true);

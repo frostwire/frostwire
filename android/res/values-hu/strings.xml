@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Csatlakozás helyi Wifi társaik keresztül multicast (ajánlott)</string>
     <string name="max_concurrent_uploads">Maximális egyidejű feltöltések</string>
     <string name="use_torlock">Használja TorLock</string>
-    <string name="use_monova">Használja Monova</string>
     <string name="tos_title">Használati feltételek</string>
     <string name="activity_downloads_name">Aktív letöltések</string>
     <string name="wait">Várjon</string>
@@ -198,7 +197,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL adunk át. (Mágnesek működnek a legjobban Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Kész letöltések lesz elérhető a többi FrostWire felhasználók a Wi-Fi hálózathoz.</string>
-    <string name="use_monova_summary">Monova van mágnes alapú, csak akkor működik, Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Sajnos FrostWire nem tudja folytatni az Ön engedélye nélkül hozzáférni lemez.</string>
     <string name="http_download_status_uncompressing">Kicsomagolása</string>
     <string name="one_time_purchase">Egy egyszeri vásárlás</string>

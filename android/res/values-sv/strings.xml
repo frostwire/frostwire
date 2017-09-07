@@ -78,7 +78,6 @@
     <string name="multicast_discovery_summary">Ansluta till lokala Wifi kamrater via multicast (rekommenderas)</string>
     <string name="max_concurrent_uploads">Maximalt antal samtidiga uppladdningar</string>
     <string name="use_torlock">Använda TorLock</string>
-    <string name="use_monova">Använda Monova</string>
     <string name="tos_title">Användarvillkor</string>
     <string name="activity_downloads_name">Aktiva nedladdningar</string>
     <string name="wait">Vänta</string>
@@ -203,7 +202,6 @@
     <string name="menu_delete_shortcut_label">Radera</string>
     <string name="magnet_url_added">Magnet URL läggs till överföringar. (Magneter fungerar bäst på Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Färdiga nedladdningar kommer att finnas tillgängliga för andra FrostWire användare på din Wi-Fi-nätverk.</string>
-    <string name="use_monova_summary">Monova är magnet baserad, fungerar endast på Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Tyvärr, FrostWire kan inte fortsätta utan din tillåtelse att komma åt hårddisken.</string>
     <string name="http_download_status_uncompressing">Avkomprimering</string>
     <string name="one_time_purchase">En gång köp</string>

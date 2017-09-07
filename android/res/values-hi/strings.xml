@@ -360,7 +360,6 @@
     <string name="add_transfer_label">एक चुंबक या धार यूआरएल पेस्ट</string>
     <string name="drawer_open">ओपन नेविगेशन दराज</string>
     <string name="use_torlock">उपयोग TorLock</string>
-    <string name="use_monova">उपयोग Monova</string>
     <string name="bittorrent_off">BitTorrent बंद</string>
     <string name="delete_this_track">इस ट्रैक को हटाएं</string>
     <string name="five_dollars">$5</string>
@@ -407,7 +406,6 @@
     <string name="player_paused_press_and_hold_to_stop">प्लेयर रुका हुआ है। (सुझाव: प्रेस और बंद करने के लिए पकड़)</string>
     <string name="menu_delete_shortcut_label">मिटाना</string>
     <string name="magnet_url_added">चुंबक यूआरएल स्थानान्तरण के लिए कहा। (मैग्नेट वाई-फाई पर सबसे अच्छा काम करते हैं)</string>
-    <string name="use_monova_summary">Monova चुंबक आधारित है, केवल वाईफाई पर काम करता है</string>
     <string name="frostwire_shutting_down_no_permissions">क्षमा करें, FrostWire डिस्क का उपयोग करने के लिए आपकी अनुमति के बिना जारी नहीं रख सकते।</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">एक बार खरीदे</string>

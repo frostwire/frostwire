@@ -23,7 +23,6 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -400,13 +399,6 @@ public final class SearchManager {
         }
     };
 
-    static final SearchEngine MONOVA = new SearchEngine("Monova", AppSettings.SEARCH_MONOVA_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new MonovaSearchPerformer("monova.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
     private static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
@@ -435,7 +427,6 @@ public final class SearchManager {
             FROSTCLICK,
             PIXABAY,
             TPB,
-            MONOVA,
             ZOOQLE,
             SOUNCLOUD,
             ARCHIVE,

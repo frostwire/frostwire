@@ -377,7 +377,6 @@
     <string name="add_transfer_label">Vložit magnet nebo torrent URL</string>
     <string name="drawer_open">Otevřít navigační panel</string>
     <string name="use_torlock">Použít TorLock</string>
-    <string name="use_monova">Použít Monova</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="delete_this_track">Smazat tuto stopu</string>
     <string name="five_dollars">$5</string>
@@ -419,7 +418,6 @@
     <string name="player_paused_press_and_hold_to_stop">Hráč pozastaveno. (Tip: stiskněte a podržte pro zastavení)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL přidána do převodů. (Magnety fungují nejlépe přes Wi-Fi)</string>
-    <string name="use_monova_summary">Monova je magnet na bázi funguje pouze na Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Je nám líto, FrostWire nemůže pokračovat bez vašeho svolení pro přístup k disku.</string>
     <string name="one_time_purchase">Koupit nyní!</string>
     <string name="activity_VPN">Spojení</string>

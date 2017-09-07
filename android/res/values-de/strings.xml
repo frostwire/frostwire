@@ -227,7 +227,6 @@
     <string name="use_tpb">Benutze ThePirateBay.org</string>
     <string name="use_torlock">Benutze TorLock</string>
     <string name="use_torrentdownloads">Benutze TorrentDownloads</string>
-    <string name="use_monova">Benutze Monova</string>
     <string name="use_eztv">Benutze Eztv</string>
     <string name="use_yify">Benutze Yify</string>
     <string name="use_frostclick">Benutze FrostClick</string>
@@ -432,7 +431,6 @@
     <string name="player_paused_press_and_hold_to_stop">Spieler wird angehalten. (Tipp: Drücken und halten Sie zu stoppen)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet-URL hinzugefügt, um Transfers. (Magnete funktionieren am besten auf Wi-Fi)</string>
-    <string name="use_monova_summary">Monova ist Magnet basiert, funktioniert nur auf der Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Sorry, Frostwire können ohne Ihre Zustimmung nicht weiter Platte zugreifen.</string>
     <string name="http_download_status_uncompressing">Dekomprimieren</string>
     <string name="one_time_purchase">Einmaliger kauf</string>

@@ -377,7 +377,6 @@
     <string name="add_transfer_label">Incollare un magnete o un URL torrente</string>
     <string name="drawer_open">Aprire il cassetto di navigazione</string>
     <string name="use_torlock">Utilizzare TorLock</string>
-    <string name="use_monova">Utilizzare Monova</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="delete_this_track">Elimina questa pista</string>
     <string name="five_dollars">$5</string>
@@ -419,7 +418,6 @@
     <string name="player_paused_press_and_hold_to_stop">Pausa Player. (Suggerimento: Tenere premuto per fermare)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">URL magnete aggiunto ai trasferimenti. (Magneti funzionano meglio sul sito Wifi)</string>
-    <string name="use_monova_summary">Monova è magnete base, funziona solo con Wi-Fi</string>
     <string name="frostwire_shutting_down_no_permissions">Siamo spiacenti, FrostWire non può continuare senza il permesso di accedere al disco.</string>
     <string name="one_time_purchase">Compra adesso!</string>
     <string name="activity_VPN">Connessione</string>

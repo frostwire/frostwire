@@ -365,7 +365,6 @@
     <string name="add_transfer_label">자석 또는 토런트 URL 붙여 넣기</string>
     <string name="drawer_open">탐색 창 열기</string>
     <string name="use_torlock">TorLock사용</string>
-    <string name="use_monova">Monova사용</string>
     <string name="bittorrent_off">비트 토 런트 해제</string>
     <string name="delete_this_track">이 트랙 삭제</string>
     <string name="five_dollars">$5</string>
@@ -411,7 +410,6 @@
     <string name="player_paused_press_and_hold_to_stop">플레이어가 일시 중지되었습니다. (팁 : 길게 누르면 멈춤)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">전송에 자석 URL이 추가되었습니다. (자석은 Wi-Fi에서 가장 잘 작동합니다)</string>
-    <string name="use_monova_summary">Monova는 마그넷 기반으로 Wifi에서만 작동합니다.</string>
     <string name="frostwire_shutting_down_no_permissions">죄송합니다. FrostWire는 디스크에 액세스 할 수있는 권한없이 계속할 수 없습니다.</string>
     <string name="http_download_status_uncompressing">압축 해제</string>
     <string name="one_time_purchase">1 회 구매</string>

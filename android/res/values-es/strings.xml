@@ -413,10 +413,8 @@
     <string name="drawer_close">Cierra el menu de navegación</string>
     <string name="add_transfer_label">Copia una URL de magnet o torrent</string>
     <string name="drawer_open">Abre el menu de navegación</string>
-    <string name="use_monova">Usar Monova</string>
     <string name="cloud_downloads_coming">Lo siento: Descargas desde el cloud estarán disponibles para futuras versiones.</string>
     <string name="magnet_url_added">URL Magnet ha sido añadida a la lista de transferencias. (Los Magnets funcionan mejor con Wi-Fi)</string>
-    <string name="use_monova_summary">Monova está basado en magnets, funciona sólo con Wi-Fi</string>
     <string name="transfers_select_completed">completado</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pausa/Para todas las Transferencias</string>
     <string name="transfers_select_downloading">descargando</string>

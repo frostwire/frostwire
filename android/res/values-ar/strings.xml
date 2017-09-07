@@ -416,7 +416,6 @@
     <string name="add_transfer_label">لصق المغناطيس أو URL سيل</string>
     <string name="drawer_open">فتح درج الملاحة</string>
     <string name="use_torlock">استخدام TorLock</string>
-    <string name="use_monova">استخدام Monova</string>
     <string name="bittorrent_off">تورنت قبالة</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">خطأ غير متوقع مسار تخزين قطف</string>
@@ -448,7 +447,6 @@
     <string name="player_paused_press_and_hold_to_stop">توقف لاعب. (نصيحة: اضغط باستمرار لإيقاف)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">وأضاف URL جذب للنقل. (مغناطيس تعمل بشكل أفضل على واي فاي)</string>
-    <string name="use_monova_summary">Monova هو المغناطيس مقرها، يعمل فقط على واي فاي</string>
     <string name="frostwire_shutting_down_no_permissions">عذرا، برنامج FrostWire لا يمكن أن يستمر دون الحصول على إذن للوصول إلى القرص.</string>
     <string name="one_time_purchase">واحد شراء الوقت</string>
     <string name="activity_VPN">صلة</string>

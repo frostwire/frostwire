@@ -416,7 +416,6 @@
     <string name="add_transfer_label">Bir mıknatıs veya sel URL\'lerini yapıştırın</string>
     <string name="drawer_open">Gezinme çekmecesini aç</string>
     <string name="use_torlock">TorLock\'u Kullan</string>
-    <string name="use_monova">Monova \'u Kullan</string>
     <string name="bittorrent_off">BitTorrent kapalı</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Depolama alanı yolunu seçerken beklenmeyen bir hata oluştu</string>
@@ -448,7 +447,6 @@
     <string name="player_paused_press_and_hold_to_stop">Oyuncu durdu. (İpucu: durdurmak için basılı tutun)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Mıknatıs URL\'leri transferlere eklendi. (Mıknatıslar Kablosuz ağda en iyi şekilde çalışır)</string>
-    <string name="use_monova_summary">Monova mıknatıs tabanlı, sadece Wifi üzerinde çalışıyor</string>
     <string name="frostwire_shutting_down_no_permissions">Üzgünüz, FrostWire diske erişim izniniz olmadan devam edemez.</string>
     <string name="one_time_purchase">Bir Kez Satın Alma</string>
     <string name="activity_VPN">Bağlantı</string>

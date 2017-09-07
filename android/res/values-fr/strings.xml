@@ -404,7 +404,6 @@
     <string name="drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="use_torlock">Utilisez TorLock</string>
     <string name="use_torrentdownloads">Utilisez TorrentDownloads</string>
-    <string name="use_monova">Utilisez Monova</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va effacer les fichiers téléchargés si FrostWire est désinstallé.</string>
     <string name="use_eztv">Utilisez Eztv</string>
@@ -418,7 +417,6 @@
     <string name="player_paused_press_and_hold_to_stop">Lecteur de musique en pause. (Astuce: Appuyez et maintenez pour arrêter)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL ajouté aux transferts. (Magnets fonctionnent le mieux sur Wi-Fi)</string>
-    <string name="use_monova_summary">Monova est magnet base, ne fonctionne que sur le Wi-Fi</string>
     <string name="or_enter_url">ou entrez l\'URL</string>
     <string name="transfers_select_completed">terminé</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pause/Stop tous les transferts</string>

@@ -364,7 +364,6 @@
     <string name="add_transfer_label">Tempelkan magnet atau URL torrent</string>
     <string name="drawer_open">Terbuka laci navigasi</string>
     <string name="use_torlock">Gunakan TorLock</string>
-    <string name="use_monova">Gunakan Monova</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="delete_this_track">Hapus lagu ini</string>
     <string name="five_dollars">$5</string>
@@ -410,7 +409,6 @@
     <string name="player_paused_press_and_hold_to_stop">Pemain jeda. (Tip: Tekan dan tahan untuk menghentikan)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">URL magnet ditambahkan ke transfer. (Magnet bekerja terbaik untuk Wi-Fi)</string>
-    <string name="use_monova_summary">Monova adalah magnet berdasarkan, bekerja hanya pada Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Maaf, FrostWire tidak dapat melanjutkan tanpa izin Anda untuk mengakses disk.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Satu kali membeli</string>

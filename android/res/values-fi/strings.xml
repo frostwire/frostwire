@@ -78,7 +78,6 @@
     <string name="multicast_discovery_summary">Yhdistä paikallinen Wifi ikäisensä kautta multicast (suositeltava)</string>
     <string name="max_concurrent_uploads">Suurin Samanaikainen lataukset</string>
     <string name="use_torlock">Käytä TorLock</string>
-    <string name="use_monova">Käytä Monova</string>
     <string name="tos_title">Käyttöehdot</string>
     <string name="activity_downloads_name">Aktiivinen Lataukset</string>
     <string name="wait">Odota</string>
@@ -203,7 +202,6 @@
     <string name="menu_delete_shortcut_label">Poistaa</string>
     <string name="magnet_url_added">Magnet URL lisätään siirtoja. (Magneetit toimivat parhaiten Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Valmiit lataukset ovat saatavilla muille FrostWire käyttäjien kanssa Wi-Fi-verkkoon.</string>
-    <string name="use_monova_summary">Monova on magneetti pohjainen, toimii vain Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Valitettavasti FrostWire ei voi jatkua ilman lupaa käyttää levylle.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Osta nyt</string>

@@ -158,7 +158,6 @@
     <string name="multicast_discovery_summary">کثیر نشریات کے ذریعے مقامی وائی فائی ساتھیوں سے مربوط (مجوزہ)</string>
     <string name="max_concurrent_uploads">زیادہ سے زیادہ بیک وقت اپ لوڈز</string>
     <string name="use_torlock">استعمال TorLock</string>
-    <string name="use_monova">استعمال Monova</string>
     <string name="tos_title">استعمال کرنے کی شرائط</string>
     <string name="summary_files_shared">مقامی طور پر s% فائلوں کا اشتراک</string>
     <string name="search">تلاش کریں</string>
@@ -261,7 +260,6 @@
     <string name="search_for_type_files">%s فائلوں کے لیے تلاش</string>
     <string name="menu_delete_shortcut_label">حذف کریں</string>
     <string name="magnet_url_added">مقناطیس URL کی منتقلی میں شامل کر دیا. (میگنےٹ وائی فائی پر بہترین کام کریں)</string>
-    <string name="use_monova_summary">Monova کی مقناطیس کی بنیاد پر ہے، صرف وائی فائی پر کام کرتا ہے</string>
     <string name="frostwire_shutting_down_no_permissions">معذرت، FrostWire ڈسک تک رسائی کے لئے آپ کی اجازت کے بغیر جاری نہیں کر سکتے.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">ایک وقت خریداری</string>

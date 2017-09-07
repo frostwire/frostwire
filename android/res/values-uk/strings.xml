@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Підключення до локальних однолітки Wifi за допомогою під LGPL (рекомендується)</string>
     <string name="max_concurrent_uploads">Максимальна кількість одночасних uploads</string>
     <string name="use_torlock">користування TorLock</string>
-    <string name="use_monova">користування Monova</string>
     <string name="tos_title">Умови користування</string>
     <string name="activity_downloads_name">Активні завантаження</string>
     <string name="wait">Зачекайте</string>
@@ -198,7 +197,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Магніт URL доданий до передачам. (Магніти найкраще працюють на Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Завершення завантаження будуть доступні іншим користувачам Frostwire в мережі Wi-Fi.</string>
-    <string name="use_monova_summary">Monova є магнітом на основі, працює тільки на Wi-Fi</string>
     <string name="frostwire_shutting_down_no_permissions">На жаль, FrostWire не може тривати без вашої згоди на доступ до диска.</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
     <string name="one_time_purchase">Свого часу покупки</string>

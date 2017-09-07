@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Pripojenie k miestnej Wifi rovesníkmi cez multicast (odporúčané)</string>
     <string name="max_concurrent_uploads">Maximálna Simultánne Nahrávanie</string>
     <string name="use_torlock">Použiť TorLock</string>
-    <string name="use_monova">Použiť Monova</string>
     <string name="tos_title">Podmienky používania</string>
     <string name="activity_downloads_name">Aktívne stiahnutie</string>
     <string name="wait">Počkať</string>
@@ -200,7 +199,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL pridaná do prevodov. (Magnety fungujú najlepšie cez Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Hotové sťahovanie bude pre ostatných užívateľov FrostWire na vašej sieti Wi-Fi k dispozícii.</string>
-    <string name="use_monova_summary">Monova je magnet na báze funguje iba na Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Je nám ľúto, FrostWire nemôže pokračovať bez vášho dovolenia pre prístup k disku.</string>
     <string name="http_download_status_uncompressing">Dekomprimovanie</string>
     <string name="one_time_purchase">Jeden nákup čas</string>

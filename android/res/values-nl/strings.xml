@@ -377,7 +377,6 @@
     <string name="add_transfer_label">Plak een magneet of torrent URL</string>
     <string name="drawer_open">Open navigatielade</string>
     <string name="use_torlock">Gebruik TorLock</string>
-    <string name="use_monova">Gebruik Monova</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="delete_this_track">Verwijder deze track</string>
     <string name="five_dollars">$5</string>
@@ -419,7 +418,6 @@
     <string name="player_paused_press_and_hold_to_stop">Speler pauze. (Tip: Houd ingedrukt om te stoppen)</string>
     <string name="menu_delete_shortcut_label">Verwijder</string>
     <string name="magnet_url_added">Magneet URL toegevoegd aan transfers. (Magneten werken het beste op Wifi)</string>
-    <string name="use_monova_summary">Monova is magneet gebaseerd, werkt alleen op de website Wifi</string>
     <string name="frostwire_shutting_down_no_permissions">Sorry, FrostWire kan niet doorgaan zonder uw toestemming om toegang te krijgen tot de schijf.</string>
     <string name="one_time_purchase">Eenmalige Aankoop</string>
     <string name="activity_VPN">Verbinding</string>

@@ -50,7 +50,6 @@ public interface AppSettings {
     String SEARCH_TORLOCK_ENABLED = "search_torlock_enabled";
     String SEARCH_EZTV_ENABLED = "search_eztv_enabled";
     String SEARCH_TBP_ENABLED = "search_tbp_enabled";
-    String SEARCH_MONOVA_ENABLED = "search_monova_enabled";
     String SEARCH_YIFY_ENABLED = "search_yify_enabled";
     String SEARCH_TORRENTDOWNLOADS_ENABLED = "search_torrentdownloads_enabled";
     String SEARCH_LIMETORRENTS_ENABLED = "search_limetorrents_enabled";

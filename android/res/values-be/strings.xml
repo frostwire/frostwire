@@ -77,7 +77,6 @@
     <string name="multicast_discovery_summary">Падключэнне да лакальных аднагодкі Wifi з дапамогай шматадрасных рассылання (рэкамендуецца)</string>
     <string name="max_concurrent_uploads">Максімальную колькасць Uploads</string>
     <string name="use_torlock">Выкарыстоўвайце TorLock</string>
-    <string name="use_monova">Выкарыстоўвайце Monova</string>
     <string name="tos_title">Умовы выкарыстання</string>
     <string name="activity_downloads_name">Актыўныя загрузкі</string>
     <string name="wait">Пачакайце</string>
@@ -198,7 +197,6 @@
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Магніт URL дададзены да перадач. (Магніты лепш за ўсё працуюць на Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Завершаныя загрузкі будуць даступныя іншым карыстальнікам Frostwire ў сетцы Wi-Fi.</string>
-    <string name="use_monova_summary">Monova з\'яўляецца магнітам на аснове, працуе толькі на Wi-Fi.</string>
     <string name="frostwire_shutting_down_no_permissions">На жаль, FrostWire не можа працягвацца без вашага дазволу на доступ да дыска.</string>
     <string name="http_download_status_uncompressing">Распакаванне</string>
     <string name="one_time_purchase">Адзін час пакупкі</string>

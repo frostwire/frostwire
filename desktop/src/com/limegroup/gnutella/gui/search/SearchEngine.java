@@ -23,7 +23,6 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.monova.MonovaSearchPerformer;
 import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -74,13 +73,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine MONOVA = new SearchEngine(MONOVA_ID, "Monova", SearchEnginesSettings.MONOVA_SEARCH_ENABLED, "monova.org") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new MonovaSearchPerformer(MONOVA.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -205,7 +197,6 @@ public abstract class SearchEngine {
                 SOUNDCLOUD,
                 PIXABAY,
                 FROSTCLICK,
-                MONOVA,
                 ARCHIVEORG,
                 TORLOCK,
                 YIFY,
