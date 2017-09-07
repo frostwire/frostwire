@@ -61,8 +61,11 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     private final int seeds;
 
     YifySearchResult(String detailsUrl, SearchMatcher matcher) {
-        this.thumbnailUrl = matcher.group("cover");
         this.detailsUrl = detailsUrl;
+
+        // this url carries the date information
+        this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
+
         this.filename = parseFileName(detailsUrl);
         this.size = parseSize(matcher.group("size"));
         this.creationTime = System.currentTimeMillis();
@@ -147,5 +150,9 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     @Override
     public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    private static String buildThumbnailUrl(String str) {
+        return str.startsWith("//") ? "https:" + str : str;
     }
 }
