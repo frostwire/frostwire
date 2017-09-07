@@ -72,21 +72,6 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
     }
 
-    @Override
-    public String toString() {
-        return String.format("{\n\tthumbnailUrl: '%s',\n\tdetailsUrl: '%s',\n\tfilename: '%s',\n\tsize: %d," +
-                        "\n\tcreationTime: %d,\n\tseeds: %d,\n\ttorrentUrl: '%s',\n\tdisplayName: '%s',\n\tinfoHash: '%s'\n}",
-                thumbnailUrl,
-                detailsUrl,
-                filename,
-                size,
-                creationTime,
-                seeds,
-                torrentUrl,
-                displayName,
-                infoHash);
-    }
-
     private String parseFileName(String detailsUrl) {
         String[] split = detailsUrl.split("/");
         return FilenameUtils.getBaseName(split[split.length - 1]) + ".torrent";
