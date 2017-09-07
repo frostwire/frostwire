@@ -89,7 +89,7 @@ public class MainApplication extends Application {
 
             Librarian.instance().syncMediaStore();
         } catch (Throwable e) {
-            throw new RuntimeException("Unable to initialized main components", e);
+            throw new RuntimeException("Unable to initialize main components", e);
         }
     }
 
