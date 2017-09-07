@@ -53,11 +53,13 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
-    private final String torrentUrl;
     private final String infoHash;
     private final long size;
     private final long creationTime;
     private final int seeds;
+
+    private final String magnetUrl;
+    private String torrentUrl;
 
     YifySearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
@@ -71,9 +73,9 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.seeds = Integer.parseInt(matcher.group("seeds"));
         this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
 
-        String magnetUrl = matcher.group("magnet");
+        this.magnetUrl = matcher.group("magnet");
         this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
-        // TODO: create a fallback to magnet
+
         this.torrentUrl = buildTorrentUrl(thumbnailUrl, infoHash);
     }
 
@@ -125,6 +127,10 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     @Override
     public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    void switchToMagnet() {
+        this.torrentUrl = magnetUrl;
     }
 
     private static String buildThumbnailUrl(String str) {

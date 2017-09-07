@@ -19,7 +19,11 @@ package com.frostwire.search.yify;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -51,5 +55,30 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
     @Override
     protected YifySearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new YifySearchResult(sr.getDetailsUrl(), matcher);
+    }
+
+    @Override
+    protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
+        try {
+            return super.crawlResult(sr, data);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("in bencoded string")) {
+                return fallbackToMagnet(sr);
+            }
+
+            throw e;
+        }
+    }
+
+    private List<SearchResult> fallbackToMagnet(CrawlableSearchResult sr) {
+        ArrayList<SearchResult> r = new ArrayList<>(1);
+        if (sr instanceof YifySearchResult) {
+            YifySearchResult yify = (YifySearchResult) sr;
+            if (!yify.getTorrentUrl().startsWith("magnet")) {
+                ((YifySearchResult) sr).switchToMagnet();
+                r.add(sr);
+            }
+        }
+        return r;
     }
 }
