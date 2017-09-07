@@ -67,18 +67,13 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         // this url carries the date information
         this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
 
-        this.filename = parseFileName(detailsUrl);
+        this.filename = buildFileName(detailsUrl);
         this.size = parseSize(matcher.group("size"));
         this.creationTime = buildCreationTime(thumbnailUrl);
         this.seeds = Integer.parseInt(matcher.group("seeds"));
         this.torrentUrl = matcher.group("magnet");
         this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
         this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
-    }
-
-    private String parseFileName(String detailsUrl) {
-        String[] split = detailsUrl.split("/");
-        return FilenameUtils.getBaseName(split[split.length - 1]) + ".torrent";
     }
 
     @Override
@@ -166,5 +161,9 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
             // not that important
             return System.currentTimeMillis();
         }
+    }
+
+    private static String buildFileName(String detailsUrl) {
+        return FilenameUtils.getBaseName(detailsUrl) + ".torrent";
     }
 }
