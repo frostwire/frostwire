@@ -24,20 +24,14 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author gubatron
  * @author aldenml
  */
-public class YifyTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+final class YifyTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
-    private final String itemId;
     private final String detailsUrl;
     private final String displayName;
 
-    public YifyTempSearchResult(String domainName, String itemId, String htmlFilename, String displayName) {
-        this.itemId = itemId;
+    YifyTempSearchResult(String domainName, String itemId, String htmlFilename, String displayName) {
         this.detailsUrl = "https://" + domainName + "/movie/" + itemId + "/" + htmlFilename;
         this.displayName = displayName;
-    }
-
-    public String getItemId() {
-        return itemId;
     }
 
     @Override

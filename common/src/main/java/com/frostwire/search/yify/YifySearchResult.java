@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * @author gubatron
  * @author aldenml
  */
-public class YifySearchResult extends AbstractTorrentSearchResult {
+public final class YifySearchResult extends AbstractTorrentSearchResult {
 
     private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
 

@@ -25,7 +25,7 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  * @author gubatron
  * @author aldenml
  */
-public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
+public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
 
     private static final int MAX_RESULTS = 21;
     private static final String HTML_REGEX = "(?is)<div class=\"minfo\">.*?<div class=\"cover\"><img src='(?<cover>.*?)' /></div>.*?<div class=\"name\"><h1>(?<displayName>.*?)</h1>.*?<li><b>Size:</b> (?<size>.*?)</li>.*?<li><b>Language:</b> (?<language>.*?)</li>.*?li><b>Peers/Seeds:</b> (?<peers>\\d*?) / (?<seeds>\\d*?)</li>.*?<div class=\"attr\"><a class=\"large button orange\" href=\"(?<magnet>.*?)\">Download Ma";
@@ -53,40 +53,4 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
     protected YifySearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new YifySearchResult(sr.getDetailsUrl(), matcher);
     }
-
-    /*
-    public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "foobar";
-        String URL_PREFIX = "https://www.yify-torrent.org";
-        String DETAIL_URL_PREFIX = URL_PREFIX + "/movie/";
-        HttpClient httpClient = HttpClientFactory.newInstance();
-        String resultsHTML = httpClient.get(URL_PREFIX + "/search/" + TEST_SEARCH_TERM + "/", 10000);
-
-        Pattern pattern = Pattern.compile(REGEX);
-        SearchMatcher sm = SearchMatcher.from(pattern.matcher(resultsHTML));
-        resultsHTML = null;
-        System.gc();
-        int found = 0;
-        while (sm.find()) {
-            System.out.println("group 1: " + sm.group(1));
-            System.out.println("group 2: " + sm.group(2));
-            System.out.println("group 3: " + sm.group(3));
-            String detailsUrl = DETAIL_URL_PREFIX + sm.group(1) + "/" + sm.group(2);
-            String detailHTML = httpClient.get(detailsUrl);
-            Pattern detailPattern = Pattern.compile(HTML_REGEX);
-            SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(detailHTML));
-
-            if (!detailMatcher.find()) {
-                System.out.println("Check HTML_REGEX, matcher failed.");
-                return;
-            }
-            System.out.println(new YifySearchResult("www.yifi-torrent.org",detailsUrl,detailMatcher));
-            System.out.println("====================================\n");
-            Thread.sleep(3000);
-        }
-
-        if (found == 0) {
-            System.out.println("No results in search page, check REGEX");
-        }
-    }*/
 }
