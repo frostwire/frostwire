@@ -27,16 +27,14 @@ import com.frostwire.search.CrawlableSearchResult;
 final class YifyTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
     private final String detailsUrl;
-    private final String displayName;
 
-    YifyTempSearchResult(String domainName, String itemId, String htmlFilename, String displayName) {
+    YifyTempSearchResult(String domainName, String itemId, String htmlFilename) {
         this.detailsUrl = "https://" + domainName + "/movie/" + itemId + "/" + htmlFilename;
-        this.displayName = displayName;
     }
 
     @Override
     public String getDisplayName() {
-        return displayName;
+        return null;
     }
 
     @Override

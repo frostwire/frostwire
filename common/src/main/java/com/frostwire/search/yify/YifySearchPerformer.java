@@ -29,7 +29,7 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
 
     private static final int MAX_RESULTS = 21;
     private static final String HTML_REGEX = "(?is)<div class=\"minfo\">.*?<div class=\"cover\"><img src='(?<cover>.*?)' /></div>.*?<div class=\"name\"><h1>(?<displayName>.*?)</h1>.*?<li><b>Size:</b> (?<size>.*?)</li>.*?<li><b>Language:</b> (?<language>.*?)</li>.*?li><b>Peers/Seeds:</b> (?<peers>\\d*?) / (?<seeds>\\d*?)</li>.*?<div class=\"attr\"><a class=\"large button orange\" href=\"(?<magnet>.*?)\">Download Ma";
-    private static final String REGEX = "(?is)<div class=\"mv\">.*?<h3><a href=['\"]/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)['\"] target=\"_blank\" title=\"(?<displayName>.*?)\">";
+    private static final String REGEX = "(?is)<div class=\"mv\">.*?<h3><a href=['\"]/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)['\"] target=\"_blank\" title=\"(.*?)\">";
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -44,9 +44,8 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group("itemId");
         String htmlFileName = matcher.group("htmlFileName");
-        String displayName = matcher.group("displayName");
 
-        return new YifyTempSearchResult(getDomainName(), itemId, htmlFileName, displayName);
+        return new YifyTempSearchResult(getDomainName(), itemId, htmlFileName);
     }
 
     @Override
