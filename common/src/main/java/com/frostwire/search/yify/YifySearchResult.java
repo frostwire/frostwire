@@ -34,11 +34,9 @@ import java.util.regex.Pattern;
  */
 public final class YifySearchResult extends AbstractTorrentSearchResult {
 
-    private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
-
+    private static final long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2L << 39, 2L << 49};
     private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
-
-    private static final Pattern sizePattern;
+    private static final Pattern SIZE_PATTERN;
 
     static {
         UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<>();
@@ -48,7 +46,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("G", 3);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("T", 4);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("P", 5);
-        sizePattern = Pattern.compile("([\\d+\\.]+)([BKMGTP])");
+        SIZE_PATTERN = Pattern.compile("([\\d.]+)([BKMGTP])");
     }
 
     private final String thumbnailUrl;
@@ -68,7 +66,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
 
         this.filename = buildFileName(detailsUrl);
-        this.size = parseSize(matcher.group("size"));
+        this.size = buildSize(matcher.group("size"));
         this.creationTime = buildCreationTime(thumbnailUrl);
         this.seeds = Integer.parseInt(matcher.group("seeds"));
         this.torrentUrl = matcher.group("magnet");
@@ -121,28 +119,6 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         return torrentUrl;
     }
 
-    protected long parseSize(String group) {
-        long result = 0;
-        Matcher matcher = sizePattern.matcher(group);
-        if (matcher.find()) {
-            String amount = matcher.group(1);
-            String unit = matcher.group(2);
-
-            long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-            //fractional size
-            if (amount.indexOf(".") > 0) {
-                float floatAmount = Float.parseFloat(amount);
-                result = (long) (floatAmount * multiplier);
-            }
-            //integer based size
-            else {
-                int intAmount = Integer.parseInt(amount);
-                result = intAmount * multiplier;
-            }
-        }
-        return result;
-    }
-
     @Override
     public String getThumbnailUrl() {
         return thumbnailUrl;
@@ -165,5 +141,27 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
 
     private static String buildFileName(String detailsUrl) {
         return FilenameUtils.getBaseName(detailsUrl) + ".torrent";
+    }
+
+    private static long buildSize(String str) {
+        long result = 0;
+        Matcher matcher = SIZE_PATTERN.matcher(str);
+        if (matcher.find()) {
+            String amount = matcher.group(1);
+            String unit = matcher.group(2);
+
+            long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
+            //fractional size
+            if (amount.indexOf(".") > 0) {
+                float floatAmount = Float.parseFloat(amount);
+                result = (long) (floatAmount * multiplier);
+            }
+            //integer based size
+            else {
+                int intAmount = Integer.parseInt(amount);
+                result = intAmount * multiplier;
+            }
+        }
+        return result;
     }
 }
