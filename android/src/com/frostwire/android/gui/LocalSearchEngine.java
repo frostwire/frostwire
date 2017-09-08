@@ -28,7 +28,6 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
 
@@ -51,9 +50,6 @@ public final class LocalSearchEngine {
 
     private final SearchManager manager;
     private SearchListener listener;
-
-    // filter constants
-    private final int MIN_SEEDS_TORRENT_RESULT;
 
     private static LocalSearchEngine instance;
     private final HashSet<Integer> opened = new HashSet<>();
@@ -90,9 +86,6 @@ public final class LocalSearchEngine {
                 LocalSearchEngine.this.onFinished(token);
             }
         });
-
-        // TODO: review the logic behind putting this in a preference
-        this.MIN_SEEDS_TORRENT_RESULT = 10;//ConfigurationManager.instance().getInt(Constants.PREF_KEY_SEARCH_MIN_SEEDS_FOR_TORRENT_RESULT);
     }
 
     public SearchListener getListener() {
@@ -195,18 +188,6 @@ public final class LocalSearchEngine {
 
         try {
             for (SearchResult sr : results) {
-                if (sr instanceof TorrentSearchResult) {
-                    if (((TorrentSearchResult) sr).getSeeds() == -1) {
-                        long creationTime = sr.getCreationTime();
-                        long age = System.currentTimeMillis() - creationTime;
-                        if (age > 31536000000L) {
-                            continue;
-                        }
-                    } else if (((TorrentSearchResult) sr).getSeeds() < MIN_SEEDS_TORRENT_RESULT) {
-                        continue;
-                    }
-                }
-
                 if (sr instanceof CrawledSearchResult) {
                     if (sr instanceof YouTubeCrawledSearchResult) {
                         // special case for flv files
