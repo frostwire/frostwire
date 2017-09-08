@@ -47,8 +47,8 @@ import java.util.List;
  *
  */
 public abstract class SearchEngine {
-    private static final Logger LOG = Logger.getLogger(SearchEngine.class);
-    public static final UserAgent FROSTWIRE_ANDROID_USER_AGENT = new UserAgent(getOSVersionString(), Constants.FROSTWIRE_VERSION_STRING, Constants.FROSTWIRE_BUILD);
+
+    private static final UserAgent FROSTWIRE_ANDROID_USER_AGENT = new UserAgent(getOSVersionString(), Constants.FROSTWIRE_VERSION_STRING, Constants.FROSTWIRE_BUILD);
     private static final int DEFAULT_TIMEOUT = 10000;
 
     private final String name;
@@ -195,14 +195,7 @@ public abstract class SearchEngine {
     public static final SearchEngine TPB = new SearchEngine("TPB", Constants.PREF_KEY_SEARCH_USE_TPB) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            TPBSearchPerformer performer = null;
-            NetworkManager networkManager = NetworkManager.instance();
-            if (networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
-                performer = new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_TIMEOUT);
-            } else {
-                LOG.info("No TPBSearchPerformer, WiFi not up");
-            }
-            return performer;
+            return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
