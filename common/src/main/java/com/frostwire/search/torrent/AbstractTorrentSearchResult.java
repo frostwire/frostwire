@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,9 @@ import java.util.Map;
  */
 public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResult implements TorrentCrawlableSearchResult {
 
-    public final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
-    public static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
+    private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2L << 39, 2L << 49};
+    private final static Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
+
     static {
         UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<>();
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("B", 0);
@@ -71,7 +72,7 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
 
     protected long calculateSize(String amount, String unit) {
         if (amount == null || unit == null) {
-            return  -1;
+            return -1;
         }
 
         final Integer unitMultiplier = UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit);
