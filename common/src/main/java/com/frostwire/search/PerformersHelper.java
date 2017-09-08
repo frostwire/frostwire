@@ -140,17 +140,4 @@ public final class PerformersHelper {
         }
         return html;
     }
-
-    public static int daysOld(SearchResult sr) {
-        if (sr.getCreationTime() == -1) {
-            return 1;
-        }
-
-        int daysOld = (int) ((System.currentTimeMillis() - sr.getCreationTime()) / 86400000);
-        if (daysOld < 0) {
-            daysOld = 1;
-        }
-
-        return daysOld;
-    }
 }

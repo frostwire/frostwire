@@ -47,12 +47,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     public TPBSearchResult fromMatcher(SearchMatcher matcher) {
-        TPBSearchResult candidate = new TPBSearchResult(getDomainName(), matcher);
-        int daysOld = PerformersHelper.daysOld(candidate);
-        if (candidate.getSeeds() < 40 || daysOld > 200) {
-            candidate = null;
-        }
-        return candidate;
+        return new TPBSearchResult(getDomainName(), matcher);
     }
 
     @Override
