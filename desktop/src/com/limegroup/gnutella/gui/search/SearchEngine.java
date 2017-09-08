@@ -55,7 +55,6 @@ public abstract class SearchEngine {
     private final BooleanSetting _setting;
 
     private static final int TPB_ID = 6;
-    private static final int MONOVA_ID = 7;
     private static final int YOUTUBE_ID = 9;
     private static final int SOUNDCLOUD_ID = 10;
     private static final int ARCHIVEORG_ID = 11;
