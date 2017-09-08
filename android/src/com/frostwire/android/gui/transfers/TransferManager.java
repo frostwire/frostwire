@@ -32,7 +32,6 @@ import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
 import com.frostwire.search.HttpSearchResult;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -359,8 +358,6 @@ public final class TransferManager {
         if (sr instanceof TorrentCrawledSearchResult) {
             TorrentCrawledSearchResult torrentCrawledSearchResult = (TorrentCrawledSearchResult) sr;
             BTEngine.getInstance().download(torrentCrawledSearchResult, null, manager.isDeleteStartedTorrentEnabled());
-        } else if (sr instanceof ScrapedTorrentFileSearchResult) {
-            return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr, sr.getReferrerUrl()));
         } else if (sr.getTorrentUrl() != null) {
             return new TorrentFetcherDownload(manager, new TorrentSearchResultInfo(sr));
         }

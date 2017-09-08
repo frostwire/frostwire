@@ -31,7 +31,6 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ContextTask;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
@@ -68,7 +67,6 @@ public class StartDownloadTask extends ContextTask<Transfer> {
         Transfer transfer = null;
         try {
             if (sr instanceof TorrentSearchResult &&
-                !(sr instanceof ScrapedTorrentFileSearchResult) &&
                 !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
                         new HandpickedTorrentDownloadDialogOnFetch((Activity) getContext()));

@@ -23,7 +23,6 @@ import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.CrawledSearchResult;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
@@ -54,7 +53,6 @@ public final class LocalSearchEngine {
     private SearchListener listener;
 
     // filter constants
-    private static final int KAT_MIN_SEEDS_TORRENT_RESULT = 2;
     private final int MIN_SEEDS_TORRENT_RESULT;
 
     private static LocalSearchEngine instance;
@@ -204,11 +202,6 @@ public final class LocalSearchEngine {
                         if (age > 31536000000L) {
                             continue;
                         }
-                    } else if (sr instanceof ScrapedTorrentFileSearchResult) {
-                        // TODO: Search architecture hack, gotta abstract these guys.
-                        if (((TorrentSearchResult) sr).getSeeds() < KAT_MIN_SEEDS_TORRENT_RESULT) {
-                            continue;
-                        }
                     } else if (((TorrentSearchResult) sr).getSeeds() < MIN_SEEDS_TORRENT_RESULT) {
                         continue;
                     }
@@ -220,8 +213,6 @@ public final class LocalSearchEngine {
                         if (!((YouTubeCrawledSearchResult) sr).getFilename().endsWith(".flv")) {
                             list.add(sr);
                         }
-                    } else if (sr instanceof ScrapedTorrentFileSearchResult) {
-                        list.add(sr);
                     } else if (filter(new LinkedList<>(currentSearchTokens), sr)) {
                         list.add(sr);
                     }
