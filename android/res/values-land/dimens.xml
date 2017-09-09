@@ -22,4 +22,7 @@
     <dimen name="dialog_min_width_major">460dp</dimen>
     <dimen name="dialog_min_width_minor">300dp</dimen>
     <dimen name="default_circleStrokeWidth">2dp</dimen>
+
+    <!-- Paddings -->
+    <dimen name="transfers_seeding_notification_top_padding">40dp</dimen>
 </resources>
