@@ -136,29 +136,29 @@ final class UniversalScanner {
                 }
             }
         }
+    }
 
-        private Runnable prepareOnMediaScannerConnectedRunnable(final MediaScannerConnection connection, final Collection<File> files) {
-            return new Runnable() {
-                @Override
-                public void run() {
-                    if (files == null || connection == null) {
-                        return;
-                    }
-                    try {
-                        /** should only arrive here on connected state, but let's double check since it's possible */
-                        if (connection.isConnected() && files != null && !files.isEmpty()) {
-                            for (File f : files) {
-                                connection.scanFile(f.getAbsolutePath(), null);
-                            }
-                        }
-                    } catch (IllegalStateException e) {
-                        LOG.warn("Scanner service wasn't really connected or service was null", e);
-                        //should we try to connect again? don't want to end up in endless loop
-                        //maybe destroy connection?
-                    }
+    private static Runnable prepareOnMediaScannerConnectedRunnable(final MediaScannerConnection connection, final Collection<File> files) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (files == null || connection == null) {
+                    return;
                 }
-            };
-        }
+                try {
+                    /** should only arrive here on connected state, but let's double check since it's possible */
+                    if (connection.isConnected() && files != null && !files.isEmpty()) {
+                        for (File f : files) {
+                            connection.scanFile(f.getAbsolutePath(), null);
+                        }
+                    }
+                } catch (IllegalStateException e) {
+                    LOG.warn("Scanner service wasn't really connected or service was null", e);
+                    //should we try to connect again? don't want to end up in endless loop
+                    //maybe destroy connection?
+                }
+            }
+        };
     }
 
     /**
