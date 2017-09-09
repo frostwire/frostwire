@@ -59,4 +59,7 @@
     <dimen name="settings_list_item_inner_horizontal_padding">16dp</dimen>
 
     <dimen name="default_circleStrokeWidth">2dp</dimen>
+
+    <!-- Paddings -->
+    <dimen name="transfers_seeding_notification_top_padding">0dp</dimen>
 </resources>
