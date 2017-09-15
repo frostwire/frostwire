@@ -31,6 +31,9 @@ import java.util.Locale;
  */
 public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
 
+    private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)<span class=\"small pad-l2\">";
+    private static final Pattern FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
+
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -39,9 +42,6 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     private final long size;
     private final long creationTime;
     private final int seeds;
-
-    private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)<span class=\"small pad-l2\">";
-    private static Pattern FILE_SIZE_PATTERN = null;
 
     ZooqleSearchResult(String detailsUrl, String urlPrefix, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
@@ -61,9 +61,6 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     private long calculateSize(String sizedata) {
         if (sizedata.contains("unknown")) {
             return -1;
-        }
-        if (FILE_SIZE_PATTERN == null) {
-            FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
         }
         Matcher matcher = FILE_SIZE_PATTERN.matcher(sizedata);
         if (matcher.find()) {
