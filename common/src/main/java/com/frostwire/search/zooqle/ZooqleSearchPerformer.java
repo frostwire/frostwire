@@ -38,11 +38,11 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     private static final String HTML_DETAIL_REGEX =
             "(?is)" +
-                    "<h4 id=\"torname\">(?<filename>.*?)<span class=\"text-muted4 pad-r2\">.torrent</span>.*" +
+                    "<h4 id=torname>(?<filename>.*?)<span class=\"text-muted4 pad-r2\">.torrent</span>.*" +
                     "title=\"Torrent cloud statistics\"></i><div class=\"progress prog trans..\" title=\"Seeders: (?<seeds>\\d+) .*<div class=\"progress-bar smaller.*" +
-                    "<i class=\"zqf zqf-files text-muted3 pad-r2 trans80\"(?<sizedata>.*)<span class=\"spacer\"></span>.*?" + // could be a size, or unknown size, managed on the search result class
+                    "<i class=\"zqf zqf-files text-muted3 pad-r2 trans80\"(?<sizedata>.*)<span class=spacer></span>.*?" + // could be a size, or unknown size, managed on the search result class
                     "<i class=\"zqf zqf-time text-muted3 pad-r2 trans80\" title=\"Date indexed\"></i>(?<month>.{3}) (?<day>\\d{1,2}), (?<year>\\d{4}) <span class=\"small pad-l\".*?" +
-                    "<a rel=\"nofollow\" href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)\\&.*?<i class=\\\"spr dl-magnet pad-r2\\\"></i>Magnet.*?" +
+                    "<a rel=nofollow href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)\\&.*?<i class=\"spr dl-magnet pad-r2\"></i>Magnet.*?" +
                     "(.*href=\"/download/(?<torrent>.*?)\\.torrent\".*?)?";
 
 
