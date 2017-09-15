@@ -17,14 +17,9 @@
 
 package com.frostwire.search.zooqle;
 
-import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
-
-import java.nio.charset.Charset;
 
 /**
  * @author aldenml
@@ -42,7 +37,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
                     "title=\"Torrent cloud statistics\"></i><div class=\"progress prog trans..\" title=\"Seeders: (?<seeds>\\d+) .*<div class=\"progress-bar smaller.*" +
                     "<i class=\"zqf zqf-files text-muted3 pad-r2 trans80\"(?<sizedata>.*)<span class=spacer></span>.*?" + // could be a size, or unknown size, managed on the search result class
                     "<i class=\"zqf zqf-time text-muted3 pad-r2 trans80\" title=\"Date indexed\"></i>(?<month>.{3}) (?<day>\\d{1,2}), (?<year>\\d{4}) <span class=\"small pad-l\".*?" +
-                    "<a rel=nofollow href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)\\&.*?<i class=\"spr dl-magnet pad-r2\"></i>Magnet.*?" +
+                    "<a rel=nofollow href=\"magnet:\\?xt=urn:btih:(?<magnet>.*)\"><i class=\"spr dl-magnet pad-r2\"></i>Magnet.*?" +
                     "(.*href=\"/download/(?<torrent>.*?)\\.torrent\".*?)?";
 
 
@@ -98,7 +93,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
         return html != null && !html.contains("Cloudflare");
     }
 
-    /**
+    /*
     public static void main(String[] args) throws Throwable {
         String TEST_QUERY_TERM = "foobar";
         String URL_PREFIX = "https://zooqle.com/";
