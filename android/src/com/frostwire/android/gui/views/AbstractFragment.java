@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
@@ -82,8 +83,7 @@ public abstract class AbstractFragment extends Fragment {
     protected void initComponents(View rootView, Bundle savedInstanceState) {
     }
 
-    @SuppressWarnings("unchecked")
-    protected final <T extends View> T findView(View v, int id) {
+    protected final <T extends View> T findView(View v, @IdRes int id) {
         T result = null;
         if (v != null) {
             result = v.findViewById(id);
