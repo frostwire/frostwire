@@ -20,10 +20,7 @@ package com.frostwire.android.gui.views;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +35,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.frostwire.android.R;
+import com.frostwire.android.util.Debug;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -52,7 +50,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     private final int layoutResId;
     private final ArrayList<String> fragmentTags;
-    private final ArrayList<BroadcastReceiver> registeredBroadcastReceivers;
 
     private boolean paused;
 
@@ -60,8 +57,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     public AbstractActivity(int layoutResId) {
         this.layoutResId = layoutResId;
-        this.fragmentTags = new ArrayList<>(0);
-        this.registeredBroadcastReceivers = new ArrayList<>(0);
+        this.fragmentTags = new ArrayList<>();
         this.paused = false;
     }
 
@@ -153,22 +149,16 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     @Override
-    public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-        registeredBroadcastReceivers.add(receiver);
-        return super.registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter, String broadcastPermission, Handler scheduler) {
-        registeredBroadcastReceivers.add(receiver);
-        return super.registerReceiver(receiver, filter, broadcastPermission, scheduler);
-    }
-
-    @Override
     public void unregisterReceiver(BroadcastReceiver receiver) {
-        if (isReceiverRegistered(receiver)) {
-            registeredBroadcastReceivers.remove(receiver);
+        try {
             super.unregisterReceiver(receiver);
+        } catch (Throwable e) {
+            if (Debug.isEnable()) {
+                // rethrow to actually see it and fix it
+                throw e;
+            }
+            // else, ignore exception, it could be to a bad call from
+            // third party frameworks
         }
     }
 
@@ -176,10 +166,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     protected void initToolbar(Toolbar toolbar) {
-    }
-
-    private boolean isReceiverRegistered(BroadcastReceiver receiver) {
-        return registeredBroadcastReceivers.contains(receiver);
     }
 
     private void setToolbar() {
