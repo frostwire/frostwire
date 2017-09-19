@@ -225,21 +225,26 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
 
         public static PlaylistFragmentDeleteDialog newInstance(PlaylistFragment playlistFragment, String playlistName, long playlistId) {
             fragment = playlistFragment;
-            return new PlaylistFragmentDeleteDialog(playlistName, playlistId);
+            PlaylistFragmentDeleteDialog f = new PlaylistFragmentDeleteDialog();
+
+            Bundle args = new Bundle();
+            args.putString("playlist_name", playlistName);
+            args.putLong("playlist_id", playlistId);
+            f.setArguments(args);
+
+            return f;
         }
 
         public PlaylistFragmentDeleteDialog() {
             super(R.layout.dialog_default);
         }
 
-        private PlaylistFragmentDeleteDialog(String playlistName, long playlistId) {
-            super(R.layout.dialog_default);
-            this.playlistName = playlistName;
-            this.playlistId = playlistId;
-        }
-
         @Override
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            Bundle args = getArguments();
+            this.playlistName = args.getString("playlist_name");
+            this.playlistId = args.getLong("playlist_id");
+
             if (playlistName != null && savedInstanceState != null) {
                 savedInstanceState.putString("playlistName", playlistName);
                 savedInstanceState.putLong("playlistId", playlistId);
