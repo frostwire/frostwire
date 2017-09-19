@@ -92,33 +92,31 @@
             android:layout_height="match_parent"
             android:text="@string/transfers_select_completed" />
     </android.support.design.widget.TabLayout>
+    <com.frostwire.android.gui.views.RichNotification
+        android:id="@+id/fragment_transfers_sd_card_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
+        frostwire:rich_notification_icon="@drawable/sd_card_notification"
+        frostwire:rich_notification_title="@string/saving_to_sd_card"
+        frostwire:rich_notification_title_underlined="true" />
 
+    <com.frostwire.android.gui.views.RichNotification
+        android:id="@+id/fragment_transfers_internal_memory_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
+        frostwire:rich_notification_icon="@drawable/internal_memory_notification"
+        frostwire:rich_notification_title="@string/saving_to_internal_memory"
+        frostwire:rich_notification_title_underlined="true" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/app_background_white">
-
-        <com.frostwire.android.gui.views.RichNotification
-            android:id="@+id/fragment_transfers_sd_card_notification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
-            frostwire:rich_notification_icon="@drawable/sd_card_notification"
-            frostwire:rich_notification_title="@string/saving_to_sd_card"
-            frostwire:rich_notification_title_underlined="true" />
-
-        <com.frostwire.android.gui.views.RichNotification
-            android:id="@+id/fragment_transfers_internal_memory_notification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
-            frostwire:rich_notification_icon="@drawable/internal_memory_notification"
-            frostwire:rich_notification_title="@string/saving_to_internal_memory"
-            frostwire:rich_notification_title_underlined="true" />
 
         <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_transfers_swipe"
@@ -139,8 +137,7 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/fragment_transfers_internal_memory_notification">
+            android:layout_height="match_parent" >
 
             <com.frostwire.android.gui.views.TransfersNoSeedsView
                 android:id="@+id/fragment_transfers_no_seeds_view"
