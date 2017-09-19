@@ -151,7 +151,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         this.LOADER_ID = loaderId;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
