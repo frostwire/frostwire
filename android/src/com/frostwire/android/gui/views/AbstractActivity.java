@@ -22,6 +22,7 @@ import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -56,7 +57,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     private static boolean menuIconsVisible = false;
 
-    public AbstractActivity(int layoutResId) {
+    public AbstractActivity(@LayoutRes int layoutResId) {
         this.layoutResId = layoutResId;
         this.fragmentTags = new ArrayList<>();
         this.paused = false;
@@ -183,7 +184,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    protected final <T extends Fragment> T findFragment(int id) {
+    protected final <T extends Fragment> T findFragment(@IdRes int id) {
         return (T) getFragmentManager().findFragmentById(id);
     }
 
