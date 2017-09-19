@@ -20,6 +20,7 @@ package com.andrew.apollo.ui.fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.List;
@@ -274,11 +276,13 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         }
 
         void onDelete() {
-            if (fragment != null) {
-                dismiss();
-                fragment.deleteSelectedPlaylist(playlistId);
+            dismiss();
+            AbstractActivity act = (AbstractActivity) getActivity();
+            for (Fragment f : act.getFragments()) {
+                if (f instanceof PlaylistFragment) {
+                    ((PlaylistFragment) f).deleteSelectedPlaylist(playlistId);
+                }
             }
-
         }
     }
 
