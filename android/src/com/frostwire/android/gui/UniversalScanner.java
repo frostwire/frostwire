@@ -31,10 +31,12 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -94,7 +96,7 @@ final class UniversalScanner {
         }
 
         public void onMediaScannerConnected() {
-            Runnable onMediaScannerConnectedRunnable = prepareOnMediaScannerConnectedRunnable(connection, files);
+            Runnable onMediaScannerConnectedRunnable = new MediaScannerConnectedRunnable(connection, files);
 
             // do not do this on main thread, causing ANRs
             if (Looper.myLooper() == Looper.getMainLooper()) {
@@ -105,7 +107,7 @@ final class UniversalScanner {
         }
 
         public void onScanCompleted(String path, Uri uri) {
-            /** This will work if onScanCompleted is invoked after scanFile finishes. */
+            /* This will work if onScanCompleted is invoked after scanFile finishes. */
             numCompletedScans++;
             if (numCompletedScans == files.size()) {
                 connection.disconnect();
@@ -138,27 +140,38 @@ final class UniversalScanner {
         }
     }
 
-    private static Runnable prepareOnMediaScannerConnectedRunnable(final MediaScannerConnection connection, final Collection<File> files) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                if (files == null || connection == null) {
-                    return;
-                }
-                try {
-                    /** should only arrive here on connected state, but let's double check since it's possible */
-                    if (connection.isConnected() && files != null && !files.isEmpty()) {
-                        for (File f : files) {
-                            connection.scanFile(f.getAbsolutePath(), null);
-                        }
-                    }
-                } catch (IllegalStateException e) {
-                    LOG.warn("Scanner service wasn't really connected or service was null", e);
-                    //should we try to connect again? don't want to end up in endless loop
-                    //maybe destroy connection?
-                }
+    private static final class MediaScannerConnectedRunnable implements Runnable {
+
+        private final WeakReference<MediaScannerConnection> connRef;
+        private final Collection<File> files;
+
+        MediaScannerConnectedRunnable(MediaScannerConnection conn, Collection<File> files) {
+            this.connRef = Ref.weak(conn);
+            this.files = files;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(connRef)) {
+                return; // early return;
             }
-        };
+            MediaScannerConnection connection = connRef.get();
+            if (files == null || connection == null) {
+                return;
+            }
+            try {
+                /* should only arrive here on connected state, but let's double check since it's possible */
+                if (connection.isConnected() && !files.isEmpty()) {
+                    for (File f : files) {
+                        connection.scanFile(f.getAbsolutePath(), null);
+                    }
+                }
+            } catch (IllegalStateException e) {
+                LOG.warn("Scanner service wasn't really connected or service was null", e);
+                //should we try to connect again? don't want to end up in endless loop
+                //maybe destroy connection?
+            }
+        }
     }
 
     /**
