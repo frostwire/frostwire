@@ -18,9 +18,11 @@
 
 package com.andrew.apollo.menu;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -33,9 +35,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -139,8 +143,13 @@ abstract class BasePlaylistDialog extends DialogFragment {
             basePlaylistDialog.onSaveClick();
             MusicUtils.refresh();
             dialog.dismiss();
-            if (Ref.alive(apolloFragmentRef)) {
-                apolloFragmentRef.get().refresh();
+
+            // refresh the PlaylistFragment
+            AbstractActivity act = (AbstractActivity) basePlaylistDialog.getActivity();
+            for (Fragment f : act.getFragments()) {
+                if (f instanceof PlaylistFragment) {
+                    ((PlaylistFragment) f).refresh();
+                }
             }
         }
     }

@@ -89,6 +89,15 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return paused;
     }
 
+    /**
+     * Returns a list of the currently attached fragments with
+     * a non null TAG.
+     * <p>
+     * If you are in API >= 26, the new method {@link FragmentManager#getFragments()}
+     * give you access to a list of all fragments that are added to the FragmentManager.
+     *
+     * @return the list of attached fragments with TAG.
+     */
     public final List<Fragment> getFragments() {
         List<Fragment> result = new LinkedList<>();
 
