@@ -82,7 +82,6 @@ public class RenamePlaylist extends BasePlaylistDialog {
                     MediaStore.Audio.Playlists._ID + "=?", new String[] {
                         String.valueOf(mRenameId)
                     });
-            closeKeyboard();
             getDialog().dismiss();
         }
     }

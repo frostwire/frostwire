@@ -95,7 +95,6 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
                 final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, added, added);
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
-            closeKeyboard();
             getDialog().dismiss();
         }
     }
