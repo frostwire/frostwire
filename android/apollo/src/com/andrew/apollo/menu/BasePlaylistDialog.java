@@ -18,7 +18,6 @@
 
 package com.andrew.apollo.menu;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -36,13 +35,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
-import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
 
 /**
  * A simple base class for the playlist dialogs.
@@ -65,8 +60,6 @@ abstract class BasePlaylistDialog extends DialogFragment {
 
     /* The default edit text text */
     String mDefaultname;
-
-    private WeakReference<ApolloFragment> apolloFragmentRef;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -96,7 +89,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
         yesButton.setText(R.string.save);
 
         noButton.setOnClickListener(new NegativeButtonOnClickListener(mPlaylistDialog));
-        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, mPlaylistDialog, apolloFragmentRef));
+        yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, mPlaylistDialog));
 
         mPlaylist.post(new Runnable() {
 
@@ -129,13 +122,11 @@ abstract class BasePlaylistDialog extends DialogFragment {
     private static class PositiveButtonOnClickListener implements View.OnClickListener {
 
         private final Dialog dialog;
-        private final WeakReference<ApolloFragment> apolloFragmentRef;
         private final BasePlaylistDialog basePlaylistDialog;
 
-        PositiveButtonOnClickListener(BasePlaylistDialog basePlaylistDialog, Dialog dialog, WeakReference<ApolloFragment> apolloFragmentRef) {
+        PositiveButtonOnClickListener(BasePlaylistDialog basePlaylistDialog, Dialog dialog) {
             this.basePlaylistDialog = basePlaylistDialog;
             this.dialog = dialog;
-            this.apolloFragmentRef = apolloFragmentRef;
         }
 
         @Override
@@ -166,22 +157,6 @@ abstract class BasePlaylistDialog extends DialogFragment {
         public void onClick(View v) {
             MusicUtils.refresh();
             dialog.dismiss();
-        }
-    }
-
-    void updateApolloFragmentReference(ApolloFragment frag) {
-        if (apolloFragmentRef == null) {
-            if (frag != null) {
-                apolloFragmentRef = Ref.weak(frag);
-            }
-        } else {
-            Ref.free(apolloFragmentRef);
-
-            if (frag != null) {
-                apolloFragmentRef = Ref.weak(frag);
-            } else {
-                apolloFragmentRef = null;
-            }
         }
     }
 
