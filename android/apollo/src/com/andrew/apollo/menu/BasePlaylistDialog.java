@@ -74,11 +74,11 @@ abstract class BasePlaylistDialog extends DialogFragment {
 
         mPrompt = getString(R.string.create_playlist_prompt);
 
-        TextView dialogTitle = (TextView) view.findViewById(R.id.dialog_default_input_title);
+        TextView dialogTitle = view.findViewById(R.id.dialog_default_input_title);
         dialogTitle.setText(mPrompt);
 
         // Initialize the edit text
-        mPlaylist = (EditText) view.findViewById(R.id.dialog_default_input_text);
+        mPlaylist = view.findViewById(R.id.dialog_default_input_text);
         // To show the "done" button on the soft keyboard
         mPlaylist.setSingleLine(true);
         // All caps
@@ -86,12 +86,12 @@ abstract class BasePlaylistDialog extends DialogFragment {
                 | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         // Set the save button action
-        Button noButton = (Button) view.findViewById(R.id.dialog_default_input_button_no);
+        Button noButton = view.findViewById(R.id.dialog_default_input_button_no);
         noButton.setText(R.string.cancel);
-        Button yesButton = (Button) view.findViewById(R.id.dialog_default_input_button_yes);
+        Button yesButton = view.findViewById(R.id.dialog_default_input_button_yes);
         yesButton.setText(R.string.save);
 
-        noButton.setOnClickListener(new NegativeButtonOnClickListener(this, mPlaylistDialog));
+        noButton.setOnClickListener(new NegativeButtonOnClickListener(mPlaylistDialog));
         yesButton.setOnClickListener(new PositiveButtonOnClickListener(this, mPlaylistDialog, apolloFragmentRef));
 
         mPlaylist.post(new Runnable() {
@@ -148,10 +148,8 @@ abstract class BasePlaylistDialog extends DialogFragment {
     private static class NegativeButtonOnClickListener implements View.OnClickListener {
 
         private final Dialog dialog;
-        private final BasePlaylistDialog basePlaylistDialog;
 
-        NegativeButtonOnClickListener(BasePlaylistDialog basePlaylistDialog, Dialog dialog) {
-            this.basePlaylistDialog = basePlaylistDialog;
+        NegativeButtonOnClickListener(Dialog dialog) {
             this.dialog = dialog;
         }
 
