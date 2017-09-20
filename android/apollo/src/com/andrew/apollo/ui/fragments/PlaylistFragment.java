@@ -278,10 +278,9 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         void onDelete() {
             dismiss();
             AbstractActivity act = (AbstractActivity) getActivity();
-            for (Fragment f : act.getFragments()) {
-                if (f instanceof PlaylistFragment) {
-                    ((PlaylistFragment) f).deleteSelectedPlaylist(playlistId);
-                }
+            PlaylistFragment f = act.findFragment(PlaylistFragment.class);
+            if (f != null) {
+                f.deleteSelectedPlaylist(playlistId);
             }
         }
     }

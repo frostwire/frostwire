@@ -21,7 +21,6 @@ package com.andrew.apollo.menu;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -137,10 +136,9 @@ abstract class BasePlaylistDialog extends DialogFragment {
 
             // refresh the PlaylistFragment
             AbstractActivity act = (AbstractActivity) basePlaylistDialog.getActivity();
-            for (Fragment f : act.getFragments()) {
-                if (f instanceof PlaylistFragment) {
-                    ((PlaylistFragment) f).refresh();
-                }
+            PlaylistFragment f = act.findFragment(PlaylistFragment.class);
+            if (f != null) {
+                f.refresh();
             }
         }
     }
