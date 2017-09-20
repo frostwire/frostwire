@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v14.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.Preference;
@@ -97,6 +98,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     public static abstract class PreferenceDialogFragment
             extends android.support.v14.preference.PreferenceDialogFragment {
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             Context context = getActivity();

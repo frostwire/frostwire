@@ -79,7 +79,6 @@ public abstract class AbstractFragment extends Fragment {
         ((AppCompatActivity) activity).startSupportActionMode(callback);
     }
 
-    @SuppressWarnings("UnusedParameters")
     protected void initComponents(View rootView, Bundle savedInstanceState) {
     }
 

@@ -44,7 +44,7 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         T item = getItem(position);
         if (convertView == null) {
             convertView = View.inflate(getContext(), layoutResId, null);
