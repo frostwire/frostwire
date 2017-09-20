@@ -24,6 +24,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,6 @@ import android.view.WindowManager.LayoutParams;
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -132,14 +132,8 @@ public abstract class AbstractDialog extends DialogFragment {
 
     protected abstract void initComponents(Dialog dlg, Bundle savedInstanceState);
 
-    @SuppressWarnings("unchecked")
-    protected final <T extends View> T findView(Dialog dlg, int id) {
-        return (T) dlg.findViewById(id);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected final <T extends Serializable> T getArgument(String key) {
-        return (T) getArguments().getSerializable(key);
+    protected final <T extends View> T findView(Dialog dlg, @IdRes int id) {
+        return dlg.findViewById(id);
     }
 
     private void dispatchDialogClick(Activity activity, String tag, int which) {
