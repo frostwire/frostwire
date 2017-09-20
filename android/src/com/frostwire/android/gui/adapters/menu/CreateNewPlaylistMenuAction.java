@@ -114,8 +114,8 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
             Button noButton = findView(dlg, R.id.dialog_default_input_button_no);
             noButton.setText(R.string.cancel);
 
-            yesButton.setOnClickListener(new DialogButtonClickListener(this, true));
-            noButton.setOnClickListener(new DialogButtonClickListener(this, false));
+            yesButton.setOnClickListener(new DialogButtonClickListener(true));
+            noButton.setOnClickListener(new DialogButtonClickListener(false));
         }
 
         String getPlaylistName() {
@@ -133,29 +133,28 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
             outState.putString("playlistName", getPlaylistName());
             super.onSaveInstanceState(outState);
         }
-    }
 
-    private static class DialogButtonClickListener implements View.OnClickListener {
-        private final CreateNewPlaylistDialog dialog;
-        private final boolean positive;
+        private final class DialogButtonClickListener implements View.OnClickListener {
 
-        DialogButtonClickListener(CreateNewPlaylistDialog dialog, boolean positive) {
-            this.dialog = dialog;
-            this.positive = positive;
-        }
+            private final boolean positive;
 
-        @Override
-        public void onClick(View view) {
-            if (!positive) {
-                dialog.dismiss();
-            } else {
-                String playlistName = dialog.getPlaylistName();
-                if (MusicUtils.getIdForPlaylist(dialog.getActivity(), playlistName) != -1) {
-                    playlistName += "+";
-                    dialog.updatePlaylistName(playlistName);
+            DialogButtonClickListener(boolean positive) {
+                this.positive = positive;
+            }
+
+            @Override
+            public void onClick(View view) {
+                if (!positive) {
+                    dismiss();
                 } else {
-                    CreateNewPlaylistDialog.menuAction.onClickCreatePlaylistButton(playlistName);
-                    dialog.dismiss();
+                    String playlistName = getPlaylistName();
+                    if (MusicUtils.getIdForPlaylist(getActivity(), playlistName) != -1) {
+                        playlistName += "+";
+                        updatePlaylistName(playlistName);
+                    } else {
+                        CreateNewPlaylistDialog.menuAction.onClickCreatePlaylistButton(playlistName);
+                        dismiss();
+                    }
                 }
             }
         }
