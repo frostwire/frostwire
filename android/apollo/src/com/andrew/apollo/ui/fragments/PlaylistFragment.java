@@ -190,19 +190,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         return true;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        // gubatron's hacks: I have not found a way to reach the playlist fragment
-        // instance from dialogs via HomeActivity and its FragmentManager
-        // therefore I just plug a static reference here to solve refreshing
-        // issues on these actions/dialogs.
-        // Any more elegant architecture fixes to interact with the PlaylistFragment
-        // in some other way is most welcome. For now, simple stupid, but I don't like
-        // solving things with these globally accessible references.
-        CreateNewPlaylistMenuAction.fragment = this;
-        super.onAttach(activity);
-    }
-
     private void deleteSelectedPlaylist(long playlistId) {
         Activity activity = getActivity();
         if (activity != null && activity.getContentResolver() != null) {
@@ -297,5 +284,4 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
             }
         }
     }
-
 }

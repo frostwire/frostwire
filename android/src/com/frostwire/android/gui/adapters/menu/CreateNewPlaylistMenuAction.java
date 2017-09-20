@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -42,8 +43,7 @@ import com.frostwire.android.gui.views.MenuAction;
  * @author aldenml
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
-    // TODO: refactor this public static field
-    public static PlaylistFragment fragment;
+
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
@@ -62,16 +62,21 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     }
 
     private void onClickCreatePlaylistButton(CharSequence text) {
-        long playlistId = MusicUtils.createPlaylist(getContext(), text.toString());
+        Context ctx = getContext();
+
+        long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
         MusicUtils.refresh();
 
         if (fileDescriptors != null) {
-            MusicUtils.addToPlaylist(getContext(), fileDescriptors, playlistId);
+            MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
         }
 
-        if (fragment != null) {
-            fragment.restartLoader(true);
-            fragment.refresh();
+        if (ctx instanceof AbstractActivity) {
+            PlaylistFragment f = ((AbstractActivity) ctx).findFragment(PlaylistFragment.class);
+            if (f != null) {
+                f.restartLoader(true);
+                f.refresh();
+            }
         }
     }
 
