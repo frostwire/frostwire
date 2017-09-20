@@ -20,7 +20,6 @@ package com.andrew.apollo.ui.fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -191,7 +190,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     }
 
     private PlaylistFragmentDeleteDialog buildDeleteDialog() {
-        return PlaylistFragmentDeleteDialog.newInstance(this, mItem.mPlaylistName, mItem.mPlaylistId);
+        return PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
     }
 
     @Override
@@ -203,7 +202,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         // Any more elegant architecture fixes to interact with the PlaylistFragment
         // in some other way is most welcome. For now, simple stupid, but I don't like
         // solving things with these globally accessible references.
-        PlaylistFragmentDeleteDialog.fragment = this;
         CreateNewPlaylistMenuAction.fragment = this;
         super.onAttach(activity);
     }
@@ -223,10 +221,8 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     public static class PlaylistFragmentDeleteDialog extends AbstractDialog {
         private String playlistName;
         private long playlistId;
-        static PlaylistFragment fragment;
 
-        public static PlaylistFragmentDeleteDialog newInstance(PlaylistFragment playlistFragment, String playlistName, long playlistId) {
-            fragment = playlistFragment;
+        public static PlaylistFragmentDeleteDialog newInstance(String playlistName, long playlistId) {
             PlaylistFragmentDeleteDialog f = new PlaylistFragmentDeleteDialog();
 
             Bundle args = new Bundle();
