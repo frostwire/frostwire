@@ -53,11 +53,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
-        showCreateNewPlaylistDialog();
-    }
-
-    private void showCreateNewPlaylistDialog() {
-        CreateNewPlaylistDialog.newInstance(this, fileDescriptors).
+        CreateNewPlaylistDialog.newInstance(fileDescriptors).
                 show(((Activity) getContext()).getFragmentManager());
     }
 
@@ -67,10 +63,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
         private EditText playlistInput;
 
-        private static CreateNewPlaylistMenuAction menuAction;
-
-        public static CreateNewPlaylistDialog newInstance(CreateNewPlaylistMenuAction action, long[] fileDescriptors) {
-            menuAction = action;
+        public static CreateNewPlaylistDialog newInstance(long[] fileDescriptors) {
             CreateNewPlaylistDialog dlg = new CreateNewPlaylistDialog();
 
             Bundle args = new Bundle();
