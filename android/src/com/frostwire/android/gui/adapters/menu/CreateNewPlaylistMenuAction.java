@@ -65,7 +65,8 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
         private long[] fileDescriptors;
 
-        private Dialog dlg;
+        private EditText playlistInput;
+
         private static CreateNewPlaylistMenuAction menuAction;
 
         public static CreateNewPlaylistDialog newInstance(CreateNewPlaylistMenuAction action, long[] fileDescriptors) {
@@ -88,11 +89,10 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
             Bundle args = getArguments();
             this.fileDescriptors = args.getLongArray("file_descriptors");
 
-            this.dlg = dlg;
             TextView title = findView(dlg, R.id.dialog_default_input_title);
             title.setText(R.string.new_empty_playlist);
 
-            EditText playlistInput = findView(dlg, R.id.dialog_default_input_text);
+            playlistInput = findView(dlg, R.id.dialog_default_input_text);
 
             if (savedInstanceState != null && savedInstanceState.getString("playlistName") != null) {
                 playlistInput.setText(savedInstanceState.getString("playlistName"));
@@ -112,12 +112,10 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         }
 
         String getPlaylistName() {
-            EditText playlistInput = findView(dlg, R.id.dialog_default_input_text);
             return playlistInput.getText().toString();
         }
 
         void updatePlaylistName(String playlistName) {
-            EditText playlistInput = findView(dlg, R.id.dialog_default_input_text);
             playlistInput.setText(playlistName);
         }
 
