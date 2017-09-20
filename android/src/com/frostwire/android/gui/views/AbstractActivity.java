@@ -197,6 +197,30 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return (T) getFragmentManager().findFragmentById(id);
     }
 
+    /**
+     * Returns the first fragment of type T (and with a non null tag) found in the
+     * internal fragment manager.
+     * <p>
+     * This method should cover 98% of the actual UI designs, if you ever get to have
+     * two fragments of the same type in the activity, review the components design.
+     * If you present two different sets of information with the same type, that's not
+     * a good OOP design, and if you present the same information, that's not a good
+     * UI/UX design.
+     *
+     * @param clazz the class of the fragment to lookup
+     * @param <T>   the type of the fragment to lookup
+     * @return the first fragment of type T if found.
+     */
+    @SuppressWarnings("unchecked")
+    public final <T extends Fragment> T findFragment(Class<T> clazz) {
+        for (Fragment f : getFragments()) {
+            if (clazz.isInstance(f)) {
+                return (T) f;
+            }
+        }
+        return null;
+    }
+
     public final Toolbar findToolbar() {
         return findView(R.id.toolbar_main);
     }
