@@ -77,7 +77,6 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
     @SuppressWarnings("WeakerAccess")
     public static class CreateNewPlaylistDialog extends AbstractDialog {
-        public static PlaylistFragment fragment;
         private Dialog dlg;
         private static CreateNewPlaylistMenuAction menuAction;
 
