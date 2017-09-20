@@ -57,36 +57,26 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     }
 
     private void showCreateNewPlaylistDialog() {
-        CreateNewPlaylistDialog.newInstance(this).
+        CreateNewPlaylistDialog.newInstance(this, fileDescriptors).
                 show(((Activity) getContext()).getFragmentManager());
     }
 
-    private void onClickCreatePlaylistButton(CharSequence text) {
-        Context ctx = getContext();
-
-        long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
-        MusicUtils.refresh();
-
-        if (fileDescriptors != null) {
-            MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
-        }
-
-        if (ctx instanceof AbstractActivity) {
-            PlaylistFragment f = ((AbstractActivity) ctx).findFragment(PlaylistFragment.class);
-            if (f != null) {
-                f.restartLoader(true);
-                f.refresh();
-            }
-        }
-    }
-
     public static class CreateNewPlaylistDialog extends AbstractDialog {
+
+        private long[] fileDescriptors;
+
         private Dialog dlg;
         private static CreateNewPlaylistMenuAction menuAction;
 
-        public static CreateNewPlaylistDialog newInstance(CreateNewPlaylistMenuAction action) {
+        public static CreateNewPlaylistDialog newInstance(CreateNewPlaylistMenuAction action, long[] fileDescriptors) {
             menuAction = action;
-            return new CreateNewPlaylistDialog();
+            CreateNewPlaylistDialog dlg = new CreateNewPlaylistDialog();
+
+            Bundle args = new Bundle();
+            args.putLongArray("file_descriptors", fileDescriptors);
+            dlg.setArguments(args);
+
+            return dlg;
         }
 
         public CreateNewPlaylistDialog() {
@@ -95,6 +85,9 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
 
         @Override
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            Bundle args = getArguments();
+            this.fileDescriptors = args.getLongArray("file_descriptors");
+
             this.dlg = dlg;
             TextView title = findView(dlg, R.id.dialog_default_input_title);
             title.setText(R.string.new_empty_playlist);
@@ -134,6 +127,25 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
             super.onSaveInstanceState(outState);
         }
 
+        private void onClickCreatePlaylistButton(CharSequence text) {
+            Context ctx = getActivity();
+
+            long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
+            MusicUtils.refresh();
+
+            if (fileDescriptors != null) {
+                MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
+            }
+
+            if (ctx instanceof AbstractActivity) {
+                PlaylistFragment f = ((AbstractActivity) ctx).findFragment(PlaylistFragment.class);
+                if (f != null) {
+                    f.restartLoader(true);
+                    f.refresh();
+                }
+            }
+        }
+
         private final class DialogButtonClickListener implements View.OnClickListener {
 
             private final boolean positive;
@@ -152,7 +164,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
                         playlistName += "+";
                         updatePlaylistName(playlistName);
                     } else {
-                        CreateNewPlaylistDialog.menuAction.onClickCreatePlaylistButton(playlistName);
+                        onClickCreatePlaylistButton(playlistName);
                         dismiss();
                     }
                 }
