@@ -92,6 +92,7 @@
             android:layout_height="match_parent"
             android:text="@string/transfers_select_completed" />
     </android.support.design.widget.TabLayout>
+
     <com.frostwire.android.gui.views.RichNotification
         android:id="@+id/fragment_transfers_sd_card_notification"
         android:layout_width="match_parent"
@@ -118,6 +119,20 @@
         android:layout_weight="1"
         android:background="@color/app_background_white">
 
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <com.frostwire.android.gui.views.TransfersNoSeedsView
+                android:id="@+id/fragment_transfers_no_seeds_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/transfers_seeding_notification_top_padding"
+                android:layout_gravity="center_vertical"
+                android:visibility="visible" />
+
+        </ScrollView>
+
         <com.frostwire.android.gui.views.SwipeLayout
             android:id="@+id/fragment_transfers_swipe"
             android:layout_width="match_parent"
@@ -134,20 +149,6 @@
                 android:groupIndicator="@null" />
 
         </com.frostwire.android.gui.views.SwipeLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <com.frostwire.android.gui.views.TransfersNoSeedsView
-                android:id="@+id/fragment_transfers_no_seeds_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/transfers_seeding_notification_top_padding"
-                android:layout_gravity="center_vertical"
-                android:visibility="visible" />
-
-        </ScrollView>
 
         <TextView
             android:id="@+id/fragment_transfers_vpn_notification"
