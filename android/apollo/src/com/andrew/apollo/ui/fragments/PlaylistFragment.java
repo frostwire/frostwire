@@ -124,7 +124,8 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                     RenamePlaylist.getInstance(mItem.mPlaylistId).show(getFragmentManager(), "RenameDialog");
                     return true;
                 case FragmentMenuItems.DELETE:
-                    final PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog = buildDeleteDialog();
+                    PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog =
+                            PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
                     playlistFragmentDeleteDialog.show(getActivity().getFragmentManager());
                     return true;
                 default:
@@ -187,10 +188,6 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     @Override
     protected boolean isSimpleLayout() {
         return true;
-    }
-
-    private PlaylistFragmentDeleteDialog buildDeleteDialog() {
-        return PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
     }
 
     @Override
