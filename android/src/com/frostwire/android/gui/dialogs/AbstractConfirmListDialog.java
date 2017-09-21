@@ -116,23 +116,12 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     @Override
     public void show(FragmentManager manager) {
-        final FragmentManager fManager = manager;
-        if (Ref.alive(activityRef)) {
-            Handler h = new Handler(activityRef.get().getMainLooper());
-            h.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        AbstractConfirmListDialog.super.show(fManager);
-                    } catch (Throwable e) {
-                        // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
-                        // TODO: this needs a refactor
-                        LOG.error("Error in show, review your logic", e);
-                    }
-                }
-            });
-        } else {
-            LOG.warn("Dialog had no context to post runnable to.");
+        try {
+            super.show(manager);
+        } catch (Throwable e) {
+            // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+            // TODO: this needs a refactor
+            LOG.error("Error in show, review your logic", e);
         }
     }
 
