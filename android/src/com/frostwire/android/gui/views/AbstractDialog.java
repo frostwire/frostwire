@@ -32,9 +32,7 @@ import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 
 import com.frostwire.android.R;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -71,7 +69,6 @@ public abstract class AbstractDialog extends DialogFragment {
     private final String tag;
     private final int layoutResId;
 
-    protected WeakReference<Activity> activityRef;
     private OnDialogClickListener onDialogClickListener;
 
     public AbstractDialog(int layoutResId) {
@@ -84,12 +81,6 @@ public abstract class AbstractDialog extends DialogFragment {
         this.tag = tag;
         this.layoutResId = layoutResId;
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        activityRef = Ref.weak(activity);
     }
 
     @Override
@@ -115,8 +106,9 @@ public abstract class AbstractDialog extends DialogFragment {
     }
 
     protected void performDialogClick(String tag, int which) {
-        if (Ref.alive(activityRef)) {
-            dispatchDialogClick(activityRef.get(), tag, which);
+        Activity activity = getActivity();
+        if (activity != null) {
+            dispatchDialogClick(activity, tag, which);
         }
     }
 
