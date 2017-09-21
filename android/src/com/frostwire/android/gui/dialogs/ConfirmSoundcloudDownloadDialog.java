@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -47,10 +46,6 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         SoundcloudSearchResultList srList = new SoundcloudSearchResultList();
         srList.listData = listData;
 
-        // this creates a bundle that gets passed to setArguments(). It's supposed to be ready
-        // before the dialog is attached to the underlying activity, after we attach to it, then
-        // we are able to use such Bundle to create our adapter.
-        dlg.onAttach((Activity) ctx);
         dlg.prepareArguments(R.drawable.download_icon, dialogTitle, dialogText, JsonUtils.toJson(srList),
                 SelectionMode.MULTIPLE_SELECTION);
 

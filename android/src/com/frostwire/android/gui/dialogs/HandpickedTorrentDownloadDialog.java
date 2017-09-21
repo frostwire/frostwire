@@ -84,7 +84,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             allChecked[i] = true;
         }
 
-        dlg.onAttach((Activity) ctx);
         dlg.prepareArguments(R.drawable.download_icon,
                 tinfo.name(),
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),

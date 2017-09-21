@@ -67,8 +67,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
             YouTubePackageSearchResult sr) {
         YouTubeDownloadDialog dlg = new YouTubeDownloadDialog(sr);
 
-        dlg.onAttach((Activity) ctx);
-
         dlg.prepareArguments(R.drawable.download_icon,
                 sr.getDisplayName(),
                 ctx.getString(R.string.pick_the_files_you_want_to_download_from_this_torrent),
