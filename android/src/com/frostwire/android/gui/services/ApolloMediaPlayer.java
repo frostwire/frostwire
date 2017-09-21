@@ -7,14 +7,13 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.core.player.Playlist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.util.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
-    private static Logger LOG = Logger.getLogger(ApolloMediaPlayer.class);
+
     private Map<Long, FileDescriptor> idMap = new HashMap<>();
 
     public ApolloMediaPlayer() {
@@ -47,23 +46,6 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
         try {
             if (MusicUtils.musicPlaybackService != null) {
                 MusicUtils.musicPlaybackService.stop();
-                LOG.info("ApolloMediaPlayer.stop() I could invoke stop() on the service.");
-            } else {
-                LOG.warn("ApolloMediaPlayer.stop() couldn't get a hold of the music playback service.");
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void shutdown() {
-        try {
-            if (MusicUtils.musicPlaybackService != null) {
-                MusicUtils.musicPlaybackService.shutdown();
-                LOG.info("ApolloMediaPlayer.shutdown() I could invoke shutdown() on the service.");
-            } else {
-                LOG.warn("ApolloMediaPlayer.shutdown() couldn't get a hold of the music playback service.");
             }
         } catch (Throwable e) {
             e.printStackTrace();

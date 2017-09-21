@@ -31,8 +31,6 @@ public interface CoreMediaPlayer {
 
     void stop();
 
-    void shutdown();
-
     boolean isPlaying();
     
     /**
