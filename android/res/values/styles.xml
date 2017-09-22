@@ -755,6 +755,7 @@
         <item name="android:textSize">@dimen/text_extra_micro</item>
     </style>
 
+
     <!-- Scrollview Style -->
     <style name="scrollbar_default_style" parent="Theme.FrostWire">
         <item name="android:overScrollHeader">@null</item>
@@ -764,4 +765,22 @@
         <item name="android:scrollbarDefaultDelayBeforeFade">0</item>
     </style>
 
+
+    <!-- Transfer Detail Activity -->
+    <style name="transferDetailTitleHeader">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textColor">@color/app_text_highlight</item>
+        <item name="android:paddingBottom">5dp</item>
+    </style>
+    <style name="transferDetailTitle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+    <style name="transferDetailText">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:textColor">@color/app_text_primary</item>
+    </style>
 </resources>
