@@ -18,24 +18,13 @@
  * limitations under the License.
  */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/app_background_white"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/transfer_detail_tab_layout"
-        style="@style/AppTabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/basic_blue"
-        app:tabMode="scrollable" />
+    <TextView
+        android:id="@+id/fragment_transfer_detail_tab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/transfer_detail_viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-</LinearLayout>
+</RelativeLayout>
