@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (marcelinkaaa), Grzesiek Rzaca (grzesiekrzaca)
@@ -334,7 +333,7 @@
     <string name="dummy_version" translatable="false">[Version]</string>
     <string name="dummy_engine" translatable="false">[Engine]</string>
     <string name="dummy_sources" translatable="false">[Sources]</string>
-    <string name="empty_string" translatable="false"/>
+    <string name="empty_string" translatable="false" />
     <string name="seed_finished_torrents">Seed Finished Torrents</string>
     <string name="seed_finished_torrents_summary">Share pieces of torrent downloads with anybody on the internet via BitTorrent</string>
     <string name="seed_finished_torrents_wifi_only">Seed only on Wi-Fi</string>
@@ -415,8 +414,8 @@
     <string name="donate_10">Donate $10</string>
     <string name="donate_25">Donate $25</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
-    <string name="one_file_shared" >One file has been shared to FrostWire devices on the same Wi-Fi network.</string>
-    <string name="n_files_shared" >%d files has been shared to FrostWire devices on the same Wi-Fi network.</string>
+    <string name="one_file_shared">One file has been shared to FrostWire devices on the same Wi-Fi network.</string>
+    <string name="n_files_shared">%d files has been shared to FrostWire devices on the same Wi-Fi network.</string>
     <string name="playing_now_colon">Playing now:</string>
     <string name="my_filetype">My %s</string>
     <string name="paused">Paused</string>
@@ -501,7 +500,7 @@
     <string name="track">track</string>
     <string name="playlist">playlist</string>
     <string name="are_you_sure_you_want_to_download_the_following">Are you sure you want to download the following %1$s (%2$s)?</string>
-    <string name="prepend_shortcut_label" translatable="false"/>
+    <string name="prepend_shortcut_label" translatable="false" />
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="menu_space_shortcut_label">Space</string>
@@ -713,4 +712,56 @@
     <string name="nothing_is_currently_seeding">Nothing is currently seeding</string>
     <string name="would_you_like_to_seed_your_finished_torrent_transfers">Would you like to seed your finished torrent transfers?</string>
     <string name="seed_all_finished">Seed All Finished</string>
+    <string name="title_activity_transfer_detail">Transfer Detail</string>
+    <string name="show_torrent_details">Show Torrent Details</string>
+
+    <string name="transfer_detail_title_header">Name:</string>
+    <string name="transfer_detail_storage_header">Storage Path:</string>
+    <string name="transfer_detail_title_dummy">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy">100%</string>
+    <string name="transfer_detail_number_dummy">0</string>
+    <string name="transfer_detail_time_dummy">1 min</string>
+    <string name="transfer_detail_size_dummy">56MB</string>
+    <string name="transfer_detail_speed_small_dummy">56Kb</string>
+    <string name="transfer_detail_date_dummy">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy">0 of 54</string>
+    <string name="transfer_detail_speed_dummy">0.0 Kb/s</string>
+    <string name="transfer_detail_download_dummy">1MB/14MB</string>
+    <string name="transfer_detail_number_of_files_dummy">12 Files</string>
+    <string name="transfer_detail_trackers_address_dummy">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy">BT://198.50/.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy">Transmission 2.82</string>
+    <string name="transfer_detail_piece_size_dummy">1001/1190</string>
+    <string name="infinity">&#8734;</string>
+    <string name="sequential_download">Sequential download</string>
+    <string name="completed">Completed</string>
+    <string name="seeding_on">Seeding ON</string>
+    <string name="time_left">Time left</string>
+    <string name="time_elapsed">Time elapsed</string>
+    <string name="download_limit">Download limit</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="upload_limit">Upload limit</string>
+    <string name="uploaded">Uploaded</string>
+    <string name="total_size">Total size</string>
+    <string name="share_ratio">Share ratio</string>
+    <string name="hash">Hash</string>
+    <string name="magnet">Magnet</string>
+    <string name="created_on">Created on</string>
+    <string name="comment">Comment</string>
+    <string name="up_speed">Up speed</string>
+    <string name="down_speed">Down speed</string>
+    <string name="working">Working</string>
+    <string name="dht">DHT</string>
+    <string name="pex">PeX</string>
+    <string name="pieces">Pieces:</string>
+    <string name="piece_size">Piece Size:</string>
+
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
