@@ -27,46 +27,45 @@
         android:title="@string/delete"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/fragment_transfer_detail_menu_pause"
-        android:icon="@drawable/contextmenu_icon_pause_transfer"
+        android:id="@+id/fragment_transfer_detail_menu_pause_resume"
+        android:icon="@drawable/action_bar_pause"
         android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/fragment_transfer_detail_menu_resume"
-        android:icon="@drawable/contextmenu_icon_play_transfer"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
-        app:showAsAction="never" />
+        android:title="@string/transfers_context_menu_pause_stop_all_transfers"
+        app:showAsAction="always" />
     <item
         android:id="@+id/fragment_transfer_detail_menu_open"
         android:icon="@drawable/contextmenu_icon_open"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
+        android:orderInCategory="3"
+        android:title="@string/open"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_clear"
-        android:icon="@drawable/contextmenu_icon_remove_transfer"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
+        android:id="@+id/fragment_transfer_detail_menu_seed"
+        android:icon="@drawable/contextmenu_icon_seed"
+        android:orderInCategory="4"
+        android:title="@string/seed"
         app:showAsAction="never" />
     <item
         android:id="@+id/fragment_transfer_detail_menu_copy_magnet"
         android:icon="@drawable/contextmenu_icon_magnet"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
+        android:orderInCategory="6"
+        android:title="@string/transfers_context_menu_copy_magnet"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_infohash"
+        android:id="@+id/fragment_transfer_detail_menu_copy_infohash"
         android:icon="@drawable/contextmenu_icon_copy"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
+        android:orderInCategory="7"
+        android:title="@string/transfers_context_menu_copy_infohash"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_tip"
-        android:icon="@drawable/contextmenu_icon_donation_fiat"
-        android:orderInCategory="2"
-        android:title="@string/transfers_context_menu_clear_finished"
+        android:id="@+id/fragment_transfer_detail_menu_remove_torrent_data"
+        android:icon="@drawable/contextmenu_icon_stop_transfer"
+        android:orderInCategory="8"
+        android:title="@string/remove_torrent_and_data"
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/fragment_transfer_detail_menu_donate"
+        android:icon="@drawable/contextmenu_icon_donation_fiat"
+        android:orderInCategory="9"
+        android:title="@string/send_tip_donation"
+        app:showAsAction="never" />
 </menu>
