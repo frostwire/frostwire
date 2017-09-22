@@ -6,10 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,39 +37,16 @@ public class TransferDetailActivity extends AbstractActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transfer_detail);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        mViewPager = (ViewPager) findViewById(R.id.activity_transfer_detail_viewpager);
+        mViewPager = findViewById(R.id.transfer_detail_viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.activity_transfer_detail_tab_layout);
+        TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.fragment_transfer_detail_menu, menu);
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.fragment_transfer_detail_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.fragment_transfer_detail_menu_delete:
-//                startActivity(new Intent(this, NearbyEventsActivity.class));
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -102,7 +76,7 @@ public class TransferDetailActivity extends AbstractActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_transfer_detail, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_transfer_detail_label, container, false);
             return rootView;
         }
     }
