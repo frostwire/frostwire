@@ -232,15 +232,11 @@ public final class ImageViewerFragment extends AbstractFragment {
                 case R.id.fragment_my_files_action_mode_menu_seed:
                     new SeedAction(context, fd, null).onClick();
                     break;
-                case R.id.fragment_my_files_action_mode_menu_open:
-                    if (inFullScreenMode) {
-                        new OpenMenuAction(context, fd).onClick();
-                    } else {
+                case R.id.fragment_my_files_action_mode_menu_open:ast
                         Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
                         intent.setDataAndType(Uri.fromFile(new File(fd.filePath)), "image/*");
                         startActivity(intent);
-                    }
                     break;
                 case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
