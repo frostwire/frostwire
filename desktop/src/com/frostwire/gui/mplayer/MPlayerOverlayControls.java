@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ import java.awt.geom.RoundRectangle2D;
  * @author aldenml
  *
  */
-public class MPlayerOverlayControls extends JDialog implements ProgressSliderListener, AlphaTarget, MediaPlayerListener {
+public final class MPlayerOverlayControls extends JDialog implements ProgressSliderListener, AlphaTarget, MediaPlayerListener {
 
     private static final long serialVersionUID = -6148347816829785754L;
 
@@ -49,29 +49,24 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
     private ProgressSlider progressSlider;
     private JButton playButton, pauseButton, fullscreenExitButton, fullscreenEnterButton;
 
-    private MediaPlayer player;
+    private final Timer hideTimer;
 
-    private double durationInSeconds = 0.0;
-    private double currentTimeInSeconds = 0.0;
-
-    private Timer hideTimer;
-
-    public MPlayerOverlayControls(Timer hideTimer) {
+    MPlayerOverlayControls(Timer hideTimer) {
 
         this.hideTimer = hideTimer;
 
-        player = MediaPlayer.instance();
+        MediaPlayer player = MediaPlayer.instance();
         player.addMediaPlayerListener(this);
 
         setupUI();
     }
 
-    protected void setupUI() {
+    private void setupUI() {
 
         Container panel = getContentPane();
 
-        ImageIcon bkgndImage = GUIMediator.getThemeImage(OSUtils.isLinux() ? "fc_background_linux" : "fc_background");
-        Dimension winSize = new Dimension(bkgndImage.getIconWidth(), bkgndImage.getIconHeight());
+        ImageIcon backgroundImage = GUIMediator.getThemeImage(OSUtils.isLinux() ? "fc_background_linux" : "fc_background");
+        Dimension winSize = new Dimension(backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
 
         setPreferredSize(winSize);
         setSize(winSize);
@@ -90,8 +85,8 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
         if (OSUtils.isMacOSX()) {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice gd = ge.getDefaultScreenDevice();
-            final boolean perpixelTransparentSupported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT);
-            if (perpixelTransparentSupported) {
+            final boolean perPixelTransparentSupported = gd.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT);
+            if (perPixelTransparentSupported) {
                 addComponentListener(new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
@@ -114,9 +109,9 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
 
         // background image
         // ------------------
-        JLabel bkgnd = new JLabel(bkgndImage);
-        bkgnd.setOpaque(false);
-        bkgnd.setSize(bkgndImage.getIconWidth(), bkgndImage.getIconHeight());
+        JLabel backgroundJLabel = new JLabel(backgroundImage);
+        backgroundJLabel.setOpaque(false);
+        backgroundJLabel.setSize(backgroundImage.getIconWidth(), backgroundImage.getIconHeight());
 
         // play button
         // ------------
@@ -239,7 +234,7 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
         progressSlider.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(progressSlider);
 
-        panel.add(bkgnd);
+        panel.add(backgroundJLabel);
     }
 
     @Override
@@ -279,24 +274,24 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
         return button;
     }
 
-    public void setIsFullscreen(boolean fullscreen) {
+    void setIsFullscreen(boolean fullscreen) {
         fullscreenExitButton.setVisible(fullscreen);
         fullscreenEnterButton.setVisible(!fullscreen);
     }
 
-    public void onPlayPressed() {
+    private void onPlayPressed() {
         MPlayerUIEventHandler.instance().onPlayPressed();
     }
 
-    public void onPausePressed() {
+    private void onPausePressed() {
         MPlayerUIEventHandler.instance().onPausePressed();
     }
 
-    public void onFastForwardPressed() {
+    private void onFastForwardPressed() {
         MPlayerUIEventHandler.instance().onFastForwardPressed();
     }
 
-    public void onRewindPressed() {
+    private void onRewindPressed() {
         MPlayerUIEventHandler.instance().onRewindPressed();
     }
 
@@ -320,11 +315,11 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
         hideTimer.restart();
     }
 
-    public void onFullscreenEnterPressed() {
+    private void onFullscreenEnterPressed() {
         MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
     }
 
-    public void onFullscreenExitPressed() {
+    private void onFullscreenExitPressed() {
         MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
     }
 
@@ -334,12 +329,11 @@ public class MPlayerOverlayControls extends JDialog implements ProgressSliderLis
 
     @Override
     public void progressChange(MediaPlayer mediaPlayer, float currentTimeInSecs) {
-        durationInSeconds = mediaPlayer.getDurationInSecs();
-        currentTimeInSeconds = currentTimeInSecs;
+        double durationInSeconds = mediaPlayer.getDurationInSecs();
 
         // adjust progress slider
         progressSlider.setTotalTime((int) Math.round(durationInSeconds));
-        progressSlider.setCurrentTime((int) Math.round(currentTimeInSeconds));
+        progressSlider.setCurrentTime((int) Math.round((double) currentTimeInSecs));
     }
 
     @Override

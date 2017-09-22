@@ -1,6 +1,6 @@
 /*
  * Created by Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public final class MPlayerComponentFactory {
     private MPlayerComponentFactory() {
     }
 
-    public MPlayerComponent createPlayerComponent() {
+    MPlayerComponent createPlayerComponent() {
         if (loadLibrary()) {
             if (IS_OS_WINDOWS) {
                 return new MPlayerComponentJava();
@@ -80,19 +80,15 @@ public final class MPlayerComponentFactory {
 
     /**
      * Used to check whether the current operating system matches a operating
-     * system name (osname).
+     * system name (osName).
      * 
-     * @param osname
+     * @param osName
      *            Name of an operating system we are looking for as being part
-     *            of the Sytem property os.name
-     * @return true, if osname matches the current operating system,false if not
-     *         and if osname is null
+     *            of the System property os.name
+     * @return true, if osName matches the current operating system,false if not
+     *         and if osName is null
      */
-    private static boolean isCurrentOS(String osname) {
-        if (osname == null) {
-            return false;
-        } else {
-            return (OS_NAME.indexOf(osname) >= 0);
-        }
+    private static boolean isCurrentOS(String osName) {
+        return osName != null && (OS_NAME.contains(osName));
     }
 }

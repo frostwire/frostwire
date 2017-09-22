@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ public class MPlayerWindow extends JFrame {
     private static final long serialVersionUID = -9154474667503959284L;
 
     private MPlayerOverlayControls overlayControls;
-    protected MPlayerComponent mplayerComponent;
-    protected Component videoCanvas;
+    MPlayerComponent mplayerComponent;
+    Component videoCanvas;
     private boolean isFullscreen = false;
 
     private AlphaAnimationThread animateAlphaThread;
@@ -45,15 +45,15 @@ public class MPlayerWindow extends JFrame {
     private Timer hideTimer;
     private static final int HIDE_DELAY = 3000;
 
-    private MediaPlayer player;
+    private final MediaPlayer player;
 
     private Point2D prevMousePosition = null;
     private boolean handleVideoResize = true;
 
-    private ScreenSaverDisabler screenSaverDisabler;
+    private final ScreenSaverDisabler screenSaverDisabler;
     private int visibleCounterFlag = 0;
 
-    protected MPlayerWindow() {
+    MPlayerWindow() {
         initializeUI();
 
         screenSaverDisabler = new ScreenSaverDisabler();
@@ -129,6 +129,11 @@ public class MPlayerWindow extends JFrame {
         pane.setPreferredSize(d);
 
         mplayerComponent = MPlayerComponentFactory.instance().createPlayerComponent();
+
+        if (mplayerComponent == null) {
+            throw new RuntimeException("MPlayerComponent instantiation isn't supported in your OS, or your OS hasn't correctly been detected by FrostWire");
+        }
+
         videoCanvas = mplayerComponent.getComponent();
         videoCanvas.setBackground(Color.black);
         videoCanvas.setSize(d);
@@ -153,7 +158,7 @@ public class MPlayerWindow extends JFrame {
             public void windowDeactivated(WindowEvent e) {
                 if (!OSUtils.isWindows()) {
                     if (visibleCounterFlag > 0) {
-                        hideOverlay(false);
+                        hideOverlay(OSUtils.isMacOSX());
                     }
                     visibleCounterFlag++;
                 }
@@ -215,13 +220,11 @@ public class MPlayerWindow extends JFrame {
             overlayControls.setVisible(visible);
 
             if (visible) {
-
                 centerOnScreen();
                 positionOverlayControls();
                 showOverlay(false);
             } else {
-
-                hideOverlay(false);
+                hideOverlay(OSUtils.isMacOSX());
             }
         }
 
@@ -304,7 +307,7 @@ public class MPlayerWindow extends JFrame {
 
             Point controlPos = new Point();
             controlPos.x = (int) ((windowSize.width - controlsSize.width) * 0.5 + windowPos.x);
-            controlPos.y = (int) ((windowSize.height - controlsSize.height) - 20 + windowPos.y);
+            controlPos.y = (windowSize.height - controlsSize.height) - 20 + windowPos.y;
 
             overlayControls.setLocation(controlPos);
         }
@@ -415,13 +418,13 @@ public class MPlayerWindow extends JFrame {
                     }
                 }
 
-                // shft + - for volume increment
+                // shift + - for volume increment
                 if (e.getKeyCode() == KeyEvent.VK_EQUALS) {
                     MPlayerUIEventHandler.instance().onVolumeIncremented();
                     return true;
                 }
 
-                // Alt+Enter, Ctrl+Enter full screen shorcuts - seen in other players.
+                // Alt+Enter, Ctrl+Enter full screen shortcuts - seen in other players.
                 if ((e.isAltDown() || e.isMetaDown() || e.isControlDown()) && e.getKeyCode() == KeyEvent.VK_ENTER) {
                     MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
                     return true;
@@ -488,7 +491,7 @@ public class MPlayerWindow extends JFrame {
                 if (e.getOppositeWindow() == overlayControls) {
                     requestFocus();
                 } else {
-                    hideOverlay(false);
+                    hideOverlay(OSUtils.isMacOSX());
                 }
             }
         }
@@ -502,7 +505,7 @@ public class MPlayerWindow extends JFrame {
         
         @Override
         public void windowIconified(WindowEvent e) {
-            hideOverlay(false);
+            hideOverlay(OSUtils.isMacOSX());
         }
         
         @Override
@@ -512,7 +515,7 @@ public class MPlayerWindow extends JFrame {
         }
     }
 
-    public void showOverlayControls() {
+    void showOverlayControls() {
         showOverlay(true);
     }
 }
