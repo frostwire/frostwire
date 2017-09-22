@@ -50,6 +50,7 @@ import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
+import com.frostwire.android.gui.adapters.menu.TransferDetailsMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
@@ -380,6 +381,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 R.string.transfers_context_menu_copy_infohash_copied,
                 download.getInfoHash()
         ));
+
+        items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
+
+
+        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details));
 
         if (download.isComplete()) {
             // Remove Torrent and Data action.
