@@ -1,9 +1,10 @@
 frostwire (6.5.8) stable; urgency=high
-  * New jlibtorrent 1.2.0.12
+  * New jlibtorrent 1.2.0.13-RC4 with improved IPv6 connectivity
   * Search: New Pixabay image search
+  * Search: YT, SC, EZTV, Torlock, Yify, Zooqle fixed
   * Networking: Improved SSL compatibility
 	
- -- FrostWire Team <contact@frostwire.com>  Wed, 23 Aug 2017 12:15:25 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 22 Sep 2017 06:02:12 -0600
 
 frostwire (6.5.7) stable; urgency=high
   * New jlibtorrent 1.2.0.12-RC1
