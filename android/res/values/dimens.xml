@@ -62,4 +62,7 @@
 
     <!-- Paddings -->
     <dimen name="transfers_seeding_notification_top_padding">0dp</dimen>
+    <dimen name="transfers_detail_page_padding_horizontal">18dp</dimen>
+    <dimen name="transfers_detail_page_padding_vertical">14dp</dimen>
+    <dimen name="transfers_detail_page_padding_vertical_small">10dp</dimen>
 </resources>

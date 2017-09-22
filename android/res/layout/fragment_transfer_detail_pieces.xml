@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_transfer_detail_progress" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_pieces_pieces"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/transferDetailTitle"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/pieces"/>
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_pieces_pieces_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/transferDetailText"
+                android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="@string/transfer_detail_piece_size_dummy"/>
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_pieces_piece_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/transferDetailTitle"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:text="@string/piece_size"/>
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_pieces_piece_size_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/transferDetailText"
+                android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:text="@string/transfer_detail_speed_small_dummy"/>
+        </RelativeLayout>
+        
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/basic_blue_highlight"
+                android:layout_margin="1dp"
+                android:src="@drawable/transfer_detail_piece"
+                android:contentDescription="@null"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/basic_blue_highlight"
+                android:layout_margin="1dp"
+                android:src="@drawable/transfer_detail_piece"
+                android:contentDescription="@null"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tint="@color/basic_blue_highlight"
+                android:layout_margin="1dp"
+                android:src="@drawable/transfer_detail_piece"
+                android:contentDescription="@null"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
