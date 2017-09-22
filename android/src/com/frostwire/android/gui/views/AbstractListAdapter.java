@@ -203,6 +203,15 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return null;
     }
 
+    public int getItemPosition(T item) {
+        int position = -1;
+        try {
+            position = visualList.indexOf(item);
+        } catch (Throwable ignored) {
+        }
+        return position;
+    }
+
     public int getViewPosition(View view) {
         T tag = (T) view.getTag();
         int result = -1;

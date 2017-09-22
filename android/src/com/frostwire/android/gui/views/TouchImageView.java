@@ -84,6 +84,7 @@ public class TouchImageView extends AppCompatImageView {
 
     private Context context;
     private Fling fling;
+    private OnFlingListener onFlingListener;
 
     private ScaleType mScaleType;
 
@@ -149,6 +150,14 @@ public class TouchImageView extends AppCompatImageView {
     @Override
     public void setOnTouchListener(View.OnTouchListener l) {
         userTouchListener = l;
+    }
+
+    /**
+     * Just add your custom onFling handling here, this object already takes care of implementing
+     * a gesture detecture.
+     */
+    public void setOnFlingListener(OnFlingListener onFlingListener) {
+        this.onFlingListener = onFlingListener;
     }
 
 //    public void setOnTouchImageViewListener(OnTouchImageViewListener l) {
@@ -665,6 +674,10 @@ public class TouchImageView extends AppCompatImageView {
         return true;
     }
 
+    public interface OnFlingListener {
+        void onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY);
+    }
+
     /**
      * Gesture Listener detects a single click or long click and passes that on
      * to the view's listener.
@@ -688,10 +701,16 @@ public class TouchImageView extends AppCompatImageView {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (onFlingListener != null) {
+                try {
+                    onFlingListener.onFling(e1, e2, velocityX, velocityY);
+                } catch (Throwable ignored) {
+                }
+            }
             if (fling != null) {
                 //
                 // If a previous fling is still active, it should be cancelled so that two flings
-                // are not run simultaenously.
+                // are not run simultaneously.
                 //
                 fling.cancelFling();
             }

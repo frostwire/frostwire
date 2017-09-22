@@ -40,6 +40,7 @@ public class OpenMenuAction extends MenuAction {
     private final String mime;
     private final byte fileType;
     private final FileDescriptor fd;
+    private final int position;
 
     public OpenMenuAction(Context context, String title, String path, String mime) {
         super(context, R.drawable.contextmenu_icon_open, R.string.open_menu_action, title);
@@ -47,6 +48,7 @@ public class OpenMenuAction extends MenuAction {
         this.mime = mime;
         this.fileType = -1;
         this.fd = null;
+        this.position = -1;
     }
 
     public OpenMenuAction(Context context, String path, String mime) {
@@ -55,14 +57,16 @@ public class OpenMenuAction extends MenuAction {
         this.mime = mime;
         this.fileType = -1;
         this.fd = null;
+        this.position = -1;
     }
 
-    public OpenMenuAction(Context context, FileDescriptor fileDescriptor) {
+    public OpenMenuAction(Context context, FileDescriptor fileDescriptor, int position) {
         super(context, R.drawable.contextmenu_icon_open, R.string.open);
         this.path = fileDescriptor.filePath;
         this.mime = fileDescriptor.mime;
         this.fileType = fileDescriptor.fileType;
         this.fd = fileDescriptor;
+        this.position = position;
     }
 
 
@@ -72,13 +76,15 @@ public class OpenMenuAction extends MenuAction {
         this.mime = pictureFileDescriptor.mime;
         this.fileType = pictureFileDescriptor.fileType;
         this.fd = pictureFileDescriptor;
+        this.position = -1;
     }
 
     @Override
     public void onClick(Context context) {
         if (fileType == Constants.FILE_TYPE_PICTURES && fd != null) {
             Intent intent = new Intent(context, ImageViewerActivity.class);
-            intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR, fd.toBundle());
+            intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR_BUNDLE, fd.toBundle());
+            intent.putExtra(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, position);
             context.startActivity(intent);
         } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
             if (MusicUtils.isPlaying()) {

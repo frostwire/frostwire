@@ -733,7 +733,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                     new SeedAction(context, fd, null).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_open:
-                    new OpenMenuAction(context, fd).onClick();
+                    new OpenMenuAction(context, fd, adapter.getItemPosition(fileDescriptorItem)).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
