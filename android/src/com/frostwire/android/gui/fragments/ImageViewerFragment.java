@@ -20,6 +20,7 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -232,7 +233,14 @@ public final class ImageViewerFragment extends AbstractFragment {
                     new SeedAction(context, fd, null).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_open:
-                    new OpenMenuAction(context, fd).onClick();
+                    if (inFullScreenMode) {
+                        new OpenMenuAction(context, fd).onClick();
+                    } else {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.fromFile(new File(fd.filePath)), "image/*");
+                        startActivity(intent);
+                    }
                     break;
                 case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
