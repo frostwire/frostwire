@@ -20,7 +20,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
 import android.content.ContentUris;
-import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,7 +38,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
-import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
@@ -51,6 +49,7 @@ import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.ImageLoader.Callback;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -233,10 +232,8 @@ public final class ImageViewerFragment extends AbstractFragment {
                     new SeedAction(context, fd, null).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_open:
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.fromFile(new File(fd.filePath)), "image/*");
-                        startActivity(intent);
+                    boolean useFileProvider = SystemUtils.hasNougatOrNewer();
+                    UIUtils.openFile(context, fd.filePath, fd.mime, useFileProvider);
                     break;
                 case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
