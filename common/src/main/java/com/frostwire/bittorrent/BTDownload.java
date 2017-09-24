@@ -216,16 +216,14 @@ public final class BTDownload implements BittorrentDownload {
             return 0;
         }
 
-        if (th.torrentFile() == null) {
+        TorrentStatus ts = th.status();
+
+        if (ts == null) { // this can't never happens
             return 0;
         }
 
-        if (th.status() == null) {
-            return 0;
-        }
-
-        float fp = th.status().progress();
-        TorrentStatus.State state = th.status().state();
+        float fp = ts.progress();
+        TorrentStatus.State state = ts.state();
 
         if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return 100;
