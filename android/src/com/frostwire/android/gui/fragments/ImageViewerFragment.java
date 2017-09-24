@@ -106,7 +106,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         progressBar = findView(v, R.id.fragment_image_viewer_progress_bar);
         progressBar.setVisibility(View.VISIBLE);
         imageViewHighRes = findView(v, R.id.fragment_image_viewer_image_highres);
-        View.OnClickListener toogleFullScreenClickListener = new View.OnClickListener() {
+        View.OnClickListener toggleFullScreenClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!highResLoaded && !inFullScreenMode) {
@@ -116,7 +116,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                 toggleFullScreen();
             }
         };
-        imageViewHighRes.setOnClickListener(toogleFullScreenClickListener);
+        imageViewHighRes.setOnClickListener(toggleFullScreenClickListener);
         if (savedInstanceState != null) {
             Bundle data = savedInstanceState.getBundle(EXTRA_FILE_DESCRIPTOR);
             if (data != null) {
