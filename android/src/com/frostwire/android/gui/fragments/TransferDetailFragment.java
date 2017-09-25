@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.util.Logger;
 
 /**
  * @author gubatron
@@ -30,8 +29,6 @@ import com.frostwire.util.Logger;
  * @author marcelinkaaa
  */
 public final class TransferDetailFragment extends AbstractFragment {
-
-    private static final Logger LOG = Logger.getLogger(TransferDetailFragment.class);
 
     public TransferDetailFragment() {
         super(R.layout.fragment_transfer_detail);
