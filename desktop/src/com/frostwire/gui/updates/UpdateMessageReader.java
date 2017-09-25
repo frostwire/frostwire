@@ -285,7 +285,7 @@ final class UpdateMessageReader implements ContentHandler {
         InputSource src;
 
         try {
-            String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion();
+            String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
             connection = (HttpURLConnection) (new URL(getUpdateURL())).openConnection();
             //String url = getUpdateURL();
             //LOG.info("Reading update file from " + url);
