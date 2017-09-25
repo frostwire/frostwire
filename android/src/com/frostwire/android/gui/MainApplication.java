@@ -1,25 +1,23 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui;
 
 import android.app.Application;
-import android.content.Context;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -29,7 +27,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.util.HttpResponseCache;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -38,17 +35,13 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
@@ -68,7 +61,6 @@ public class MainApplication extends Application {
 
             ignoreHardwareMenu();
             AbstractActivity.setMenuIconsVisible(true);
-            installHttpCache();
 
             ConfigurationManager.create(this);
 
@@ -114,13 +106,6 @@ public class MainApplication extends Application {
         }
     }
 
-    private void installHttpCache() {
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        if (threadPool != null) {
-            threadPool.execute(new InstallHttpCacheRunnable(this));
-        }
-    }
-
     private void setupBTEngine() {
         SystemPaths paths = Platforms.get().systemPaths();
 
@@ -151,26 +136,6 @@ public class MainApplication extends Application {
             }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
-        }
-    }
-
-    private static class InstallHttpCacheRunnable implements Runnable {
-        private WeakReference<Context> ctxRef;
-
-        InstallHttpCacheRunnable(Context context) {
-            ctxRef = Ref.weak(context);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-            try {
-                HttpResponseCache.install(ctxRef.get());
-            } catch (IOException e) {
-                LOG.error("Unable to install global http cache", e);
-            }
         }
     }
 }
