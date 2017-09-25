@@ -20,16 +20,6 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 
 public class TransferDetailActivity extends AbstractActivity {
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
 
     public TransferDetailActivity() {
         super(R.layout.activity_transfer_detail);
@@ -39,28 +29,18 @@ public class TransferDetailActivity extends AbstractActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
-        mViewPager = findViewById(R.id.transfer_detail_viewpager);
+        ViewPager mViewPager = findViewById(R.id.transfer_detail_viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
     }
 
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
     public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
-        }
+        private static final String ARG_SECTION_NUMBER = "section_number";
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -77,23 +57,18 @@ public class TransferDetailActivity extends AbstractActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_transfer_detail_label, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.fragment_transfer_detail_label, container, false);
         }
     }
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public AbstractFragment getItem(int position) {
-            AbstractFragment fragment;
             switch(position) {
                 case 0: return TransferDetailDetailsFragment.newInstance("Details");
                 case 1: return TransferDetailFilesFragment.newInstance("Files");
@@ -122,8 +97,8 @@ public class TransferDetailActivity extends AbstractActivity {
                     return "PEERS";
                 case 4:
                     return "PIECES";
+                default: return "DETAILS";
             }
-            return null;
         }
     }
 }
