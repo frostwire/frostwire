@@ -1,22 +1,23 @@
 package com.frostwire.android.gui.activities;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.fragments.TransfersFragmentDetailDetails;
-import com.frostwire.android.gui.fragments.TransfersFragmentDetailFiles;
-import com.frostwire.android.gui.fragments.TransfersFragmentDetailPeers;
-import com.frostwire.android.gui.fragments.TransfersFragmentDetailPieces;
-import com.frostwire.android.gui.fragments.TransfersFragmentDetailTrackers;
+import com.frostwire.android.gui.fragments.TransferDetailDetailsFragment;
+import com.frostwire.android.gui.fragments.TransferDetailFilesFragment;
+import com.frostwire.android.gui.fragments.TransferDetailPeersFragment;
+import com.frostwire.android.gui.fragments.TransferDetailPiecesFragment;
+import com.frostwire.android.gui.fragments.TransferDetailTrackersFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractFragment;
 
 public class TransferDetailActivity extends AbstractActivity {
     /**
@@ -38,7 +39,7 @@ public class TransferDetailActivity extends AbstractActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
         mViewPager = findViewById(R.id.transfer_detail_viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -91,15 +92,15 @@ public class TransferDetailActivity extends AbstractActivity {
         }
 
         @Override
-        public Fragment getItem(int position) {
-            Fragment fragment;
+        public AbstractFragment getItem(int position) {
+            AbstractFragment fragment;
             switch(position) {
-                case 0: return TransfersFragmentDetailDetails.newInstance("Details");
-                case 1: return TransfersFragmentDetailFiles.newInstance("Files");
-                case 2: return TransfersFragmentDetailTrackers.newInstance("Trackers");
-                case 3: return TransfersFragmentDetailPeers.newInstance("Peers");
-                case 4: return TransfersFragmentDetailPieces.newInstance("Pieces");
-                default: return TransfersFragmentDetailDetails.newInstance("Details");
+                case 0: return TransferDetailDetailsFragment.newInstance("Details");
+                case 1: return TransferDetailFilesFragment.newInstance("Files");
+                case 2: return TransferDetailTrackersFragment.newInstance("Trackers");
+                case 3: return TransferDetailPeersFragment.newInstance("Peers");
+                case 4: return TransferDetailPiecesFragment.newInstance("Pieces");
+                default: return TransferDetailDetailsFragment.newInstance("Details");
             }
         }
 
