@@ -281,7 +281,7 @@ final class UpdateMessageReader implements ContentHandler {
     }
 
     void readUpdateFile() {
-        HttpURLConnection connection;
+        HttpURLConnection connection = null;
         InputSource src;
 
         try {
@@ -303,16 +303,22 @@ final class UpdateMessageReader implements ContentHandler {
 
             XMLReader rdr = XMLReaderFactory.createXMLReader("com.sun.org.apache.xerces.internal.parsers.SAXParser");
             rdr.setContentHandler(this);
-
             rdr.parse(src);
-            connection.getInputStream().close();
-            connection.disconnect();
         } catch (java.net.SocketTimeoutException e3) {
-            System.out.println("UpdateMessageReader.readUpdateFile() Socket Timeout Exception " + e3.toString());
+            System.err.println("UpdateMessageReader.readUpdateFile() Socket Timeout Exception " + e3.toString());
         } catch (IOException e) {
-            System.out.println("UpdateMessageReader.readUpdateFile() IO exception " + e.toString());
+            System.err.println("UpdateMessageReader.readUpdateFile() IO exception " + e.toString());
         } catch (SAXException e2) {
-            System.out.println("UpdateMessageReader.readUpdateFile() SAX exception " + e2.toString());
+            System.err.println("UpdateMessageReader.readUpdateFile() SAX exception " + e2.toString());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.getInputStream().close();
+                    connection.disconnect();
+                } catch (Throwable ignored) {
+                    // close quietly
+                }
+            }
         }
     }
 
