@@ -88,7 +88,7 @@ public class ConfigurationManager {
     private void removePreference(String key) {
         try {
             editor.remove(key);
-            editor.commit();
+            editor.apply();
         } catch (Throwable ignore) {
         }
     }
@@ -99,7 +99,7 @@ public class ConfigurationManager {
 
     public void setString(String key, String value) {
         editor.putString(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public int getInt(String key) {
@@ -108,7 +108,7 @@ public class ConfigurationManager {
 
     public void setInt(String key, int value) {
         editor.putInt(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public long getLong(String key) {
@@ -117,7 +117,7 @@ public class ConfigurationManager {
 
     public void setLong(String key, long value) {
         editor.putLong(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean getBoolean(String key) {
@@ -126,7 +126,7 @@ public class ConfigurationManager {
 
     public void setBoolean(String key, boolean value) {
         editor.putBoolean(key, value);
-        editor.commit();
+        editor.apply();
     }
 
     public File getFile(String key) {
@@ -135,7 +135,7 @@ public class ConfigurationManager {
 
     private void setFile(String key, File value) {
         editor.putString(key, value.getAbsolutePath());
-        editor.commit();
+        editor.apply();
     }
 
     public byte[] getByteArray(String key) {
@@ -197,7 +197,7 @@ public class ConfigurationManager {
 
     public void setStringArray(String key, String[] values) {
         editor.putString(key, JsonUtils.toJson(values));
-        editor.commit();
+        editor.apply();
     }
 
     public boolean showTransfersOnDownloadStart() {
