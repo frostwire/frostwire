@@ -1,4 +1,4 @@
-FrostWire 1.9.9 - SEP/21/2017
+FrostWire 1.9.9 - SEP/25/2017
  - Search: More search results when not in WiFi
  - Search: New Pixabay image search
  - Search: YT, SC, EZTV, Torlock, Yify, Zooqle fixed
