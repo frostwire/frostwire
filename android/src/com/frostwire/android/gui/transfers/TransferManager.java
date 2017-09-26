@@ -65,7 +65,6 @@ public final class TransferManager {
     private int startedTransfers = 0;
     private final Object alreadyDownloadingMonitor = new Object();
     private volatile static TransferManager instance;
-    private final ConfigurationManager CM;
 
     public static TransferManager instance() {
         if (instance == null) {
@@ -76,7 +75,6 @@ public final class TransferManager {
 
     private TransferManager() {
         registerPreferencesChangeListener();
-        CM = ConfigurationManager.instance();
         this.httpDownloads = new CopyOnWriteArrayList<>();
         this.bittorrentDownloads = new CopyOnWriteArrayList<>();
         this.downloadsToReview = 0;
@@ -441,7 +439,7 @@ public final class TransferManager {
     }
 
     public boolean isDeleteStartedTorrentEnabled() {
-        return CM.getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
+        return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
     }
 
     public static boolean isResumable(BittorrentDownload bt) {

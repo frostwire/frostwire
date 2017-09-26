@@ -200,11 +200,6 @@ public class ConfigurationManager {
         editor.commit();
     }
 
-
-    public int maxConcurrentUploads() {
-        return getInt(Constants.PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS);
-    }
-
     public boolean showTransfersOnDownloadStart() {
         return getBoolean(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START);
     }

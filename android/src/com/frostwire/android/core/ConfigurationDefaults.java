@@ -111,7 +111,6 @@ final class ConfigurationDefaults {
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);
-        defaultValues.put(Constants.PREF_KEY_NETWORK_MAX_CONCURRENT_UPLOADS, 3);
 
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, true);
