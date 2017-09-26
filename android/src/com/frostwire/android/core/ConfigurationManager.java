@@ -153,7 +153,7 @@ public class ConfigurationManager {
     }
 
     private void setByteArray(String key, byte[] value) {
-        setString(key, new String(Hex.encode(value)));
+        setString(key, Hex.encode(value));
     }
 
     public void resetToDefaults() {
