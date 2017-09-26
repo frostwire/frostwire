@@ -20,6 +20,7 @@ package com.frostwire.android.util;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.os.StrictMode;
 import android.view.View;
 
 import com.frostwire.android.BuildConfig;
@@ -50,6 +51,42 @@ public final class Debug {
      */
     public static boolean isEnable() {
         return BuildConfig.DEBUG;
+    }
+
+    /**
+     * Enable the most strict form of {@link StrictMode} possible,
+     * with log and death as penalty. When {@code enable} is {@code false}, the
+     * default more relaxed (LAX) policy is used.
+     * <p>
+     * This method only perform an actual action if the application is
+     * in debug mode.
+     *
+     * @param enable {@code true} activate the most strict policy
+     */
+    public static void setStrictPolicy(boolean enable) {
+        if (!isEnable()) {
+            return; // no debug mode, do nothing
+        }
+
+        // by default, the LAX policy
+        StrictMode.ThreadPolicy threadPolicy = StrictMode.ThreadPolicy.LAX;
+        StrictMode.VmPolicy vmPolicy = StrictMode.VmPolicy.LAX;
+
+        if (enable) {
+            threadPolicy = new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build();
+            vmPolicy = new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build();
+        }
+
+        StrictMode.setThreadPolicy(threadPolicy);
+        StrictMode.setVmPolicy(vmPolicy);
     }
 
     /**
