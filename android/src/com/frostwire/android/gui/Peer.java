@@ -100,7 +100,9 @@ public final class Peer {
             if (Ref.alive(cb)) {
                 try {
                     Finger finger = Librarian.instance().finger();
-                    cb.get().onFinger(finger);
+                    if (Ref.alive(cb)) {
+                        cb.get().onFinger(finger);
+                    }
                 } catch (Throwable e) {
                     e.printStackTrace();
                     // TODO: fix this the right way!!
