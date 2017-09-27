@@ -143,6 +143,7 @@
                 android:id="@+id/fragment_transfers_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                style="@style/scrollbar_default_style"
                 android:divider="@color/transparent"
                 android:dividerHeight="0dp"
                 android:childDivider="#00000000"

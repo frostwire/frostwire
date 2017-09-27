@@ -67,6 +67,7 @@ import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
+import com.frostwire.android.gui.util.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -343,19 +344,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             }
         });
         list = findView(v, R.id.fragment_my_files_gridview);
-        list.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
-                if (scrollState == SCROLL_STATE_IDLE){
-                    list.setFastScrollEnabled(false);
-                } else {
-                    list.setFastScrollEnabled(true);
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView absListView, int i, int i1, int i2) {}
-        });
+        list.setOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener());
 
         SwipeLayout swipe = findView(v, R.id.fragment_my_files_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
