@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
@@ -342,6 +343,20 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             }
         });
         list = findView(v, R.id.fragment_my_files_gridview);
+        list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE){
+                    list.setFastScrollEnabled(false);
+                } else {
+                    list.setFastScrollEnabled(true);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {}
+        });
+
         SwipeLayout swipe = findView(v, R.id.fragment_my_files_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override

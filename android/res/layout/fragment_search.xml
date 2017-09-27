@@ -81,11 +81,11 @@
                 android:id="@+id/fragment_search_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                style="@style/scrollbar_default_style"
                 android:divider="@color/transparent"
                 android:dividerHeight="0dp"
                 android:childDivider="#00000000"
-                android:groupIndicator="@null"
-                android:fastScrollEnabled="true"/>
+                android:groupIndicator="@null" />
         </FrameLayout>
     </com.frostwire.android.gui.views.SwipeLayout>
 </LinearLayout>

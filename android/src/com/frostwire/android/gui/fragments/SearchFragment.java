@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -267,6 +268,20 @@ public final class SearchFragment extends AbstractFragment implements
             }
         });
         list = findView(view, R.id.fragment_search_list);
+        list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                if (scrollState == SCROLL_STATE_IDLE){
+                    list.setFastScrollEnabled(false);
+                } else {
+                    list.setFastScrollEnabled(true);
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {}
+        });
+
         SwipeLayout swipe = findView(view, R.id.fragment_search_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
