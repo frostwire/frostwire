@@ -16,6 +16,7 @@ import com.frostwire.android.gui.fragments.TransferDetailFilesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailPeersFragment;
 import com.frostwire.android.gui.fragments.TransferDetailPiecesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailTrackersFragment;
+import com.frostwire.android.gui.fragments.TransferDetailStatusFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 
@@ -33,6 +34,7 @@ public class TransferDetailActivity extends AbstractActivity {
 
         ViewPager mViewPager = findViewById(R.id.transfer_detail_viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(1);
 
         TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
         tabLayout.setupWithViewPager(mViewPager);
@@ -71,17 +73,18 @@ public class TransferDetailActivity extends AbstractActivity {
         public AbstractFragment getItem(int position) {
             switch(position) {
                 case 0: return TransferDetailDetailsFragment.newInstance("Details");
-                case 1: return TransferDetailFilesFragment.newInstance("Files");
-                case 2: return TransferDetailTrackersFragment.newInstance("Trackers");
-                case 3: return TransferDetailPeersFragment.newInstance("Peers");
-                case 4: return TransferDetailPiecesFragment.newInstance("Pieces");
-                default: return TransferDetailDetailsFragment.newInstance("Details");
+                case 1: return TransferDetailStatusFragment.newInstance("Status");
+                case 2: return TransferDetailFilesFragment.newInstance("Files");
+                case 3: return TransferDetailTrackersFragment.newInstance("Trackers");
+                case 4: return TransferDetailPeersFragment.newInstance("Peers");
+                case 5: return TransferDetailPiecesFragment.newInstance("Pieces");
+                default: return TransferDetailStatusFragment.newInstance("Status");
             }
         }
 
         @Override
         public int getCount() {
-            return 5;
+            return 6;
         }
 
         @Override
@@ -90,14 +93,16 @@ public class TransferDetailActivity extends AbstractActivity {
                 case 0:
                     return "DETAILS";
                 case 1:
-                    return "FILES";
+                    return "STATUS";
                 case 2:
-                    return "TRACKERS";
+                    return "FILES";
                 case 3:
-                    return "PEERS";
+                    return "TRACKERS";
                 case 4:
+                    return "PEERS";
+                case 5:
                     return "PIECES";
-                default: return "DETAILS";
+                default: return "STATUS";
             }
         }
     }
