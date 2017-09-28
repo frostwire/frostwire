@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
@@ -17,16 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
--->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/section_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="You finally made it to fragment one"/>
+package com.frostwire.android.gui.fragments;
 
-</RelativeLayout>
+import android.os.Bundle;
+import com.frostwire.android.R;
+import com.frostwire.android.gui.views.AbstractFragment;
+
+/**
+ * @author gubatron
+ * @author aldenml
+ * @author marcelinkaaa
+ */
+
+public class TransferDetailStatusFragment extends AbstractFragment {
+
+    public TransferDetailStatusFragment() {
+        super(R.layout.fragment_transfer_detail_status);
+        setHasOptionsMenu(true);
+    }
+
+    public static TransferDetailStatusFragment newInstance(String text) {
+
+        TransferDetailStatusFragment f = new TransferDetailStatusFragment();
+        Bundle b = new Bundle();
+        b.putString("msg", text);
+
+        f.setArguments(b);
+
+        return f;
+    }
+}
