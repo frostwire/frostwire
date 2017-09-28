@@ -70,7 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view_transfer_detail_progress_progress"
-            android:text="@string/transfer_detail_download_dummy" />
+            android:text="@string/transfer_detail_status_dummy" />
 
         <LinearLayout
             android:id="@+id/view_transfer_detail_progress_download_speed_container"
