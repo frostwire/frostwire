@@ -47,43 +47,43 @@
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_pieces"
+                style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/transferDetailTitle"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:text="@string/pieces"/>
+                android:text="@string/pieces" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_pieces_number"
+                style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/transferDetailText"
-                android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:text="@string/transfer_detail_piece_size_dummy"/>
+                android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
+                android:text="@string/transfer_detail_piece_size_dummy" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_piece_size"
+                style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/transferDetailTitle"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:text="@string/piece_size"/>
+                android:layout_alignParentRight="true"
+                android:text="@string/piece_size" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_piece_size_number"
+                style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/transferDetailText"
-                android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
-                android:text="@string/transfer_detail_speed_small_dummy"/>
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
+                android:text="@string/transfer_detail_speed_small_dummy" />
         </RelativeLayout>
-        
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -93,35 +93,37 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="horizontal"
             android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
             android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
-            android:orientation="horizontal">
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:tint="@color/basic_blue_highlight"
                 android:layout_margin="1dp"
+                android:contentDescription="@null"
                 android:src="@drawable/transfer_detail_piece"
-                android:contentDescription="@null"/>
+                android:tint="@color/basic_blue_highlight" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:tint="@color/basic_blue_highlight"
                 android:layout_margin="1dp"
+                android:contentDescription="@null"
                 android:src="@drawable/transfer_detail_piece"
-                android:contentDescription="@null"/>
+                android:tint="@color/basic_blue_highlight" />
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:tint="@color/basic_blue_highlight"
                 android:layout_margin="1dp"
+                android:contentDescription="@null"
                 android:src="@drawable/transfer_detail_piece"
-                android:contentDescription="@null"/>
+                android:tint="@color/basic_blue_highlight" />
 
         </LinearLayout>
     </LinearLayout>
