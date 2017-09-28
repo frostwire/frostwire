@@ -771,16 +771,21 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/body_text</item>
         <item name="android:textColor">@color/app_text_highlight</item>
+        <item name="android:textAllCaps">true</item>
         <item name="android:paddingBottom">5dp</item>
     </style>
     <style name="transferDetailTitle">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/body_text</item>
         <item name="android:textColor">@color/app_text_primary</item>
+        <item name="android:textAllCaps">true</item>
     </style>
     <style name="transferDetailText">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/body_text</item>
         <item name="android:textColor">@color/app_text_primary</item>
+    </style>
+    <style name="transferDetailText.bold">
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>
