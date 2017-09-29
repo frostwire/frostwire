@@ -72,13 +72,13 @@ public class TransferDetailActivity extends AbstractActivity {
         @Override
         public AbstractFragment getItem(int position) {
             switch(position) {
-                case 0: return TransferDetailDetailsFragment.newInstance("Details");
-                case 1: return TransferDetailStatusFragment.newInstance("Status");
-                case 2: return TransferDetailFilesFragment.newInstance("Files");
-                case 3: return TransferDetailTrackersFragment.newInstance("Trackers");
-                case 4: return TransferDetailPeersFragment.newInstance("Peers");
-                case 5: return TransferDetailPiecesFragment.newInstance("Pieces");
-                default: return TransferDetailStatusFragment.newInstance("Status");
+                case 0: return TransferDetailDetailsFragment.newInstance(getString(R.string.details).toUpperCase());
+                case 1: return TransferDetailStatusFragment.newInstance(getString(R.string.status).toUpperCase());
+                case 2: return TransferDetailFilesFragment.newInstance(getString(R.string.files).toUpperCase());
+                case 3: return TransferDetailTrackersFragment.newInstance(getString(R.string.trackers).toUpperCase());
+                case 4: return TransferDetailPeersFragment.newInstance(getString(R.string.peers).toUpperCase());
+                case 5: return TransferDetailPiecesFragment.newInstance(getString(R.string.pieces).toUpperCase());
+                default: return TransferDetailStatusFragment.newInstance(getString(R.string.status).toUpperCase());
             }
         }
 
@@ -91,18 +91,18 @@ public class TransferDetailActivity extends AbstractActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "DETAILS";
+                    return getString(R.string.details).toUpperCase();
                 case 1:
-                    return "STATUS";
+                    return getString(R.string.status).toUpperCase();
                 case 2:
-                    return "FILES";
+                    return getString(R.string.files).toUpperCase();
                 case 3:
-                    return "TRACKERS";
+                    return getString(R.string.trackers).toUpperCase();
                 case 4:
-                    return "PEERS";
+                    return getString(R.string.peers).toUpperCase();
                 case 5:
-                    return "PIECES";
-                default: return "STATUS";
+                    return getString(R.string.pieces).toUpperCase();
+                default: return getString(R.string.status).toUpperCase();
             }
         }
     }
