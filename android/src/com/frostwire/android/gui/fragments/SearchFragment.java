@@ -56,9 +56,9 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
 import com.frostwire.android.gui.util.ScrollDirectionListener;
+import com.frostwire.android.gui.util.ScrollListeners;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -202,12 +202,12 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         if (list != null) {
-            list.setOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener());
+            list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
         }
 
         if (list != null && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
             list.setOnScrollListener(
-                    new ComposedOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener(),
+                    new ScrollListeners.ComposedOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener(),
                             DirectionDetectorScrollListener.createOnScrollListener(
                                     createScrollDirectionListener(),
                                     Engine.instance().getThreadPool())

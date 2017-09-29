@@ -55,7 +55,7 @@ import com.frostwire.android.gui.fragments.preference.TorrentFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.ComposedOnScrollListener;
+import com.frostwire.android.gui.util.ScrollListeners;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
@@ -425,7 +425,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         list = findView(v, R.id.fragment_transfers_list);
-        list.setOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener());
+        list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
 
         SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
