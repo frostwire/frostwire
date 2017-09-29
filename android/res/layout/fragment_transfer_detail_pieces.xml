@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:text="@string/pieces" />
+                android:text="@string/pieces_header" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_pieces_number"
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:text="@string/piece_size" />
+                android:text="@string/piece_size_header" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_pieces_piece_size_number"
