@@ -251,6 +251,7 @@ public class SearchHeaderBanner extends LinearLayout {
                 return;
             }
             if (!Ref.alive(searchHeaderBannerRef)) {
+                LOG.info("onBannerLoaded() aborted, searchHeaderBanner reference lost");
                 return;
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
@@ -271,6 +272,7 @@ public class SearchHeaderBanner extends LinearLayout {
                 return;
             }
             if (!Ref.alive(searchHeaderBannerRef)) {
+                LOG.info("onBannerFailed() aborted, searchHeaderBanner reference lost");
                 return;
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
