@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Filter;
@@ -66,6 +67,7 @@ import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
+import com.frostwire.android.gui.util.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -342,6 +344,8 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             }
         });
         list = findView(v, R.id.fragment_my_files_gridview);
+        list.setOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener());
+
         SwipeLayout swipe = findView(v, R.id.fragment_my_files_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override

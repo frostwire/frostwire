@@ -56,6 +56,7 @@ import com.frostwire.android.gui.tasks.StartDownloadTask;
 import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
 import com.frostwire.android.gui.util.ScrollDirectionListener;
 import com.frostwire.android.gui.util.UIUtils;
@@ -199,11 +200,19 @@ public final class SearchFragment extends AbstractFragment implements
         } else {
             setupPromoSlides();
         }
+
+        if (list != null) {
+            list.setOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener());
+        }
+
         if (list != null && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
             list.setOnScrollListener(
-                    DirectionDetectorScrollListener.createOnScrollListener(
-                            createScrollDirectionListener(),
-                            Engine.instance().getThreadPool()));
+                    new ComposedOnScrollListener(new ComposedOnScrollListener.FastScrollDisabledWhenIdleOnScrollListener(),
+                            DirectionDetectorScrollListener.createOnScrollListener(
+                                    createScrollDirectionListener(),
+                                    Engine.instance().getThreadPool())
+                    )
+            );
         }
         if (searchHeaderBanner != null) {
             //searchHeaderBanner.onResume();
@@ -266,7 +275,9 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
         });
+
         list = findView(view, R.id.fragment_search_list);
+
         SwipeLayout swipe = findView(view, R.id.fragment_search_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
@@ -282,7 +293,6 @@ public final class SearchFragment extends AbstractFragment implements
         showSearchView(view);
         showRatingsReminder(view);
     }
-
 
     private void startMagnetDownload(String magnet) {
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);

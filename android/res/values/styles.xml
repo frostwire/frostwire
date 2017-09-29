@@ -70,8 +70,7 @@
         <item name="android:divider">@android:color/transparent</item>
         <item name="android:footerDividersEnabled">false</item>
         <item name="android:headerDividersEnabled">false</item>
-        <item name="android:overScrollHeader">@null</item>
-        <item name="android:overScrollFooter">@null</item>
+
     </style>
 
     <style name="TransparentExpandableListView" parent="@android:style/Widget.ExpandableListView">
@@ -741,6 +740,15 @@
     <style name="keywordTagCount">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/text_extra_micro</item>
+    </style>
+
+    <!-- Scrollview Style -->
+    <style name="scrollbar_default_style" parent="Theme.FrostWire">
+        <item name="android:overScrollHeader">@null</item>
+        <item name="android:overScrollFooter">@null</item>
+        <item name="android:fadeScrollbars">true</item>
+        <item name="android:scrollbarFadeDuration">0</item>
+        <item name="android:scrollbarDefaultDelayBeforeFade">0</item>
     </style>
 
 </resources>
