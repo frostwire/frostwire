@@ -715,31 +715,32 @@
     <string name="title_activity_transfer_detail">Transfer Detail</string>
     <string name="show_torrent_details">Show Torrent Details</string>
 
+    <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
+    <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
+    <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
+    <string name="transfer_detail_hash_dummy" translatable="false">d882dd01gh00ccefc1e4defee52e76f8</string>
+    <string name="transfer_detail_percentage_dummy" translatable="false">100%</string>
+    <string name="transfer_detail_number_dummy" translatable="false">0</string>
+    <string name="transfer_detail_time_dummy" translatable="false">1 min</string>
+    <string name="transfer_detail_size_dummy" translatable="false">56MB</string>
+    <string name="transfer_detail_speed_small_dummy" translatable="false">56Kb</string>
+    <string name="transfer_detail_date_dummy" translatable="false">Sept. 2, 2017</string>
+    <string name="transfer_detail_comment_dummy" translatable="false">Torrent file created with FrostWire http://www.frostwire.com</string>
+    <string name="transfer_detail_number_of_number_dummy" translatable="false">0 of 54</string>
+    <string name="transfer_detail_speed_dummy" translatable="false">0.0 Kb/s</string>
+    <string name="transfer_detail_download_size_dummy" translatable="false">14MB/14MB</string>
+    <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
+    <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
+    <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
+    <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50/.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">Transmission 2.82</string>
+    <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+
     <string name="transfer_detail_title_header">Name:</string>
     <string name="transfer_detail_storage_header">Storage Path:</string>
-    <string name="transfer_detail_title_dummy">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
-    <string name="transfer_detail_file_dummy">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
-    <string name="transfer_detail_storage_dummy">/storage/emulated/0/FrostWire/Downloads</string>
-    <string name="transfer_detail_hash_dummy">d882dd01gh00ccefc1e4defee52e76f8</string>
-    <string name="transfer_detail_percentage_dummy">100%</string>
-    <string name="transfer_detail_number_dummy">0</string>
-    <string name="transfer_detail_time_dummy">1 min</string>
-    <string name="transfer_detail_size_dummy">56MB</string>
-    <string name="transfer_detail_speed_small_dummy">56Kb</string>
-    <string name="transfer_detail_date_dummy">Sept. 2, 2017</string>
-    <string name="transfer_detail_comment_dummy">Torrent file created with FrostWire http://www.frostwire.com</string>
-    <string name="transfer_detail_number_of_number_dummy">0 of 54</string>
-    <string name="transfer_detail_speed_dummy">0.0 Kb/s</string>
-    <string name="transfer_detail_download_size_dummy">14MB/14MB</string>
-    <string name="transfer_detail_upload_size_dummy">1.7 MB</string>
-    <string name="transfer_detail_status_dummy">Seeding</string>
-    <string name="transfer_detail_number_of_files_dummy">12 Files</string>
-    <string name="transfer_detail_files_number_dummy">12</string>
-    <string name="transfer_detail_trackers_address_dummy">udp://9.rarbg.com:2710/announce</string>
-    <string name="transfer_detail_peers_address_dummy">BT://198.50/.174.100:51413</string>
-    <string name="transfer_detail_peers_address_source_dummy">Transmission 2.82</string>
-    <string name="transfer_detail_piece_size_dummy">1001/1190</string>
-    <string name="infinity">&#8734;</string>
     <string name="add_trackers">Add trackers</string>
     <string name="number_of_files">Number of files</string>
     <string name="active_time">Active time</string>
@@ -765,8 +766,13 @@
     <string name="working">Working</string>
     <string name="dht">DHT</string>
     <string name="pex">PeX</string>
-    <string name="pieces">Pieces:</string>
-    <string name="piece_size">Piece Size:</string>
+    <string name="pieces_header">Pieces:</string>
+    <string name="piece_size_header">Piece Size:</string>
+
+    <string name="details">Details</string>
+    <string name="status">Status</string>
+    <string name="trackers">Trackers</string>
+    <string name="pieces">Pieces</string>
 
 
 
