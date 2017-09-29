@@ -57,8 +57,8 @@ import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
-import com.frostwire.android.gui.util.ScrollDirectionListener;
-import com.frostwire.android.gui.util.ScrollListeners;
+import com.frostwire.android.gui.util.ScrollListeners.ComposedOnScrollListener;
+import com.frostwire.android.gui.util.ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -202,14 +202,14 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         if (list != null) {
-            list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
+            list.setOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener());
         }
 
         if (list != null && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
             list.setOnScrollListener(
-                    new ScrollListeners.ComposedOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener(),
-                            DirectionDetectorScrollListener.createOnScrollListener(
-                                    createScrollDirectionListener(),
+                    new ComposedOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener(),
+                            new DirectionDetectorScrollListener(
+                                    new ScrollDirectionListener(this),
                                     Engine.instance().getThreadPool())
                     )
             );
@@ -418,18 +418,25 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private ScrollDirectionListener createScrollDirectionListener() {
-        return new ScrollDirectionListener() {
-            @Override
-            public void onScrollUp() {
-                onSearchScrollUp();
-            }
+    private static final class ScrollDirectionListener implements DirectionDetectorScrollListener.ScrollDirectionListener {
+        private final WeakReference<SearchFragment> searchFragmentWeakReference;
 
-            @Override
-            public void onScrollDown() {
-                onSearchScrollDown();
+        ScrollDirectionListener(SearchFragment searchFragment) {
+            searchFragmentWeakReference = Ref.weak(searchFragment);
+        }
+
+        @Override
+        public void onScrollUp () {
+            if (Ref.alive(searchFragmentWeakReference)) {
+                searchFragmentWeakReference.get().onSearchScrollUp();
             }
-        };
+        }
+        @Override
+        public void onScrollDown () {
+            if (Ref.alive(searchFragmentWeakReference)) {
+                searchFragmentWeakReference.get().onSearchScrollDown();
+            }
+        }
     }
 
     private void onSearchScrollDown() {
