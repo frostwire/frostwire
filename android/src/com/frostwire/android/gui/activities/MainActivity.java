@@ -957,6 +957,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         switchContent(searchFragment);
     }
 
+    public static void refreshTransfers(Context context) {
+        Intent intent = new Intent(context,
+                MainActivity.class).
+                setAction(Constants.ACTION_SHOW_TRANSFERS).
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(intent);
+    }
+
     // TODO: refactor and move this method for a common place when needed
     private static String saveViewContent(Context context, Uri uri, String name) {
         InputStream inStream = null;

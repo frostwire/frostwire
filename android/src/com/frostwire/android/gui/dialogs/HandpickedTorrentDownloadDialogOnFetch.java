@@ -48,11 +48,11 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
     }
 
     @Override
-    public void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri) {
-        createHandpickedTorrentDownloadDialog(torrentInfoData, magnetUri);
+    public void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri, long torrentFetcherDownloadTokenId) {
+        createHandpickedTorrentDownloadDialog(torrentInfoData, magnetUri, torrentFetcherDownloadTokenId);
     }
 
-    private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData, String magnetUri) {
+    private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData, String magnetUri, long torrentFetcherDownloadTokenId) {
         if (!Ref.alive(contextRef) ||
             !Ref.alive(fragmentManagerRef) ||
             torrentInfoData == null || torrentInfoData.length == 0) {
@@ -66,7 +66,8 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
                     HandpickedTorrentDownloadDialog.newInstance(
                             contextRef.get(),
                             TorrentInfo.bdecode(torrentInfoData),
-                            magnetUri);
+                            magnetUri,
+                            torrentFetcherDownloadTokenId);
             dlg.show(fragmentManagerRef.get());
         } catch (Throwable t) {
             LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);

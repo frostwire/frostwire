@@ -301,10 +301,14 @@ public final class TransferManager {
     }
 
     public BittorrentDownload downloadTorrent(String uri) {
-        return downloadTorrent(uri, null);
+        return downloadTorrent(uri, null, null);
     }
 
     public BittorrentDownload downloadTorrent(String uri, TorrentFetcherListener fetcherListener) {
+        return downloadTorrent(uri, fetcherListener, null);
+    }
+
+    public BittorrentDownload downloadTorrent(String uri, TorrentFetcherListener fetcherListener, String tempDownloadTitle) {
         String url = uri.trim();
         try {
             if (url.contains("urn%3Abtih%3A")) {
@@ -332,15 +336,17 @@ public final class TransferManager {
                 if (u.getScheme().equalsIgnoreCase("file")) {
                     BTEngine.getInstance().download(new File(u.getPath()), null, null);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
-                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()));
+                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle));
                     bittorrentDownloads.add(download);
                 }
             } else {
                 if (u.getScheme().equalsIgnoreCase("file")) {
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null);
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, -1);
                 } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
-                    new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString()), fetcherListener);
+                    download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
+                    bittorrentDownloads.add(download);
+                    return download;
                 }
                 return null;
             }
@@ -369,7 +375,7 @@ public final class TransferManager {
             if (bittorrentDownload != null) {
                 bittorrentDownloads.add(bittorrentDownload);
             }
-            return null;
+            return bittorrentDownload;
         } catch (Throwable e) {
             LOG.warn("Error creating download from search result: " + sr);
             return new InvalidBittorrentDownload(R.string.empty_string);

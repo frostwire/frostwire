@@ -24,5 +24,5 @@ package com.frostwire.android.gui.transfers;
  * @author aldenml
  */
 public interface TorrentFetcherListener {
-     void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri);
+     void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri, long torrentFetcherDownloadTokenId);
 }

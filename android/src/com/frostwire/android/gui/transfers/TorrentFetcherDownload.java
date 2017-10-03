@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.transfers;
@@ -31,6 +30,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.RandomAccess;
 
 /**
  * @author gubatron
@@ -44,6 +45,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
     private final TorrentDownloadInfo info;
     private final Date created;
     private final TorrentFetcherListener fetcherListener;
+    public final long tokenId;
 
     private TransferState state;
 
@@ -56,6 +58,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         this.info = info;
         this.created = new Date();
         this.fetcherListener = listener;
+        this.tokenId = new Random(System.currentTimeMillis()).nextLong();
         state = TransferState.DOWNLOADING_TORRENT;
 
         Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + info.getTorrentUrl());
@@ -278,7 +281,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     // Don't download the torrent yourself, there's a listener waiting
                     // for the .torrent, and it's up to this listener to start the transfer.
                     if (fetcherListener != null) {
-                        fetcherListener.onTorrentInfoFetched(data, uri);
+                        fetcherListener.onTorrentInfoFetched(data, uri, tokenId);
                         return;
                     }
 
