@@ -624,7 +624,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
         long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
         long daysInstalled = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installationTimestamp);
-        if (daysInstalled < 5) {
+        if (installationTimestamp == -1 || daysInstalled < 5) {
             //LOG.info("SearchFragment.showRatingsReminder() aborted. Too soon to show ratings reminder. daysInstalled=" + daysInstalled);
             return;
         }
