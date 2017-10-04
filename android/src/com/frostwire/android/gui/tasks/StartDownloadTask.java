@@ -69,7 +69,7 @@ public class StartDownloadTask extends ContextTask<Transfer> {
             if (sr instanceof TorrentSearchResult &&
                 !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
-                        new HandpickedTorrentDownloadDialogOnFetch((Activity) getContext()));
+                        new HandpickedTorrentDownloadDialogOnFetch((Activity) getContext()), sr.getDisplayName());
             } else if (sr instanceof YouTubePackageSearchResult) {
                 YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(getContext(), (YouTubePackageSearchResult) sr);
                 ytDownloadDlg.show(((Activity) getContext()).getFragmentManager());
@@ -108,6 +108,7 @@ public class StartDownloadTask extends ContextTask<Transfer> {
                         UIUtils.showShortMessage(ctx, message);
                     }
                 }
+                UIUtils.showTransfersOnDownloadStart(ctx);
             } else if (!(transfer instanceof ExistingDownload)) {
                 UIUtils.showLongMessage(ctx, ((InvalidTransfer) transfer).getReasonResId());
             }

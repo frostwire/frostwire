@@ -51,6 +51,7 @@ import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;

@@ -777,7 +777,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         ALL, DOWNLOADING, COMPLETED, SEEDING
     }
 
-
     public void onClick(TransfersFragment f) {
         f.toggleAddTransferControls();
     }

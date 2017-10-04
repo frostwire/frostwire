@@ -28,9 +28,15 @@ import org.apache.commons.io.FilenameUtils;
 class TorrentUrlInfo implements TorrentDownloadInfo {
 
     private final String url;
+    private final String displayName;
 
     public TorrentUrlInfo(String url) {
+        this(url, null);
+    }
+
+    public TorrentUrlInfo(String url, String displayName) {
         this.url = url;
+        this.displayName = displayName;
     }
 
     @Override
@@ -45,7 +51,7 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
 
     @Override
     public String getDisplayName() {
-        return FilenameUtils.getName(url);
+        return (displayName == null || displayName.isEmpty()) ? FilenameUtils.getName(url) : displayName;
     }
 
     @Override
