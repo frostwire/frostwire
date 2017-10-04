@@ -34,6 +34,7 @@ import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
@@ -535,6 +536,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             panel.add(labelTitle, "cell 0 0");
 
             final JTextArea textTrackers = new JTextArea();
+            ThemeMediator.fixKeyStrokes(textTrackers);
             JScrollPane scrollPane = new JScrollPane(textTrackers);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             fillTrackers(textTrackers);
