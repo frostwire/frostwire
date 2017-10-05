@@ -462,6 +462,10 @@ public final class Initializer {
         if (iface.equals("0.0.0.0")) {
             iface = "0.0.0.0:%1$d,[::]:%1$d";
         } else {
+            // quick IPv6 test
+            if (iface.contains(":")) {
+                iface = "[" + iface + "]";
+            }
             iface = iface + ":%1$d";
         }
         String if_string = String.format(iface, port0);

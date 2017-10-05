@@ -31,6 +31,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Allows the user to pick a custom interface/address to bind to.
@@ -182,10 +183,15 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         if (iface.equals("0.0.0.0")) {
             iface = "0.0.0.0:%1$d,[::]:%1$d";
         } else {
+            // quick IPv6 test
+            if (iface.contains(":")) {
+                iface = "[" + iface + "]";
+            }
             iface = iface + ":%1$d";
         }
 
-        int port0 = 0;
+        // TODO: consider the actual port range
+        int port0 = 37000 + new Random().nextInt(20000);
 
         if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
             port0 = ConnectionSettings.PORT_RANGE_0.getValue();
@@ -194,7 +200,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         String if_string = String.format(iface, port0);
         BTEngine.getInstance().listenInterfaces(if_string);
 
-        return true;
+        return false;
     }
 
     public boolean isDirty() {
