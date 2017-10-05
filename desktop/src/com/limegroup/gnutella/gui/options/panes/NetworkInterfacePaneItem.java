@@ -47,7 +47,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
     private final JCheckBox CUSTOM;
 
-    private List<JRadioButton> activeButtons = new ArrayList<JRadioButton>();
+    private List<JRadioButton> activeButtons = new ArrayList<>();
 
     public NetworkInterfacePaneItem() {
         super(TITLE, LABEL);
@@ -122,7 +122,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         }
     }
 
-    protected void updateButtons(boolean enable) {
+    private void updateButtons(boolean enable) {
         for (JRadioButton button : activeButtons) {
             button.setEnabled(enable);
         }
@@ -194,7 +194,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         String if_string = String.format(iface, port0);
         BTEngine.getInstance().listenInterfaces(if_string);
 
-        return isDirty;
+        return true;
     }
 
     public boolean isDirty() {
