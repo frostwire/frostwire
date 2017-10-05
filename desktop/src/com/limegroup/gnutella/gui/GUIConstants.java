@@ -58,7 +58,7 @@ public final class GUIConstants {
     // alpha and beta features are always enabled when running from source.
 
     public enum Feature {
-        VPN_DROP_GUARD(State.ALPHA);
+        VPN_DROP_GUARD(State.BETA);
 
         private final State status;
 
