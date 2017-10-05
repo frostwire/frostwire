@@ -1,7 +1,8 @@
 frostwire (6.5.9) stable; urgency=high
+  * New VPN Drop Guard feature available in BitTorrent settings
   * UX: Edit tracker dialog supports basic keyword shortcuts
 	
- -- FrostWire Team <contact@frostwire.com>  Wed, 04 Oct 2017 06:29:29 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 05 Oct 2017 08:22:32 -0600
 
 frostwire (6.5.8) stable; urgency=high
   * New jlibtorrent 1.2.0.13-RC4 with improved IPv6 connectivity
