@@ -94,7 +94,13 @@ import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
+import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.DURATION;
+import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.IS_PLAYING;
+import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.POSITION;
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
@@ -246,6 +252,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     };
 
+    private long lastProgressBarTouched;
+    private long lastKnownPosition = 0;
+    private long lastKnownDuration = 0;
+    private boolean lastKnownIsPlaying = false;
+    private Map<MusicServiceRequestRunnable.MusicServiceRequestType, MusicServiceRequestRunnable> musicServiceRequestRunnables;
+
+
     public AudioPlayerActivity() {
         super(R.layout.activity_player_base);
     }
@@ -288,6 +301,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         findView(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+
+        // this thread collection will be populated as needed, see updateLastKnown()
+        musicServiceRequestRunnables = new HashMap<>();
     }
 
     private void initRemoveAds() {
@@ -333,18 +349,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
         final long now = SystemClock.elapsedRealtime();
+        lastProgressBarTouched = now;
+        lastKnownDuration = MusicUtils.duration();
         if (now - mLastSeekEventTime > 250) {
             mLastSeekEventTime = now;
             mLastShortSeekEventTime = now;
-            mPosOverride = MusicUtils.duration() * progress / 1000;
+            mPosOverride = lastKnownDuration * progress / 1000;
             MusicUtils.seek(mPosOverride);
+            refreshCurrentTime(mFromTouch);
             if (!mFromTouch) {
-                // refreshCurrentTime();
                 mPosOverride = -1;
             }
         } else if (now - mLastShortSeekEventTime > 5) {
             mLastShortSeekEventTime = now;
-            mPosOverride = MusicUtils.duration() * progress / 1000;
+            mPosOverride = lastKnownDuration * progress / 1000;
             refreshCurrentTimeText(mPosOverride);
         }
     }
@@ -529,7 +547,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         filter.addAction(MusicPlaybackService.REFRESH);
         registerReceiver(mPlaybackStatus, filter);
         // Refresh the current time
-        final long next = refreshCurrentTime();
+        final long next = refreshCurrentTime(false);
         queueNextRefresh(next);
         MusicUtils.notifyForegroundStateChanged(this, true);
     }
@@ -544,6 +562,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         mIsPaused = false;
 
         try {
@@ -857,6 +876,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
         if (repcount == 0) {
             mStartSeekPos = MusicUtils.position();
+            lastKnownPosition = mStartSeekPos;
             mLastSeekEventTime = 0;
         } else {
             if (delta < 5000) {
@@ -883,7 +903,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             } else {
                 mPosOverride = -1;
             }
-            refreshCurrentTime();
+            refreshCurrentTime(true);
         }
     }
 
@@ -898,7 +918,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
         if (repcount == 0) {
-            mStartSeekPos = MusicUtils.position();
+            lastKnownPosition = MusicUtils.position();
+            mStartSeekPos = lastKnownPosition;
             mLastSeekEventTime = 0;
         } else {
             if (delta < 5000) {
@@ -909,10 +930,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 delta = 50000 + (delta - 5000) * 40;
             }
             long newpos = mStartSeekPos + delta;
-            final long duration = MusicUtils.duration();
+            long duration = lastKnownDuration(true);
             if (newpos >= duration) {
                 // move to next track
                 MusicUtils.next();
+                duration = MusicUtils.duration();
+                lastKnownDuration = duration;
                 mStartSeekPos -= duration; // is OK to go negative
                 newpos -= duration;
             }
@@ -925,7 +948,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             } else {
                 mPosOverride = -1;
             }
-            refreshCurrentTime();
+            refreshCurrentTime(true);
         }
     }
 
@@ -933,36 +956,135 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mCurrentTime.setText(MusicUtils.makeTimeString(this, pos / 1000));
     }
 
-    /* Used to update the current time string */
-    private long refreshCurrentTime() {
-        if (musicPlaybackService == null) {
-            return 500;
+    /**
+     * Calls to MusicUtils.getXXX() are calls to a background music service.
+     * Making these calls in the main thread may call ANRs
+     * These Runnables are here to update local copies of the last known values
+     * asked to the MusicService.
+     */
+    static final class MusicServiceRequestRunnable implements Runnable {
+
+        enum MusicServiceRequestType {
+            POSITION,
+            DURATION,
+            IS_PLAYING
         }
+
+        private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
+        private final MusicServiceRequestType requestType;
+
+        MusicServiceRequestRunnable(AudioPlayerActivity activity, MusicServiceRequestType reqType) {
+            audioPlayerActivityRef = Ref.weak(activity);
+            requestType = reqType;
+        }
+
+        public boolean activityReferenceAlive() {
+            return Ref.alive(audioPlayerActivityRef);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(audioPlayerActivityRef)) {
+                return;
+            }
+            switch (requestType) {
+                case POSITION:
+                    long position = MusicUtils.position();
+                    if (Ref.alive(audioPlayerActivityRef)) {
+                        audioPlayerActivityRef.get().lastKnownPosition = position;
+                    }
+                    break;
+                case DURATION:
+                    long duration = MusicUtils.duration();
+                    if (Ref.alive(audioPlayerActivityRef)) {
+                        audioPlayerActivityRef.get().lastKnownDuration = duration;
+                    }
+                    break;
+                case IS_PLAYING:
+                    boolean isPlaying = MusicUtils.isPlaying();
+                    if (Ref.alive(audioPlayerActivityRef)) {
+                        audioPlayerActivityRef.get().lastKnownIsPlaying = isPlaying;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private long lastKnownPosition(boolean blockingMusicServiceRequest) {
+        if (!blockingMusicServiceRequest) {
+            updateLastKnown(POSITION);
+        } else {
+            lastKnownPosition = MusicUtils.position();
+        }
+        return lastKnownPosition;
+    }
+
+    private long lastKnownDuration(boolean blockingMusicServiceRequest) {
+        if (!blockingMusicServiceRequest) {
+            updateLastKnown(DURATION);
+        } else {
+            lastKnownDuration = MusicUtils.duration();
+        }
+        return lastKnownDuration;
+    }
+
+    private boolean lastKnownIsPlaying(boolean blockingMusicServiceRequest) {
+        if (!blockingMusicServiceRequest) {
+            updateLastKnown(IS_PLAYING);
+        } else {
+            lastKnownIsPlaying = MusicUtils.isPlaying();
+        }
+        return lastKnownIsPlaying;
+    }
+
+    private void updateLastKnown(MusicServiceRequestRunnable.MusicServiceRequestType requestType) {
+        MusicServiceRequestRunnable musicServiceRequestRunnable = musicServiceRequestRunnables.get(requestType);
+
+        // Make sure the request thread exists and it contains a live weak reference to this activity
+        if (musicServiceRequestRunnable == null || !musicServiceRequestRunnable.activityReferenceAlive()) {
+            musicServiceRequestRunnables.put(requestType, new MusicServiceRequestRunnable(this, requestType));
+            musicServiceRequestRunnable = musicServiceRequestRunnables.get(requestType);
+        }
+
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        threadPool.execute(musicServiceRequestRunnable);
+    }
+
+    /* Used to update the current time string
+    *  @return the delay on which this method call should be posted again
+    * */
+    private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
+        if (musicPlaybackService == null) {
+            return 500L;
+        }
+
         try {
-            final long pos = mPosOverride < 0 ? MusicUtils.position() : mPosOverride;
-            if (pos >= 0 && MusicUtils.duration() > 0) {
+            final long pos = mPosOverride < 0 ? lastKnownPosition(blockingMusicServiceRequest) : mPosOverride;
+            long duration = lastKnownDuration(false);
+            if (pos >= 0 && duration > 0) {
                 refreshCurrentTimeText(pos);
-                final int progress = (int) (1000 * pos / MusicUtils.duration());
+                final int progress = (int) (1000 * pos / duration);
                 mProgress.setProgress(progress);
 
                 if (mFromTouch) {
-                    return 500;
-                } else if (MusicUtils.isPlaying()) {
+                    return 500L;
+                } else if (lastKnownIsPlaying(false)) {
                     mCurrentTime.setVisibility(View.VISIBLE);
                 } else {
                     // blink the counter
                     final int vis = mCurrentTime.getVisibility();
                     mCurrentTime.setVisibility(vis == View.INVISIBLE ? View.VISIBLE
                             : View.INVISIBLE);
-                    return 500;
+                    return 500L;
                 }
             } else {
                 mCurrentTime.setText("--:--");
                 mProgress.setProgress(1000);
             }
             // calculate the number of milliseconds until the next full second,
-            // so
-            // the counter can be updated at just the right time
+            // so the counter can be updated at just the right time
             final long remaining = 1000 - pos % 1000;
             // approximate how often we would need to refresh the slider to
             // move it smoothly
@@ -970,18 +1092,18 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             if (width == 0) {
                 width = 320;
             }
-            final long smoothrefreshtime = MusicUtils.duration() / width;
-            if (smoothrefreshtime > remaining) {
+            final long smooth_refresh_time = duration / width;
+            if (smooth_refresh_time > remaining) {
                 return remaining;
             }
-            if (smoothrefreshtime < 20) {
-                return 20;
+            if (smooth_refresh_time < 20) {
+                return 20L;
             }
-            return smoothrefreshtime;
+            return smooth_refresh_time;
         } catch (final Exception ignored) {
-
+            LOG.error(ignored.getMessage(), ignored);
         }
-        return 500;
+        return 500L;
     }
 
     /**
@@ -1136,10 +1258,31 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         @Override
         public void handleMessage(final Message msg) {
+            if (!Ref.alive(mAudioPlayer)) {
+                return;
+            }
+            AudioPlayerActivity audioPlayerActivity = mAudioPlayer.get();
             switch (msg.what) {
                 case REFRESH_TIME:
-                    final long next = mAudioPlayer.get().refreshCurrentTime();
-                    mAudioPlayer.get().queueNextRefresh(next);
+                    // we only refresh synchronously when the progress bar has been moved
+                    // by the user, to avoid the progress bar from jumping back and forth
+                    // otherwise, no need to wait for MusicService in the main thread to update
+                    // the UI.
+                    boolean blockingRefresh =
+                            (SystemClock.elapsedRealtime() -
+                                    audioPlayerActivity.lastProgressBarTouched) < 300;
+                    long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
+
+                    // a blocking refresh could take long and screen could rotate, or activity go away
+                    if (blockingRefresh && Ref.alive(mAudioPlayer)) {
+                        audioPlayerActivity = mAudioPlayer.get();
+                    }
+                    if (!Ref.alive(mAudioPlayer)) {
+                        return;
+                    }
+                    if (audioPlayerActivity != null) {
+                        audioPlayerActivity.queueNextRefresh(next);
+                    }
                     break;
                 default:
                     break;
