@@ -1270,7 +1270,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     // the UI.
                     boolean blockingRefresh =
                             (SystemClock.elapsedRealtime() -
-                                    audioPlayerActivity.lastProgressBarTouched) < 300;
+                                    audioPlayerActivity.lastProgressBarTouched) < 500;
                     long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
 
                     // a blocking refresh could take long and screen could rotate, or activity go away
