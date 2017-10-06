@@ -391,7 +391,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         // TEST. Uncomment below
         // CM.setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, (long) (System.currentTimeMillis() - 8.64e+7));
 
-        long installationTimestamp = System.currentTimeMillis() - CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
+        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
         if (installationTimestamp == -1) {
             LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
             delayedOnResumeInterstitialRunnable = null;
