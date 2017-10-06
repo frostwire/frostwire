@@ -89,7 +89,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
      */
     public void addSongId(final Long songId, final String songName, final String albumName,
                           final String artistName) {
-        if (songId == null || songName == null || albumName == null || artistName == null) {
+        if (songId == null || songId <= -1 || songName == null || albumName == null || artistName == null) {
             return;
         }
         final Long playCount = getPlayCount(songId);
@@ -98,7 +98,7 @@ public class FavoritesStore extends SQLiteOpenHelper {
         values.put(FavoriteColumns.SONGNAME, songName);
         values.put(FavoriteColumns.ALBUMNAME, albumName);
         values.put(FavoriteColumns.ARTISTNAME, artistName);
-        values.put(FavoriteColumns.PLAYCOUNT, playCount != 0 ? playCount + 1 : 1);
+        values.put(FavoriteColumns.PLAYCOUNT, (playCount != null && playCount != 0) ? playCount + 1 : 1);
         writeableDatabase.beginTransaction();
         writeableDatabase.delete(FavoriteColumns.NAME,
                 FavoriteColumns.ID + " = ?", new String[]{
