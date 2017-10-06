@@ -183,6 +183,8 @@ public final class Debug {
         } else if (obj instanceof Enum) {
             // avoids infinite recursion checking $VALUES field
             return true;
+        } else if (obj instanceof Boolean) {
+            return true;
         }
 
         // exclude some well know packages
