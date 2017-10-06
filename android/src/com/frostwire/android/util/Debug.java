@@ -180,6 +180,9 @@ public final class Debug {
             return true;
         } else if (obj instanceof String) {
             return true;
+        } else if (obj instanceof Enum) {
+            // avoids infinite recursion checking $VALUES field
+            return true;
         }
 
         // exclude some well know packages
