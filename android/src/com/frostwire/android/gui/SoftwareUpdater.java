@@ -484,7 +484,7 @@ public final class SoftwareUpdater {
         boolean oguryKillOnExit = false;
         int interstitialOffersTransferStarts = 5;
         int interstitialTransferOffersTimeoutInMinutes = 15;
-        int interstitialOnResumeFirstDisplayDelayInMinutes = 120;
+        int interstitialOnResumeFirstDisplayDelayInMinutes = 30;
         int interstitialOnResumeTimeoutInMinutes = 15;
         int onExitThreshold = 100;
         int onBackThreshold = 100;

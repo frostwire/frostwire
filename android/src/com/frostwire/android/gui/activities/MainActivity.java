@@ -419,14 +419,15 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
             }
             //LOG.info("tryOnResumeInterstitial() might be ready for first display (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
         } else {
+            int minutesSinceSessionStarted = (int) TimeUnit.MILLISECONDS.toMinutes(now - CM.getLong(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP));
             int minutesSinceLastDisplay = (int) TimeUnit.MILLISECONDS.toMinutes(now - lastDisplayTimestamp);
             int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
-            if (minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
-                LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
+            if (minutesSinceSessionStarted < onResumeOfferTimeoutInMinutes || minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
+                LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
                 delayedOnResumeInterstitialRunnable = null;
                 return;
             }
-            //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ")");
+            //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
         }
 
         LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable");
