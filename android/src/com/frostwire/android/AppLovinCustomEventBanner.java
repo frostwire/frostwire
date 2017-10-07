@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-package com.frostwire.android.offers;
+package com.frostwire.android;
+// I wanted this to be in com.frostwire.android.offers.AppLovinCustomEventBanner but it wasn't working.
+// instructions were very specific to have this be <PACKAGE_NAME>.AppLovinCustomEventBanner
+// therefore the file was renamed and moved here to be com.frostwire.android.AppLovinCustomEventBanner
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,8 +46,8 @@ import java.util.Map;
  */
 
 
-public class AppLovinMopubBannerAdapter extends CustomEventBanner {
-    private static Logger LOG = Logger.getLogger(AppLovinMopubBannerAdapter.class);
+public class AppLovinCustomEventBanner extends CustomEventBanner {
+    private static Logger LOG = Logger.getLogger(AppLovinCustomEventBanner.class);
     private static final String AD_WIDTH_KEY = "com_mopub_ad_width";
     private static final String AD_HEIGHT_KEY = "com_mopub_ad_height";
     //
@@ -151,7 +154,7 @@ public class AppLovinMopubBannerAdapter extends CustomEventBanner {
             final Constructor<?> constructor = AppLovinAdView.class.getConstructor(AppLovinAdSize.class, contextClass);
             adView = (AppLovinAdView) constructor.newInstance(size, parentContext);
         } catch (Throwable th) {
-            LOG.error("Unable to get create AppLovinAdView.");
+            LOG.error("Unable to get create AppLovinAdView.", th);
             customEventBannerListener.onBannerFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
         }
         return adView;

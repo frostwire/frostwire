@@ -294,7 +294,7 @@
             android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
         <meta-data
             android:name="applovin.sdk.verbose_logging"
-            android:value="false" />
+            android:value="true" />
 
         <activity
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
