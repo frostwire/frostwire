@@ -3071,6 +3071,26 @@ public class MusicPlaybackService extends Service {
         }
     }
 
+    private static final class StartMediaPlayerRunnable implements Runnable {
+        private final WeakReference<MediaPlayer> mCurrentMediaPlayerRef;
+
+        StartMediaPlayerRunnable(WeakReference<MediaPlayer> mCurrentMediaPlayerRef) {
+            this.mCurrentMediaPlayerRef = mCurrentMediaPlayerRef;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(mCurrentMediaPlayerRef)) {
+                return;
+            }
+            try {
+                mCurrentMediaPlayerRef.get().start();
+            } catch (Throwable ignored) {
+            }
+
+        }
+    }
+
     private static final class MultiPlayer implements MediaPlayer.OnErrorListener,
             MediaPlayer.OnCompletionListener {
 
@@ -3083,16 +3103,6 @@ public class MusicPlaybackService extends Service {
         private Handler mHandler;
 
         private boolean mIsInitialized = false;
-
-        private final Runnable startMediaPlayerRunnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mCurrentMediaPlayer.start();
-                } catch (Throwable ignored) {
-                }
-            }
-        };
 
         private interface OnPlayerPrepareCallback {
             void onPrepared(boolean result);
@@ -3305,6 +3315,7 @@ public class MusicPlaybackService extends Service {
          * Starts or resumes playback.
          */
         public void start() {
+            StartMediaPlayerRunnable startMediaPlayerRunnable = new StartMediaPlayerRunnable(Ref.weak(mCurrentMediaPlayer));
             if (Looper.myLooper() == Looper.getMainLooper()) {
                 Engine.instance().getThreadPool().execute(startMediaPlayerRunnable);
             } else {

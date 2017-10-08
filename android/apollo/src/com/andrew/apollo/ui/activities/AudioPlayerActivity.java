@@ -1070,7 +1070,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
                 if (mFromTouch) {
                     return 500L;
-                } else if (lastKnownIsPlaying(false)) {
+                } else if (lastKnownIsPlaying(blockingMusicServiceRequest)) {
                     mCurrentTime.setVisibility(View.VISIBLE);
                 } else {
                     // blink the counter
