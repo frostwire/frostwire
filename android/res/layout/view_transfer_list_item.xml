@@ -24,11 +24,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#FFDADADA" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -189,4 +184,8 @@
             android:src="@drawable/my_files_play_icon" />
 
     </LinearLayout>
+    <View
+        style="@style/divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
 </LinearLayout>
