@@ -85,7 +85,7 @@
 
             <TextView
                 android:id="@+id/view_transfer_item_list_item_size"
-                style="@style/TransferListItemSize"
+                style="@style/TransfersList.Item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
