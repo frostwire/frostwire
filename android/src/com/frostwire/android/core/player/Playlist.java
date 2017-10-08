@@ -26,15 +26,6 @@ import java.util.List;
  *
  */
 public interface Playlist {
-    String getTitle();
-    
-    void setTitle(String s);
-
-    PlaylistItem getPreviousItem();
-
-    PlaylistItem getNextItem();
-    
-    void removeItem(PlaylistItem item);
     
     List<PlaylistItem> getItems();
     

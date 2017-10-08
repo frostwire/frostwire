@@ -39,7 +39,7 @@ public final class EphemeralPlaylist implements Playlist {
     private int currentIndex;
 
     public EphemeralPlaylist(List<FileDescriptor> fds) {
-        this.items = new ArrayList<PlaylistItem>();
+        this.items = new ArrayList<>();
 
         for (FileDescriptor fd : fds) {
             this.items.add(new PlaylistItem(fd));
@@ -59,36 +59,6 @@ public final class EphemeralPlaylist implements Playlist {
         this.currentIndex = -1;
     }
 
-    @Override
-    public PlaylistItem getPreviousItem() {
-        if (items.size() == 0) {
-            return null;
-        }
-
-        if (currentIndex == 0 || currentIndex == -1) {
-            currentIndex = items.size() - 1;
-        } else {
-            currentIndex--;
-        }
-
-        PlaylistItem item = items.get(currentIndex);
-
-        return item;
-    }
-
-    @Override
-    public PlaylistItem getNextItem() {
-        if (items.size() == 0) {
-            return null;
-        }
-
-        currentIndex = ((currentIndex + 1) % items.size());
-
-        PlaylistItem item = items.get(currentIndex);
-
-        return item;
-    }
-
     public void setNextItem(PlaylistItem playlistItem) {
         for (int index = 0; index < items.size(); index++) {
             if (items.get(index).equals(playlistItem)) {
@@ -98,27 +68,6 @@ public final class EphemeralPlaylist implements Playlist {
         }
     }
 
-    @Override
-    public String getTitle() {
-        return "";
-    }
-
-    @Override
-    public void setTitle(String s) {   
-    }
-
-    @Override
-    public void removeItem(PlaylistItem item) {
-        if (items.size() > 0) {
-            items.remove(item);
-            currentIndex--;
-            
-            if (currentIndex < 0) {
-                currentIndex = 0;
-            }
-        }
-    }
-    
     @Override
     public List<PlaylistItem> getItems() {
         return items;
