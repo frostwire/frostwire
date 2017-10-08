@@ -97,7 +97,6 @@
         android:id="@+id/fragment_transfers_sd_card_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
         frostwire:rich_notification_icon="@drawable/sd_card_notification"
         frostwire:rich_notification_title="@string/saving_to_sd_card"
@@ -107,7 +106,6 @@
         android:id="@+id/fragment_transfers_internal_memory_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
         frostwire:rich_notification_icon="@drawable/internal_memory_notification"
         frostwire:rich_notification_title="@string/saving_to_internal_memory"
@@ -198,14 +196,12 @@
             android:id="@+id/fragment_transfers_dht_peers"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
+            style="@style/TransfersIndicator"
+            android:textStyle="bold"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1.0"
-            android:gravity="center_vertical"
-            android:text="@string/dht_contacts"
-            android:textColor="@color/app_text_white"
-            android:textSize="@dimen/text_size_extra_micro" />
+            android:text="@string/dht_contacts" />
 
         <LinearLayout
             android:layout_width="wrap_content"
