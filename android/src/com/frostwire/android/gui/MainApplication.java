@@ -55,35 +55,30 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        try {
-            //android.os.Debug.waitForDebugger();
-            PlayStore.getInstance().initialize(this); // as early as possible
+        PlayStore.getInstance().initialize(this); // as early as possible
 
-            ignoreHardwareMenu();
-            AbstractActivity.setMenuIconsVisible(true);
+        ignoreHardwareMenu();
+        AbstractActivity.setMenuIconsVisible(true);
 
-            ConfigurationManager.create(this);
+        ConfigurationManager.create(this);
 
-            Platforms.set(new AndroidPlatform(this));
+        Platforms.set(new AndroidPlatform(this));
 
-            setupBTEngine();
+        setupBTEngine();
 
-            NetworkManager.create(this);
-            Librarian.create(this);
-            Engine.instance().onApplicationCreate(this);
+        NetworkManager.create(this);
+        Librarian.create(this);
+        Engine.instance().onApplicationCreate(this);
 
-            ImageLoader.getInstance(this);
-            CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));
-            CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
+        ImageLoader.getInstance(this);
+        CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));
+        CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 
-            LocalSearchEngine.create();
+        LocalSearchEngine.create();
 
-            cleanTemp();
+        cleanTemp();
 
-            Librarian.instance().syncMediaStore();
-        } catch (Throwable e) {
-            throw new RuntimeException("Unable to initialize main components", e);
-        }
+        Librarian.instance().syncMediaStore();
     }
 
     @Override
