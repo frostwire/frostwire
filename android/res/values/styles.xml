@@ -197,16 +197,15 @@
 
     <style name="TransfersList"></style>
 
-    <style name="TransfersList.Item"></style>
     <!--v21-->
     <style name="TransfersList.Item.Title">
-        <item name="android:textSize">@dimen/text_x_medium</item>
+        <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textStyle">bold</item>
         <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
-    <style name="TransfersList.Item.Status">
+    <style name="TransfersList.Item">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">@dimen/text_micro</item>
         <item name="android:textColor">@color/app_text_primary</item>
@@ -238,9 +237,9 @@
 
     <style name="TransfersIndicator">
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/app_text_light</item>
         <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textSize">@dimen/text_size_micro</item>
+        <item name="android:textColor">@color/app_text_white</item>
+        <item name="android:textSize">@dimen/text_size_extra_micro</item>
     </style>
 
     <!-- Transfers indicator end -->
@@ -320,12 +319,6 @@
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:background">#ffedb802</item>
         <item name="android:padding">2sp</item>
-    </style>
-
-    <style name="TransferListItemSize">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">@dimen/text_micro</item>
-        <item name="android:textColor">@color/basic_blue_highlight_dark</item>
     </style>
 
     <style name="NoSearchResultsLink">

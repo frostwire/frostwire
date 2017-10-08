@@ -66,7 +66,7 @@
 
         <TextView
             android:id="@+id/view_transfer_detail_progress_status"
-            style="@style/TransfersList.Item.Status"
+            style="@style/TransfersList.Item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view_transfer_detail_progress_progress"
@@ -93,7 +93,7 @@
 
             <TextView
                 android:id="@+id/view_transfer_detail_progress_down_speed"
-                style="@style/TransfersList.Item.Status"
+                style="@style/TransfersList.Item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:foregroundGravity="left"
@@ -109,7 +109,7 @@
 
             <TextView
                 android:id="@+id/view_transfer_detail_progress_up_speed"
-                style="@style/TransfersList.Item.Status"
+                style="@style/TransfersList.Item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:foregroundGravity="left"
