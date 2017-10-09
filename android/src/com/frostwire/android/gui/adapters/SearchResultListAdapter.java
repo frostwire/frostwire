@@ -59,6 +59,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -226,8 +227,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public FilteredSearchResults filter(List<SearchResult> results) {
         FilteredSearchResults fsr = new FilteredSearchResults();
-        ArrayList<SearchResult> mediaTypedFiltered = new ArrayList<>();
-        ArrayList<SearchResult> keywordFiltered = new ArrayList<>();
+        CopyOnWriteArrayList<SearchResult> mediaTypedFiltered = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<SearchResult> keywordFiltered = new CopyOnWriteArrayList<>();
         List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
         for (SearchResult sr : results) {
             MediaType mt;
