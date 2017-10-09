@@ -30,7 +30,7 @@
     <!-- Don't go nuts, max version number will be: 2,147,483,647 -->
 
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="19"
         android:targetSdkVersion="25" />
 
     <!-- GPS -->
