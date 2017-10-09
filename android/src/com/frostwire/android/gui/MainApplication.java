@@ -70,7 +70,8 @@ public class MainApplication extends Application {
         Librarian.create(this);
         Engine.instance().onApplicationCreate(this);
 
-        ImageLoader.getInstance(this);
+        ImageLoader.start(this, Engine.instance().getThreadPool());
+
         CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 

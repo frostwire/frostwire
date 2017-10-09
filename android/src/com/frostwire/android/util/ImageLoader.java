@@ -31,6 +31,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -329,6 +330,25 @@ public final class ImageLoader {
     public void shutdown() {
         shutdown = true;
         picasso.shutdown();
+    }
+
+    public static void start(MainApplication mainApplication, ExecutorService threadPool) {
+        threadPool.execute(new ImageLoaderStarter(mainApplication));
+    }
+
+    private static final class ImageLoaderStarter implements Runnable {
+        private WeakReference<MainApplication> mainAppRef;
+
+        ImageLoaderStarter(MainApplication mainApplication) {
+            mainAppRef = Ref.weak(mainApplication);
+        }
+
+        @Override
+        public void run() {
+            if (instance == null && Ref.alive(mainAppRef)) {
+                ImageLoader.getInstance(mainAppRef.get());
+            }
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
