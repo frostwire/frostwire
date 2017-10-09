@@ -357,7 +357,7 @@ public final class SearchFragment extends AbstractFragment implements
             boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
             // the second condition exists to accommodate a reset keywordDetector upon screen rotation
             if (!searchFinished || (keywordDetector.totalHistogramKeys() == 0 && results.size() > 0)) {
-                KeywordDetectorFeeder.submitSearchResults(this, results);
+                updateKeywordDetectorWithSearchResults(this, results);
             }
         }
     }
@@ -397,26 +397,25 @@ public final class SearchFragment extends AbstractFragment implements
      * the screen by mistake when a search is submitted, otherwise I would've put this code directly on the main
      * thread, but some frames might be skipped, not a good experience whe you hit 'Search'
      */
-    private static class KeywordDetectorFeeder {
-        private static void submitSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
-            final WeakReference<SearchFragment> fragmentRef = Ref.weak(fragment);
-            Engine.instance().getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Ref.alive(fragmentRef)) {
-                        return;
-                    }
-                    SearchFragment fragment = fragmentRef.get();
-                    if (fragment == null) {
-                        return; // everything is possible
-                    }
-                    KeywordDetector keywordDetector = fragment.keywordDetector;
-                    keywordDetector.feedSearchResults(results);
-                    keywordDetector.requestHistogramsUpdateAsync(null);
+    private static void updateKeywordDetectorWithSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
+        final WeakReference<SearchFragment> fragmentRef = Ref.weak(fragment);
+        final ArrayList<SearchResult> resultsCopy = new ArrayList<>(results);
+        Engine.instance().getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!Ref.alive(fragmentRef)) {
+                    return;
                 }
-            });
-        }
+                SearchFragment fragment = fragmentRef.get();
+                if (fragment == null) {
+                    return; // everything is possible
+                }
+                fragment.keywordDetector.feedSearchResults(resultsCopy);
+                fragment.keywordDetector.requestHistogramsUpdateAsync(null);
+            }
+        });
     }
+
 
     private static final class ScrollDirectionListener implements DirectionDetectorScrollListener.ScrollDirectionListener {
         private final WeakReference<SearchFragment> searchFragmentWeakReference;
