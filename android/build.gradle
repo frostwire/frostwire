@@ -173,8 +173,8 @@ dependencies {
     compile 'com.android.support:support-v13:26.0.2'
     compile 'com.google.android.gms:play-services-ads-lite:11.4.2'
     compile 'com.google.android.gms:play-services-base:11.4.2'
-    compile('com.mopub:mopub-sdk-banner:4.16.1@aar') { transitive = true }
-    compile('com.mopub:mopub-sdk-interstitial:4.16.1@aar') { transitive = true }
+    compile('com.mopub:mopub-sdk-banner:4.17.0@aar') { transitive = true }
+    compile('com.mopub:mopub-sdk-interstitial:4.17.0@aar') { transitive = true }
     compile 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     compile 'com.frostwire:jlibtorrent-android-arm:1.2.0.13-RC6'
     compile 'com.frostwire:jlibtorrent-android-x86:1.2.0.13-RC6'
