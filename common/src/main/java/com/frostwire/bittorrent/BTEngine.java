@@ -136,6 +136,7 @@ public final class BTEngine extends SessionManager {
         sp.set_int(settings_pack.int_types.stop_tracker_timeout.swigValue(), 0);
         sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
         sp.set_bool(settings_pack.bool_types.enable_dht.swigValue(), ctx.enableDht);
+        sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true);
 
         super.start(params);
     }
