@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.os.Bundle;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractFragment;
 
@@ -33,16 +32,5 @@ public class TransferDetailStatusFragment extends AbstractFragment {
     public TransferDetailStatusFragment() {
         super(R.layout.fragment_transfer_detail_status);
         setHasOptionsMenu(true);
-    }
-
-    public static TransferDetailStatusFragment newInstance(String text) {
-
-        TransferDetailStatusFragment f = new TransferDetailStatusFragment();
-        Bundle b = new Bundle();
-        b.putString("msg", text);
-
-        f.setArguments(b);
-
-        return f;
     }
 }

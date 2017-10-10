@@ -20,7 +20,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -40,19 +39,7 @@ public class TransferDetailTrackersFragment extends AbstractFragment {
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
-
-        Button addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
         //TODO: open a dialog to add a tracker
-    }
-
-    public static TransferDetailTrackersFragment newInstance(String text) {
-
-        TransferDetailTrackersFragment f = new TransferDetailTrackersFragment();
-        Bundle b = new Bundle();
-        b.putString("msg", text);
-
-        f.setArguments(b);
-
-        return f;
+        //Button addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
 }
