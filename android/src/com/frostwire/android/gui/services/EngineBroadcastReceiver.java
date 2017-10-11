@@ -212,21 +212,19 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             if (!SystemUtils.isPrimaryExternalPath(new File(path))) {
                 UIUtils.broadcastAction(context, Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
 
-                if (SystemUtils.hasKitKatOrNewer()) {
-                    final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
-                    if (privateDir.exists() && privateDir.isDirectory()) {
-                        Thread t = new Thread(new Runnable() {
+                final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
+                if (privateDir.exists() && privateDir.isDirectory()) {
+                    Thread t = new Thread(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                Platforms.fileSystem().scan(privateDir);
-                            }
-                        });
+                        @Override
+                        public void run() {
+                            Platforms.fileSystem().scan(privateDir);
+                        }
+                    });
 
-                        t.setName("Private MediaScanning");
-                        t.setDaemon(true);
-                        t.start();
-                    }
+                    t.setName("Private MediaScanning");
+                    t.setDaemon(true);
+                    t.start();
                 }
             }
         } catch (Throwable e) {

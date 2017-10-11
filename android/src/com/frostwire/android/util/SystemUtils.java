@@ -23,8 +23,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Process;
 import android.os.StatFs;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.os.EnvironmentCompat;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.gui.services.EngineService;
@@ -47,7 +45,6 @@ public final class SystemUtils {
 
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
-    private static final int VERSION_SDK_KITKAT_4_4 = 19;
     private static final int VERSION_SDK_NOUGAT_7_0 = 24;
 
     private SystemUtils() {
@@ -116,20 +113,7 @@ public final class SystemUtils {
             return false;
         }
 
-        boolean result = false;
-
-        if (hasKitKatOrNewer()) {
-            result = Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(path));
-        } else {
-            try {
-                String[] l = path.list();
-                result = l != null && l.length > 0;
-            } catch (Throwable e) {
-                LOG.error("Error detecting secondary external storage state", e);
-            }
-        }
-
-        return result;
+        return Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path));
     }
 
     public static boolean isPrimaryExternalPath(File path) {
@@ -153,50 +137,19 @@ public final class SystemUtils {
      * Use this instead ContextCompat
      */
     public static File[] getExternalFilesDirs(Context context) {
-        if (hasKitKatOrNewer()) {
-            List<File> dirs = new LinkedList<>();
+        List<File> dirs = new LinkedList<>();
 
-            for (File f : ContextCompat.getExternalFilesDirs(context, null)) {
-                if (f != null) {
-                    dirs.add(f);
-                }
+        for (File f : context.getExternalFilesDirs(null)) {
+            if (f != null) {
+                dirs.add(f);
             }
-
-            return dirs.toArray(new File[dirs.size()]);
-        } else {
-            List<File> dirs = new LinkedList<>();
-
-            dirs.add(context.getExternalFilesDir(null));
-
-            try {
-                String secondaryStorages = System.getenv("SECONDARY_STORAGE");
-                if (secondaryStorages != null) {
-                    String[] storages = secondaryStorages.split(File.pathSeparator);
-                    for (String s : storages) {
-                        dirs.add(new File(s));
-                    }
-                }
-            } catch (Throwable e) {
-                LOG.error("Unable to get secondary external storages", e);
-            }
-
-            return dirs.toArray(new File[dirs.size()]);
         }
+
+        return dirs.toArray(new File[dirs.size()]);
     }
 
     private static boolean hasSdkOrNewer(int versionCode) {
         return Build.VERSION.SDK_INT >= versionCode;
-    }
-
-    /**
-     * Used to determine if the device is running
-     * KitKat (Android 4.4) or greater.
-     *
-     * @return {@code true} if the device is running KitKat or greater,
-     * {@code false} otherwise
-     */
-    public static boolean hasKitKatOrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_KITKAT_4_4);
     }
 
     /**

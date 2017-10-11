@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.MediaStore;
@@ -552,12 +551,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     public void selectNewPhoto() {
         removeFromCache();
         final Intent intent = new Intent();
-        if (Build.VERSION.SDK_INT < 19) {
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-        } else {
-            intent.setAction("android.intent.action.OPEN_DOCUMENT"); //Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-        }
+        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
         startActivityForResult(intent, NEW_PHOTO);
     }
