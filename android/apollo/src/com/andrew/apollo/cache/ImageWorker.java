@@ -412,17 +412,6 @@ public abstract class ImageWorker {
     }
 
     /**
-     * Subclasses should override this to define any processing or work that
-     * must happen to produce the final {@link Bitmap}. This will be executed in
-     * a background thread and be long running.
-     *
-     * @param key The key to identify which image to process, as provided by
-     *            {@link ImageWorker#loadImage(mKey, ImageView)}
-     * @return The processed {@link Bitmap}.
-     */
-    protected abstract Bitmap processBitmap(String key);
-
-    /**
      * Used to define what type of image URL to fetch for, artist or album.
      */
     public enum ImageType {
