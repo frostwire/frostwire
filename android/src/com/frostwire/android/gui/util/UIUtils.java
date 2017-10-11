@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -560,14 +559,6 @@ public final class UIUtils {
         DisplayMetrics dm = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         return dm.heightPixels > dm.widthPixels;
-    }
-
-    public static Uri getUriFromResourceId(Context context, int resourceId) {
-        Resources r = context.getResources();
-        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
-                r.getResourcePackageName(resourceId) + '/'+
-                r.getResourceTypeName(resourceId) + '/' +
-                r.getResourceEntryName(resourceId));
     }
 
     public static boolean isMain() {
