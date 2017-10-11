@@ -72,7 +72,7 @@ import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 public final class SoftwareUpdater {
 
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
+    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
     public interface ConfigurationUpdateListener {
         void onConfigurationUpdate(boolean updateAvailable);
@@ -198,7 +198,6 @@ public final class SoftwareUpdater {
 
     /**
      * @return true if there's an update available.
-     * @throws IOException
      */
     private boolean handleOTAUpdate() throws IOException {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
@@ -568,7 +567,7 @@ public final class SoftwareUpdater {
                 values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
             }
 
-            final ArrayAdapter adapter = new ArrayAdapter(getActivity(),
+            final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
                     R.layout.dialog_update_bullet,
                     R.id.dialog_update_bullets_checked_text_view,
                     values);
