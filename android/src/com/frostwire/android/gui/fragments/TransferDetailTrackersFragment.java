@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 /**
  * @author gubatron
@@ -30,11 +30,9 @@ import com.frostwire.android.gui.views.AbstractFragment;
  * @author marcelinkaaa
  */
 
-public class TransferDetailTrackersFragment extends AbstractFragment {
-
+public class TransferDetailTrackersFragment extends AbstractTransferDetailFragment {
     public TransferDetailTrackersFragment() {
-        super(R.layout.fragment_transfer_detail_trackers);
-        setHasOptionsMenu(true);
+        super(R.layout.fragment_transfer_detail_trackers, R.string.trackers);
     }
 
     @Override
