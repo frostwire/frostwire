@@ -18,9 +18,8 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.os.Bundle;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 /**
  * @author gubatron
@@ -28,21 +27,8 @@ import com.frostwire.android.gui.views.AbstractFragment;
  * @author marcelinkaaa
  */
 
-public class TransferDetailPiecesFragment extends AbstractFragment {
-
+public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
     public TransferDetailPiecesFragment() {
-        super(R.layout.fragment_transfer_detail_pieces);
-        setHasOptionsMenu(true);
-    }
-
-    public static TransferDetailPiecesFragment newInstance(String text) {
-
-        TransferDetailPiecesFragment f = new TransferDetailPiecesFragment();
-        Bundle b = new Bundle();
-        b.putString("msg", text);
-
-        f.setArguments(b);
-
-        return f;
+        super(R.layout.fragment_transfer_detail_pieces, R.string.pieces);
     }
 }

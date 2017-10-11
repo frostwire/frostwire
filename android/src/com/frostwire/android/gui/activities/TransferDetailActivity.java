@@ -18,7 +18,7 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.FragmentManager;
-import android.os.Bundle;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -32,8 +32,7 @@ import com.frostwire.android.gui.fragments.TransferDetailStatusFragment;
 import com.frostwire.android.gui.fragments.TransferDetailTrackersFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
-
-import java.util.HashMap;
+import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 public class TransferDetailActivity extends AbstractActivity {
 
@@ -42,95 +41,61 @@ public class TransferDetailActivity extends AbstractActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+    protected void onResume() {
+        super.onResume();
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, getFragmentManager());
 
         ViewPager mViewPager = findViewById(R.id.transfer_detail_viewpager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        if (mViewPager != null) {
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            // TODO: remember last selected
+            mViewPager.setCurrentItem(0);
 
-        TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
-        tabLayout.setupWithViewPager(mViewPager);
+            TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
+            tabLayout.setupWithViewPager(mViewPager);
+        }
     }
-
 
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        private final HashMap<Integer, AbstractFragment> detailFragments;
-        private final String[] titles;
+        private final AbstractTransferDetailFragment[] detailFragments;
 
-        SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(Context context, FragmentManager fm) {
             super(fm);
-            detailFragments = new HashMap<>();
-            titles = initPageTitles();
+            detailFragments = initFragments(context);
+        }
+
+        private AbstractTransferDetailFragment[] initFragments(Context context) {
+            // to change the order of the tabs, add/revmove tabs, just maintain here.
+            AbstractTransferDetailFragment[] fragments = {
+                    new TransferDetailStatusFragment(),
+                    new TransferDetailFilesFragment(),
+                    new TransferDetailDetailsFragment(),
+                    new TransferDetailTrackersFragment(),
+                    new TransferDetailPeersFragment(),
+                    new TransferDetailPiecesFragment()
+            };
+            // I do this here because android wants Fragments to be started with the default constructor
+            // I need the fragments to have a Context reference early so they can fetch the title strings
+            for (AbstractTransferDetailFragment fragment : fragments) {
+                fragment.setContext(context);
+            }
+            return fragments;
         }
 
         @Override
         public AbstractFragment getItem(int position) {
-            switch(position) {
-                case 0:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_details)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_details, new TransferDetailDetailsFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_details);
-                case 1:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_status)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_status, new TransferDetailStatusFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_status);
-                case 2:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_files)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_files, new TransferDetailFilesFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_files);
-                case 3:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_trackers)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_trackers, new  TransferDetailTrackersFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_trackers);
-                case 4:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_peers)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_peers, new TransferDetailPeersFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_peers);
-                case 5:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_pieces)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_pieces, new TransferDetailPiecesFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_pieces);
-                default:
-                    if (!detailFragments.containsKey(R.layout.fragment_transfer_detail_status)) {
-                        detailFragments.put(R.layout.fragment_transfer_detail_status, new TransferDetailStatusFragment());
-                    }
-                    return detailFragments.get(R.layout.fragment_transfer_detail_status);
-            }
+            return detailFragments[position];
         }
 
         @Override
         public int getCount() {
-            return titles.length;
+            return detailFragments.length;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles[position];
-        }
-
-        private String[] initPageTitles() {
-            String[] pageTitles = new String[] {
-                    getString(R.string.details),  // 0
-                    getString(R.string.status),   // 1
-                    getString(R.string.trackers), // 2
-                    getString(R.string.peers),    // 3
-                    getString(R.string.pieces),   // 4
-                    getString(R.string.status),   // 5
-            };
-            for (int i=0; i < pageTitles.length; i++) {
-                pageTitles[i] = pageTitles[i].toUpperCase();
-            }
-            return pageTitles;
+            return detailFragments[position].getTitle().toUpperCase();
         }
     }
 }

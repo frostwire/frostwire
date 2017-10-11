@@ -19,7 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 /**
  * @author gubatron
@@ -27,10 +27,8 @@ import com.frostwire.android.gui.views.AbstractFragment;
  * @author marcelinkaaa
  */
 
-public class TransferDetailStatusFragment extends AbstractFragment {
-
+public class TransferDetailStatusFragment extends AbstractTransferDetailFragment {
     public TransferDetailStatusFragment() {
-        super(R.layout.fragment_transfer_detail_status);
-        setHasOptionsMenu(true);
+        super(R.layout.fragment_transfer_detail_status, R.string.status);
     }
 }
