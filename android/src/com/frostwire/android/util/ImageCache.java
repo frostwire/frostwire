@@ -18,6 +18,7 @@
 
 package com.frostwire.android.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -45,9 +46,9 @@ final class ImageCache implements Cache {
     private final DiskCache disk;
     private final LruCache mem;
 
-    public ImageCache(File directory, long diskSize, int memSize) {
+    public ImageCache(Context context, File directory, long diskSize) {
         this.disk = createDiskCache(directory, diskSize);
-        this.mem = new LruCache(memSize);
+        this.mem = new LruCache(context);
     }
 
     @Override

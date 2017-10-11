@@ -34,9 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static android.content.Context.ACTIVITY_SERVICE;
-import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -60,17 +57,6 @@ public final class SystemUtils {
         }
 
         return new File(cache, directory);
-    }
-
-    public static int calculateMemoryCacheSize(Context context) {
-        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        boolean largeHeap = (context.getApplicationInfo().flags & FLAG_LARGE_HEAP) != 0;
-        int memoryClass = am.getMemoryClass();
-        if (largeHeap) {
-            memoryClass = am.getLargeMemoryClass();
-        }
-        // Target ~15% of the available heap.
-        return 1024 * 1024 * memoryClass / 7;
     }
 
     /**
