@@ -58,7 +58,6 @@ public final class ImageLoader {
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
 
-    private static final int MIN_DISK_CACHE_SIZE = 8 * 1024 * 1024; // 8MB
     private static final int MAX_DISK_CACHE_SIZE = 64 * 1024 * 1024; // 64MB
 
     private static final String SCHEME_IMAGE = "image";
@@ -150,9 +149,8 @@ public final class ImageLoader {
 
     private ImageLoader(Context context) {
         File directory = SystemUtils.getCacheDir(context, "picasso");
-        long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
         int memSize = SystemUtils.calculateMemoryCacheSize(context);
-        this.cache = new ImageCache(directory, diskSize, memSize);
+        this.cache = new ImageCache(directory, MAX_DISK_CACHE_SIZE, memSize);
         ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).

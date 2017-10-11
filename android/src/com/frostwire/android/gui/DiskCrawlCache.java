@@ -39,7 +39,6 @@ public final class DiskCrawlCache implements CrawlCache {
 
     private static final Logger LOG = Logger.getLogger(DiskCrawlCache.class);
 
-    private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
     private final WeakReference<Context> contextRef;
@@ -54,8 +53,7 @@ public final class DiskCrawlCache implements CrawlCache {
         Context context = contextRef.get();
         if (context != null) {
             File directory = SystemUtils.getCacheDir(context, "search");
-            long diskSize = SystemUtils.calculateDiskCacheSize(directory, MIN_DISK_CACHE_SIZE, MAX_DISK_CACHE_SIZE);
-            this.cache = createDiskCache(directory, diskSize);
+            this.cache = createDiskCache(directory, MAX_DISK_CACHE_SIZE);
         }
     }
 

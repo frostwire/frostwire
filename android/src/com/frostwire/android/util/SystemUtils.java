@@ -73,23 +73,6 @@ public final class SystemUtils {
         return 1024 * 1024 * memoryClass / 7;
     }
 
-    public static long calculateDiskCacheSize(File dir, int minSize, int maxSize) {
-        long size = minSize;
-
-        try {
-            StatFs statFs = new StatFs(dir.getAbsolutePath());
-            // TODO: upgrade these deprecated calls whenever we move past API 18
-            // to getBlockCountLong() and getBlockSizeLong().
-            long available = ((long) statFs.getBlockCount()) * statFs.getBlockSize();
-            // Target 2% of the total space.
-            size = available / 50;
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        // Bound inside min/max size for disk cache.
-        return Math.max(Math.min(size, maxSize), minSize);
-    }
-
     /**
      * returns true if the media is present
      * and mounted at its mount point with read/write access.
