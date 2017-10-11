@@ -3368,6 +3368,24 @@ public class MusicPlaybackService extends Service {
             }
         }
 
+        private void releaseMediaPlayerAsync(MediaPlayer mediaPlayer) {
+            Engine.instance().getThreadPool().execute(new MediaPlayerReleaseRunnable(mediaPlayer));
+        }
+
+        private static final class MediaPlayerReleaseRunnable implements Runnable {
+            private final WeakReference<MediaPlayer> mpRef;
+            MediaPlayerReleaseRunnable(MediaPlayer mediaPlayer) {
+                mpRef = Ref.weak(mediaPlayer);
+            }
+
+            @Override
+            public void run() {
+                if (Ref.alive(mpRef)) {
+                    mpRef.get().release();
+                }
+            }
+        }
+
         /**
          * Pauses playback. Call start() to resume.
          */
