@@ -19,7 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 /**
  * @author gubatron
@@ -27,10 +27,8 @@ import com.frostwire.android.gui.views.AbstractFragment;
  * @author marcelinkaaa
  */
 
-public class TransferDetailPeersFragment extends AbstractFragment {
-
+public class TransferDetailPeersFragment extends AbstractTransferDetailFragment {
     public TransferDetailPeersFragment() {
-        super(R.layout.fragment_transfer_detail_peers);
-        setHasOptionsMenu(true);
+        super(R.layout.fragment_transfer_detail_peers, R.string.peers);
     }
 }
