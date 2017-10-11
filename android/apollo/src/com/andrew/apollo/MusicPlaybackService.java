@@ -3362,9 +3362,8 @@ public class MusicPlaybackService extends Service {
         public void release() {
             stop();
             try {
-                mCurrentMediaPlayer.release();
+                releaseMediaPlayerAsync(mCurrentMediaPlayer);
             } catch (Throwable ignored) {
-
             }
         }
 
