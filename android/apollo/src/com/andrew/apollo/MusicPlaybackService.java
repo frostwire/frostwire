@@ -3092,23 +3092,44 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private static final class StartMediaPlayerRunnable implements Runnable {
-        private final WeakReference<MediaPlayer> mCurrentMediaPlayerRef;
+    private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer, MediaPlayerRunnable.Action action) {
+        Engine.instance().getThreadPool().execute(new MediaPlayerRunnable(mediaPlayer, action));
+    }
 
-        StartMediaPlayerRunnable(WeakReference<MediaPlayer> mCurrentMediaPlayerRef) {
-            this.mCurrentMediaPlayerRef = mCurrentMediaPlayerRef;
+    private static final class MediaPlayerRunnable implements Runnable {
+        enum Action {
+            START,
+            RELEASE,
+            RESET
+        }
+
+        private final WeakReference<MediaPlayer> mpRef;
+        private final Action action;
+
+        MediaPlayerRunnable(MediaPlayer mediaPlayer, Action action) {
+            mpRef = Ref.weak(mediaPlayer);
+            this.action = action;
         }
 
         @Override
         public void run() {
-            if (!Ref.alive(mCurrentMediaPlayerRef)) {
-                return;
+            if (Ref.alive(mpRef)) {
+                MediaPlayer mediaPlayer = mpRef.get();
+                try {
+                    switch (action) {
+                        case START:
+                            mediaPlayer.start();
+                            return;
+                        case RELEASE:
+                            mediaPlayer.release();
+                            return;
+                        case RESET:
+                            mediaPlayer.reset();
+                            return;
+                    }
+                } catch (Throwable ignored) {
+                }
             }
-            try {
-                mCurrentMediaPlayerRef.get().start();
-            } catch (Throwable ignored) {
-            }
-
         }
     }
 
@@ -3294,7 +3315,7 @@ public class MusicPlaybackService extends Service {
             }
 
             try {
-                mCurrentMediaPlayer.release();
+                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
             } catch (Throwable e) {
                 LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
             } finally {
@@ -3306,9 +3327,8 @@ public class MusicPlaybackService extends Service {
             if (mNextMediaPlayer == null) {
                 return;
             }
-
             try {
-                mNextMediaPlayer.release();
+                mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
             } catch (Throwable e) {
                 LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
             } finally {
@@ -3336,11 +3356,10 @@ public class MusicPlaybackService extends Service {
          * Starts or resumes playback.
          */
         public void start() {
-            StartMediaPlayerRunnable startMediaPlayerRunnable = new StartMediaPlayerRunnable(Ref.weak(mCurrentMediaPlayer));
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().execute(startMediaPlayerRunnable);
+                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.START);
             } else {
-                startMediaPlayerRunnable.run();
+                new MediaPlayerRunnable(mCurrentMediaPlayer, MediaPlayerRunnable.Action.START).run();
             }
         }
 
@@ -3349,12 +3368,16 @@ public class MusicPlaybackService extends Service {
          */
         public void stop() {
             try {
-                mCurrentMediaPlayer.reset();
+                try {
+                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RESET);
+                } catch (Throwable ignored) {
+                }
                 mIsInitialized = false;
             } catch (Throwable t) {
                 // recover from possible IllegalStateException caused by native _reset() method.
             }
         }
+
 
         /**
          * Releases resources associated with this MediaPlayer object.
@@ -3362,26 +3385,8 @@ public class MusicPlaybackService extends Service {
         public void release() {
             stop();
             try {
-                releaseMediaPlayerAsync(mCurrentMediaPlayer);
+                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
             } catch (Throwable ignored) {
-            }
-        }
-
-        private void releaseMediaPlayerAsync(MediaPlayer mediaPlayer) {
-            Engine.instance().getThreadPool().execute(new MediaPlayerReleaseRunnable(mediaPlayer));
-        }
-
-        private static final class MediaPlayerReleaseRunnable implements Runnable {
-            private final WeakReference<MediaPlayer> mpRef;
-            MediaPlayerReleaseRunnable(MediaPlayer mediaPlayer) {
-                mpRef = Ref.weak(mediaPlayer);
-            }
-
-            @Override
-            public void run() {
-                if (Ref.alive(mpRef)) {
-                    mpRef.get().release();
-                }
             }
         }
 
