@@ -47,7 +47,7 @@ public final class DiskCache {
 
     private final DiskLruCache cache;
 
-    public DiskCache(File directory, long size) throws IOException {
+    public DiskCache(File directory, long size) {
         this.cache = DiskLruCache.create(FileSystem.SYSTEM, directory, APP_VERSION, VALUE_COUNT, size);
     }
 
