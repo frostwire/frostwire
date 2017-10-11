@@ -186,7 +186,7 @@ public final class NavigationMenu {
 
     private void onUpdateButtonClicked(Context context) {
         hide();
-        SoftwareUpdater.instance().notifyUserAboutUpdate(context);
+        SoftwareUpdater.getInstance().notifyUserAboutUpdate(context);
     }
 
     private AdMenuItemView initAdMenuItemListener(final Activity activity) {

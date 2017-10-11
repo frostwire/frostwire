@@ -92,19 +92,18 @@ public final class SoftwareUpdater {
 
     private final Set<ConfigurationUpdateListener> configurationUpdateListeners;
 
-    private static SoftwareUpdater instance;
-
-    public static SoftwareUpdater instance() {
-        if (instance == null) {
-            instance = new SoftwareUpdater();
-        }
-        return instance;
-    }
-
     private SoftwareUpdater() {
         this.oldVersion = false;
         this.latestVersion = Constants.FROSTWIRE_VERSION_STRING;
         this.configurationUpdateListeners = new HashSet<>();
+    }
+
+    private static class Loader {
+        static final SoftwareUpdater INSTANCE = new SoftwareUpdater();
+    }
+
+    public static SoftwareUpdater getInstance() {
+        return Loader.INSTANCE;
     }
 
     public void checkForUpdate(final Context context) {

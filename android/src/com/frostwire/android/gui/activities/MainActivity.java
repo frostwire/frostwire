@@ -242,7 +242,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         setupInitialFragment(savedInstanceState);
         playerSubscription = TimerService.subscribe(((MiniPlayerView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
-        SoftwareUpdater.instance().addConfigurationUpdateListener(this);
+        SoftwareUpdater.getInstance().addConfigurationUpdateListener(this);
         setupActionBar();
     }
 
@@ -590,7 +590,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         }
 
         //avoid memory leaks when the device is tilted and the menu gets recreated.
-        SoftwareUpdater.instance().removeConfigurationUpdateListener(this);
+        SoftwareUpdater.getInstance().removeConfigurationUpdateListener(this);
 
         if (mToken != null) {
             MusicUtils.unbindFromService(mToken);
@@ -620,7 +620,7 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
                 Engine.instance().startServices(); // it's necessary for the first time after wizard
             }
         }
-        SoftwareUpdater.instance().checkForUpdate(this);
+        SoftwareUpdater.getInstance().checkForUpdate(this);
     }
 
     private void checkSDPermission() {
