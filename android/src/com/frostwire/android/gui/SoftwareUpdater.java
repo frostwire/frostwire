@@ -78,8 +78,6 @@ public final class SoftwareUpdater {
         void onConfigurationUpdate(boolean updateAvailable);
     }
 
-    private static final String TAG = "FW.SoftwareUpdater";
-
     private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
     private static final String UPDATE_ACTION_OTA = "ota";
@@ -151,7 +149,7 @@ public final class SoftwareUpdater {
 
                     return handleOTAUpdate();
                 } catch (Throwable e) {
-                    Log.e(TAG, "Failed to check/retrieve/update the update information", e);
+                    LOG.error("Failed to check/retrieve/update the update information", e);
                 }
 
                 return false;
@@ -277,7 +275,7 @@ public final class SoftwareUpdater {
                 });
             }
         } catch (Throwable e) {
-            Log.e(TAG, "Failed to notify update", e);
+            LOG.error("Failed to notify update", e);
             updateTimestamp = -1; // try again next time MainActivity is resumed
         }
     }
