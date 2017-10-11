@@ -18,7 +18,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
@@ -158,7 +157,9 @@ public class NotificationHelper {
                     isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
         }
         try {
-            mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
+            if (mNotification != null) {
+                mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
+            }
         } catch (SecurityException t) {
             // java.lang.SecurityException
         }
