@@ -1744,12 +1744,33 @@ public class MusicPlaybackService extends Service {
             case PLAYSTATE_CHANGED:
             case POSITION_CHANGED:
             case PLAYSTATE_STOPPED:
-                mRemoteControlClient.setPlaybackState(playState);
+                remoteControlClientSetPlaybackStateAsync(playState);
                 break;
             case META_CHANGED:
             case QUEUE_CHANGED:
                 changeQueueAsync(playState);
                 break;
+        }
+    }
+
+    private void remoteControlClientSetPlaybackStateAsync(int playState) {
+        Engine.instance().getThreadPool().execute(new SetPlaybackStateRunnable(mRemoteControlClient, playState));
+    }
+
+    private final static class SetPlaybackStateRunnable implements Runnable {
+        private final WeakReference<RemoteControlClient> rcRef;
+        private final int playState;
+
+        public SetPlaybackStateRunnable(RemoteControlClient rc, int playState) {
+            rcRef = Ref.weak(rc);
+            this.playState = playState;
+        }
+
+        @Override
+        public void run() {
+            if (Ref.alive(rcRef)) {
+                rcRef.get().setPlaybackState(playState);
+            }
         }
     }
 
