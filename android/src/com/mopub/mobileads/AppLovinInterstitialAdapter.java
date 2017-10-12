@@ -20,6 +20,7 @@ package com.mopub.mobileads;
 import android.app.Activity;
 import android.content.Context;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
@@ -67,6 +68,7 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
         final AppLovinAd adToRender = lastReceived;
         if (adToRender != null) {
             LOG.info("Showing MoPub-AppLovin interstitial ad");
+            final boolean wasPlayingMusic = MusicUtils.isPlaying();
             parentActivity.runOnUiThread(new Runnable() {
                 public void run() {
                     AppLovinInterstitialAdDialog inter = AppLovinInterstitialAd.create(sdk, parentActivity);
@@ -79,6 +81,10 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                     inter.setAdDisplayListener(new AppLovinAdDisplayListener() {
                         @Override
                         public void adDisplayed(AppLovinAd appLovinAd) {
+                            if (wasPlayingMusic) {
+                                LOG.info("adDisplayed(): wasPlayingMusic, ensuring music playback continues");
+                                MusicUtils.play();
+                            }
                             mInterstitialListener.onInterstitialShown();
                         }
 
