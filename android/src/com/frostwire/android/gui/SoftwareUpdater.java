@@ -56,8 +56,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -502,11 +505,16 @@ public final class SoftwareUpdater {
     }
 
     public static class SoftwareUpdaterDialog extends AbstractDialog {
-        private static Update update;
 
         public static SoftwareUpdaterDialog newInstance(Update update) {
-            SoftwareUpdaterDialog.update = update;
-            return new SoftwareUpdaterDialog();
+            SoftwareUpdaterDialog dlg = new SoftwareUpdaterDialog();
+
+            Bundle args = new Bundle();
+            args.putSerializable("updateMessages", new HashMap<>(update.updateMessages));
+            args.putStringArrayList("changelog", new ArrayList<>(update.changelog));
+            dlg.setArguments(args);
+
+            return dlg;
         }
 
         public SoftwareUpdaterDialog() {
@@ -515,7 +523,12 @@ public final class SoftwareUpdater {
 
         @Override
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-            String message = StringUtils.getLocaleString(update.updateMessages, getString(R.string.update_message));
+            Bundle args = getArguments();
+            @SuppressWarnings("unchecked")
+            HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
+            ArrayList<String> changelog = args.getStringArrayList("changelog");
+
+            String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));
 
             TextView title = findView(dlg, R.id.dialog_default_update_title);
             title.setText(R.string.update_title);
@@ -524,9 +537,9 @@ public final class SoftwareUpdater {
             text.setText(message);
 
             final ListView listview = findView(dlg, R.id.dialog_default_update_list_view);
-            String[] values = new String[update.changelog.size()];
+            String[] values = new String[changelog.size()];
             for (int i = 0; i < values.length; i++) {
-                values[i] = String.valueOf(Html.fromHtml("&#8226; " + update.changelog.get(i)));
+                values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
             }
 
             final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
