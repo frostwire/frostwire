@@ -18,30 +18,21 @@
 package com.frostwire.android.gui;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
@@ -56,15 +47,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
 /**
  * @author gubatron
@@ -73,7 +59,7 @@ import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 public final class SoftwareUpdater {
 
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = true; // debug flag.
+    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
     private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
@@ -245,7 +231,8 @@ public final class SoftwareUpdater {
                 }
 
                 LOG.info("notifyUserAboutUpdate(): showing update dialog.");
-                SoftwareUpdaterDialog.newInstance(update).show(((Activity) context).getFragmentManager());
+                SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(update.updateMessages, update.changelog);
+                dlg.show(((Activity) context).getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
@@ -468,76 +455,5 @@ public final class SoftwareUpdater {
         int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
         int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
-    }
-
-    public static class SoftwareUpdaterDialog extends AbstractDialog {
-
-        public static SoftwareUpdaterDialog newInstance(Update update) {
-            SoftwareUpdaterDialog dlg = new SoftwareUpdaterDialog();
-
-            Bundle args = new Bundle();
-            args.putSerializable("updateMessages", new HashMap<>(update.updateMessages));
-            args.putStringArrayList("changelog", new ArrayList<>(update.changelog));
-            dlg.setArguments(args);
-
-            return dlg;
-        }
-
-        public SoftwareUpdaterDialog() {
-            super(R.layout.dialog_default_update);
-        }
-
-        @Override
-        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-            Bundle args = getArguments();
-            @SuppressWarnings("unchecked")
-            HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
-            ArrayList<String> changelog = args.getStringArrayList("changelog");
-
-            String message = StringUtils.getLocaleString(updateMessages, getString(R.string.update_message));
-
-            TextView title = findView(dlg, R.id.dialog_default_update_title);
-            title.setText(R.string.update_title);
-
-            TextView text = findView(dlg, R.id.dialog_default_update_text);
-            text.setText(message);
-
-            final ListView listview = findView(dlg, R.id.dialog_default_update_list_view);
-            String[] values = new String[changelog.size()];
-            for (int i = 0; i < values.length; i++) {
-                values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
-            }
-
-            final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
-                    R.layout.dialog_update_bullet,
-                    R.id.dialog_update_bullets_checked_text_view,
-                    values);
-            listview.setAdapter(adapter);
-
-            // Set the save button action
-            Button noButton = findView(dlg, R.id.dialog_default_update_button_no);
-            noButton.setText(R.string.cancel);
-
-            Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
-            yesButton.setText(android.R.string.ok);
-            yesButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Engine.instance().stopServices(false);
-                    // since Nougat, a naked file path can't be put directly inside
-                    // an intent
-                    boolean useFileProvider = hasNougatOrNewer();
-                    UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
-                            Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
-                    dismiss();
-                }
-            });
-            noButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                }
-            });
-        }
     }
 }
