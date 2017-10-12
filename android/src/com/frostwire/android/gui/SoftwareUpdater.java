@@ -73,7 +73,7 @@ import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 public final class SoftwareUpdater {
 
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
+    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = true; // debug flag.
 
     private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
@@ -470,40 +470,6 @@ public final class SoftwareUpdater {
         int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
     }
 
-    private static class PositiveButtonOnClickListener implements View.OnClickListener {
-        private final Context context;
-        private final Dialog newSoftwareUpdaterDialog;
-
-        PositiveButtonOnClickListener(Context context, Dialog newSoftwareUpdaterDialog) {
-            this.context = context;
-            this.newSoftwareUpdaterDialog = newSoftwareUpdaterDialog;
-        }
-
-        @Override
-        public void onClick(View v) {
-            Engine.instance().stopServices(false);
-            // since Nougat, a naked file path can't be put directly inside
-            // an intent
-            boolean useFileProvider = hasNougatOrNewer();
-            UIUtils.openFile(context, getUpdateApk().getAbsolutePath(),
-                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
-            newSoftwareUpdaterDialog.dismiss();
-        }
-    }
-
-    private static class NegativeButtonOnClickListener implements View.OnClickListener {
-        private final Dialog newSoftwareUpdaterDialog;
-
-        NegativeButtonOnClickListener(Dialog newSoftwareUpdaterDialog) {
-            this.newSoftwareUpdaterDialog = newSoftwareUpdaterDialog;
-        }
-
-        @Override
-        public void onClick(View v) {
-            newSoftwareUpdaterDialog.dismiss();
-        }
-    }
-
     public static class SoftwareUpdaterDialog extends AbstractDialog {
 
         public static SoftwareUpdaterDialog newInstance(Update update) {
@@ -554,8 +520,24 @@ public final class SoftwareUpdater {
 
             Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
             yesButton.setText(android.R.string.ok);
-            yesButton.setOnClickListener(new PositiveButtonOnClickListener(getActivity(), dlg));
-            noButton.setOnClickListener(new NegativeButtonOnClickListener(dlg));
+            yesButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Engine.instance().stopServices(false);
+                    // since Nougat, a naked file path can't be put directly inside
+                    // an intent
+                    boolean useFileProvider = hasNougatOrNewer();
+                    UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
+                            Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
+                    dismiss();
+                }
+            });
+            noButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
         }
     }
 }
