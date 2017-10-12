@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
@@ -54,7 +55,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
-import com.frostwire.android.gui.SoftwareUpdater.ConfigurationUpdateListener;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
@@ -102,7 +102,7 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * @author gubatron
  * @author aldenml
  */
-public class MainActivity extends AbstractActivity implements ConfigurationUpdateListener,
+public class MainActivity extends AbstractActivity implements
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -131,6 +131,14 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     private BroadcastReceiver mainBroadcastReceiver;
     private boolean externalStoragePermissionsRequested = false;
     private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
+
+    private BroadcastReceiver notifyUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean value = intent.getBooleanExtra("value", false);
+            updateNavigationMenu(value);
+        }
+    };
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -242,7 +250,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         setupInitialFragment(savedInstanceState);
         playerSubscription = TimerService.subscribe(((MiniPlayerView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
         onNewIntent(getIntent());
-        SoftwareUpdater.getInstance().addConfigurationUpdateListener(this);
         setupActionBar();
     }
 
@@ -343,6 +350,10 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onResume() {
         super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(notifyUpdateReceiver,
+                new IntentFilter(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE));
+
         setupDrawer();
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
@@ -365,6 +376,9 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
     @Override
     protected void onPause() {
         super.onPause();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(notifyUpdateReceiver);
+
         if (mainBroadcastReceiver != null) {
             try {
                 unregisterReceiver(mainBroadcastReceiver);
@@ -588,9 +602,6 @@ public class MainActivity extends AbstractActivity implements ConfigurationUpdat
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
         }
-
-        //avoid memory leaks when the device is tilted and the menu gets recreated.
-        SoftwareUpdater.getInstance().removeConfigurationUpdateListener(this);
 
         if (mToken != null) {
             MusicUtils.unbindFromService(mToken);

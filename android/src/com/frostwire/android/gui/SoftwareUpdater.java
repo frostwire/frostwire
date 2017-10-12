@@ -26,8 +26,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -58,10 +58,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
@@ -74,10 +72,6 @@ public final class SoftwareUpdater {
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
     private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
-    public interface ConfigurationUpdateListener {
-        void onConfigurationUpdate(boolean updateAvailable);
-    }
-
     private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
     private static final String UPDATE_ACTION_OTA = "ota";
@@ -88,12 +82,9 @@ public final class SoftwareUpdater {
     private Update update;
     private long updateTimestamp;
 
-    private final Set<ConfigurationUpdateListener> configurationUpdateListeners;
-
     private SoftwareUpdater() {
         this.oldVersion = false;
         this.latestVersion = Constants.FROSTWIRE_VERSION_STRING;
-        this.configurationUpdateListeners = new HashSet<>();
     }
 
     private static class Loader {
@@ -106,10 +97,6 @@ public final class SoftwareUpdater {
 
     public void checkForUpdate(final Context context) {
         long now = System.currentTimeMillis();
-
-        if (context instanceof ConfigurationUpdateListener) {
-            addConfigurationUpdateListener((ConfigurationUpdateListener) context);
-        }
 
         if (now - updateTimestamp < UPDATE_MESSAGE_TIMEOUT) {
             return;
@@ -185,7 +172,9 @@ public final class SoftwareUpdater {
                 }
 
                 //nav menu or other components always needs to be updated after we read the config.
-                notifyConfigurationUpdateListeners(result);
+                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+                intent.putExtra("value", result);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
         };
 
@@ -234,14 +223,6 @@ public final class SoftwareUpdater {
             }
         }
         return false;
-    }
-
-    public void addConfigurationUpdateListener(ConfigurationUpdateListener listener) {
-        try {
-            configurationUpdateListeners.add(listener);
-        } catch (Throwable ignored) {
-            LOG.error("Could not add configuration update listener", ignored);
-        }
     }
 
     private static File getUpdateApk() {
@@ -419,16 +400,6 @@ public final class SoftwareUpdater {
         }
     }
 
-    private void notifyConfigurationUpdateListeners(boolean result) {
-        for (ConfigurationUpdateListener listener : configurationUpdateListeners) {
-            try {
-                listener.onConfigurationUpdate(result);
-            } catch (Throwable ignored) {
-                LOG.error(ignored.getMessage(), ignored);
-            }
-        }
-    }
-
     private static class Update {
         /**
          * version X.Y.Z
@@ -494,12 +465,6 @@ public final class SoftwareUpdater {
         int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
         int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
-    }
-
-    public void removeConfigurationUpdateListener(Object slideMenuFragment) {
-        if (configurationUpdateListeners.size() > 0) {
-            configurationUpdateListeners.remove(slideMenuFragment);
-        }
     }
 
     private static class PositiveButtonOnClickListener implements View.OnClickListener {
