@@ -385,7 +385,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
 
 
-        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details));
+        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details, download.getInfoHash()));
 
         if (download.isComplete()) {
             // Remove Torrent and Data action.
