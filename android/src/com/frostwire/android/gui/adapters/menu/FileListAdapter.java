@@ -156,7 +156,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return view;
     }
 
-    private View getGridItemView(int position, View view) {
+    private View getGridItemView(final int position, View view) {
         final FileDescriptorItem item = getItem(position);
         Context ctx = getContext();
 
@@ -181,7 +181,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                                         new MenuBuilder(menuAdapter).show();
                                     }
                                 } else {
-                                    localPlay(item.fd, v);
+                                    localPlay(item.fd, v, position);
                                 }
                             }
                         }
@@ -215,7 +215,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 if (selectAllMode) {
                     onItemClicked(v);
                 } else {
-                    localPlay(item.fd, v);
+                    localPlay(item.fd, v, getViewPosition(v));
                 }
             }
         });
@@ -319,7 +319,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if (canOpenFile) {
-                items.add(new OpenMenuAction(context, fd));
+                items.add(new OpenMenuAction(context, fd, getViewPosition(view)));
             }
 
             items.add(new FileInformationAction(context, fd));
@@ -373,7 +373,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     protected void onLocalPlay() {
     }
 
-    private void localPlay(FileDescriptor fd, View view) {
+    private void localPlay(FileDescriptor fd, View view, int position) {
         if (fd == null) {
             return;
         }
@@ -400,7 +400,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 } else {
                     if (fd.fileType == Constants.FILE_TYPE_PICTURES && ctx instanceof MainActivity) {
                         Intent intent = new Intent(ctx, ImageViewerActivity.class);
-                        intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR, fd.toBundle());
+                        intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR_BUNDLE, fd.toBundle());
+                        intent.putExtra(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, position);
                         ctx.startActivity(intent);
                     } else {
                         UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
@@ -751,7 +752,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 return;
             }
 
-            localPlay(fd, v);
+            localPlay(fd, v, getViewPosition(v));
         }
     }
 

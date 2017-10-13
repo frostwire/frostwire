@@ -257,7 +257,7 @@ public final class Librarian {
             int idCol = c.getColumnIndex(MediaColumns._ID);
             int pathCol = c.getColumnIndex(MediaColumns.DATA);
 
-            List<Integer> ids = new ArrayList<>();
+            List<Integer> ids = new ArrayList<>(0);
 
             while (c.moveToNext()) {
                 int id = Integer.valueOf(c.getString(idCol));
@@ -292,7 +292,7 @@ public final class Librarian {
      * @return List<FileDescriptor>
      */
     private List<FileDescriptor> getFiles(int offset, int pageSize, TableFetcher fetcher, String where, String[] whereArgs) {
-        List<FileDescriptor> result = new ArrayList<>();
+        List<FileDescriptor> result = new ArrayList<>(0);
 
         if (fetcher == null) {
             return result;
