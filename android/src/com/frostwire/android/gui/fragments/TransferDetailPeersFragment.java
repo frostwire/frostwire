@@ -29,6 +29,6 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 public class TransferDetailPeersFragment extends AbstractTransferDetailFragment {
     public TransferDetailPeersFragment() {
-        super(R.layout.fragment_transfer_detail_peers, R.string.peers);
+        super(R.layout.fragment_transfer_detail_peers);
     }
 }

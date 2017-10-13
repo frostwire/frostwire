@@ -29,6 +29,6 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 public class TransferDetailFilesFragment extends AbstractTransferDetailFragment {
     public TransferDetailFilesFragment() {
-        super(R.layout.fragment_transfer_detail_files, R.string.files);
+        super(R.layout.fragment_transfer_detail_files);
     }
 }
