@@ -23,7 +23,9 @@ import android.content.Intent;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.TransferDetailActivity;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.transfers.BittorrentDownload;
 
 /**
  * @author gubatron
@@ -32,14 +34,17 @@ import com.frostwire.android.gui.views.MenuAction;
  */
 public class TransferDetailsMenuAction extends MenuAction {
 
-    public TransferDetailsMenuAction(Context context, int stringId) {
+    private final String infohash;
+
+    public TransferDetailsMenuAction(Context context, int stringId, String infoHash) {
         super(context, R.drawable.contextmenu_icon_file, stringId);
+        this.infohash = infoHash;
     }
 
     @Override
     public void onClick(Context context) {
         Intent intent = new Intent(getContext(), TransferDetailActivity.class);
+        intent.putExtra("infoHash", infohash);
         context.startActivity(intent);
     }
-
 }

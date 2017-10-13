@@ -82,7 +82,6 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         try {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
         } catch (Throwable ignored) {
-
         }
     }
 
