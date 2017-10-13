@@ -19,6 +19,13 @@
 package com.frostwire.android.gui.views;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.frostwire.android.R;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.util.Logger;
 
 /**
  * @author aldenml
@@ -28,17 +35,71 @@ import android.os.Bundle;
  */
 
 
-public abstract class AbstractTransferDetailFragment extends AbstractFragment {
+public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
+    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+    private String tabTitle;
+    protected UIBittorrentDownload uiBittorrentDownload;
+
+    private TextView detailProgressTitleTextView;
+    private ProgressBar detailProgressProgressBar;
+    private TimerSubscription subscription;
+
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
         setHasOptionsMenu(true);
     }
 
-    public String getTitle() {
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            return arguments.getString("tabTitle");
+    public String getTabTitle() {
+        return tabTitle;
+    }
+
+    public AbstractTransferDetailFragment init(String tabTitle, UIBittorrentDownload uiBittorrentDownload) {
+        this.tabTitle = tabTitle;
+        this.uiBittorrentDownload = uiBittorrentDownload;
+        return this;
+    }
+
+    @Override
+    protected void initComponents(View rootView, Bundle savedInstanceState) {
+        super.initComponents(rootView, savedInstanceState);
+        initDetailProgress(rootView);
+        updateDetailProgress(uiBittorrentDownload);
+    }
+
+    /**
+     * This is a common section at the top of all the detail fragments
+     * which contains the title of the transfer and the current progress
+     * */
+    protected void initDetailProgress(View rootView) {
+        detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
+        detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
+    }
+
+    protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
+        if (detailProgressTitleTextView != null) {
+            detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
         }
-        return "[title]";
+
+        if (detailProgressProgressBar != null) {
+            detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
+        }
+    }
+
+    @Override
+    public void onTime() {
+        LOG.info("onTime(): " + uiBittorrentDownload.getInfoHash() + " :: " + uiBittorrentDownload.getProgress() + " % :: " + uiBittorrentDownload.getDisplayName());
+        updateDetailProgress(uiBittorrentDownload);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        subscription = TimerService.subscribe(this, 2);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        subscription.unsubscribe();
     }
 }

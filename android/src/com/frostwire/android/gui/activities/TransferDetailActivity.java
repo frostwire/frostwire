@@ -18,7 +18,6 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.FragmentManager;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -31,9 +30,15 @@ import com.frostwire.android.gui.fragments.TransferDetailPeersFragment;
 import com.frostwire.android.gui.fragments.TransferDetailPiecesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailStatusFragment;
 import com.frostwire.android.gui.fragments.TransferDetailTrackersFragment;
+import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.transfers.Transfer;
+
+import java.util.List;
 
 public class TransferDetailActivity extends AbstractActivity {
 
@@ -42,9 +47,23 @@ public class TransferDetailActivity extends AbstractActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, getFragmentManager());
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        String infoHash = getIntent().getStringExtra("infoHash");
+
+        if (infoHash == null || infoHash == "") {
+            throw new RuntimeException("Invalid infoHash received");
+        }
+
+        UIBittorrentDownload uiBittorrentDownload = (UIBittorrentDownload)
+                TransferManager.instance().getBittorrentDownload(infoHash);
+
+        if (uiBittorrentDownload == null) {
+            throw new RuntimeException("Could not find matching transfer for infoHash:"+infoHash);
+        }
+
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager(), uiBittorrentDownload);
 
         ViewPager mViewPager = findViewById(R.id.transfer_detail_viewpager);
         if (mViewPager != null) {
@@ -61,34 +80,21 @@ public class TransferDetailActivity extends AbstractActivity {
 
         private final AbstractTransferDetailFragment[] detailFragments;
 
-        SectionsPagerAdapter(Context context, FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm, UIBittorrentDownload uiBittorrentDownload) {
             super(fm);
-            detailFragments = initFragments(context);
+            detailFragments = initFragments(uiBittorrentDownload);
         }
 
-        private AbstractTransferDetailFragment[] initFragments(Context context) {
-            // to change the order of the tabs, add/revmove tabs, just maintain here.
+        private AbstractTransferDetailFragment[] initFragments(UIBittorrentDownload uiBittorrentDownload) {
+            // to change the order of the tabs, add/remove tabs, just maintain here.
             AbstractTransferDetailFragment[] fragments = {
-                    new TransferDetailStatusFragment(),
-                    new TransferDetailFilesFragment(),
-                    new TransferDetailDetailsFragment(),
-                    new TransferDetailTrackersFragment(),
-                    new TransferDetailPeersFragment(),
-                    new TransferDetailPiecesFragment()
+                    new TransferDetailStatusFragment().init(getString(R.string.status), uiBittorrentDownload),
+                    new TransferDetailFilesFragment().init(getString(R.string.files), uiBittorrentDownload),
+                    new TransferDetailDetailsFragment().init(getString(R.string.details), uiBittorrentDownload),
+                    new TransferDetailTrackersFragment().init(getString(R.string.trackers), uiBittorrentDownload),
+                    new TransferDetailPeersFragment().init(getString(R.string.peers), uiBittorrentDownload),
+                    new TransferDetailPiecesFragment().init(getString(R.string.pieces), uiBittorrentDownload)
             };
-            String[] tabTitles = {
-                    getString(R.string.status),
-                    getString(R.string.files),
-                    getString(R.string.details),
-                    getString(R.string.trackers),
-                    getString(R.string.peers),
-                    getString(R.string.pieces)
-            };
-            for (int i=0; i < fragments.length; i++) {
-                Bundle bundle = new Bundle();
-                bundle.putString("tabTitle", tabTitles[i]);
-                fragments[i].setArguments(bundle);
-            }
             return fragments;
         }
 
@@ -104,7 +110,7 @@ public class TransferDetailActivity extends AbstractActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return detailFragments[position].getTitle().toUpperCase();
+            return detailFragments[position].getTabTitle().toUpperCase();
         }
     }
 }

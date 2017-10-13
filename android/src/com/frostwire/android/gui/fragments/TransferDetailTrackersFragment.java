@@ -37,6 +37,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
+        super.initComponents(v, savedInstanceState);
         //TODO: open a dialog to add a tracker
         //Button addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
