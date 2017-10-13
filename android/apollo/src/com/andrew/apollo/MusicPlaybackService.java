@@ -1772,7 +1772,6 @@ public class MusicPlaybackService extends Service {
                 try {
                     rcRef.get().setPlaybackState(playState);
                 } catch (Throwable ignored) {
-                    
                 }
             }
         }
