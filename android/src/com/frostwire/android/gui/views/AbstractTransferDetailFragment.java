@@ -18,11 +18,7 @@
 
 package com.frostwire.android.gui.views;
 
-import android.content.Context;
-
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
+import android.os.Bundle;
 
 /**
  * @author aldenml
@@ -33,22 +29,16 @@ import java.lang.ref.WeakReference;
 
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-    private WeakReference<Context> contextRef; //TransferDetailActivity
-    private final int titleStringId;
-    public AbstractTransferDetailFragment(int layoutId, int titleStringId) {
+    public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
-        this.titleStringId = titleStringId;
         setHasOptionsMenu(true);
     }
 
-    public void setContext(Context context) {
-        contextRef = Ref.weak(context);
-    }
-
     public String getTitle() {
-        if (Ref.alive(contextRef)) {
-            return contextRef.get().getString(titleStringId);
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            return arguments.getString("tabTitle");
         }
-        return "";
+        return "[title]";
     }
 }

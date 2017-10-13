@@ -18,8 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.content.Context;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
@@ -31,6 +29,6 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 public class TransferDetailDetailsFragment extends AbstractTransferDetailFragment {
     public TransferDetailDetailsFragment() {
-        super(R.layout.fragment_transfer_detail_details, R.string.details);
+        super(R.layout.fragment_transfer_detail_details);
     }
 }
