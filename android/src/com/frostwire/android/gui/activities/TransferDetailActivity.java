@@ -77,12 +77,12 @@ public class TransferDetailActivity extends AbstractActivity {
                     new TransferDetailPiecesFragment()
             };
             String[] tabTitles = {
-                    context.getString(R.string.status),
-                    context.getString(R.string.files),
-                    context.getString(R.string.details),
-                    context.getString(R.string.trackers),
-                    context.getString(R.string.peers),
-                    context.getString(R.string.pieces)
+                    getString(R.string.status),
+                    getString(R.string.files),
+                    getString(R.string.details),
+                    getString(R.string.trackers),
+                    getString(R.string.peers),
+                    getString(R.string.pieces)
             };
             for (int i=0; i < fragments.length; i++) {
                 Bundle bundle = new Bundle();
