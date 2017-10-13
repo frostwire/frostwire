@@ -106,8 +106,8 @@ public class MainActivity extends AbstractActivity implements
         OnDialogClickListener,
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
-    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
 
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
     private static final String CURRENT_FRAGMENT_KEY = "current_fragment";
@@ -116,35 +116,26 @@ public class MainActivity extends AbstractActivity implements
     private static boolean firstTime = true;
 
     private ServiceToken mToken;
-
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
+    private final Stack<Integer> fragmentsStack;
     private final MainController controller;
-
+    private boolean externalStoragePermissionsRequested = false;
     private NavigationMenu navigationMenu;
+    private Fragment currentFragment;
     private SearchFragment search;
     private MyFilesFragment library;
     private TransfersFragment transfers;
-
-    private Fragment currentFragment;
-    private final Stack<Integer> fragmentsStack;
-    private TimerSubscription playerSubscription;
     private BroadcastReceiver mainBroadcastReceiver;
-    private boolean externalStoragePermissionsRequested = false;
+    private BroadcastReceiver notifyUpdateReceiver;
+    private TimerSubscription playerSubscription;
     private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
-
-    private BroadcastReceiver notifyUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean value = intent.getBooleanExtra("value", false);
-            updateNavigationMenu(value);
-        }
-    };
 
     public MainActivity() {
         super(R.layout.activity_main);
-        this.controller = new MainController(this);
-        this.fragmentsStack = new Stack<>();
-        this.permissionsCheckers = initPermissionsCheckers();
+        controller = new MainController(this);
+        fragmentsStack = new Stack<>();
+        permissionsCheckers = initPermissionsCheckers();
+        notifyUpdateReceiver = new UpdateNavigationMenuBroadcastReceiver(this);
     }
 
     @Override
@@ -181,10 +172,6 @@ public class MainActivity extends AbstractActivity implements
 
         syncNavigationMenu();
         updateHeader(getCurrentFragment());
-    }
-
-    public void onConfigurationUpdate(boolean frostWireUpdateAvailable) {
-        updateNavigationMenu(frostWireUpdateAvailable);
     }
 
     public void shutdown() {
@@ -355,6 +342,7 @@ public class MainActivity extends AbstractActivity implements
                 new IntentFilter(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE));
 
         setupDrawer();
+
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
@@ -530,15 +518,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void registerMainBroadcastReceiver() {
-        mainBroadcastReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (Constants.ACTION_NOTIFY_SDCARD_MOUNTED.equals(intent.getAction())) {
-                    onNotifySdCardMounted();
-                }
-            }
-        };
+        mainBroadcastReceiver = new MainBroadcastReceiver(this);
         IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
         registerReceiver(mainBroadcastReceiver, bf);
     }
@@ -547,6 +527,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {
             // MIGHT DO: save checkedNavViewMenuItemId in bundle.
+            outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
             super.onSaveInstanceState(outState);
             saveLastFragment(outState);
             saveFragmentsStack(outState);
@@ -944,6 +925,11 @@ public class MainActivity extends AbstractActivity implements
         DrawerLayout drawerLayout = findView(R.id.activity_main_drawer_layout);
         Toolbar toolbar = findToolbar();
         navigationMenu = new NavigationMenu(controller, drawerLayout, toolbar);
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            updateNavigationMenu(intent.getBooleanExtra("updateAvailable", false));
+        }
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
@@ -1008,5 +994,40 @@ public class MainActivity extends AbstractActivity implements
         }
 
         return "file://" + target.getAbsolutePath();
+    }
+
+    private static final class MainBroadcastReceiver extends BroadcastReceiver {
+        private final WeakReference<MainActivity> activityRef;
+
+        MainBroadcastReceiver(MainActivity activity) {
+            activityRef = Ref.weak(activity);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Ref.alive(activityRef) && Constants.ACTION_NOTIFY_SDCARD_MOUNTED.equals(intent.getAction())) {
+                activityRef.get().onNotifySdCardMounted();
+            }
+        }
+    }
+
+    private static final class UpdateNavigationMenuBroadcastReceiver extends BroadcastReceiver {
+        private final WeakReference<MainActivity> activityRef;
+
+        UpdateNavigationMenuBroadcastReceiver(MainActivity activity) {
+            activityRef = Ref.weak(activity);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Ref.alive(activityRef)) {
+                boolean value = intent.getBooleanExtra("value", false);
+                activityRef.get().updateNavigationMenu(value);
+                Intent mainActivityIntent = activityRef.get().getIntent();
+                if (mainActivityIntent != null) {
+                    mainActivityIntent.putExtra("updateAvailable", value);
+                }
+            }
+        }
     }
 }
