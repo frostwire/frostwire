@@ -30,6 +30,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.gui.util.UIUtils;
@@ -143,6 +144,10 @@ public final class SoftwareUpdater {
 
             @Override
             protected void onPostExecute(Boolean result) {
+                //nav menu or other components always needs to be updated after we read the config.
+                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+                intent.putExtra("value", result);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
                 if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
                     notifyUserAboutUpdate(context);
@@ -159,11 +164,6 @@ public final class SoftwareUpdater {
                     SearchEngine pixabaySE = SearchEngine.PIXABAY;
                     pixabaySE.setActive(false);
                 }
-
-                //nav menu or other components always needs to be updated after we read the config.
-                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
-                intent.putExtra("value", result);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
         };
 
@@ -230,7 +230,11 @@ public final class SoftwareUpdater {
                     return;
                 }
 
-                LOG.info("notifyUserAboutUpdate(): showing update dialog.");
+               // Fresh runs with fast connections might send the broadcast intent before
+               // MainActivity has had a chance to register the broadcast receiver (onResume)
+               // therefore, the menu update icon will only show on the 2nd run only
+               ((MainActivity) context).updateNavigationMenu(true);
+
                 SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(update.updateMessages, update.changelog);
                 dlg.show(((Activity) context).getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {

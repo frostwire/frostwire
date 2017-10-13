@@ -232,7 +232,7 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
-        updateNavigationMenu(false);
+        updateNavigationMenu();
         setupFragments();
         setupInitialFragment(savedInstanceState);
         playerSubscription = TimerService.subscribe(((MiniPlayerView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
@@ -240,12 +240,22 @@ public class MainActivity extends AbstractActivity implements
         setupActionBar();
     }
 
-    private void updateNavigationMenu(boolean updateAvailable) {
+    public void updateNavigationMenu(boolean updateAvailable) {
+        LOG.info("updateNavigationMenu("+updateAvailable+")");
         if (navigationMenu == null) {
             setupDrawer();
         }
         if (updateAvailable) {
+            // make sure it will remember this, even if the menu gets destroyed
+            getIntent().putExtra("updateAvailable", true);
             navigationMenu.onUpdateAvailable();
+        }
+    }
+
+    private void updateNavigationMenu() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            updateNavigationMenu(intent.getBooleanExtra("updateAvailable", false));
         }
     }
 
@@ -343,11 +353,6 @@ public class MainActivity extends AbstractActivity implements
 
         setupDrawer();
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            updateNavigationMenu(intent.getBooleanExtra("updateAvailable", false));
-        }
-
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
@@ -357,6 +362,8 @@ public class MainActivity extends AbstractActivity implements
         checkLastSeenVersion();
         registerMainBroadcastReceiver();
         syncNavigationMenu();
+        updateNavigationMenu();
+
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
@@ -1022,11 +1029,11 @@ public class MainActivity extends AbstractActivity implements
         public void onReceive(Context context, Intent intent) {
             if (Ref.alive(activityRef)) {
                 boolean value = intent.getBooleanExtra("value", false);
-                activityRef.get().updateNavigationMenu(value);
                 Intent mainActivityIntent = activityRef.get().getIntent();
                 if (mainActivityIntent != null) {
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
+                activityRef.get().updateNavigationMenu(value);
             }
         }
     }
