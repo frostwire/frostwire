@@ -19,6 +19,7 @@ package com.frostwire.android.gui.activities;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -75,10 +76,18 @@ public class TransferDetailActivity extends AbstractActivity {
                     new TransferDetailPeersFragment(),
                     new TransferDetailPiecesFragment()
             };
-            // I do this here because android wants Fragments to be started with the default constructor
-            // I need the fragments to have a Context reference early so they can fetch the title strings
-            for (AbstractTransferDetailFragment fragment : fragments) {
-                fragment.setContext(context);
+            String[] tabTitles = {
+                    context.getString(R.string.status),
+                    context.getString(R.string.files),
+                    context.getString(R.string.details),
+                    context.getString(R.string.trackers),
+                    context.getString(R.string.peers),
+                    context.getString(R.string.pieces)
+            };
+            for (int i=0; i < fragments.length; i++) {
+                Bundle bundle = new Bundle();
+                bundle.putString("tabTitle", tabTitles[i]);
+                fragments[i].setArguments(bundle);
             }
             return fragments;
         }
