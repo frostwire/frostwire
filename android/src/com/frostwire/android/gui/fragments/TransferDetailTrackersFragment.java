@@ -32,7 +32,7 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 
 public class TransferDetailTrackersFragment extends AbstractTransferDetailFragment {
     public TransferDetailTrackersFragment() {
-        super(R.layout.fragment_transfer_detail_trackers, R.string.trackers);
+        super(R.layout.fragment_transfer_detail_trackers);
     }
 
     @Override
