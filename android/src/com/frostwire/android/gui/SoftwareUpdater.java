@@ -274,7 +274,7 @@ public final class SoftwareUpdater {
 
     private boolean isFrostWireOld(int myBuild, String latestBuild) {
         if (Constants.IS_BASIC_AND_DEBUG) {
-            myBuild += 40000;
+            myBuild += 10000;
         }
         boolean result;
         try {
