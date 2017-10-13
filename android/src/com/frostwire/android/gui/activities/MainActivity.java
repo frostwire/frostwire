@@ -441,11 +441,11 @@ public class MainActivity extends AbstractActivity implements
                 delayedOnResumeInterstitialRunnable = null;
                 return;
             }
-            //LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
+            LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
         }
 
-        LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable");
-        delayedOnResumeInterstitialRunnable = new DelayedOnResumeInterstitialRunnable(20000, this);
+        LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable attempt");
+        delayedOnResumeInterstitialRunnable = new DelayedOnResumeInterstitialRunnable(2000, this);
         Engine.instance().getThreadPool().execute(delayedOnResumeInterstitialRunnable);
     }
 
@@ -502,7 +502,7 @@ public class MainActivity extends AbstractActivity implements
         }
 
         public void cancel() {
-            //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel()");
+            LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel()");
             cancelled = true;
             if (Ref.alive(activityRef)) {
                 //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel() clearing runnable reference from MainActivity");
