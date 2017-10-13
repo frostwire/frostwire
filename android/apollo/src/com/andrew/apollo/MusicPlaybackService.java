@@ -1769,7 +1769,11 @@ public class MusicPlaybackService extends Service {
         @Override
         public void run() {
             if (Ref.alive(rcRef)) {
-                rcRef.get().setPlaybackState(playState);
+                try {
+                    rcRef.get().setPlaybackState(playState);
+                } catch (Throwable ignored) {
+                    
+                }
             }
         }
     }
