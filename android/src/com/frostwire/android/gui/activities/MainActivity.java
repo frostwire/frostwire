@@ -107,19 +107,19 @@ public class MainActivity extends AbstractActivity implements
         ServiceConnection,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
-    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
+    public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
     private static final String FRAGMENTS_STACK_KEY = "fragments_stack";
     private static final String CURRENT_FRAGMENT_KEY = "current_fragment";
     private static final String LAST_BACK_DIALOG_ID = "last_back_dialog";
     private static final String SHUTDOWN_DIALOG_ID = "shutdown_dialog";
     private static boolean firstTime = true;
+    private boolean externalStoragePermissionsRequested = false;
 
-    private ServiceToken mToken;
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
     private final Stack<Integer> fragmentsStack;
     private final MainController controller;
-    private boolean externalStoragePermissionsRequested = false;
+    private ServiceToken mToken;
     private NavigationMenu navigationMenu;
     private Fragment currentFragment;
     private SearchFragment search;
@@ -342,6 +342,11 @@ public class MainActivity extends AbstractActivity implements
                 new IntentFilter(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE));
 
         setupDrawer();
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            updateNavigationMenu(intent.getBooleanExtra("updateAvailable", false));
+        }
 
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
@@ -925,11 +930,6 @@ public class MainActivity extends AbstractActivity implements
         DrawerLayout drawerLayout = findView(R.id.activity_main_drawer_layout);
         Toolbar toolbar = findToolbar();
         navigationMenu = new NavigationMenu(controller, drawerLayout, toolbar);
-
-        Intent intent = getIntent();
-        if (intent != null) {
-            updateNavigationMenu(intent.getBooleanExtra("updateAvailable", false));
-        }
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
