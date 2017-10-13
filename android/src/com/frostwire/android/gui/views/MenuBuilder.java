@@ -53,7 +53,7 @@ public class MenuBuilder implements DialogInterface.OnClickListener, DialogInter
     private Dialog createDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(adapter.getContext());
 
-        //builder.setTitle(adapter.getTitle());
+        //builder.setTitle(adapter.getTabTitle());
         builder.setAdapter(adapter, this);
         builder.setInverseBackgroundForced(true);
 
