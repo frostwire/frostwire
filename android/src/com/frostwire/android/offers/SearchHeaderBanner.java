@@ -124,7 +124,7 @@ public class SearchHeaderBanner extends LinearLayout {
         boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
         boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || isTablet) && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
         if (!bannerVisible) {
-            LOG.info("updateComponents() not eligible for search banner display. adsDisabled=" + adsDisabled +
+            LOG.info("updateComponents(): not eligible for search banner display. adsDisabled=" + adsDisabled +
                     ", screenTallEnough=" + screenTallEnough +
                     ", isPortrait=" + isPortrait +
                     ", isTablet=" + isTablet +
@@ -135,6 +135,7 @@ public class SearchHeaderBanner extends LinearLayout {
         }
         setBannerViewVisibility(BannerType.MOPUB, false);
         loadFallbackBanner();
+        moPubView.setTesting(false);
         moPubView.setAutorefreshEnabled(true);
         moPubView.setAdUnitId("be0b959f15994fd5b56c997f63530bd0");
         String currentQuery = getCurrentQuery();
@@ -144,8 +145,9 @@ public class SearchHeaderBanner extends LinearLayout {
         moPubView.setBannerAdListener(moPubBannerListener);
         try {
             moPubView.loadAd();
+            LOG.info("updateComponents(): moPubView.loadAd()");
         } catch (Throwable e) {
-            LOG.warn("SearchFragment Mopub banner could not be loaded", e);
+            LOG.warn("updateComponents(): SearchFragment Mopub banner could not be loaded", e);
             loadFallbackBanner();
         }
         dismissBannerButton.setOnClickListener(new DismissBannerButtonClickListener(this));
@@ -256,6 +258,7 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
             if (searchHeaderBanner.getCurrentQuery() == null) {
+                LOG.info("onBannerLoaded() hiding, no ongoing query available");
                 searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
                 return;
             }
@@ -277,7 +280,7 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
             if (searchHeaderBanner.moPubView != null) {
-                onDestroy();
+                searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, false);
             }
             if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
                 searchHeaderBanner.loadFallbackBanner();
@@ -287,6 +290,18 @@ public class SearchHeaderBanner extends LinearLayout {
         @Override
         public void onBannerClicked(MoPubView banner) {
             //LOG.info("onBannerClicked: " + banner);
+            banner.forceRefresh();
+            if (!Ref.alive(searchHeaderBannerRef)) {
+                LOG.info("onBannerClicked() aborted, searchHeaderBanner reference lost");
+                return;
+            }
+            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            if (searchHeaderBanner.moPubView != null) {
+                searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, false);
+            }
+            if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
+                searchHeaderBanner.loadFallbackBanner();
+            }
         }
 
         @Override
@@ -354,7 +369,6 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             SearchHeaderBanner searchHeaderBanner = this.searchHeaderBanner.get();
             searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
-            searchHeaderBanner.moPubBannerListener.onDestroy();
             // basic or debug
             if (Constants.IS_BASIC_AND_DEBUG || Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 Activity activity = (Activity) searchHeaderBanner.getContext();

@@ -215,7 +215,6 @@ public final class SearchFragment extends AbstractFragment implements
             );
         }
         if (searchHeaderBanner != null) {
-            //searchHeaderBanner.onResume();
             searchHeaderBanner.setSearchFragmentReference(this);
             if (getCurrentQuery() == null || Offers.disabledAds()){
                 searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
@@ -224,15 +223,6 @@ public final class SearchFragment extends AbstractFragment implements
         if (getCurrentQuery() == null) {
             searchInput.setFileTypeCountersVisible(false);
         }
-    }
-
-    @Override
-    public void onPause() {
-        if (searchHeaderBanner != null) {
-            searchHeaderBanner.setSearchFragmentReference(this);
-            searchHeaderBanner.onDestroy();
-        }
-        super.onPause();
     }
 
     @Override
