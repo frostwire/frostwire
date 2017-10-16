@@ -129,7 +129,7 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/transfers_seeding_notification_top_padding"
                 android:layout_gravity="center_vertical"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
         </ScrollView>
 

@@ -257,25 +257,31 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
             Collections.sort(selectedStatusTransfers, transferComparator);
             adapter.updateList(selectedStatusTransfers);
-            int i = 0;
-            for (TransferStatus transferStatus : tabPositionToTransferStatus) {
-                if (transferStatus == selectedStatus) {
-                    TabLayout.Tab tab = tabLayout.getTabAt(i);
-                    if (tab != null && !tab.isSelected()) {
-                        tab.select();
-                    }
-                    break;
-                }
-                i++;
-            }
             if (selectedStatus == TransferStatus.SEEDING) {
                 handlePossibleSeedingSuggestions(allTransfers);
-            } else {
-                transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
             }
+
         } else if (this.getActivity() != null) {
             setupAdapter();
         }
+
+        // mark the selected tab
+        int i = 0;
+        for (TransferStatus transferStatus : tabPositionToTransferStatus) {
+            if (transferStatus == selectedStatus) {
+                TabLayout.Tab tab = tabLayout.getTabAt(i);
+                if (tab != null && !tab.isSelected()) {
+                    tab.select();
+                }
+                break;
+            }
+            i++;
+        }
+
+        if (selectedStatus != TransferStatus.SEEDING) {
+            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+        }
+
         // TODO: optimize these calls
         if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
