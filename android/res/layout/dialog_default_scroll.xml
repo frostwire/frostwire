@@ -65,7 +65,7 @@
             android:id="@+id/dialog_default_scroll_button_yes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
+            android:layout_marginStart="1dp"
             android:layout_weight="0.5"
             android:background="@color/app_background_white" />
     </LinearLayout>

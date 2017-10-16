@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Marcelina Knitter (@marcelinkaaa), Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
@@ -35,45 +36,37 @@
         style="@style/DefaultDialogTheme.MainText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/dialog_default_update_title"
-        android:paddingBottom="10dp"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:paddingTop="10dp" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dialog_default_update_title" />
 
     <ListView
         android:id="@+id/dialog_default_update_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/dialog_default_update_text"
         android:layout_above="@+id/dialog_default_update_buttons"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/dialog_default_update_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/basic_gray_medium"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0">
+        android:paddingBottom="5dp">
 
         <Button
             android:id="@+id/dialog_default_update_button_no"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:background="@color/app_background_white"
-            android:visibility="visible" />
+            android:layout_toStartOf="@+id/dialog_default_update_button_yes"
+            android:background="@color/app_background_white" />
 
         <Button
             android:id="@+id/dialog_default_update_button_yes"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
+            android:layout_alignParentEnd="true"
             android:background="@color/app_background_white" />
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>
