@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.util.Logger;
 
 /**
@@ -37,16 +38,20 @@ import com.frostwire.util.Logger;
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
     private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+    protected final TransferStateStrings transferStateStrings;
+
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
-
     private TextView detailProgressTitleTextView;
     private ProgressBar detailProgressProgressBar;
     private TimerSubscription subscription;
+    private TextView detailProgressStatusTextView;
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
         setHasOptionsMenu(true);
+        // we can pass null below since this map has already been initialized by TransferListAdapter
+        transferStateStrings = TransferStateStrings.getInstance(null);
     }
 
     public String getTabTitle() {
@@ -73,6 +78,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     protected void initDetailProgress(View rootView) {
         detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
         detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
+        detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
     }
 
     protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
@@ -82,6 +88,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
         if (detailProgressProgressBar != null) {
             detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
+        }
+
+        if (detailProgressStatusTextView != null) {
+            detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
     }
 
