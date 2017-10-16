@@ -494,54 +494,6 @@ public final class ImageCache {
     }
 
     /**
-     * Clears the disk and memory caches
-     */
-    public void clearCaches() {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                // Clear the disk cache
-                try {
-                    if (mDiskCache != null) {
-                        mDiskCache.delete();
-                        mDiskCache = null;
-                    }
-                } catch (final IOException e) {
-                    Log.e(TAG, "clearCaches - " + e);
-                }
-                // Clear the memory cache
-                evictAll();
-                return null;
-            }
-        }, (Void[])null);
-    }
-
-    /**
-     * Closes the disk cache associated with this ImageCache object. Note that
-     * this includes disk access so this should not be executed on the main/UI
-     * thread.
-     */
-    public void close() {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                if (mDiskCache != null) {
-                    try {
-                        if (!mDiskCache.isClosed()) {
-                            mDiskCache.close();
-                            mDiskCache = null;
-                        }
-                    } catch (final IOException e) {
-                        Log.e(TAG, "close - " + e);
-                    }
-                }
-                return null;
-            }
-        }, (Void[])null);
-    }
-
-    /**
      * Evicts all of the items from the memory cache and lets the system know
      * now would be a good time to garbage collect
      */

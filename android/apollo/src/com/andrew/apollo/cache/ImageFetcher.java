@@ -19,10 +19,6 @@ import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 /**
  * A subclass of {@link ImageWorker} that fetches images from a URL.
  */
@@ -99,15 +95,6 @@ public class ImageFetcher extends ImageWorker {
     public void setPauseDiskCache(final boolean pause) {
         if (mImageCache != null) {
             mImageCache.setPauseDiskCache(pause);
-        }
-    }
-
-    /**
-     * Clears the disk and memory caches
-     */
-    public void clearCaches() {
-        if (mImageCache != null) {
-            mImageCache.clearCaches();
         }
     }
 

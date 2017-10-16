@@ -115,17 +115,6 @@ public abstract class ImageWorker {
     }
 
     /**
-     * Closes the disk cache associated with this ImageCache object. Note that
-     * this includes disk access so this should not be executed on the main/UI
-     * thread.
-     */
-    public void close() {
-        if (mImageCache != null) {
-            mImageCache.close();
-        }
-    }
-
-    /**
      * flush() is called to synchronize up other methods that are accessing the
      * cache first
      */
