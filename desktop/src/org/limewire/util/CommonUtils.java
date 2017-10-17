@@ -25,7 +25,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
-import java.util.*;
+import java.util.Properties;
 
 /**
  * Provides convenience functionality ranging from getting user information,
@@ -55,21 +55,21 @@ import java.util.*;
  */
 public class CommonUtils {
 
-    public static final String FROSTWIRE_420_PREFS_DIR_NAME = ".frostwire4.20";
+    private static final String FROSTWIRE_420_PREFS_DIR_NAME = ".frostwire4.20";
 
-    public static final String FROSTWIRE_500_PREFS_DIR_NAME = ".frostwire5";
+    private static final String FROSTWIRE_500_PREFS_DIR_NAME = ".frostwire5";
 
-    public static final String META_SETTINGS_KEY_USER_SETTINGS_WINDOWS = "user.settings.dir.windows";
+    private static final String META_SETTINGS_KEY_USER_SETTINGS_WINDOWS = "user.settings.dir.windows";
 
-    public static final String META_SETTINGS_KEY_USER_SETTINGS_MAC = "user.settings.dir.mac";
+    private static final String META_SETTINGS_KEY_USER_SETTINGS_MAC = "user.settings.dir.mac";
 
-    public static final String META_SETTINGS_KEY_USER_SETTINGS_POSIX = "user.settings.dir.posix";
+    private static final String META_SETTINGS_KEY_USER_SETTINGS_POSIX = "user.settings.dir.posix";
 
-    public static final String META_SETTINGS_KEY_ROOT_FOLDER_WINDOWS = "user.settings.root_folder.windows";
+    private static final String META_SETTINGS_KEY_ROOT_FOLDER_WINDOWS = "user.settings.root_folder.windows";
 
-    public static final String META_SETTINGS_KEY_ROOT_FOLDER_MAC = "user.settings.root_folder.mac";
+    private static final String META_SETTINGS_KEY_ROOT_FOLDER_MAC = "user.settings.root_folder.mac";
 
-    public static final String META_SETTINGS_KEY_ROOT_FOLDER_POSIX = "user.settings.root_folder.posix";
+    private static final String META_SETTINGS_KEY_ROOT_FOLDER_POSIX = "user.settings.root_folder.posix";
 
     //private static Boolean IS_PORTABLE = null;
 
@@ -97,15 +97,6 @@ public class CommonUtils {
     }
 
     /**
-     * Return the user's name.
-     *
-     * @return the <tt>String</tt> denoting the user's name.
-     */
-    public static String getUserName() {
-        return System.getProperty("user.name");
-    }
-
-    /**
      * Gets an InputStream from a resource file.
      * 
      * @param location the location of the resource in the resource file
@@ -113,9 +104,9 @@ public class CommonUtils {
      * @throws IOException if the resource could not be located or there was
      *  another IO error accessing the resource
      */
-    public static InputStream getResourceStream(String location) throws IOException {
+    static InputStream getResourceStream(String location) throws IOException {
         ClassLoader cl = CommonUtils.class.getClassLoader();
-        URL resource = null;
+        URL resource;
 
         if (cl == null) {
             resource = ClassLoader.getSystemResource(location);
@@ -165,48 +156,6 @@ public class CommonUtils {
     }
 
     /**
-     * Returns the stack traces of all current Threads.
-     */
-    public static String getAllStackTraces() {
-        try {
-            Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-
-            List<Map.Entry<Thread, StackTraceElement[]>> sorted = new ArrayList<Map.Entry<Thread, StackTraceElement[]>>(map.entrySet());
-            Collections.sort(sorted, new Comparator<Map.Entry<Thread, StackTraceElement[]>>() {
-                public int compare(Map.Entry<Thread, StackTraceElement[]> a, Map.Entry<Thread, StackTraceElement[]> b) {
-                    return a.getKey().getName().compareTo(b.getKey().getName());
-                }
-            });
-
-            StringBuilder buffer = new StringBuilder();
-            for (Map.Entry<Thread, StackTraceElement[]> entry : sorted) {
-                Thread key = entry.getKey();
-                StackTraceElement[] value = entry.getValue();
-
-                buffer.append(key.getName()).append("\n");
-                for (int i = 0; i < value.length; i++) {
-                    buffer.append("    ").append(value[i]).append("\n");
-                }
-                buffer.append("\n");
-            }
-
-            // Remove the last '\n'
-            if (buffer.length() > 0) {
-                buffer.setLength(buffer.length() - 1);
-            }
-
-            return buffer.toString();
-        } catch (Exception err) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            pw.println("An error occured during getting the StackTraces of all active Threads");
-            err.printStackTrace(pw);
-            pw.flush();
-            return sw.toString();
-        }
-    }
-
-    /**
      * Converts a value in seconds to:
      *     "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
      *     "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
@@ -242,28 +191,6 @@ public class CommonUtils {
     }
 
     /**
-     * Returns a normalized and shortened valid file name taking the length
-     * of the path of the parent directory into account.
-     * 
-     * The name is cleared from illegal filesystem characters and it is ensured
-     * that the maximum path system on the system is not exceeded unless the 
-     * parent directory path has already the maximum path length.
-     *
-     * @param parentDir
-     * @param name
-     * @throws IOException if the parent directory's path takes up 
-     * {@link OSUtils#getMaxPathLength()}.
-     * @return
-     */
-    public static String convertFileName(File parentDir, String name) throws IOException {
-        int parentLength = parentDir.getAbsolutePath().getBytes(Charset.defaultCharset().name()).length;
-        if (parentLength >= OSUtils.getMaxPathLength() - 1 /* for the separator char*/) {
-            throw new IOException("Path too long");
-        }
-        return convertFileName(name, Math.min(OSUtils.getMaxPathLength() - parentLength - 1, 180));
-    }
-
-    /**
      * Cleans up the filename and truncates it to length of 180 bytes by calling
      * {@link #convertFileName(String, int) convertFileName(String, 180)}. 
      */
@@ -279,7 +206,7 @@ public class CommonUtils {
      * can take up
      * @return the cleaned up file name
      */
-    public static String convertFileName(String name, int maxBytes) {
+    private static String convertFileName(String name, int maxBytes) {
         // use default encoding which is also used for files judging from the
         // property name "file.encoding"
         try {
@@ -310,7 +237,7 @@ public class CommonUtils {
      * characters in <code>name</code> 
      * @throws IllegalArgumentException if maxBytes <= 0
      */
-    public static String convertFileName(String name, int maxBytes, Charset charSet) throws CharacterCodingException {
+    private static String convertFileName(String name, int maxBytes, Charset charSet) throws CharacterCodingException {
 
         if (maxBytes <= 0) {
             throw new IllegalArgumentException("maxBytes must be > 0");
@@ -345,18 +272,14 @@ public class CommonUtils {
                 }
             }
         }
-        for (int i = 0; i < ILLEGAL_CHARS_ANY_OS.length; i++)
-            name = name.replace(ILLEGAL_CHARS_ANY_OS[i], '_');
+        for (char ILLEGAL_CHARS_ANY_O : ILLEGAL_CHARS_ANY_OS) name = name.replace(ILLEGAL_CHARS_ANY_O, '_');
 
         if (OSUtils.isWindows() || OSUtils.isOS2()) {
-            for (int i = 0; i < ILLEGAL_CHARS_WINDOWS.length; i++)
-                name = name.replace(ILLEGAL_CHARS_WINDOWS[i], '_');
+            for (char ILLEGAL_CHARS_WINDOW : ILLEGAL_CHARS_WINDOWS) name = name.replace(ILLEGAL_CHARS_WINDOW, '_');
         } else if (OSUtils.isLinux() || OSUtils.isSolaris()) {
-            for (int i = 0; i < ILLEGAL_CHARS_UNIX.length; i++)
-                name = name.replace(ILLEGAL_CHARS_UNIX[i], '_');
+            for (char aILLEGAL_CHARS_UNIX : ILLEGAL_CHARS_UNIX) name = name.replace(aILLEGAL_CHARS_UNIX, '_');
         } else if (OSUtils.isMacOSX()) {
-            for (int i = 0; i < ILLEGAL_CHARS_MACOS.length; i++)
-                name = name.replace(ILLEGAL_CHARS_MACOS[i], '_');
+            for (char ILLEGAL_CHARS_MACO : ILLEGAL_CHARS_MACOS) name = name.replace(ILLEGAL_CHARS_MACO, '_');
         }
 
         return name;
@@ -365,9 +288,8 @@ public class CommonUtils {
     /**
      * Returns the prefix of <code>string</code> which takes up a maximum
      * of <code>maxBytes</code>.
-     * @throws CharacterCodingException 
      */
-    static String getPrefixWithMaxBytes(String string, int maxBytes, Charset charSet) throws CharacterCodingException {
+    private static String getPrefixWithMaxBytes(String string, int maxBytes, Charset charSet) throws CharacterCodingException {
         try {
             return new String(getMaxBytes(string, maxBytes, charSet), charSet.name());
         } catch (UnsupportedEncodingException uee) {
@@ -385,7 +307,7 @@ public class CommonUtils {
      * @throws CharacterCodingException if the char set's encoder could not
      * handle the characters in the string
      */
-    static byte[] getMaxBytes(String string, int maxBytes, Charset charSet) throws CharacterCodingException {
+    private static byte[] getMaxBytes(String string, int maxBytes, Charset charSet) throws CharacterCodingException {
         byte[] bytes = new byte[maxBytes];
         ByteBuffer out = ByteBuffer.wrap(bytes);
         CharBuffer in = CharBuffer.wrap(string.toCharArray());
@@ -413,7 +335,7 @@ public class CommonUtils {
 
     public static String getExecutableDirectory() {
 
-        Class<?> clazz = null;
+        Class<?> clazz;
         String path;
         String defaultPath = "/Applications/FrostWire.app/";
         String decodedPath = defaultPath;
@@ -442,7 +364,7 @@ public class CommonUtils {
      * This returns the validated directory, or throws an IOException
      * if it can't be validated.
      */
-    public static File validateSettingsDirectory(File dir) throws IOException {
+    private static File validateSettingsDirectory(File dir) throws IOException {
         dir = dir.getAbsoluteFile();
         if (!dir.isDirectory()) {
             dir.delete(); // delete whatever it may have been
@@ -473,9 +395,6 @@ public class CommonUtils {
      * 
      * If the directory can't be set (because it isn't a folder, can't be made into
      * a folder, or isn't readable and writable), an IOException is thrown.
-     * 
-     * @param settingsDir
-     * @throws IOException
      */
     public static void setUserSettingsDir(File settingsDir) throws IOException {
         if (settingsDirectory != null)
@@ -489,7 +408,7 @@ public class CommonUtils {
      * set, this returns the user's home directory.
      * 
      * settingsDirectory has already been set at this point as portable if we're on portable.
-     * @see LimeCoreGlue.preinstall()
+     * see LimeCoreGlue.preinstall()
      */
     public synchronized static File getUserSettingsDir() {
         if (settingsDirectory != null)
@@ -530,7 +449,7 @@ public class CommonUtils {
         File userDir = CommonUtils.getUserHomeDir();
 
         // Changing permissions without permission in Unix is rude
-        if (OSUtils.isWindows() && userDir != null && userDir.exists())
+        if (OSUtils.isWindows() && userDir.exists())
             FileUtils.setWriteable(userDir);
 
         File settingsDir = new File(userDir, FROSTWIRE_500_PREFS_DIR_NAME);
@@ -615,25 +534,19 @@ public class CommonUtils {
 
     /**
      * The root folder where all the default save directories exist.
-     * @return
      */
     public static File getPortableRootFolder() {
         Properties metaConfiguration = CommonUtils.loadMetaConfiguration();
         return getPortableRootFolder(metaConfiguration);
     }
 
-    public static File getPortableRootFolder(Properties metaConfiguration) {
+    private static File getPortableRootFolder(Properties metaConfiguration) {
         return getPortableMetaFile(metaConfiguration, CommonUtils.META_SETTINGS_KEY_ROOT_FOLDER_WINDOWS, CommonUtils.META_SETTINGS_KEY_ROOT_FOLDER_MAC, CommonUtils.META_SETTINGS_KEY_ROOT_FOLDER_POSIX);
     }
 
     /**
      * Get the file/dir pointed out by a configuration key form the .meta Properties object
      * depending on what operating system you are on.
-     * 
-     * @param metaConfiguration
-     * @param windowsKey
-     * @param macKey
-     * @param posixKey
      * @return The file if the key has been specified, otherwise null.
      */
     private static File getPortableMetaFile(Properties metaConfiguration, final String windowsKey, final String macKey, final String posixKey) {
