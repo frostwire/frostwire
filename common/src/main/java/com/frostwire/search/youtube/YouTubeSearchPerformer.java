@@ -18,13 +18,13 @@
 
 package com.frostwire.search.youtube;
 
-import com.frostwire.util.Logger;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.HtmlManipulator;
+import com.frostwire.util.Logger;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
 
     @Override
     protected List<? extends SearchResult> crawlResult(YouTubeSearchResult sr, byte[] data) throws Exception {
-        List<SearchResult> list = new LinkedList();
+        List<SearchResult> list = new LinkedList<>();
 
         String detailsUrl = sr.getDetailsUrl();
         List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, false);
@@ -107,7 +107,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         }
 
         YouTubePackageSearchResult packagedResult = new YouTubePackageSearchResult(sr, list);
-        List<SearchResult> results = new LinkedList();
+        List<SearchResult> results = new LinkedList<>();
         results.add(packagedResult);
         results.addAll(list);
         return results;
@@ -192,7 +192,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         }
     }
 
-    /**
+    /*
     public static void main(String[] args) throws UnsupportedEncodingException {
         byte[] readAllBytes = new byte[0];
         try {
