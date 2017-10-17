@@ -27,7 +27,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.util.Logger;
+
+import java.text.DecimalFormatSymbols;
 
 /**
  * @author aldenml
@@ -38,7 +39,9 @@ import com.frostwire.util.Logger;
 
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
-    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+    //private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+
+    private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
 
     private String tabTitle;
@@ -78,12 +81,12 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
      * This is a common section at the top of all the detail fragments
      * which contains the title of the transfer and the current progress
      * */
-    protected void initDetailProgress(View rootView) {
-        detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
-        detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
-        detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
-        detailProgressDownSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_down_speed);
-        detailProgressUpSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_up_speed);
+    protected void initDetailProgress(View v) {
+        detailProgressTitleTextView = findView(v, R.id.view_transfer_detail_progress_title);
+        detailProgressProgressBar = findView(v, R.id.view_transfer_detail_progress_progress);
+        detailProgressStatusTextView = findView(v, R.id.view_transfer_detail_progress_status);
+        detailProgressDownSpeedTextView = findView(v, R.id.view_transfer_detail_progress_down_speed);
+        detailProgressUpSpeedTextView = findView(v, R.id.view_transfer_detail_progress_up_speed);
     }
 
     protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
@@ -110,7 +113,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onTime() {
-        LOG.info("onTime(): " + uiBittorrentDownload.getInfoHash() + " :: " + uiBittorrentDownload.getProgress() + " % :: " + uiBittorrentDownload.getDisplayName());
+        //LOG.info("onTime(): " + uiBittorrentDownload.getInfoHash() + " :: " + uiBittorrentDownload.getProgress() + " % :: " + uiBittorrentDownload.getDisplayName());
         updateDetailProgress(uiBittorrentDownload);
     }
 
@@ -118,11 +121,55 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public void onResume() {
         super.onResume();
         subscription = TimerService.subscribe(this, 2);
+        onTime();
     }
 
     @Override
     public void onPause() {
         super.onPause();
         subscription.unsubscribe();
+    }
+
+    // All utility functions will be here for now
+
+    /**
+     * Converts a value in seconds to:
+     *     "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
+     *     "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
+     *     "m:ss" where m=minutes<60, ss=seconds
+     */
+    public static String seconds2time(long seconds) {
+        if (seconds == -1) {
+            if (INFINITY == null) {
+                INFINITY = DecimalFormatSymbols.getInstance().getInfinity();
+            }
+            return INFINITY;
+        }
+        long minutes = seconds / 60;
+        seconds = seconds - minutes * 60;
+        long hours = minutes / 60;
+        minutes = minutes - hours * 60;
+        long days = hours / 24;
+        hours = hours - days * 24;
+        // build the numbers into a string
+        StringBuilder time = new StringBuilder();
+        if (days != 0) {
+            time.append(Long.toString(days));
+            time.append(":");
+            if (hours < 10)
+                time.append("0");
+        }
+        if (days != 0 || hours != 0) {
+            time.append(Long.toString(hours));
+            time.append(":");
+            if (minutes < 10)
+                time.append("0");
+        }
+        time.append(Long.toString(minutes));
+        time.append(":");
+        if (seconds < 10)
+            time.append("0");
+        time.append(Long.toString(seconds));
+        return time.toString();
     }
 }
