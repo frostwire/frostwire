@@ -82,11 +82,9 @@
                 android:id="@+id/fragment_transfer_detail_files_file_type_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerInParent="true"
                 android:layout_marginEnd="5dp"
-                android:layout_marginRight="5dp"
                 android:contentDescription="@null"
                 android:src="@drawable/my_files_audio_icon_selector_menu" />
 
@@ -95,8 +93,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toEndOf="@+id/fragment_transfer_detail_files_file_type_icon"
-                android:layout_toLeftOf="@+id/fragment_transfer_detail_files_file_play_icon"
-                android:layout_toRightOf="@+id/fragment_transfer_detail_files_file_type_icon"
                 android:layout_toStartOf="@+id/fragment_transfer_detail_files_file_play_icon"
                 android:gravity="center_vertical">
 
@@ -120,10 +116,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_toEndOf="@+id/fragment_transfer_detail_files_file_progressbar"
-                    android:layout_toRightOf="@+id/fragment_transfer_detail_files_file_progressbar"
                     android:text="@string/transfer_detail_percentage_dummy"
                     android:textColor="@color/app_text_primary"
                     android:textSize="@dimen/text_x_small"
@@ -135,7 +129,6 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/fragment_transfer_detail_files_file_progressbar"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
                     android:text="@string/transfer_detail_upload_size_dummy"
                     android:textColor="@color/app_text_secondary"
                     android:textSize="@dimen/text_x_small" />
@@ -146,9 +139,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="5dp"
                 android:layout_marginStart="5dp"
                 android:contentDescription="@null"
                 android:src="@drawable/my_files_play_icon" />

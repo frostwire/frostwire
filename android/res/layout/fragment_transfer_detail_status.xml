@@ -216,7 +216,6 @@
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:text="@string/peers" />
 
@@ -225,7 +224,6 @@
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/fragment_transfer_detail_status_peers_label"
                 android:layout_marginTop="5dp"
@@ -237,7 +235,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="@string/seeds" />
 
             <TextView
@@ -246,7 +243,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_below="@+id/fragment_transfer_detail_status_seeds_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_number_of_number_dummy" />
@@ -274,7 +270,6 @@
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:text="@string/active_time" />
 
@@ -283,7 +278,6 @@
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/fragment_transfer_detail_status_active_time_label"
                 android:layout_marginTop="5dp"
@@ -295,7 +289,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="@string/seeding_time" />
 
             <TextView
@@ -304,7 +297,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_below="@+id/fragment_transfer_detail_status_seeding_time_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_time_dummy" />

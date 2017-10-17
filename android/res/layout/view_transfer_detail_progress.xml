@@ -24,8 +24,6 @@
     android:background="@color/app_background_body_light"
     android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
     android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-    android:paddingLeft="10dp"
-    android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
     android:paddingStart="10dp"
     android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
@@ -34,17 +32,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:src="@drawable/folder_icon"
         android:layout_centerInParent="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <RelativeLayout
         android:id="@+id/view_transfer_detail_progress_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@+id/view_transfer_detail_progress_folder_icon">
+        android:layout_toEndOf="@+id/view_transfer_detail_progress_folder_icon">
 
         <TextView
             android:id="@+id/view_transfer_detail_progress_title"
@@ -77,7 +74,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:layout_below="@+id/view_transfer_detail_progress_progress"
             android:layout_marginBottom="1dp"
             android:gravity="center_vertical"
