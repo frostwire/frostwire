@@ -16,14 +16,11 @@
  */
 package org.apache.commons.io.output;
  
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 //import org.apache.commons.io.input.ClosedInputStream;

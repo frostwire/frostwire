@@ -18,17 +18,12 @@
 package com.frostwire.util.http;
 
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ssl;
 import com.frostwire.util.UserAgentGenerator;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 

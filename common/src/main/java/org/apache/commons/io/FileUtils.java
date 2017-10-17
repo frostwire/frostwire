@@ -38,11 +38,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedInputStream;
-import java.util.zip.Checksum;
 
 //import org.apache.commons.io.filefilter.DirectoryFileFilter;
 //import org.apache.commons.io.filefilter.FalseFileFilter;

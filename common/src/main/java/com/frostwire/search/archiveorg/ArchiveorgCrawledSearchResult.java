@@ -20,7 +20,6 @@ package com.frostwire.search.archiveorg;
 
 import java.util.Locale;
 
-import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
