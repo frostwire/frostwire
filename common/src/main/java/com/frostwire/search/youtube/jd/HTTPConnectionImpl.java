@@ -464,8 +464,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
     }
 
     public boolean isConnected() {
-        if (this.httpSocket != null && this.httpSocket.isConnected()) { return true; }
-        return false;
+        return this.httpSocket != null && this.httpSocket.isConnected();
     }
 
     @Override
@@ -480,8 +479,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
     public boolean isOK() {
         final int code = this.getResponseCode();
         if (code >= 200 && code < 400) { return true; }
-        if (this.isResponseCodeAllowed(code)) { return true; }
-        return false;
+        return this.isResponseCodeAllowed(code);
     }
 
     protected boolean isResponseCodeAllowed(final int code) {

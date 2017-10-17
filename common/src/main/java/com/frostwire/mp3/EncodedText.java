@@ -74,8 +74,7 @@ public class EncodedText {
 		if (super.equals(obj)) return true;
 		EncodedText other = (EncodedText) obj;
 		if (textEncoding != other.textEncoding) return false;
-		if (! Arrays.equals(value, other.value)) return false;
-		return true;
+		return Arrays.equals(value, other.value);
 	}
 	
 	public static String unicodeBytesToString(byte[] bytes, String characterSet) {

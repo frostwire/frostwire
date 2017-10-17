@@ -265,14 +265,14 @@ public class Browser {
      */
     private void checkContentLengthLimit(final Request request) throws BrowserException {
         long length = -1;
-        if (request == null || request.getHttpConnection() == null || (length = request.getHttpConnection().getLongContentLength()) < 0) {
-            return;
-        } else if (length > this.limit) {
-            final Logger llogger = this.getLogger();
-            if (llogger != null) {
-                llogger.severe(request.printHeaders());
+        if (request != null && request.getHttpConnection() != null && (length = request.getHttpConnection().getLongContentLength()) >= 0) {
+            if (length > this.limit) {
+                final Logger llogger = this.getLogger();
+                if (llogger != null) {
+                    llogger.severe(request.printHeaders());
+                }
+                throw new BrowserException("Content-length too big", request.getHttpConnection());
             }
-            throw new BrowserException("Content-length too big", request.getHttpConnection());
         }
     }
 

@@ -24,7 +24,6 @@ public class MutableInteger {
 		if (! (obj instanceof MutableInteger)) return false;
 		if (super.equals(obj)) return true;
 		MutableInteger other = (MutableInteger) obj;
-		if (value != other.value) return false;
-		return true;
+		return value == other.value;
 	}
 }

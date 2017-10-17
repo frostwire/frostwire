@@ -32,8 +32,7 @@ public abstract class AbstractID3v2FrameData {
 	public boolean equals(Object obj) {
 		if (! (obj instanceof AbstractID3v2FrameData)) return false;
 		AbstractID3v2FrameData other = (AbstractID3v2FrameData) obj;
-		if (unsynchronisation != other.unsynchronisation) return false;
-		return true;
+		return unsynchronisation == other.unsynchronisation;
 	}
 
 	protected abstract void unpackFrameData(byte[] bytes) throws InvalidDataException;

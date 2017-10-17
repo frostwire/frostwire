@@ -58,11 +58,7 @@ public class Encoding {
     public static boolean isUrlCoded(final String str) {
         if (str == null) { return false; }
         try {
-            if (URLDecoder.decode(str, "UTF-8").length() != str.length()) {
-                return true;
-            } else {
-                return false;
-            }
+            return URLDecoder.decode(str, "UTF-8").length() != str.length();
         } catch (final Exception e) {
             return false;
         }
@@ -96,19 +92,14 @@ public class Encoding {
                 sb.append("%20");
             } else if (ch >= 33 && ch <= 38) {
                 sb.append(ch);
-                continue;
             } else if (ch >= 40 && ch <= 59) {
                 sb.append(ch);
-                continue;
             } else if (ch == 61) {
                 sb.append(ch);
-                continue;
             } else if (ch >= 63 && ch <= 95) {
                 sb.append(ch);
-                continue;
             } else if (ch >= 97 && ch <= 126) {
                 sb.append(ch);
-                continue;
             } else {
                 try {
                     sb.append(URLEncoder.encode(String.valueOf(ch), "UTF-8"));

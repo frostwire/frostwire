@@ -154,7 +154,6 @@ public class Cookie {
         }
         this.expireTime = -1;
         System.out.println("Cookie: no Format for " + expires + " found!");
-        return;
     }
 
     public void setHost(final String host) {
@@ -179,7 +178,6 @@ public class Cookie {
         }
         this.hostTime = -1;
         System.out.println("Cookie: no Format for " + date + " found!");
-        return;
     }
 
     public void setKey(final String key) {
