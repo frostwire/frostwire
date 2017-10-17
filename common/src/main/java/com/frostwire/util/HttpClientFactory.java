@@ -70,6 +70,6 @@ public class HttpClientFactory {
     private static boolean isWindowsXP() {
         String os = System.getProperty("os.name");
         os = os.toLowerCase(Locale.US);
-        return os.indexOf("windows xp") > -1;
+        return os.contains("windows xp");
     }
 }

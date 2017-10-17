@@ -386,7 +386,7 @@ public class Browser {
         // request.setFollowRedirects(doRedirects);
         this.forwardCookies(request);
         if (sendref) {
-            request.getHeaders().put("Referer", this.currentURL.toString());
+            request.getHeaders().put("Referer", this.currentURL);
         }
         if (this.headers != null) {
             this.mergeHeaders(request);
@@ -524,7 +524,7 @@ public class Browser {
     }
 
     public String getURL() {
-        return this.request == null ? null : this.request.getUrl().toString();
+        return this.request == null ? null : this.request.getUrl();
     }
 
     /**

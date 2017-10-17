@@ -4,7 +4,7 @@ public class BufferTools {
 
 	public static String byteBufferToString(byte[] bytes, int offset, int length) {
 		if (length < 1) return "";
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuffer = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			char ch;
 			if (bytes[offset + i] >= 0) ch = (char)bytes[offset + i];
@@ -47,7 +47,7 @@ public class BufferTools {
 	
 	public static String padStringRight(String s, int length, char padWith) {
 		if (s.length() >= length) return s;
-		StringBuffer stringBuffer = new StringBuffer(s);
+		StringBuilder stringBuffer = new StringBuilder(s);
 		while (stringBuffer.length() < length) {
 			stringBuffer.append(padWith);
 		}
@@ -118,16 +118,12 @@ public class BufferTools {
 
 	public static byte[] copyBuffer(byte[] bytes, int offset, int length) {
 		byte[] copy = new byte[length];
-		for (int i = 0; i < length; i++) {
-			copy[i] = bytes[offset + i];
-		}
+		System.arraycopy(bytes, offset + 0, copy, 0, length);
 		return copy;
 	}
 	
 	public static void copyIntoByteBuffer(byte[] bytes, int offset, int length, byte[] destBuffer, int destOffset) {
-		for (int i = offset; i < length; i++) {
-			destBuffer[destOffset + i] = bytes[i];
-		}
+		System.arraycopy(bytes, offset, destBuffer, destOffset + offset, length - offset);
 	}
 	
 	public static int sizeUnsynchronisationWouldAdd(byte[] bytes) {
@@ -187,10 +183,10 @@ public class BufferTools {
 	}
 
 	public static String substitute(String s, String replaceThis, String withThis) {
-		if (replaceThis.length() < 1 || s.indexOf(replaceThis) < 0) {
+		if (replaceThis.length() < 1 || !s.contains(replaceThis)) {
 			return s;
 		}
-		StringBuffer newString = new StringBuffer();
+		StringBuilder newString = new StringBuilder();
 		int lastPosition = 0;
 		int position = 0;
 		while ((position = s.indexOf(replaceThis, position)) >= 0) {
@@ -210,7 +206,7 @@ public class BufferTools {
 	}
 
 	public static String asciiOnly(String s) {
-		StringBuffer newString = new StringBuffer();
+		StringBuilder newString = new StringBuilder();
 		for (int i = 0; i < s.length(); i++) {
 			char ch = s.charAt(i);
 			if (ch < 32 || ch > 126) {

@@ -117,7 +117,7 @@ public class ID3v1Tag implements ID3v1 {
 	}
 	
 	private String numericsOnly(String s) {
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuffer = new StringBuilder();
 		for (int i = 0; i < s.length(); i++) {
 			char ch = s.charAt(i);
 			if (ch >= '0' && ch <= '9') {

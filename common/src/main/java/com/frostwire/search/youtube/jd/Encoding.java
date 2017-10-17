@@ -85,7 +85,7 @@ public class Encoding {
 
     public static String urlEncode_light(final String url) {
         if (url == null) { return null; }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < url.length(); i++) {
             final char ch = url.charAt(i);
             if (ch == ' ') {

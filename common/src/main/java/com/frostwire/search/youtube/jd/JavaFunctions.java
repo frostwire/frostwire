@@ -67,9 +67,7 @@ final class JavaFunctions {
 
         if (obj instanceof Object[]) {
             Object[] arr = (Object[]) obj;
-            for (int i = 0; i < arr.length; i++) {
-                r[i] = arr[i];
-            }
+            System.arraycopy(arr, 0, r, 0, arr.length);
             return new ArrayList<Object>(Arrays.asList(r));
         }
 

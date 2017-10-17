@@ -223,7 +223,7 @@ public class StringUtils {
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             //Is token a delimiter?
-            if (token.length() == 1 && delimiters.indexOf(token) >= 0) {
+            if (token.length() == 1 && delimiters.contains(token)) {
                 //If so, add blank only if last token was a delimiter.
                 if (gotDelimiter)
                     tokens.add("");

@@ -68,7 +68,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
     public static LinkedList<SoundcloudSearchResult> fromJson(String json) {
         LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
-        if (json.indexOf("\"collection\":") != -1) {
+        if (json.contains("\"collection\":")) {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
 
             if (obj != null && obj.collection != null) {
@@ -79,7 +79,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
                     }
                 }
             }
-        } else if (json.indexOf("\"tracks\":") != -1) {
+        } else if (json.contains("\"tracks\":")) {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
 
             if (obj != null && obj.tracks != null) {
