@@ -34,21 +34,25 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 public class TransferDetailStatusFragment extends AbstractTransferDetailFragment {
 
     private TextView completedTextView;
+    private TextView timeLeftTextView;
 
     public TransferDetailStatusFragment() {
         super(R.layout.fragment_transfer_detail_status);
     }
 
     @Override
-    protected void initComponents(View rootView, Bundle savedInstanceState) {
-        super.initComponents(rootView, savedInstanceState);
-        completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
+    protected void initComponents(View v, Bundle savedInstanceState) {
+        super.initComponents(v, savedInstanceState);
+        completedTextView = findView(v, R.id.fragment_transfer_detail_status_completion);
         completedTextView.setText("");
+        timeLeftTextView = findView(v, R.id.fragment_transfer_detail_status_time_left);
+        timeLeftTextView.setText("");
     }
 
     @Override
     public void onTime() {
         super.onTime();
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
+        timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
     }
 }
