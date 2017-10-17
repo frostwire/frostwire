@@ -95,6 +95,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     }
 
     protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
+        if (uiBittorrentDownload == null) {
+            return;
+        }
         if (detailProgressTitleTextView != null) {
             detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
         }
