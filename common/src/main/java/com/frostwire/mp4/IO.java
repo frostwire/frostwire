@@ -158,15 +158,15 @@ final class IO {
     }
 
     public static ByteBuffer put(ByteBuffer buf, int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            buf.putInt(arr[i]);
+        for (int anArr : arr) {
+            buf.putInt(anArr);
         }
         return buf;
     }
 
     public static ByteBuffer put(ByteBuffer buf, short[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            buf.putShort(arr[i]);
+        for (short anArr : arr) {
+            buf.putShort(anArr);
         }
         return buf;
     }

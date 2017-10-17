@@ -81,9 +81,8 @@ public abstract class Request {
         if (query == null) { return ret; }
         final String[][] split = new Regex(query.trim(), "&?(.*?)=(.*?)($|&(?=.*?=.+))").getMatches();
         if (split != null) {
-            final int splitLength = split.length;
-            for (int i = 0; i < splitLength; i++) {
-                ret.put(split[i][0], split[i][1]);
+            for (String[] aSplit : split) {
+                ret.put(aSplit[0], aSplit[1]);
             }
         }
         return ret;
@@ -184,8 +183,7 @@ public abstract class Request {
         if (cookieHeaders == null || cookieHeaders.size() == 0) { return; }
         final String date = this.httpConnection.getHeaderField("Date");
         final String host = Browser.getHost(this.httpConnection.getURL());
-        for (int i = 0; i < cookieHeaders.size(); i++) {
-            final String header = cookieHeaders.get(i);
+        for (final String header : cookieHeaders) {
             this.getCookies().add(Cookies.parseCookies(header, host, date));
         }
     }

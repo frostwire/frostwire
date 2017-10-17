@@ -327,8 +327,7 @@ public final class Mp4Demuxer {
     private static int calcMdatOffset(FragmentCtx[] ctxs, Mp4Info inf) throws IOException {
         int len = 0;
 
-        for (int i = 0; i < ctxs.length; i++) {
-            FragmentCtx ctx = ctxs[i];
+        for (FragmentCtx ctx : ctxs) {
             MovieFragmentBox moof = ctx.moof;
             MediaDataBox mdat = ctx.mdat;
 

@@ -42,8 +42,7 @@ public final class SourceFilter implements SearchFilter {
 
     public SourceFilter(SourceKey... keys) {
         this.keys = new HashMap<>();
-        for (int i = 0; i < keys.length; i++) {
-            SourceKey k = keys[i];
+        for (SourceKey k : keys) {
             this.keys.put(k.source(), k);
         }
     }
