@@ -199,7 +199,7 @@ public class Browser {
             } else if (parts[i].equalsIgnoreCase("..")) {
                 if (i > 0) {
                     int j = i - 1;
-                    while (true && j > 0) {
+                    while (j > 0) {
                         if (parts[j].length() > 0) {
                             parts[j] = "";
                             break;

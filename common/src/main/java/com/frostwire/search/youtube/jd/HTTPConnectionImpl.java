@@ -531,7 +531,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
                 break;
             }
         }
-        if (hostSet == false) {
+        if (!hostSet) {
             /* host entry does not exist,lets add it */
             this.addHostHeader();
         }

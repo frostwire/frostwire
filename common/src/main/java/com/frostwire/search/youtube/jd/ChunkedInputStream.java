@@ -61,7 +61,7 @@ public class ChunkedInputStream extends InputStream {
                 // System.out.println("chunkedExtension found");
                 chunkExt = true;
             }
-            if (chunkExt == false) {
+            if (!chunkExt) {
                 b[0] = (byte) (read & 0xFF);
                 sb.append(new String(b, 0, 1));
             }

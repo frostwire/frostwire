@@ -272,7 +272,7 @@ public final class YouTubeExtractor {
         currentYTSig = ytSig;
 
         /* html5_fmt_map */
-        if (br.getRegex(FILENAME_PATTERN).count() != 0 && fileNameFound == false) {
+        if (br.getRegex(FILENAME_PATTERN).count() != 0 && !fileNameFound) {
             filename = Encoding.htmlDecode(br.getRegex(FILENAME_PATTERN).getMatch(0).trim());
         }
 
@@ -335,7 +335,7 @@ public final class YouTubeExtractor {
             } else {
                 if (br.containsHTML("reason=Unfortunately"))
                     return null;
-                if (tryGetDetails == true) {
+                if (tryGetDetails) {
                     br.getPage("http://www.youtube.com/get_video_info?el=detailpage&video_id=" + getVideoID(videoURL));
                     return parseLinks(br, videoURL, filename, ythack, false, ytSig);
                 } else {
