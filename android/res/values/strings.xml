@@ -187,7 +187,6 @@
     <string name="connected_using_dataplan">Connected using Data Plan</string>
     <string name="send_to_chat">Send to Chat</string>
     <string name="sent_file_to_chat">Sent file to Chat</string>
-    <string name="sent_files_to_chat">Sent %d files to Chat</string>
     <string name="choose_wifi_network">Choose a Wi-Fi network</string>
     <string name="please_update_to_v">Please Update to v. %s</string>
     <string name="cant_open_file">Sorry, don\'t know how to open this file.</string>
@@ -714,7 +713,6 @@
     <string name="seed_all_finished">Seed All Finished</string>
     <string name="title_activity_transfer_detail">Transfer Detail</string>
     <string name="show_torrent_details">Show Torrent Details</string>
-
     <string name="transfer_detail_title_dummy" translatable="false">Title_Dummy_collection_FrostWire_FrostClick.com_MP3_320k_Mar_9_2014</string>
     <string name="transfer_detail_file_dummy" translatable="false">01_Wildlight_Twirl_Me_Hers_Was_As_Thunder_FROSTWIRE_FROSTCLICK_CREATIVE_COMMONS.mp3</string>
     <string name="transfer_detail_storage_dummy" translatable="false">/storage/emulated/0/FrostWire/Downloads</string>
@@ -773,8 +771,8 @@
     <string name="status">Status</string>
     <string name="trackers">Trackers</string>
     <string name="pieces">Pieces</string>
-
-
+    <string name="m_of_n_decimals">%1$d of %2$d</string>
+    <string name="m_of_n_strings">%1$s of %2$s</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
