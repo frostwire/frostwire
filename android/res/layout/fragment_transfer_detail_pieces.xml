@@ -50,7 +50,6 @@
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:text="@string/pieces_header" />
 
@@ -59,7 +58,6 @@
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
                 android:text="@string/transfer_detail_piece_size_dummy" />
@@ -70,7 +68,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="@string/piece_size_header" />
 
             <TextView
@@ -79,7 +76,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
                 android:text="@string/transfer_detail_speed_small_dummy" />
         </RelativeLayout>
