@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
 /**
@@ -46,6 +47,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     private ProgressBar detailProgressProgressBar;
     private TimerSubscription subscription;
     private TextView detailProgressStatusTextView;
+    private TextView detailProgressDownSpeedTextView;
+    private TextView detailProgressUpSpeedTextView;
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
@@ -79,6 +82,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
         detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
         detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
+        detailProgressDownSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_down_speed);
+        detailProgressUpSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_up_speed);
     }
 
     protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
@@ -92,6 +97,14 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
         if (detailProgressStatusTextView != null) {
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
+        }
+
+        if (detailProgressDownSpeedTextView != null) {
+            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()));
+        }
+
+        if (detailProgressUpSpeedTextView != null) {
+            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()));
         }
     }
 
