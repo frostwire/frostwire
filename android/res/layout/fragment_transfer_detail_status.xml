@@ -48,7 +48,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_completion_header"
+                android:id="@+id/fragment_transfer_detail_status_completion_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_time_left_header"
+                android:id="@+id/fragment_transfer_detail_status_time_left_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -114,7 +114,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_downloaded_header"
+                android:id="@+id/fragment_transfer_detail_status_downloaded_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -147,7 +147,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_uploaded_header"
+                android:id="@+id/fragment_transfer_detail_status_uploaded_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_share_ratio_header"
+                android:id="@+id/fragment_transfer_detail_status_share_ratio_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -212,7 +212,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_peers_header"
+                android:id="@+id/fragment_transfer_detail_status_peers_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -227,12 +227,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_status_peers_header"
+                android:layout_below="@+id/fragment_transfer_detail_status_peers_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_number_of_number_dummy" />
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_seeds_header"
+                android:id="@+id/fragment_transfer_detail_status_seeds_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -247,7 +247,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/fragment_transfer_detail_status_seeds_header"
+                android:layout_below="@+id/fragment_transfer_detail_status_seeds_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_number_of_number_dummy" />
 
@@ -270,7 +270,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_active_time_header"
+                android:id="@+id/fragment_transfer_detail_status_active_time_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -285,12 +285,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_status_active_time_header"
+                android:layout_below="@+id/fragment_transfer_detail_status_active_time_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_time_dummy" />
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_seeding_time_header"
+                android:id="@+id/fragment_transfer_detail_status_seeding_time_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -305,7 +305,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/fragment_transfer_detail_status_seeding_time_header"
+                android:layout_below="@+id/fragment_transfer_detail_status_seeding_time_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_time_dummy" />
 
