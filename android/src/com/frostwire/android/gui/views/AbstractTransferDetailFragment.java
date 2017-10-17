@@ -27,6 +27,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.Sha1Hash;
+import com.frostwire.jlibtorrent.TorrentHandle;
 
 import java.text.DecimalFormatSymbols;
 
@@ -46,6 +49,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
+    protected TorrentHandle torrentHandle;
     private TextView detailProgressTitleTextView;
     private ProgressBar detailProgressProgressBar;
     private TimerSubscription subscription;
@@ -67,6 +71,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public AbstractTransferDetailFragment init(String tabTitle, UIBittorrentDownload uiBittorrentDownload) {
         this.tabTitle = tabTitle;
         this.uiBittorrentDownload = uiBittorrentDownload;
+        this.torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
         return this;
     }
 
@@ -80,7 +85,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     /**
      * This is a common section at the top of all the detail fragments
      * which contains the title of the transfer and the current progress
-     * */
+     */
     protected void initDetailProgress(View v) {
         detailProgressTitleTextView = findView(v, R.id.view_transfer_detail_progress_title);
         detailProgressProgressBar = findView(v, R.id.view_transfer_detail_progress_progress);
@@ -93,19 +98,15 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         if (detailProgressTitleTextView != null) {
             detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
         }
-
         if (detailProgressProgressBar != null) {
             detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
         }
-
         if (detailProgressStatusTextView != null) {
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
-
         if (detailProgressDownSpeedTextView != null) {
             detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()));
         }
-
         if (detailProgressUpSpeedTextView != null) {
             detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()));
         }
@@ -129,14 +130,13 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         super.onPause();
         subscription.unsubscribe();
     }
-
     // All utility functions will be here for now
 
     /**
      * Converts a value in seconds to:
-     *     "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
-     *     "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
-     *     "m:ss" where m=minutes<60, ss=seconds
+     * "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
+     * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
+     * "m:ss" where m=minutes<60, ss=seconds
      */
     public static String seconds2time(long seconds) {
         if (seconds == -1) {
@@ -171,5 +171,14 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             time.append("0");
         time.append(Long.toString(seconds));
         return time.toString();
+    }
+
+    public static String getShareRatio(UIBittorrentDownload dl) {
+        long sent = dl.getBytesSent();
+        long received = dl.getBytesReceived();
+        if (received < 0) {
+            return "0%";
+        }
+        return String.valueOf(100 * ((float) sent / (float) received)) + "%";
     }
 }
