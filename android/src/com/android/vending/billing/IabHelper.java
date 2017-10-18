@@ -235,25 +235,6 @@ public class IabHelper {
                 logDebug("Billing service connected.");
                 mService = IInAppBillingService.Stub.asInterface(service);
                 final String packageName = mContext.getPackageName();
-                try {
-                    logDebug("Checking for in-app billing 3 support.");
-
-                    // check for in-app billing v3 support
-                    int response = mService.isBillingSupported(3, packageName, ITEM_TYPE_INAPP);
-                    if (response != BILLING_RESPONSE_RESULT_OK) {
-                        if (listener != null) listener.onIabSetupFinished(new IabResult(response,
-                                "Error checking for billing v3 support."));
-
-                        // if in-app purchases aren't supported, neither are subscriptions
-                        mSubscriptionsSupported = false;
-                        mSubscriptionUpdateSupported = false;
-                        return;
-                    } else {
-                        logDebug("In-app billing version 3 supported for " + packageName);
-                    }
-
-                    // Check for v5 subscriptions support. This is needed for
-                    // getBuyIntentToReplaceSku which allows for subscription update
                     new Thread("IabHelper-isBillingSupportedCheck") {
                         @Override
                         public void run() {
@@ -266,7 +247,34 @@ public class IabHelper {
                             }
 
                             try {
+                                logDebug("Checking for in-app billing 3 support.");
+                                // check for in-app billing v3 support
+                                int response = mService.isBillingSupported(3, packageName, ITEM_TYPE_INAPP);
+                                if (response != BILLING_RESPONSE_RESULT_OK) {
+                                    if (listener != null)
+                                        listener.onIabSetupFinished(new IabResult(response,
+                                                "Error checking for billing v3 support."));
+                                    // if in-app purchases aren't supported, neither are subscriptions
+                                    mSubscriptionsSupported = false;
+                                    mSubscriptionUpdateSupported = false;
+                                    return;
+                                } else {
+                                    logDebug("In-app billing version 3 supported for " + packageName);
+                                }
+                            } catch (RemoteException e) {
+                                if (listener != null) {
+                                    listener.onIabSetupFinished(new IabResult(IABHELPER_REMOTE_EXCEPTION,
+                                            "RemoteException while setting up in-app billing."));
+                                }
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            // Check for v5 subscriptions support. This is needed for
+                            // getBuyIntentToReplaceSku which allows for subscription update
+                            try {
                                 int response = mService.isBillingSupported(5, packageName, ITEM_TYPE_SUBS);
+
                                 if (response == BILLING_RESPONSE_RESULT_OK) {
                                     logDebug("Subscription re-signup AVAILABLE.");
                                     mSubscriptionUpdateSupported = true;
@@ -302,15 +310,6 @@ public class IabHelper {
                             }
                         }
                     }.start();
-                }
-                catch (RemoteException e) {
-                    if (listener != null) {
-                        listener.onIabSetupFinished(new IabResult(IABHELPER_REMOTE_EXCEPTION,
-                                "RemoteException while setting up in-app billing."));
-                    }
-                    e.printStackTrace();
-                    return;
-                }
             }
         };
 
