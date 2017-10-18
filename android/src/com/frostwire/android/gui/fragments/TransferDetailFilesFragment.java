@@ -19,7 +19,12 @@
 package com.frostwire.android.gui.fragments;
 
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -38,6 +43,9 @@ import java.util.List;
 public class TransferDetailFilesFragment extends AbstractTransferDetailFragment {
     private TextView fileNumberTextView;
     private TextView totalSizeTextView;
+    private RecyclerView recyclerView;
+    private TransferDetailFilesRecyclerViewAdapter adapter;
+    private LinearLayoutManager layoutManager;
 
     public TransferDetailFilesFragment() {
         super(R.layout.fragment_transfer_detail_files);
@@ -52,6 +60,8 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
         totalSizeTextView.setText("");
+
+        recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
     }
 
     @Override
@@ -64,10 +74,72 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         List<TransferItem> items = uiBittorrentDownload.getItems();
 
+        if (items == null) {
+            return;
+        }
+
         // since these transfer properties don't change, we'll only do this once
-        if ("".equals(fileNumberTextView.getText()) && items != null) {
+        if ("".equals(fileNumberTextView.getText())) {
             fileNumberTextView.setText(getString(R.string.n_files, items.size()));
             totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
+        }
+
+        if (adapter == null) {
+            adapter = new TransferDetailFilesRecyclerViewAdapter(items);
+            layoutManager = new LinearLayoutManager(getActivity());
+            recyclerView.setAdapter(adapter);
+            // still don't understand this part below, I don't see a RelativeLayoutManager available anyways
+            recyclerView.setLayoutManager(layoutManager);
+        } else {
+            adapter.updateTransferItems(items);
+        }
+
+    }
+
+    private final static class TransferDetailFilesTransferItemViewHolder extends RecyclerView.ViewHolder {
+        public TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
+            super(itemView);
+        }
+    }
+
+    private final static class TransferDetailFilesRecyclerViewAdapter extends RecyclerView.Adapter<TransferDetailFilesTransferItemViewHolder> {
+
+        private List<TransferItem> items;
+
+        public TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
+            this.items = items;
+        }
+
+        @Override
+        public TransferDetailFilesTransferItemViewHolder onCreateViewHolder(ViewGroup parent, int i) {
+            return new TransferDetailFilesTransferItemViewHolder((RelativeLayout) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_transfer_detail_files_recyclerview_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
+            if (items == null || items.isEmpty()) {
+                return;
+            }
+            TransferItem transferItem = items.get(i);
+            // file type icon
+
+            // file name
+            // TODO: cache this view if possible on the view holder to save up this query everytime
+            // perhaps through a viewHolder.updateModel(transferItem) method.
+            TextView fileNameTextView = viewHolder.itemView.findViewById(R.id.fragment_transfer_detail_files_file_name);
+            fileNameTextView.setText(transferItem.getName());
+        }
+
+        @Override
+        public int getItemCount() {
+            return (items == null || items.isEmpty()) ? 0 : items.size();
+        }
+
+        public void updateTransferItems(List<TransferItem> freshItems) {
+            items.clear();
+            items.addAll(freshItems);
+            notifyDataSetChanged();
         }
     }
 }
