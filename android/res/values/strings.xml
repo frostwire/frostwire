@@ -773,6 +773,7 @@
     <string name="pieces">Pieces</string>
     <string name="m_of_n_decimals">%1$d of %2$d</string>
     <string name="m_of_n_strings">%1$s of %2$s</string>
+    <string name="n_files">%1$d FILES</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
