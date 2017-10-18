@@ -18,8 +18,16 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.transfers.TransferItem;
+
+import java.util.List;
 
 /**
  * @author gubatron
@@ -28,7 +36,38 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
  */
 
 public class TransferDetailFilesFragment extends AbstractTransferDetailFragment {
+    private TextView fileNumberTextView;
+    private TextView totalSizeTextView;
+
     public TransferDetailFilesFragment() {
         super(R.layout.fragment_transfer_detail_files);
+    }
+
+    @Override
+    protected void initComponents(View v, Bundle savedInstanceState) {
+        super.initComponents(v, savedInstanceState);
+
+        fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
+        fileNumberTextView.setText("");
+
+        totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
+        totalSizeTextView.setText("");
+    }
+
+    @Override
+    public void onTime() {
+        super.onTime();
+
+        if (uiBittorrentDownload == null) {
+            return;
+        }
+
+        List<TransferItem> items = uiBittorrentDownload.getItems();
+
+        // since these transfer properties don't change, we'll only do this once
+        if ("".equals(fileNumberTextView.getText()) && items != null) {
+            fileNumberTextView.setText(getString(R.string.n_files, items.size()));
+            totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
+        }
     }
 }
