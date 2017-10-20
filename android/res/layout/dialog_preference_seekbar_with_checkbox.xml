@@ -23,7 +23,7 @@
     android:scrollbars="vertical">
 
     <TextView
-        android:id="@+id/dialog_default_title"
+        android:id="@+id/dialog_preference_seekbar_with_checkbox_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
