@@ -26,7 +26,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
-import android.support.v7.widget.ListViewCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,7 +56,6 @@ import com.frostwire.android.gui.fragments.preference.TorrentFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.ScrollListeners;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
@@ -91,13 +91,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final Comparator<Transfer> transferComparator;
     private final TransferStatus[] tabPositionToTransferStatus;
     private TabLayout tabLayout;
-    private ListViewCompat list;
+    private RecyclerView list;
+    private TransferListAdapter adapter;
+    private RecyclerView.LayoutManager recyclerViewLayoutManager;
+
     private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
     private TextView vpnRichToast;
     private ClearableEditTextView addTransferUrlTextView;
-    private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private boolean isVPNactive;
@@ -187,7 +189,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
         // Handle item selection
-        setupAdapter();
+        setupAdapter(getActivity());
         switch (item.getItemId()) {
             case R.id.fragment_transfers_menu_add_transfer:
                 toggleAddTransferControls();
@@ -263,7 +265,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
 
         } else if (this.getActivity() != null) {
-            setupAdapter();
+            setupAdapter(this.getActivity());
         }
 
         // mark the selected tab
@@ -427,7 +429,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         list = findView(v, R.id.fragment_transfers_list);
-        list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
+        recyclerViewLayoutManager = new LinearLayoutManager(this.getActivity());
+
+        // TODO: had to comment this out when I switched to RecyclerView
+        //list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
 
         SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
@@ -507,10 +512,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private void setupAdapter() {
+    private void setupAdapter(Context context) {
+        if (context == null) {
+            return;
+        }
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
         Collections.sort(transfers, transferComparator);
-        adapter = new TransferListAdapter(TransfersFragment.this.getActivity(), transfers);
+        adapter = new TransferListAdapter(context, transfers);
         list.setAdapter(adapter);
     }
 
