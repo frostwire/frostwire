@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,6 +54,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
@@ -85,7 +85,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public class TransferListAdapter extends BaseExpandableListAdapter {
+public class TransferListAdapter extends AbstractAdapter<Transfer> {
     private static final Logger LOG = Logger.getLogger(TransferListAdapter.class);
     private final WeakReference<Context> context;
     private final OnClickListener viewOnClickListener;
@@ -99,8 +99,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private final TransferStateStrings transferStateStrings;
     private List<Transfer> list;
 
-
     public TransferListAdapter(Context context, List<Transfer> list) {
+        super(context, R.layout.view_transfer_list_item);
         this.context = new WeakReference<>(context);
         this.viewOnClickListener = new ViewOnClickListener();
         this.viewOnLongClickListener = new ViewOnLongClickListener();
@@ -111,54 +111,16 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return list.get(groupPosition).getItems().get(childPosition);
-    }
-
-    private TransferItem getChildItem(int groupPosition, int childPosition) {
-        return list.get(groupPosition).getItems().get(childPosition);
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
-        TransferItem item = getChildItem(groupPosition, childPosition);
-
-        if (convertView == null) {
-            convertView = View.inflate(context.get(), R.layout.view_transfer_item_list_item, null);
-            convertView.setOnClickListener(viewOnClickListener);
-            convertView.setOnLongClickListener(viewOnLongClickListener);
+    protected void setupView(View view, ViewGroup parent, Transfer transfer) {
+        if (transfer instanceof BittorrentDownload) {
+            populateBittorrentDownload(view, (BittorrentDownload) transfer);
+        } else if (transfer instanceof HttpDownload) {
+            populateHttpDownload(view, (HttpDownload) transfer);
+        } else if (transfer instanceof YouTubeDownload) {
+            populateCloudDownload(view, transfer);
+        } else if (transfer instanceof SoundcloudDownload) {
+            populateCloudDownload(view, transfer);
         }
-
-        try {
-            initTouchFeedback(convertView, item);
-            populateChildView(convertView, item);
-        } catch (Throwable e) {
-            LOG.error("Fatal error getting view: " + e.getMessage(), e);
-        }
-
-        return convertView;
-    }
-
-    @Override
-    public int getChildrenCount(int groupPosition) {
-        try {
-            final Transfer transfer = list.get(groupPosition);
-            int size = transfer.getItems().size();
-            return size <= 1 ? 0 : size;
-        } catch (IndexOutOfBoundsException e) {
-            return 0;
-        }
-    }
-
-    @Override
-    public Object getGroup(int groupPosition) {
-        return list.get(groupPosition);
     }
 
     private Transfer getGroupItem(int groupPosition) {
@@ -169,17 +131,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    @Override
-    public int getGroupCount() {
-        return list.size();
-    }
-
-    @Override
-    public long getGroupId(int groupPosition) {
-        return groupPosition;
-    }
-
-    @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         Transfer item = getGroupItem(groupPosition);
         ExpandableListView expandableListView = (ExpandableListView) parent;
@@ -198,15 +149,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         listItemLinearLayoutHolder.setTag(item);
 
         try {
-            populateGroupView(listItemLinearLayoutHolder, item);
+            setupView(listItemLinearLayoutHolder, parent, item);
         } catch (Throwable e) {
             LOG.error("Not able to populate group view in expandable list:" + e.getMessage());
-        }
-
-        try {
-            setupGroupIndicator(listItemLinearLayoutHolder, expandableListView, isExpanded, item, groupPosition);
-        } catch (Throwable e) {
-            LOG.error("Not able to setup touch handlers for group indicator ImageView: " + e.getMessage());
         }
 
         return listItemLinearLayoutHolder;
@@ -215,11 +160,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
     }
 
     public void updateList(List<Transfer> g) {
@@ -235,27 +175,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 LOG.warn("Error dismissing dialog", e);
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <TView extends View> TView findView(View view, int id) {
-        return (TView) view.findViewById(id);
-    }
-
-    private void populateGroupView(View view, Transfer transfer) {
-        if (transfer instanceof BittorrentDownload) {
-            populateBittorrentDownload(view, (BittorrentDownload) transfer);
-        } else if (transfer instanceof HttpDownload) {
-            populateHttpDownload(view, (HttpDownload) transfer);
-        } else if (transfer instanceof YouTubeDownload) {
-            populateCloudDownload(view, transfer);
-        } else if (transfer instanceof SoundcloudDownload) {
-            populateCloudDownload(view, transfer);
-        }
-    }
-
-    private void populateChildView(View view, TransferItem item) {
-        populateBittorrentDownloadItem(view, item);
     }
 
     private MenuAdapter getMenuAdapter(View view) {
@@ -383,66 +302,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         dialogs.add(dialog);
     }
 
-    private void setupGroupIndicator(final LinearLayout listItemMainLayout,
-                                     final ExpandableListView expandableListView,
-                                     final boolean expanded,
-                                     final Transfer item,
-                                     final int groupPosition) {
-        final ImageView groupIndicator = findView(listItemMainLayout, R.id.view_transfer_list_item_group_indicator);
-        groupIndicator.setClickable(true);
-        final int totalItems = item != null ? item.getItems().size() : 0;
-        prepareGroupIndicatorDrawable(item, groupIndicator, totalItems > 1, expanded);
-
-        if (totalItems > 1) {
-            groupIndicator.setOnClickListener(new GroupIndicatorClickAdapter(expandableListView, groupPosition));
-        }
-    }
-
-    private void prepareGroupIndicatorDrawable(final Transfer item,
-                                               final ImageView groupIndicator,
-                                               final boolean hasMultipleFiles,
-                                               final boolean expanded) {
-        if (hasMultipleFiles) {
-            groupIndicator.setImageResource(expanded ? R.drawable.transfer_menuitem_minus : R.drawable.transfer_menuitem_plus);
-        } else {
-            String path = null;
-            if (item instanceof BittorrentDownload) {
-                BittorrentDownload bItem = (BittorrentDownload) item;
-                if (bItem.getItems().size() > 0) {
-                    TransferItem transferItem = bItem.getItems().get(0);
-                    path = transferItem.getFile().getAbsolutePath();
-                }
-            } else if (item instanceof Transfer) {
-                Transfer transferItem = item;
-                if (transferItem.getSavePath() != null) {
-                    path = transferItem.getSavePath().getAbsolutePath();
-                }
-            }
-
-            String extension = null;
-            if (path != null) {
-                extension = FilenameUtils.getExtension(path);
-            }
-
-            if (extension != null && extension.equals("apk")) {
-                try {
-                    //Apk apk = new Apk(context,path);
-
-                    //TODO: Get the APK Icon so we can show the APK icon on the transfer manager once
-                    //it's finished downloading, or as it's uploading to another peer.
-                    //apk.getDrawable(id);
-
-                    //in the meantime, just hardcode it
-                    groupIndicator.setImageResource(R.drawable.my_files_application_icon_selector_menu);
-                } catch (Throwable e) {
-                    groupIndicator.setImageResource(R.drawable.my_files_application_icon_selector_menu);
-                }
-            } else {
-                groupIndicator.setImageResource(MediaType.getFileTypeIconId(extension));
-            }
-        }
-    }
-
     private void initTouchFeedback(View v, TransferItem item) {
         v.setOnClickListener(viewOnClickListener);
         v.setOnLongClickListener(viewOnLongClickListener);
@@ -475,7 +334,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         peers.setText(context.get().getString(R.string.peers_n, formatPeers(download)));
         seeds.setVisibility(View.VISIBLE);
         peers.setVisibility(View.VISIBLE);
-
 
         title.setText(download.getDisplayName());
         setProgress(progress, download.getProgress());
@@ -739,11 +597,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         if (item != null) {
             long downloaded = item.getSequentialDownloaded();
             long size = item.getSize();
-
-            //LOG.debug("Downloaded: " + downloaded + ", seq: " + dl.isSequentialDownload());
-
             if (size > 0) {
-
                 long percent = (100 * downloaded) / size;
 
                 if (percent > 30 || downloaded > 10 * 1024 * 1024) {
@@ -753,7 +607,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 }
             }
         }
-
         return null;
     }
 }

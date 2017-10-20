@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
+import android.support.v7.widget.ListViewCompat;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,7 +35,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -91,7 +91,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final Comparator<Transfer> transferComparator;
     private final TransferStatus[] tabPositionToTransferStatus;
     private TabLayout tabLayout;
-    private ExpandableListView list;
+    private ListViewCompat list;
     private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
