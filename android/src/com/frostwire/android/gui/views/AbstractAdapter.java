@@ -64,14 +64,14 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
         @SuppressWarnings("unchecked")
         SparseArray<View> h = (SparseArray<View>) view.getTag();
         if (h == null) {
-            h = new SparseArray<View>();
+            h = new SparseArray<>();
             view.setTag(h);
         }
         return h;
     }
 
     private View getView(View view, SparseArray<View> h, int id) {
-        View v = null;
+        View v;
 
         int index = h.indexOfKey(id);
         if (index < 0) {
