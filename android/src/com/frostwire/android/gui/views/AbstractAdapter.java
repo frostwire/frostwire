@@ -71,7 +71,7 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
     }
 
     private View getView(View view, SparseArray<View> h, int id) {
-        View v = null;
+        View v;
 
         int index = h.indexOfKey(id);
         if (index < 0) {
