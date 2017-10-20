@@ -18,20 +18,32 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.MediaType;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.gui.views.ClickAdapter;
+import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.transfers.TransferItem;
 
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -54,36 +66,28 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-
         fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
         fileNumberTextView.setText("");
-
         totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
         totalSizeTextView.setText("");
-
         recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
     }
 
     @Override
     public void onTime() {
         super.onTime();
-
         if (uiBittorrentDownload == null) {
             return;
         }
-
         List<TransferItem> items = uiBittorrentDownload.getItems();
-
         if (items == null) {
             return;
         }
-
         // since these transfer properties don't change, we'll only do this once
         if ("".equals(fileNumberTextView.getText())) {
             fileNumberTextView.setText(getString(R.string.n_files, items.size()));
             totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
         }
-
         if (adapter == null) {
             adapter = new TransferDetailFilesRecyclerViewAdapter(items);
             layoutManager = new LinearLayoutManager(getActivity());
@@ -93,12 +97,52 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         } else {
             adapter.updateTransferItems(items);
         }
-
     }
 
     private final static class TransferDetailFilesTransferItemViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView fileTypeImageView;
+        private TextView fileNameTextView;
+        private ProgressBar fileProgressBar;
+        private TextView fileProgressTextView;
+        private TextView fileSizeTextView;
+        private ImageButton playButtonImageView;
+
         public TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
             super(itemView);
+        }
+
+        public void updateTransferItem(TransferItem transferItem) {
+            if (fileNameTextView == null) {
+                initComponents();
+            }
+            fileTypeImageView.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
+            fileNameTextView.setText(transferItem.getName());
+            fileProgressBar.setProgress(transferItem.getProgress());
+            fileProgressTextView.setText(transferItem.getProgress() + "%");
+            fileSizeTextView.setText(UIUtils.getBytesInHuman(transferItem.getDownloaded()) + " / " + UIUtils.getBytesInHuman(transferItem.getSize()));
+
+            playButtonImageView.setTag(transferItem);
+            updatePlayButtonVisibility(transferItem);
+        }
+
+        private void initComponents() {
+            // file type icon
+            fileTypeImageView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_type_icon);
+            fileNameTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_name);
+            fileProgressBar = itemView.findViewById(R.id.fragment_transfer_detail_files_file_progressbar);
+            fileProgressTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_percentage);
+            fileSizeTextView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_download_size);
+            playButtonImageView = itemView.findViewById(R.id.fragment_transfer_detail_files_file_play_icon);
+            playButtonImageView.setOnClickListener(new OpenOnClickListener(itemView.getContext()));
+        }
+
+        private void updatePlayButtonVisibility(TransferItem item) {
+            if (item.isComplete()) {
+                playButtonImageView.setVisibility(View.VISIBLE);
+            } else {
+                playButtonImageView.setVisibility(previewFile((BTDownloadItem) item) != null ? View.VISIBLE : View.GONE);
+            }
         }
     }
 
@@ -107,7 +151,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private List<TransferItem> items;
 
         public TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
-            this.items = items;
+            this.items = new LinkedList<>(items);
         }
 
         @Override
@@ -122,13 +166,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 return;
             }
             TransferItem transferItem = items.get(i);
-            // file type icon
-
-            // file name
-            // TODO: cache this view if possible on the view holder to save up this query everytime
-            // perhaps through a viewHolder.updateModel(transferItem) method.
-            TextView fileNameTextView = viewHolder.itemView.findViewById(R.id.fragment_transfer_detail_files_file_name);
-            fileNameTextView.setText(transferItem.getName());
+            if (transferItem != null) {
+                viewHolder.updateTransferItem(transferItem);
+            }
         }
 
         @Override
@@ -138,8 +178,60 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         public void updateTransferItems(List<TransferItem> freshItems) {
             items.clear();
-            items.addAll(freshItems);
+            if (freshItems != null && freshItems.size() > 0) {
+                items.addAll(freshItems);
+            }
             notifyDataSetChanged();
         }
+    }
+
+    private static final class OpenOnClickListener extends ClickAdapter<Context> {
+
+        public OpenOnClickListener(Context ctx) {
+            super(ctx);
+        }
+
+        public void onClick(Context ctx, View v) {
+            Engine.instance().getVibrator().hapticFeedback();
+            Object tag = v.getTag();
+            if (tag instanceof TransferItem) {
+                TransferItem item = (TransferItem) tag;
+                File path = item.isComplete() ? item.getFile() : null;
+                if (path == null && item instanceof BTDownloadItem) {
+                    path = previewFile((BTDownloadItem) item);
+                }
+                if (path != null) {
+                    if (path.exists()) {
+                        UIUtils.openFile(ctx, path);
+                    } else {
+                        UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
+                    }
+                }
+            } else if (tag instanceof File) {
+                File path = (File) tag;
+                System.out.println(path);
+                if (path.exists()) {
+                    UIUtils.openFile(ctx, path);
+                } else {
+                    UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
+                }
+            }
+        }
+    }
+
+    private static File previewFile(BTDownloadItem item) {
+        if (item != null) {
+            long downloaded = item.getSequentialDownloaded();
+            long size = item.getSize();
+            if (size > 0) {
+                long percent = (100 * downloaded) / size;
+                if (percent > 30 || downloaded > 10 * 1024 * 1024) {
+                    return item.getFile();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 }
