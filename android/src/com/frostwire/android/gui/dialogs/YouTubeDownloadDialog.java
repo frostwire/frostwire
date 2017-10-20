@@ -168,11 +168,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         }
 
         @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            return super.getView(position, view, parent);
-        }
-
-        @Override
         public String getCheckedSum() {
             return ""; // unused for single selection mode dialog.
         }
