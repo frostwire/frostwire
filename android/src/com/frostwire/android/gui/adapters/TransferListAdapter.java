@@ -119,7 +119,12 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     public void updateList(List<Transfer> g) {
-        list = g;
+        if (list != null) {
+            list.clear();
+            list.addAll(g);
+        } else {
+            list = g;
+        }
         notifyDataSetChanged();
     }
 
