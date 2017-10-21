@@ -132,6 +132,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
         private static final String UNLIMITED_VALUE = "unlimitedValue";
         private static final String UNLIMITED_CHECKED = "unlimitedChecked";
         private static final String CURRENT_VALUE = "currentValue";
+        private static final String DIALOG_TITLE = "dialogTitle";
 
         private int mStartRange;
         private int mEndRange;
@@ -144,6 +145,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
         private SeekBar mSeekbar;
         private CheckBox mUnlimitedCheckbox;
         private TextView mCurrentValueTextView;
+        private TextView mDialogTitleTextView;
 
         public static CustomSeekBarPreferenceDialog newInstance(final CustomSeekBarPreference preference) {
             CustomSeekBarPreferenceDialog fragment = new CustomSeekBarPreferenceDialog();
@@ -157,6 +159,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
             bundle.putBoolean(SUPPORTS_UNLIMITED, preference.supportsUnlimitedValue());
             bundle.putInt(UNLIMITED_VALUE, preference.getUnlimitedValue());
             bundle.putInt(CURRENT_VALUE, -1);
+            bundle.putCharSequence(DIALOG_TITLE, preference.getDialogTitle());
             fragment.setArguments(bundle);
             return fragment;
         }
@@ -222,6 +225,10 @@ public final class CustomSeekBarPreference extends DialogPreference {
             mCurrentValueTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
             mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
             Bundle arguments = getArguments();
+
+            mDialogTitleTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_title);
+            mDialogTitleTextView.setText(arguments.getCharSequence(DIALOG_TITLE));
+
             mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
             mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {
                 @Override
