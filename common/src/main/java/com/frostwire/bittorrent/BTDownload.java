@@ -275,6 +275,10 @@ public final class BTDownload implements BittorrentDownload {
         return th.isValid() ? th.status().numPeers() : 0;
     }
 
+    public TorrentHandle getTorrentHandle() {
+        return th;
+    }
+
     public int getTotalPeers() {
         return th.isValid() ? th.status().listPeers() : 0;
     }
