@@ -45,7 +45,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_storage_path_header"
+                android:id="@+id/fragment_transfer_detail_details_storage_path_label"
                 style="@style/transferDetailTitleHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_storage_path_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_storage_path_label"
                 android:text="@string/transfer_detail_storage_dummy" />
 
         </RelativeLayout>
@@ -80,7 +80,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox_header"
+                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -112,7 +112,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_seeding_on_checkBox_header"
+                android:id="@+id/fragment_transfer_detail_details_seeding_on_checkBox_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -143,7 +143,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_total_size_header"
+                android:id="@+id/fragment_transfer_detail_details_total_size_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -156,12 +156,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_total_size_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_total_size_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_size_dummy" />
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_files_number_header"
+                android:id="@+id/fragment_transfer_detail_details_files_number_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_files_number_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_files_number_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/transfer_detail_files_number_dummy" />
 
@@ -197,7 +197,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_speed_limits_header"
+                android:id="@+id/fragment_transfer_detail_details_speed_limits_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -210,7 +210,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
                 android:text="@string/infinity" />
 
@@ -219,7 +219,7 @@
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/fragment_transfer_detail_details_speed_limit_download"
                 android:src="@drawable/transfers_triangle_downward"
@@ -231,7 +231,7 @@
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
                 android:layout_toStartOf="@+id/fragment_transfer_detail_details_speed_limit_upload_arrow"
                 android:text="@string/infinity" />
@@ -242,7 +242,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
                 android:src="@drawable/transfers_triangle_upward"
                 android:tint="@color/app_text_secondary"
@@ -264,7 +264,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_hash_header"
+                android:id="@+id/fragment_transfer_detail_details_hash_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -276,7 +276,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_hash_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_hash_label"
                 android:layout_marginTop="5dp"
                 android:layout_toStartOf="@+id/fragment_transfer_detail_details_hash_copy_button"
                 android:text="@string/transfer_detail_hash_dummy" />
@@ -309,7 +309,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_magnet_header"
+                android:id="@+id/fragment_transfer_detail_details_magnet_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -321,7 +321,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_details_magnet_header"
+                android:layout_below="@+id/fragment_transfer_detail_details_magnet_label"
                 android:layout_marginTop="5dp"
                 android:layout_toStartOf="@+id/fragment_transfer_detail_details_magnet_copy_button"
                 android:text="@string/transfer_detail_hash_dummy" />
@@ -357,7 +357,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_created_on_header"
+                android:id="@+id/fragment_transfer_detail_details_created_on_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -390,7 +390,7 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_comment_header"
+                android:id="@+id/fragment_transfer_detail_details_comment_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
