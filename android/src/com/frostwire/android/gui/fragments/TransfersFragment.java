@@ -545,6 +545,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
         Collections.sort(transfers, transferComparator);
         adapter = new TransferListAdapter(context, transfers);
+        list.setLayoutManager(recyclerViewLayoutManager);
         list.setAdapter(adapter);
     }
 
