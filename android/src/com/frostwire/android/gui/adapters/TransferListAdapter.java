@@ -89,6 +89,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
      * Keep track of all dialogs ever opened so we dismiss when we leave to avoid memory leaks
      */
     private final List<Dialog> dialogs;
+    private final TransferStateStrings transferStateStrings;
     private List<Transfer> list;
 
     public TransferListAdapter(Context context, List<Transfer> list) {
@@ -197,70 +198,70 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         return tag instanceof HttpDownload || tag instanceof YouTubeDownload;
     }
 
-    private String populateBittorrentDownloadMenuActions(BittorrentDownload download, List<MenuAction> items) {
+    private String populateBittorrentDownloadMenuActions(BittorrentDownload bittorrentDownload, List<MenuAction> items) {
         String title;
-        title = download.getDisplayName();
+        title = bittorrentDownload.getDisplayName();
 
         //If it's a torrent download with a single file, we should be able to open it.
-        if (download.isComplete() && download.getItems().size() > 0) {
-            TransferItem transferItem = download.getItems().get(0);
+        if (bittorrentDownload.isComplete() && bittorrentDownload.getItems().size() > 0) {
+            TransferItem transferItem = bittorrentDownload.getItems().get(0);
             String path = transferItem.getFile().getAbsolutePath();
             String mimeType = UIUtils.getMimeType(path);
             items.add(new OpenMenuAction(context.get(), path, mimeType));
         }
 
-        if (!download.isComplete() && !download.isSeeding()) {
-            if (!download.isPaused()) {
-                items.add(new PauseDownloadMenuAction(context.get(), download));
+        if (!bittorrentDownload.isComplete() && !bittorrentDownload.isSeeding()) {
+            if (!bittorrentDownload.isPaused()) {
+                items.add(new PauseDownloadMenuAction(context.get(), bittorrentDownload));
             } else {
                 NetworkManager networkManager = NetworkManager.instance();
                 boolean wifiIsUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
                 boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
                 if (wifiIsUp || bittorrentOnMobileData) {
-                    if (!download.isComplete()) {
-                        items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
+                    if (!bittorrentDownload.isComplete()) {
+                        items.add(new ResumeDownloadMenuAction(context.get(), bittorrentDownload, R.string.resume_torrent_menu_action));
                     }
                 }
             }
         }
 
-        if (download.getState() == TransferState.FINISHED) {
-            items.add(new SeedAction(context.get(), download));
+        if (bittorrentDownload.getState() == TransferState.FINISHED) {
+            items.add(new SeedAction(context.get(), bittorrentDownload));
         }
 
-        if (download.getState() == TransferState.SEEDING) {
-            items.add(new StopSeedingAction(context.get(), download));
+        if (bittorrentDownload.getState() == TransferState.SEEDING) {
+            items.add(new StopSeedingAction(context.get(), bittorrentDownload));
         }
 
-        items.add(new CancelMenuAction(context.get(), download, !download.isComplete()));
+        items.add(new CancelMenuAction(context.get(), bittorrentDownload, !bittorrentDownload.isComplete()));
 
         items.add(new CopyToClipboardMenuAction(context.get(),
                 R.drawable.contextmenu_icon_magnet,
                 R.string.transfers_context_menu_copy_magnet,
                 R.string.transfers_context_menu_copy_magnet_copied,
-                download.magnetUri() + BTEngine.getInstance().magnetPeers()
+                bittorrentDownload.magnetUri() + BTEngine.getInstance().magnetPeers()
         ));
 
         items.add(new CopyToClipboardMenuAction(context.get(),
                 R.drawable.contextmenu_icon_copy,
                 R.string.transfers_context_menu_copy_infohash,
                 R.string.transfers_context_menu_copy_infohash_copied,
-                download.getInfoHash()
+                bittorrentDownload.getInfoHash()
         ));
 
-        items.add(new ResumeDownloadMenuAction(context.get(), download, R.string.resume_torrent_menu_action));
+        items.add(new ResumeDownloadMenuAction(context.get(), bittorrentDownload, R.string.resume_torrent_menu_action));
 
 
-        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details, download.getInfoHash()));
+        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details, bittorrentDownload.getInfoHash()));
 
-        if (download.isComplete()) {
+        if (bittorrentDownload.isComplete()) {
             // Remove Torrent and Data action.
-            items.add(new CancelMenuAction(context.get(), download, true, true));
+            items.add(new CancelMenuAction(context.get(), bittorrentDownload, true, true));
         }
 
-        if (download instanceof UIBittorrentDownload) {
-            UIBittorrentDownload uidl = (UIBittorrentDownload) download;
+        if (bittorrentDownload instanceof UIBittorrentDownload) {
+            UIBittorrentDownload uidl = (UIBittorrentDownload) bittorrentDownload;
             if (uidl.hasPaymentOptions()) {
                 PaymentOptions po = uidl.getPaymentOptions();
                 if (po.bitcoin != null) {
@@ -304,6 +305,15 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         private OpenOnClickListener playOnClickListener;
         private final TransferStateStrings transferStateStrings;
 
+        private TextView title;
+        private ProgressBar progress;
+        private TextView status;
+        private TextView speed;
+        private TextView size;
+        private TextView seeds;
+        private TextView peers;
+        private ImageButton buttonPlay;
+
         public ViewHolder(Context context,
                           TransferListAdapter adapter,
                           View itemView,
@@ -337,9 +347,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                             populateBittorrentDownload(listItemLinearLayoutHolder, (BittorrentDownload) transfer);
                         } else if (transfer instanceof HttpDownload) {
                             populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
-                        } else if (transfer instanceof YouTubeDownload) {
-                            populateCloudDownload(listItemLinearLayoutHolder, transfer);
-                        } else if (transfer instanceof SoundcloudDownload) {
+                        } else if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload) {
                             populateCloudDownload(listItemLinearLayoutHolder, transfer);
                         }
                     } catch (Throwable e) {
@@ -349,17 +357,35 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             }
         }
 
-        private void populateHttpDownload(LinearLayout view, HttpDownload download) {
-            // TODO: cache these component references to save on graph searches
-            TextView title = view.findViewById(R.id.view_transfer_list_item_title);
-            ProgressBar progress = view.findViewById(R.id.view_transfer_list_item_progress);
-            TextView status = view.findViewById(R.id.view_transfer_list_item_status);
-            TextView speed = view.findViewById(R.id.view_transfer_list_item_speed);
-            TextView size = view.findViewById(R.id.view_transfer_list_item_size);
-            TextView seeds = view.findViewById(R.id.view_transfer_list_item_seeds);
-            TextView peers = view.findViewById(R.id.view_transfer_list_item_peers);
-            ImageButton buttonPlay = view.findViewById(R.id.view_transfer_list_item_button_play);
+        private void ensureComponentsReferenced(View view) {
+            if (title == null) {
+                title = view.findViewById(R.id.view_transfer_list_item_title);
+            }
+            if (progress == null) {
+                progress = view.findViewById(R.id.view_transfer_list_item_progress);
+            }
+            if (status == null) {
+                status = view.findViewById(R.id.view_transfer_list_item_status);
+            }
+            if (speed == null) {
+                speed = view.findViewById(R.id.view_transfer_list_item_speed);
+            }
+            if (size == null) {
+                size = view.findViewById(R.id.view_transfer_list_item_size);
+            }
+            if (seeds == null) {
+                seeds = view.findViewById(R.id.view_transfer_list_item_seeds);
+            }
+            if (peers == null) {
+                peers = view.findViewById(R.id.view_transfer_list_item_peers);
+            }
+            if (buttonPlay == null) {
+                buttonPlay = view.findViewById(R.id.view_transfer_list_item_button_play);
+            }
+        }
 
+        private void populateHttpDownload(LinearLayout view, HttpDownload download) {
+            ensureComponentsReferenced(view);
             seeds.setText("");
             peers.setText("");
             title.setText(download.getDisplayName());
@@ -381,18 +407,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         }
 
         private void populateBittorrentDownload(LinearLayout view, BittorrentDownload download) {
-            // TODO: cache these component references to save on graph searches
-            TextView title = view.findViewById(R.id.view_transfer_list_item_title);
-            ProgressBar progress = view.findViewById(R.id.view_transfer_list_item_progress);
-            TextView status = view.findViewById(R.id.view_transfer_list_item_status);
-            TextView speed = view.findViewById(R.id.view_transfer_list_item_speed);
-            TextView size = view.findViewById(R.id.view_transfer_list_item_size);
-
-            TextView seeds = view.findViewById(R.id.view_transfer_list_item_seeds);
-            TextView peers = view.findViewById(R.id.view_transfer_list_item_peers);
-
-            ImageButton buttonPlay = view.findViewById(R.id.view_transfer_list_item_button_play);
-
+            ensureComponentsReferenced(view);
             Context context = view.getContext();
 
             seeds.setText(context.getString(R.string.seeds_n, formatSeeds(download)));
@@ -435,16 +450,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         }
 
         private void populateCloudDownload(LinearLayout view, Transfer download) {
-            // TODO: cache these component references to save on graph searches
-            TextView title = view.findViewById(R.id.view_transfer_list_item_title);
-            ProgressBar progress = view.findViewById(R.id.view_transfer_list_item_progress);
-            TextView status = view.findViewById(R.id.view_transfer_list_item_status);
-            TextView speed = view.findViewById(R.id.view_transfer_list_item_speed);
-            TextView size = view.findViewById(R.id.view_transfer_list_item_size);
-            TextView seeds = view.findViewById(R.id.view_transfer_list_item_seeds);
-            TextView peers = view.findViewById(R.id.view_transfer_list_item_peers);
-            ImageButton buttonPlay = view.findViewById(R.id.view_transfer_list_item_button_play);
-
+            ensureComponentsReferenced(view);
             seeds.setText("");
             peers.setText("");
             title.setText(download.getDisplayName());
@@ -494,23 +500,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     buttonPlay.setVisibility(previewFile((BTDownloadItem) item) != null ? View.VISIBLE : View.GONE);
                 } else {
                     buttonPlay.setVisibility(View.GONE);
-                }
-            }
-        }
-
-        // TODO: figure out when/where to plug this
-        private void initTouchFeedback(View v, TransferItem item) {
-            v.setOnClickListener(viewOnClickListener);
-            v.setOnLongClickListener(viewOnLongClickListener);
-            v.setTag(item);
-
-            if (v instanceof ViewGroup) {
-                ViewGroup vg = (ViewGroup) v;
-
-                int count = vg.getChildCount();
-                for (int i = 0; i < count; i++) {
-                    View child = vg.getChildAt(i);
-                    initTouchFeedback(child, item);
                 }
             }
         }
