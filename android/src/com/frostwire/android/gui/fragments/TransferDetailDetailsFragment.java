@@ -32,6 +32,7 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.TransferItem;
 
 import java.util.List;
@@ -129,8 +130,15 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 createdOn.setText(DateUtils.formatDateTime(getActivity(), uiBittorrentDownload.getCreated().getTime(), DateUtils.FORMAT_ABBREV_MONTH | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
             }
             if ("".equals(comment.getText())) {
-                // TODO: figure out hot to get the torrent descripton
-                //comment.setText(extras.get("btdownload"));
+                TorrentInfo torrentInfo = uiBittorrentDownload.getDl().getTorrentHandle().torrentFile();
+                String torrentComment = torrentInfo.comment();
+                if (torrentComment != null && !"".equals(torrentComment)) {
+                    comment.setText(torrentComment);
+                } else {
+                    comment.setText(" ");
+                    View view = findView(comment.getRootView(), R.id.fragment_transfer_detail_details_comment_container);
+                    view.setVisibility(View.GONE);
+                }
             }
             if (onSequentialDownloadCheckboxCheckedListener == null) {
                 onSequentialDownloadCheckboxCheckedListener = new SequentialDownloadCheckboxCheckedListener(uiBittorrentDownload);
