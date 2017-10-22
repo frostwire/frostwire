@@ -52,7 +52,7 @@ import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
-import com.frostwire.android.gui.fragments.preference.TorrentFragment;
+import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -452,7 +452,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             Context ctx = v12.getContext();
             Intent i = new Intent(ctx, SettingsActivity.class);
             if (showTorrentSettingsOnClick) {
-                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentFragment.class.getName());
+                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentPreferenceFragment.class.getName());
                 i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
             }
             ctx.startActivity(i);
