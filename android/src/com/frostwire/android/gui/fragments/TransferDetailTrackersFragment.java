@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -98,8 +99,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
         private final WeakReference<TrackerRecyclerViewAdapter> adapterRef; // so we can notify it when we've changed its underlying data
         private final TextView trackerTextView;
-        private final ImageButton editButton;
-        private final ImageButton removeButton;
+        private final ImageView editButton;
+        private final ImageView removeButton;
         private final TorrentHandle torrentHandle;
         private int trackerOffset;
 
