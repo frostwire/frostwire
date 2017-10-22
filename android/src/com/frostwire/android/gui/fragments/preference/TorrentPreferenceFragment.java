@@ -35,9 +35,9 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-public final class TorrentFragment extends AbstractPreferenceFragment {
+public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
-    public TorrentFragment() {
+    public TorrentPreferenceFragment() {
         super(R.xml.settings_torrent);
     }
 

@@ -18,12 +18,21 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.format.DateUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -34,7 +43,9 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.TransferItem;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -50,7 +61,9 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     private TextView totalSize;
     private TextView numberOfFiles;
     private TextView downloadSpeedLimit;
+    private ImageView downloadSpeedLimitArrow;
     private TextView uploadSpeedLimit;
+    private ImageView uploadSpeedLimitArrow;
     private TextView hash;
     private ImageButton hashCopyButton;
     private TextView magnet;
@@ -59,6 +72,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     private TextView comment;
     private CompoundButton.OnCheckedChangeListener onSequentialDownloadCheckboxCheckedListener;
     private View.OnClickListener onCopyToClipboardListener;
+    private View.OnClickListener onRateLimitClickListener;
 
     public TransferDetailDetailsFragment() {
         super(R.layout.fragment_transfer_detail_details);
@@ -73,7 +87,9 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         totalSize = findView(rv, R.id.fragment_transfer_detail_details_total_size);
         numberOfFiles = findView(rv, R.id.fragment_transfer_detail_details_files_number);
         downloadSpeedLimit = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_download);
+        downloadSpeedLimitArrow = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
         uploadSpeedLimit = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_upload);
+        uploadSpeedLimitArrow = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
         hash = findView(rv, R.id.fragment_transfer_detail_details_hash);
         hashCopyButton = findView(rv, R.id.fragment_transfer_detail_details_hash_copy_button);
         magnet = findView(rv, R.id.fragment_transfer_detail_details_magnet);
@@ -146,9 +162,16 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             sequentialDownloadCheckBox.setOnCheckedChangeListener(null);
             sequentialDownloadCheckBox.setChecked(btDL.isSequentialDownload());
             sequentialDownloadCheckBox.setOnCheckedChangeListener(onSequentialDownloadCheckboxCheckedListener);
+
             seedingOnCheckBox.setChecked(btDL.isSeeding());
-            // TODO: add touch listener to this row and present a dialog with sliders
-            // to control both speed limits.
+
+            if (onRateLimitClickListener == null) {
+                onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, getFragmentManager());
+                downloadSpeedLimit.setOnClickListener(onRateLimitClickListener);
+                downloadSpeedLimitArrow.setOnClickListener(onRateLimitClickListener);
+                uploadSpeedLimit.setOnClickListener(onRateLimitClickListener);
+                uploadSpeedLimitArrow.setOnClickListener(onRateLimitClickListener);
+            }
             int downloadRateLimit = btDL.getDownloadRateLimit();
             int uploadRateLimit = btDL.getUploadRateLimit();
             if (downloadRateLimit != -1) {
@@ -211,6 +234,267 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                             messageId,
                             data);
             action.onClick();
+        }
+    }
+
+    public static final class SpeedLimitDialog extends DialogFragment {
+        private UIBittorrentDownload uiBittorrentDownload;
+        private Direction direction;
+
+        enum Direction {
+            Download,
+            Upload
+        }
+
+        private static final String START_RANGE = "startRange";
+        private static final String END_RANGE = "endRange";
+        private static final String DEFAULT_VALUE = "defaultValue";
+        private static final String IS_BYTE_RATE = "isByteRate";
+        private static final String PLURAL_UNIT_RESOURCE_ID = "pluralUnitResourceId";
+        private static final String SUPPORTS_UNLIMITED = "supportsUnlimited";
+        private static final String UNLIMITED_VALUE = "unlimitedValue";
+        private static final String UNLIMITED_CHECKED = "unlimitedChecked";
+        private static final String CURRENT_VALUE = "currentValue";
+
+        private int mStartRange;
+        private int mEndRange;
+        private int mDefault;
+        private boolean mIsByteRate;
+        //private int mPluralUnitResourceId;
+        private boolean mSupportsUnlimited;
+        private int mUnlimitedValue;
+        private boolean mSkipListeners;
+        private SeekBar mSeekbar;
+        private CheckBox mUnlimitedCheckbox;
+        private TextView mCurrentValueTextView;
+
+        public static SpeedLimitDialog newInstance(UIBittorrentDownload uiBittorrentDownload, Direction direction) {
+            SpeedLimitDialog dialog = new SpeedLimitDialog().init(uiBittorrentDownload, direction);
+            dialog.setCancelable(true);
+            Bundle bundle = new Bundle();
+            //bundle.putString(ARG_KEY, preference.getKey());
+            bundle.putInt(START_RANGE, 1024);
+            bundle.putInt(END_RANGE, 5242880);
+            bundle.putInt(DEFAULT_VALUE, 0);
+            bundle.putBoolean(IS_BYTE_RATE, true);
+            // bundle.putInt(PLURAL_UNIT_RESOURCE_ID, preference.getPluralUnitResourceId());
+            bundle.putBoolean(SUPPORTS_UNLIMITED, true);
+            bundle.putInt(UNLIMITED_VALUE, 0);
+            BTDownload dl = uiBittorrentDownload.getDl();
+            bundle.putInt(CURRENT_VALUE, direction == Direction.Download ? dl.getDownloadRateLimit() : dl.getUploadRateLimit());
+            dialog.setArguments(bundle);
+            return dialog;
+        }
+
+        public SpeedLimitDialog() {
+        }
+
+        public SpeedLimitDialog init(UIBittorrentDownload uiBittorrentDownload, Direction direction) {
+            this.uiBittorrentDownload = uiBittorrentDownload;
+            this.direction = direction;
+            return this;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            Bundle args = getArguments();
+            mStartRange = args.getInt(START_RANGE);
+            mEndRange = args.getInt(END_RANGE);
+            mDefault = args.getInt(DEFAULT_VALUE);
+            mIsByteRate = args.getBoolean(IS_BYTE_RATE);
+            //mPluralUnitResourceId = args.getInt(PLURAL_UNIT_RESOURCE_ID);
+            mSupportsUnlimited = args.getBoolean(SUPPORTS_UNLIMITED);
+            mUnlimitedValue = args.getInt(UNLIMITED_VALUE);
+        }
+
+        @Override
+        public void onSaveInstanceState(@NonNull Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putInt(START_RANGE, mStartRange);
+            outState.putInt(END_RANGE, mEndRange);
+            outState.putInt(DEFAULT_VALUE, mDefault);
+            outState.putBoolean(IS_BYTE_RATE, mIsByteRate);
+            //outState.putInt(PLURAL_UNIT_RESOURCE_ID, mPluralUnitResourceId);
+            outState.putBoolean(SUPPORTS_UNLIMITED, mSupportsUnlimited);
+            outState.putInt(UNLIMITED_VALUE, mUnlimitedValue);
+            outState.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
+            outState.putInt(CURRENT_VALUE, mSeekbar.getProgress());
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater layoutInflater = getActivity().getLayoutInflater();
+            View view = layoutInflater.inflate(R.layout.dialog_preference_seekbar_with_checkbox, null);
+            builder.setView(view);
+
+            mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
+            mSeekbar.setMax(mEndRange);
+            int previousValue = -1;
+            if (getArguments() != null) {
+                int curVal = getArguments().getInt(CURRENT_VALUE);
+                if (curVal != -1) {
+                    previousValue = curVal;
+                }
+            }
+            mSeekbar.setProgress(previousValue);
+            mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    onSeekbarChanged(seekBar, i);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+            });
+            mCurrentValueTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
+            mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
+            Bundle arguments = getArguments();
+            mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
+            mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onUnlimitedCheckboxClicked();
+                }
+            });
+            updateComponents(previousValue);
+            updateCurrentValueTextView(previousValue);
+            builder.setTitle(direction == Direction.Download ? R.string.torrent_max_download_speed : R.string.torrent_max_upload_speed);
+            builder.setCancelable(true);
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    onDialogClosed(false);
+                }
+            });
+            builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    onDialogClosed(true);
+                }
+            });
+            return  builder.create();
+        }
+
+        private void updateComponents(int currentValue) {
+            mSkipListeners = true;
+            if (!mSupportsUnlimited) {
+                mUnlimitedCheckbox.setVisibility(View.GONE);
+                mSeekbar.setEnabled(true);
+                mSeekbar.setProgress(currentValue);
+            } else {
+                mUnlimitedCheckbox.setVisibility(View.VISIBLE);
+                mSeekbar.setEnabled(true);
+                if (mUnlimitedCheckbox.isChecked()) {
+                    mSeekbar.setProgress(mSeekbar.getMax());
+                    mSeekbar.setEnabled(false);
+                } else {
+                    boolean isUnlimited = currentValue == mUnlimitedValue;
+                    if (isUnlimited) {
+                        mSeekbar.setProgress(mSeekbar.getMax());
+                        mUnlimitedCheckbox.setChecked(true);
+                        mSeekbar.setEnabled(false);
+                    }
+                }
+            }
+            mSkipListeners = false;
+        }
+
+        private void onSeekbarChanged(SeekBar seekBar, int value) {
+            if (mSkipListeners) {
+                return;
+            }
+            value = seekbarMinValueCheck(seekBar, value);
+            Bundle arguments = getArguments();
+            arguments.putInt(CURRENT_VALUE, value);
+            updateCurrentValueTextView(value);
+        }
+
+        // SeekBar does not support a minimum value .setMinimum(int), have to override behaviour
+        private int seekbarMinValueCheck(SeekBar seekBar, int value) {
+            if (value < mStartRange) {
+                mSkipListeners = true;
+                value = mStartRange;
+                seekBar.setProgress(value);
+                mSkipListeners = false;
+            }
+            return value;
+        }
+
+        private void onUnlimitedCheckboxClicked() {
+            Bundle arguments = getArguments();
+            arguments.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
+            if (mSkipListeners) {
+                return;
+            }
+            mSkipListeners = true;
+            int seekbarValue = mSeekbar.getProgress();
+            int currentValue = mUnlimitedCheckbox.isChecked() ? mUnlimitedValue : seekbarValue;
+            updateComponents(currentValue);
+            updateCurrentValueTextView(currentValue);
+            mSkipListeners = false;
+        }
+
+        private void updateCurrentValueTextView(int value) {
+            if (mSupportsUnlimited && (value == mUnlimitedValue) || mUnlimitedCheckbox.isChecked()) {
+                mCurrentValueTextView.setText(getResources().getText(R.string.unlimited));
+            } else if (mIsByteRate) {
+                mCurrentValueTextView.setText(String.format("%s/s", UIUtils.getBytesInHuman(value)));
+            } //else if (mPluralUnitResourceId != -1) {
+            //    mCurrentValueTextView.setText(getResources().getQuantityString(mPluralUnitResourceId, value, value));
+            //}
+        }
+
+        public void onDialogClosed(boolean positiveResult) {
+            if (positiveResult) {
+                seekbarMinValueCheck(mSeekbar, mSeekbar.getProgress());
+                int value = (mSupportsUnlimited && mUnlimitedCheckbox.isChecked()) ?
+                        mUnlimitedValue :
+                        mSeekbar.getProgress();
+                if (uiBittorrentDownload != null) {
+                    BTDownload dl = uiBittorrentDownload.getDl();
+                    if (direction == Direction.Download) {
+                        dl.setDownloadRateLimit(value);
+                    } else if (direction == Direction.Upload) {
+                        dl.setUploadRateLimit(value);
+                    }
+                }
+            }
+        }
+    }
+
+    public static final class OnSpeedLimitClickListener implements View.OnClickListener {
+        private final UIBittorrentDownload uiBittorrentDownload;
+        private final WeakReference<FragmentManager> fragmentManagerRef;
+
+        OnSpeedLimitClickListener(UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManager) {
+            this.uiBittorrentDownload = uiBittorrentDownload;
+            fragmentManagerRef = Ref.weak(fragmentManager);
+        }
+
+        @Override
+        public void onClick(View v) {
+            SpeedLimitDialog.Direction direction = SpeedLimitDialog.Direction.Upload;
+            switch (v.getId()) {
+                case R.id.fragment_transfer_detail_details_speed_limit_download:
+                case R.id.fragment_transfer_detail_details_speed_limit_download_arrow:
+                    direction = SpeedLimitDialog.Direction.Download;
+                    break;
+                case R.id.fragment_transfer_detail_details_speed_limit_upload:
+                case R.id.fragment_transfer_detail_details_speed_limit_upload_arrow:
+                    direction = SpeedLimitDialog.Direction.Upload;
+                    break;
+            }
+
+            SpeedLimitDialog dialog = SpeedLimitDialog.newInstance(uiBittorrentDownload, direction);
+            dialog.show(fragmentManagerRef.get(), "SpeedLimitDialog");
         }
     }
 }
