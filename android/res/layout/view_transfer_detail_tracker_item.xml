@@ -19,34 +19,59 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/view_transfer_detail_tracker_address"
-        style="@style/transferDetailText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
-        android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-        android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
-        android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
-        android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-        android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small"
-        android:text="@string/transfer_detail_trackers_address_dummy" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <!-- TODO for @marcelinkaaa, replace these for ImageButtons with icons representing
-         'edit' (a pencil?) and 'remove' (an 'x'? maybe) actions -->
-    <ImageButton
-        android:id="@+id/view_transfer_detail_tracker_edit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:src="@drawable/menu_update"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"/>
-    <ImageButton
-        android:id="@+id/view_transfer_detail_tracker_remove_button"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:src="@drawable/action_bar_delete"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
+        android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingEnd="0dp"
+        android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/view_transfer_detail_tracker_address"
+            style="@style/transferDetailText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".77"
+            android:text="@string/transfer_detail_trackers_address_dummy" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".23"
+            android:gravity="end">
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_tracker_edit_button"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:contentDescription="@null"
+                android:paddingEnd="2dp"
+                android:paddingStart="0dp"
+                android:src="@drawable/contextmenu_icon_rename" />
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_tracker_remove_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@null"
+                android:paddingEnd="5dp"
+                android:paddingStart="2dp"
+                android:src="@drawable/contextmenu_icon_remove_transfer" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_line"
+        android:contentDescription="@null" />
 </LinearLayout>
