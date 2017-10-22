@@ -99,18 +99,11 @@
             android:background="@drawable/divider_line"
             android:contentDescription="@null" />
 
-        <TextView
-            android:id="@+id/fragment_transfer_detail_trackers_address"
-            style="@style/transferDetailText"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_transfer_detail_trackers_address_recyclerview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
-            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small"
-            android:text="@string/transfer_detail_trackers_address_dummy" />
+            android:layout_height="wrap_content">
+        </android.support.v7.widget.RecyclerView>
 
         <ImageView
             android:layout_width="match_parent"
