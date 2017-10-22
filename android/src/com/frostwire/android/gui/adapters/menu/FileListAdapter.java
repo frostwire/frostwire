@@ -47,6 +47,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ListAdapterFilter;
@@ -73,6 +74,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
@@ -397,15 +400,18 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 //special treatment of ringtones
                 if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
                     playRingtone(fd);
+                } else if (fd.fileType == Constants.FILE_TYPE_PICTURES && ctx instanceof MainActivity) {
+                    Intent intent = new Intent(ctx, ImageViewerActivity.class);
+                    intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR_BUNDLE, fd.toBundle());
+                    intent.putExtra(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, position);
+                    ctx.startActivity(intent);
+                } else if ("application/x-bittorrent".equals(fd.mime)) {
+                    // torrents are often DOCUMENT typed
+                    boolean useFileProvider = hasNougatOrNewer();
+                    TransferManager.instance().downloadTorrent(UIUtils.getFileUri(ctx, fd.filePath, useFileProvider).toString());
+                    UIUtils.showTransfersOnDownloadStart(ctx);
                 } else {
-                    if (fd.fileType == Constants.FILE_TYPE_PICTURES && ctx instanceof MainActivity) {
-                        Intent intent = new Intent(ctx, ImageViewerActivity.class);
-                        intent.putExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR_BUNDLE, fd.toBundle());
-                        intent.putExtra(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, position);
-                        ctx.startActivity(intent);
-                    } else {
-                        UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
-                    }
+                    UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
                 }
             } else {
                 // it will automatically remove the 'Open' entry.

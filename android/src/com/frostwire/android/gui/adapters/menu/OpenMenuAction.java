@@ -27,8 +27,11 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+
+import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
 /**
  * @author gubatron
@@ -93,8 +96,14 @@ public class OpenMenuAction extends MenuAction {
             MusicUtils.playSimple(this.path);
         } else if (fileType == Constants.FILE_TYPE_AUDIO) {
             UIUtils.playEphemeralPlaylist(fd);
+        } else if ("application/x-bittorrent".equals(fd.mime)) {
+            // torrents are often DOCUMENT typed
+            boolean useFileProvider = hasNougatOrNewer();
+            TransferManager.instance().downloadTorrent(UIUtils.getFileUri(context, fd.filePath, useFileProvider).toString());
+            UIUtils.showTransfersOnDownloadStart(context);
         } else {
-            UIUtils.openFile(context, path, mime, true);
+            boolean useFileProvider = hasNougatOrNewer();
+            UIUtils.openFile(context, path, mime, useFileProvider);
         }
     }
 }
