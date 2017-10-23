@@ -253,7 +253,7 @@ public class ShareTorrentDialog extends JDialog {
 
     private String getLink() {
         if (link == null) {
-            link = "http://maglnk.com/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent);
+            link = "http://maglnk.xyz/" + info_hash + "/?" + TorrentUtil.getMagnetURLParameters(torrent);
         }
         return link;
     }
