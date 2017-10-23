@@ -31,9 +31,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -166,6 +168,46 @@ public final class UIUtils {
     public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(iconId).setMessage(message).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
+        builder.create().show();
+    }
+
+    public interface TextViewInputDialogCallback {
+        void onDialogSubmitted(String value, boolean cancelled);
+    }
+
+    public static void showEditTextDialog(Context context,
+                                          int iconId,
+                                          int messageStringId,
+                                          int titleStringId,
+                                          final TextViewInputDialogCallback callback) {
+        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+        LinearLayout customView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_alertdialog_edittext, null);
+        final EditText inputEditText = customView.findViewById(R.id.view_alertdialog_edittext_edittext);
+        inputEditText.setHint(context.getString(messageStringId));
+        builder.setIcon(iconId).setTitle(titleStringId).setCancelable(true);
+        builder.setView(customView);
+        builder.setPositiveButton(R.string.add, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (inputEditText != null && callback != null) {
+                    try {
+                        callback.onDialogSubmitted(inputEditText.getText().toString(), false);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if (callback != null) {
+                    callback.onDialogSubmitted(null, true);
+                }
+                dialog.dismiss();
+            }
+        });
         builder.create().show();
     }
 
