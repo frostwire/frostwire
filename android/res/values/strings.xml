@@ -740,6 +740,11 @@
     <string name="transfer_detail_title_header">Name:</string>
     <string name="transfer_detail_storage_header">Storage Path:</string>
     <string name="add_trackers">Add trackers</string>
+    <string name="add_tracker">Add tracker</string>
+    <string name="edit_tracker">Edit tracker</string>
+    <string name="enter_valid_tracker_url_here">Enter valid tracker url here</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
     <string name="number_of_files">Number of files</string>
     <string name="active_time">Active time</string>
     <string name="seeding_time">Seeding time</string>

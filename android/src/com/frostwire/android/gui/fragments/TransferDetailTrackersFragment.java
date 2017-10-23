@@ -25,13 +25,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.AnnounceEntry;
@@ -76,27 +75,53 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     public void onTime() {
         super.onTime();
 
-        if (adapter == null) {
+        if (adapter == null && uiBittorrentDownload != null) {
             layoutManager = new LinearLayoutManager(getActivity());
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
+            addTrackerButton.setOnClickListener(new AddTrackerButtonClickListener(uiBittorrentDownload.getDl().getTorrentHandle(), adapter));
         } else {
-
+            adapter.notifyDataSetChanged();
         }
         dhtStatus.setText(BTEngine.getInstance().isDhtRunning() ? R.string.working : R.string.disabled);
         pexStatus.setText("--");
     }
 
-    private static final class AddTrackerButtonClickListener implements View.OnClickListener {
+    private static final class AddTrackerButtonClickListener implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {
+        private final TorrentHandle torrentHandle;
+        private final WeakReference<TrackerRecyclerViewAdapter> adapterRef;
+
+
+        AddTrackerButtonClickListener(TorrentHandle torrentHandle, TrackerRecyclerViewAdapter adapter) {
+            this.torrentHandle = torrentHandle;
+            adapterRef = Ref.weak(adapter);
+        }
+
         @Override
         public void onClick(View v) {
+            UIUtils.showEditTextDialog(v.getContext(),
+                    R.drawable.contextmenu_icon_seed,
+                    R.string.enter_valid_tracker_url_here,
+                    R.string.add_tracker,
+                    this);
+        }
 
+        @Override
+        public void onDialogSubmitted(String value, boolean cancelled) {
+            if (!cancelled && torrentHandle != null && value != null) {
+                value = value.trim();
+                if (value.startsWith("udp://") || value.startsWith("http://") || value.startsWith("https://")) {
+                    torrentHandle.addTracker(new AnnounceEntry(value));
+                    if (Ref.alive(adapterRef)) {
+                        adapterRef.get().notifyDataSetChanged();
+                    }
+                }
+            }
         }
     }
 
     private static final class TrackerItemViewHolder extends RecyclerView.ViewHolder {
-
         private final WeakReference<TrackerRecyclerViewAdapter> adapterRef; // so we can notify it when we've changed its underlying data
         private final TextView trackerTextView;
         private final ImageView editButton;
