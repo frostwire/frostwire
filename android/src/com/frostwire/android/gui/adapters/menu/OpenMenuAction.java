@@ -96,7 +96,7 @@ public class OpenMenuAction extends MenuAction {
             MusicUtils.playSimple(this.path);
         } else if (fileType == Constants.FILE_TYPE_AUDIO) {
             UIUtils.playEphemeralPlaylist(fd);
-        } else if ("application/x-bittorrent".equals(fd.mime)) {
+        } else if (fd != null && "application/x-bittorrent".equals(fd.mime)) {
             // torrents are often DOCUMENT typed
             boolean useFileProvider = hasNougatOrNewer();
             TransferManager.instance().downloadTorrent(UIUtils.getFileUri(context, fd.filePath, useFileProvider).toString());
