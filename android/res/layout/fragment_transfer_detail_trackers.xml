@@ -107,13 +107,8 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/fragment_transfer_detail_trackers_address_recyclerview"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:contentDescription="@null" />
     </LinearLayout>
 </ScrollView>
