@@ -394,8 +394,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                     ctx.startActivity(intent);
                 } else if ("application/x-bittorrent".equals(fd.mime)) {
                     // torrents are often DOCUMENT typed
-                    boolean useFileProvider = hasNougatOrNewer();
-                    TransferManager.instance().downloadTorrent(UIUtils.getFileUri(ctx, fd.filePath, useFileProvider).toString());
+                    TransferManager.instance().downloadTorrent(UIUtils.getFileUri(ctx, fd.filePath, false).toString());
                     UIUtils.showTransfersOnDownloadStart(ctx);
                 } else {
                     UIUtils.openFile(ctx, fd.filePath, fd.mime, true);
