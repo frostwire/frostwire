@@ -24,12 +24,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.transfers.BittorrentDownload;
 
 import java.text.DecimalFormatSymbols;
 
@@ -132,6 +134,31 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public void onPause() {
         super.onPause();
         subscription.unsubscribe();
+    }
+
+    // Fragment State serialization = onSaveInstanceState
+    // Fragment State deserialization = onActivityCreated
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (uiBittorrentDownload != null) {
+            outState.putString("infohash",uiBittorrentDownload.getInfoHash());
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (uiBittorrentDownload == null && savedInstanceState != null) {
+            String infohash = savedInstanceState.getString("infohash");
+            if (infohash != null) {
+                BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infohash);
+                if (bittorrentDownload instanceof UIBittorrentDownload) {
+                    uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
+                }
+            }
+        }
     }
     // All utility functions will be here for now
 
