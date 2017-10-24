@@ -76,6 +76,9 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     public void onTime() {
         super.onTime();
+        if (uiBittorrentDownload == null) {
+            return;
+        }
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
         if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
             timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
