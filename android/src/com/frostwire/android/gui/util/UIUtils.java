@@ -179,11 +179,17 @@ public final class UIUtils {
                                           int iconId,
                                           int messageStringId,
                                           int titleStringId,
+                                          String optionalEditTextValue,
                                           final TextViewInputDialogCallback callback) {
-        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         LinearLayout customView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_alertdialog_edittext, null);
         final EditText inputEditText = customView.findViewById(R.id.view_alertdialog_edittext_edittext);
         inputEditText.setHint(context.getString(messageStringId));
+
+        if (optionalEditTextValue != null && optionalEditTextValue.length() > 0) {
+            inputEditText.setText(optionalEditTextValue);
+        }
+
+        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
         builder.setIcon(iconId).setTitle(titleStringId).setCancelable(true);
         builder.setView(customView);
         builder.setPositiveButton(R.string.add, new OnClickListener() {
