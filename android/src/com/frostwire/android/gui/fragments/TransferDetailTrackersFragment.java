@@ -72,7 +72,10 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     @Override
     public void onTime() {
         super.onTime();
-        if (adapter == null && uiBittorrentDownload != null) {
+        if (uiBittorrentDownload == null) {
+            return;
+        }
+        if (adapter == null) {
             layoutManager = new LinearLayoutManager(getActivity());
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
             recyclerView.setLayoutManager(layoutManager);
