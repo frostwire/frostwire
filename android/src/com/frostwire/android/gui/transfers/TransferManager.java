@@ -323,11 +323,11 @@ public final class TransferManager {
             }
 
             Uri u = Uri.parse(url);
-
-            if (!u.getScheme().equalsIgnoreCase("file") &&
-                    !u.getScheme().equalsIgnoreCase("http") &&
-                    !u.getScheme().equalsIgnoreCase("https") &&
-                    !u.getScheme().equalsIgnoreCase("magnet")) {
+            String scheme = u.getScheme();
+            if (!scheme.equalsIgnoreCase("file") &&
+                    !scheme.equalsIgnoreCase("http") &&
+                    !scheme.equalsIgnoreCase("https") &&
+                    !scheme.equalsIgnoreCase("magnet")) {
                 LOG.warn("Invalid URI scheme: " + u.toString());
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
             }
@@ -335,17 +335,17 @@ public final class TransferManager {
             BittorrentDownload download = null;
 
             if (fetcherListener == null) {
-                if (u.getScheme().equalsIgnoreCase("file")) {
+                if (scheme.equalsIgnoreCase("file")) {
                     BTEngine.getInstance().download(new File(u.getPath()), null, null);
-                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
+                } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle));
                     bittorrentDownloadsList.add(download);
                     bittorrentDownloadsMap.put(download.getInfoHash(), download);
                 }
             } else {
-                if (u.getScheme().equalsIgnoreCase("file")) {
+                if (scheme.equalsIgnoreCase("file")) {
                     fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, -1);
-                } else if (u.getScheme().equalsIgnoreCase("http") || u.getScheme().equalsIgnoreCase("https") || u.getScheme().equalsIgnoreCase("magnet")) {
+                } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
                     bittorrentDownloadsList.add(download);
@@ -357,7 +357,7 @@ public final class TransferManager {
 
             return download;
         } catch (Throwable e) {
-            LOG.warn("Error creating download from uri: " + url);
+            LOG.warn("Error creating download from uri: " + url, e);
             return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
         }
     }
