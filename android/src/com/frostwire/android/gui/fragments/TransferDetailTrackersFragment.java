@@ -38,6 +38,7 @@ import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,19 +63,15 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-
         dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
         pexStatus = findView(v, R.id.fragment_transfer_detail_trackers_pex_status);
-
         recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
-
         addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
 
     @Override
     public void onTime() {
         super.onTime();
-
         if (adapter == null && uiBittorrentDownload != null) {
             layoutManager = new LinearLayoutManager(getActivity());
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
@@ -104,6 +101,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                     R.drawable.contextmenu_icon_seed,
                     R.string.enter_valid_tracker_url_here,
                     R.string.add_tracker,
+                    null,
                     this);
         }
 
@@ -138,10 +136,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             trackerTextView = itemView.findViewById(R.id.view_transfer_detail_tracker_address);
             editButton = itemView.findViewById(R.id.view_transfer_detail_tracker_edit_button);
             removeButton = itemView.findViewById(R.id.view_transfer_detail_tracker_remove_button);
-
             this.torrentHandle = torrentHandle;
             this.trackerOffset = trackerOffset;
-
             editButton.setOnClickListener(new OnEditTrackerClicked(this));
             removeButton.setOnClickListener(new OnRemoveTrackerClicked(this));
         }
@@ -155,7 +151,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             trackerTextView.setText(trackerEntry.url());
         }
 
-        private static final class OnEditTrackerClicked implements View.OnClickListener {
+        private static final class OnEditTrackerClicked implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {
 
             private final WeakReference<TrackerItemViewHolder> vhRef;
 
@@ -165,22 +161,61 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
             @Override
             public void onClick(View v) {
+                String selectedTrackerURL = getSelectedTrackerURL();
+                if (selectedTrackerURL == null) {
+                    return;
+                }
+                UIUtils.showEditTextDialog(v.getContext(),
+                        R.drawable.contextmenu_icon_rename,
+                        R.string.enter_valid_tracker_url_here,
+                        R.string.edit_tracker,
+                        selectedTrackerURL,
+                        this);
+            }
+
+            @Override
+            public void onDialogSubmitted(String value, boolean cancelled) {
                 if (!Ref.alive(vhRef)) {
                     return;
                 }
-                // TODO: some edit textview dialog, once it's done this happens
-                // with the dialog's textview's contents.
+                TrackerItemViewHolder trackerViewHolder = vhRef.get();
+                if (!cancelled && value != null) {
+                    value = value.trim();
+                    if (value.startsWith("udp://") || value.startsWith("http://") || value.startsWith("https://")) {
+                        AnnounceEntry newTracker = new AnnounceEntry(value);
+                        TorrentHandle th = trackerViewHolder.torrentHandle;
+                        List<AnnounceEntry> originalTrackers = th.trackers();
+                        int offsetToReplace = trackerViewHolder.trackerOffset;
+                        // let's create another list just to make sure we won't have any weird
+                        // memory issues [could've just done originalTrackers.set(offsetToReplace, newTracker)]
+                        List<AnnounceEntry> newTrackerList = new ArrayList<>(originalTrackers.size());
+                        for (int i = 0; i < newTrackerList.size(); i++) {
+                            if (i != offsetToReplace) {
+                                newTrackerList.add(originalTrackers.get(i));
+                            } else {
+                                newTrackerList.add(newTracker);
+                            }
+                        }
 
+                        th.replaceTrackers(newTrackerList);
+                        th.saveResumeData();
+
+                        if (Ref.alive(trackerViewHolder.adapterRef)) {
+                            trackerViewHolder.adapterRef.get().notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+
+            private String getSelectedTrackerURL() {
+                if (!Ref.alive(vhRef)) {
+                    return null;
+                }
                 TrackerItemViewHolder viewHolder = vhRef.get();
                 int trackerOffset = viewHolder.trackerOffset;
                 List<AnnounceEntry> trackers = viewHolder.torrentHandle.trackers();
-
-                // replace the entry
-                //AnnounceEntry entry = new AnnounceEntry(new announce_entry("udp://sometracker.com:8090"));
-
-                if (Ref.alive(viewHolder.adapterRef)) {
-                    viewHolder.adapterRef.get().notifyDataSetChanged();
-                }
+                AnnounceEntry selectedTracker = trackers.get(trackerOffset);
+                return selectedTracker.url();
             }
         }
 
@@ -199,7 +234,6 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 // TODO: are you sure you want to remove X dialog or toast would be nice
                 int trackerOffset = vhRef.get().trackerOffset;
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
-
                 TrackerItemViewHolder viewHolder = vhRef.get();
                 if (Ref.alive(viewHolder.adapterRef)) {
                     viewHolder.adapterRef.get().notifyDataSetChanged();
@@ -229,8 +263,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         @Override
         public int getItemCount() {
             if (uiBittorrentDownload == null ||
-                uiBittorrentDownload.getDl() == null ||
-                uiBittorrentDownload.getDl().getTorrentHandle() == null) {
+                    uiBittorrentDownload.getDl() == null ||
+                    uiBittorrentDownload.getDl().getTorrentHandle() == null) {
                 return 0;
             }
             TorrentHandle torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();

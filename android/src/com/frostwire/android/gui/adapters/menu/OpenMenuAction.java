@@ -97,9 +97,7 @@ public class OpenMenuAction extends MenuAction {
         } else if (fileType == Constants.FILE_TYPE_AUDIO) {
             UIUtils.playEphemeralPlaylist(context, fd);
         } else if (fd != null && "application/x-bittorrent".equals(fd.mime)) {
-            // torrents are often DOCUMENT typed
-            boolean useFileProvider = hasNougatOrNewer();
-            TransferManager.instance().downloadTorrent(UIUtils.getFileUri(context, fd.filePath, useFileProvider).toString());
+            TransferManager.instance().downloadTorrent(UIUtils.getFileUri(context, fd.filePath, false).toString());
             UIUtils.showTransfersOnDownloadStart(context);
         } else {
             boolean useFileProvider = hasNougatOrNewer();
