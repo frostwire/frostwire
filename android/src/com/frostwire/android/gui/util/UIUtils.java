@@ -180,11 +180,13 @@ public final class UIUtils {
                                           int messageStringId,
                                           int titleStringId,
                                           int positiveButtonStringId,
+                                          boolean multilineInput,
                                           String optionalEditTextValue,
                                           final TextViewInputDialogCallback callback) {
         LinearLayout customView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_alertdialog_edittext, null);
         final EditText inputEditText = customView.findViewById(R.id.view_alertdialog_edittext_edittext);
         inputEditText.setHint(context.getString(messageStringId));
+        inputEditText.setMaxLines(!multilineInput ? 1 : 5);
 
         if (optionalEditTextValue != null && optionalEditTextValue.length() > 0) {
             inputEditText.setText(optionalEditTextValue);
