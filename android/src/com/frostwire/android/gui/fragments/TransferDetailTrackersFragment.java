@@ -67,22 +67,27 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
         pexStatus = findView(v, R.id.fragment_transfer_detail_trackers_pex_status);
         recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
 
     @Override
     public void onResume() {
-        super.onResume();
+        if (uiBittorrentDownload == null) {
+            return;
+        }
         if (adapter == null && isAdded()) {
-            layoutManager = new LinearLayoutManager(getActivity());
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
-            recyclerView.setLayoutManager(layoutManager);
+        }
+        if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
         }
         if (addTrackerButtonClickListener == null && adapter != null) {
-            addTrackerButtonClickListener = new AddTrackerButtonClickListener(uiBittorrentDownload.getDl().getTorrentHandle(), adapter);
+            TorrentHandle torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
+            addTrackerButtonClickListener = new AddTrackerButtonClickListener(torrentHandle, adapter);
             addTrackerButton.setOnClickListener(addTrackerButtonClickListener);
         }
+        super.onResume();
     }
 
     @Override
