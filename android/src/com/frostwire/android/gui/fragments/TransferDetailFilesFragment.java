@@ -91,9 +91,8 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (adapter == null) {
             adapter = new TransferDetailFilesRecyclerViewAdapter(items);
             layoutManager = new LinearLayoutManager(getActivity());
-            recyclerView.setAdapter(adapter);
-            // still don't understand this part below, I don't see a RelativeLayoutManager available anyways
             recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
         } else {
             adapter.updateTransferItems(items);
         }
