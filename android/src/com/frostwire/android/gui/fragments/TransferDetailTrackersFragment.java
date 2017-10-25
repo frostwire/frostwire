@@ -59,6 +59,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     private Button addTrackerButton;
 
     private TrackerRecyclerViewAdapter adapter;
+    private AddTrackerButtonClickListener addTrackerButtonClickListener;
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
@@ -70,20 +71,31 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter == null && isAdded()) {
+            layoutManager = new LinearLayoutManager(getActivity());
+            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+        }
+
+        if (addTrackerButtonClickListener == null && adapter != null) {
+            addTrackerButtonClickListener = new AddTrackerButtonClickListener(uiBittorrentDownload.getDl().getTorrentHandle(), adapter);
+            addTrackerButton.setOnClickListener(addTrackerButtonClickListener);
+        }
+    }
+
+    @Override
     public void onTime() {
         super.onTime();
         if (uiBittorrentDownload == null) {
             return;
         }
-        if (adapter == null) {
-            layoutManager = new LinearLayoutManager(getActivity());
-            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-            addTrackerButton.setOnClickListener(new AddTrackerButtonClickListener(uiBittorrentDownload.getDl().getTorrentHandle(), adapter));
-        } else {
+        if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+
         dhtStatus.setText(BTEngine.getInstance().isDhtRunning() ? R.string.working : R.string.disabled);
         pexStatus.setText("--");
     }
@@ -104,6 +116,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                     R.drawable.contextmenu_icon_seed,
                     R.string.enter_valid_tracker_url_here,
                     R.string.add_tracker,
+                    R.string.add,
                     null,
                     this);
         }
@@ -114,6 +127,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 value = value.trim();
                 if (value.startsWith("udp://") || value.startsWith("http://") || value.startsWith("https://")) {
                     torrentHandle.addTracker(new AnnounceEntry(value));
+                    torrentHandle.saveResumeData();
+                    torrentHandle.forceReannounce();
                     if (Ref.alive(adapterRef)) {
                         adapterRef.get().notifyDataSetChanged();
                     }
@@ -152,6 +167,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             }
             AnnounceEntry trackerEntry = trackers.get(trackerOffset);
             trackerTextView.setText(trackerEntry.url());
+            this.trackerOffset = trackerOffset;
         }
 
         private static final class OnEditTrackerClicked implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {
@@ -172,6 +188,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         R.drawable.contextmenu_icon_rename,
                         R.string.enter_valid_tracker_url_here,
                         R.string.edit_tracker,
+                        R.string.edit,
                         selectedTrackerURL,
                         this);
             }
@@ -192,7 +209,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         // let's create another list just to make sure we won't have any weird
                         // memory issues [could've just done originalTrackers.set(offsetToReplace, newTracker)]
                         List<AnnounceEntry> newTrackerList = new ArrayList<>(originalTrackers.size());
-                        for (int i = 0; i < newTrackerList.size(); i++) {
+                        for (int i = 0; i < originalTrackers.size(); i++) {
                             if (i != offsetToReplace) {
                                 newTrackerList.add(originalTrackers.get(i));
                             } else {
@@ -202,6 +219,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
                         th.replaceTrackers(newTrackerList);
                         th.saveResumeData();
+                        th.forceReannounce();
 
                         if (Ref.alive(trackerViewHolder.adapterRef)) {
                             trackerViewHolder.adapterRef.get().notifyDataSetChanged();
