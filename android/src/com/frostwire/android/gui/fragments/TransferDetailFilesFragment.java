@@ -57,7 +57,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     private TextView totalSizeTextView;
     private RecyclerView recyclerView;
     private TransferDetailFilesRecyclerViewAdapter adapter;
-    private LinearLayoutManager layoutManager;
 
     public TransferDetailFilesFragment() {
         super(R.layout.fragment_transfer_detail_files);
@@ -71,6 +70,28 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
         totalSizeTextView.setText("");
         recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onResume() {
+        if (uiBittorrentDownload == null) {
+            return;
+        }
+        List<TransferItem> items = uiBittorrentDownload.getItems();
+        if (items == null) {
+            return;
+        }
+        if (adapter == null) {
+            adapter = new TransferDetailFilesRecyclerViewAdapter(items);
+        }
+        if (recyclerView.getAdapter() == null) {
+
+            recyclerView.setAdapter(adapter);
+        }
+        fileNumberTextView.setText(getString(R.string.n_files, items.size()));
+        totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
+        super.onResume();
     }
 
     @Override
@@ -83,17 +104,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (items == null) {
             return;
         }
-        // since these transfer properties don't change, we'll only do this once
-        if ("".equals(fileNumberTextView.getText())) {
-            fileNumberTextView.setText(getString(R.string.n_files, items.size()));
-            totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
-        }
-        if (adapter == null) {
-            adapter = new TransferDetailFilesRecyclerViewAdapter(items);
-            layoutManager = new LinearLayoutManager(getActivity());
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-        } else {
+        if (adapter != null) {
             adapter.updateTransferItems(items);
         }
     }
@@ -120,7 +131,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             fileProgressBar.setProgress(transferItem.getProgress());
             fileProgressTextView.setText(transferItem.getProgress() + "%");
             fileSizeTextView.setText(UIUtils.getBytesInHuman(transferItem.getDownloaded()) + " / " + UIUtils.getBytesInHuman(transferItem.getSize()));
-
             playButtonImageView.setTag(transferItem);
             updatePlayButtonVisibility(transferItem);
         }
