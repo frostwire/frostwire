@@ -160,6 +160,11 @@ public final class Debug {
                 f.setAccessible(true);
                 Object value = f.get(obj);
 
+                // avoid recursion due to self reference field
+                if (value == obj) {
+                    continue;
+                }
+
                 if (hasContext(value, level + 1)) {
                     return true;
                 }
