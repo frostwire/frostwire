@@ -85,7 +85,7 @@ public class InstallerUpdater implements Runnable {
         if (!forceUpdate && !UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.getValue()) {
             return;
         }
-        cleanupOldUpdates();
+        cleanupInvalidUpdates();
 
         if (checkIfDownloaded()) {
             showUpdateMessage();
@@ -372,46 +372,36 @@ public class InstallerUpdater implements Runnable {
     private void downloadComplete() {
         System.out.println("InstallerUpdater.downloadComplete()!!!!");
         printDownloadManagerStatus(_manager);
-        cleanupOldUpdates();
+        cleanupInvalidUpdates();
 
         if (checkIfDownloaded()) {
             showUpdateMessage();
         }
     }
 
-    private void cleanupOldUpdates() {
-        if (_updateMessage.getSaveAs() != null) {
-            if (!UpdateSettings.UPDATES_DIR.exists()) {
-                UpdateSettings.UPDATES_DIR.mkdirs();
-                return;
-            }
+    private void cleanupInvalidUpdates() {
+        if (!UpdateSettings.UPDATES_DIR.exists() ||
+            !UpdateSettings.UPDATES_DIR.isDirectory()) {
+            return;
+        }
+        File[] files = UpdateSettings.UPDATES_DIR.listFiles();
+        if (files == null || files.length == 0) {
+            return;
+        }
 
-            File[] files = UpdateSettings.UPDATES_DIR.listFiles();
+        String currentMD5 = _updateMessage.getRemoteMD5();
 
-            String latestUpdateFileName = _updateMessage.getSaveAs();
-            for (File f : files) {
-                if (!f.getName().equals(latestUpdateFileName)) {
-                    f.delete();
-                    LOG.info("cleanupOldUpdates() - removed old " + f.getName());
+        for (File file : files) {
+            try {
+                String fileMD5 = DigestUtils.getMD5(file);
+                if (!DigestUtils.compareMD5(currentMD5, fileMD5)) {
+                    System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> removed " + file.getName());
+                    file.delete();
                 }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
-
-        final Pattern p = Pattern.compile("^frostwire-([0-9]+[0-9]?\\.[0-9]+[0-9]?\\.[0-9]+[0-9]?)(.*?)(\\.torrent)?$");
-        FilenameFilter filenameFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                Matcher m = p.matcher(name);
-                return m.matches() && !m.group(1).equals(_updateMessage.getVersion());
-            }
-        };
-        File[] files = UpdateSettings.UPDATES_DIR.listFiles(filenameFilter);
-        if (files != null) {
-            for (File f : files) {
-                f.delete();
-            }
-        }
-
     }
 
     private boolean checkIfDownloaded() {
