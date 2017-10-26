@@ -25,6 +25,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 
 import com.frostwire.android.core.ConfigurationManager;
@@ -35,6 +36,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 
@@ -88,10 +90,12 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     case CONNECTED:
                         handleConnectedNetwork(networkInfo);
                         handleNetworkStatusChange();
+                        reopenNetworkSockets();
                         break;
                     case DISCONNECTED:
                         handleDisconnectedNetwork(networkInfo);
                         handleNetworkStatusChange();
+                        reopenNetworkSockets();
                         break;
                     case CONNECTING:
                     case DISCONNECTING:
@@ -255,5 +259,14 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         // the type name is OK for now
         String typeName = networkInfo.getTypeName();
         return typeName != null && typeName.contains("VPN");
+    }
+
+    private static void reopenNetworkSockets() {
+        Engine.instance().getThreadPool().execute(() -> {
+            // sleep for a second, since IPv6 addresses takes time to be reported
+            SystemClock.sleep(1000);
+            // TODO: use public java API when available
+            BTEngine.getInstance().swig().reopen_network_sockets();
+        });
     }
 }
