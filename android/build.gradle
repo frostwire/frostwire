@@ -153,12 +153,10 @@ android {
 
     productFlavors {
         basic {
-            dimension "distributionChannel"
             applicationId 'com.frostwire.android'
             versionCode 9060000 + project.ext.versionCode
         }
         plus1 {
-            dimension "distributionChannel"
             applicationId 'com.frostwire.android'
             versionCode 9070000 + project.ext.versionCode
         }
