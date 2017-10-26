@@ -147,12 +147,12 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:layout_toLeftOf="@+id/fragment_transfer_detail_peers_arrow_down"
-                    android:layout_toStartOf="@+id/fragment_transfer_detail_peers_arrow_down"
+                    android:layout_toLeftOf="@+id/view_transfer_detail_peer_item_arrow_down"
+                    android:layout_toStartOf="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:text="@string/dummy_size" />
 
                 <ImageView
-                    android:id="@+id/fragment_transfer_detail_peers_arrow_down"
+                    android:id="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
                     android:layout_toLeftOf="@+id/view_transfer_list_item_speed"
