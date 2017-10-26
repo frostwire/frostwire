@@ -174,8 +174,6 @@
     <string name="broadcast_discovery_summary">Connect to local Wi-Fi peers via broadcast (more traffic on router)</string>
     <string name="internet_discovery">Internet Discovery</string>
     <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">From</string>
     <string name="wants_to_share_a_file">wants to share a file</string>
     <string name="translators">Translators</string>
@@ -402,7 +400,7 @@
     <string name="support_frostwire_summary">Show ads to support the development of this app.</string>
     <string name="storage_preference_title">Select Storage Location</string>
     <string name="storage_preference_summary">The default storage location where files will be saved.</string>
-    <string name="bittorrent">BitTorrent</string>
+    <string name="bittorrent" translatable="false">BitTorrent</string>
     <string name="bittorrent_network_summary">Connection status</string>
     <string name="loading">Loading</string>
     <string name="wifi_sharing">Wi-Fi Sharing</string>
@@ -454,7 +452,7 @@
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
-    <string name="btc">BTC</string>
+    <string name="btc" translatable="false">BTC</string>
     <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
     <string name="transfers_select_downloading">downloading</string>
@@ -545,8 +543,8 @@
     <string name="enable_dht">Enable DHT</string>
     <string name="enable_dht_summary">Use the Distributed Hash Table to announce/search torrent peers</string>
     <string name="dummy_build" translatable="false">[build number]</string>
-    <string name="basic">Basic</string>
-    <string name="plus">Plus</string>
+    <string name="basic" translatable="false">Basic</string>
+    <string name="plus" translatable="false">Plus</string>
     <string name="build">build</string>
     <string name="try_other_keywords">Try fewer/different keywords</string>
     <string name="learn_how_to_get_more_results">Learn how to get more results</string>
@@ -673,7 +671,7 @@
     <string name="frostwire_sticker_and_more">FrostWire stickers and more</string>
     <string name="donate_your_time">Donate your time</string>
     <string name="changelog">Changelog</string>
-    <string name="pro">PRO</string>
+    <string name="pro" translatable="false">PRO</string>
     <string name="unlimited">Unlimited</string>
     <string name="search_preferences_one_engine_checked_always">By default, one search engine needs to be checked at all times</string>
     <string name="number_picker_tip">Tip: touch selected number to use keyboard</string>
@@ -730,10 +728,11 @@
     <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
     <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
     <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
+    <string name="transfer_detail_number_of_peers_dummy" translatable="false">12 Peers</string>
     <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
     <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
-    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50/.174.100:51413</string>
-    <string name="transfer_detail_peers_address_source_dummy" translatable="false">Transmission 2.82</string>
+    <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
+    <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
     <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
     <string name="infinity" translatable="false">&#8734;</string>
 
@@ -759,16 +758,18 @@
     <string name="uploaded">Uploaded</string>
     <string name="total_size">Total size</string>
     <string name="share_ratio">Share ratio</string>
-    <string name="hash">Hash</string>
-    <string name="magnet">Magnet</string>
+    <string name="hash" translatable="false">Hash</string>
+    <string name="magnet" translatable="false">Magnet</string>
     <string name="created_on">Created on</string>
     <string name="comment">Comment</string>
     <string name="speed_limits">Speed limits</string>
     <string name="up_speed">Up speed</string>
     <string name="down_speed">Down speed</string>
     <string name="working">Working</string>
-    <string name="dht">DHT</string>
-    <string name="pex">PeX</string>
+    <string name="tracker" translatable="false">Tracker</string>
+    <string name="dht" translatable="false">DHT</string>
+    <string name="pex" translatable="false">PeX</string>
+    <string name="lsd" translatable="false">LSD</string>
     <string name="pieces_header">Pieces:</string>
     <string name="piece_size_header">Piece Size:</string>
 
@@ -779,7 +780,12 @@
     <string name="m_of_n_decimals">%1$d of %2$d</string>
     <string name="m_of_n_strings">%1$s of %2$s</string>
     <string name="n_files">%1$d FILES</string>
+    <string name="n_peers">%1$d PEERS</string>
+    <string name="source_type">Source: %1$s</string>
     <string name="remove_tracker">Remove tracker</string>
+    <string name="downloaded_n">Downloaded %1$s</string>
+    <string name="uploaded_n">Uploaded %1$s</string>
+    <string name="rtt_ms">RTT %1$d ms</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
