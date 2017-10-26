@@ -135,7 +135,8 @@ public final class UpdateMediator {
             } else if (OSUtils.isMacOSX()) {
                 final String[] mountCommand = new String[] { "hdiutil", "attach", executableFile.getAbsolutePath() };
                 final String[] finderShowCommand = new String[] { "open", "/Volumes/" + FilenameUtils.getBaseName(executableFile.getName()) };
-                final String[] finderShowCommandFallback = new String[]{"open", "file:///Volumes/Frostwire Installer"};
+                final String[] finderShowCommandFallback = new String[]{"open", "file:///Volumes/Frostwire"};
+                final String[] finderShowCommandFallback2 = new String[]{"open", "file:///Volumes/Frostwire Installer"};
 
                 ProcessBuilder pbuilder = new ProcessBuilder(mountCommand);
                 Process mountingProcess = pbuilder.start();
@@ -146,6 +147,10 @@ public final class UpdateMediator {
                 showProcess.waitFor();
 
                 pbuilder = new ProcessBuilder(finderShowCommandFallback);
+                showProcess = pbuilder.start();
+                showProcess.waitFor();
+
+                pbuilder = new ProcessBuilder(finderShowCommandFallback2);
                 showProcess = pbuilder.start();
                 showProcess.waitFor();
 
