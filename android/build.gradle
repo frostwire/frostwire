@@ -28,9 +28,10 @@ buildscript {
 
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -38,9 +39,7 @@ buildscript {
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "https://maven.google.com"
-    }
+    google()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
@@ -75,8 +74,8 @@ def changeApkOutput(variant) {
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
     def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix
 
-    variant.outputs.each { output ->
-        output.outputFile = file(name + '.apk')
+    variant.outputs.all { output ->
+        outputFileName = file(name + '.apk')
     }
 }
 
@@ -149,6 +148,8 @@ android {
                     'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "classicApp"
 
     productFlavors {
         basic {
