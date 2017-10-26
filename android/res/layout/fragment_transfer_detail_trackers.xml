@@ -63,21 +63,21 @@
                 android:text="@string/working" />
 
             <TextView
-                android:id="@+id/transfer_detail_trackers_pex_title"
+                android:id="@+id/transfer_detail_trackers_lsd_title"
                 style="@style/transferDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:paddingBottom="5dp"
-                android:text="@string/pex" />
+                android:text="@string/lsd" />
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_trackers_pex_status"
+                android:id="@+id/fragment_transfer_detail_trackers_lsd_status"
                 style="@style/transferDetailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/transfer_detail_trackers_pex_title"
+                android:layout_below="@+id/transfer_detail_trackers_lsd_title"
                 android:text="@string/working" />
         </RelativeLayout>
 

@@ -33,9 +33,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentStatus;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -53,9 +53,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
 
     private TextView dhtStatus;
-    private TextView pexStatus;
+    private TextView lsdStatus;
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     private Button addTrackerButton;
 
     private TrackerRecyclerViewAdapter adapter;
@@ -65,7 +64,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
         dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
-        pexStatus = findView(v, R.id.fragment_transfer_detail_trackers_pex_status);
+        lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
         recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
@@ -99,8 +98,11 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
-        dhtStatus.setText(BTEngine.getInstance().isDhtRunning() ? R.string.working : R.string.disabled);
-        pexStatus.setText("--");
+        TorrentStatus status = uiBittorrentDownload.getDl().getTorrentHandle().status();
+        boolean announcingToDht = status.announcingToDht();
+        boolean announcingToLSD = status.announcingToLsd();
+        dhtStatus.setText(announcingToDht ? R.string.working : R.string.disabled);
+        lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
     }
 
     private static final class AddTrackerButtonClickListener implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {

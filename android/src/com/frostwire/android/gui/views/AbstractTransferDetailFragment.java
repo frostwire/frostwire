@@ -125,9 +125,12 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onResume() {
-        super.onResume();
+        if (uiBittorrentDownload == null) {
+            return;
+        }
         subscription = TimerService.subscribe(this, 2);
         onTime();
+        super.onResume();
     }
 
     @Override
