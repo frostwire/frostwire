@@ -176,12 +176,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-base:11.4.2'
     implementation('com.mopub:mopub-sdk-banner:4.17.0@aar') {
         transitive = true
-        exclude module: 'libAvid-mopub'
         exclude module: 'moat-mobile-app-kit'
     }
     implementation('com.mopub:mopub-sdk-interstitial:4.17.0@aar') {
         transitive = true
-        exclude module: 'libAvid-mopub'
         exclude module: 'moat-mobile-app-kit'
     }
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
