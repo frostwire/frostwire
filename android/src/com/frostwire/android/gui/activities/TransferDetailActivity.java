@@ -35,10 +35,6 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
-import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.transfers.Transfer;
-
-import java.util.List;
 
 public class TransferDetailActivity extends AbstractActivity {
 
@@ -52,7 +48,7 @@ public class TransferDetailActivity extends AbstractActivity {
 
         String infoHash = getIntent().getStringExtra("infoHash");
 
-        if (infoHash == null || infoHash == "") {
+        if (infoHash == null || "".equals(infoHash)) {
             throw new RuntimeException("Invalid infoHash received");
         }
 
@@ -87,7 +83,7 @@ public class TransferDetailActivity extends AbstractActivity {
 
         private AbstractTransferDetailFragment[] initFragments(UIBittorrentDownload uiBittorrentDownload) {
             // to change the order of the tabs, add/remove tabs, just maintain here.
-            AbstractTransferDetailFragment[] fragments = {
+            return new AbstractTransferDetailFragment[]{
                     new TransferDetailStatusFragment().init(getString(R.string.status), uiBittorrentDownload),
                     new TransferDetailFilesFragment().init(getString(R.string.files), uiBittorrentDownload),
                     new TransferDetailDetailsFragment().init(getString(R.string.details), uiBittorrentDownload),
@@ -95,7 +91,6 @@ public class TransferDetailActivity extends AbstractActivity {
                     new TransferDetailPeersFragment().init(getString(R.string.peers), uiBittorrentDownload),
                     new TransferDetailPiecesFragment().init(getString(R.string.pieces), uiBittorrentDownload)
             };
-            return fragments;
         }
 
         @Override
