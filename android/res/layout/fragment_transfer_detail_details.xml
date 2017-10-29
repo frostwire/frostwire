@@ -100,32 +100,6 @@
             android:background="@drawable/divider_line"
             android:contentDescription="@null" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
-            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
-
-            <TextView
-                android:id="@+id/fragment_transfer_detail_details_seeding_on_checkBox_label"
-                style="@style/transferDetailText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/seeding_on" />
-
-            <CheckBox
-                android:id="@+id/fragment_transfer_detail_details_seeding_on_checkBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-        </LinearLayout>
-
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
