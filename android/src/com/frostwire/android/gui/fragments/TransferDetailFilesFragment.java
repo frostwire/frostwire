@@ -97,16 +97,14 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     @Override
     public void onTime() {
         super.onTime();
-        if (uiBittorrentDownload == null) {
+        if (!isVisible() || uiBittorrentDownload == null || adapter == null) {
             return;
         }
         List<TransferItem> items = uiBittorrentDownload.getItems();
-        if (items == null) {
+        if (items == null || adapter == null) {
             return;
         }
-        if (adapter != null) {
-            adapter.updateTransferItems(items);
-        }
+        adapter.updateTransferItems(items);
     }
 
     private final static class TransferDetailFilesTransferItemViewHolder extends RecyclerView.ViewHolder {
