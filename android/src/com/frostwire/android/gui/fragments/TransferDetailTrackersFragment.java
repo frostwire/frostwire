@@ -92,7 +92,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     @Override
     public void onTime() {
         super.onTime();
-        if (uiBittorrentDownload == null) {
+        if (!isVisible() || uiBittorrentDownload == null) {
             return;
         }
         if (adapter != null) {
