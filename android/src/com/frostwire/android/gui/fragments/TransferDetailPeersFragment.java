@@ -79,7 +79,10 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     @Override
     public void onTime() {
         super.onTime();
-        if (adapter != null && uiBittorrentDownload != null) {
+        if (!isVisible() || uiBittorrentDownload == null) {
+            return;
+        }
+        if (adapter != null) {
             ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter.updatePeers(peerInfos);
             peerNumberTextView.setText(getString(R.string.n_peers, peerInfos.size()));
