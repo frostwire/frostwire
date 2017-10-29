@@ -48,7 +48,6 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     private RecyclerView recyclerView;
     private PeersAdapter adapter;
 
-
     public TransferDetailPeersFragment() {
         super(R.layout.fragment_transfer_detail_peers);
     }
@@ -90,13 +89,14 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     }
 
     private static final class PeerItemViewHolder extends RecyclerView.ViewHolder {
+        @SuppressWarnings("unused")
         private int offset; // could be used for click listeners on peers, say to remove/throttle, copy ip:port
-        private TextView addressTextView;
-        private TextView rttTextView;
-        private TextView clientTextView;
-        private TextView downSpeedTextView;
-        private TextView upSpeedTextView;
-        private TextView sourceTypeTextView;
+        private final TextView addressTextView;
+        private final TextView rttTextView;
+        private final TextView clientTextView;
+        private final TextView downSpeedTextView;
+        private final TextView upSpeedTextView;
+        private final TextView sourceTypeTextView;
         private TextView downloadedTextView;
         private TextView uploadedTextView;
 

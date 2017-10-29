@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -254,18 +253,15 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         R.drawable.contextmenu_icon_seed,
                         trackerToRemove.url(),
                         R.string.remove_tracker,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                TrackerItemViewHolder viewHolder = vhRef.get();
-                                List<AnnounceEntry> trackers = viewHolder.torrentHandle.trackers();
-                                trackers.remove(viewHolder.trackerOffset);
-                                viewHolder.torrentHandle.replaceTrackers(trackers);
-                                viewHolder.torrentHandle.saveResumeData();
-                                viewHolder.torrentHandle.forceReannounce();
-                                if (Ref.alive(viewHolder.adapterRef)) {
-                                    viewHolder.adapterRef.get().notifyDataSetChanged();
-                                }
+                        (dialog, which) -> {
+                            TrackerItemViewHolder viewHolder = vhRef.get();
+                            List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
+                            trackers1.remove(viewHolder.trackerOffset);
+                            viewHolder.torrentHandle.replaceTrackers(trackers1);
+                            viewHolder.torrentHandle.saveResumeData();
+                            viewHolder.torrentHandle.forceReannounce();
+                            if (Ref.alive(viewHolder.adapterRef)) {
+                                viewHolder.adapterRef.get().notifyDataSetChanged();
                             }
                         });
 
