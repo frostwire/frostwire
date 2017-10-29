@@ -21,7 +21,6 @@ package com.frostwire.android.gui.fragments;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -57,7 +56,6 @@ import java.util.List;
 public class TransferDetailDetailsFragment extends AbstractTransferDetailFragment {
     private TextView storagePath;
     private CheckBox sequentialDownloadCheckBox;
-    private CheckBox seedingOnCheckBox;
     private TextView totalSize;
     private TextView numberOfFiles;
     private TextView downloadSpeedLimit;
@@ -83,7 +81,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         super.initComponents(rv, savedInstanceState);
         storagePath = findView(rv, R.id.fragment_transfer_detail_details_storage_path);
         sequentialDownloadCheckBox = findView(rv, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
-        seedingOnCheckBox = findView(rv, R.id.fragment_transfer_detail_details_seeding_on_checkBox);
         totalSize = findView(rv, R.id.fragment_transfer_detail_details_total_size);
         numberOfFiles = findView(rv, R.id.fragment_transfer_detail_details_files_number);
         downloadSpeedLimit = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_download);
@@ -98,8 +95,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         comment = findView(rv, R.id.fragment_transfer_detail_details_comment);
         storagePath.setText("");
         sequentialDownloadCheckBox.setChecked(false);
-        seedingOnCheckBox.setChecked(false);
-        seedingOnCheckBox.setEnabled(false);
         totalSize.setText("");
         numberOfFiles.setText("");
         downloadSpeedLimit.setText("");
@@ -115,7 +110,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     public void onTime() {
         super.onTime();
-        if (uiBittorrentDownload != null) {
+        if (isVisible() && uiBittorrentDownload != null) {
             BTDownload btDL = uiBittorrentDownload.getDl();
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);
@@ -162,8 +157,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             sequentialDownloadCheckBox.setOnCheckedChangeListener(null);
             sequentialDownloadCheckBox.setChecked(btDL.isSequentialDownload());
             sequentialDownloadCheckBox.setOnCheckedChangeListener(onSequentialDownloadCheckboxCheckedListener);
-
-            seedingOnCheckBox.setChecked(btDL.isSeeding());
 
             if (onRateLimitClickListener == null) {
                 onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, getFragmentManager());
@@ -250,7 +243,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         private static final String END_RANGE = "endRange";
         private static final String DEFAULT_VALUE = "defaultValue";
         private static final String IS_BYTE_RATE = "isByteRate";
-        private static final String PLURAL_UNIT_RESOURCE_ID = "pluralUnitResourceId";
         private static final String SUPPORTS_UNLIMITED = "supportsUnlimited";
         private static final String UNLIMITED_VALUE = "unlimitedValue";
         private static final String UNLIMITED_CHECKED = "unlimitedChecked";
@@ -260,7 +252,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         private int mEndRange;
         private int mDefault;
         private boolean mIsByteRate;
-        //private int mPluralUnitResourceId;
         private boolean mSupportsUnlimited;
         private int mUnlimitedValue;
         private boolean mSkipListeners;
@@ -343,7 +334,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    onSeekbarChanged(seekBar, i);
+                    onSeekBarChanged(seekBar, i);
                 }
 
                 @Override
@@ -358,28 +349,13 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
             Bundle arguments = getArguments();
             mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
-            mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onUnlimitedCheckboxClicked();
-                }
-            });
+            mUnlimitedCheckbox.setOnClickListener(view1 -> onUnlimitedCheckboxClicked());
             updateComponents(previousValue);
             updateCurrentValueTextView(previousValue);
             builder.setTitle(direction == Direction.Download ? R.string.torrent_max_download_speed : R.string.torrent_max_upload_speed);
             builder.setCancelable(true);
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    onDialogClosed(false);
-                }
-            });
-            builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    onDialogClosed(true);
-                }
-            });
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> onDialogClosed(false));
+            builder.setPositiveButton(R.string.accept, (dialog, which) -> onDialogClosed(true));
             return  builder.create();
         }
 
@@ -407,7 +383,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mSkipListeners = false;
         }
 
-        private void onSeekbarChanged(SeekBar seekBar, int value) {
+        private void onSeekBarChanged(SeekBar seekBar, int value) {
             if (mSkipListeners) {
                 return;
             }
