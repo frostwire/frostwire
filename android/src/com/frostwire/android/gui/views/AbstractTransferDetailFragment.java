@@ -127,6 +127,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onResume() {
+        super.onResume();
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -134,7 +135,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         if (subscription == null) {
             subscription = TimerService.subscribe(this, 2);
         }
-        super.onResume();
     }
 
     @Override
@@ -144,6 +144,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             subscription.unsubscribe();
         }
     }
+
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated
 

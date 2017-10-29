@@ -101,7 +101,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             return;
         }
         List<TransferItem> items = uiBittorrentDownload.getItems();
-        if (items == null || adapter == null) {
+        if (items == null) {
             return;
         }
         adapter.updateTransferItems(items);
@@ -155,7 +155,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
     private final static class TransferDetailFilesRecyclerViewAdapter extends RecyclerView.Adapter<TransferDetailFilesTransferItemViewHolder> {
 
-        private List<TransferItem> items;
+        private final List<TransferItem> items;
 
         public TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
             this.items = new LinkedList<>(items);
@@ -169,7 +169,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         @Override
         public void onBindViewHolder(TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
-            if (items == null || items.isEmpty()) {
+            if (items.isEmpty()) {
                 return;
             }
             TransferItem transferItem = items.get(i);
@@ -180,7 +180,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         @Override
         public int getItemCount() {
-            return (items == null || items.isEmpty()) ? 0 : items.size();
+            return items.isEmpty() ? 0 : items.size();
         }
 
         public void updateTransferItems(List<TransferItem> freshItems) {
