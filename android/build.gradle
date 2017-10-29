@@ -241,7 +241,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 
         def myKeyAlias = ""
         def myKeyPassword = ""
-
+        System.setProperty('java.awt.headless', 'false')
         if (System.console() == null) {
             new SwingBuilder().edt {
                 dialog(modal: true,
@@ -260,7 +260,7 @@ gradle.taskGraph.whenReady { taskGraph ->
                         button(defaultButton: true, text: 'OK', actionPerformed: {
                             myKeyAlias = inputAlias.text
                             myKeyPassword = new String(inputPassword.password)
-                            dispose();
+                            dispose()
                         })
                     }
                 }
