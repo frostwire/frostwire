@@ -76,7 +76,7 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     public void onTime() {
         super.onTime();
-        if (uiBittorrentDownload == null) {
+        if (!isVisible() || uiBittorrentDownload == null) {
             return;
         }
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
@@ -85,11 +85,9 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
         } else {
             timeLeftTextView.setText("");
         }
-
         downloadedTextView.setText(getString(R.string.m_of_n_strings,
                 getBytesInHuman(uiBittorrentDownload.getDl().getTotalBytesReceived()),
                 getBytesInHuman(uiBittorrentDownload.getSize())));
-
         uploadedTextView.setText(getBytesInHuman(uiBittorrentDownload.getBytesSent()));
         shareRatioTextView.setText(getShareRatio(uiBittorrentDownload));
         peersTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedPeers(), uiBittorrentDownload.getTotalPeers()));

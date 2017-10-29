@@ -54,7 +54,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     protected TorrentHandle torrentHandle;
     private TextView detailProgressTitleTextView;
     private ProgressBar detailProgressProgressBar;
-    private TimerSubscription subscription;
+    protected TimerSubscription subscription;
     private TextView detailProgressStatusTextView;
     private TextView detailProgressDownSpeedTextView;
     private TextView detailProgressUpSpeedTextView;
@@ -119,7 +119,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onTime() {
-        //LOG.info("onTime(): " + uiBittorrentDownload.getInfoHash() + " :: " + uiBittorrentDownload.getProgress() + " % :: " + uiBittorrentDownload.getDisplayName());
+        if (!isVisible() || uiBittorrentDownload == null) {
+            return;
+        }
         updateDetailProgress(uiBittorrentDownload);
     }
 
@@ -128,17 +130,20 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         if (uiBittorrentDownload == null) {
             return;
         }
-        subscription = TimerService.subscribe(this, 2);
         onTime();
+        if (subscription == null) {
+            subscription = TimerService.subscribe(this, 2);
+        }
         super.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        subscription.unsubscribe();
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
     }
-
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated
 
@@ -146,7 +151,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (uiBittorrentDownload != null) {
-            outState.putString("infohash",uiBittorrentDownload.getInfoHash());
+            outState.putString("infohash", uiBittorrentDownload.getInfoHash());
         }
     }
 
