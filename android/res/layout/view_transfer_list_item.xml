@@ -41,21 +41,13 @@
             android:paddingTop="20dp">
 
             <ImageView
-                android:id="@+id/view_transfer_list_item_group_indicator"
+                android:id="@+id/view_transfer_list_item_download_type_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_vertical"
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
                 android:src="@drawable/transfer_menuitem_plus" />
-
-            <ImageView
-                android:id="@+id/view_transfer_list_item_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|center_vertical"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter" />
         </FrameLayout>
 
         <LinearLayout
@@ -66,8 +58,6 @@
             android:orientation="vertical"
             android:paddingBottom="6dp"
             android:paddingEnd="8dp"
-            android:paddingLeft="0dp"
-            android:paddingRight="8dp"
             android:paddingStart="0dp"
             android:paddingTop="6dp">
 
@@ -113,7 +103,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
-                        android:layout_marginRight="4dp"
                         android:text="@string/dummy_peers" />
 
                     <TextView
@@ -127,7 +116,6 @@
                         style="@style/TransfersList.Item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="4dp"
                         android:layout_marginStart="4dp"
                         android:text="@string/dummy_seeds" />
                 </LinearLayout>
@@ -145,9 +133,7 @@
                     style="@style/TransfersList.Item"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:layout_toLeftOf="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:layout_toStartOf="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:text="@string/dummy_size" />
 
@@ -155,7 +141,6 @@
                     android:id="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:layout_width="wrap_content"
                     android:layout_height="15dp"
-                    android:layout_toLeftOf="@+id/view_transfer_list_item_speed"
                     android:layout_toStartOf="@+id/view_transfer_list_item_speed"
                     android:contentDescription="@null"
                     android:src="@drawable/transfers_triangle_downward"
@@ -167,7 +152,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
                     android:text="@string/dummy_speed" />
             </RelativeLayout>
 
@@ -181,7 +165,19 @@
             android:background="@null"
             android:contentDescription="@null"
             android:scaleType="fitCenter"
+            android:visibility="gone"
             android:src="@drawable/my_files_play_icon" />
+
+        <ImageButton
+            android:id="@+id/view_transfer_list_item_button_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/my_files_details_icon" />
 
     </LinearLayout>
     <View
