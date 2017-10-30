@@ -28,6 +28,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -312,6 +313,8 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         private TextView seeds;
         private TextView peers;
         private ImageButton buttonPlay;
+        private ImageButton buttonDetails;
+        private ImageView fileTypeIndicatorImageView;
 
         public ViewHolder(Context context,
                           TransferListAdapter adapter,
@@ -381,6 +384,12 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             if (buttonPlay == null) {
                 buttonPlay = view.findViewById(R.id.view_transfer_list_item_button_play);
             }
+            if (buttonDetails == null) {
+                buttonDetails = view.findViewById(R.id.view_transfer_list_item_button_details);
+            }
+            if (fileTypeIndicatorImageView == null) {
+                fileTypeIndicatorImageView = view.findViewById(R.id.view_transfer_list_item_download_type_indicator);
+            }
         }
 
         private void populateHttpDownload(LinearLayout view, HttpDownload download) {
@@ -394,6 +403,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             status.setText(downloadStatus);
             speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
             size.setText(UIUtils.getBytesInHuman(download.getSize()));
+            buttonDetails.setVisibility(View.GONE);
 
             File previewFile = download.previewFile();
             if (previewFile != null && WebSearchPerformer.isStreamable(previewFile.getName())) {
@@ -418,6 +428,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             setProgress(progress, download.getProgress());
             title.setCompoundDrawables(null, null, null, null);
 
+            buttonDetails.setVisibility(View.VISIBLE);
+            buttonPlay.setVisibility(View.GONE);
+
             final String downloadStatus = transferStateStrings.get(download.getState());
             status.setText(downloadStatus);
             NetworkManager networkManager = NetworkManager.instance();
@@ -436,16 +449,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     setPaymentOptionDrawable(uidl, title);
                 }
             }
-
-            List<TransferItem> items = download.getItems();
-            if (items != null && items.size() == 1) {
-                TransferItem item = items.get(0);
-                buttonPlay.setTag(item);
-                updatePlayButtonVisibility(item, buttonPlay);
-                buttonPlay.setOnClickListener(playOnClickListener);
-            } else {
-                buttonPlay.setVisibility(View.GONE);
-            }
         }
 
         private void populateCloudDownload(LinearLayout view, Transfer download) {
@@ -458,6 +461,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             status.setText(transferStateStrings.get(download.getState()));
             speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
             size.setText(UIUtils.getBytesInHuman(download.getSize()));
+            buttonDetails.setVisibility(View.GONE);
 
             File previewFile = download.previewFile();
             if (previewFile != null) {
@@ -488,18 +492,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
                 tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
                 title.setCompoundDrawables(tipDrawable, null, null, null);
-            }
-        }
-
-        private void updatePlayButtonVisibility(TransferItem item, ImageButton buttonPlay) {
-            if (item.isComplete()) {
-                buttonPlay.setVisibility(View.VISIBLE);
-            } else {
-                if (item instanceof BTDownloadItem) {
-                    buttonPlay.setVisibility(previewFile((BTDownloadItem) item) != null ? View.VISIBLE : View.GONE);
-                } else {
-                    buttonPlay.setVisibility(View.GONE);
-                }
             }
         }
     } // ViewHolder
