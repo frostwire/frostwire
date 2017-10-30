@@ -1,3 +1,8 @@
+frostwire (6.6.0) stable; urgency=high
+  * Portuguese translation updated
+	
+ -- FrostWire Team <contact@frostwire.com>  Mon, 30 Oct 2017 24:51:34 -0600
+
 frostwire (6.5.9) stable; urgency=high
   * New VPN Drop Guard feature available in BitTorrent settings
   * UX: Edit tracker dialog supports basic keyword shortcuts

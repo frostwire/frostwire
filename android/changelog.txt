@@ -9,6 +9,7 @@ FrostWire 1.9.9 build 461 - OCT/29/2017
  - Transfer screen on rotation would not keep last tab selected
  - Java 8 usage, gradle 4.2.1
  - compileSDKVersion 27, support libraries 27.0.0, kotlin plugin 1.1.51
+ - Material design dialog update
 
 FrostWire 1.9.9 - OCT/05/2017
  - Search: More search results when not in WiFi
