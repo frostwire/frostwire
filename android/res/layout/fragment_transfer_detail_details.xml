@@ -100,12 +100,6 @@
             android:background="@drawable/divider_line"
             android:contentDescription="@null" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:contentDescription="@null" />
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -298,6 +292,7 @@
                 android:layout_below="@+id/fragment_transfer_detail_details_magnet_label"
                 android:layout_marginTop="5dp"
                 android:layout_toStartOf="@+id/fragment_transfer_detail_details_magnet_copy_button"
+                android:maxLines="4"
                 android:text="@string/transfer_detail_hash_dummy" />
 
             <ImageButton
