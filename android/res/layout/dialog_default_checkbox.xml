@@ -21,9 +21,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/default_dialog_background"
     android:orientation="vertical"
-    android:scrollbars="vertical"
-    android:background="@drawable/default_dialog_background">
+    android:scrollbars="vertical">
 
     <TextView
         android:id="@+id/dialog_default_checkbox_title"
@@ -33,34 +33,34 @@
 
     <TextView
         android:id="@+id/dialog_default_checkbox_text"
+        style="@style/DefaultDialogTheme.MainText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp" />
+        android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0"
-        android:background="@color/basic_gray_medium">
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/dialog_default_checkbox_button_no"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_toStartOf="@+id/dialog_default_checkbox_button_yes"
             android:background="@color/app_background_white" />
 
         <Button
             android:id="@+id/dialog_default_checkbox_button_yes"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_alignParentEnd="true"
             android:background="@color/app_background_white" />
-    </LinearLayout>
+    </RelativeLayout>
 
     <CheckBox
         android:id="@+id/dialog_default_checkbox_show"

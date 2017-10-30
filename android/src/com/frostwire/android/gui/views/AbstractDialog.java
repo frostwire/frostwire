@@ -23,6 +23,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.view.LayoutInflater;
@@ -87,6 +89,7 @@ public abstract class AbstractDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dlg = super.onCreateDialog(savedInstanceState);
         dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dlg.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setContentView(dlg, layoutResId);
         initComponents(dlg, savedInstanceState);
         return dlg;

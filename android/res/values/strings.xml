@@ -258,6 +258,8 @@
     <string name="dummy_peers" translatable="false">[Peers]</string>
     <string name="dummy_text" translatable="false">[Text]</string>
     <string name="dummy_number" translatable="false">[Number]</string>
+    <string name="dummy_date" translatable="false">[Date]</string>
+    <string name="dummy_path" translatable="false">[Path]</string>
     <string name="view_transfer_item_list_item_icon">Icon for file type</string>
     <string name="nickname_sharing_count_files">%1$s - Sharing %2$d files</string>
     <string name="play_image_description">Play</string>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
 * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
 * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
@@ -34,42 +35,28 @@
         android:id="@+id/dialog_confirm_list_text"
         style="@style/DefaultDialogTheme.MainText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="10dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="10dp" />
+        android:layout_height="wrap_content" />
 
-    <ImageView
+    <View
+        style="@style/divider_line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:id="@+id/imageView"
-        android:background="@color/app_divider" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/basic_gray_light">
+        android:layout_height="1dp" />
 
         <CheckBox
             android:id="@+id/dialog_confirm_list_select_all_checkbox"
             style="@style/DefaultDialogTheme.SmallTextMedium"
+            android:background="@color/basic_gray_light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.0"
             android:checked="true"
-            android:gravity="left|center_vertical"
-            android:padding="5dp"
+            android:gravity="start|center_vertical"
+            android:padding="8dp"
             android:text="@string/select_all" />
 
-    </LinearLayout>
-
-    <ImageView
+    <View
+        style="@style/divider_line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:id="@+id/imageView1"
-        android:background="@color/basic_gray_medium" />
+        android:layout_height="1dp" />
 
     <ListView
         android:id="@+id/dialog_confirm_list_listview"
@@ -80,11 +67,16 @@
 
     <!-- summary of what was selected, only visible for selection mode in [multiple choice, no-choice] -->
 
+    <View
+        style="@style/divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
     <LinearLayout
         android:id="@+id/dialog_confirm_list_selection_summary"
+        android:background="@color/basic_gray_light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/basic_gray_medium"
         android:paddingBottom="8dp"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
@@ -96,7 +88,7 @@
             style="@style/DefaultDialogTheme.SmallTextMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".5"/>
+            android:layout_weight=".5" />
 
         <!-- selection sum, e.g. for files, this would be the number of total bytes -->
         <TextView
@@ -105,37 +97,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight=".5"
-            android:gravity="right" />
+            android:gravity="end" />
     </LinearLayout>
 
+    <View
+        style="@style/divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp" />
+
     <!-- buttons -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/basic_gray_medium"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0">
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
 
         <Button
             android:id="@+id/dialog_confirm_list_button_no"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_toStartOf="@+id/dialog_confirm_list_button_yes"
             android:background="@color/app_background_white"
-            android:minLines="1"
-            android:text="@android:string/no" />
+            android:text="@android:string/cancel" />
 
         <Button
             android:id="@+id/dialog_confirm_list_button_yes"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
+            android:layout_alignParentEnd="true"
             android:background="@color/app_background_white"
-            android:minLines="1"
-            android:text="@android:string/yes" />
-    </LinearLayout>
+            android:text="@android:string/ok" />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -38,28 +38,25 @@
         android:padding="15dp"
         android:selectAllOnFocus="true" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp"
-        android:weightSum="1.0"
-        android:background="@color/basic_gray_medium">
+        android:paddingBottom="5dp">
 
         <Button
             android:id="@+id/dialog_default_input_button_no"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:background="@color/app_background_white"/>
+            android:layout_toStartOf="@+id/dialog_default_input_button_yes"
+            android:background="@color/app_background_white" />
 
         <Button
             android:id="@+id/dialog_default_input_button_yes"
-            android:layout_width="match_parent"
+            style="@style/DefaultDialogTheme.Buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:layout_weight="0.5"
-            android:background="@color/app_background_white"/>
-    </LinearLayout>
+            android:layout_alignParentEnd="true"
+            android:background="@color/app_background_white" />
+    </RelativeLayout>
 </LinearLayout>

@@ -626,7 +626,7 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Default Dialog -->
+    <!-- Default Dialog Styles -->
     <style name="DefaultDialogTheme">
         <item name="android:windowMinWidthMajor">@dimen/dialog_min_width_major</item>
         <item name="android:windowMinWidthMinor">@dimen/dialog_min_width_minor</item>
@@ -639,43 +639,56 @@
         <item name="android:textSize">@dimen/text_large</item>
         <item name="android:buttonStyle">@style/DefaultDialogTheme.Buttons</item>
     </style>
+
     <!-- v21 -->
     <style name="DefaultDialogTheme.TitleBar">
         <item name="android:background">@drawable/default_dialog_title_background</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/app_text_white</item>
         <item name="android:textSize">@dimen/text_x_large</item>
-        <item name="android:padding">15dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingLeft">20dp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DefaultDialogTheme.MainText">
-        <item name="android:textSize">@dimen/text_large</item>
+        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:padding">15dp</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
+    </style>
+
+    <!--v21-->
+    <style name="DefaultDialogTheme.SmallTextMedium">
+        <item name="android:textSize">@dimen/text_small</item>
         <item name="android:textColor">@color/app_text_primary</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DefaultDialogTheme.SmallText">
         <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">@color/app_text_secondary</item>
+        <item name="android:textColor">@color/app_text_primary</item>
         <item name="android:padding">3dp</item>
+    </style>
+
+    <!--v21-->
+    <style name="DefaultDialogTheme.Buttons" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:text">@color/app_text_highlight</item>
+        <item name="android:textColor">@color/app_text_highlight</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minLines">1</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="DefaultDialogTheme.LongText">
         <item name="android:textSize">@dimen/text_medium</item>
-    </style>
-
-    <style name="DefaultDialogTheme.Buttons">
-        <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:paddingTop">15dp</item>
-        <item name="android:paddingBottom">15dp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:minLines">1</item>
-    </style>
-    <!--v21-->
-    <style name="DefaultDialogTheme.SmallTextMedium">
-        <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">@color/app_text_secondary</item>
-        <item name="android:padding">3dp</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ToolbarNavigationButtonStyle" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">

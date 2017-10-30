@@ -19,11 +19,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
+
 <!-- See FileInformationAction.java -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_white"
+    android:background="@drawable/default_dialog_background"
     android:clickable="true"
     android:orientation="vertical">
 
@@ -58,14 +59,15 @@
                 style="@style/DefaultDialogTheme.MainText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
-                android:text="[file name goes here]" />
+                android:padding="5dp"
+                android:text="@string/dummy_title" />
 
             <LinearLayout
                 android:id="@+id/dialog_file_information_size_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -86,7 +88,8 @@
                         style="@style/DefaultDialogTheme.MainText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="[file size goes here]" />
+                        android:padding="5dp"
+                        android:text="@string/dummy_size" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -107,7 +110,8 @@
                         style="@style/DefaultDialogTheme.MainText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="[date taken goes here]" />
+                        android:padding="5dp"
+                        android:text="@string/dummy_date" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -116,6 +120,7 @@
                 style="@style/DefaultDialogTheme.SmallTextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:maxLines="1"
                 android:text="@string/storage_path" />
 
@@ -124,27 +129,19 @@
                 style="@style/DefaultDialogTheme.MainText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="[file path goes here]" />
+                android:padding="5dp"
+                android:text="@string/dummy_path" />
 
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/dialog_file_information_button_section"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/dialog_file_information_button_ok"
+        style="@style/DefaultDialogTheme.Buttons"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/basic_gray_medium"
-        android:orientation="horizontal"
-        android:paddingBottom="1dp"
-        android:paddingTop="1dp">
-
-        <Button
-            android:id="@+id/dialog_file_information_button_ok"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
-            android:background="@color/app_background_white"
-            android:text="@string/dismiss" />
-    </LinearLayout>
-
+        android:layout_gravity="end"
+        android:background="@color/app_background_white"
+        android:paddingBottom="15dp"
+        android:text="@string/dismiss" />
 </LinearLayout>
