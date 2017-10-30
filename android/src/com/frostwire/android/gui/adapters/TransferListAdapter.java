@@ -253,7 +253,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
 
         items.add(new ResumeDownloadMenuAction(context.get(), bittorrentDownload, R.string.resume_torrent_menu_action));
 
-        items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details, bittorrentDownload.getInfoHash()));
+        if (bittorrentDownload.getInfoHash() != null && !"".equals(bittorrentDownload.getInfoHash())) {
+            items.add(new TransferDetailsMenuAction(context.get(), R.string.show_torrent_details, bittorrentDownload.getInfoHash()));
+        }
 
         if (bittorrentDownload.isComplete()) {
             // Remove Torrent and Data action.

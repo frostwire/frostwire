@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,9 +37,6 @@ import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
-import com.frostwire.util.Logger;
-
-import java.util.Random;
 
 /**
  * @author gubatron
@@ -51,6 +50,9 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     private RecyclerView recyclerView;
     private PieceAdapter adapter;
     private int totalPieces;
+    private int downloadedColor;
+    private int notDownloadedColor;
+
 
     public TransferDetailPiecesFragment() {
         super(R.layout.fragment_transfer_detail_pieces);
@@ -86,8 +88,14 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
 
         if (adapter == null && isAdded()) {
+            Resources r = getResources();
+            // I do this color look-up only once and pass it down to the view holder
+            // otherwise it has to be done thousands of times.
+            downloadedColor = r.getColor(R.color.basic_blue_highlight);
+            notDownloadedColor = r.getColor(R.color.basic_gray_dark);
+
             pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            adapter = new PieceAdapter(torrentInfo.numPieces(), status.pieces());
+            adapter = new PieceAdapter(torrentInfo.numPieces(), status.pieces(), downloadedColor, notDownloadedColor);
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
             recyclerView.setAdapter(adapter);
         }
@@ -107,10 +115,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (!isVisible() || uiBittorrentDownload == null) {
             return;
         }
-        TorrentStatus status = torrentHandle.status();
-        if (status == null) {
-            return;
-        }
+        TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         PieceIndexBitfield pieces = status.pieces();
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
         if (adapter != null) {
@@ -134,13 +139,15 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
     private static final class PieceViewHolder extends RecyclerView.ViewHolder {
         private Piece piece;
-        private static final int downloadedColor = R.color.basic_blue_highlight;
-        private static final int notDownloadedColor = R.color.basic_gray_dark;
         private final ImageView circleView;
+        private final int downloadedColor;
+        private final int notDownloadedColor;
 
-        public PieceViewHolder(View itemView) {
+        public PieceViewHolder(View itemView, int downloadedColor, int notDownloadedColor) {
             super(itemView);
             circleView = itemView.findViewById(R.id.view_transfer_detail_piece_image_view);
+            this.downloadedColor = downloadedColor;
+            this.notDownloadedColor = notDownloadedColor;
         }
 
         public void updatePiece(Piece piece) {
@@ -153,30 +160,34 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             if (circleView == null) {
                 return;
             }
-            circleView.setColorFilter(piece.downloaded ? downloadedColor : notDownloadedColor);
+            circleView.setColorFilter(piece.downloaded ? downloadedColor : notDownloadedColor, PorterDuff.Mode.SRC_IN);
+            circleView.invalidate();
         }
     }
 
     private static final class PieceAdapter extends RecyclerView.Adapter<PieceViewHolder> {
-        private static final Logger LOG = Logger.getLogger(PieceAdapter.class);
         private final int totalPieces;
+        private final int downloadedColor;
+        private final int notDownloadedColor;
         private PieceIndexBitfield pieces;
 
-        PieceAdapter(int totalPieces, PieceIndexBitfield pieces) {
+        PieceAdapter(int totalPieces, PieceIndexBitfield pieces, int downloadedColor, int notDownloadedColor) {
             this.totalPieces = totalPieces;
             this.pieces = pieces;
+            this.downloadedColor = downloadedColor;
+            this.notDownloadedColor = notDownloadedColor;
         }
 
         @Override
         public PieceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new PieceViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_piece, null));
+            return new PieceViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_piece, null), downloadedColor, notDownloadedColor);
         }
 
         @Override
         public void onBindViewHolder(PieceViewHolder holder, int position) {
-            LOG.info("onBindViewHolder(" + holder + "," + position + ")");
-            if (pieces != null) {
-                holder.updatePiece(new Piece(position, new Random(System.currentTimeMillis()).nextInt() % 2 == 0));
+            //LOG.info("onBindViewHolder(" + holder + "," + position + ")");
+            if (pieces != null && position <= pieces.endIndex() ) {
+                holder.updatePiece(new Piece(position, pieces.getBit(position)));
             }
         }
 
