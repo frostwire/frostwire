@@ -128,7 +128,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             fileNameTextView.setText(transferItem.getName());
             fileProgressBar.setProgress(transferItem.getProgress());
             fileProgressTextView.setText(transferItem.getProgress() + "%");
-            fileSizeTextView.setText(UIUtils.getBytesInHuman(transferItem.getDownloaded()) + " / " + UIUtils.getBytesInHuman(transferItem.getSize()));
+            fileSizeTextView.setText(UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));
             playButtonImageView.setTag(transferItem);
             updatePlayButtonVisibility(transferItem);
         }
