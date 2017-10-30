@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
             android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
             android:text="@string/transfer_detail_number_of_peers_dummy"/>
 
@@ -57,12 +57,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </android.support.v7.widget.RecyclerView>
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:contentDescription="@null"/>
 
     </LinearLayout>
 </ScrollView>

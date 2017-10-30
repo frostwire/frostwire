@@ -52,36 +52,44 @@
             android:layout_marginBottom="5dp"
             android:text="@string/transfer_detail_file_dummy"/>
 
-        <ProgressBar
-            android:id="@+id/fragment_transfer_detail_files_file_progressbar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-            android:layout_toStartOf="@+id/fragment_transfer_detail_files_file_percentage"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_below="@+id/fragment_transfer_detail_files_file_name">
 
-        <TextView
-            android:id="@+id/fragment_transfer_detail_files_file_percentage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-            android:text="@string/transfer_detail_percentage_dummy"
-            android:textColor="@color/app_text_primary"
-            android:textSize="@dimen/text_x_small"
-            android:textStyle="bold"
-            android:paddingStart="8dp"
-            android:paddingEnd="0dp"/>
+            <ProgressBar
+                android:id="@+id/fragment_transfer_detail_files_file_progressbar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
+                android:layout_alignParentStart="true"/>
 
-        <TextView
-            android:id="@+id/fragment_transfer_detail_files_file_download_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-            android:text="@string/transfer_detail_upload_size_dummy"
-            android:textColor="@color/app_text_secondary"
-            android:textSize="@dimen/text_x_small"/>
+            <TextView
+                android:id="@+id/fragment_transfer_detail_files_file_percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
+                android:layout_toEndOf="@+id/fragment_transfer_detail_files_file_progressbar"
+                android:text="@string/transfer_detail_percentage_dummy"
+                android:textColor="@color/app_text_primary"
+                android:textSize="@dimen/text_x_small"
+                android:textStyle="bold"
+                android:paddingStart="8dp"
+                android:paddingEnd="55dp"/>
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_files_file_download_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
+                android:layout_alignParentEnd="true"
+                android:text="@string/transfer_detail_upload_size_dummy"
+                android:textColor="@color/app_text_secondary"
+                android:textSize="@dimen/text_x_small"/>
+        </LinearLayout>
     </RelativeLayout>
 
     <ImageButton
