@@ -783,7 +783,7 @@
     <string name="n_peers">%1$d PEERS</string>
     <string name="source_type">Source: %1$s</string>
     <string name="remove_tracker">Remove tracker</string>
-    <string name="downloaded_n">Downloaded %1$s</string>
+    <string name="downloaded_n">Downloaded %1$s / </string>
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="rtt_ms">RTT %1$d ms</string>
 
