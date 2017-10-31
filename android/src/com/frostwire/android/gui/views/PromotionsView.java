@@ -97,30 +97,28 @@ public class PromotionsView extends LinearLayout {
 
         gridview = findViewById(R.id.view_promotions_gridview);
 
-        gridview.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                if (gridview == null || gridview.getAdapter() == null) {
-                    return;
-                }
-                PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
-                if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) {
-                    promoAdapter.onSpecialOfferClick();
-                    return;
-                }
+        gridview.setOnItemClickListener((parent, v, position, id) -> {
+            if (gridview == null || gridview.getAdapter() == null) {
+                return;
+            }
+            PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) {
+                promoAdapter.onSpecialOfferClick();
+                return;
+            }
 
-                boolean inLandscapeMode = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+            boolean inLandscapeMode = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
-                // FROSTWIRE FEATURES VIEW
-                if (!inLandscapeMode && ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) ||
-                    (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 1))) {
-                    promoAdapter.onAllFeaturedDownloadsClick("topHeader");
-                    return;
-                }
+            // FROSTWIRE FEATURES VIEW
+            if (!inLandscapeMode && ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) ||
+                (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 1))) {
+                promoAdapter.onAllFeaturedDownloadsClick("topHeader");
+                return;
+            }
 
-                if (position ==  promoAdapter.getCount()-1) {
-                    promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");
-                    return;
-                }
+            if (position ==  promoAdapter.getCount()-1) {
+                promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");
+                return;
             }
         });
     }
