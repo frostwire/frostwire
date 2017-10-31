@@ -502,19 +502,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             // This logic will be better on the next commit, much better
             // also will have to cache these results so I don't do this on every refresh
             if (download instanceof BittorrentDownload) {
-                List<TransferItem> items = download.getItems();
-                if (items!=null && items.size() <= 3) {
-                    // get the biggest sized file's file extension
-                    TransferItem biggestItem = null;
-                    for (TransferItem item : items) {
-                        if (biggestItem == null) {
-                            biggestItem = item;
-                        } else if (item.getSize() > biggestItem.getSize()) {
-                            biggestItem = item;
-                        }
-                    }
-                    ext = FilenameUtils.getExtension(biggestItem.getFile().getAbsolutePath());
-                }
+                ext = ((BittorrentDownload) download).getPredominantFileExtension();
             }
 
             fileTypeIndicatorImageView.setImageResource(MediaType.getFileTypeIconId(ext));
