@@ -180,6 +180,11 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
+    public String getPredominantFileExtension() {
+        return "torrent";
+    }
+
+    @Override
     public String getName() {
         return null;
     }
