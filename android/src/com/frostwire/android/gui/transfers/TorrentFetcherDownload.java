@@ -197,6 +197,11 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         remove(deleteData);
     }
 
+    @Override
+    public String getPredominantFileExtension() {
+        return "torrent";
+    }
+
     public void pause() {
     }
 

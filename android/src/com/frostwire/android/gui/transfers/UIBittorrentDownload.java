@@ -177,6 +177,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         remove(null, deleteTorrent, deleteData);
     }
 
+    @Override
+    public String getPredominantFileExtension() {
+        return getDl() == null ? "torrent" : getDl().getPredominantFileExtension();
+    }
+
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
