@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,8 +39,6 @@ public abstract class ClickAdapter<T> implements View.OnClickListener, View.OnLo
         this.ownerRef = Ref.weak(owner);
     }
 
-
-
     @Override
     public final void onClick(View v) {
         if (Ref.alive(ownerRef)) {
@@ -50,20 +48,12 @@ public abstract class ClickAdapter<T> implements View.OnClickListener, View.OnLo
 
     @Override
     public final boolean onLongClick(View v) {
-        if (Ref.alive(ownerRef)) {
-            return onLongClick(ownerRef.get(), v);
-        }
-
-        return false;
+        return Ref.alive(ownerRef) && onLongClick(ownerRef.get(), v);
     }
 
     @Override
     public final boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (Ref.alive(ownerRef)) {
-            return onKey(ownerRef.get(), v, keyCode, event);
-        }
-
-        return false;
+        return Ref.alive(ownerRef) && onKey(ownerRef.get(), v, keyCode, event);
     }
 
     @Override
@@ -83,6 +73,7 @@ public abstract class ClickAdapter<T> implements View.OnClickListener, View.OnLo
     public void onClick(T owner, View v) {
     }
 
+    @SuppressWarnings("unused")
     public boolean onLongClick(T owner, View v) {
         return false;
     }
@@ -91,6 +82,7 @@ public abstract class ClickAdapter<T> implements View.OnClickListener, View.OnLo
         return false;
     }
 
+    @SuppressWarnings("unused")
     public void onClick(T owner, DialogInterface dialog, int which) {
     }
 
