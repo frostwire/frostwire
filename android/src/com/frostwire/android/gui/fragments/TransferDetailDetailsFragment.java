@@ -167,12 +167,12 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             }
             int downloadRateLimit = btDL.getDownloadRateLimit();
             int uploadRateLimit = btDL.getUploadRateLimit();
-            if (downloadRateLimit != -1) {
+            if (downloadRateLimit > 0) {
                 downloadSpeedLimit.setText(UIUtils.getBytesInHuman(downloadRateLimit) + "/s");
             } else {
                 downloadSpeedLimit.setText(R.string.unlimited);
             }
-            if (uploadRateLimit != -1) {
+            if (uploadRateLimit > 0) {
                 uploadSpeedLimit.setText(UIUtils.getBytesInHuman(uploadRateLimit) + "/s");
             } else {
                 uploadSpeedLimit.setText(R.string.unlimited);
@@ -272,7 +272,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             bundle.putBoolean(SUPPORTS_UNLIMITED, true);
             bundle.putInt(UNLIMITED_VALUE, 0);
             BTDownload dl = uiBittorrentDownload.getDl();
-            bundle.putInt(CURRENT_VALUE, direction == Direction.Download ? dl.getDownloadRateLimit() : dl.getUploadRateLimit());
+            int rateLimit = direction == Direction.Download ? dl.getDownloadRateLimit() : dl.getUploadRateLimit();
+            bundle.putInt(CURRENT_VALUE, rateLimit);
             dialog.setArguments(bundle);
             return dialog;
         }
@@ -306,7 +307,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             outState.putInt(END_RANGE, mEndRange);
             outState.putInt(DEFAULT_VALUE, mDefault);
             outState.putBoolean(IS_BYTE_RATE, mIsByteRate);
-            //outState.putInt(PLURAL_UNIT_RESOURCE_ID, mPluralUnitResourceId);
             outState.putBoolean(SUPPORTS_UNLIMITED, mSupportsUnlimited);
             outState.putInt(UNLIMITED_VALUE, mUnlimitedValue);
             outState.putBoolean(UNLIMITED_CHECKED, mUnlimitedCheckbox.isChecked());
@@ -323,10 +323,10 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
 
             mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
-            int previousValue = -1;
+            int previousValue = 0;
             if (getArguments() != null) {
                 int curVal = getArguments().getInt(CURRENT_VALUE);
-                if (curVal != -1) {
+                if (curVal != 0) {
                     previousValue = curVal;
                 }
             }
@@ -423,9 +423,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 mCurrentValueTextView.setText(getResources().getText(R.string.unlimited));
             } else if (mIsByteRate) {
                 mCurrentValueTextView.setText(String.format("%s/s", UIUtils.getBytesInHuman(value)));
-            } //else if (mPluralUnitResourceId != -1) {
-            //    mCurrentValueTextView.setText(getResources().getQuantityString(mPluralUnitResourceId, value, value));
-            //}
+            }
         }
 
         public void onDialogClosed(boolean positiveResult) {
