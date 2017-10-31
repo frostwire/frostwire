@@ -44,6 +44,7 @@
         <TextView
             android:id="@+id/view_transfer_detail_peer_item_rtt"
             style="@style/TransfersList.Item"
+            android:layout_below="@+id/view_transfer_detail_peer_item_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
@@ -63,8 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/view_transfer_detail_peer_item_address"
-            android:layout_marginBottom="1dp"
+            android:layout_below="@+id/view_transfer_detail_peer_item_rtt"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -101,23 +101,18 @@
                 android:text="@string/transfer_detail_speed_dummy" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/view_transfer_detail_peer_source_type"
+            style="@style/TransfersList.Item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_transfer_detail_peer_item_client"
+            android:text="@string/source_type" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/view_transfer_detail_peer_item_download_speed_container">
-
-            <TextView
-                android:id="@+id/view_transfer_detail_peer_source_type"
-                style="@style/TransfersList.Item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/source_type" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.0" />
-
             <TextView
                 android:id="@+id/view_transfer_detail_peer_downloaded"
                 style="@style/TransfersList.Item"
