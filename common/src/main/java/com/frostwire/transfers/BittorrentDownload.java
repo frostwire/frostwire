@@ -64,4 +64,13 @@ public interface BittorrentDownload extends Transfer {
     void resume();
 
     void remove(boolean deleteTorrent, boolean deleteData);
+
+    /**
+     * Adds up the number of bytes per file extension and returns
+     * the winning file extension for the torrent.
+     *
+     * If the files are not known, then it returns "torrent"
+     * @return
+     */
+    String getPredominantFileExtension();
 }
