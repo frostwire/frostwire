@@ -110,10 +110,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
         if (detailProgressDownSpeedTextView != null) {
-            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()));
+            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
         }
         if (detailProgressUpSpeedTextView != null) {
-            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()));
+            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
         }
     }
 
@@ -144,7 +144,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             subscription.unsubscribe();
         }
     }
-
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated
 
