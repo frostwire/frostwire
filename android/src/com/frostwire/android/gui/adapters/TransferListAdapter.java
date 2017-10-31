@@ -38,6 +38,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.CancelMenuAction;
@@ -71,6 +72,8 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -415,6 +418,8 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             } else {
                 buttonPlay.setVisibility(View.GONE);
             }
+
+            populateFileTypeIndicatorImageView(download);
         }
 
         private void populateBittorrentDownload(LinearLayout view, BittorrentDownload download) {
@@ -451,6 +456,8 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     setPaymentOptionDrawable(uidl, title);
                 }
             }
+
+            populateFileTypeIndicatorImageView(download);
         }
 
         private void populateCloudDownload(LinearLayout view, Transfer download) {
@@ -481,6 +488,36 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     status.setText(transferStateStrings.get(download.getState()) + " (" + yt.demuxingProgress() + "%)");
                 }
             }
+
+            populateFileTypeIndicatorImageView(download);
+        }
+
+        private void populateFileTypeIndicatorImageView(Transfer download) {
+            File savePath = download.getSavePath();
+            String ext = null;
+            if (savePath != null) {
+                ext = FilenameUtils.getExtension(savePath.getAbsolutePath());
+            }
+
+            // This logic will be better on the next commit, much better
+            // also will have to cache these results so I don't do this on every refresh
+            if (download instanceof BittorrentDownload) {
+                List<TransferItem> items = download.getItems();
+                if (items!=null && items.size() <= 3) {
+                    // get the biggest sized file's file extension
+                    TransferItem biggestItem = null;
+                    for (TransferItem item : items) {
+                        if (biggestItem == null) {
+                            biggestItem = item;
+                        } else if (item.getSize() > biggestItem.getSize()) {
+                            biggestItem = item;
+                        }
+                    }
+                    ext = FilenameUtils.getExtension(biggestItem.getFile().getAbsolutePath());
+                }
+            }
+
+            fileTypeIndicatorImageView.setImageResource(MediaType.getFileTypeIconId(ext));
         }
 
         private void setPaymentOptionDrawable(UIBittorrentDownload download, TextView title) {
