@@ -258,6 +258,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         private SeekBar mSeekbar;
         private CheckBox mUnlimitedCheckbox;
         private TextView mCurrentValueTextView;
+        private TextView mDialogTitle;
 
         public static SpeedLimitDialog newInstance(UIBittorrentDownload uiBittorrentDownload, Direction direction) {
             SpeedLimitDialog dialog = new SpeedLimitDialog().init(uiBittorrentDownload, direction);
@@ -321,6 +322,9 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             View view = layoutInflater.inflate(R.layout.dialog_preference_seekbar_with_checkbox, null);
             builder.setView(view);
 
+            mDialogTitle = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_title);
+            mDialogTitle.setText(direction == Direction.Download ? R.string.torrent_max_download_speed : R.string.torrent_max_upload_speed);
+
             mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
             int previousValue = 0;
@@ -345,6 +349,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                 public void onStopTrackingTouch(SeekBar seekBar) {
                 }
             });
+
             mCurrentValueTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
             mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
             Bundle arguments = getArguments();
@@ -352,7 +357,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mUnlimitedCheckbox.setOnClickListener(view1 -> onUnlimitedCheckboxClicked());
             updateComponents(previousValue);
             updateCurrentValueTextView(previousValue);
-            builder.setTitle(direction == Direction.Download ? R.string.torrent_max_download_speed : R.string.torrent_max_upload_speed);
             builder.setCancelable(true);
             builder.setNegativeButton(R.string.cancel, (dialog, which) -> onDialogClosed(false));
             builder.setPositiveButton(R.string.accept, (dialog, which) -> onDialogClosed(true));
