@@ -1,7 +1,8 @@
 frostwire (6.6.0) stable; urgency=high
+  * New jlibtorrent 1.2.0.13-RC14, storage and upnp related crashes fixed
   * Portuguese translation updated
 	
- -- FrostWire Team <contact@frostwire.com>  Mon, 30 Oct 2017 24:51:34 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 1 Nov 2017 15:09:57 -0600
 
 frostwire (6.5.9) stable; urgency=high
   * New VPN Drop Guard feature available in BitTorrent settings
