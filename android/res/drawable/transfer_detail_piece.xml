@@ -26,6 +26,6 @@
         android:color="@color/basic_blue_highlight"/>
 
     <size
-        android:width="9dp"
-        android:height="9dp"/>
+        android:width="10dp"
+        android:height="10dp"/>
 </shape>
