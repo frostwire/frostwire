@@ -79,20 +79,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     protected void initComponents(View rv, Bundle savedInstanceState) {
         super.initComponents(rv, savedInstanceState);
-        storagePath = findView(rv, R.id.fragment_transfer_detail_details_storage_path);
-        sequentialDownloadCheckBox = findView(rv, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
-        totalSize = findView(rv, R.id.fragment_transfer_detail_details_total_size);
-        numberOfFiles = findView(rv, R.id.fragment_transfer_detail_details_files_number);
-        downloadSpeedLimit = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_download);
-        downloadSpeedLimitArrow = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
-        uploadSpeedLimit = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_upload);
-        uploadSpeedLimitArrow = findView(rv, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
-        hash = findView(rv, R.id.fragment_transfer_detail_details_hash);
-        hashCopyButton = findView(rv, R.id.fragment_transfer_detail_details_hash_copy_button);
-        magnet = findView(rv, R.id.fragment_transfer_detail_details_magnet);
-        magnetCopyButton = findView(rv, R.id.fragment_transfer_detail_details_magnet_copy_button);
-        createdOn = findView(rv, R.id.fragment_transfer_detail_details_created_on);
-        comment = findView(rv, R.id.fragment_transfer_detail_details_comment);
+        ensureComponentsReferenced();
         storagePath.setText("");
         sequentialDownloadCheckBox.setChecked(false);
         totalSize.setText("");
@@ -111,6 +98,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     public void onTime() {
         super.onTime();
         if (uiBittorrentDownload != null) {
+            ensureComponentsReferenced();
             BTDownload btDL = uiBittorrentDownload.getDl();
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);
@@ -177,6 +165,58 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             } else {
                 uploadSpeedLimit.setText(R.string.unlimited);
             }
+        }
+    }
+
+    @Override
+    public void ensureComponentsReferenced() {
+        View v = getRootView();
+        if (v == null) {
+            // we still don't have the root view
+            return;
+        }
+
+        if (storagePath == null) {
+            storagePath = findView(v, R.id.fragment_transfer_detail_details_storage_path);
+        }
+        if (sequentialDownloadCheckBox == null) {
+            sequentialDownloadCheckBox = findView(v, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
+        }
+        if (totalSize == null) {
+            totalSize = findView(v, R.id.fragment_transfer_detail_details_total_size);
+        }
+        if (numberOfFiles == null) {
+            numberOfFiles = findView(v, R.id.fragment_transfer_detail_details_files_number);
+        }
+        if (downloadSpeedLimit == null) {
+            downloadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download);
+        }
+        if (downloadSpeedLimitArrow == null) {
+            downloadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
+        }
+        if (uploadSpeedLimit == null) {
+            uploadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload);
+        }
+        if (uploadSpeedLimitArrow == null) {
+            uploadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
+        }
+        if (hash == null) {
+            hash = findView(v, R.id.fragment_transfer_detail_details_hash);
+        }
+        if (hashCopyButton == null) {
+            hashCopyButton = findView(v, R.id.fragment_transfer_detail_details_hash_copy_button);
+        }
+        if (magnet == null) {
+            magnet = findView(v, R.id.fragment_transfer_detail_details_magnet);
+        }
+        if (magnetCopyButton == null) {
+            magnetCopyButton = findView(v, R.id.fragment_transfer_detail_details_magnet_copy_button);
+        }
+        if (createdOn == null) {
+            createdOn = findView(v, R.id.fragment_transfer_detail_details_created_on);
+        }
+        if (comment == null) {
+            comment = findView(v, R.id.fragment_transfer_detail_details_comment);
         }
     }
 

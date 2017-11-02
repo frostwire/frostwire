@@ -62,11 +62,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-        dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
-        lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
-        recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
+        ensureComponentsReferenced();
     }
 
     @Override
@@ -78,6 +74,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         if (adapter == null && isAdded()) {
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
         }
+        ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
         }
@@ -87,6 +84,27 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             addTrackerButton.setOnClickListener(addTrackerButtonClickListener);
         }
         onTime();
+    }
+
+    @Override
+    public void ensureComponentsReferenced() {
+        View v = getRootView();
+        if (v == null) {
+            return;
+        }
+        if (dhtStatus == null) {
+            dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
+        }
+        if (lsdStatus == null) {
+            lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
+        }
+        if (recyclerView == null) {
+            recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+        if (addTrackerButton == null) {
+            addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
+        }
     }
 
     @Override
@@ -101,6 +119,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         TorrentStatus status = uiBittorrentDownload.getDl().getTorrentHandle().status();
         boolean announcingToDht = status.announcingToDht();
         boolean announcingToLSD = status.announcingToLsd();
+        ensureComponentsReferenced();
         dhtStatus.setText(announcingToDht ? R.string.working : R.string.disabled);
         lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
     }

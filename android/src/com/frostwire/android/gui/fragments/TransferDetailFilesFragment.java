@@ -65,11 +65,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-        fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
+        ensureComponentsReferenced();
         fileNumberTextView.setText("");
-        totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
         totalSizeTextView.setText("");
-        recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
@@ -86,12 +84,32 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (adapter == null) {
             adapter = new TransferDetailFilesRecyclerViewAdapter(items);
         }
+
+        ensureComponentsReferenced();
+
         if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
         }
         fileNumberTextView.setText(getString(R.string.n_files, items.size()));
         totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
         onTime();
+    }
+
+    @Override
+    public void ensureComponentsReferenced() {
+        View v = getRootView();
+        if (v == null) {
+            return;
+        }
+        if (fileNumberTextView == null) {
+            fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
+        }
+        if (totalSizeTextView == null) {
+            totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
+        }
+        if (recyclerView == null) {
+            recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
+        }
     }
 
     @Override
