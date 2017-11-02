@@ -75,6 +75,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
     @Override
     public void onResume() {
+        super.onResume();
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -86,12 +87,11 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             adapter = new TransferDetailFilesRecyclerViewAdapter(items);
         }
         if (recyclerView.getAdapter() == null) {
-
             recyclerView.setAdapter(adapter);
         }
         fileNumberTextView.setText(getString(R.string.n_files, items.size()));
         totalSizeTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getSize()));
-        super.onResume();
+        onTime();
     }
 
     @Override
