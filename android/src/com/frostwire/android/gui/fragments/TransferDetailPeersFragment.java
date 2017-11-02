@@ -55,8 +55,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
-        peerNumberTextView = findView(rootView, R.id.fragment_transfer_detail_peers_number);
-        recyclerView = findView(rootView, R.id.fragment_transfer_detail_peers_recyclerview);
+        ensureComponentsReferenced();
     }
 
     @Override
@@ -69,11 +68,26 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter = new PeersAdapter(peerInfos);
         }
+        ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
         }
         onTime();
+    }
+
+    @Override
+    public void ensureComponentsReferenced() {
+        View v = getRootView();
+        if (v == null) {
+            return;
+        }
+        if (peerNumberTextView == null) {
+            peerNumberTextView = findView(v, R.id.fragment_transfer_detail_peers_number);
+        }
+        if (recyclerView == null) {
+            recyclerView = findView(v, R.id.fragment_transfer_detail_peers_recyclerview);
+        }
     }
 
     @Override
