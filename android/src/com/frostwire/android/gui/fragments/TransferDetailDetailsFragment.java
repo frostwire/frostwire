@@ -110,7 +110,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     public void onTime() {
         super.onTime();
-        if (isVisible() && uiBittorrentDownload != null) {
+        if (uiBittorrentDownload != null) {
             BTDownload btDL = uiBittorrentDownload.getDl();
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);

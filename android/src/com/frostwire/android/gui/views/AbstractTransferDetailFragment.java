@@ -118,7 +118,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onTime() {
-        if (!isVisible() || !isAdded()) {
+        if (!isAdded()) {
             return;
         }
         if (uiBittorrentDownload == null) {
