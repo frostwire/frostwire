@@ -48,7 +48,7 @@ import java.text.DecimalFormatSymbols;
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
-
+    private View rootView;
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
     protected TorrentHandle torrentHandle;
@@ -79,6 +79,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
+        this.rootView = rootView;
         initDetailProgress(rootView);
         updateDetailProgress(uiBittorrentDownload);
     }
@@ -88,11 +89,21 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
      * which contains the title of the transfer and the current progress
      */
     protected void initDetailProgress(View v) {
-        detailProgressTitleTextView = findView(v, R.id.view_transfer_detail_progress_title);
-        detailProgressProgressBar = findView(v, R.id.view_transfer_detail_progress_progress);
-        detailProgressStatusTextView = findView(v, R.id.view_transfer_detail_progress_status);
-        detailProgressDownSpeedTextView = findView(v, R.id.view_transfer_detail_progress_down_speed);
-        detailProgressUpSpeedTextView = findView(v, R.id.view_transfer_detail_progress_up_speed);
+        if (detailProgressTitleTextView == null) {
+            detailProgressTitleTextView = findView(v, R.id.view_transfer_detail_progress_title);
+        }
+        if (detailProgressProgressBar == null) {
+            detailProgressProgressBar = findView(v, R.id.view_transfer_detail_progress_progress);
+        }
+        if (detailProgressStatusTextView == null) {
+            detailProgressStatusTextView = findView(v, R.id.view_transfer_detail_progress_status);
+        }
+        if (detailProgressDownSpeedTextView == null) {
+            detailProgressDownSpeedTextView = findView(v, R.id.view_transfer_detail_progress_down_speed);
+        }
+        if (detailProgressUpSpeedTextView == null) {
+            detailProgressUpSpeedTextView = findView(v, R.id.view_transfer_detail_progress_up_speed);
+        }
     }
 
     protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
@@ -145,6 +156,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             return;
         }
         ensureTorrentHandle();
+        ensureComponentsReferenced();
         updateDetailProgress(uiBittorrentDownload);
     }
 
@@ -171,6 +183,12 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
             recoverUIBittorrentDownload(infoHash);
         }
     }
+
+    protected View getRootView() {
+        return rootView;
+    }
+
+    protected abstract void ensureComponentsReferenced();
 
     private void recoverUIBittorrentDownload(String infoHash) {
         if (infoHash != null) {
