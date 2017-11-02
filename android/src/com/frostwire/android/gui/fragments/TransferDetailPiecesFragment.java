@@ -62,24 +62,20 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-        piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
-        pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
-        recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
-        progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
+        ensureComponentsReferenced();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (isVisible()) {
-            progressBar.setVisibility(View.VISIBLE);
-        }
         if (uiBittorrentDownload == null) {
             return;
         }
         if (torrentHandle == null) {
             return;
         }
+        ensureComponentsReferenced();
+        progressBar.setVisibility(View.VISIBLE);
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
         if (adapter == null && isAdded()) {
@@ -110,16 +106,35 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     }
 
     @Override
+    public void ensureComponentsReferenced() {
+        View v = getRootView();
+        if (v == null) {
+            return;
+        }
+        if (piecesNumberTextView == null) {
+            piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
+        }
+        if (pieceSizeTextView == null) {
+            pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
+        }
+        if (recyclerView == null) {
+            recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
+        }
+        if (progressBar == null) {
+            progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
+        }
+    }
+
+    @Override
     public void onTime() {
         super.onTime();
         if (uiBittorrentDownload == null) {
             return;
         }
-
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         PieceIndexBitfield pieces = status.pieces();
+        ensureComponentsReferenced();
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
-
         if (adapter != null) {
             if (pieces.count() > 0) {
                 adapter.updateData(pieces);
