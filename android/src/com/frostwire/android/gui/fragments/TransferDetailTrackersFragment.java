@@ -71,6 +71,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
     @Override
     public void onResume() {
+        super.onResume();
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -85,7 +86,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             addTrackerButtonClickListener = new AddTrackerButtonClickListener(torrentHandle, adapter);
             addTrackerButton.setOnClickListener(addTrackerButtonClickListener);
         }
-        super.onResume();
+        onTime();
     }
 
     @Override

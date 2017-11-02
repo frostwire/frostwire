@@ -94,14 +94,23 @@
             android:paddingLeft="12dp"
             android:paddingRight="6dp"
             android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
+            android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/fragment_transfer_detail_pieces_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="6dp"/>
+                android:padding="6dp"
+                android:visibility="gone"/>
 
+            <ProgressBar
+                android:id="@+id/fragment_transfer_detail_pieces_indeterminate_progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:indeterminate="true"
+                android:visibility="visible"/>
         </LinearLayout>
 
     </LinearLayout>
