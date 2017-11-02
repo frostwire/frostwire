@@ -34,7 +34,6 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.util.Logger;
 
 import java.text.DecimalFormatSymbols;
 
@@ -47,8 +46,6 @@ import java.text.DecimalFormatSymbols;
 
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
-    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
-
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
 
@@ -57,7 +54,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     protected TorrentHandle torrentHandle;
     private TextView detailProgressTitleTextView;
     private ProgressBar detailProgressProgressBar;
-    protected TimerSubscription subscription;
     private TextView detailProgressStatusTextView;
     private TextView detailProgressDownSpeedTextView;
     private TextView detailProgressUpSpeedTextView;
@@ -145,11 +141,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     @Override
     public void onResume() {
         super.onResume();
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
-        subscription = TimerService.subscribe(this, 2);
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -160,9 +151,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     @Override
     public void onPause() {
         super.onPause();
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
     }
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated

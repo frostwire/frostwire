@@ -80,11 +80,6 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (torrentHandle == null) {
             return;
         }
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
-
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
         if (adapter == null && isAdded()) {
@@ -111,8 +106,6 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
             piecesNumberTextView.setText(totalPieces + "");
         }
-
-        subscription = TimerService.subscribe(this, 5);
         onTime();
     }
 
