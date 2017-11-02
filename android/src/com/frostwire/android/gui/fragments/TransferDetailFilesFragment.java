@@ -97,7 +97,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     @Override
     public void onTime() {
         super.onTime();
-        if (!isVisible() || uiBittorrentDownload == null || adapter == null) {
+        if (uiBittorrentDownload == null || adapter == null) {
             return;
         }
         List<TransferItem> items = uiBittorrentDownload.getItems();
