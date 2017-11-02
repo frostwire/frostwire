@@ -61,6 +61,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
 
     @Override
     public void onResume() {
+        super.onResume();
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -72,7 +73,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
         }
-        super.onResume(); // calls onTime()
+        onTime();
     }
 
     @Override

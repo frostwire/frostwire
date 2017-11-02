@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -48,10 +49,9 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
     private PieceAdapter adapter;
     private int totalPieces;
-    private int downloadedColor;
-    private int notDownloadedColor;
 
 
     public TransferDetailPiecesFragment() {
@@ -65,14 +65,18 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
         pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
         recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
+        progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
     }
 
     @Override
     public void onResume() {
+        super.onResume();
+        if (isVisible()) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         if (uiBittorrentDownload == null) {
             return;
         }
-        TorrentHandle torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
         if (torrentHandle == null) {
             return;
         }
@@ -80,24 +84,27 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             subscription.unsubscribe();
             subscription = null;
         }
-        TorrentStatus status = torrentHandle.status();
-        if (status == null) {
-            return;
-        }
 
+        TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
-
         if (adapter == null && isAdded()) {
             Resources r = getResources();
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
-            downloadedColor = r.getColor(R.color.basic_blue_highlight);
-            notDownloadedColor = r.getColor(R.color.basic_gray_dark);
-
             pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            adapter = new PieceAdapter(torrentInfo.numPieces(), status.pieces(), downloadedColor, notDownloadedColor);
+            adapter = new PieceAdapter(torrentInfo.numPieces(),
+                    status.pieces(),
+                    r.getColor(R.color.basic_blue_highlight),
+                    r.getColor(R.color.basic_gray_dark));
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
+        }
+
+        if (adapter != null) {
             recyclerView.setAdapter(adapter);
+            if (status.pieces().count() > 0) {
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
         }
 
         if (totalPieces == -1) {
@@ -106,7 +113,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         }
 
         subscription = TimerService.subscribe(this, 5);
-        super.onResume();
+        onTime();
     }
 
     @Override
@@ -115,11 +122,20 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (!isVisible() || uiBittorrentDownload == null) {
             return;
         }
+
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         PieceIndexBitfield pieces = status.pieces();
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
+
         if (adapter != null) {
-            adapter.updateData(pieces);
+            if (pieces.count() > 0) {
+                adapter.updateData(pieces);
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -185,8 +201,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
         @Override
         public void onBindViewHolder(PieceViewHolder holder, int position) {
-            //LOG.info("onBindViewHolder(" + holder + "," + position + ")");
-            if (pieces != null && position <= pieces.endIndex() ) {
+            if (pieces != null && pieces.count() > 0 && position <= pieces.endIndex() ) {
                 holder.updatePiece(new Piece(position, pieces.getBit(position)));
             }
         }

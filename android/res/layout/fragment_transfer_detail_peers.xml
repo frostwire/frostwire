@@ -44,7 +44,7 @@
             android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
-            android:text="@string/transfer_detail_number_of_peers_dummy"/>
+            android:text=""/>
 
         <ImageView
             android:layout_width="match_parent"

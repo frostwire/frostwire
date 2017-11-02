@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.views;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -32,6 +34,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.util.Logger;
 
 import java.text.DecimalFormatSymbols;
 
@@ -44,7 +47,7 @@ import java.text.DecimalFormatSymbols;
 
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
-    //private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
+    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
 
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
@@ -73,7 +76,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public AbstractTransferDetailFragment init(String tabTitle, UIBittorrentDownload uiBittorrentDownload) {
         this.tabTitle = tabTitle;
         this.uiBittorrentDownload = uiBittorrentDownload;
-        this.torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+        ensureTorrentHandle();
         return this;
     }
 
@@ -119,8 +122,22 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     @Override
     public void onTime() {
-        if (!isVisible() || uiBittorrentDownload == null) {
+        if (!isVisible() || !isAdded()) {
             return;
+        }
+        if (uiBittorrentDownload == null) {
+            Activity activity = getActivity();
+            if (activity != null) {
+                Intent intent = activity.getIntent();
+                if (intent != null) {
+                    String infoHash = intent.getStringExtra("infoHash");
+                    recoverUIBittorrentDownload(infoHash);
+                }
+            }
+
+            if (uiBittorrentDownload == null) {
+                return;
+            }
         }
         updateDetailProgress(uiBittorrentDownload);
     }
@@ -128,13 +145,16 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     @Override
     public void onResume() {
         super.onResume();
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+        subscription = TimerService.subscribe(this, 2);
         if (uiBittorrentDownload == null) {
             return;
         }
-        onTime();
-        if (subscription == null) {
-            subscription = TimerService.subscribe(this, 2);
-        }
+        ensureTorrentHandle();
+        updateDetailProgress(uiBittorrentDownload);
     }
 
     @Override
@@ -159,15 +179,30 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (uiBittorrentDownload == null && savedInstanceState != null) {
-            String infohash = savedInstanceState.getString("infohash");
-            if (infohash != null) {
-                BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infohash);
-                if (bittorrentDownload instanceof UIBittorrentDownload) {
-                    uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
-                }
+            String infoHash = savedInstanceState.getString("infohash");
+            recoverUIBittorrentDownload(infoHash);
+        }
+    }
+
+    private void recoverUIBittorrentDownload(String infoHash) {
+        if (infoHash != null) {
+            BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infoHash);
+            if (bittorrentDownload instanceof UIBittorrentDownload) {
+                uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
+                ensureTorrentHandle();
             }
         }
     }
+
+    private void ensureTorrentHandle() {
+        if (torrentHandle == null && uiBittorrentDownload != null) {
+            torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
+            if (torrentHandle == null) {
+                torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+            }
+        }
+    }
+
     // All utility functions will be here for now
 
     /**
