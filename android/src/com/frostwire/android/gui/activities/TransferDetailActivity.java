@@ -84,8 +84,8 @@ public class TransferDetailActivity extends AbstractActivity {
         private AbstractTransferDetailFragment[] initFragments(UIBittorrentDownload uiBittorrentDownload) {
             // to change the order of the tabs, add/remove tabs, just maintain here.
             return new AbstractTransferDetailFragment[]{
-                    new TransferDetailStatusFragment().init(getString(R.string.status), uiBittorrentDownload),
                     new TransferDetailFilesFragment().init(getString(R.string.files), uiBittorrentDownload),
+                    new TransferDetailStatusFragment().init(getString(R.string.status), uiBittorrentDownload),
                     new TransferDetailDetailsFragment().init(getString(R.string.details), uiBittorrentDownload),
                     new TransferDetailTrackersFragment().init(getString(R.string.trackers), uiBittorrentDownload),
                     new TransferDetailPeersFragment().init(getString(R.string.peers), uiBittorrentDownload),
