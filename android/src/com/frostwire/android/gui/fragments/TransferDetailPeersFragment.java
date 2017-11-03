@@ -18,8 +18,8 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -53,12 +53,6 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     }
 
     @Override
-    protected void initComponents(View rootView, Bundle savedInstanceState) {
-        super.initComponents(rootView, savedInstanceState);
-        ensureComponentsReferenced();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (uiBittorrentDownload == null) {
@@ -68,7 +62,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter = new PeersAdapter(peerInfos);
         }
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
             recyclerView.setAdapter(adapter);
@@ -77,22 +71,27 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.peers;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-        if (peerNumberTextView == null) {
-            peerNumberTextView = findView(v, R.id.fragment_transfer_detail_peers_number);
-        }
-        if (recyclerView == null) {
-            recyclerView = findView(v, R.id.fragment_transfer_detail_peers_recyclerview);
-        }
+        peerNumberTextView = findView(v, R.id.fragment_transfer_detail_peers_number);
+        recyclerView = findView(v, R.id.fragment_transfer_detail_peers_recyclerview);
     }
 
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
         if (uiBittorrentDownload == null) {
             return;
         }
