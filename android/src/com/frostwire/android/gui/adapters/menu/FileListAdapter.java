@@ -76,8 +76,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
-
 /**
  * Adapter in control of the List View shown when we're browsing the files of
  * one peer.
