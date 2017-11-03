@@ -202,11 +202,7 @@ public final class Librarian {
             return;
         }
 
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                syncMediaStoreSupport();
-            }
-        });
+        Thread t = new Thread(() -> syncMediaStoreSupport());
         t.setName("syncMediaStore");
         t.setDaemon(true);
         t.start();
