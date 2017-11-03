@@ -23,8 +23,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -118,7 +116,6 @@ public class PromotionsView extends LinearLayout {
 
             if (position ==  promoAdapter.getCount()-1) {
                 promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");
-                return;
             }
         });
     }
@@ -130,7 +127,7 @@ public class PromotionsView extends LinearLayout {
         // aldenml: The need of this method is because don't have the best
         // use of saved states for fragments starting from the top activity.
         // When the activity configuration changes (for example, orientation)
-        // the gridview is kept in memory, then the need of this forced unbind.
+        // the GridView is kept in memory, then the need of this forced unbind.
         //
         // Additionally, I'm recycling the picasso drawables for older devices. 
         unbindPromotionDrawables();
