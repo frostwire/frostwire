@@ -90,6 +90,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         super.initComponents(rootView, savedInstanceState);
         this.rootView = rootView;
         ensureComponentsReferenced();
+        ensureCommonComponentsReferenced();
         updateCommonComponents(uiBittorrentDownload);
     }
 
