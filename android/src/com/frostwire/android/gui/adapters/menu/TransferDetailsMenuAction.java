@@ -23,9 +23,7 @@ import android.content.Intent;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.TransferDetailActivity;
-import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.transfers.BittorrentDownload;
 
 /**
  * @author gubatron
