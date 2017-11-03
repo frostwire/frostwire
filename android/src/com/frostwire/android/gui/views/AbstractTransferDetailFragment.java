@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.util.Logger;
 
 import java.text.DecimalFormatSymbols;
 
@@ -44,8 +46,8 @@ import java.text.DecimalFormatSymbols;
  *         Created on 10/10/17.
  */
 
-
 public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
+    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
     private View rootView;
@@ -65,13 +67,20 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         transferStateStrings = TransferStateStrings.getInstance(null);
     }
 
+    protected abstract int getTabTitleStringId();
+
+    protected abstract void ensureComponentsReferenced();
+
     public String getTabTitle() {
         return tabTitle;
     }
 
-    public AbstractTransferDetailFragment init(String tabTitle, UIBittorrentDownload uiBittorrentDownload) {
-        this.tabTitle = tabTitle;
+    public AbstractTransferDetailFragment init(final Activity activity, final SparseArray<String> tabTitles, final UIBittorrentDownload uiBittorrentDownload) {
+        this.tabTitle = tabTitles.get(getTabTitleStringId());
         this.uiBittorrentDownload = uiBittorrentDownload;
+        if (activity != null) {
+            onAttach(activity);
+        }
         ensureTorrentHandle();
         return this;
     }
@@ -80,90 +89,47 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
         this.rootView = rootView;
-        initDetailProgress(rootView);
-        updateDetailProgress(uiBittorrentDownload);
-    }
-
-    /**
-     * This is a common section at the top of all the detail fragments
-     * which contains the title of the transfer and the current progress
-     */
-    protected void initDetailProgress(View v) {
-        if (detailProgressTitleTextView == null) {
-            detailProgressTitleTextView = findView(v, R.id.view_transfer_detail_progress_title);
-        }
-        if (detailProgressProgressBar == null) {
-            detailProgressProgressBar = findView(v, R.id.view_transfer_detail_progress_progress);
-        }
-        if (detailProgressStatusTextView == null) {
-            detailProgressStatusTextView = findView(v, R.id.view_transfer_detail_progress_status);
-        }
-        if (detailProgressDownSpeedTextView == null) {
-            detailProgressDownSpeedTextView = findView(v, R.id.view_transfer_detail_progress_down_speed);
-        }
-        if (detailProgressUpSpeedTextView == null) {
-            detailProgressUpSpeedTextView = findView(v, R.id.view_transfer_detail_progress_up_speed);
-        }
-    }
-
-    protected void updateDetailProgress(UIBittorrentDownload uiBittorrentDownload) {
-        if (uiBittorrentDownload == null) {
-            return;
-        }
-        if (detailProgressTitleTextView != null) {
-            detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
-        }
-        if (detailProgressProgressBar != null) {
-            detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
-        }
-        if (detailProgressStatusTextView != null) {
-            detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
-        }
-        if (detailProgressDownSpeedTextView != null) {
-            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
-        }
-        if (detailProgressUpSpeedTextView != null) {
-            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
-        }
+        ensureComponentsReferenced();
+        updateCommonComponents(uiBittorrentDownload);
     }
 
     @Override
     public void onTime() {
-        if (!isAdded()) {
+        LOG.info(getClass().getSimpleName() + ".onTime()");
+        Activity activity = getActivity();
+        if (activity == null) {
+            LOG.info("onTime() aborted, activity == null");
             return;
         }
         if (uiBittorrentDownload == null) {
-            Activity activity = getActivity();
-            if (activity != null) {
-                Intent intent = activity.getIntent();
-                if (intent != null) {
-                    String infoHash = intent.getStringExtra("infoHash");
-                    recoverUIBittorrentDownload(infoHash);
-                }
+            Intent intent = activity.getIntent();
+            if (intent != null) {
+                String infoHash = intent.getStringExtra("infoHash");
+                recoverUIBittorrentDownload(infoHash);
             }
-
             if (uiBittorrentDownload == null) {
+                LOG.info("onTime() aborted, uiBittorrentDownload == null");
                 return;
             }
         }
-        updateDetailProgress(uiBittorrentDownload);
+        updateCommonComponents(uiBittorrentDownload);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (uiBittorrentDownload == null) {
-            return;
-        }
-        ensureTorrentHandle();
         ensureComponentsReferenced();
-        updateDetailProgress(uiBittorrentDownload);
+        ensureCommonComponentsReferenced();
+        if (uiBittorrentDownload != null && ensureTorrentHandle()) {
+            updateCommonComponents(uiBittorrentDownload);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
     }
+
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated
 
@@ -188,7 +154,32 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         return rootView;
     }
 
-    protected abstract void ensureComponentsReferenced();
+    private void updateCommonComponents(UIBittorrentDownload uiBittorrentDownload) {
+        if (uiBittorrentDownload == null) {
+            LOG.info("updateCommonComponents() aborted, no uiBittorrentDownload");
+            return;
+        }
+        detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
+        detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
+        detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
+        detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
+        detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
+    }
+
+    /**
+     * This is a common section at the top of all the detail fragments
+     * which contains the title of the transfer and the current progress
+     */
+    private void ensureCommonComponentsReferenced() {
+        if (rootView == null) {
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
+        }
+        detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
+        detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
+        detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
+        detailProgressDownSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_down_speed);
+        detailProgressUpSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_up_speed);
+    }
 
     private void recoverUIBittorrentDownload(String infoHash) {
         if (infoHash != null) {
@@ -200,13 +191,14 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         }
     }
 
-    private void ensureTorrentHandle() {
+    private boolean ensureTorrentHandle() {
         if (torrentHandle == null && uiBittorrentDownload != null) {
             torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
             if (torrentHandle == null) {
                 torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
             }
         }
+        return torrentHandle != null;
     }
 
     // All utility functions will be here for now
