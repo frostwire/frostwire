@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -57,15 +56,15 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         super();
     }
 
-    private YouTubeDownloadDialog(YouTubePackageSearchResult sr) {
-        super();
+    private YouTubeDownloadDialog init(YouTubePackageSearchResult sr) {
         youTubePackageSearchResultWeakReference = Ref.weak(sr);
+        return this;
     }
 
     public static YouTubeDownloadDialog newInstance(
             Context ctx,
             YouTubePackageSearchResult sr) {
-        YouTubeDownloadDialog dlg = new YouTubeDownloadDialog(sr);
+        YouTubeDownloadDialog dlg = new YouTubeDownloadDialog().init(sr);
 
         dlg.prepareArguments(R.drawable.download_icon,
                 sr.getDisplayName(),
