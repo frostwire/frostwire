@@ -73,9 +73,7 @@ final class MediaScanner {
                     }
                 }
 
-                if (success) {
-                    LOG.info("Scan success for path: " + path + ", uri: " + uri);
-                } else {
+                if (!success) {
                     LOG.info("Scan failed for path: " + path + ", uri: " + uri);
                 }
 
