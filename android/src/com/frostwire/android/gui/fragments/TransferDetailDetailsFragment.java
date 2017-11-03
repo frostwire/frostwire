@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
@@ -79,7 +80,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     protected void initComponents(View rv, Bundle savedInstanceState) {
         super.initComponents(rv, savedInstanceState);
-        ensureComponentsReferenced();
         storagePath.setText("");
         sequentialDownloadCheckBox.setChecked(false);
         totalSize.setText("");
@@ -97,8 +97,12 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
         if (uiBittorrentDownload != null) {
-            ensureComponentsReferenced();
+            //ensureComponentsReferenced();
             BTDownload btDL = uiBittorrentDownload.getDl();
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);
@@ -169,55 +173,30 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.details;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            // we still don't have the root view
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-
-        if (storagePath == null) {
-            storagePath = findView(v, R.id.fragment_transfer_detail_details_storage_path);
-        }
-        if (sequentialDownloadCheckBox == null) {
-            sequentialDownloadCheckBox = findView(v, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
-        }
-        if (totalSize == null) {
-            totalSize = findView(v, R.id.fragment_transfer_detail_details_total_size);
-        }
-        if (numberOfFiles == null) {
-            numberOfFiles = findView(v, R.id.fragment_transfer_detail_details_files_number);
-        }
-        if (downloadSpeedLimit == null) {
-            downloadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download);
-        }
-        if (downloadSpeedLimitArrow == null) {
-            downloadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
-        }
-        if (uploadSpeedLimit == null) {
-            uploadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload);
-        }
-        if (uploadSpeedLimitArrow == null) {
-            uploadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
-        }
-        if (hash == null) {
-            hash = findView(v, R.id.fragment_transfer_detail_details_hash);
-        }
-        if (hashCopyButton == null) {
-            hashCopyButton = findView(v, R.id.fragment_transfer_detail_details_hash_copy_button);
-        }
-        if (magnet == null) {
-            magnet = findView(v, R.id.fragment_transfer_detail_details_magnet);
-        }
-        if (magnetCopyButton == null) {
-            magnetCopyButton = findView(v, R.id.fragment_transfer_detail_details_magnet_copy_button);
-        }
-        if (createdOn == null) {
-            createdOn = findView(v, R.id.fragment_transfer_detail_details_created_on);
-        }
-        if (comment == null) {
-            comment = findView(v, R.id.fragment_transfer_detail_details_comment);
-        }
+        storagePath = findView(v, R.id.fragment_transfer_detail_details_storage_path);
+        sequentialDownloadCheckBox = findView(v, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
+        totalSize = findView(v, R.id.fragment_transfer_detail_details_total_size);
+        numberOfFiles = findView(v, R.id.fragment_transfer_detail_details_files_number);
+        downloadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download);
+        downloadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
+        uploadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload);
+        uploadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
+        hash = findView(v, R.id.fragment_transfer_detail_details_hash);
+        hashCopyButton = findView(v, R.id.fragment_transfer_detail_details_hash_copy_button);
+        magnet = findView(v, R.id.fragment_transfer_detail_details_magnet);
+        magnetCopyButton = findView(v, R.id.fragment_transfer_detail_details_magnet_copy_button);
+        createdOn = findView(v, R.id.fragment_transfer_detail_details_created_on);
+        comment = findView(v, R.id.fragment_transfer_detail_details_comment);
     }
 
     private static final class SequentialDownloadCheckboxCheckedListener implements CompoundButton.OnCheckedChangeListener {
@@ -336,7 +315,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mEndRange = args.getInt(END_RANGE);
             mDefault = args.getInt(DEFAULT_VALUE);
             mIsByteRate = args.getBoolean(IS_BYTE_RATE);
-            //mPluralUnitResourceId = args.getInt(PLURAL_UNIT_RESOURCE_ID);
             mSupportsUnlimited = args.getBoolean(SUPPORTS_UNLIMITED);
             mUnlimitedValue = args.getInt(UNLIMITED_VALUE);
         }

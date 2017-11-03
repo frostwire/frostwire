@@ -18,9 +18,9 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -59,12 +59,6 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     }
 
     @Override
-    protected void initComponents(View v, Bundle savedInstanceState) {
-        super.initComponents(v, savedInstanceState);
-        ensureComponentsReferenced();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (uiBittorrentDownload == null) {
@@ -73,7 +67,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (torrentHandle == null) {
             return;
         }
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         progressBar.setVisibility(View.VISIBLE);
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
@@ -86,7 +80,6 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
                     status.pieces(),
                     r.getColor(R.color.basic_blue_highlight),
                     r.getColor(R.color.basic_gray_dark));
-            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
         }
 
         if (adapter != null) {
@@ -105,34 +98,36 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.pieces;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-        if (piecesNumberTextView == null) {
-            piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
-        }
-        if (pieceSizeTextView == null) {
-            pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
-        }
-        if (recyclerView == null) {
-            recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
-        }
-        if (progressBar == null) {
-            progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
-        }
+        piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
+        pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
+        progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
+        recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
     }
 
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
         if (uiBittorrentDownload == null) {
             return;
         }
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         PieceIndexBitfield pieces = status.pieces();
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
         if (adapter != null) {
             if (pieces.count() > 0) {

@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -53,7 +54,6 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-        ensureComponentsReferenced();
         completedTextView.setText("");
         timeLeftTextView.setText("");
         downloadedTextView.setText("");
@@ -68,10 +68,14 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
         if (uiBittorrentDownload == null) {
             return;
         }
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
         if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
             timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
@@ -92,37 +96,24 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.status;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-        if (completedTextView == null) {
-            completedTextView = findView(v, R.id.fragment_transfer_detail_status_completion);
-        }
-        if (timeLeftTextView == null) {
-            timeLeftTextView = findView(v, R.id.fragment_transfer_detail_status_time_left);
-        }
-        if (downloadedTextView == null) {
-            downloadedTextView = findView(v, R.id.fragment_transfer_detail_status_downloaded);
-        }
-        if (uploadedTextView == null) {
-            uploadedTextView = findView(v, R.id.fragment_transfer_detail_status_uploaded);
-        }
-        if (shareRatioTextView == null) {
-            shareRatioTextView = findView(v, R.id.fragment_transfer_detail_status_share_ratio);
-        }
-        if (peersTextView == null) {
-            peersTextView = findView(v, R.id.fragment_transfer_detail_status_peers);
-        }
-        if (seedsTextView == null) {
-            seedsTextView = findView(v, R.id.fragment_transfer_detail_status_seeds);
-        }
-        if (activeTimeTextView == null) {
-            activeTimeTextView = findView(v, R.id.fragment_transfer_detail_status_active_time);
-        }
-        if (seedingTimeTextView == null) {
-            seedingTimeTextView = findView(v, R.id.fragment_transfer_detail_status_seeding_time);
-        }
+        completedTextView = findView(v, R.id.fragment_transfer_detail_status_completion);
+        timeLeftTextView = findView(v, R.id.fragment_transfer_detail_status_time_left);
+        downloadedTextView = findView(v, R.id.fragment_transfer_detail_status_downloaded);
+        uploadedTextView = findView(v, R.id.fragment_transfer_detail_status_uploaded);
+        shareRatioTextView = findView(v, R.id.fragment_transfer_detail_status_share_ratio);
+        peersTextView = findView(v, R.id.fragment_transfer_detail_status_peers);
+        seedsTextView = findView(v, R.id.fragment_transfer_detail_status_seeds);
+        activeTimeTextView = findView(v, R.id.fragment_transfer_detail_status_active_time);
+        seedingTimeTextView = findView(v, R.id.fragment_transfer_detail_status_seeding_time);
     }
 }
