@@ -18,7 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.os.Bundle;
+import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -60,12 +60,6 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     private AddTrackerButtonClickListener addTrackerButtonClickListener;
 
     @Override
-    protected void initComponents(View v, Bundle savedInstanceState) {
-        super.initComponents(v, savedInstanceState);
-        ensureComponentsReferenced();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         if (uiBittorrentDownload == null) {
@@ -74,7 +68,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         if (adapter == null && isAdded()) {
             adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
         }
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
         }
@@ -87,29 +81,31 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.trackers;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-        if (dhtStatus == null) {
-            dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
-        }
-        if (lsdStatus == null) {
-            lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
-        }
-        if (recyclerView == null) {
-            recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        }
-        if (addTrackerButton == null) {
-            addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
-        }
+        dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
+        lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
+        recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
 
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
+
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -119,7 +115,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         TorrentStatus status = uiBittorrentDownload.getDl().getTorrentHandle().status();
         boolean announcingToDht = status.announcingToDht();
         boolean announcingToLSD = status.announcingToLsd();
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
         dhtStatus.setText(announcingToDht ? R.string.working : R.string.disabled);
         lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
     }

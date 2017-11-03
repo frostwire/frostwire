@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -65,7 +66,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
         super.initComponents(v, savedInstanceState);
-        ensureComponentsReferenced();
         fileNumberTextView.setText("");
         totalSizeTextView.setText("");
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -85,7 +85,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             adapter = new TransferDetailFilesRecyclerViewAdapter(items);
         }
 
-        ensureComponentsReferenced();
+        //ensureComponentsReferenced();
 
         if (recyclerView.getAdapter() == null) {
             recyclerView.setAdapter(adapter);
@@ -96,25 +96,28 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
     }
 
     @Override
+    protected int getTabTitleStringId() {
+        return R.string.files;
+    }
+
+    @Override
     public void ensureComponentsReferenced() {
         View v = getRootView();
         if (v == null) {
-            return;
+            throw new RuntimeException("can't ensure components are referenced without a rootView");
         }
-        if (fileNumberTextView == null) {
-            fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
-        }
-        if (totalSizeTextView == null) {
-            totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
-        }
-        if (recyclerView == null) {
-            recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
-        }
+        fileNumberTextView = findView(v, R.id.fragment_transfer_detail_files_file_number);
+        totalSizeTextView = findView(v, R.id.fragment_transfer_detail_files_size_all);
+        recyclerView = findView(v, R.id.fragment_transfer_detail_files_recycler_view);
     }
 
     @Override
     public void onTime() {
         super.onTime();
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
         if (uiBittorrentDownload == null || adapter == null) {
             return;
         }
