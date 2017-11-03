@@ -55,16 +55,13 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void initComponents(Bundle savedInstanceState) {
+        super.initComponents(savedInstanceState);
+
         initUIBittorrentDownload();
         initTabTitles();
         initFragments();
-        super.onCreate(savedInstanceState); // calls initComponents
-    }
 
-    @Override
-    protected void initComponents(Bundle savedInstanceState) {
-        super.initComponents(savedInstanceState);
         if (detailFragments == null || detailFragments.length <= 0) {
             throw new RuntimeException("check your logic: can't initialize components without initialized fragments");
         }
