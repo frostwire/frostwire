@@ -49,7 +49,6 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     public TransferDetailTrackersFragment() {
         super(R.layout.fragment_transfer_detail_trackers);
     }
-
     private TextView dhtStatus;
     private TextView lsdStatus;
     private RecyclerView recyclerView;

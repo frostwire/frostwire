@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.activities;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -39,16 +40,15 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
-import com.frostwire.util.Logger;
+
+import java.util.List;
 
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
-    private Logger LOG = Logger.getLogger(TransferDetailActivity.class);
-    private OnPageChangeListener onPageChangeListener;
-    private ViewPager viewPager;
     private TimerSubscription subscription;
     private UIBittorrentDownload uiBittorrentDownload;
     private SparseArray<String> tabTitles;
     private AbstractTransferDetailFragment[] detailFragments;
+    private int lastSelectedTabIndex;
 
     public TransferDetailActivity() {
         super(R.layout.activity_transfer_detail);
@@ -63,10 +63,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (detailFragments == null || detailFragments.length <= 0) {
             throw new RuntimeException("check your logic: can't initialize components without initialized fragments");
         }
-        onPageChangeListener = new OnPageChangeListener(this, detailFragments);
+        OnPageChangeListener onPageChangeListener = new OnPageChangeListener(this);
         SectionsPagerAdapter mSectionsPagerAdapter =
                 new SectionsPagerAdapter(getFragmentManager(), detailFragments);
-        viewPager = findViewById(R.id.transfer_detail_viewpager);
+        ViewPager viewPager = findViewById(R.id.transfer_detail_viewpager);
         if (viewPager != null) {
             viewPager.clearOnPageChangeListeners();
             viewPager.setAdapter(mSectionsPagerAdapter);
@@ -121,8 +121,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
                 new TransferDetailDetailsFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailTrackersFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailPeersFragment().init(this, tabTitles, uiBittorrentDownload),
-                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload)
-        };
+                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload)};
     }
 
     @Override
@@ -136,7 +135,6 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
         subscription = TimerService.subscribe(this, 2);
-        LOG.info("onResume() - subscribed to timer");
     }
 
     @Override
@@ -145,41 +143,71 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (subscription != null) {
             subscription.unsubscribe();
             subscription = null;
-            LOG.info("onPause() - un-subscribed from timer");
         }
     }
 
     @Override
     public void onTime() {
         if (subscription == null || subscription.isUnsubscribed()) {
-            LOG.info("onTime() aborted, subscription not ready yet");
             return;
         }
-        if (onPageChangeListener == null) {
-            LOG.info("onTime() aborted, no onPageChangeListener");
+        if (detailFragments == null || detailFragments.length == 0) {
             return;
         }
-        AbstractTransferDetailFragment currentFragment = onPageChangeListener.getCurrentFragment();
+        if (lastSelectedTabIndex < 0 || lastSelectedTabIndex > detailFragments.length - 1) {
+            return;
+        }
+        AbstractTransferDetailFragment currentFragment = detailFragments[lastSelectedTabIndex];
         if (currentFragment == null) {
-            LOG.info("onTime() aborted, no currentFragment");
             return;
         }
         if (!currentFragment.isAdded()) {
-            LOG.info("onTime()  aborted, currentFragment(" + currentFragment.getClass().getSimpleName() + ") not added");
-            return;
+            Fragment correspondingActiveFragment = getCorrespondingActiveFragment(currentFragment);
+            if (correspondingActiveFragment == null) {
+                return; // definitively not added yet
+            }
+            detailFragments[lastSelectedTabIndex]=(AbstractTransferDetailFragment) correspondingActiveFragment;
+            currentFragment = detailFragments[lastSelectedTabIndex];
         }
         try {
-            LOG.info("onTime()");
             currentFragment.onTime();
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
+    /**
+     * Fragment rotation ends up with initialized detail fragments not added,
+     * it seems the SectionsPageAdapter doesn't properly tag the fragments
+     * and we have to manually find the corresponding added fragment
+     * in the list keep by AbstractFragment's getFragments()
+     *
+     * We receive a fragment whose .isAdded() method returns false and we
+     * look into our tracked list of fragments for an equivalent instance that
+     * is marked as added and return it.
+     *
+     * We'll then replace that instance in our detailFragments[] array
+     */
+    private Fragment getCorrespondingActiveFragment(AbstractTransferDetailFragment currentFragment) {
+        List<Fragment> fragments = getFragments();
+        if (fragments.size() > 1) {
+            for (Fragment f : fragments) {
+                if (f.isAdded() && currentFragment.getClass() == f.getClass()) {
+                    return f;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void onTabSelected(int position) {
+        lastSelectedTabIndex = position;
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("lastSelectedTabIndex", viewPager.getCurrentItem());
+        outState.putInt("lastSelectedTabIndex", lastSelectedTabIndex);
     }
 
     private static class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -206,29 +234,13 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         public CharSequence getPageTitle(int position) {
             return detailFragments[position].getTabTitle().toUpperCase();
         }
-
-        public AbstractTransferDetailFragment[] getFragments() {
-            return detailFragments;
-        }
     }
 
     private static final class OnPageChangeListener implements ViewPager.OnPageChangeListener {
-        private static Logger LOG = Logger.getLogger(OnPageChangeListener.class);
         private final TransferDetailActivity activity;
-        private AbstractTransferDetailFragment[] detailFragments;
-        private AbstractTransferDetailFragment currentFragment;
 
-        OnPageChangeListener(TransferDetailActivity activity, AbstractTransferDetailFragment[] detailFragments) {
+        OnPageChangeListener(TransferDetailActivity activity) {
             this.activity = activity;
-            this.detailFragments = detailFragments;
-            currentFragment = detailFragments[0];
-        }
-
-        public AbstractTransferDetailFragment getCurrentFragment() {
-            if (currentFragment == null && detailFragments != null && detailFragments.length > 0) {
-                currentFragment = detailFragments[0];
-            }
-            return currentFragment;
         }
 
         @Override
@@ -238,14 +250,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         @Override
         public void onPageSelected(int position) {
             try {
-                currentFragment = detailFragments[position];
-            } catch (Throwable t) {
-                currentFragment = null;
-                t.printStackTrace();
-                return;
-            }
-            try {
-                LOG.info("onPageSelected(" + position + ") -> " + currentFragment.getTabTitle());
+                activity.onTabSelected(position);
                 activity.onTime();
             } catch (Throwable t) {
                 t.printStackTrace();

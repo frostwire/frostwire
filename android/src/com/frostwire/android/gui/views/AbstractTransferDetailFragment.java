@@ -35,7 +35,6 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.util.Logger;
 
 import java.text.DecimalFormatSymbols;
 
@@ -47,7 +46,6 @@ import java.text.DecimalFormatSymbols;
  */
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-    private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
     private String tabTitle;
@@ -73,6 +71,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     protected abstract void ensureComponentsReferenced(View rootView);
 
     protected abstract void updateComponents();
+
+
 
     public String getTabTitle() {
         return tabTitle;
@@ -105,7 +105,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     public void onTime() {
-        LOG.info(getClass().getSimpleName() + ".onTime()");
         if (uiBittorrentDownload == null) {
             Intent intent = getActivity().getIntent();
             if (intent != null) {
@@ -113,7 +112,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
                 recoverUIBittorrentDownload(infoHash);
             }
             if (uiBittorrentDownload == null) {
-                LOG.info("onTime() aborted, uiBittorrentDownload == null");
                 return;
             }
         }
@@ -143,7 +141,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     private void updateCommonComponents() {
         if (uiBittorrentDownload == null) {
-            LOG.info("updateCommonComponents() aborted, no uiBittorrentDownload");
             return;
         }
         detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
