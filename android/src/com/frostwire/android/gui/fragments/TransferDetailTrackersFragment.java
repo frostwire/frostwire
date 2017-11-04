@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -86,26 +85,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     }
 
     @Override
-    public void ensureComponentsReferenced() {
-        View v = getRootView();
-        if (v == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
-        dhtStatus = findView(v, R.id.fragment_transfer_detail_trackers_dht_status);
-        lsdStatus = findView(v, R.id.fragment_transfer_detail_trackers_lsd_status);
-        recyclerView = findView(v, R.id.fragment_transfer_detail_trackers_address_recyclerview);
+    public void ensureComponentsReferenced(View rootView) {
+        dhtStatus = findView(rootView, R.id.fragment_transfer_detail_trackers_dht_status);
+        lsdStatus = findView(rootView, R.id.fragment_transfer_detail_trackers_lsd_status);
+        recyclerView = findView(rootView, R.id.fragment_transfer_detail_trackers_address_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        addTrackerButton = findView(v, R.id.fragment_transfer_detail_trackers_add_tracker_button);
+        addTrackerButton = findView(rootView, R.id.fragment_transfer_detail_trackers_add_tracker_button);
     }
 
     @Override
-    public void onTime() {
-        super.onTime();
-        Activity activity = getActivity();
-        if (activity == null) {
-            return;
-        }
-
+    protected void updateComponents() {
         if (uiBittorrentDownload == null) {
             return;
         }
@@ -115,7 +104,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         TorrentStatus status = uiBittorrentDownload.getDl().getTorrentHandle().status();
         boolean announcingToDht = status.announcingToDht();
         boolean announcingToLSD = status.announcingToLsd();
-        //ensureComponentsReferenced();
+
         dhtStatus.setText(announcingToDht ? R.string.working : R.string.disabled);
         lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
     }
