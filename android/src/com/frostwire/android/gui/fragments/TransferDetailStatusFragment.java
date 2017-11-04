@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -66,16 +65,28 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     }
 
     @Override
-    public void onTime() {
-        super.onTime();
-        Activity activity = getActivity();
-        if (activity == null) {
-            return;
-        }
+    protected int getTabTitleStringId() {
+        return R.string.status;
+    }
+
+    @Override
+    public void ensureComponentsReferenced(View rootView) {
+        completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
+        timeLeftTextView = findView(rootView, R.id.fragment_transfer_detail_status_time_left);
+        downloadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_downloaded);
+        uploadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_uploaded);
+        shareRatioTextView = findView(rootView, R.id.fragment_transfer_detail_status_share_ratio);
+        peersTextView = findView(rootView, R.id.fragment_transfer_detail_status_peers);
+        seedsTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeds);
+        activeTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_active_time);
+        seedingTimeTextView = findView(rootView, R.id.fragment_transfer_detail_status_seeding_time);
+    }
+
+    @Override
+    protected void updateComponents() {
         if (uiBittorrentDownload == null) {
             return;
         }
-        //ensureComponentsReferenced();
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
         if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
             timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
@@ -93,27 +104,5 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
             activeTimeTextView.setText(seconds2time(torrentHandle.status().activeDuration()));
             seedingTimeTextView.setText(seconds2time(torrentHandle.status().seedingDuration()));
         }
-    }
-
-    @Override
-    protected int getTabTitleStringId() {
-        return R.string.status;
-    }
-
-    @Override
-    public void ensureComponentsReferenced() {
-        View v = getRootView();
-        if (v == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
-        completedTextView = findView(v, R.id.fragment_transfer_detail_status_completion);
-        timeLeftTextView = findView(v, R.id.fragment_transfer_detail_status_time_left);
-        downloadedTextView = findView(v, R.id.fragment_transfer_detail_status_downloaded);
-        uploadedTextView = findView(v, R.id.fragment_transfer_detail_status_uploaded);
-        shareRatioTextView = findView(v, R.id.fragment_transfer_detail_status_share_ratio);
-        peersTextView = findView(v, R.id.fragment_transfer_detail_status_peers);
-        seedsTextView = findView(v, R.id.fragment_transfer_detail_status_seeds);
-        activeTimeTextView = findView(v, R.id.fragment_transfer_detail_status_active_time);
-        seedingTimeTextView = findView(v, R.id.fragment_transfer_detail_status_seeding_time);
     }
 }
