@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
@@ -95,12 +94,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     }
 
     @Override
-    public void onTime() {
-        super.onTime();
-        Activity activity = getActivity();
-        if (activity == null) {
-            return;
-        }
+    protected void updateComponents() {
         if (uiBittorrentDownload != null) {
             //ensureComponentsReferenced();
             BTDownload btDL = uiBittorrentDownload.getDl();
@@ -178,25 +172,21 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     }
 
     @Override
-    public void ensureComponentsReferenced() {
-        View v = getRootView();
-        if (v == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
-        storagePath = findView(v, R.id.fragment_transfer_detail_details_storage_path);
-        sequentialDownloadCheckBox = findView(v, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
-        totalSize = findView(v, R.id.fragment_transfer_detail_details_total_size);
-        numberOfFiles = findView(v, R.id.fragment_transfer_detail_details_files_number);
-        downloadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download);
-        downloadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
-        uploadSpeedLimit = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload);
-        uploadSpeedLimitArrow = findView(v, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
-        hash = findView(v, R.id.fragment_transfer_detail_details_hash);
-        hashCopyButton = findView(v, R.id.fragment_transfer_detail_details_hash_copy_button);
-        magnet = findView(v, R.id.fragment_transfer_detail_details_magnet);
-        magnetCopyButton = findView(v, R.id.fragment_transfer_detail_details_magnet_copy_button);
-        createdOn = findView(v, R.id.fragment_transfer_detail_details_created_on);
-        comment = findView(v, R.id.fragment_transfer_detail_details_comment);
+    public void ensureComponentsReferenced(View rootView) {
+        storagePath = findView(rootView, R.id.fragment_transfer_detail_details_storage_path);
+        sequentialDownloadCheckBox = findView(rootView, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
+        totalSize = findView(rootView, R.id.fragment_transfer_detail_details_total_size);
+        numberOfFiles = findView(rootView, R.id.fragment_transfer_detail_details_files_number);
+        downloadSpeedLimit = findView(rootView, R.id.fragment_transfer_detail_details_speed_limit_download);
+        downloadSpeedLimitArrow = findView(rootView, R.id.fragment_transfer_detail_details_speed_limit_download_arrow);
+        uploadSpeedLimit = findView(rootView, R.id.fragment_transfer_detail_details_speed_limit_upload);
+        uploadSpeedLimitArrow = findView(rootView, R.id.fragment_transfer_detail_details_speed_limit_upload_arrow);
+        hash = findView(rootView, R.id.fragment_transfer_detail_details_hash);
+        hashCopyButton = findView(rootView, R.id.fragment_transfer_detail_details_hash_copy_button);
+        magnet = findView(rootView, R.id.fragment_transfer_detail_details_magnet);
+        magnetCopyButton = findView(rootView, R.id.fragment_transfer_detail_details_magnet_copy_button);
+        createdOn = findView(rootView, R.id.fragment_transfer_detail_details_created_on);
+        comment = findView(rootView, R.id.fragment_transfer_detail_details_comment);
     }
 
     private static final class SequentialDownloadCheckboxCheckedListener implements CompoundButton.OnCheckedChangeListener {
@@ -215,7 +205,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     }
 
     private static final class CopyToClipboardOnClickListener implements View.OnClickListener {
-
         private final UIBittorrentDownload uiBittorrentDownload;
 
         CopyToClipboardOnClickListener(UIBittorrentDownload uiBittorrentDownload) {
@@ -283,12 +272,10 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             SpeedLimitDialog dialog = new SpeedLimitDialog().init(uiBittorrentDownload, direction);
             dialog.setCancelable(true);
             Bundle bundle = new Bundle();
-            //bundle.putString(ARG_KEY, preference.getKey());
             bundle.putInt(START_RANGE, 1024);
             bundle.putInt(END_RANGE, 5242880);
             bundle.putInt(DEFAULT_VALUE, 0);
             bundle.putBoolean(IS_BYTE_RATE, true);
-            // bundle.putInt(PLURAL_UNIT_RESOURCE_ID, preference.getPluralUnitResourceId());
             bundle.putBoolean(SUPPORTS_UNLIMITED, true);
             bundle.putInt(UNLIMITED_VALUE, 0);
             BTDownload dl = uiBittorrentDownload.getDl();

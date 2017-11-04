@@ -83,8 +83,12 @@ public abstract class AbstractFragment extends Fragment {
         ((AppCompatActivity) activity).startSupportActionMode(callback);
     }
 
+    /**
+     * onCreateView calls this before it returns the rootView it has just inflated
+     * @param rootView
+     * @param savedInstanceState
+     */
     protected void initComponents(View rootView, Bundle savedInstanceState) {
-        LOG.info(getClass().getSimpleName() + ".initComponents()");
     }
 
     protected final <T extends View> T findView(View v, @IdRes int id) {
