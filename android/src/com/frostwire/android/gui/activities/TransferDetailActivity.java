@@ -57,22 +57,19 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         super.initComponents(savedInstanceState);
-
         initUIBittorrentDownload();
         initTabTitles();
         initFragments();
-
         if (detailFragments == null || detailFragments.length <= 0) {
             throw new RuntimeException("check your logic: can't initialize components without initialized fragments");
         }
-        onPageChangeListener = new OnPageChangeListener(detailFragments);
+        onPageChangeListener = new OnPageChangeListener(this, detailFragments);
         SectionsPagerAdapter mSectionsPagerAdapter =
                 new SectionsPagerAdapter(getFragmentManager(), detailFragments);
         viewPager = findViewById(R.id.transfer_detail_viewpager);
         if (viewPager != null) {
+            viewPager.clearOnPageChangeListeners();
             viewPager.setAdapter(mSectionsPagerAdapter);
-            TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
-            tabLayout.setupWithViewPager(viewPager);
             viewPager.setCurrentItem(0);
             if (savedInstanceState != null) {
                 int lastSelectedTabIndex = savedInstanceState.getInt("lastSelectedTabIndex", -1);
@@ -81,6 +78,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
                 }
             }
             viewPager.addOnPageChangeListener(onPageChangeListener);
+            TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
+            tabLayout.setupWithViewPager(viewPager);
+        } else {
+            throw new RuntimeException("initComponents() Could not get viewPager");
         }
     }
 
@@ -134,22 +135,8 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
-        reInitFragments();
         subscription = TimerService.subscribe(this, 2);
         LOG.info("onResume() - subscribed to timer");
-    }
-
-    private void reInitFragments() {
-        // TO TEST: getting rid of this method and just creating new fragments altogether on rotation
-        if (detailFragments == null || detailFragments.length <= 0) {
-            throw new RuntimeException("check your logic: no fragments to re-initialize");
-        }
-        if (tabTitles == null || tabTitles.size() <= 0) {
-            throw new RuntimeException("check your logic: tabTitles not initialized");
-        }
-        for (AbstractTransferDetailFragment fragment : detailFragments) {
-            fragment.init(this, tabTitles, uiBittorrentDownload);
-        }
     }
 
     @Override
@@ -164,6 +151,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     @Override
     public void onTime() {
+        if (subscription == null || subscription.isUnsubscribed()) {
+            LOG.info("onTime() aborted, subscription not ready yet");
+            return;
+        }
         if (onPageChangeListener == null) {
             LOG.info("onTime() aborted, no onPageChangeListener");
             return;
@@ -171,6 +162,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         AbstractTransferDetailFragment currentFragment = onPageChangeListener.getCurrentFragment();
         if (currentFragment == null) {
             LOG.info("onTime() aborted, no currentFragment");
+            return;
+        }
+        if (!currentFragment.isAdded()) {
+            LOG.info("onTime()  aborted, currentFragment(" + currentFragment.getClass().getSimpleName() + ") not added");
             return;
         }
         try {
@@ -219,10 +214,12 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     private static final class OnPageChangeListener implements ViewPager.OnPageChangeListener {
         private static Logger LOG = Logger.getLogger(OnPageChangeListener.class);
+        private final TransferDetailActivity activity;
         private AbstractTransferDetailFragment[] detailFragments;
         private AbstractTransferDetailFragment currentFragment;
 
-        OnPageChangeListener(AbstractTransferDetailFragment[] detailFragments) {
+        OnPageChangeListener(TransferDetailActivity activity, AbstractTransferDetailFragment[] detailFragments) {
+            this.activity = activity;
             this.detailFragments = detailFragments;
             currentFragment = detailFragments[0];
         }
@@ -249,7 +246,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             }
             try {
                 LOG.info("onPageSelected(" + position + ") -> " + currentFragment.getTabTitle());
-                currentFragment.onTime();
+                activity.onTime();
             } catch (Throwable t) {
                 t.printStackTrace();
             }
