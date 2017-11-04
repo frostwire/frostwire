@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,12 +61,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter = new PeersAdapter(peerInfos);
         }
-        //ensureComponentsReferenced();
-        if (recyclerView.getAdapter() == null) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            recyclerView.setAdapter(adapter);
-        }
-        onTime();
+        updateComponents();
     }
 
     @Override
@@ -76,24 +70,19 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
     }
 
     @Override
-    public void ensureComponentsReferenced() {
-        View v = getRootView();
-        if (v == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
-        peerNumberTextView = findView(v, R.id.fragment_transfer_detail_peers_number);
-        recyclerView = findView(v, R.id.fragment_transfer_detail_peers_recyclerview);
+    public void ensureComponentsReferenced(View rootView) {
+        peerNumberTextView = findView(rootView, R.id.fragment_transfer_detail_peers_number);
+        recyclerView = findView(rootView, R.id.fragment_transfer_detail_peers_recyclerview);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
-    public void onTime() {
-        super.onTime();
-        Activity activity = getActivity();
-        if (activity == null) {
-            return;
-        }
+    protected void updateComponents() {
         if (uiBittorrentDownload == null) {
             return;
+        }
+        if (recyclerView.getAdapter() == null) {
+            recyclerView.setAdapter(adapter);
         }
         if (adapter != null) {
             ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();

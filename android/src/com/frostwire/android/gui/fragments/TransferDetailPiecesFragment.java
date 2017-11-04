@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.GridLayoutManager;
@@ -67,34 +66,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (torrentHandle == null) {
             return;
         }
-        //ensureComponentsReferenced();
-        progressBar.setVisibility(View.VISIBLE);
-        TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
-        TorrentInfo torrentInfo = torrentHandle.torrentFile();
-        if (adapter == null && isAdded()) {
-            Resources r = getResources();
-            // I do this color look-up only once and pass it down to the view holder
-            // otherwise it has to be done thousands of times.
-            pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            adapter = new PieceAdapter(torrentInfo.numPieces(),
-                    status.pieces(),
-                    r.getColor(R.color.basic_blue_highlight),
-                    r.getColor(R.color.basic_gray_dark));
-        }
-
-        if (adapter != null) {
-            recyclerView.setAdapter(adapter);
-            if (status.pieces().count() > 0) {
-                progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-            }
-        }
-
-        if (totalPieces == -1) {
-            totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
-            piecesNumberTextView.setText(totalPieces + "");
-        }
-        onTime();
+        updateComponents();
     }
 
     @Override
@@ -103,31 +75,44 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     }
 
     @Override
-    public void ensureComponentsReferenced() {
-        View v = getRootView();
-        if (v == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
-        piecesNumberTextView = findView(v, R.id.fragment_transfer_detail_pieces_pieces_number);
-        pieceSizeTextView = findView(v, R.id.fragment_transfer_detail_pieces_piece_size_number);
-        progressBar = findView(v, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
-        recyclerView = findView(v, R.id.fragment_transfer_detail_pieces_recycler_view);
+    public void ensureComponentsReferenced(View rootView) {
+        piecesNumberTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_pieces_number);
+        pieceSizeTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_piece_size_number);
+        progressBar = findView(rootView, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
+        recyclerView = findView(rootView, R.id.fragment_transfer_detail_pieces_recycler_view);
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
     }
 
     @Override
-    public void onTime() {
-        super.onTime();
-        Activity activity = getActivity();
-        if (activity == null) {
-            return;
-        }
+    protected void updateComponents() {
         if (uiBittorrentDownload == null) {
             return;
         }
+        progressBar.setVisibility(View.VISIBLE);
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
+        TorrentInfo torrentInfo = torrentHandle.torrentFile();
         PieceIndexBitfield pieces = status.pieces();
-        //ensureComponentsReferenced();
+        if (adapter == null && isAdded()) {
+            Resources r = getResources();
+            // I do this color look-up only once and pass it down to the view holder
+            // otherwise it has to be done thousands of times.
+            pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
+            adapter = new PieceAdapter(torrentInfo.numPieces(),
+                    pieces,
+                    r.getColor(R.color.basic_blue_highlight),
+                    r.getColor(R.color.basic_gray_dark));
+        }
+        if (adapter != null) {
+            recyclerView.setAdapter(adapter);
+            if (status.pieces().count() > 0) {
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+        if (totalPieces == -1) {
+            totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
+            piecesNumberTextView.setText(totalPieces + "");
+        }
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
         if (adapter != null) {
             if (pieces.count() > 0) {
