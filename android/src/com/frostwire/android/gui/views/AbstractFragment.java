@@ -88,7 +88,7 @@ public abstract class AbstractFragment extends Fragment {
      * @param rootView
      * @param savedInstanceState
      */
-    protected void initComponents(View rootView, Bundle savedInstanceState) {
+    protected void initComponents(final View rootView, Bundle savedInstanceState) {
     }
 
     protected final <T extends View> T findView(View v, @IdRes int id) {
