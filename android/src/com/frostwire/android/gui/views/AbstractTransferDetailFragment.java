@@ -46,11 +46,10 @@ import java.text.DecimalFormatSymbols;
  *         Created on 10/10/17.
  */
 
-public abstract class AbstractTransferDetailFragment extends AbstractFragment implements TimerObserver {
+public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private static Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private static String INFINITY = null;
     protected final TransferStateStrings transferStateStrings;
-    private View rootView;
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
     protected TorrentHandle torrentHandle;
@@ -59,6 +58,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     private TextView detailProgressStatusTextView;
     private TextView detailProgressDownSpeedTextView;
     private TextView detailProgressUpSpeedTextView;
+    protected boolean componentsReferenced;
+    protected boolean commonComponentsReferenced;
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
@@ -69,7 +70,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
 
     protected abstract int getTabTitleStringId();
 
-    protected abstract void ensureComponentsReferenced();
+    protected abstract void ensureComponentsReferenced(View rootView);
+
+    protected abstract void updateComponents();
 
     public String getTabTitle() {
         return tabTitle;
@@ -88,22 +91,23 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
-        this.rootView = rootView;
-        ensureComponentsReferenced();
-        ensureCommonComponentsReferenced();
-        updateCommonComponents(uiBittorrentDownload);
+        commonComponentsReferenced=false;
+        componentsReferenced=false;
+        ensureCommonComponentsReferenced(rootView);
+        updateCommonComponents();
+        ensureComponentsReferenced(rootView);
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateCommonComponents();
+    }
+
     public void onTime() {
         LOG.info(getClass().getSimpleName() + ".onTime()");
-        Activity activity = getActivity();
-        if (activity == null) {
-            LOG.info("onTime() aborted, activity == null");
-            return;
-        }
         if (uiBittorrentDownload == null) {
-            Intent intent = activity.getIntent();
+            Intent intent = getActivity().getIntent();
             if (intent != null) {
                 String infoHash = intent.getStringExtra("infoHash");
                 recoverUIBittorrentDownload(infoHash);
@@ -113,22 +117,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
                 return;
             }
         }
-        updateCommonComponents(uiBittorrentDownload);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        ensureComponentsReferenced();
-        ensureCommonComponentsReferenced();
-        if (uiBittorrentDownload != null && ensureTorrentHandle()) {
-            updateCommonComponents(uiBittorrentDownload);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
+        updateCommonComponents();
+        updateComponents();
     }
 
     // Fragment State serialization = onSaveInstanceState
@@ -151,11 +141,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         }
     }
 
-    protected View getRootView() {
-        return rootView;
-    }
-
-    private void updateCommonComponents(UIBittorrentDownload uiBittorrentDownload) {
+    private void updateCommonComponents() {
         if (uiBittorrentDownload == null) {
             LOG.info("updateCommonComponents() aborted, no uiBittorrentDownload");
             return;
@@ -170,11 +156,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
     /**
      * This is a common section at the top of all the detail fragments
      * which contains the title of the transfer and the current progress
+     * @param rootView
      */
-    private void ensureCommonComponentsReferenced() {
-        if (rootView == null) {
-            throw new RuntimeException("can't ensure components are referenced without a rootView");
-        }
+    private void ensureCommonComponentsReferenced(View rootView) {
         detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
         detailProgressProgressBar = findView(rootView, R.id.view_transfer_detail_progress_progress);
         detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
@@ -192,14 +176,13 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment im
         }
     }
 
-    private boolean ensureTorrentHandle() {
+    private void ensureTorrentHandle() {
         if (torrentHandle == null && uiBittorrentDownload != null) {
             torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
             if (torrentHandle == null) {
                 torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
             }
         }
-        return torrentHandle != null;
     }
 
     // All utility functions will be here for now
