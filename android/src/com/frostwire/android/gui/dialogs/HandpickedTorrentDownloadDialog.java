@@ -298,7 +298,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
                 List<TorrentFileEntry> checked = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
                         (List<TorrentFileEntry>) dlg.getList() :
-                        new ArrayList<TorrentFileEntry>();
+                        new ArrayList<>();
 
                 if (checked.isEmpty()) {
                     checked.addAll(dlg.getChecked());
@@ -333,30 +333,27 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            Engine.instance().getThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        // there is a still a chance of reference getting null, this is in
-                        // the background
-                        if (!Ref.alive(ctxRef) || !Ref.alive(dlgRef)) {
-                            return;
-                        }
-                        Context ctx = ctxRef.get();
-                        HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
-
-                        String magnet = dlg.getMagnetUri();
-                        List<TcpEndpoint> peers = parsePeers(magnet);
-                        BTEngine.getInstance().download(dlg.getTorrentInfo(),
-                                null,
-                                selection,
-                                peers,
-                                TransferManager.instance().isDeleteStartedTorrentEnabled());
-                        UIUtils.showTransfersOnDownloadStart(ctx);
-                        dlg.removeTorrentFetcherDownloadFromTransfers();
-                        MainActivity.refreshTransfers(ctx);
-                    } catch (Throwable ignored) {
+            Engine.instance().getThreadPool().execute(() -> {
+                try {
+                    // there is a still a chance of reference getting null, this is in
+                    // the background
+                    if (!Ref.alive(ctxRef) || !Ref.alive(dlgRef)) {
+                        return;
                     }
+                    Context ctx = ctxRef.get();
+                    HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
+
+                    String magnet = dlg.getMagnetUri();
+                    List<TcpEndpoint> peers = parsePeers(magnet);
+                    BTEngine.getInstance().download(dlg.getTorrentInfo(),
+                            null,
+                            selection,
+                            peers,
+                            TransferManager.instance().isDeleteStartedTorrentEnabled());
+                    UIUtils.showTransfersOnDownloadStart(ctx);
+                    dlg.removeTorrentFetcherDownloadFromTransfers();
+                    MainActivity.refreshTransfers(ctx);
+                } catch (Throwable ignored) {
                 }
             });
         }

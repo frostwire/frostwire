@@ -487,17 +487,14 @@ public class MainActivity extends AbstractActivity implements
                 return;
             }
             final Activity activity = activityRef.get();
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (cancelled) {
-                        //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 3).");
-                        activityRef.get().delayedOnResumeInterstitialRunnable = null;
-                        return;
-                    }
-                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") showing interstitial");
-                    Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false, true);
+            activity.runOnUiThread(() -> {
+                if (cancelled) {
+                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 3).");
+                    activityRef.get().delayedOnResumeInterstitialRunnable = null;
+                    return;
                 }
+                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") showing interstitial");
+                Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false, true);
             });
         }
 
@@ -747,7 +744,7 @@ public class MainActivity extends AbstractActivity implements
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        search.connectDrawerLayoutFilterView((DrawerLayout) findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
+        search.connectDrawerLayoutFilterView(findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
         library = (MyFilesFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_my_files);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
