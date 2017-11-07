@@ -19,6 +19,7 @@ package com.frostwire.android.gui.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,6 +27,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
@@ -35,9 +37,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -49,6 +53,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
@@ -175,29 +180,71 @@ public final class UIUtils {
         void onDialogSubmitted(String value, boolean cancelled);
     }
 
-    public static void showEditTextDialog(Context context,
-                                          int iconId,
+    public static void showEditTextDialog(Activity activity,
                                           int messageStringId,
                                           int titleStringId,
                                           int positiveButtonStringId,
+                                          boolean cancelable,
                                           boolean multilineInput,
                                           String optionalEditTextValue,
                                           final TextViewInputDialogCallback callback) {
-        LinearLayout customView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_alertdialog_edittext, null);
-        final EditText inputEditText = customView.findViewById(R.id.view_alertdialog_edittext_edittext);
-        inputEditText.setHint(context.getString(messageStringId));
-        inputEditText.setMaxLines(!multilineInput ? 1 : 5);
+        new EditTextDialog().
+                init(titleStringId,
+                    messageStringId,
+                    positiveButtonStringId,
+                    cancelable,
+                    multilineInput,
+                    optionalEditTextValue,
+                    callback).show(activity.getFragmentManager());
+    }
 
-        if (optionalEditTextValue != null && optionalEditTextValue.length() > 0) {
-            inputEditText.setText(optionalEditTextValue);
+    public final static class EditTextDialog extends AbstractDialog {
+
+        private int titleStringId;
+        private int messageStringId;
+        private int positiveButtonStringId;
+        private boolean cancelable;
+        private boolean multilineInput;
+        private String optionalEditTextValue;
+        private TextViewInputDialogCallback callback;
+
+        public EditTextDialog() {
+            super(R.layout.dialog_default_input);
         }
 
-        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
-        builder.setIcon(iconId).setTitle(titleStringId).setCancelable(true);
-        builder.setView(customView);
-        builder.setPositiveButton(positiveButtonStringId, new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+        public EditTextDialog init(int titleStringId,
+                                   int messageStringId,
+                                   int positiveButtonStringId,
+                                   boolean cancelable,
+                                   boolean multilineInput,
+                                   String optionalEditTextValue,
+                                   final TextViewInputDialogCallback callback) {
+            this.titleStringId = titleStringId;
+            this.messageStringId = messageStringId;
+            this.positiveButtonStringId = positiveButtonStringId;
+            this.cancelable = cancelable;
+            this.multilineInput = multilineInput;
+            this.optionalEditTextValue = optionalEditTextValue;
+            this.callback = callback;
+            return this;
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            final TextView title = findView(dlg, R.id.dialog_default_input_title);
+            title.setText(titleStringId);
+            final EditText inputEditText = findView(dlg, R.id.dialog_default_input_text);
+            inputEditText.setHint(getString(messageStringId));
+            inputEditText.setMaxLines(!multilineInput ? 1 : 5);
+            if (optionalEditTextValue != null && optionalEditTextValue.length() > 0) {
+                inputEditText.setText(optionalEditTextValue);
+            }
+            final Button positiveButton = findView(dlg, R.id.dialog_default_input_button_yes);
+            positiveButton.setText(positiveButtonStringId);
+            final Button negativeButton = findView(dlg, R.id.dialog_default_input_button_no);
+            negativeButton.setText(R.string.cancel);
+            negativeButton.setVisibility(cancelable ? View.VISIBLE : View.GONE);
+            positiveButton.setOnClickListener(view -> {
                 if (inputEditText != null && callback != null) {
                     try {
                         callback.onDialogSubmitted(inputEditText.getText().toString(), false);
@@ -205,19 +252,16 @@ public final class UIUtils {
                         t.printStackTrace();
                     }
                 }
-                dialog.dismiss();
-            }
-        });
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
+                dlg.dismiss();
+            });
+            negativeButton.setOnClickListener(view -> {
                 if (callback != null) {
                     callback.onDialogSubmitted(null, true);
                 }
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();
+                dlg.dismiss();
+            });
+        }
+
     }
 
     public static String getBytesInHuman(long size) {
@@ -476,7 +520,7 @@ public final class UIUtils {
      */
     public static boolean diceRollPassesThreshold(ConfigurationManager cm, String thresholdPreferenceKey) {
         int thresholdValue = cm.getInt(thresholdPreferenceKey);
-        int diceRoll = new Random().nextInt(100)+1; //1-100
+        int diceRoll = new Random().nextInt(100) + 1; //1-100
         if (thresholdValue <= 0) {
             LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> false");
             return false;
