@@ -50,7 +50,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -329,31 +328,30 @@ public final class BTEngine extends SessionManager {
 
         TorrentHandle th = find(ti.infoHash());
         boolean torrentHandleExists = th != null;
-
-        if (selection != null) {
-            if (torrentHandleExists) {
+        if (torrentHandleExists) {
+            try {
                 priorities = th.filePriorities();
-            } else {
-                priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-
-            if (priorities != null) {
-                boolean changed = false;
-                for (int i = 0; i < selection.length; i++) {
-                    if (selection[i] && i < priorities.length) {
-                        if (priorities[i] == Priority.IGNORE) {
-                            priorities[i] = Priority.NORMAL;
-                            changed = true;
-                        }
+        } else {
+            priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+        }
+        if (priorities != null) {
+            boolean changed = false;
+            for (int i = 0; i < selection.length; i++) {
+                if (selection[i] && i < priorities.length) {
+                    if (priorities[i] == Priority.IGNORE) {
+                        priorities[i] = Priority.NORMAL;
+                        changed = true;
                     }
                 }
+            }
 
-                if (!changed) { // nothing to do
-                    return;
-                }
+            if (!changed) { // nothing to do
+                return;
             }
         }
-
         download(ti, saveDir, priorities, null, peers);
 
         if (!torrentHandleExists) {
@@ -414,12 +412,7 @@ public final class BTEngine extends SessionManager {
             return;
         }
 
-        File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent");
-            }
-        });
+        File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent"));
 
         if (torrents != null) {
             for (File t : torrents) {
