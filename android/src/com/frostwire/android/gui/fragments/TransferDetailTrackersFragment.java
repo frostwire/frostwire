@@ -32,6 +32,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentStatus;
@@ -109,7 +110,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         lsdStatus.setText(announcingToLSD ? R.string.working : R.string.disabled);
     }
 
-    private static final class AddTrackerButtonClickListener implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {
+    private static final class AddTrackerButtonClickListener implements View.OnClickListener, EditTextDialog.TextViewInputDialogCallback {
         private final TorrentHandle torrentHandle;
         private final WeakReference<TrackerRecyclerViewAdapter> adapterRef;
 
@@ -180,7 +181,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             this.trackerOffset = trackerOffset;
         }
 
-        private static final class OnEditTrackerClicked implements View.OnClickListener, UIUtils.TextViewInputDialogCallback {
+        private static final class OnEditTrackerClicked implements View.OnClickListener, EditTextDialog.TextViewInputDialogCallback {
 
             private final WeakReference<TrackerItemViewHolder> vhRef;
 
