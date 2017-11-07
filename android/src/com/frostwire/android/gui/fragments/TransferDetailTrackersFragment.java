@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -120,11 +121,11 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
         @Override
         public void onClick(View v) {
-            UIUtils.showEditTextDialog(v.getContext(),
-                    R.drawable.contextmenu_icon_seed,
+            UIUtils.showEditTextDialog((Activity) v.getContext(),
                     R.string.enter_valid_tracker_url_here,
                     R.string.add_tracker,
                     R.string.add,
+                    true,
                     false,
                     null,
                     this);
@@ -193,11 +194,11 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 if (selectedTrackerURL == null) {
                     return;
                 }
-                UIUtils.showEditTextDialog(v.getContext(),
-                        R.drawable.contextmenu_icon_rename,
+                UIUtils.showEditTextDialog((Activity) v.getContext(),
                         R.string.enter_valid_tracker_url_here,
                         R.string.edit_tracker,
                         R.string.edit,
+                        true,
                         false,
                         selectedTrackerURL,
                         this);
