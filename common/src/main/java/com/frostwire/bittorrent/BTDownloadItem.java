@@ -63,7 +63,7 @@ public class BTDownloadItem implements TransferItem {
 
     @Override
     public boolean isSkipped() {
-        return th.getFilePriority(index) == Priority.IGNORE;
+        return th.filePriority(index) == Priority.IGNORE;
     }
 
     @Override

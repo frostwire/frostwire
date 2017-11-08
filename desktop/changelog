@@ -1,3 +1,8 @@
+frostwire (6.6.1) stable; urgency=high
+  * New jlibtorrent 1.2.0.14
+	
+ -- FrostWire Team <contact@frostwire.com>  Tue, 7 Nov 2017 20:29:57 -0600
+
 frostwire (6.6.0) stable; urgency=high
   * New jlibtorrent 1.2.0.13-RC14, storage and upnp related crashes fixed
   * Portuguese translation updated
