@@ -40,12 +40,12 @@ import com.frostwire.android.core.MediaType;
  */
 public final class TableFetchers {
 
-    public final static TableFetcher AUDIO_TABLE_FETCHER = new AudioTableFetcher();
-    public final static TableFetcher PICTURES_TABLE_FETCHER = new PicturesTableFetcher();
-    public final static TableFetcher VIDEOS_TABLE_FETCHER = new VideosTableFetcher();
-    public final static TableFetcher DOCUMENTS_TABLE_FETCHER = new DocumentsTableFetcher();
-    public final static TableFetcher RINGTONES_TABLE_FETCHER = new RingtonesTableFetcher();
-    public final static TableFetcher TORRENTS_TABLE_FETCHER = new TorrentsTableFetcher();
+    private static final TableFetcher AUDIO_TABLE_FETCHER = new AudioTableFetcher();
+    private static final TableFetcher PICTURES_TABLE_FETCHER = new PicturesTableFetcher();
+    private static final TableFetcher VIDEOS_TABLE_FETCHER = new VideosTableFetcher();
+    private static final TableFetcher DOCUMENTS_TABLE_FETCHER = new DocumentsTableFetcher();
+    private static final TableFetcher RINGTONES_TABLE_FETCHER = new RingtonesTableFetcher();
+    private static final TableFetcher TORRENTS_TABLE_FETCHER = new TorrentsTableFetcher();
 
     public static abstract class AbstractTableFetcher implements TableFetcher {
 
@@ -116,7 +116,7 @@ public final class TableFetchers {
             long dateModified = cur.getLong(dateModifiedCol);
             long albumId = cur.getLong(albumIdCol);
 
-            FileDescriptor fd = new FileDescriptor(Integer.valueOf(id), artist, title, album, year, path, Constants.FILE_TYPE_AUDIO, mime, size, dateAdded, dateModified, true);
+            FileDescriptor fd = new FileDescriptor(id, artist, title, album, year, path, Constants.FILE_TYPE_AUDIO, mime, size, dateAdded, dateModified, true);
             fd.albumId = albumId;
 
             return fd;
@@ -146,7 +146,7 @@ public final class TableFetchers {
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
 
-            return new FileDescriptor(Integer.valueOf(id), null, title, null, null, path, Constants.FILE_TYPE_PICTURES, mime, size, dateAdded, dateModified, true);
+            return new FileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_PICTURES, mime, size, dateAdded, dateModified, true);
         }
 
         public String[] getColumns() {
@@ -249,7 +249,7 @@ public final class TableFetchers {
             int size = cur.getInt(sizeCol);
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
-            return new FileDescriptor(Integer.valueOf(id), null, title, null, null, path, Constants.FILE_TYPE_DOCUMENTS, mime, size, dateAdded, dateModified, true);
+            return new FileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_DOCUMENTS, mime, size, dateAdded, dateModified, true);
         }
 
         public String[] getColumns() {
@@ -363,7 +363,7 @@ public final class TableFetchers {
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
 
-            return new FileDescriptor(Integer.valueOf(id), artist, title, album, year, path, Constants.FILE_TYPE_RINGTONES, mime, size, dateAdded, dateModified, true);
+            return new FileDescriptor(id, artist, title, album, year, path, Constants.FILE_TYPE_RINGTONES, mime, size, dateAdded, dateModified, true);
         }
 
         public String[] getColumns() {
@@ -412,25 +412,6 @@ public final class TableFetchers {
                 return TORRENTS_TABLE_FETCHER;
             default:
                 return null;
-        }
-    }
-
-    public static TableFetcher getFetcher(Uri uri) {
-        String str = uri.toString();
-        if (str.startsWith(AUDIO_TABLE_FETCHER.getContentUri().toString())) {
-            return AUDIO_TABLE_FETCHER;
-        } else if (str.startsWith(PICTURES_TABLE_FETCHER.getContentUri().toString())) {
-            return PICTURES_TABLE_FETCHER;
-        } else if (str.startsWith(VIDEOS_TABLE_FETCHER.getContentUri().toString())) {
-            return VIDEOS_TABLE_FETCHER;
-        } else if (str.startsWith(DOCUMENTS_TABLE_FETCHER.getContentUri().toString())) {
-            return DOCUMENTS_TABLE_FETCHER;
-        } else if (str.startsWith(TORRENTS_TABLE_FETCHER.getContentUri().toString())) {
-            return TORRENTS_TABLE_FETCHER;
-        } else if (str.startsWith(RINGTONES_TABLE_FETCHER.getContentUri().toString())) {
-            return RINGTONES_TABLE_FETCHER;
-        } else {
-            return DOCUMENTS_TABLE_FETCHER;
         }
     }
 }
