@@ -172,8 +172,8 @@ dependencies {
     implementation 'com.android.support:design:27.0.0'
     implementation 'com.android.support:preference-v14:27.0.0'
     implementation 'com.android.support:support-v13:27.0.0'
-    implementation 'com.google.android.gms:play-services-ads-lite:11.4.2'
-    implementation 'com.google.android.gms:play-services-base:11.4.2'
+    implementation 'com.google.android.gms:play-services-ads-lite:11.6.0'
+    implementation 'com.google.android.gms:play-services-base:11.6.0'
     implementation('com.mopub:mopub-sdk-banner:4.17.0@aar') {
         transitive = true
         exclude module: 'moat-mobile-app-kit'
