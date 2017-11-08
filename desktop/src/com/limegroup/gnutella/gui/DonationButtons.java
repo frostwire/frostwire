@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import org.limewire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * 
@@ -36,7 +34,7 @@ public class DonationButtons extends JPanel {
 
     private static final Color FONT_COLOR = new Color(0x1f3545);
 
-    public DonationButtons() {
+    DonationButtons() {
         setLayout(new MigLayout("insets 0, nogrid, ltr, gapx 6", "", "[align center]"));
         add(createDonateLabel());
         //MigLayout lesson: Using px explicitly as the unit does make a big difference.
@@ -44,7 +42,8 @@ public class DonationButtons extends JPanel {
         int bitcoinWidth = (OSUtils.isLinux()) ? 52 : 46;
         int paypalWidth = (OSUtils.isLinux()) ? 52 : 46;
 
-        add(new DonationButton("bitcoin", "http://www.frostwire.com/bitcoin", I18n.tr("Support FrostWire development with a Bitcoin donation")), "w "+bitcoinWidth+"px!, h 18px!");
+        add(new DonationButton("btc", "http://www.frostwire.com/bitcoin", I18n.tr("Support FrostWire development with a Bitcoin donation")), "w "+bitcoinWidth+"px!, h 18px!");
+        add(new DonationButton("bch", "http://www.frostwire.com/bitcoin-cash", I18n.tr("Support FrostWire development with a Bitcoin Cash donation")), "w "+bitcoinWidth+"px!, h 18px!");
         add(new DonationButton("$1", "http://www.frostwire.com/?id=donate&amt=1", I18n.tr("Support FrostWire development with a USD $1 donation")), "w 26px!, h 18px!");
         add(new DonationButton("$5", "http://www.frostwire.com/?id=donate&amt=5", I18n.tr("Support FrostWire development with a USD $5 donation")), "w 26px!, h 18px!");
         add(new DonationButton("$10", "http://www.frostwire.com/?id=donate&amt=10", I18n.tr("Support FrostWire development with a USD $10 donation")), "w 30px!, h 18px!");
@@ -62,7 +61,7 @@ public class DonationButtons extends JPanel {
 
     private class DonationButton extends JButton {
 
-        public DonationButton(String text, String donationURL, String tipText) {
+        DonationButton(String text, String donationURL, String tipText) {
             initComponent(text, donationURL, tipText);
         }
 
@@ -79,12 +78,7 @@ public class DonationButtons extends JPanel {
             setHorizontalTextPosition(SwingConstants.CENTER);
             setVerticalTextPosition(SwingConstants.CENTER);
             setToolTipText(tipText);
-            addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GUIMediator.openURL(donationURL);
-                }
-            });
+            addActionListener(e -> GUIMediator.openURL(donationURL));
         }
 
         @Override
