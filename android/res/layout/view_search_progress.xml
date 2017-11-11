@@ -18,26 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/app_background_body_light"
-              android:gravity="center_horizontal|center_vertical"
-              android:orientation="vertical"
-              android:clickable="true">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background_body_light"
+    android:fillViewport="true"
+    android:clickable="true"
+    android:focusable="true">
 
-    <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="vertical"
-                  android:gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical">
+
         <TextView
-                android:id="@+id/view_search_progress_text_no_results_feedback"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_results_feedback"
-                android:textSize="18sp"
-                android:layout_marginTop="20dp"
-                android:visibility="gone"/>
+            android:id="@+id/view_search_progress_text_no_results_feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/no_results_feedback"
+            android:textSize="18sp"
+            android:visibility="gone" />
 
         <!-- TODO: Add message somewhere in this layout if internet is down -->
 
@@ -52,7 +54,7 @@
             android:text="@string/try_other_keywords"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/view_search_progress_no_data_connection"
@@ -61,36 +63,40 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
+            android:maxLines="2"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
-            android:maxLines="2"
             android:text="@string/no_data_check_internet_connection"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
-        <TextView android:id="@+id/view_search_progress_try_frostwire_plus"
-                  android:text="@string/learn_how_to_get_more_results"
-                  style="@style/NoSearchResultsLink"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_gravity="center_horizontal"
-                  android:layout_marginBottom="10dp"
-                  android:visibility="gone"/>
+        <TextView
+            android:id="@+id/view_search_progress_try_frostwire_plus"
+            style="@style/NoSearchResultsLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="@string/learn_how_to_get_more_results"
+            android:visibility="gone" />
 
-        <ProgressBar android:id="@+id/view_search_progress_progressbar"
-                     style="?android:attr/progressBarStyleLarge"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"/>
+        <ProgressBar
+            android:id="@+id/view_search_progress_progressbar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-        <Button android:id="@+id/view_search_progress_button_cancel"
-                style="@style/BlueButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:minHeight="45dp"
-                android:minWidth="150dp"
-                android:text="@android:string/cancel"/>
+        <Button
+            android:id="@+id/view_search_progress_button_cancel"
+            style="@style/BlueButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:minHeight="45dp"
+            android:minWidth="150dp"
+            android:text="@android:string/cancel" />
 
     </LinearLayout>
-</LinearLayout>
+</ScrollView>
