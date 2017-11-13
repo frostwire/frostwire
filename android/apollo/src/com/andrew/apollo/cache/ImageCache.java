@@ -23,11 +23,23 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.*;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Looper;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
-import com.andrew.apollo.utils.ApolloUtils;
 
-import java.io.*;
+import com.andrew.apollo.utils.ApolloUtils;
+import com.frostwire.util.Ref;
+
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -105,7 +117,7 @@ public final class ImageCache {
      * @param context The {@link Context} to use
      * @return A new instance of this class.
      */
-    public final static ImageCache getInstance(final Context context) {
+    public static ImageCache getInstance(final Context context) {
         if (sInstance == null) {
             sInstance = new ImageCache(context.getApplicationContext());
         }
@@ -116,20 +128,30 @@ public final class ImageCache {
      * Initialize the cache, providing all parameters.
      *
      * @param context The {@link Context} to use
-     * @param cacheParams The cache parameters to initialize the cache
      */
     private void init(final Context context) {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                // Initialize the disk cahe in a background thread
-                initDiskCache(context);
-                return null;
-            }
-        }, (Void[])null);
+        ApolloUtils.execute(new InitDiskCacheAsyncTask(this, context), (Void[]) null);
         // Set up the memory cache
         initLruCache(context);
+    }
+
+    private static class InitDiskCacheAsyncTask extends AsyncTask<Void, Void, Void> {
+        private ImageCache imageCache;
+        private WeakReference<Context> contextRef;
+
+        InitDiskCacheAsyncTask(ImageCache imageCache, Context context) {
+            this.imageCache = imageCache;
+            contextRef = Ref.weak(context);
+        }
+
+        @Override
+        protected Void doInBackground(final Void... unused) {
+            // Initialize the disk cahe in a background thread
+            if (Ref.alive(contextRef)) {
+                imageCache.initDiskCache(contextRef.get());
+            }
+            return null;
+        }
     }
 
     /**
@@ -160,7 +182,7 @@ public final class ImageCache {
                     try {
                         mDiskCache = DiskLruCache.open(diskCacheDir, 1, 1, DISK_CACHE_SIZE);
                     } catch (final IOException e) {
-                        diskCacheDir = null;
+                        e.printStackTrace();
                     }
                 }
             }
@@ -173,12 +195,11 @@ public final class ImageCache {
      * @param context The {@link Context} to use
      */
     public void initLruCache(final Context context) {
-        final ActivityManager activityManager = (ActivityManager)context
+        final ActivityManager activityManager = (ActivityManager) context
                 .getSystemService(Context.ACTIVITY_SERVICE);
         final int lruCacheSize = Math.round(MEM_CACHE_DIVIDER * activityManager.getMemoryClass()
                 * 1024 * 1024);
         mLruCache = new MemoryCache(lruCacheSize);
-
         // Release some memory as needed
         context.registerComponentCallbacks(new ComponentCallbacks2() {
 
@@ -217,19 +238,16 @@ public final class ImageCache {
      * , if not found a new one is created using the supplied params and saved
      * to a {@link RetainFragment}
      *
-     * @param activity The calling {@link FragmentActivity}
+     * @param activity The calling {FragmentActivity}
      * @return An existing retained ImageCache object or a new one if one did
-     *         not exist
+     * not exist
      */
     public static final ImageCache findOrCreateCache(final Activity activity) {
-
         // Search for, or create an instance of the non-UI RetainFragment
         final RetainFragment retainFragment = findOrCreateRetainFragment(
                 activity.getFragmentManager());
-
         // See if we already have an ImageCache stored in RetainFragment
-        ImageCache cache = (ImageCache)retainFragment.getObject();
-
+        ImageCache cache = (ImageCache) retainFragment.getObject();
         // No existing ImageCache, create one and store it in RetainFragment
         if (cache == null) {
             cache = getInstance(activity);
@@ -244,12 +262,11 @@ public final class ImageCache {
      *
      * @param fm The {@link FragmentManager} to use
      * @return The existing instance of the {@link Fragment} or the new instance
-     *         if just created
+     * if just created
      */
     public static final RetainFragment findOrCreateRetainFragment(final FragmentManager fm) {
         // Check to see if we have retained the worker fragment
-        RetainFragment retainFragment = (RetainFragment)fm.findFragmentByTag(TAG);
-
+        RetainFragment retainFragment = (RetainFragment) fm.findFragmentByTag(TAG);
         // If not retained, we need to create and add it
         if (retainFragment == null) {
             retainFragment = new RetainFragment();
@@ -261,17 +278,15 @@ public final class ImageCache {
     /**
      * Adds a new image to the memory and disk caches
      *
-     * @param data The key used to store the image
+     * @param data   The key used to store the image
      * @param bitmap The {@link Bitmap} to cache
      */
     public void addBitmapToCache(final String data, final Bitmap bitmap) {
         if (data == null || bitmap == null) {
             return;
         }
-
         // Add to memory cache
         addBitmapToMemCache(data, bitmap);
-
         // Add to disk cache
         if (mDiskCache != null) {
             final String key = hashKeyForDisk(data);
@@ -310,7 +325,7 @@ public final class ImageCache {
     /**
      * Called to add a new image to the memory cache
      *
-     * @param data The key identifier
+     * @param data   The key identifier
      * @param bitmap The {@link Bitmap} to cache
      */
     public void addBitmapToMemCache(final String data, final Bitmap bitmap) {
@@ -352,13 +367,11 @@ public final class ImageCache {
         if (data == null) {
             return null;
         }
-
         // Check in the memory cache here to avoid going to the disk cache less
         // often
         if (getBitmapFromMemCache(data) != null) {
             return getBitmapFromMemCache(data);
         }
-
         waitUntilUnpaused();
         final String key = hashKeyForDisk(data);
         if (mDiskCache != null) {
@@ -415,8 +428,8 @@ public final class ImageCache {
      * calling {@code #getArtworkFromFile(Context, String)} again
      *
      * @param context The {@link Context} to use
-     * @param data The name of the album art
-     * @param id The ID of the album to find artwork for
+     * @param data    The name of the album art
+     * @param id      The ID of the album to find artwork for
      * @return The artwork for an album
      */
     public final Bitmap getCachedArtwork(final Context context, final String data, final long id) {
@@ -438,7 +451,7 @@ public final class ImageCache {
      * Used to fetch the artwork for an album locally from the user's device
      *
      * @param context The {@link Context} to use
-     * @param albumID The ID of the album to find artwork for
+     * @param albumId The ID of the album to find artwork for
      * @return The artwork for an album
      */
     public final Bitmap getArtworkFromFile(final Context context, final long albumId) {
@@ -462,10 +475,9 @@ public final class ImageCache {
         } catch (final OutOfMemoryError evict) {
             // Log.e(TAG, "OutOfMemoryError - getArtworkFromFile - ", evict);
             evictAll();
-        }  catch (final NullPointerException e) {
+        } catch (final NullPointerException e) {
             // Log.e(TAG, "NullPointerException - getArtworkFromFile - ", e);
         } catch (SecurityException e) {
-
         }
         return artwork;
     }
@@ -490,7 +502,7 @@ public final class ImageCache {
                 }
                 return null;
             }
-        }, (Void[])null);
+        }, (Void[]) null);
     }
 
     /**
@@ -515,7 +527,6 @@ public final class ImageCache {
         if (mLruCache != null) {
             mLruCache.remove(key);
         }
-
         try {
             // Remove the disk entry
             if (mDiskCache != null) {
@@ -568,16 +579,16 @@ public final class ImageCache {
     /**
      * Get a usable cache directory (external if available, internal otherwise)
      *
-     * @param context The {@link Context} to use
+     * @param context    The {@link Context} to use
      * @param uniqueName A unique directory name to append to the cache
-     *            directory
+     *                   directory
      * @return The cache directory
      */
     public static final File getDiskCacheDir(final Context context, final String uniqueName) {
         // getExternalCacheDir(context) returns null if external storage is not ready
         final String cachePath = getExternalCacheDir(context) != null
-                                    ? getExternalCacheDir(context).getPath()
-                                    : context.getCacheDir().getPath();
+                ? getExternalCacheDir(context).getPath()
+                : context.getCacheDir().getPath();
         return new File(cachePath, uniqueName);
     }
 
@@ -585,7 +596,7 @@ public final class ImageCache {
      * Check if external storage is built-in or removable
      *
      * @return True if external storage is removable (like an SD card), false
-     *         otherwise
+     * otherwise
      */
     public static final boolean isExternalStorageRemovable() {
         return Environment.isExternalStorageRemovable();
@@ -634,7 +645,7 @@ public final class ImageCache {
      *
      * @param bytes The bytes to convert.
      * @return A {@link String} converted from the bytes of a hashable key used
-     *         to store a filename on the disk, to hex digits.
+     * to store a filename on the disk, to hex digits.
      */
     private static final String bytesToHexString(final byte[] bytes) {
         final StringBuilder builder = new StringBuilder();
