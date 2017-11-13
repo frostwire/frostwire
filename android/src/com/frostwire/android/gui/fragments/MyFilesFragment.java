@@ -401,23 +401,35 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     private Loader<Object> createLoaderFiles(final byte fileType) {
-        AsyncTaskLoader<Object> loader = new AsyncTaskLoader<Object>(getActivity()) {
-            @Override
-            public Object loadInBackground() {
-                try {
-                    return new Object[]{fileType, peer.browse(fileType)};
-                } catch (Throwable e) {
-                    LOG.error("Error performing finger", e);
-                }
-                return null;
-            }
-        };
+        CreateLoaderFilesAsyncTaskLoader loader = new CreateLoaderFilesAsyncTaskLoader(getActivity(), fileType, peer);
         try {
             loader.forceLoad();
         } catch (Throwable t) {
             LOG.warn("createLoaderFiles(fileType="+fileType+") loader.forceLoad() failed. Continuing.", t);
         }
         return loader;
+    }
+
+    private final static class CreateLoaderFilesAsyncTaskLoader extends AsyncTaskLoader<Object> {
+
+        private byte fileType;
+        private Peer peer;
+
+        public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType, Peer peer) {
+            super(activity);
+            this.fileType = fileType;
+            this.peer = peer;
+        }
+
+        @Override
+        public Object loadInBackground() {
+            try {
+                return new Object[]{fileType, peer.browse(fileType)};
+            } catch (Throwable e) {
+                LOG.error("Error performing finger", e);
+            }
+            return null;
+        }
     }
 
     private void updateHeader() {
@@ -590,7 +602,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             autoCheckUnCheckSelectAllCheckbox();
             selectionModeCallback.onItemChecked(getActivity(), adapter.getCheckedCount());
         }
-
     }
 
     private boolean onFileItemLongClicked(View v) {

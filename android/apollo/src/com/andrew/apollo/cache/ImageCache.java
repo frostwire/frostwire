@@ -135,7 +135,7 @@ public final class ImageCache {
         initLruCache(context);
     }
 
-    private static class InitDiskCacheAsyncTask extends AsyncTask<Void, Void, Void> {
+    private final static class InitDiskCacheAsyncTask extends AsyncTask<Void, Void, Void> {
         private ImageCache imageCache;
         private WeakReference<Context> contextRef;
 

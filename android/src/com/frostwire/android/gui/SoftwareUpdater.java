@@ -391,7 +391,7 @@ public final class SoftwareUpdater {
         int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
     }
 
-    private static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
+    private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
         private SoftwareUpdater softwareUpdater;
         private WeakReference<Context> contextReference;
 
