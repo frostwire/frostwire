@@ -19,8 +19,6 @@ package com.frostwire.android.gui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,6 +37,7 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXStats;
 import com.frostwire.uxstats.UXStatsConf;
@@ -48,6 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.List;
@@ -66,6 +66,7 @@ public final class SoftwareUpdater {
 
     private static final String UPDATE_ACTION_OTA = "ota";
     private static final String UPDATE_ACTION_MARKET = "market";
+    private static final String UPDATE_ACTION_OTA_OVERRIDE = "ota_override";
 
     private boolean oldVersion;
     private String latestVersion;
@@ -87,87 +88,11 @@ public final class SoftwareUpdater {
 
     public void checkForUpdate(final Context context) {
         long now = System.currentTimeMillis();
-
         if (now - updateTimestamp < UPDATE_MESSAGE_TIMEOUT) {
             return;
         }
-
         updateTimestamp = now;
-
-        AsyncTask<Void, Void, Boolean> updateTask = new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                try {
-                    byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
-                            getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
-
-                    if (jsonBytes != null) {
-                        update = JsonUtils.toObject(new String(jsonBytes), Update.class);
-
-                        if (update.vc != null) {
-                            oldVersion = isFrostWireOld(BuildConfig.VERSION_CODE, update.vc);
-                        } else {
-                            latestVersion = update.v;
-                            String[] latestVersionArr = latestVersion.split("\\.");
-
-                            // lv = latest version
-                            byte[] lv = new byte[]{Byte.valueOf(latestVersionArr[0]), Byte.valueOf(latestVersionArr[1]), Byte.valueOf(latestVersionArr[2])};
-
-                            // mv = my version
-                            byte[] mv = buildVersion(Constants.FROSTWIRE_VERSION_STRING);
-
-                            oldVersion = isFrostWireOld(mv, lv);
-                        }
-
-                        updateConfiguration(update, context);
-                    } else {
-                        LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
-                    }
-
-                    return handleOTAUpdate();
-                } catch (Throwable e) {
-                    LOG.error("Failed to check/retrieve/update the update information", e);
-                }
-
-                return false;
-            }
-
-            private byte[] buildVersion(String v) {
-                try {
-                    String[] arr = v.split("\\.");
-                    return new byte[]{Byte.parseByte(arr[0]), Byte.parseByte(arr[1]), Byte.parseByte(arr[2])};
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-                return new byte[]{0, 0, 0};
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                //nav menu or other components always needs to be updated after we read the config.
-                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
-                intent.putExtra("value", result);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
-                if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
-                    notifyUserAboutUpdate(context);
-                }
-
-                // Even if we're offline, we need to disable these for the Google Play Distro.
-                if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                    SearchEngine ytSE = SearchEngine.YOUTUBE;
-                    ytSE.setActive(false);
-
-                    SearchEngine scSE = SearchEngine.SOUNCLOUD;
-                    scSE.setActive(false);
-
-                    SearchEngine pixabaySE = SearchEngine.PIXABAY;
-                    pixabaySE.setActive(false);
-                }
-            }
-        };
-
-        // TODO: Use our executors and a runnable instead.
+        AsyncTask<Void, Void, Boolean> updateTask = new CheckUpdateAsyncTask(this, context);
         updateTask.execute();
     }
 
@@ -175,9 +100,16 @@ public final class SoftwareUpdater {
      * @return true if there's an update available.
      */
     private boolean handleOTAUpdate() throws IOException {
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-            LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
-            return false;
+        if (update.a != null && !UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
+                LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
+                return false;
+            }
+        }
+
+        if (UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
+            LOG.info("handleOTAUpdate() overriding, take update from OTA message");
+            update.a = UPDATE_ACTION_OTA;
         }
 
         if (oldVersion) {
@@ -241,12 +173,10 @@ public final class SoftwareUpdater {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
 
-                UIUtils.showYesNoDialog(context, R.drawable.app_icon, message, R.string.update_title, new OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(update.m));
-                        context.startActivity(intent);
-                    }
+                UIUtils.showYesNoDialog(context, R.drawable.app_icon, message, R.string.update_title, (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(update.m));
+                    context.startActivity(intent);
                 });
             }
         } catch (Throwable e) {
@@ -459,5 +389,90 @@ public final class SoftwareUpdater {
         int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
         int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
+    }
+
+    private static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
+        private SoftwareUpdater softwareUpdater;
+        private WeakReference<Context> contextReference;
+
+        CheckUpdateAsyncTask(SoftwareUpdater softwareUpdater, Context context) {
+            this.softwareUpdater = softwareUpdater;
+            contextReference = Ref.weak(context);
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
+                        getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
+
+                if (jsonBytes != null) {
+                    softwareUpdater.update = JsonUtils.toObject(new String(jsonBytes), Update.class);
+
+                    if (softwareUpdater.update.vc != null) {
+                        softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(BuildConfig.VERSION_CODE, softwareUpdater.update.vc);
+                    } else {
+                        softwareUpdater.latestVersion = softwareUpdater.update.v;
+                        String[] latestVersionArr = softwareUpdater.latestVersion.split("\\.");
+
+                        // lv = latest version
+                        byte[] lv = new byte[]{Byte.valueOf(latestVersionArr[0]), Byte.valueOf(latestVersionArr[1]), Byte.valueOf(latestVersionArr[2])};
+
+                        // mv = my version
+                        byte[] mv = buildVersion(Constants.FROSTWIRE_VERSION_STRING);
+
+                        softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);
+                    }
+
+                    if (Ref.alive(contextReference)) {
+                        softwareUpdater.updateConfiguration(softwareUpdater.update, contextReference.get());
+                    }
+                } else {
+                    LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
+                }
+
+                return softwareUpdater.handleOTAUpdate();
+            } catch (Throwable e) {
+                LOG.error("Failed to check/retrieve/update the update information", e);
+            }
+
+            return false;
+        }
+
+        private byte[] buildVersion(String v) {
+            try {
+                String[] arr = v.split("\\.");
+                return new byte[]{Byte.parseByte(arr[0]), Byte.parseByte(arr[1]), Byte.parseByte(arr[2])};
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            return new byte[]{0, 0, 0};
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            //nav menu or other components always needs to be updated after we read the config.
+            if (Ref.alive(contextReference)) {
+                Context context = contextReference.get();
+                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+                intent.putExtra("value", result);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
+                    softwareUpdater.notifyUserAboutUpdate(context);
+                }
+            }
+
+            // Even if we're offline, we need to disable these for the Google Play Distro.
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
+                SearchEngine ytSE = SearchEngine.YOUTUBE;
+                ytSE.setActive(false);
+
+                SearchEngine scSE = SearchEngine.SOUNCLOUD;
+                scSE.setActive(false);
+
+                SearchEngine pixabaySE = SearchEngine.PIXABAY;
+                pixabaySE.setActive(false);
+            }
+        }
     }
 }
