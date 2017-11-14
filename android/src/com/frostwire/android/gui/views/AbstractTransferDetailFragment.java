@@ -56,8 +56,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private TextView detailProgressStatusTextView;
     private TextView detailProgressDownSpeedTextView;
     private TextView detailProgressUpSpeedTextView;
-    protected boolean componentsReferenced;
-    protected boolean commonComponentsReferenced;
 
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
@@ -91,8 +89,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
-        commonComponentsReferenced=false;
-        componentsReferenced=false;
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
         ensureComponentsReferenced(rootView);
