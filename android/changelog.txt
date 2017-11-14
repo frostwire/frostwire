@@ -1,4 +1,4 @@
-FrostWire 1.9.9 build 465 - NOV/08/2017
+FrostWire 1.9.9 build 466 - NOV/14/2017
  - App Startup is faster
  - Multiple freezes fixed, memory leaks fixed, crashes fixed
  - Android Jelly-Bean (<4.4) support dropped, minSdkVersion=19
@@ -10,6 +10,7 @@ FrostWire 1.9.9 build 465 - NOV/08/2017
  - Java 8 usage, gradle 4.3
  - compileSDKVersion 27, support libraries 27.0.1, kotlin plugin 1.1.51
  - Material design dialog update
+ - TPB domain update
 
 FrostWire 1.9.9 - OCT/05/2017
  - Search: More search results when not in WiFi
