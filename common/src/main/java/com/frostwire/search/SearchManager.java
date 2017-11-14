@@ -395,7 +395,7 @@ public final class SearchManager {
     private static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
         @Override
         public SearchPerformer newPerformer(long token, String keywords) {
-            return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
+            return new TPBSearchPerformer("thepiratebay.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
         }
     };
 

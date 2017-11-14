@@ -195,7 +195,7 @@ public abstract class SearchEngine {
     public static final SearchEngine TPB = new SearchEngine("TPB", Constants.PREF_KEY_SEARCH_USE_TPB) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new TPBSearchPerformer("thepiratebay.se", token, keywords, DEFAULT_TIMEOUT);
+            return new TPBSearchPerformer("thepiratebay.org", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
