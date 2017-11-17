@@ -63,6 +63,9 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (detailFragments == null || detailFragments.length <= 0) {
             throw new RuntimeException("check your logic: can't initialize components without initialized fragments");
         }
+        if (savedInstanceState != null) {
+            lastSelectedTabIndex = savedInstanceState.getInt("lastSelectedTabIndex", -1);
+        }
         OnPageChangeListener onPageChangeListener = new OnPageChangeListener(this);
         SectionsPagerAdapter mSectionsPagerAdapter =
                 new SectionsPagerAdapter(getFragmentManager(), detailFragments);
@@ -70,13 +73,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (viewPager != null) {
             viewPager.clearOnPageChangeListeners();
             viewPager.setAdapter(mSectionsPagerAdapter);
-            viewPager.setCurrentItem(0);
-            if (savedInstanceState != null) {
-                int lastSelectedTabIndex = savedInstanceState.getInt("lastSelectedTabIndex", -1);
-                if (lastSelectedTabIndex != -1) {
-                    viewPager.setCurrentItem(lastSelectedTabIndex);
-                }
-            }
+            viewPager.setCurrentItem(lastSelectedTabIndex == -1 ? 0 : lastSelectedTabIndex);
             viewPager.addOnPageChangeListener(onPageChangeListener);
             TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
             tabLayout.setupWithViewPager(viewPager);
@@ -135,6 +132,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
         subscription = TimerService.subscribe(this, 2);
+        onTime();
     }
 
     @Override
