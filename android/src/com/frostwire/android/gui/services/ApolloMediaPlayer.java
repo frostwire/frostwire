@@ -1,5 +1,7 @@
 package com.frostwire.android.gui.services;
 
+import android.util.LongSparseArray;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
@@ -8,13 +10,11 @@ import com.frostwire.android.core.player.Playlist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.gui.Librarian;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
 
-    private Map<Long, FileDescriptor> idMap = new HashMap<>();
+    private LongSparseArray<FileDescriptor> idMap = new LongSparseArray<>();
 
     public ApolloMediaPlayer() {
     }
@@ -71,7 +71,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
             }
 
             return fd;
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
         }
 
         return null;
@@ -81,9 +81,8 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     public FileDescriptor getSimplePlayerCurrentFD() {
         try {
             long audioId = MusicUtils.getCurrentSimplePlayerAudioId();
-            FileDescriptor fd = Librarian.instance().getFileDescriptor(Constants.FILE_TYPE_RINGTONES, (int) audioId);
-            return fd;
-        } catch (Throwable e) {
+            return Librarian.instance().getFileDescriptor(Constants.FILE_TYPE_RINGTONES, (int) audioId);
+        } catch (Throwable ignored) {
         }
         return null;
     }

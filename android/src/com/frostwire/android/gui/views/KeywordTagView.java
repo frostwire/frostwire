@@ -29,7 +29,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -136,26 +135,18 @@ public final class KeywordTagView extends AppCompatTextView {
             setTextColor(ContextCompat.getColor(getContext(), R.color.app_text_primary));
         }
 
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onTouched();
-            }
-        });
+        setOnClickListener(v -> onTouched());
         if (dismissible) {
-            setOnTouchListener(new OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() != MotionEvent.ACTION_UP) {
-                        return false;
-                    }
-                    TextView tv = (TextView) v;
-                    if (event.getX() >= tv.getWidth() - tv.getTotalPaddingRight()) {
-                        onDismissed();
-                        return true;
-                    }
+            setOnTouchListener((v, event) -> {
+                if (event.getAction() != MotionEvent.ACTION_UP) {
                     return false;
                 }
+                TextView tv = (TextView) v;
+                if (event.getX() >= tv.getWidth() - tv.getTotalPaddingRight()) {
+                    onDismissed();
+                    return true;
+                }
+                return false;
             });
         }
     }

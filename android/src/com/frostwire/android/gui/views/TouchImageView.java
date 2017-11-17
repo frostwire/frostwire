@@ -15,6 +15,7 @@
  */
 
 package com.frostwire.android.gui.views;
+
 /**
  * Modified by
  *
@@ -23,7 +24,6 @@ package com.frostwire.android.gui.views;
  * @author marcelinkaaa
  * Created on 5/7/17.
  */
-
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -1164,7 +1164,6 @@ public class TouchImageView extends AppCompatImageView {
     private void compatPostOnAnimation(Runnable runnable) {
         if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
             postOnAnimation(runnable);
-
         } else {
             postDelayed(runnable, 1000 / 60);
         }

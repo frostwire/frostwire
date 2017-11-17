@@ -34,7 +34,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -178,12 +177,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         artistName.setText(source);
 
         if (!audio) {
-            videoTexture.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    toggleFullScreen(videoTexture);
-                    return false;
-                }
+            videoTexture.setOnTouchListener((view, motionEvent) -> {
+                toggleFullScreen(videoTexture);
+                return false;
             });
         }
 
@@ -192,12 +188,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
 
         final Button downloadButton = findView(R.id.activity_preview_player_download_button);
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onDownloadButtonClick();
-            }
-        });
+        downloadButton.setOnClickListener(v -> onDownloadButtonClick());
 
         if (isFullScreen) {
             isFullScreen = false; //so it will make it full screen on what was an orientation change.
@@ -225,12 +216,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             return;
         }
         fallbackImageView.setVisibility(View.GONE);
-        dismissButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                destroyMopubView();
-                fallbackImageView.setVisibility(View.GONE);
-            }
+        dismissButton.setOnClickListener(view -> {
+            destroyMopubView();
+            fallbackImageView.setVisibility(View.GONE);
         });
 
         mopubView.setTesting(false);
@@ -609,7 +597,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     public void onPrepared(MediaPlayer mp) {
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if (am != null) {
+            am.requestAudioFocus(PreviewPlayerActivity.this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        }
 
         final ImageView img = findView(R.id.activity_preview_player_thumbnail);
         onVideoViewPrepared(img);
@@ -672,7 +662,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
 
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        if (mAudioManager.isMusicActive()) {
+        if (mAudioManager != null && mAudioManager.isMusicActive()) {
             Intent i = new Intent("com.android.music.musicservicecommand");
             i.putExtra("command", "pause");
             getApplication().sendBroadcast(i);

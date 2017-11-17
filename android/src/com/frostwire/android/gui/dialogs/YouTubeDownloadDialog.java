@@ -57,15 +57,11 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         super();
     }
 
-    private YouTubeDownloadDialog(YouTubePackageSearchResult sr) {
-        super();
-        youTubePackageSearchResultWeakReference = Ref.weak(sr);
-    }
-
     public static YouTubeDownloadDialog newInstance(
             Context ctx,
             YouTubePackageSearchResult sr) {
-        YouTubeDownloadDialog dlg = new YouTubeDownloadDialog(sr);
+        YouTubeDownloadDialog dlg = new YouTubeDownloadDialog();
+        youTubePackageSearchResultWeakReference = Ref.weak(sr);
 
         dlg.prepareArguments(R.drawable.download_icon,
                 sr.getDisplayName(),

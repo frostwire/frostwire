@@ -6,7 +6,7 @@ import android.widget.AutoCompleteTextView;
 
 import com.frostwire.android.gui.util.UIUtils;
 
-public class FWAutoCompleteTextView extends AutoCompleteTextView {
+public class FWAutoCompleteTextView extends android.support.v7.widget.AppCompatAutoCompleteTextView {
     private boolean showKeyboardOnPaste;
     
     public FWAutoCompleteTextView(Context context, AttributeSet attrs, int defStyle) {
