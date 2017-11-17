@@ -1,4 +1,4 @@
-FrostWire 1.9.9 build 466 - NOV/14/2017
+FrostWire 1.9.9 build 467 - NOV/15/2017
  - App Startup is faster
  - Multiple freezes fixed, memory leaks fixed, crashes fixed
  - Android Jelly-Bean (<4.4) support dropped, minSdkVersion=19
@@ -7,7 +7,7 @@ FrostWire 1.9.9 build 466 - NOV/14/2017
  - Update system refactor, cleanup, updates shown on nav menu
  - New Afrikaans translation
  - Transfer screen on rotation would not keep last tab selected
- - Java 8 usage, gradle 4.3
+ - Java 8 usage, gradle 4.3.1
  - compileSDKVersion 27, support libraries 27.0.1, kotlin plugin 1.1.51
  - Material design dialog update
  - TPB domain update
