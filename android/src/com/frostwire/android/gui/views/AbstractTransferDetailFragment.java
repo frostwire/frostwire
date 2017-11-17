@@ -89,6 +89,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
+        if (uiBittorrentDownload == null && savedInstanceState != null) {
+            String infoHash = savedInstanceState.getString("infohash");
+            recoverUIBittorrentDownload(infoHash);
+        }
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
         ensureComponentsReferenced(rootView);
@@ -129,10 +133,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (uiBittorrentDownload == null && savedInstanceState != null) {
-            String infoHash = savedInstanceState.getString("infohash");
-            recoverUIBittorrentDownload(infoHash);
-        }
+//        if (uiBittorrentDownload == null && savedInstanceState != null) {
+//            String infoHash = savedInstanceState.getString("infohash");
+//            recoverUIBittorrentDownload(infoHash);
+//        }
     }
 
     private void updateCommonComponents() {
