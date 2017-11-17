@@ -108,8 +108,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (uiBittorrentDownload == null) {
             Intent intent = getActivity().getIntent();
             if (intent != null) {
-                String infoHash = intent.getStringExtra("infoHash");
-                recoverUIBittorrentDownload(infoHash);
+                recoverUIBittorrentDownload(intent.getStringExtra("infoHash"));
             }
             if (uiBittorrentDownload == null) {
                 return;
