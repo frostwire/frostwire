@@ -20,6 +20,8 @@ package com.frostwire.android.gui.fragments;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -37,7 +39,9 @@ import static com.frostwire.android.gui.util.UIUtils.getBytesInHuman;
 public class TransferDetailStatusFragment extends AbstractTransferDetailFragment {
 
     private TextView completedTextView;
+    private LinearLayout timeLeftLabelContainer;
     private TextView timeLeftTextView;
+    private ImageView timeLeftDividerLine;
     private TextView downloadedTextView;
     private TextView uploadedTextView;
     private TextView shareRatioTextView;
@@ -72,7 +76,9 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     public void ensureComponentsReferenced(View rootView) {
         completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
+        timeLeftLabelContainer = findView(rootView, R.id.fragment_transfer_detail_status_time_left_container);
         timeLeftTextView = findView(rootView, R.id.fragment_transfer_detail_status_time_left);
+        timeLeftDividerLine = findView(rootView, R.id.fragment_transfer_detail_status_time_left_divider_line);
         downloadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_downloaded);
         uploadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_uploaded);
         shareRatioTextView = findView(rootView, R.id.fragment_transfer_detail_status_share_ratio);
@@ -88,10 +94,15 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
             return;
         }
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
-        if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
+
+        TransferState state = uiBittorrentDownload.getState();
+
+        int timeLeftVisibility = (state == TransferState.DOWNLOADING) ? View.VISIBLE : View.GONE;
+        timeLeftLabelContainer.setVisibility(timeLeftVisibility);
+        timeLeftTextView.setVisibility(timeLeftVisibility);
+        timeLeftDividerLine.setVisibility(timeLeftVisibility);
+        if (timeLeftVisibility == View.VISIBLE) {
             timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
-        } else {
-            timeLeftTextView.setText("");
         }
         downloadedTextView.setText(getString(R.string.m_of_n_strings,
                 getBytesInHuman(uiBittorrentDownload.getDl().getTotalBytesReceived()),

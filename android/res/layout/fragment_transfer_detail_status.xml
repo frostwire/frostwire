@@ -70,6 +70,7 @@
             android:contentDescription="@null" />
 
         <LinearLayout
+            android:id="@+id/fragment_transfer_detail_status_time_left_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -97,6 +98,7 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/fragment_transfer_detail_status_time_left_divider_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
