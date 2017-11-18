@@ -120,12 +120,7 @@ public final class UIUtils {
 
     public static void showDismissableMessage(View view, int resourceId) {
         final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(R.string.dismiss, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        }).show();
+        snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
     }
 
     public static void sendShutdownIntent(Context ctx) {
@@ -167,11 +162,7 @@ public final class UIUtils {
     }
 
     public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener) {
-        showYesNoDialog(context, iconId, message, titleId, positiveListener, new OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        showYesNoDialog(context, iconId, message, titleId, positiveListener, (dialog, which) -> dialog.dismiss());
     }
 
     public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
@@ -223,7 +214,7 @@ public final class UIUtils {
      */
     public static void openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
-            if (filePath != null && !openAudioInternal(filePath)) {
+            if (filePath != null && !openAudioInternal(context, filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -279,15 +270,15 @@ public final class UIUtils {
     /**
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
      */
-    public static void playEphemeralPlaylist(FileDescriptor fd) {
-        Engine.instance().getMediaPlayer().play(Librarian.instance().createEphemeralPlaylist(fd));
+    public static void playEphemeralPlaylist(final Context context, FileDescriptor fd) {
+        Engine.instance().getMediaPlayer().play(Librarian.instance().createEphemeralPlaylist(context, fd));
     }
 
-    private static boolean openAudioInternal(String filePath) {
+    private static boolean openAudioInternal(final Context context, String filePath) {
         try {
-            List<FileDescriptor> fds = Librarian.instance().getFiles(filePath, true);
+            List<FileDescriptor> fds = Librarian.instance().getFiles(context, filePath, true);
             if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
-                playEphemeralPlaylist(fds.get(0));
+                playEphemeralPlaylist(context, fds.get(0));
                 UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 return true;
             } else {
@@ -315,7 +306,9 @@ public final class UIUtils {
     public static void showKeyboard(Context context, View view) {
         view.requestFocus();
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        if (imm != null) {
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 
     public static void hideKeyboardFromActivity(Activity activity) {
@@ -324,7 +317,9 @@ public final class UIUtils {
         if (view == null) {
             view = new View(activity);
         }
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     public static void goToFrostWireMainActivity(Activity activity) {
@@ -351,12 +346,7 @@ public final class UIUtils {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View customView = View.inflate(context, R.layout.view_social_buttons, null);
         builder.setView(customView);
-        builder.setPositiveButton(context.getString(android.R.string.ok), new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setPositiveButton(context.getString(android.R.string.ok), (dialog, which) -> dialog.dismiss());
         final AlertDialog socialLinksDialog = builder.create();
         socialLinksDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         socialLinksDialog.setOnDismissListener(dismissListener);
@@ -364,35 +354,15 @@ public final class UIUtils {
         ImageButton twitterButton = customView.findViewById(R.id.view_social_buttons_twitter_button);
         ImageButton redditButton = customView.findViewById(R.id.view_social_buttons_reddit_button);
         final String referrerParam = "?ref=android_" + ((referrerContextSuffix != null) ? referrerContextSuffix.trim() : "");
-        fbButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
-            }
-        });
-        twitterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
-            }
-        });
-        redditButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
-            }
-        });
+        fbButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam));
+        twitterButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam));
+        redditButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam));
         if (showInstallationCompleteSection) {
             LinearLayout installationCompleteLayout =
                     customView.findViewById(R.id.view_social_buttons_installation_complete_layout);
             installationCompleteLayout.setVisibility(View.VISIBLE);
             ImageButton dismissCheckButton = customView.findViewById(R.id.view_social_buttons_dismiss_check);
-            dismissCheckButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    socialLinksDialog.dismiss();
-                }
-            });
+            dismissCheckButton.setOnClickListener(v -> socialLinksDialog.dismiss());
         }
         socialLinksDialog.show();
     }

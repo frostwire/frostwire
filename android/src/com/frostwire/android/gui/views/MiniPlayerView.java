@@ -51,12 +51,7 @@ public class MiniPlayerView extends LinearLayout {
 
     public MiniPlayerView(Context context, AttributeSet set) {
         super(context, set);
-        refresher = new TimerObserver() {
-            @Override
-            public void onTime() {
-                refresherOnTime();
-            }
-        };
+        refresher = this::refresherOnTime;
     }
 
     public TimerObserver getRefresher() {
@@ -182,7 +177,7 @@ public class MiniPlayerView extends LinearLayout {
     public void refresherOnTime() {
         CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
         if (mp != null) {
-            FileDescriptor fd = mp.getCurrentFD();
+            FileDescriptor fd = mp.getCurrentFD(getContext());
 
             String title = "";
             String artist = "";

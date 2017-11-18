@@ -18,6 +18,7 @@
 
 package com.frostwire.android;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -134,7 +135,7 @@ public final class AndroidPlatform extends AbstractPlatform {
             fs = new DefaultFileSystem() {
                 @Override
                 public void scan(File file) {
-                    Librarian.instance().scan(file);
+                    Librarian.instance().scan(app, file);
                 }
             };
         }
@@ -167,6 +168,7 @@ public final class AndroidPlatform extends AbstractPlatform {
             return r;
         }
 
+        @SuppressLint("SdCardPath")
         @Override
         public int stat(String path, posix_stat_t buf) {
             LOG.info("posix - stat:" + path);

@@ -18,6 +18,8 @@
 
 package com.frostwire.android.core.player;
 
+import android.content.Context;
+
 import com.frostwire.android.core.FileDescriptor;
 
 /**
@@ -38,12 +40,12 @@ public interface CoreMediaPlayer {
      * 
      * @return
      */
-    FileDescriptor getCurrentFD();
+    FileDescriptor getCurrentFD(final Context context);
 
     /**
      * The current file the simple media player is playing.
      *
      * @return
      */
-    FileDescriptor getSimplePlayerCurrentFD();
+    FileDescriptor getSimplePlayerCurrentFD(final Context context);
 }

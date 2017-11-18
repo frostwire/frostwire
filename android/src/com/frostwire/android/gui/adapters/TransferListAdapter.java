@@ -51,7 +51,6 @@ import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -70,6 +69,7 @@ import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -105,7 +105,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         this.viewOnLongClickListener = new ViewOnLongClickListener();
         this.playOnClickListener = new OpenOnClickListener(context);
         this.dialogs = new ArrayList<>();
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<Transfer>() : list;
+        this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
         initTransferStateStringMap();
     }
 
@@ -308,8 +308,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         String title = download.getDisplayName();
         boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
-        if (finishedSuccessfully) {
-            final List<FileDescriptor> files = Librarian.instance().getFiles(download.getSavePath().getAbsolutePath(), true);
+        if (finishedSuccessfully && Ref.alive(context)) {
+            final List<FileDescriptor> files = Librarian.instance().getFiles(context.get(), download.getSavePath().getAbsolutePath(), true);
             boolean singleFile = files != null && files.size() == 1;
             if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(context.get(), files.get(0), download));
@@ -320,7 +320,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 items.add(new OpenMenuAction(context.get(), download.getDisplayName(), download.getSavePath().getAbsolutePath(), extractMime(download)));
             }
         }
-        items.add(new CancelMenuAction(context.get(), download, !finishedSuccessfully));
+        if (Ref.alive(context)) {
+            items.add(new CancelMenuAction(context.get(), download, !finishedSuccessfully));
+        }
         return title;
     }
 
@@ -328,9 +330,8 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
         return tag instanceof HttpDownload || tag instanceof YouTubeDownload || tag instanceof SoundcloudDownload;
     }
 
-    private String populateBittorrentDownloadMenuActions(BittorrentDownload tag, List<MenuAction> items) {
+    private String populateBittorrentDownloadMenuActions(BittorrentDownload download, List<MenuAction> items) {
         String title;
-        BittorrentDownload download = tag;
         title = download.getDisplayName();
 
         //If it's a torrent download with a single file, we should be able to open it.

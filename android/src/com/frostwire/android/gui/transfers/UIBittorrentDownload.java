@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         try {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
-        } catch (Throwable t) {
+        } catch (Throwable ignored) {
 
         }
     }
@@ -193,13 +193,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         final List<TransferItem> items = getItems();
         final ContentResolver cr = context.getContentResolver();
         for (TransferItem item : items) {
-            final List<FileDescriptor> fileDescriptors = Librarian.instance().getFiles(item.getFile().getAbsolutePath(), true);
+            final List<FileDescriptor> fileDescriptors = Librarian.instance().getFiles(context, item.getFile().getAbsolutePath(), true);
             for (FileDescriptor fd : fileDescriptors) {
                 File file = new File(fd.filePath);
                 if (file.isFile()) {
                     try {
                         TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
-                        cr.delete(fetcher.getContentUri(), MediaStore.MediaColumns._ID + " = " + fd.id, null);
+                        if (fetcher != null) {
+                            cr.delete(fetcher.getContentUri(), MediaStore.MediaColumns._ID + " = " + fd.id, null);
+                        }
                     } catch (Throwable e) {
                         LOG.error("Failed to delete file from media store. (" + fd.filePath + ")", e);
                     }
@@ -354,16 +356,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         boolean canDelete = true;
 
         File[] files = directory.listFiles();
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
+        if (files != null && files.length > 0) {
+            for (File file : files) {
                 try {
-                    if (!files[i].getCanonicalPath().startsWith(canonicalParent))
+                    if (!file.getCanonicalPath().startsWith(canonicalParent))
                         continue;
                 } catch (IOException ioe) {
                     canDelete = false;
                 }
-
-                if (!deleteEmptyDirectoryRecursive(files[i])) {
+                if (!deleteEmptyDirectoryRecursive(file)) {
                     canDelete = false;
                 }
             }
@@ -395,7 +396,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     private List<TransferItem> calculateItems(BTDownload dl) {
-        List<TransferItem> l = new LinkedList<TransferItem>();
+        List<TransferItem> l = new LinkedList<>();
 
         for (TransferItem item : dl.getItems()) {
             if (!item.isSkipped()) {

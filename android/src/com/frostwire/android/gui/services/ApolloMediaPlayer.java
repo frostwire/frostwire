@@ -1,5 +1,6 @@
 package com.frostwire.android.gui.services;
 
+import android.content.Context;
 import android.util.LongSparseArray;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -58,13 +59,13 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     }
 
     @Override
-    public FileDescriptor getCurrentFD() {
+    public FileDescriptor getCurrentFD(final Context context) {
         try {
             long audioId = MusicUtils.getCurrentAudioId();
             FileDescriptor fd = idMap.get(audioId);
 
-            if (audioId != -1 && fd == null) {
-                fd = Librarian.instance().getFileDescriptor(Constants.FILE_TYPE_AUDIO, (int) audioId);
+            if (audioId != -1 && fd == null && context != null) {
+                fd = Librarian.instance().getFileDescriptor(context, Constants.FILE_TYPE_AUDIO, (int) audioId);
                 if (fd != null) {
                     idMap.put(audioId, fd);
                 }
@@ -78,10 +79,13 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     }
 
     @Override
-    public FileDescriptor getSimplePlayerCurrentFD() {
+    public FileDescriptor getSimplePlayerCurrentFD(final Context context) {
+        if (context == null) {
+            return null;
+        }
         try {
             long audioId = MusicUtils.getCurrentSimplePlayerAudioId();
-            return Librarian.instance().getFileDescriptor(Constants.FILE_TYPE_RINGTONES, (int) audioId);
+            return Librarian.instance().getFileDescriptor(context, Constants.FILE_TYPE_RINGTONES, (int) audioId);
         } catch (Throwable ignored) {
         }
         return null;

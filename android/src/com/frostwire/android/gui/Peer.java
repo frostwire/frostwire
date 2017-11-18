@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui;
 
+import android.content.Context;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.services.Engine;
@@ -56,12 +58,12 @@ public final class Peer {
         this.hashCode = key.hashCode();
     }
 
-    public void finger(final Finger.FingerCallback callback) {
-        Engine.instance().getThreadPool().execute(new FingerTask(callback));
+    public void finger(final Context context, final Finger.FingerCallback callback) {
+        Engine.instance().getThreadPool().execute(new FingerTask(context, callback));
     }
 
-    public List<FileDescriptor> browse(byte fileType) {
-        return Librarian.instance().getFiles(fileType, 0, Integer.MAX_VALUE);
+    public List<FileDescriptor> browse(final Context context, byte fileType) {
+        return Librarian.instance().getFiles(context, fileType, 0, Integer.MAX_VALUE);
     }
 
     @Override
@@ -89,19 +91,21 @@ public final class Peer {
 
     private static final class FingerTask implements Runnable {
 
+        private final WeakReference<Context> ctxRef;
         private final WeakReference<Finger.FingerCallback> cb;
 
-        FingerTask(Finger.FingerCallback cb) {
+        FingerTask(Context context, Finger.FingerCallback cb) {
+            this.ctxRef = Ref.weak(context);
             this.cb = Ref.weak(cb);
         }
 
         @Override
         public void run() {
-            if (Ref.alive(cb)) {
+            if (Ref.alive(ctxRef) && Ref.alive(cb)) {
                 try {
-                    Finger finger = Librarian.instance().finger();
-                    if (Ref.alive(cb)) {
-                        cb.get().onFinger(finger);
+                    Finger finger = Librarian.instance().finger(ctxRef.get());
+                    if (Ref.alive(ctxRef) && Ref.alive(cb)) {
+                        cb.get().onFinger(ctxRef.get(), finger);
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();

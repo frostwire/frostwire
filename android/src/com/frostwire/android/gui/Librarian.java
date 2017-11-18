@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui;
 
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -63,15 +62,13 @@ public final class Librarian {
 
     private static final String TAG = "FW.Librarian";
 
-    private final Application context;
-
     private static Librarian instance;
 
-    public synchronized static void create(Application context) {
+    public synchronized static void create() {
         if (instance != null) {
             return;
         }
-        instance = new Librarian(context);
+        instance = new Librarian();
     }
 
     public static Librarian instance() {
@@ -81,24 +78,24 @@ public final class Librarian {
         return instance;
     }
 
-    private Librarian(Application context) {
-        this.context = context;
+    public List<FileDescriptor> getFiles(final Context context, byte fileType, int offset, int pageSize) {
+        return getFiles(context, offset, pageSize, TableFetchers.getFetcher(fileType));
     }
 
-    public List<FileDescriptor> getFiles(byte fileType, int offset, int pageSize) {
-        return getFiles(offset, pageSize, TableFetchers.getFetcher(fileType));
-    }
-
-    public List<FileDescriptor> getFiles(byte fileType, String where, String[] whereArgs) {
-        return getFiles(0, Integer.MAX_VALUE, TableFetchers.getFetcher(fileType), where, whereArgs);
+    public List<FileDescriptor> getFiles(final Context context, byte fileType, String where, String[] whereArgs) {
+        return getFiles(context, 0, Integer.MAX_VALUE, TableFetchers.getFetcher(fileType), where, whereArgs);
     }
 
     /**
      * @param fileType
      * @return int
      */
-    public int getNumFiles(byte fileType) {
+    public int getNumFiles(final Context context, byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
+
+        if (fetcher == null) {
+            return -1;
+        }
 
         Cursor c = null;
 
@@ -122,8 +119,8 @@ public final class Librarian {
         return result;
     }
 
-    public FileDescriptor getFileDescriptor(byte fileType, int fileId) {
-        List<FileDescriptor> fds = getFiles(0, 1, TableFetchers.getFetcher(fileType), BaseColumns._ID + "=?", new String[]{String.valueOf(fileId)});
+    public FileDescriptor getFileDescriptor(final Context context, byte fileType, int fileId) {
+        List<FileDescriptor> fds = getFiles(context, 0, 1, TableFetchers.getFetcher(fileType), BaseColumns._ID + "=?", new String[]{String.valueOf(fileId)});
         if (fds.size() > 0) {
             return fds.get(0);
         } else {
@@ -131,7 +128,7 @@ public final class Librarian {
         }
     }
 
-    public String renameFile(FileDescriptor fd, String newFileName) {
+    public String renameFile(final Context context, FileDescriptor fd, String newFileName) {
         try {
             String filePath = fd.filePath;
             File oldFile = new File(filePath);
@@ -143,6 +140,9 @@ public final class Librarian {
             values.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(newFileName));
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
+            if (fetcher == null) {
+                return null;
+            }
             cr.update(fetcher.getContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
             oldFile.renameTo(newFile);
             return newFile.getAbsolutePath();
@@ -168,7 +168,9 @@ public final class Librarian {
             if (context != null) {
                 ContentResolver cr = context.getContentResolver();
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-                cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+                if (fetcher != null) {
+                    cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+                }
             }
         } catch (Throwable e) {
             Log.e(TAG, "Failed to delete files from media store", e);
@@ -178,8 +180,8 @@ public final class Librarian {
                 new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, fileType));
     }
 
-    public void scan(File file) {
-        scan(file, Transfers.getIgnorableFiles());
+    public void scan(final Context context, File file) {
+        scan(context, file, Transfers.getIgnorableFiles());
         if (context == null) {
             Log.w(TAG, "Librarian has no `context` object to scan() with.");
             return;
@@ -187,29 +189,28 @@ public final class Librarian {
         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
-    public Finger finger() {
-        Finger finger = new Finger(getNumFiles(Constants.FILE_TYPE_AUDIO),
-                getNumFiles(Constants.FILE_TYPE_VIDEOS),
-                getNumFiles(Constants.FILE_TYPE_PICTURES),
-                getNumFiles(Constants.FILE_TYPE_DOCUMENTS),
-                getNumFiles(Constants.FILE_TYPE_TORRENTS),
-                getNumFiles(Constants.FILE_TYPE_RINGTONES));
-        return finger;
+    public Finger finger(final Context context) {
+        return new Finger(getNumFiles(context, Constants.FILE_TYPE_AUDIO),
+                getNumFiles(context, Constants.FILE_TYPE_VIDEOS),
+                getNumFiles(context, Constants.FILE_TYPE_PICTURES),
+                getNumFiles(context, Constants.FILE_TYPE_DOCUMENTS),
+                getNumFiles(context, Constants.FILE_TYPE_TORRENTS),
+                getNumFiles(context, Constants.FILE_TYPE_RINGTONES));
     }
 
-    public void syncMediaStore() {
+    public void syncMediaStore(final Context context) {
         if (!SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
 
-        Thread t = new Thread(() -> syncMediaStoreSupport());
+        Thread t = new Thread(() -> syncMediaStoreSupport(context));
         t.setName("syncMediaStore");
         t.setDaemon(true);
         t.start();
     }
 
-    public EphemeralPlaylist createEphemeralPlaylist(FileDescriptor fd) {
-        List<FileDescriptor> fds = Librarian.instance().getFiles(Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
+    public EphemeralPlaylist createEphemeralPlaylist(final Context context, FileDescriptor fd) {
+        List<FileDescriptor> fds = Librarian.instance().getFiles(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
 
         if (fds.size() == 0) { // just in case
             Log.w(TAG, "Logic error creating ephemeral playlist");
@@ -222,20 +223,24 @@ public final class Librarian {
         return playlist;
     }
 
-    private void syncMediaStoreSupport() {
+    private void syncMediaStoreSupport(final Context context) {
         Set<File> ignorableFiles = Transfers.getIgnorableFiles();
 
-        syncMediaStore(Constants.FILE_TYPE_AUDIO, ignorableFiles);
-        syncMediaStore(Constants.FILE_TYPE_PICTURES, ignorableFiles);
-        syncMediaStore(Constants.FILE_TYPE_VIDEOS, ignorableFiles);
-        syncMediaStore(Constants.FILE_TYPE_RINGTONES, ignorableFiles);
-        syncMediaStore(Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
+        syncMediaStore(context, Constants.FILE_TYPE_AUDIO, ignorableFiles);
+        syncMediaStore(context, Constants.FILE_TYPE_PICTURES, ignorableFiles);
+        syncMediaStore(context, Constants.FILE_TYPE_VIDEOS, ignorableFiles);
+        syncMediaStore(context, Constants.FILE_TYPE_RINGTONES, ignorableFiles);
+        syncMediaStore(context, Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
 
         Platforms.fileSystem().scan(Platforms.torrents());
     }
 
-    private void syncMediaStore(byte fileType, Set<File> ignorableFiles) {
+    private void syncMediaStore(final Context context, byte fileType, Set<File> ignorableFiles) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
+
+        if (fetcher == null) {
+            return;
+        }
 
         Cursor c = null;
         try {
@@ -275,8 +280,8 @@ public final class Librarian {
         }
     }
 
-    private List<FileDescriptor> getFiles(int offset, int pageSize, TableFetcher fetcher) {
-        return getFiles(offset, pageSize, fetcher, null, null);
+    private List<FileDescriptor> getFiles(final Context context, int offset, int pageSize, TableFetcher fetcher) {
+        return getFiles(context, offset, pageSize, fetcher, null, null);
     }
 
     /**
@@ -287,10 +292,10 @@ public final class Librarian {
      * @param fetcher  - An implementation of TableFetcher
      * @return List<FileDescriptor>
      */
-    private List<FileDescriptor> getFiles(int offset, int pageSize, TableFetcher fetcher, String where, String[] whereArgs) {
+    private List<FileDescriptor> getFiles(final Context context, int offset, int pageSize, TableFetcher fetcher, String where, String[] whereArgs) {
         List<FileDescriptor> result = new ArrayList<>(0);
 
-        if (fetcher == null) {
+        if (context == null || fetcher == null) {
             return result;
         }
 
@@ -326,8 +331,8 @@ public final class Librarian {
         return result;
     }
 
-    public List<FileDescriptor> getFiles(String filepath, boolean exactPathMatch) {
-        return getFiles(getFileType(filepath, true), filepath, exactPathMatch);
+    public List<FileDescriptor> getFiles(final Context context, String filepath, boolean exactPathMatch) {
+        return getFiles(context, getFileType(filepath, true), filepath, exactPathMatch);
     }
 
     /**
@@ -336,14 +341,13 @@ public final class Librarian {
      * @param exactPathMatch - set it to false and pass an incomplete filepath prefix to get files in a folder for example.
      * @return
      */
-    public List<FileDescriptor> getFiles(byte fileType, String filepath, boolean exactPathMatch) {
+    public List<FileDescriptor> getFiles(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
         String[] whereArgs = new String[]{(exactPathMatch) ? filepath : "%" + filepath + "%"};
-        List<FileDescriptor> fds = Librarian.instance().getFiles(fileType, where, whereArgs);
-        return fds;
+        return Librarian.instance().getFiles(context, fileType, where, whereArgs);
     }
 
-    private void scan(File file, Set<File> ignorableFiles) {
+    private void scan(final Context context, File file, Set<File> ignorableFiles) {
         //if we just have a single file, do it the old way
         if (file.isFile()) {
             if (ignorableFiles.contains(file)) {
@@ -375,8 +379,8 @@ public final class Librarian {
      * @author gubatron
      */
     private static Collection<File> getAllFolderFiles(File folder, String[] extensions) {
-        Set<File> results = new HashSet<File>();
-        Stack<File> subFolders = new Stack<File>();
+        Set<File> results = new HashSet<>();
+        Stack<File> subFolders = new Stack<>();
         File currentFolder = folder;
         while (currentFolder != null && currentFolder.isDirectory() && currentFolder.canRead()) {
             File[] fs = null;

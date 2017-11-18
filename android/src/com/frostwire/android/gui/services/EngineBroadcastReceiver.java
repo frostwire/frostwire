@@ -69,12 +69,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                             !NetworkManager.instance().isTunnelUp()) {
                         //don't start
                     } else {
-                        Engine.instance().getThreadPool().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                Engine.instance().startServices();
-                            }
-                        });
+                        Engine.instance().getThreadPool().execute(() -> Engine.instance().startServices());
                     }
                 }
             } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
@@ -82,7 +77,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 handleActionPhoneStateChanged(intent);
             } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
-                Librarian.instance().syncMediaStore();
+                Librarian.instance().syncMediaStore(context);
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
                 DetailedState detailedState = networkInfo.getDetailedState();
@@ -113,12 +108,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleVPNDetection() {
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                NetworkManager.instance().detectTunnel();
-            }
-        });
+        Engine.instance().getThreadPool().execute(() -> NetworkManager.instance().detectTunnel());
     }
 
     private void handleActionPhoneStateChanged(Intent intent) {
@@ -140,12 +130,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                Engine.instance().stopServices(true);
-            }
-        });
+        Engine.instance().getThreadPool().execute(() -> Engine.instance().stopServices(true));
     }
 
     private void handleConnectedNetwork(NetworkInfo networkInfo) {
@@ -186,13 +171,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                         return;
                     }
 
-                    Engine.instance().getThreadPool().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            Engine.instance().startServices();
-                            if (shouldStopSeeding()) {
-                                TransferManager.instance().stopSeedingTorrents();
-                            }
+                    Engine.instance().getThreadPool().execute(() -> {
+                        Engine.instance().startServices();
+                        if (shouldStopSeeding()) {
+                            TransferManager.instance().stopSeedingTorrents();
                         }
                     });
 
@@ -218,13 +200,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
                 final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
                 if (privateDir.exists() && privateDir.isDirectory()) {
-                    Thread t = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Platforms.fileSystem().scan(privateDir);
-                        }
-                    });
+                    Thread t = new Thread(() -> Platforms.fileSystem().scan(privateDir));
 
                     t.setName("Private MediaScanning");
                     t.setDaemon(true);

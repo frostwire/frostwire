@@ -67,7 +67,7 @@ public class MainApplication extends Application {
         setupBTEngine();
 
         NetworkManager.create(this);
-        Librarian.create(this);
+        Librarian.create();
         Engine.instance().onApplicationCreate(this);
 
         ImageLoader.start(this, Engine.instance().getThreadPool());
@@ -79,7 +79,7 @@ public class MainApplication extends Application {
 
         cleanTemp();
 
-        Librarian.instance().syncMediaStore();
+        Librarian.instance().syncMediaStore(this);
     }
 
     @Override

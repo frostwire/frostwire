@@ -95,7 +95,7 @@ public class OpenMenuAction extends MenuAction {
             }
             MusicUtils.playSimple(this.path);
         } else if (fileType == Constants.FILE_TYPE_AUDIO) {
-            UIUtils.playEphemeralPlaylist(fd);
+            UIUtils.playEphemeralPlaylist(context, fd);
         } else if (fd != null && "application/x-bittorrent".equals(fd.mime)) {
             // torrents are often DOCUMENT typed
             boolean useFileProvider = hasNougatOrNewer();

@@ -79,14 +79,18 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     private void renameFile(String newFileName) {
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
         if (isValidFileName(newFileName)) {
-            fd.filePath = Librarian.instance().renameFile(fd, newFileName);
+            fd.filePath = Librarian.instance().renameFile(context, fd, newFileName);
             fd.title = FilenameUtils.getBaseName(newFileName);
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
         } else {
-            UIUtils.showLongMessage(getContext(), R.string.invalid_filename);
+            UIUtils.showLongMessage(context, R.string.invalid_filename);
         }
     }
 

@@ -69,10 +69,12 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -414,19 +416,23 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
         private byte fileType;
         private Peer peer;
+        private WeakReference<Activity> activityRef;
 
         public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType, Peer peer) {
             super(activity);
             this.fileType = fileType;
             this.peer = peer;
+            activityRef = Ref.weak(activity);
         }
 
         @Override
         public Object loadInBackground() {
-            try {
-                return new Object[]{fileType, peer.browse(fileType)};
-            } catch (Throwable e) {
-                LOG.error("Error performing finger", e);
+            if (Ref.alive(activityRef)) {
+                try {
+                    return new Object[]{fileType, peer.browse(activityRef.get(), fileType)};
+                } catch (Throwable e) {
+                    LOG.error("Error performing finger", e);
+                }
             }
             return null;
         }
@@ -437,9 +443,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             LOG.warn("Something wrong. peer is null");
             return;
         }
-        peer.finger(finger -> {
-            if (isAdded()) {
-                getActivity().runOnUiThread(() -> {
+        peer.finger(getActivity(), (context, finger) -> {
+            if (MyFilesFragment.this.isAdded()) {
+                MyFilesFragment.this.getActivity().runOnUiThread(() -> {
                     if (header != null) {
                         byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
                         int numTotal = 0;
@@ -463,29 +469,30 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                                 numTotal = finger.numTotalVideoFiles;
                                 break;
                         }
-
-                        if (isAdded()) {
-                            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+                        if (MyFilesFragment.this.isAdded()) {
+                            String fileTypeStr = MyFilesFragment.this.getString(R.string.my_filetype, UIUtils.getFileTypeAsString(MyFilesFragment.this.getResources(), fileType));
                             TextView title = header.findViewById(R.id.view_my_files_header_text_title);
                             title.setText(fileTypeStr);
                         }
                         TextView total = header.findViewById(R.id.view_my_files_header_text_total);
                         total.setText("(" + String.valueOf(numTotal) + ")");
                     }
-
                     if (adapter == null) {
-                        clickFileTypeTab(lastFileType);
+                        MyFilesFragment.this.clickFileTypeTab(lastFileType);
                     }
-                    refreshCheckBoxMenuItemVisibility();
+                    MyFilesFragment.this.refreshCheckBoxMenuItemVisibility();
                     MusicUtils.stopSimplePlayer();
-                    restoreListViewScrollPosition();
+                    MyFilesFragment.this.restoreListViewScrollPosition();
                 });
             }
         });
     }
 
     private void clickFileTypeTab(byte lastFileType) {
-        tabLayout.getTabAt(fileTypeToTabPosition[lastFileType]).select();
+        TabLayout.Tab tab = tabLayout.getTabAt(fileTypeToTabPosition[lastFileType]);
+        if (tab != null) {
+            tab.select();
+        }
     }
 
     private void restoreListViewScrollPosition() {
@@ -652,7 +659,10 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         if (nextTabPosition == -1) {
             nextTabPosition = 5;
         }
-        tabLayout.getTabAt(nextTabPosition).select();
+        TabLayout.Tab tab = tabLayout.getTabAt(nextTabPosition);
+        if (tab != null) {
+           tab.select();
+        }
     }
 
     private void refreshCheckBoxMenuItemVisibility() {

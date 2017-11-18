@@ -41,6 +41,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -139,20 +140,17 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         ImageView thumbnailView = findView(view, R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         if (thumbnailView != null) {
             thumbnailView.setTag(item);
-            thumbnailView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!selectAllMode) {
-                        if (getShowMenuOnClick()) {
-                            if (showMenu(v)) {
-                                return;
-                            }
+            thumbnailView.setOnClickListener(v -> {
+                if (!selectAllMode) {
+                    if (getShowMenuOnClick()) {
+                        if (showMenu(v)) {
+                            return;
                         }
-                        LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
-                        onItemClicked(v);
-                    } else {
-                        onItemClicked(v);
                     }
+                    LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
+                    onItemClicked(v);
+                } else {
+                    onItemClicked(v);
                 }
             });
         }
@@ -170,31 +168,23 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         try {
             initCheckableGridImageView((RelativeLayout) view, item);
-            initTouchFeedback(view, item, new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // background image listener
-                            if (selectAllMode) {
-                                onItemClicked(v);
-                            } else {
-                                if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
-                                    LOG.info("getGridItemView() Background ImageView.onClick(), show the menu");
-                                    MenuAdapter menuAdapter = getMenuAdapter(v);
-                                    if (menuAdapter != null) {
-                                        new MenuBuilder(menuAdapter).show();
-                                    }
-                                } else {
-                                    localPlay(item.fd, v, position);
-                                }
-                            }
+            // toggles checkbox mode.
+            initTouchFeedback(view, item, v -> {
+                // background image listener
+                if (selectAllMode) {
+                    onItemClicked(v);
+                } else {
+                    if (item.fd.fileType == Constants.FILE_TYPE_VIDEOS) {
+                        LOG.info("getGridItemView() Background ImageView.onClick(), show the menu");
+                        MenuAdapter menuAdapter = getMenuAdapter(v);
+                        if (menuAdapter != null) {
+                            new MenuBuilder(menuAdapter).show();
                         }
-                    }, new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            // toggles checkbox mode.
-                            return onItemLongClicked(v);
-                        }
-                    },
+                    } else {
+                        localPlay(item.fd, v, position);
+                    }
+                }
+            }, this::onItemLongClicked,
                     null);
             initPlaybackStatusOverlayTouchFeedback(view, item);
         } catch (Throwable e) {
@@ -212,14 +202,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             playbackStatusOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
         playbackStatusOverlayView.setTag(item);
-        playbackStatusOverlayView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectAllMode) {
-                    onItemClicked(v);
-                } else {
-                    localPlay(item.fd, v, getViewPosition(v));
-                }
+        playbackStatusOverlayView.setOnClickListener(v -> {
+            if (selectAllMode) {
+                onItemClicked(v);
+            } else {
+                localPlay(item.fd, v, getViewPosition(v));
             }
         });
     }
@@ -384,11 +371,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         onLocalPlay();
         Context ctx = getContext();
         if (fd.mime != null && fd.mime.contains("audio")) {
-            if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
+            if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
                 Engine.instance().getMediaPlayer().stop();
             } else {
                 try {
-                    UIUtils.playEphemeralPlaylist(fd);
+                    UIUtils.playEphemeralPlaylist(ctx, fd);
                     UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 } catch (RuntimeException re) {
                     UIUtils.showShortMessage(ctx, R.string.media_player_failed);
@@ -455,13 +442,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
         } else {
             if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD())) {
+                if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
                 }
             } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
+                if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
@@ -532,10 +519,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 R.id.view_my_files_thumbnail_grid_item_playback_overlay_view :
                 R.id.view_my_files_thumbnail_list_item_playback_overlay_view);
 
-        if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD()) || fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD())) {
-            mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
-        } else {
-            mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
+        CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
+        if (mediaPlayer != null) {
+            if (fd.equals(mediaPlayer.getCurrentFD(getContext())) || fd.equals(mediaPlayer.getSimplePlayerCurrentFD(getContext()))) {
+                mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
+            } else {
+                mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
+            }
         }
 
         downloadButton.setTag(fd);

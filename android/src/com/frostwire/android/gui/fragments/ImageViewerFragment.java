@@ -48,7 +48,6 @@ import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.TouchImageView;
 import com.frostwire.android.util.ImageLoader;
@@ -248,13 +247,14 @@ public final class ImageViewerFragment extends AbstractFragment {
                 return;
             }
             ImageViewerFragment fragment = fragmentRef.get();
+            Activity activity = fragment.getActivity();
             int offset = fragment.position;
             Librarian librarian = Librarian.instance();
 
             List<FileDescriptor> fileDescriptors = new ArrayList<>(0);
             // We're at the beginning
             if (offset == 0) {
-                fileDescriptors.addAll(librarian.getFiles(Constants.FILE_TYPE_PICTURES, offset + 1, 1));
+                fileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
                 if (!Ref.alive(fragmentRef)) {
                     return;
                 }
@@ -264,7 +264,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                     fragment.setNextStateBundle(prepareFileBundle(fileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
                 }
             } else if (offset > 0) {
-                fileDescriptors.addAll(librarian.getFiles(Constants.FILE_TYPE_PICTURES, offset - 1, 3));
+                fileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
                 if (!Ref.alive(fragmentRef)) {
                     return;
                 }
@@ -351,12 +351,9 @@ public final class ImageViewerFragment extends AbstractFragment {
                 case R.id.fragment_my_files_action_mode_menu_delete:
                     ArrayList<FileDescriptor> fdList = new ArrayList<>(1);
                     fdList.add(fd);
-                    new DeleteFileMenuAction(context, null, fdList, new AbstractDialog.OnDialogClickListener() {
-                        @Override
-                        public void onDialogClick(String tag, int which) {
-                            if (which == 1) {
-                                getActivity().finish();
-                            }
+                    new DeleteFileMenuAction(context, null, fdList, (tag, which) -> {
+                        if (which == 1) {
+                            getActivity().finish();
                         }
                     }).onClick();
                     break;
@@ -376,12 +373,9 @@ public final class ImageViewerFragment extends AbstractFragment {
                     break;
                 case R.id.fragment_my_files_action_mode_menu_rename:
                     final ActionMode fMode = mode;
-                    new RenameFileMenuAction(context, null, fd, new AbstractDialog.OnDialogClickListener() {
-                        @Override
-                        public void onDialogClick(String tag, int which) {
-                            if (which == 1 && tag != null) {
-                                onRenameFileMenuDialogOk(tag, fMode);
-                            }
+                    new RenameFileMenuAction(context, null, fd, (tag, which) -> {
+                        if (which == 1 && tag != null) {
+                            onRenameFileMenuDialogOk(tag, fMode);
                         }
                     }).onClick();
                     break;

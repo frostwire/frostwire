@@ -18,13 +18,15 @@
 
 package com.frostwire.android.gui;
 
+import android.content.Context;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class Finger {
     public interface FingerCallback {
-        void onFinger(final Finger finger);
+        void onFinger(final Context context, final Finger finger);
     }
 
     public final int numTotalAudioFiles;
