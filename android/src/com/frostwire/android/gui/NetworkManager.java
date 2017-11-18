@@ -23,15 +23,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class NetworkManager {
-    private final Application context;
+    private final WeakReference<Application> contextRef;
     private boolean tunnelUp;
     private NetworkStatusListener networkStatusListener;
 
@@ -52,7 +54,7 @@ public final class NetworkManager {
     }
 
     private NetworkManager(Application context) {
-        this.context = context;
+        this.contextRef = Ref.weak(context);
         this.networkStatusListener = null;
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
@@ -65,29 +67,34 @@ public final class NetworkManager {
         return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager)) || isDataWiMAXUp(connectivityManager);
     }
 
-    public boolean isDataMobileUp(ConnectivityManager connectivityManager) {
-        NetworkInfo networkInfo = (connectivityManager != null) ?
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) :
-                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+    private boolean isNetworkTypeUp(ConnectivityManager connectivityManager, final int NETWORK_TYPE) {
+        NetworkInfo networkInfo = null;
+        ConnectivityManager connManager1;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getNetworkInfo(NETWORK_TYPE);
+        } else if ((connManager1 = getConnectivityManager()) != null) {
+            networkInfo = connManager1.getNetworkInfo(NETWORK_TYPE);
+        }
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+    }
+
+    public boolean isDataMobileUp(ConnectivityManager connectivityManager) {
+        return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
     }
 
     public boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
-        NetworkInfo networkInfo = (connectivityManager != null) ?
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI) :
-                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+        return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
     }
 
     public boolean isDataWiMAXUp(ConnectivityManager connectivityManager) {
-        NetworkInfo networkInfo = (connectivityManager != null) ?
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIMAX) :
-                getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIMAX);
-        return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
+        return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIMAX);
     }
 
     public ConnectivityManager getConnectivityManager() {
-        return (ConnectivityManager) context.getSystemService(Application.CONNECTIVITY_SERVICE);
+        if (!Ref.alive(contextRef)) {
+            return null;
+        }
+        return (ConnectivityManager) contextRef.get().getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
     public boolean isTunnelUp() {
@@ -106,13 +113,15 @@ public final class NetworkManager {
     }
 
     private static boolean isValidInterfaceName(String interfaceName) {
+        if (interfaceName == null) {
+            return false;
+        }
         try {
             String[] arr = new File("/sys/class/net").list();
             if (arr == null) {
                 return false;
             }
-            for (int i = 0; i < arr.length; i++) {
-                String validName = arr[i];
+            for (String validName : arr) {
                 if (interfaceName.equals(validName)) {
                     return true;
                 }
