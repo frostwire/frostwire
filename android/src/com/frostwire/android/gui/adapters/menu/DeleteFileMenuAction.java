@@ -105,7 +105,7 @@ public final class DeleteFileMenuAction extends MenuAction {
             }
             FileListAdapter fileListAdapter = adapterRef.get();
             byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
-            Librarian.instance().deleteFiles(fileType, new ArrayList<>(files), contextRef.get());
+            Librarian.instance().deleteFiles(contextRef.get(), fileType, new ArrayList<>(files));
         }
     }
 

@@ -38,10 +38,12 @@ import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -92,11 +94,6 @@ public final class Librarian {
      */
     public int getNumFiles(final Context context, byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-        if (fetcher == null) {
-            return -1;
-        }
-
         Cursor c = null;
 
         int result;
@@ -140,9 +137,6 @@ public final class Librarian {
             values.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(newFileName));
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
-            if (fetcher == null) {
-                return null;
-            }
             cr.update(fetcher.getContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
             oldFile.renameTo(newFile);
             return newFile.getAbsolutePath();
@@ -152,7 +146,7 @@ public final class Librarian {
         return null;
     }
 
-    public void deleteFiles(byte fileType, Collection<FileDescriptor> fds, final Context context) {
+    public void deleteFiles(final Context context, byte fileType, Collection<FileDescriptor> fds) {
         List<Integer> ids = new ArrayList<>(fds.size());
         final int audioMediaType = MediaType.getAudioMediaType().getId();
         for (FileDescriptor fd : fds) {
@@ -168,9 +162,9 @@ public final class Librarian {
             if (context != null) {
                 ContentResolver cr = context.getContentResolver();
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-                if (fetcher != null) {
-                    cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
-                }
+                cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+            } else {
+                Log.e(TAG, "Failed to delete files from media store, no context available");
             }
         } catch (Throwable e) {
             Log.e(TAG, "Failed to delete files from media store", e);
@@ -202,8 +196,8 @@ public final class Librarian {
         if (!SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
-
-        Thread t = new Thread(() -> syncMediaStoreSupport(context));
+        WeakReference<Context> contextRef = new WeakReference<>(context);
+        Thread t = new Thread(() -> syncMediaStoreSupport(contextRef));
         t.setName("syncMediaStore");
         t.setDaemon(true);
         t.start();
@@ -223,7 +217,14 @@ public final class Librarian {
         return playlist;
     }
 
-    private void syncMediaStoreSupport(final Context context) {
+    private void syncMediaStoreSupport(final WeakReference<Context> contextRef) {
+
+        if (!Ref.alive(contextRef)) {
+            return;
+        }
+
+        Context context = contextRef.get();
+
         Set<File> ignorableFiles = Transfers.getIgnorableFiles();
 
         syncMediaStore(context, Constants.FILE_TYPE_AUDIO, ignorableFiles);
