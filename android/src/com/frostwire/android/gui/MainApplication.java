@@ -35,6 +35,7 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FileUtils;
 
@@ -79,7 +80,7 @@ public class MainApplication extends Application {
 
         cleanTemp();
 
-        Librarian.instance().syncMediaStore(this);
+        Librarian.instance().syncMediaStore(Ref.weak(this));
     }
 
     @Override

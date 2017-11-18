@@ -192,11 +192,10 @@ public final class Librarian {
                 getNumFiles(context, Constants.FILE_TYPE_RINGTONES));
     }
 
-    public void syncMediaStore(final Context context) {
+    public void syncMediaStore(final WeakReference<Context> contextRef) {
         if (!SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
-        WeakReference<Context> contextRef = new WeakReference<>(context);
         Thread t = new Thread(() -> syncMediaStoreSupport(contextRef));
         t.setName("syncMediaStore");
         t.setDaemon(true);
@@ -218,7 +217,6 @@ public final class Librarian {
     }
 
     private void syncMediaStoreSupport(final WeakReference<Context> contextRef) {
-
         if (!Ref.alive(contextRef)) {
             return;
         }
