@@ -329,7 +329,7 @@ public final class ImageLoader {
     }
 
     private static final class ImageLoaderStarter implements Runnable {
-        private WeakReference<MainApplication> mainAppRef;
+        private final WeakReference<MainApplication> mainAppRef;
 
         ImageLoaderStarter(MainApplication mainApplication) {
             mainAppRef = Ref.weak(mainApplication);
@@ -348,7 +348,7 @@ public final class ImageLoader {
         public int targetWidth = 0;
         public int targetHeight = 0;
         public int placeholderResId = 0;
-        public boolean fit = false;
+        public final boolean fit = false;
         public boolean centerInside = false;
         public boolean noFade = false;
         public boolean noCache = false;

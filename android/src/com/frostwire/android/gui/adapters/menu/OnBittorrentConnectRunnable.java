@@ -44,7 +44,7 @@ import java.lang.ref.WeakReference;
 
 
 final class OnBittorrentConnectRunnable implements Runnable {
-    private WeakReference<MenuAction> menuActionRef;
+    private final WeakReference<MenuAction> menuActionRef;
 
     OnBittorrentConnectRunnable(MenuAction menuAction) {
         menuActionRef = Ref.weak(menuAction);

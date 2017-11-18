@@ -777,8 +777,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         private ImageButton backgroundView;
         private TextView fileSizeTextView;
         private FrameLayout checkedOverlayView;
-        private int width;
-        private int height;
+        private final int width;
+        private final int height;
 
         public CheckableImageView(Context context,
                                   ViewGroup containerView,

@@ -90,7 +90,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
     // TODO: this class needs heavy refactor/cleanup
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
-        private WeakReference<AbstractConfirmListDialog> dlgRef;
+        private final WeakReference<AbstractConfirmListDialog> dlgRef;
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);

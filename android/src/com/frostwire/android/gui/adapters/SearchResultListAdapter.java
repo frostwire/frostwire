@@ -73,7 +73,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     private int fileType;
 
-    private ImageLoader thumbLoader;
+    private final ImageLoader thumbLoader;
     private final List<KeywordFilter> keywordFiltersPipeline;
     private final AtomicLong lastFilterCallTimestamp = new AtomicLong();
     private FilteredSearchResults cachedFilteredSearchResults = null;

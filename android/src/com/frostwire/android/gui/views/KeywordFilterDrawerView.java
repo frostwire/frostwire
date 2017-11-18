@@ -58,7 +58,7 @@ import java.util.Set;
 public final class KeywordFilterDrawerView extends LinearLayout {
 
     private KeywordFiltersPipelineListener pipelineListener;
-    private EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
+    private final EnumMap<KeywordDetector.Feature, TagsController> featureContainer = new EnumMap<>(KeywordDetector.Feature.class);
     private LinearLayout appliedTagsTipTextViewContainer;
     private TextView clearAppliedFiltersTextView;
     private KeywordFilterDrawerController keywordFilterDrawerController;

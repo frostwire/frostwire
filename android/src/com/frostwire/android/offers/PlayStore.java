@@ -59,9 +59,9 @@ public final class PlayStore extends StoreBase {
     private static final String SUBS_TYPE = "subs";
 
     private IabHelper helper;
-    private IabHelper.QueryInventoryFinishedListener inventoryListener;
-    private IabHelper.OnIabPurchaseFinishedListener purchaseFinishedListener;
-    private IabHelper.OnConsumeFinishedListener consumeFinishedListener;
+    private final IabHelper.QueryInventoryFinishedListener inventoryListener;
+    private final IabHelper.OnIabPurchaseFinishedListener purchaseFinishedListener;
+    private final IabHelper.OnConsumeFinishedListener consumeFinishedListener;
 
     private Inventory inventory;
     private long lastRefreshTime;

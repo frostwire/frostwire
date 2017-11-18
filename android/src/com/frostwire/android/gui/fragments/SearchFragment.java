@@ -907,8 +907,8 @@ public final class SearchFragment extends AbstractFragment implements
 
     private class FilterToolbarButton implements KeywordDetector.KeywordDetectorListener, KeywordFilterDrawerView.KeywordFiltersPipelineListener {
 
-        private ImageButton imageButton;
-        private TextView counterTextView;
+        private final ImageButton imageButton;
+        private final TextView counterTextView;
         private Animation pulse;
         private boolean filterButtonClickedBefore;
         private long lastUIUpdate = 0;

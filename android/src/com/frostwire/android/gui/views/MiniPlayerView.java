@@ -47,7 +47,7 @@ public class MiniPlayerView extends LinearLayout {
     private TextView artistText;
     private ImageView coverImage;
     private ImageView playPauseButton;
-    private TimerObserver refresher;
+    private final TimerObserver refresher;
 
     public MiniPlayerView(Context context, AttributeSet set) {
         super(context, set);

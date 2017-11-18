@@ -102,11 +102,11 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private TabLayout tabLayout;
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxListener;
     private boolean selectAllModeOn;
-    private Peer peer;
+    private final Peer peer;
     private View header;
     private long lastAdapterRefresh;
     private String previousFilter;
-    private SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
+    private final SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
 
     // given the byte:fileType as the index, this array will match the corresponding UXAction code.
     // no if's necessary, random access -> O(1)
@@ -414,9 +414,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
     private final static class CreateLoaderFilesAsyncTaskLoader extends AsyncTaskLoader<Object> {
 
-        private byte fileType;
-        private Peer peer;
-        private WeakReference<Activity> activityRef;
+        private final byte fileType;
+        private final Peer peer;
+        private final WeakReference<Activity> activityRef;
 
         public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType, Peer peer) {
             super(activity);

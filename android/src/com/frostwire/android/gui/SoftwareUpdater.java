@@ -392,8 +392,8 @@ public final class SoftwareUpdater {
     }
 
     private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
-        private SoftwareUpdater softwareUpdater;
-        private WeakReference<Context> contextReference;
+        private final SoftwareUpdater softwareUpdater;
+        private final WeakReference<Context> contextReference;
 
         CheckUpdateAsyncTask(SoftwareUpdater softwareUpdater, Context context) {
             this.softwareUpdater = softwareUpdater;

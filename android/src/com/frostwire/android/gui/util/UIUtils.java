@@ -73,7 +73,7 @@ public final class UIUtils {
     /**
      * Localizable Number Format constant for the current default locale.
      */
-    private static NumberFormat NUMBER_FORMAT0; // localized "#,##0"
+    private static final NumberFormat NUMBER_FORMAT0; // localized "#,##0"
 
     private static final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
 
@@ -386,8 +386,8 @@ public final class UIUtils {
 
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
     public static class IntentByteExtra {
-        public String name;
-        public byte value;
+        public final String name;
+        public final byte value;
 
         public IntentByteExtra(String name, byte value) {
             this.name = name;

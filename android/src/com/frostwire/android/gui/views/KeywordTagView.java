@@ -49,9 +49,9 @@ public final class KeywordTagView extends AppCompatTextView {
 
     private KeywordFilter keywordFilter;
 
-    private TextAppearanceSpan keywordSpan;
-    private TextAppearanceSpan countSpan;
-    private FlexboxLayout.LayoutParams layoutParams;
+    private final TextAppearanceSpan keywordSpan;
+    private final TextAppearanceSpan countSpan;
+    private final FlexboxLayout.LayoutParams layoutParams;
 
     private KeywordTagView(Context context, AttributeSet attrs, KeywordFilter keywordFilter) {
         super(context, attrs);

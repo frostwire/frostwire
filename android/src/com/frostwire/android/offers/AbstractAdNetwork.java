@@ -29,7 +29,7 @@ import com.frostwire.util.Logger;
  */
 public abstract class AbstractAdNetwork implements AdNetwork {
 
-    private static Logger LOG = Logger.getLogger(AbstractAdNetwork.class);
+    private static final Logger LOG = Logger.getLogger(AbstractAdNetwork.class);
     public abstract void initialize(Activity activity);
     public abstract boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward);
     public abstract void loadNewInterstitial(Activity activity);

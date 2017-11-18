@@ -34,16 +34,16 @@ import java.util.List;
  */
 public final class Peer {
 
-    private String address;
+    private final String address;
 
     /**
      * 16 bytes (128bit - UUID identifier letting us know who is the sender)
      */
-    private String clientVersion;
+    private final String clientVersion;
 
     private int hashCode = -1;
 
-    private String key;
+    private final String key;
 
     public Peer() {
         String address = "0.0.0.0";

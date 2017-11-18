@@ -57,7 +57,7 @@ import java.util.Set;
  */
 public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filterable {
 
-    private static Logger LOG = Logger.getLogger(AbstractListAdapter.class);
+    private static final Logger LOG = Logger.getLogger(AbstractListAdapter.class);
 
     private final Context context;
     private final int viewItemId;

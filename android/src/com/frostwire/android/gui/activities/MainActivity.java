@@ -126,7 +126,7 @@ public class MainActivity extends AbstractActivity implements
     private MyFilesFragment library;
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
-    private BroadcastReceiver notifyUpdateReceiver;
+    private final BroadcastReceiver notifyUpdateReceiver;
     private TimerSubscription playerSubscription;
     private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
 

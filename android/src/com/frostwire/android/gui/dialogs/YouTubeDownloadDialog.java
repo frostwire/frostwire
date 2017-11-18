@@ -51,7 +51,7 @@ import java.util.List;
 public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResult> {
 
     private static WeakReference<YouTubePackageSearchResult> youTubePackageSearchResultWeakReference;
-    private static Pattern FORMAT_PATTERN = Pattern.compile("(?is)(H26.*p?|VP8.*p?|AAC.*p?)");
+    private static final Pattern FORMAT_PATTERN = Pattern.compile("(?is)(H26.*p?|VP8.*p?|AAC.*p?)");
 
     public YouTubeDownloadDialog() {
         super();
@@ -181,7 +181,7 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
     // TODO: this class needs heavy refactor/cleanup
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
-        private WeakReference<AbstractConfirmListDialog> dlgRef;
+        private final WeakReference<AbstractConfirmListDialog> dlgRef;
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);

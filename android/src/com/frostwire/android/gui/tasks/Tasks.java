@@ -30,7 +30,7 @@ import com.frostwire.util.Logger;
  * @author aldenml
  */
 public final class Tasks {
-    private static Logger LOG = Logger.getLogger(Tasks.class);
+    private static final Logger LOG = Logger.getLogger(Tasks.class);
 
     public static <Param, Progress, Report> void executeSerial(
             AsyncTask<Param, Progress, Report> task,

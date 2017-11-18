@@ -46,7 +46,7 @@ import java.util.Map;
 
 
 public class AppLovinCustomEventBanner extends CustomEventBanner {
-    private static Logger LOG = Logger.getLogger(AppLovinCustomEventBanner.class);
+    private static final Logger LOG = Logger.getLogger(AppLovinCustomEventBanner.class);
     private static final String AD_WIDTH_KEY = "com_mopub_ad_width";
     private static final String AD_HEIGHT_KEY = "com_mopub_ad_height";
     //

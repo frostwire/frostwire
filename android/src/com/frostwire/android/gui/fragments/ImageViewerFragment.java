@@ -293,7 +293,7 @@ public final class ImageViewerFragment extends AbstractFragment {
 
     private final static class ToggleFullscreenListener implements View.OnClickListener {
 
-        WeakReference<ImageViewerFragment> fragmentRef;
+        final WeakReference<ImageViewerFragment> fragmentRef;
 
         ToggleFullscreenListener(ImageViewerFragment fragment) {
             fragmentRef = Ref.weak(fragment);

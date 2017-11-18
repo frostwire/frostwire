@@ -53,8 +53,8 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
-    private Context mParentContext;
-    private OnTimeRunnable mOnTimeRunnable;
+    private final Context mParentContext;
+    private final OnTimeRunnable mOnTimeRunnable;
     private TimerSubscription mTimerSubscription;
 
     private RemoteViews notificationViews;
@@ -196,7 +196,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     private static class OnTimeRunnable implements Runnable {
 
-        private WeakReference<NotificationUpdateDemon> updateDemonRef;
+        private final WeakReference<NotificationUpdateDemon> updateDemonRef;
 
         OnTimeRunnable(NotificationUpdateDemon updateDemon) {
             updateDemonRef = Ref.weak(updateDemon);

@@ -62,7 +62,7 @@ public final class LollipopFileSystem implements FileSystem {
     private static final int CACHE_MAX_SIZE = 1000;
     private static final LruCache<String, DocumentFile> CACHE = new LruCache<>(CACHE_MAX_SIZE);
 
-    private static List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
+    private static final List<String> FIXED_SDCARD_PATHS = buildFixedSdCardPaths();
 
     private final Application app;
 

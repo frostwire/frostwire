@@ -35,10 +35,10 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
     private final ExecutorService threadPool;
     private final ScrollDirectionListener scrollDirectionListener;
     private int lastFirstVisibleItem;
-    private AtomicBoolean enabled = new AtomicBoolean(true);
-    private AtomicBoolean inMotion = new AtomicBoolean(false);
-    private AtomicBoolean enabledScrollDown = new AtomicBoolean(true);
-    private AtomicBoolean enabledScrollUp = new AtomicBoolean(true);
+    private final AtomicBoolean enabled = new AtomicBoolean(true);
+    private final AtomicBoolean inMotion = new AtomicBoolean(false);
+    private final AtomicBoolean enabledScrollDown = new AtomicBoolean(true);
+    private final AtomicBoolean enabledScrollUp = new AtomicBoolean(true);
 
     public DirectionDetectorScrollListener(final ScrollDirectionListener scrollDirectionListener, final ExecutorService threadPool) {
         this.threadPool = threadPool;

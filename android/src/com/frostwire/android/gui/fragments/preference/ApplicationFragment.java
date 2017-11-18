@@ -285,7 +285,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
 
         private int clicksLeftToConsumeProducts = 20;
         private final Collection<Product> purchasedProducts;
-        private WeakReference<Activity> activityRef;
+        private final WeakReference<Activity> activityRef;
 
         RemoveAdsOnPreferenceClickListener(Activity activity, final Collection<Product> purchasedProducts) {
             activityRef = Ref.weak(activity);

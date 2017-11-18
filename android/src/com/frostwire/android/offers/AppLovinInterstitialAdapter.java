@@ -35,9 +35,9 @@ import java.lang.ref.WeakReference;
 
 class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDisplayListener, AppLovinAdLoadListener {
     private static final Logger LOG = Logger.getLogger(AppLovinInterstitialAdapter.class);
-    private WeakReference<? extends Activity> activityRef;
+    private final WeakReference<? extends Activity> activityRef;
     private final Application app;
-    private AppLovinAdNetwork appLovinAdNetwork;
+    private final AppLovinAdNetwork appLovinAdNetwork;
     private AppLovinAd ad;
 
     private boolean finishAfterDismiss = false;

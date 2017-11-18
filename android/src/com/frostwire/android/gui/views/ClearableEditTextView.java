@@ -47,7 +47,7 @@ public class ClearableEditTextView extends RelativeLayout {
     private ImageButton buttonClear;
 
     private OnActionListener listener;
-    private String hint;
+    private final String hint;
 
     public ClearableEditTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -220,8 +220,8 @@ public class ClearableEditTextView extends RelativeLayout {
 
     private static class SingleLineTransformationMethod extends ReplacementTransformationMethod {
 
-        private static char[] ORIGINAL = new char[] { '\n', '\r' };
-        private static char[] REPLACEMENT = new char[] { '\uFEFF', '\uFEFF' };
+        private static final char[] ORIGINAL = new char[] { '\n', '\r' };
+        private static final char[] REPLACEMENT = new char[] { '\uFEFF', '\uFEFF' };
 
         protected char[] getOriginal() {
             return ORIGINAL;

@@ -33,7 +33,7 @@ import com.frostwire.android.R;
  */
 public final class ButtonActionPreference extends Preference {
 
-    private CharSequence buttonText;
+    private final CharSequence buttonText;
 
     private Button button;
 

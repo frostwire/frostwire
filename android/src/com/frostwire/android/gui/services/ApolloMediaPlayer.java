@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
 
-    private LongSparseArray<FileDescriptor> idMap = new LongSparseArray<>();
+    private final LongSparseArray<FileDescriptor> idMap = new LongSparseArray<>();
 
     public ApolloMediaPlayer() {
     }

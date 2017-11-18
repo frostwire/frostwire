@@ -38,9 +38,9 @@ import java.lang.ref.WeakReference;
  *
  */
 public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherListener {
-    private WeakReference<Context> contextRef;
-    private WeakReference<FragmentManager> fragmentManagerRef;
-    private static Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
+    private final WeakReference<Context> contextRef;
+    private final WeakReference<FragmentManager> fragmentManagerRef;
+    private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
 
     public HandpickedTorrentDownloadDialogOnFetch(Activity activity) {
         contextRef = Ref.weak((Context) activity);

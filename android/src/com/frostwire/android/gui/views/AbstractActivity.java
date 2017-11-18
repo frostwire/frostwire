@@ -293,7 +293,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     private static final class ActionModeCallback implements ActionMode.Callback {
 
-        private ActionMode.Callback cb;
+        private final ActionMode.Callback cb;
 
         private ActionModeCallback(ActionMode.Callback cb) {
             this.cb = cb;

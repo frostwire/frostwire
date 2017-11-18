@@ -101,7 +101,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TimerSubscription subscription;
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
-    private Handler vpnRichToastHandler;
+    private final Handler vpnRichToastHandler;
     private boolean showTorrentSettingsOnClick;
     private TransfersNoSeedsView transfersNoSeedsView;
 
