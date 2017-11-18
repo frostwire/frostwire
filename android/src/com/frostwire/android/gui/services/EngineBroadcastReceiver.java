@@ -39,6 +39,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import java.io.File;
 
@@ -77,7 +78,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 handleActionPhoneStateChanged(intent);
             } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
-                Librarian.instance().syncMediaStore(context);
+                Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
                 DetailedState detailedState = networkInfo.getDetailedState();
