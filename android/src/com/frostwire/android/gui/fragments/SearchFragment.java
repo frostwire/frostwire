@@ -1048,15 +1048,15 @@ public final class SearchFragment extends AbstractFragment implements
             filteredHistograms = filtered_histograms;
         }
 
-        private boolean referencesAlive() {
-            return Ref.alive(activityRef) &&
-                    Ref.alive(filterToolbarButtonRef) &&
-                    Ref.alive(keywordFilterDrawerViewRef);
+        private boolean referencesDead() {
+            return !Ref.alive(activityRef) ||
+                    !Ref.alive(filterToolbarButtonRef) ||
+                    !Ref.alive(keywordFilterDrawerViewRef);
         }
 
         @Override
         public void run() {
-            if (!referencesAlive()) {
+            if (referencesDead()) {
                 return;
             }
             FilterToolbarButton filterToolbarButton = filterToolbarButtonRef.get();
@@ -1068,7 +1068,7 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             }
             Runnable uiRunnable = () -> {
-                if (!referencesAlive()) {
+                if (referencesDead()) {
                     return;
                 }
                 FilterToolbarButton filterToolbarButton1 = filterToolbarButtonRef.get();

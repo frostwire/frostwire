@@ -55,7 +55,7 @@ public final class TimerService {
 
         @Override
         public void run() {
-            if (!subscription.isUnsubscribed()) {
+            if (subscription.isSubscribed()) {
                 subscription.onTime();
                 handler.postDelayed(this, interval);
             }

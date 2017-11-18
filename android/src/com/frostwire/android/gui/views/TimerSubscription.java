@@ -44,12 +44,12 @@ public final class TimerSubscription {
         this.unsubscribed = false;
     }
 
-    public boolean isUnsubscribed() {
+    public boolean isSubscribed() {
         if (!unsubscribed && !Ref.alive(observer)) {
             unsubscribe();
         }
 
-        return unsubscribed;
+        return !unsubscribed;
     }
 
     public void unsubscribe() {
@@ -58,7 +58,7 @@ public final class TimerSubscription {
     }
 
     public void onTime() {
-        if (!isUnsubscribed()) { // double check of unsubscribed intentional 
+        if (isSubscribed()) {
             try {
                 onTime(observer.get());
             } catch (Throwable e) {
