@@ -37,11 +37,6 @@ import java.util.Random;
  */
 public class AdMenuItemView extends RelativeLayout {
 
-    private TextView textThumbnail;
-    private ImageView imageThumbnail;
-    private TextView textHeadline;
-    private TextView textSubtitle;
-
     public AdMenuItemView(Context context, AttributeSet set) {
         super(context, set);
     }
@@ -51,11 +46,10 @@ public class AdMenuItemView extends RelativeLayout {
         super.onFinishInflate();
 
         View.inflate(getContext(), R.layout.view_ad_menuitem, this);
-
-        textHeadline = findViewById(R.id.view_ad_menu_item_headline);
-        textSubtitle = findViewById(R.id.view_ad_menu_item_subtitle);
-        textThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail);
-        imageThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail_image);
+        TextView textHeadline = findViewById(R.id.view_ad_menu_item_headline);
+        TextView textSubtitle = findViewById(R.id.view_ad_menu_item_subtitle);
+        TextView textThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail);
+        ImageView imageThumbnail = findViewById(R.id.view_ad_menu_item_thumbnail_image);
 
         textHeadline.setText(R.string.support_frostwire);
 

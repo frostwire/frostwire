@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class DirectionDetectorScrollListener implements AbsListView.OnScrollListener {
     private final ScrollDirectionVotes votes = new ScrollDirectionVotes();
-    private final int MIN_VOTES = 4;
-    private final long DISABLE_INTERVAL_ON_EVENT = 100L;
     private final ExecutorService threadPool;
     private final ScrollDirectionListener scrollDirectionListener;
     private int lastFirstVisibleItem;
@@ -53,11 +51,9 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
             case SCROLL_STATE_IDLE:
                 inMotion.set(false);
                 // wait a little longer to call victory
-                submitRunnable(400, new Runnable() {
-                    public void run() {
-                        if (!inMotion.get()) {
-                            onIdle();
-                        }
+                submitRunnable(400, () -> {
+                    if (!inMotion.get()) {
+                        onIdle();
                     }
                 });
                 break;
@@ -122,20 +118,17 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
     private void disable(final long interval, final AtomicBoolean flag) {
         // stop listening for 500 seconds to be able to detect rate of change.
         flag.set(false);
-        submitRunnable(interval, new Runnable() {
-            @Override
-            public void run() {
-                flag.set(true);
-            }
-        });
+        submitRunnable(interval, () -> flag.set(true));
     }
 
     private void checkCandidates() {
+        int MIN_VOTES = 4;
         if (votes.total() >= MIN_VOTES) {
             // democratic check
             if (votes.delta() > votes.total() * 0.5) {
                 boolean scrollingUp = votes.ups() > votes.downs();
                 votes.reset();
+                long DISABLE_INTERVAL_ON_EVENT = 100L;
                 disable(DISABLE_INTERVAL_ON_EVENT,
                         scrollingUp ? enabledScrollUp : enabledScrollDown);
                 if (scrollingUp) {
