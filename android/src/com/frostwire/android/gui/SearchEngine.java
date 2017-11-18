@@ -35,7 +35,6 @@ import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
-import com.frostwire.util.Logger;
 
 import java.util.Arrays;
 import java.util.List;

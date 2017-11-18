@@ -2,7 +2,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.AutoCompleteTextView;
 
 import com.frostwire.android.gui.util.UIUtils;
 
