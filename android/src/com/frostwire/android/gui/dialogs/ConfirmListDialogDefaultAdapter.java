@@ -21,6 +21,7 @@ package com.frostwire.android.gui.dialogs;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -57,7 +58,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     private static final int ITEM_ART = 2;
 
     private static final Map<SelectionMode, Integer> selectionModeToLayoutId = new HashMap<>();
-    private static final Map<SelectionMode, Map<Integer,Integer>> layoutMapping = new HashMap<>();
+    private static final Map<SelectionMode, SparseIntArray> layoutMapping = new HashMap<>();
     private final SelectionMode selectionMode;
 
     static {
@@ -65,17 +66,17 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         selectionModeToLayoutId.put(SelectionMode.SINGLE_SELECTION, R.layout.confirmation_dialog_single_selection_list_item);
         selectionModeToLayoutId.put(SelectionMode.MULTIPLE_SELECTION,R.layout.confirmation_dialog_multiple_selection_list_item);
 
-        layoutMapping.put(SelectionMode.NO_SELECTION, new HashMap<Integer, Integer>());
+        layoutMapping.put(SelectionMode.NO_SELECTION, new SparseIntArray());
         layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_no_selection_list_item_title);
         layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_no_selection_list_item_size);
         layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_no_selection_list_item_art);
 
-        layoutMapping.put(SelectionMode.SINGLE_SELECTION, new HashMap<Integer, Integer>());
+        layoutMapping.put(SelectionMode.SINGLE_SELECTION, new SparseIntArray());
         layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_single_selection_list_item_title);
         layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_single_selection_list_item_size);
         layoutMapping.get(SelectionMode.SINGLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_single_selection_list_item_art);
 
-        layoutMapping.put(SelectionMode.MULTIPLE_SELECTION, new HashMap<Integer, Integer>());
+        layoutMapping.put(SelectionMode.MULTIPLE_SELECTION, new SparseIntArray());
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_multiple_selection_list_item_title);
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_SIZE, R.id.confirmation_dialog_multiple_selection_list_item_size);
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
