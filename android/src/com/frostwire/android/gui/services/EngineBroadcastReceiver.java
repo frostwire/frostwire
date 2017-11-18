@@ -37,6 +37,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.swig.session;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -243,7 +244,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             // sleep for a second, since IPv6 addresses takes time to be reported
             SystemClock.sleep(1000);
             // TODO: use public java API when available
-            BTEngine.getInstance().swig().reopen_network_sockets();
+            session swig = BTEngine.getInstance().swig();
+            if (swig != null) {
+                swig.reopen_network_sockets();
+            }
         });
     }
 }

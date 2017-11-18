@@ -110,7 +110,7 @@ public final class BTEngine extends SessionManager {
 
     public static BTEngine getInstance() {
         if (ctx == null) {
-            throw new IllegalStateException("Context can't be null");
+            throw new IllegalStateException("BTContext can't be null");
         }
         return Loader.INSTANCE;
     }
