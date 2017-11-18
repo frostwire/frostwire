@@ -105,7 +105,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
                 final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
                 List<SoundcloudSearchResult> results = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
                         (List<SoundcloudSearchResult>) dlg.getList() :
-                        new ArrayList<SoundcloudSearchResult>();
+                        new ArrayList<>();
 
                 if (results.isEmpty()) {
                     results.addAll(dlg.getChecked());

@@ -127,15 +127,12 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         if (!shutdownAfter && appLovinAd != null) {
             ad = null;
             if (Ref.alive(activityRef)) {
-                Offers.THREAD_POOL.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
-                            try {
-                                appLovinAdNetwork.loadNewInterstitial(activityRef.get());
-                            } catch (Throwable e) {
-                                LOG.error(e.getMessage(), e);
-                            }
+                Offers.THREAD_POOL.execute(() -> {
+                    if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
+                        try {
+                            appLovinAdNetwork.loadNewInterstitial(activityRef.get());
+                        } catch (Throwable e) {
+                            LOG.error(e.getMessage(), e);
                         }
                     }
                 });

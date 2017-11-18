@@ -197,8 +197,8 @@ public final class LollipopFileSystem implements FileSystem {
         DocumentFile[] files = f.listFiles();
         if (filter != null && files != null) {
             List<File> result = new ArrayList<>(files.length);
-            for (int i = 0; i < files.length; i++) {
-                Uri uri = files[i].getUri();
+            for (DocumentFile file1 : files) {
+                Uri uri = file1.getUri();
                 String path = getDocumentPath(uri);
                 if (path == null) {
                     continue;
@@ -326,6 +326,9 @@ public final class LollipopFileSystem implements FileSystem {
         try {
             ContentResolver cr = app.getContentResolver();
             ParcelFileDescriptor fd = cr.openFileDescriptor(f.getUri(), mode);
+            if (fd == null) {
+                return -1;
+            }
             return fd.detachFd();
         } catch (Throwable e) {
             LOG.error("Unable to get native fd", e);
@@ -375,9 +378,7 @@ public final class LollipopFileSystem implements FileSystem {
                     }
                 }
             }
-
-            for (int i = 0; i < segments.length; i++) {
-                String segment = segments[i];
+            for (String segment : segments) {
                 DocumentFile child = f.findFile(segment);
                 if (child != null) {
                     f = child;
@@ -475,9 +476,7 @@ public final class LollipopFileSystem implements FileSystem {
 
             Uri rootUri = getDocumentUri(context, new File(baseFolder));
             DocumentFile f = DocumentFile.fromTreeUri(context, rootUri);
-
-            for (int i = 0; i < segments.length; i++) {
-                String segment = segments[i];
+            for (String segment : segments) {
                 DocumentFile child = f.findFile(segment);
                 if (child != null) {
                     f = child;
@@ -558,8 +557,7 @@ public final class LollipopFileSystem implements FileSystem {
 
         String[] extSdPaths = getExtSdCardPaths(context);
         try {
-            for (int i = 0; i < extSdPaths.length; i++) {
-                String extSdPath = extSdPaths[i];
+            for (String extSdPath : extSdPaths) {
                 if (file.getCanonicalPath().startsWith(extSdPath)) {
                     return extSdPath;
                 }
@@ -574,8 +572,7 @@ public final class LollipopFileSystem implements FileSystem {
         List<String> paths = new ArrayList<>();
         File[] externals = ContextCompat.getExternalFilesDirs(context, "external");
         File external = context.getExternalFilesDir("external");
-        for (int i = 0; i < externals.length; i++) {
-            File file = externals[i];
+        for (File file : externals) {
             if (file != null && !file.equals(external)) {
                 String absolutePath = file.getAbsolutePath();
                 int index = absolutePath.lastIndexOf("/Android/data");

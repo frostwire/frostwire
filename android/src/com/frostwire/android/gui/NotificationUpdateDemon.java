@@ -191,7 +191,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
     @SuppressWarnings("deprecation")
     private boolean isScreenOn() {
         PowerManager pm = (PowerManager) mParentContext.getSystemService(Context.POWER_SERVICE);
-        return pm.isScreenOn();
+        return pm != null && pm.isScreenOn();
     }
 
     private static class OnTimeRunnable implements Runnable {
@@ -211,12 +211,9 @@ public final class NotificationUpdateDemon implements TimerObserver {
             if (updateDemon.isScreenOn()) {
                 // the context we have is the main app context, not an activity
                 Handler mainHandler = new Handler(updateDemon.mParentContext.getMainLooper());
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (Ref.alive(updateDemonRef)) {
-                            updateDemonRef.get().updatePermanentStatusNotification();
-                        }
+                mainHandler.post(() -> {
+                    if (Ref.alive(updateDemonRef)) {
+                        updateDemonRef.get().updatePermanentStatusNotification();
                     }
                 });
             }

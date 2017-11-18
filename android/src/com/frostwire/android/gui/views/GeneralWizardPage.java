@@ -23,8 +23,6 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -99,12 +97,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         TextView titleHorizontalBreak = findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
         if (AndroidPlatform.saf()) {
-            textStoragePath.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    StoragePicker.show((Activity) getContext());
-                }
-            });
+            textStoragePath.setOnClickListener(v -> StoragePicker.show((Activity) getContext()));
         } else {
             titleHorizontalBreak.setVisibility(View.GONE);
             textStoragePathTitle.setVisibility(View.GONE);
@@ -112,29 +105,19 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         }
 
         checkSeedFinishedTorrents = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
-        checkSeedFinishedTorrents.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
-                checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
-                textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.app_text_wizard : R.color.app_text_wizard_dark));
-                validate();
-            }
+        checkSeedFinishedTorrents.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
+            checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
+            textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.app_text_wizard : R.color.app_text_wizard_dark));
+            validate();
         });
 
 
         checkSeedFinishedTorrentsWifiOnly = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents_wifi_only);
-        checkSeedFinishedTorrentsWifiOnly.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                validate();
-            }
-        });
+        checkSeedFinishedTorrentsWifiOnly.setOnCheckedChangeListener((buttonView, isChecked) -> validate());
 
         checkUXStats = findViewById(R.id.view_general_wizard_page_check_ux_stats);
-        checkUXStats.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                validate();
-            }
-        });
+        checkUXStats.setOnCheckedChangeListener((buttonView, isChecked) -> validate());
 
         final TextView welcome_to_frostwire = findViewById(R.id.view_general_wizard_page_welcome_to_frostwire);
         final String basicOrPlus = getContext().getString(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);

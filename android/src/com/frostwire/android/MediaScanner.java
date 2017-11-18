@@ -56,29 +56,26 @@ final class MediaScanner {
 
         final CountDownLatch finishSignal = new CountDownLatch(paths.size());
 
-        MediaScannerConnection.scanFile(context, paths.toArray(new String[0]), null, new MediaScannerConnection.OnScanCompletedListener() {
-            @Override
-            public void onScanCompleted(String path, Uri uri) {
-                boolean success = true;
-                if (uri == null) {
+        MediaScannerConnection.scanFile(context, paths.toArray(new String[0]), null, (path, uri) -> {
+            boolean success = true;
+            if (uri == null) {
+                success = false;
+                failedPaths.add(path);
+            } else {
+                // verify the stored size four faulty scan
+                long size = getSize(context, uri);
+                if (size == 0) {
+                    LOG.warn("Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
                     success = false;
                     failedPaths.add(path);
-                } else {
-                    // verify the stored size four faulty scan
-                    long size = getSize(context, uri);
-                    if (size == 0) {
-                        LOG.warn("Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
-                        success = false;
-                        failedPaths.add(path);
-                    }
                 }
-
-                if (!success) {
-                    LOG.info("Scan failed for path: " + path + ", uri: " + uri);
-                }
-
-                finishSignal.countDown();
             }
+
+            if (!success) {
+                LOG.info("Scan failed for path: " + path + ", uri: " + uri);
+            }
+
+            finishSignal.countDown();
         });
 
         try {

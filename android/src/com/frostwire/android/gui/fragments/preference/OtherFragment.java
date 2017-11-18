@@ -55,23 +55,20 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     private void setupPermanentStatusNotificationOption() {
         CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION);
         if (cb != null) {
-            cb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    final boolean notificationEnabled = (boolean) newValue;
-                    if (!notificationEnabled) {
-                        Context ctx = getActivity();
-                        NotificationManager notificationService = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-                        if (notificationService != null) {
-                            try {
-                                notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
-                            } catch (Throwable t) {
-                                // possible java.lang.SecurityException
-                            }
+            cb.setOnPreferenceChangeListener((preference, newValue) -> {
+                final boolean notificationEnabled = (boolean) newValue;
+                if (!notificationEnabled) {
+                    Context ctx = getActivity();
+                    NotificationManager notificationService = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (notificationService != null) {
+                        try {
+                            notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                        } catch (Throwable t) {
+                            // possible java.lang.SecurityException
                         }
                     }
-                    return true;
                 }
+                return true;
             });
         }
     }
@@ -79,13 +76,10 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     private void setupHapticFeedback() {
         final CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
         if (cb != null) {
-            cb.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cb.isChecked());
-                    Engine.instance().getVibrator().onPreferenceChanged();
-                    return true;
-                }
+            cb.setOnPreferenceClickListener(preference -> {
+                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cb.isChecked());
+                Engine.instance().getVibrator().onPreferenceChanged();
+                return true;
             });
         }
     }
@@ -93,14 +87,12 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     private void setupUXStatsOption() {
         CheckBoxPreference checkPref = findPreference(Constants.PREF_KEY_UXSTATS_ENABLED);
         if (checkPref != null) {
-            checkPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    boolean newVal = (Boolean) newValue;
-                    if (!newVal) { // not send ux stats
-                        UXStats.instance().setContext(null);
-                    }
-                    return true;
+            checkPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean newVal = (Boolean) newValue;
+                if (!newVal) { // not send ux stats
+                    UXStats.instance().setContext(null);
                 }
+                return true;
             });
         }
     }
@@ -110,13 +102,10 @@ public final class OtherFragment extends AbstractPreferenceFragment {
 
         if (preference != null) {
             updateIndexSummary(preference);
-            preference.setOnActionListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LocalSearchEngine.instance().clearCache();
-                    UIUtils.showShortMessage(getView(), R.string.deleted_crawl_cache);
-                    updateIndexSummary(preference);
-                }
+            preference.setOnActionListener(v -> {
+                LocalSearchEngine.instance().clearCache();
+                UIUtils.showShortMessage(getView(), R.string.deleted_crawl_cache);
+                updateIndexSummary(preference);
             });
         }
     }

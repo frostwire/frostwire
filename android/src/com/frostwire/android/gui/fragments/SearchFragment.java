@@ -255,14 +255,11 @@ public final class SearchFragment extends AbstractFragment implements
         promotions.setPromotionDownloader(this);
         searchProgress = findView(view, R.id.fragment_search_search_progress);
         searchProgress.setCurrentQueryReporter(this);
-        searchProgress.setCancelOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (LocalSearchEngine.instance().isSearchFinished()) {
-                    performSearch(searchInput.getText(), adapter.getFileType()); // retry
-                } else {
-                    cancelSearch();
-                }
+        searchProgress.setCancelOnClickListener(v -> {
+            if (LocalSearchEngine.instance().isSearchFinished()) {
+                performSearch(searchInput.getText(), adapter.getFileType()); // retry
+            } else {
+                cancelSearch();
             }
         });
 
@@ -328,13 +325,10 @@ public final class SearchFragment extends AbstractFragment implements
             updateKeywordDetector(keywordFiltered);
         }
         if (isAdded()) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.addResults(keywordFiltered, mediaTypeFiltered);
-                    showSearchView(getView());
-                    refreshFileTypeCounters(true);
-                }
+            getActivity().runOnUiThread(() -> {
+                adapter.addResults(keywordFiltered, mediaTypeFiltered);
+                showSearchView(getView());
+                refreshFileTypeCounters(true);
             });
         }
     }
@@ -390,19 +384,16 @@ public final class SearchFragment extends AbstractFragment implements
     private static void updateKeywordDetectorWithSearchResults(SearchFragment fragment, final List<? extends SearchResult> results) {
         final WeakReference<SearchFragment> fragmentRef = Ref.weak(fragment);
         final ArrayList<SearchResult> resultsCopy = new ArrayList<>(results);
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (!Ref.alive(fragmentRef)) {
-                    return;
-                }
-                SearchFragment fragment = fragmentRef.get();
-                if (fragment == null) {
-                    return; // everything is possible
-                }
-                fragment.keywordDetector.feedSearchResults(resultsCopy);
-                fragment.keywordDetector.requestHistogramsUpdateAsync(null);
+        Engine.instance().getThreadPool().execute(() -> {
+            if (!Ref.alive(fragmentRef)) {
+                return;
             }
+            SearchFragment fragment1 = fragmentRef.get();
+            if (fragment1 == null) {
+                return; // everything is possible
+            }
+            fragment1.keywordDetector.feedSearchResults(resultsCopy);
+            fragment1.keywordDetector.requestHistogramsUpdateAsync(null);
         });
     }
 
@@ -741,14 +732,11 @@ public final class SearchFragment extends AbstractFragment implements
             if (Ref.alive(searchFragmentRef)) {
                 SearchFragment searchFragment = searchFragmentRef.get();
                 if (searchFragment.isAdded()) {
-                    searchFragment.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (Ref.alive(searchFragmentRef)) {
-                                SearchFragment searchFragment = searchFragmentRef.get();
-                                searchFragment.searchProgress.setProgressEnabled(false);
-                                searchFragment.deepSearchProgress.setVisibility(View.GONE);
-                            }
+                    searchFragment.getActivity().runOnUiThread(() -> {
+                        if (Ref.alive(searchFragmentRef)) {
+                            SearchFragment searchFragment1 = searchFragmentRef.get();
+                            searchFragment1.searchProgress.setProgressEnabled(false);
+                            searchFragment1.deepSearchProgress.setVisibility(View.GONE);
                         }
                     });
                 }
@@ -954,12 +942,9 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void onKeywordDetectorFinished() {
             if (isAdded()) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        keywordFilterDrawerView.hideIndeterminateProgressViews();
-                        keywordFilterDrawerView.requestLayout();
-                    }
+                getActivity().runOnUiThread(() -> {
+                    keywordFilterDrawerView.hideIndeterminateProgressViews();
+                    keywordFilterDrawerView.requestLayout();
                 });
             }
         }
@@ -1029,18 +1014,15 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         private void initListeners() {
-            imageButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!filterButtonClickedBefore) {
-                        filterButtonClickedBefore = true;
-                        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED, true);
-                        imageButton.clearAnimation();
-                        pulse = null;
-                    }
-                    openKeywordFilterDrawerView();
-                    UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
+            imageButton.setOnClickListener(v -> {
+                if (!filterButtonClickedBefore) {
+                    filterButtonClickedBefore = true;
+                    ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED, true);
+                    imageButton.clearAnimation();
+                    pulse = null;
                 }
+                openKeywordFilterDrawerView();
+                UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
             });
         }
 
@@ -1085,25 +1067,22 @@ public final class SearchFragment extends AbstractFragment implements
                 } catch (InterruptedException ignored) {
                 }
             }
-            Runnable uiRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (!referencesAlive()) {
-                        return;
-                    }
-                    FilterToolbarButton filterToolbarButton = filterToolbarButtonRef.get();
-                    KeywordFilterDrawerView keywordFilterDrawerView = keywordFilterDrawerViewRef.get();
-                    filterToolbarButton.lastUIUpdate = System.currentTimeMillis();
-                    // should be safe from concurrent modification exception as new list with filtered elements
-                    for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
-                        List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
-                        keywordFilterDrawerView.updateData(
-                                feature,
-                                filteredHistogram);
-                    }
-                    filterToolbarButton.updateVisibility();
-                    keywordFilterDrawerView.requestLayout();
+            Runnable uiRunnable = () -> {
+                if (!referencesAlive()) {
+                    return;
                 }
+                FilterToolbarButton filterToolbarButton1 = filterToolbarButtonRef.get();
+                KeywordFilterDrawerView keywordFilterDrawerView = keywordFilterDrawerViewRef.get();
+                filterToolbarButton1.lastUIUpdate = System.currentTimeMillis();
+                // should be safe from concurrent modification exception as new list with filtered elements
+                for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+                    List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
+                    keywordFilterDrawerView.updateData(
+                            feature,
+                            filteredHistogram);
+                }
+                filterToolbarButton1.updateVisibility();
+                keywordFilterDrawerView.requestLayout();
             };
             Activity activity = activityRef.get();
             if (activity != null) {

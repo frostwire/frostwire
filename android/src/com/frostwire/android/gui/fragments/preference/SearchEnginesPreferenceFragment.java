@@ -60,23 +60,20 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         fillSearchEnginePreferences(activeSearchEnginePreferences, inactiveSearchPreferences);
 
         // click listener for the search engines. Checks or unchecks the SelectAll checkbox
-        Preference.OnPreferenceClickListener searchEngineClickListener = new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                CheckBoxPreference cb = (CheckBoxPreference) preference;
+        Preference.OnPreferenceClickListener searchEngineClickListener = preference -> {
+            CheckBoxPreference cb = (CheckBoxPreference) preference;
 
-                if (!cb.isChecked()) {
-                    setChecked(selectAll, false, false);
-                    if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
-                        cb.setChecked(true); // always keep one checked
-                        UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
-                    }
-                    selectAll.setTitle(R.string.select_all);
-                } else {
-                    updateSelectAllCheckBox();
+            if (!cb.isChecked()) {
+                setChecked(selectAll, false, false);
+                if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
+                    cb.setChecked(true); // always keep one checked
+                    UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                 }
-                return true;
+                selectAll.setTitle(R.string.select_all);
+            } else {
+                updateSelectAllCheckBox();
             }
+            return true;
         };
 
         // hide inactive search engines and setup click listeners to interact with Select All.
@@ -88,14 +85,11 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
             preference.setOnPreferenceClickListener(searchEngineClickListener);
         }
 
-        selectAll.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                CheckBoxPreference selectAll = (CheckBoxPreference) preference;
-                checkAllEngines(selectAll.isChecked());
-                selectAll.setTitle(selectAll.isChecked() ? R.string.deselect_all : R.string.select_all);
-                return true;
-            }
+        selectAll.setOnPreferenceClickListener(preference -> {
+            CheckBoxPreference selectAll1 = (CheckBoxPreference) preference;
+            checkAllEngines(selectAll1.isChecked());
+            selectAll1.setTitle(selectAll1.isChecked() ? R.string.deselect_all : R.string.select_all);
+            return true;
         });
         updateSelectAllCheckBox();
     }

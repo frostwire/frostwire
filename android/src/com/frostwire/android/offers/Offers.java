@@ -42,7 +42,7 @@ public final class Offers {
     private static final Logger LOG = Logger.getLogger(Offers.class);
 
     static final boolean DEBUG_MODE = false;
-    static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<Runnable>(), true);
+    static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
     private static Map<String,AdNetwork> AD_NETWORKS;
     private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();

@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -97,12 +96,7 @@ public final class FileInformationAction extends MenuAction {
             fileStoragePathTextView = findView(dlg, R.id.dialog_file_information_storage_path);
             updateFileMetadata(fileDescriptor);
             Button buttonOk = findView(dlg, R.id.dialog_file_information_button_ok);
-            buttonOk.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onOkButtonClick();
-                }
-            });
+            buttonOk.setOnClickListener(v -> onOkButtonClick());
         }
 
         private void updateFileMetadata(FileDescriptor fd) {

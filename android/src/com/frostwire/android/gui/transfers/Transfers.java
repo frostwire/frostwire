@@ -22,7 +22,7 @@ public final class Transfers {
     }
 
     public static Set<File> getSkipedFiles() {
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
         List<Transfer> transfers = TransferManager.instance().getTransfers();
 
         for (Transfer t : transfers) {
@@ -35,7 +35,7 @@ public final class Transfers {
     }
 
     public static Set<File> getSkippedFiles(BTDownload dl) {
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
         List<TransferItem> items = dl.getItems();
         for (TransferItem item : items) {
             try {
@@ -50,7 +50,7 @@ public final class Transfers {
     }
 
     public static Set<File> getIncompleteFiles() {
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
         List<Transfer> transfers = TransferManager.instance().getTransfers();
 
         for (Transfer t : transfers) {

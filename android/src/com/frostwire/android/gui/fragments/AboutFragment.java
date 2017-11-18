@@ -109,11 +109,6 @@ public final class AboutFragment extends AbstractFragment {
     }
 
     private static void setupClickUrl(View v, final String url) {
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UIUtils.openURL(view.getContext(), url);
-            }
-        });
+        v.setOnClickListener(view -> UIUtils.openURL(view.getContext(), url));
     }
 }

@@ -41,22 +41,19 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
             return;
         }
 
-        Offers.THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (!started()) {
-                        final Context applicationContext = activity.getApplicationContext();
-                        AppLovinSdk.initializeSdk(applicationContext);
-                        AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
-                        AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
-                        LOG.info("AppLovin initialized.");
-                        start();
-                        loadNewInterstitial(activity);
-                    }
-                } catch (Throwable e) {
-                    LOG.error(e.getMessage(), e);
+        Offers.THREAD_POOL.execute(() -> {
+            try {
+                if (!started()) {
+                    final Context applicationContext = activity.getApplicationContext();
+                    AppLovinSdk.initializeSdk(applicationContext);
+                    AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
+                    AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
+                    LOG.info("AppLovin initialized.");
+                    start();
+                    loadNewInterstitial(activity);
                 }
+            } catch (Throwable e) {
+                LOG.error(e.getMessage(), e);
             }
         });
     }

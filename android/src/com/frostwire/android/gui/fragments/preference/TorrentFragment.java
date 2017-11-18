@@ -52,36 +52,32 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
         final CheckBoxPreference preferenceSeedingWifiOnly = findPreference(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
 
         if (preferenceSeeding != null) {
-            preferenceSeeding.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    boolean newVal = (Boolean) newValue;
+            preferenceSeeding.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean newVal = (Boolean) newValue;
 
-                    if (!newVal) { // not seeding at all
-                        TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
-                    }
-
-                    if (preferenceSeedingWifiOnly != null) {
-                        preferenceSeedingWifiOnly.setEnabled(newVal);
-                    }
-
-                    UXStats.instance().log(newVal ? UXAction.SHARING_SEEDING_ENABLED : UXAction.SHARING_SEEDING_DISABLED);
-                    return true;
+                if (!newVal) { // not seeding at all
+                    TransferManager.instance().stopSeedingTorrents();
+                    UIUtils.showShortMessage(getView(), R.string.seeding_has_been_turned_off);
                 }
+
+                if (preferenceSeedingWifiOnly != null) {
+                    preferenceSeedingWifiOnly.setEnabled(newVal);
+                }
+
+                UXStats.instance().log(newVal ? UXAction.SHARING_SEEDING_ENABLED : UXAction.SHARING_SEEDING_DISABLED);
+                return true;
             });
         }
 
         if (preferenceSeedingWifiOnly != null) {
-            preferenceSeedingWifiOnly.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    boolean newVal = (Boolean) newValue;
-                    NetworkManager networkManager = NetworkManager.instance();
-                    if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) { // not seeding on mobile data
-                        TransferManager.instance().stopSeedingTorrents();
-                        UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
-                    }
-                    return true;
+            preferenceSeedingWifiOnly.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean newVal = (Boolean) newValue;
+                NetworkManager networkManager = NetworkManager.instance();
+                if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) { // not seeding on mobile data
+                    TransferManager.instance().stopSeedingTorrents();
+                    UIUtils.showShortMessage(getView(), R.string.wifi_seeding_has_been_turned_off);
                 }
+                return true;
             });
         }
 
@@ -92,17 +88,14 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
 
     private void setupTorrentOptions() {
         SwitchPreferenceCompat pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean newStatus = (boolean) newValue;
-                if (newStatus) {
-                    BTEngine.getInstance().startDht();
-                } else {
-                    BTEngine.getInstance().stopDht();
-                }
-                return true;
+        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+            boolean newStatus = (boolean) newValue;
+            if (newStatus) {
+                BTEngine.getInstance().startDht();
+            } else {
+                BTEngine.getInstance().stopDht();
             }
+            return true;
         });
 
         final BTEngine e = BTEngine.getInstance();
@@ -129,16 +122,13 @@ public final class TorrentFragment extends AbstractPreferenceFragment {
     private void setupFWSeekbarPreference(final String key, final BTEngine btEngine) {
         final CustomSeekBarPreference pickerPreference = findPreference(key);
         if (pickerPreference != null) {
-            pickerPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    if (btEngine != null) {
-                        int newVal = (int) newValue;
-                        executeBTEngineAction(key, btEngine, newVal);
-                        return checkBTEngineActionResult(key, btEngine, newVal);
-                    }
-                    return false;
+            pickerPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+                if (btEngine != null) {
+                    int newVal = (int) newValue;
+                    executeBTEngineAction(key, btEngine, newVal);
+                    return checkBTEngineActionResult(key, btEngine, newVal);
                 }
+                return false;
             });
         }
     }

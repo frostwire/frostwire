@@ -101,22 +101,14 @@ public final class NavigationMenu {
         if (navView == null) {
             resultNavView = activity.findViewById(R.id.activity_main_nav_view);
             resultNavView.setNavigationItemSelectedListener(
-                    new NavigationView.OnNavigationItemSelectedListener() {
-                        @Override
-                        public boolean onNavigationItemSelected(MenuItem menuItem) {
-                            onMenuItemSelected(menuItem);
-                            return true;
-                        }
+                    menuItem -> {
+                        onMenuItemSelected(menuItem);
+                        return true;
                     });
             View navViewHeader = resultNavView.getHeaderView(0);
             // Logo
             ImageView navLogo = navViewHeader.findViewById(R.id.nav_view_header_main_app_logo);
-            navLogo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_GIVE_URL);
-                }
-            });
+            navLogo.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_GIVE_URL));
 
             // Prep title and version
             TextView title = navViewHeader.findViewById(R.id.nav_view_header_main_title);
@@ -126,12 +118,9 @@ public final class NavigationMenu {
             version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
             TextView build = navViewHeader.findViewById(R.id.nav_view_header_main_build);
             build.setText(activity.getText(R.string.build) + " " + BuildConfig.VERSION_CODE);
-            View.OnClickListener aboutActivityLauncher = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), AboutActivity.class);
-                    v.getContext().startActivity(intent);
-                }
+            View.OnClickListener aboutActivityLauncher = v -> {
+                Intent intent = new Intent(v.getContext(), AboutActivity.class);
+                v.getContext().startActivity(intent);
             };
             title.setOnClickListener(aboutActivityLauncher);
             version.setOnClickListener(aboutActivityLauncher);
@@ -140,12 +129,7 @@ public final class NavigationMenu {
             // Prep update button
             ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
             updateButton.setVisibility(View.GONE);
-            updateButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onUpdateButtonClicked(activity);
-                }
-            });
+            updateButton.setOnClickListener(v -> onUpdateButtonClicked(activity));
         }
         return resultNavView;
     }
@@ -192,12 +176,9 @@ public final class NavigationMenu {
     private AdMenuItemView initAdMenuItemListener(final Activity activity) {
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
-        menuAd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(activity, BuyActivity.class);
-                activity.startActivity(intent);
-            }
+        menuAd.setOnClickListener(v -> {
+            Intent intent = new Intent(activity, BuyActivity.class);
+            activity.startActivity(intent);
         });
         return adMenuItemView;
     }

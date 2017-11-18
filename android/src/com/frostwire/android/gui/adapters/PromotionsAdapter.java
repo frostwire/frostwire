@@ -83,26 +83,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         }
 
         final Slide theSlide = viewItem;
-        View.OnClickListener downloadPromoClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startPromotionDownlaod(theSlide);
-            }
-        };
+        View.OnClickListener downloadPromoClickListener = view -> startPromotionDownlaod(theSlide);
 
-        View.OnClickListener previewClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startVideoPreview(theSlide.videoURL);
-            }
-        };
+        View.OnClickListener previewClickListener = view -> startVideoPreview(theSlide.videoURL);
 
-        View.OnClickListener readmoreClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openClickURL(theSlide.clickURL);
-            }
-        };
+        View.OnClickListener readmoreClickListener = view -> openClickURL(theSlide.clickURL);
 
         if (imageView != null) {
             imageView.setOnClickListener(downloadPromoClickListener);

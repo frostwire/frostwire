@@ -152,14 +152,11 @@ public final class InHouseBannerFactory {
     }
 
     private static void initClickListeners() {
-        CLICK_LISTENERS.put(Message.AD_REMOVAL, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), BuyActivity.class);
-                intent.putExtra("shutdownActivityAfterwards", false);
-                intent.putExtra("dismissActivityAfterward", false);
-                v.getContext().startActivity(intent);
-            }
+        CLICK_LISTENERS.put(Message.AD_REMOVAL, v -> {
+            Intent intent = new Intent(v.getContext(), BuyActivity.class);
+            intent.putExtra("shutdownActivityAfterwards", false);
+            intent.putExtra("dismissActivityAfterward", false);
+            v.getContext().startActivity(intent);
         });
         if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));

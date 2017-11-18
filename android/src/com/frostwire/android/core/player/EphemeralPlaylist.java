@@ -22,7 +22,6 @@ import com.frostwire.android.core.FileDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -45,15 +44,11 @@ public final class EphemeralPlaylist implements Playlist {
             this.items.add(new PlaylistItem(fd));
         }
         
-        Collections.sort(this.items, new Comparator<PlaylistItem>() {
-
-            @Override
-            public int compare(PlaylistItem a, PlaylistItem b) {
-                if (a.getFD().dateAdded == b.getFD().dateAdded) {
-                    return 0;
-                }
-                return (a.getFD().dateAdded > b.getFD().dateAdded) ? -1 : 1;
+        Collections.sort(this.items, (a, b) -> {
+            if (a.getFD().dateAdded == b.getFD().dateAdded) {
+                return 0;
             }
+            return (a.getFD().dateAdded > b.getFD().dateAdded) ? -1 : 1;
         });
 
         this.currentIndex = -1;

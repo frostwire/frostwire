@@ -86,47 +86,26 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         clearAppliedFiltersTextView = findView(R.id.view_drawer_search_filters_clear_all);
         clearAppliedFiltersTextView.setVisibility(View.GONE);
         pipelineLayout = findView(R.id.view_drawer_search_filters_pipeline_layout);
-        findView(R.id.view_drawer_search_filters_exit_button).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onExitButtonClicked();
-            }
-        });
-        clearAppliedFiltersTextView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearAppliedFilters();
-            }
-        });
+        findView(R.id.view_drawer_search_filters_exit_button).setOnClickListener(v -> onExitButtonClicked());
+        clearAppliedFiltersTextView.setOnClickListener(v -> clearAppliedFilters());
         final ImageButton tagTipsCloseButton = findView(R.id.view_drawer_search_filters_touch_tag_tips_close_button);
-        tagTipsCloseButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                appliedTagsTipTextViewContainer.setVisibility(View.GONE);
-                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED, true);
-            }
+        tagTipsCloseButton.setOnClickListener(v -> {
+            appliedTagsTipTextViewContainer.setVisibility(View.GONE);
+            ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_SEARCH_KEYWORDFILTERDRAWER_TIP_TOUCHTAGS_DISMISSED, true);
         });
         final EditText keywordEditText = findView(R.id.view_drawer_search_filters_keyword_edittext);
-        keywordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    actionId = EditorInfo.IME_ACTION_DONE;
-                }
-                return actionId == EditorInfo.IME_ACTION_DONE && onKeywordEntered(v);
+        keywordEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                actionId = EditorInfo.IME_ACTION_DONE;
             }
+            return actionId == EditorInfo.IME_ACTION_DONE && onKeywordEntered(v);
         });
         final TextView appliedTagsTipHtmlTextView = findView(R.id.view_drawer_search_filters_touch_tag_tips_text_html_textview);
         appliedTagsTipHtmlTextView.setText(Html.fromHtml(getResources().getString(R.string.tip_touch_tags_to)));
 
         final ImageButton clearTextButton = findView(R.id.view_drawer_search_filters_keyword_text_button_clear);
         clearTextButton.setVisibility(RelativeLayout.GONE);
-        clearTextButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                keywordEditText.setText("");
-            }
-        });
+        clearTextButton.setOnClickListener(v -> keywordEditText.setText(""));
         keywordEditText.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 clearTextButton.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
@@ -140,19 +119,19 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         });
         featureContainer.put(KeywordDetector.Feature.SEARCH_SOURCE,
                 new TagsController(
-                        (TextView) findView(R.id.view_drawer_search_filters_search_sources_textview),
-                        (ViewGroup) findView(R.id.view_drawer_search_filters_search_sources),
-                        (ProgressBar) findView(R.id.view_drawer_search_filters_search_sources_progress)));
+                        findView(R.id.view_drawer_search_filters_search_sources_textview),
+                        findView(R.id.view_drawer_search_filters_search_sources),
+                        findView(R.id.view_drawer_search_filters_search_sources_progress)));
         featureContainer.put(KeywordDetector.Feature.FILE_EXTENSION,
                 new TagsController(
-                        (TextView) findView(R.id.view_drawer_search_filters_file_extensions_textview),
-                        (ViewGroup) findView(R.id.view_drawer_search_filters_file_extensions),
-                        (ProgressBar) findView(R.id.view_drawer_search_filters_file_extensions_progress)));
+                        findView(R.id.view_drawer_search_filters_file_extensions_textview),
+                        findView(R.id.view_drawer_search_filters_file_extensions),
+                        findView(R.id.view_drawer_search_filters_file_extensions_progress)));
         featureContainer.put(KeywordDetector.Feature.FILE_NAME,
                 new TagsController(
-                        (TextView) findView(R.id.view_drawer_search_filters_file_names_textview),
-                        (ViewGroup) findView(R.id.view_drawer_search_filters_file_names),
-                        (ProgressBar) findView(R.id.view_drawer_search_filters_file_names_progress)));
+                        findView(R.id.view_drawer_search_filters_file_names_textview),
+                        findView(R.id.view_drawer_search_filters_file_names),
+                        findView(R.id.view_drawer_search_filters_file_names_progress)));
     }
 
     private void onExitButtonClicked() {
@@ -185,7 +164,7 @@ public final class KeywordFilterDrawerView extends LinearLayout {
 
     private void clearAppliedFilters() {
         pipelineLayout.removeAllViews();
-        updateAppliedKeywordFilters(Collections.<KeywordFilter>emptyList());
+        updateAppliedKeywordFilters(Collections.emptyList());
         for (TagsController c : featureContainer.values()) {
             c.restore();
             c.showProgressView(true);
@@ -264,12 +243,9 @@ public final class KeywordFilterDrawerView extends LinearLayout {
 
     public void reset() {
         // visual reset
-        ((Activity) getContext()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                clearAppliedFilters();
-                resetTagsContainers();
-            }
+        ((Activity) getContext()).runOnUiThread(() -> {
+            clearAppliedFilters();
+            resetTagsContainers();
         });
     }
 
@@ -385,12 +361,7 @@ public final class KeywordFilterDrawerView extends LinearLayout {
             this.header = header;
             this.container = container;
             this.progressBar = progressBar;
-            this.header.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggle();
-                }
-            });
+            this.header.setOnClickListener(v -> toggle());
         }
 
         boolean isExpanded() {

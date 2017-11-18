@@ -94,17 +94,17 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         this.radioButtonCheckedChangeListener = new RadioButtonOnCheckedChangeListener();
         this.dialogs = new ArrayList<>();
-        this.list = (list == null || list.equals(Collections.emptyList())) ? new ArrayList<T>() : list;
+        this.list = (list == null || list.equals(Collections.emptyList())) ? new ArrayList<>() : list;
         this.checked = checked;
         this.visualList = list;
     }
 
     public AbstractListAdapter(Context context, int viewItemId, List<T> list) {
-        this(context, viewItemId, list, new HashSet<T>());
+        this(context, viewItemId, list, new HashSet<>());
     }
 
     public AbstractListAdapter(Context context, int viewItemId) {
-        this(context, viewItemId, new ArrayList<T>(), new HashSet<T>());
+        this(context, viewItemId, new ArrayList<>(), new HashSet<>());
     }
 
     protected int getViewItemId() {
@@ -231,7 +231,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public void setList(List<T> list) {
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<T>() : list;
+        this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
         this.visualList = this.list;
         this.checked.clear();
         notifyDataSetInvalidated();

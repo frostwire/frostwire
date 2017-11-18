@@ -156,7 +156,7 @@ public class MediaType implements Serializable {
         if (extensions == null) {
             this.exts = Collections.emptySet();
         } else {
-            Set<String> set = new TreeSet<String>(new CaseInsensitiveStringComparator());
+            Set<String> set = new TreeSet<>(new CaseInsensitiveStringComparator());
             set.addAll(Arrays.asList(extensions));
             this.exts = set;
         }

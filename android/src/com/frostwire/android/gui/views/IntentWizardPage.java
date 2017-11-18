@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -68,12 +67,9 @@ public class IntentWizardPage extends RelativeLayout implements WizardPageView {
 
     @Override
     public void finish() {
-        UIUtils.showSocialLinksDialog(getContext(), true, new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (getContext() instanceof Activity) {
-                    ((Activity) getContext()).finish();
-                }
+        UIUtils.showSocialLinksDialog(getContext(), true, dialog -> {
+            if (getContext() instanceof Activity) {
+                ((Activity) getContext()).finish();
             }
         }, "wizard");
     }

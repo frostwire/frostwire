@@ -224,18 +224,16 @@ public final class CustomSeekBarPreference extends DialogPreference {
             });
             mCurrentValueTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_current_value_textview);
             mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
+
             Bundle arguments = getArguments();
-
             mDialogTitleTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_title);
-            mDialogTitleTextView.setText(arguments.getCharSequence(DIALOG_TITLE));
-
-            mUnlimitedCheckbox.setChecked((arguments != null && arguments.getBoolean(UNLIMITED_CHECKED)));
-            mUnlimitedCheckbox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onUnlimitedCheckboxClicked();
-                }
-            });
+            if (arguments != null) {
+                mDialogTitleTextView.setText(arguments.getCharSequence(DIALOG_TITLE));
+                mUnlimitedCheckbox.setChecked(arguments.getBoolean(UNLIMITED_CHECKED));
+            } else {
+                mUnlimitedCheckbox.setChecked(false);
+            }
+            mUnlimitedCheckbox.setOnClickListener(view1 -> onUnlimitedCheckboxClicked());
             updateComponents(previousValue);
             updateCurrentValueTextView(previousValue);
         }

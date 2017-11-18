@@ -23,7 +23,6 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -37,11 +36,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -170,14 +167,11 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     private void initButtonListeners() {
         final Dialog dialog = dlg;
         Button noButton = findView(dialog, R.id.dialog_confirm_list_button_no);
-        noButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onCancelListener != null) {
-                    onCancelListener.onCancel(dialog);
-                }
-                dialog.dismiss();
+        noButton.setOnClickListener(v -> {
+            if (onCancelListener != null) {
+                onCancelListener.onCancel(dialog);
             }
+            dialog.dismiss();
         });
 
         onYesListener = createOnYesListener();
@@ -195,17 +189,14 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             return;
         }
 
-        selectAllCheckboxOnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (buttonView.isChecked()) {
-                    adapter.checkAll();
-                } else {
-                    adapter.clearChecked();
-                }
-                updateSelectedCount();
-                updateSelectedInBundle();
+        selectAllCheckboxOnCheckedChangeListener = (buttonView, isChecked) -> {
+            if (buttonView.isChecked()) {
+                adapter.checkAll();
+            } else {
+                adapter.clearChecked();
             }
+            updateSelectedCount();
+            updateSelectedInBundle();
         };
 
         selectAllCheckbox.setVisibility(View.VISIBLE);
@@ -335,12 +326,10 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             }
             result = new boolean[adapter.getCount()];
             List<T> all = adapter.getList();
-            Iterator<T> iterator = checked.iterator();
-            while (iterator.hasNext()) {
-                T item = iterator.next();
+            for (T item : checked) {
                 int i = all.indexOf(item);
                 if (i >= 0) {
-                    result[i]=true;
+                    result[i] = true;
                 } else {
                     LOG.warn("getSelected() is not finding the checked items on the list. Verify that [" + item.getClass().getSimpleName() + "] implements equals() and hashCode()");
                 }

@@ -136,12 +136,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     }
 
     private void initTryFrostWirePlusListener() {
-        textTryFrostWirePlus.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS);
-            }
-        });
+        textTryFrostWirePlus.setOnClickListener(v -> UIUtils.openURL(getContext(), Constants.FROSTWIRE_MORE_RESULTS));
     }
 
     private void startProgress() {
@@ -184,13 +179,10 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
         this.isDataUp = isDataUp;
         if (!isDataUp) {
-            Runnable uiRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        UIUtils.showDismissableMessage(SearchProgressView.this, R.string.no_data_check_internet_connection);
-                    } catch (Throwable ignored) {
-                    }
+            Runnable uiRunnable = () -> {
+                try {
+                    UIUtils.showDismissableMessage(SearchProgressView.this, R.string.no_data_check_internet_connection);
+                } catch (Throwable ignored) {
                 }
             };
             if (Looper.getMainLooper() == Looper.myLooper()) {

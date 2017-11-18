@@ -69,75 +69,69 @@ public final class PlayStore extends StoreBase {
     private String lastSkuPurchased;
 
     public PlayStore() {
-        inventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if (result.isFailure()) {
-                    LOG.error("Failed to query inventory: " + result);
-                    return;
-                }
-
-                if (helper == null) {
-                    LOG.warn("Helper has been disposed");
-                    return;
-                }
-
-                if (inventory == null) {
-                    LOG.warn("Failed to get inventory, something wrong with the IabHelper");
-                    return;
-                }
-
-                PlayStore.this.inventory = inventory;
-                products = buildProducts(inventory);
+        inventoryListener = (result, inventory) -> {
+            if (result.isFailure()) {
+                LOG.error("Failed to query inventory: " + result);
+                return;
             }
+
+            if (helper == null) {
+                LOG.warn("Helper has been disposed");
+                return;
+            }
+
+            if (inventory == null) {
+                LOG.warn("Failed to get inventory, something wrong with the IabHelper");
+                return;
+            }
+
+            PlayStore.this.inventory = inventory;
+            products = buildProducts(inventory);
         };
 
-        purchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
-            public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-                if (result.isFailure()) {
-                    LOG.error("Error purchasing: " + result);
-                    return;
-                }
+        purchaseFinishedListener = (result, purchase) -> {
+            if (result.isFailure()) {
+                LOG.error("Error purchasing: " + result);
+                return;
+            }
 
-                if (helper == null) {
-                    LOG.warn("Helper has been disposed");
-                    return;
-                }
+            if (helper == null) {
+                LOG.warn("Helper has been disposed");
+                return;
+            }
 
-                if (purchase == null) {
-                    // could be the result of a call to endAsync
-                    return;
-                }
+            if (purchase == null) {
+                // could be the result of a call to endAsync
+                return;
+            }
 
-                String sku = purchase.getSku();
-                lastSkuPurchased = sku;
-                LOG.info("Purchased sku " + sku);
+            String sku = purchase.getSku();
+            lastSkuPurchased = sku;
+            LOG.info("Purchased sku " + sku);
 
-                if (inventory != null) {
-                    try {
-                        inventory.addPurchase(purchase);
-                        products = buildProducts(inventory);
-                        LOG.info("Inventory updated");
-                    } catch (Throwable e) {
-                        LOG.error("Error updating internal inventory after purchase", e);
-                    }
+            if (inventory != null) {
+                try {
+                    inventory.addPurchase(purchase);
+                    products = buildProducts(inventory);
+                    LOG.info("Inventory updated");
+                } catch (Throwable e) {
+                    LOG.error("Error updating internal inventory after purchase", e);
                 }
             }
         };
 
-        consumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
-            public void onConsumeFinished(Purchase purchase, IabResult result) {
-                if (result.isFailure()) {
-                    LOG.error("Error consuming: " + result);
-                    return;
-                }
-
-                if (helper == null) {
-                    LOG.warn("Helper has been disposed");
-                    return;
-                }
-
-                LOG.info("Consumption finished. Purchase: " + purchase + ", result: " + result);
+        consumeFinishedListener = (purchase, result) -> {
+            if (result.isFailure()) {
+                LOG.error("Error consuming: " + result);
+                return;
             }
+
+            if (helper == null) {
+                LOG.warn("Helper has been disposed");
+                return;
+            }
+
+            LOG.info("Consumption finished. Purchase: " + purchase + ", result: " + result);
         };
     }
 
@@ -158,16 +152,13 @@ public final class PlayStore extends StoreBase {
         helper = new IabHelper(context, base64EncodedPublicKey);
         helper.enableDebugLogging(true, LOG.getName()); // toggle this value for development
 
-        helper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
-            @Override
-            public void onIabSetupFinished(IabResult result) {
-                if (!result.isSuccess()) {
-                    LOG.error("Problem setting up in-app billing: " + result);
-                    return;
-                }
-
-                refresh();
+        helper.startSetup(result -> {
+            if (!result.isSuccess()) {
+                LOG.error("Problem setting up in-app billing: " + result);
+                return;
             }
+
+            refresh();
         });
     }
 

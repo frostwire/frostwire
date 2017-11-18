@@ -25,7 +25,6 @@ import android.content.Context;
 
 import com.applovin.adview.AppLovinAdView;
 import com.applovin.sdk.AppLovinAd;
-import com.applovin.sdk.AppLovinAdClickListener;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinAdSize;
@@ -92,13 +91,10 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                     LOG.debug("Banner dismissed");
                 }
             });
-            adView.setAdClickListener(new AppLovinAdClickListener() {
-                @Override
-                public void adClicked(final AppLovinAd ad) {
-                    LOG.debug("Banner clicked");
-                    customEventBannerListener.onBannerClicked();
-                    customEventBannerListener.onLeaveApplication();
-                }
+            adView.setAdClickListener(ad -> {
+                LOG.debug("Banner clicked");
+                customEventBannerListener.onBannerClicked();
+                customEventBannerListener.onLeaveApplication();
             });
             adView.loadNextAd();
         } else {

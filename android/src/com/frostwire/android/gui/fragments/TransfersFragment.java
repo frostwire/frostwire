@@ -403,12 +403,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void showVPNRichToast() {
         vpnRichToast.setVisibility(View.VISIBLE);
         long VPN_NOTIFICATION_DURATION = 10000;
-        vpnRichToastHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                vpnRichToast.setVisibility(View.GONE);
-            }
-        }, VPN_NOTIFICATION_DURATION);
+        vpnRichToastHandler.postDelayed(() -> vpnRichToast.setVisibility(View.GONE), VPN_NOTIFICATION_DURATION);
     }
 
     @Override
@@ -447,28 +442,20 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         });
         textDHTPeers = findView(v, R.id.fragment_transfers_dht_peers);
         textDHTPeers.setVisibility(View.INVISIBLE);
-        textDHTPeers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context ctx = v.getContext();
-                Intent i = new Intent(ctx, SettingsActivity.class);
-                if (showTorrentSettingsOnClick) {
-                    i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentFragment.class.getName());
-                    i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
-                }
-                ctx.startActivity(i);
+        textDHTPeers.setOnClickListener(v12 -> {
+            Context ctx = v12.getContext();
+            Intent i = new Intent(ctx, SettingsActivity.class);
+            if (showTorrentSettingsOnClick) {
+                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentFragment.class.getName());
+                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
             }
+            ctx.startActivity(i);
         });
         textDownloads = findView(v, R.id.fragment_transfers_text_downloads);
         textUploads = findView(v, R.id.fragment_transfers_text_uploads);
         vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
         vpnRichToast.setVisibility(View.GONE);
-        vpnRichToast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                vpnRichToast.setVisibility(View.GONE);
-            }
-        });
+        vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
 
         initVPNStatusButton(v);
 
@@ -477,18 +464,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void initVPNStatusButton(View v) {
         final ImageView vpnStatusButton = findView(v, R.id.fragment_transfers_status_vpn_icon);
-        vpnStatusButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context ctx = v.getContext();
-                Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
-                i.setAction(isVPNactive ?
-                        Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                        Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
-                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                i.putExtra("from", "transfers");
-                ctx.startActivity(i);
-            }
+        vpnStatusButton.setOnClickListener(v1 -> {
+            Context ctx = v1.getContext();
+            Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
+            i.setAction(isVPNactive ?
+                    Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                    Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            i.putExtra("from", "transfers");
+            ctx.startActivity(i);
         });
     }
 
@@ -505,12 +489,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             boolean inPrivateFolder = currentPath.contains("Android/data");
             if (inPrivateFolder) {
                 sdCardNotification.setVisibility(View.VISIBLE);
-                sdCardNotification.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showStoragePreference();
-                    }
-                });
+                sdCardNotification.setOnClickListener(v12 -> showStoragePreference());
             }
         }
         //if you do have an SD Card mounted and you're using internal memory, we'll let you know
@@ -523,12 +502,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
             internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
             internalMemoryNotification.setVisibility(View.VISIBLE);
-            internalMemoryNotification.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showStoragePreference();
-                }
-            });
+            internalMemoryNotification.setOnClickListener(v1 -> showStoragePreference());
         }
     }
 
@@ -683,6 +657,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void autoPasteMagnetOrURL() {
         ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            return;
+        }
         ClipData primaryClip = clipboard.getPrimaryClip();
         if (primaryClip != null) {
             Item itemAt = primaryClip.getItemAt(0);
@@ -733,7 +710,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void hideAddTransfersKeyboard() {
         InputMethodManager imm = (InputMethodManager) addTransferUrlTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
+        }
     }
 
     /**

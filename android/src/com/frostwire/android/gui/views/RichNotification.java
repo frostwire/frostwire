@@ -126,12 +126,7 @@ public class RichNotification extends LinearLayout {
 			imageViewIcon.setBackground(icon);
 		}
 		
-		OnClickListener onClickNotificationListener = new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onClickNotification();
-			}
-		};
+		OnClickListener onClickNotificationListener = v -> onClickNotification();
 
 		TextView textViewTitle = updateTextViewText(R.id.view_rich_notification_title, title, onClickNotificationListener);
 		TextView textViewDescription = updateTextViewText(R.id.view_rich_notification_description, description, onClickNotificationListener);
@@ -140,12 +135,7 @@ public class RichNotification extends LinearLayout {
 		textViewDescription.setTypeface(ROBOTO_LIGHT, Typeface.NORMAL);
 		
 		ImageView dismissButton = findViewById(R.id.view_rich_notification_close_button);
-		dismissButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onDismiss();				
-			}
-		});
+		dismissButton.setOnClickListener(v -> onDismiss());
 
 		LinearLayout actionLinksContainer = findViewById(R.id.view_rich_notification_action_links);
 		actionLinksContainer.setVisibility(numberOfActionLinks > 0 ? View.VISIBLE : View.GONE);

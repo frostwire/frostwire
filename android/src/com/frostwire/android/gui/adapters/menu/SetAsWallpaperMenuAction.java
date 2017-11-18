@@ -49,15 +49,12 @@ public class SetAsWallpaperMenuAction extends MenuAction {
             return;
         }
         UIUtils.showShortMessage(context, R.string.your_android_wall_paper_will_change);
-        Engine.instance().getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
-                    WallpaperManager.getInstance(context).setBitmap(bitmap);
-                } catch (Throwable e) {
-                    UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
-                }
+        Engine.instance().getThreadPool().execute(() -> {
+            try {
+                Bitmap bitmap = BitmapFactory.decodeFile(fd.filePath);
+                WallpaperManager.getInstance(context).setBitmap(bitmap);
+            } catch (Throwable e) {
+                UIUtils.showShortMessage(context, R.string.failed_to_set_wallpaper);
             }
         });
     }

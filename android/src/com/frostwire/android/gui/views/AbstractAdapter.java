@@ -64,7 +64,7 @@ public abstract class AbstractAdapter<T> extends ArrayAdapter<T> {
         @SuppressWarnings("unchecked")
         SparseArray<View> h = (SparseArray<View>) view.getTag();
         if (h == null) {
-            h = new SparseArray<View>();
+            h = new SparseArray<>();
             view.setTag(h);
         }
         return h;

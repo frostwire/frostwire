@@ -61,12 +61,7 @@ final class OnBittorrentConnectRunnable implements Runnable {
         final MenuAction menuAction = menuActionRef.get();
         final Looper mainLooper = menuAction.getContext().getMainLooper();
         Handler h = new Handler(mainLooper);
-        h.post(new Runnable() {
-            @Override
-            public void run() {
-                menuAction.onClick(menuAction.getContext());
-            }
-        });
+        h.post(() -> menuAction.onClick(menuAction.getContext()));
     }
 
     void onBittorrentConnect(Context context) {

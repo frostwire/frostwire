@@ -76,12 +76,9 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void initEventHandlers() {
-        OnClickListener goToAudioPlayerActivityListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAudioPlayerActivity();
-                NavUtils.openAudioPlayer((Activity) getContext());
-            }
+        OnClickListener goToAudioPlayerActivityListener = v -> {
+            openAudioPlayerActivity();
+            NavUtils.openAudioPlayer((Activity) getContext());
         };
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
 
@@ -89,35 +86,17 @@ public class MiniPlayerView extends LinearLayout {
         statusContainer.setOnClickListener(goToAudioPlayerActivityListener);
 
         ImageView previous = findViewById(R.id.view_miniplayer_previous);
-        previous.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPreviousClick();
-            }
-        });
+        previous.setOnClickListener(v -> onPreviousClick());
 
         playPauseButton = findViewById(R.id.view_miniplayer_play_pause);
         playPauseButton.setClickable(true);
-        playPauseButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPlayPauseClick();
-            }
-        });
-        playPauseButton.setOnLongClickListener(new OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                onPlayPauseLongClick();
-                return true;
-            }
+        playPauseButton.setOnClickListener(v -> onPlayPauseClick());
+        playPauseButton.setOnLongClickListener(v -> {
+            onPlayPauseLongClick();
+            return true;
         });
         ImageView next = findViewById(R.id.view_miniplayer_next);
-        next.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onNextClick();
-            }
-        });
+        next.setOnClickListener(v -> onNextClick());
     }
 
     private void onPreviousClick() {

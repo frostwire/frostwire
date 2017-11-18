@@ -24,7 +24,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ReplacementTransformationMethod;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
@@ -184,12 +183,9 @@ public class ClearableEditTextView extends RelativeLayout {
         // workaround for android issue: http://code.google.com/p/android/issues/detail?id=2516
         // the comment http://code.google.com/p/android/issues/detail?id=2516#c9
         // seems a little overkill for this situation, but it could work for a general situation.
-        input.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                input.requestFocusFromTouch();
-                return false;
-            }
+        input.setOnTouchListener((v, event) -> {
+            input.requestFocusFromTouch();
+            return false;
         });
 
         imageSearch = findViewById(R.id.view_clearable_edit_text_image_search);
@@ -197,11 +193,9 @@ public class ClearableEditTextView extends RelativeLayout {
 
         buttonClear = findViewById(R.id.view_clearable_edit_text_button_clear);
         buttonClear.setVisibility(RelativeLayout.GONE);
-        buttonClear.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                input.setText("");
-                onClear();
-            }
+        buttonClear.setOnClickListener(v -> {
+            input.setText("");
+            onClear();
         });
     }
 

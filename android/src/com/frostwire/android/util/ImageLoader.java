@@ -157,12 +157,7 @@ public final class ImageLoader {
                 downloader(new ImageLoaderDownloader(context.getApplicationContext())).
                 executor(threadPool);
         if (DEBUG_ERRORS) {
-            picassoBuilder.listener(new Picasso.Listener() {
-                @Override
-                public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                    LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception);
-                }
-            });
+            picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
         this.picasso = picassoBuilder.build();
         this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);

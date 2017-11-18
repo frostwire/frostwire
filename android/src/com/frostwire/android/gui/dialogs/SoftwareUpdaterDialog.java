@@ -20,7 +20,6 @@ package com.frostwire.android.gui.dialogs;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -80,16 +79,18 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         text.setText(message);
 
         final ListView listview = findView(dlg, R.id.dialog_default_update_list_view);
-        String[] values = new String[changelog.size()];
-        for (int i = 0; i < values.length; i++) {
-            values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
-        }
 
-        final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
-                R.layout.dialog_update_bullet,
-                R.id.dialog_update_bullets_checked_text_view,
-                values);
-        listview.setAdapter(adapter);
+        if (changelog != null) {
+            String[] values = new String[changelog.size()];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
+            }
+            final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
+                    R.layout.dialog_update_bullet,
+                    R.id.dialog_update_bullets_checked_text_view,
+                    values);
+            listview.setAdapter(adapter);
+        }
 
         // Set the save button action
         Button noButton = findView(dlg, R.id.dialog_default_update_button_no);
@@ -97,24 +98,16 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
 
         Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
         yesButton.setText(android.R.string.ok);
-        yesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Engine.instance().stopServices(false);
-                // since Nougat, a naked file path can't be put directly inside
-                // an intent
-                boolean useFileProvider = hasNougatOrNewer();
-                UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
-                        Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
-                dismiss();
-            }
+        yesButton.setOnClickListener(v -> {
+            Engine.instance().stopServices(false);
+            // since Nougat, a naked file path can't be put directly inside
+            // an intent
+            boolean useFileProvider = hasNougatOrNewer();
+            UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
+                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
+            dismiss();
         });
-        noButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
+        noButton.setOnClickListener(v -> dismiss());
     }
 
     private static File getUpdateApk() {

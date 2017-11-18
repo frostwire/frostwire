@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Environment;
@@ -568,23 +567,21 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        OnSharedPreferenceChangeListener preferenceListener = new OnSharedPreferenceChangeListener() {
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                BTEngine e = BTEngine.getInstance();
+        OnSharedPreferenceChangeListener preferenceListener = (sharedPreferences, key) -> {
+            BTEngine e = BTEngine.getInstance();
 
-                if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                    e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
-                } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                    e.uploadRateLimit((int) ConfigurationManager.instance().getLong(key));
-                } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
-                    e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
-                } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
-                    e.maxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
-                } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
-                    e.maxConnections((int) ConfigurationManager.instance().getLong(key));
-                } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
-                    e.maxPeers((int) ConfigurationManager.instance().getLong(key));
-                }
+            if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
+                e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
+            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
+                e.uploadRateLimit((int) ConfigurationManager.instance().getLong(key));
+            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
+                e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
+            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
+                e.maxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
+            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
+                e.maxConnections((int) ConfigurationManager.instance().getLong(key));
+            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
+                e.maxPeers((int) ConfigurationManager.instance().getLong(key));
             }
         };
         ConfigurationManager.instance().registerOnPreferenceChange(preferenceListener);

@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.SwitchPreferenceCompat;
-import android.support.v7.preference.TwoStatePreference;
 import android.widget.Toast;
 
 import com.frostwire.android.AndroidPlatform;
@@ -82,28 +81,25 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
 
     private void setupDataSaving() {
         SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(final Preference preference, Object newValue) {
-                boolean newVal = (Boolean) newValue;
-                NetworkManager networkManager = NetworkManager.instance();
-                if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
-                    if (TransferManager.instance().isHttpDownloadInProgress()) {
-                        YesNoDialog dlg = YesNoDialog.newInstance(
-                                CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG,
-                                R.string.data_saving_kill_http_warning_title,
-                                R.string.data_saving_kill_http_warning,
-                                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
-                        );
-                        dlg.setTargetFragment(ApplicationFragment.this, 0);
-                        dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
+        preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+            boolean newVal = (Boolean) newValue;
+            NetworkManager networkManager = NetworkManager.instance();
+            if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
+                if (TransferManager.instance().isHttpDownloadInProgress()) {
+                    YesNoDialog dlg = YesNoDialog.newInstance(
+                            CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG,
+                            R.string.data_saving_kill_http_warning_title,
+                            R.string.data_saving_kill_http_warning,
+                            YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
+                    );
+                    dlg.setTargetFragment(ApplicationFragment.this, 0);
+                    dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
-                        return false;
-                    }
-                    turnOffTransfers();
+                    return false;
                 }
-                return true;
+                turnOffTransfers();
             }
+            return true;
         });
     }
 
@@ -112,7 +108,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     public void onDialogClick(String tag, int which) {
         if (CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG.equals(tag) && Dialog.BUTTON_POSITIVE == which) {
             turnOffTransfers();
-            setChecked((TwoStatePreference) findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY), true, false);
+            setChecked(findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY), true, false);
         }
     }
 
@@ -139,46 +135,40 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
 
     private void setupVPNRequirementOption() {
         SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean newVal = (boolean) newValue;
-                if (newVal && !NetworkManager.instance().isTunnelUp()) {
-                    disconnect();
-                    setChecked((TwoStatePreference) findPreference("frostwire.prefs.internal.connect_disconnect"), false, false);
-                    UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
-                }
-                return true;
+        preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+            boolean newVal = (boolean) newValue;
+            if (newVal && !NetworkManager.instance().isTunnelUp()) {
+                disconnect();
+                setChecked(findPreference("frostwire.prefs.internal.connect_disconnect"), false, false);
+                UIUtils.showShortMessage(getView(), R.string.switch_off_engine_without_vpn);
             }
+            return true;
         });
     }
 
     private void setupConnectSwitch() {
         SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
-        preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                boolean newStatus = (boolean) newValue;
-                Engine e = Engine.instance();
-                if (e.isStarted() && !newStatus) {
-                    disconnect();
-                    UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
-                } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
-                    NetworkManager networkManager = NetworkManager.instance();
-                    if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
-                            !networkManager.isTunnelUp()) {
-                        UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
-                        return false;
-                    } else if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false) &&
-                            networkManager.isDataMobileUp(networkManager.getConnectivityManager())) {
-                        UIUtils.showShortMessage(getView(), R.string.wifi_network_unavailable);
-                        return false;
-                    } else {
-                        connect();
-                    }
+        preference.setOnPreferenceChangeListener((preference1, newValue) -> {
+            boolean newStatus = (boolean) newValue;
+            Engine e = Engine.instance();
+            if (e.isStarted() && !newStatus) {
+                disconnect();
+                UIUtils.showShortMessage(getView(), R.string.toast_on_disconnect);
+            } else if (newStatus && (e.isStopped() || e.isDisconnected())) {
+                NetworkManager networkManager = NetworkManager.instance();
+                if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY, false) &&
+                        !networkManager.isTunnelUp()) {
+                    UIUtils.showShortMessage(getView(), R.string.cannot_start_engine_without_vpn);
+                    return false;
+                } else if (getPreferenceManager().getSharedPreferences().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false) &&
+                        networkManager.isDataMobileUp(networkManager.getConnectivityManager())) {
+                    UIUtils.showShortMessage(getView(), R.string.wifi_network_unavailable);
+                    return false;
+                } else {
+                    connect();
                 }
-                return true;
             }
+            return true;
         });
 
         updateConnectSwitchStatus();
@@ -199,12 +189,9 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             }
             p = findPreference(lollipopKey);
             if (p != null) {
-                p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        updateStorageOptionSummary(newValue.toString());
-                        return true;
-                    }
+                p.setOnPreferenceChangeListener((preference, newValue) -> {
+                    updateStorageOptionSummary(newValue.toString());
+                    return true;
                 });
                 updateStorageOptionSummary(ConfigurationManager.instance().getStoragePath());
             }
@@ -265,14 +252,11 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                 p.setOnPreferenceClickListener(null);
             } else {
                 p.setSummary(R.string.remove_ads_description);
-                p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        PlayStore.getInstance().endAsync();
-                        Intent intent = new Intent(getActivity(), BuyActivity.class);
-                        startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
-                        return true;
-                    }
+                p.setOnPreferenceClickListener(preference -> {
+                    PlayStore.getInstance().endAsync();
+                    Intent intent = new Intent(getActivity(), BuyActivity.class);
+                    startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+                    return true;
                 });
             }
         }

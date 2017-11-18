@@ -21,7 +21,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -48,10 +47,7 @@ import java.lang.reflect.Method;
 public final class DangerousPermissionsChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     public boolean hasAskedBefore() {
-        if (requestCode == ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE) {
-            return ConfigurationManager.instance().getBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS);
-        }
-        return false;
+        return requestCode == ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE && ConfigurationManager.instance().getBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS);
     }
 
     public interface OnPermissionsGrantedCallback {
@@ -245,18 +241,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                     builder.setIcon(R.drawable.sd_card_notification);
                     builder.setTitle(R.string.why_we_need_storage_permissions);
                     builder.setMessage(R.string.why_we_need_storage_permissions_summary);
-                    builder.setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            shutdownFrostWire();
-                        }
-                    });
-                    builder.setPositiveButton(R.string.request_again, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestPermissions();
-                        }
-                    });
+                    builder.setNegativeButton(R.string.exit, (dialog, which) -> shutdownFrostWire());
+                    builder.setPositiveButton(R.string.request_again, (dialog, which) -> requestPermissions());
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
                     return false;

@@ -21,7 +21,6 @@ package com.frostwire.android.gui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ViewFlipper;
@@ -50,11 +49,9 @@ public class WizardActivity extends AbstractActivity {
 
     public WizardActivity() {
         super(R.layout.activity_wizard);
-        completeListener = new OnCompleteListener() {
-            public void onComplete(WizardPageView pageView, boolean complete) {
-                if (pageView == currentPageView) {
-                    buttonNext.setEnabled(complete);
-                }
+        completeListener = (pageView, complete) -> {
+            if (pageView == currentPageView) {
+                buttonNext.setEnabled(complete);
             }
         };
     }
@@ -68,18 +65,10 @@ public class WizardActivity extends AbstractActivity {
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         buttonPrevious = findView(R.id.activity_wizard_button_previous);
-        buttonPrevious.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                previousPage();
-            }
-        });
+        buttonPrevious.setOnClickListener(v -> previousPage());
 
         buttonNext = findView(R.id.activity_wizard_button_next);
-        buttonNext.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                nextPage();
-            }
-        });
+        buttonNext.setOnClickListener(v -> nextPage());
 
         viewFlipper = findView(R.id.activity_wizard_view_flipper);
         int count = viewFlipper.getChildCount();

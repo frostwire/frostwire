@@ -313,12 +313,7 @@ public final class BuyActivity extends AbstractActivity {
 
                 paymentOptionsView.animate().setDuration(200)
                         .scaleY(0).setInterpolator(new DecelerateInterpolator())
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                scaleDownPaymentOptionsView(layout);
-                            }
-                        })
+                        .withEndAction(() -> scaleDownPaymentOptionsView(layout))
                         .start();
             } else {
                 // first time shown
@@ -429,12 +424,7 @@ public final class BuyActivity extends AbstractActivity {
             offerAccepted = true;
             offerLayout.animate().setDuration(500)
                     .translationY(offerLayout.getBottom()).setInterpolator(new AccelerateDecelerateInterpolator())
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            offerLayout.setVisibility(View.GONE);
-                        }
-                    })
+                    .withEndAction(() -> offerLayout.setVisibility(View.GONE))
                     .start();
         }
     }

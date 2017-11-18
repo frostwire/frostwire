@@ -38,7 +38,7 @@ final class EngineThreadPool extends ThreadPool {
     private static final int MAXIMUM_POOL_SIZE = 4;
 
     EngineThreadPool() {
-        super("Engine", MAXIMUM_POOL_SIZE, new LinkedBlockingQueue<Runnable>(), false);
+        super("Engine", MAXIMUM_POOL_SIZE, new LinkedBlockingQueue<>(), false);
     }
 
     @Override

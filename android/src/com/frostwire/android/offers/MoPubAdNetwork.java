@@ -133,21 +133,18 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
 
             try {
                 final Activity activity = activityRef.get();
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        LOG.info("Loading " + placement + " interstitial");
-                        try {
-                            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, moPubAdNetwork.placements.get(placement));
-                            MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(moPubAdNetwork, placement);
-                            moPubInterstitial.setInterstitialAdListener(moPubListener);
-                            if (Ref.alive(activityRef)) {
-                                moPubAdNetwork.interstitials.put(placement, moPubInterstitial);
-                                moPubInterstitial.load();
-                            }
-                        } catch (Throwable e) {
-                            LOG.warn("Mopub Interstitial couldn't be loaded", e);
+                activity.runOnUiThread(() -> {
+                    LOG.info("Loading " + placement + " interstitial");
+                    try {
+                        final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, moPubAdNetwork.placements.get(placement));
+                        MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(moPubAdNetwork, placement);
+                        moPubInterstitial.setInterstitialAdListener(moPubListener);
+                        if (Ref.alive(activityRef)) {
+                            moPubAdNetwork.interstitials.put(placement, moPubInterstitial);
+                            moPubInterstitial.load();
                         }
+                    } catch (Throwable e) {
+                        LOG.warn("Mopub Interstitial couldn't be loaded", e);
                     }
                 });
             } catch (Throwable t) {

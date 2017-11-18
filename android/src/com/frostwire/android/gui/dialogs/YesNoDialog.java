@@ -21,7 +21,6 @@ package com.frostwire.android.gui.dialogs;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -82,24 +81,16 @@ public class YesNoDialog extends AbstractDialog {
 
         Button buttonYes = findView(dlg, R.id.dialog_default_button_yes);
         buttonYes.setText(android.R.string.yes);
-        buttonYes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ((flags & FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) == FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) {
-                    dlg.dismiss();
-                }
-                performDialogClick(id, Dialog.BUTTON_POSITIVE);
+        buttonYes.setOnClickListener(v -> {
+            if ((flags & FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) == FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) {
+                dlg.dismiss();
             }
+            performDialogClick(id, Dialog.BUTTON_POSITIVE);
         });
 
         Button buttonNo = findView(dlg, R.id.dialog_default_button_no);
         buttonNo.setText(android.R.string.no);
-        buttonNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dlg.dismiss();
-            }
-        });
+        buttonNo.setOnClickListener(v -> dlg.dismiss());
     }
 
     @Override
