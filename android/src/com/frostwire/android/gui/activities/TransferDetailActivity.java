@@ -146,7 +146,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     @Override
     public void onTime() {
-        if (subscription == null || subscription.isUnsubscribed()) {
+        if (subscription == null || !subscription.isSubscribed()) {
             return;
         }
         if (detailFragments == null || detailFragments.length == 0) {
