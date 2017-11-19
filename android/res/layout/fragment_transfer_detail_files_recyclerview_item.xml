@@ -19,8 +19,8 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/fragment_transfer_detail_files_file_type_icon"
@@ -30,7 +30,7 @@
         android:layout_centerInParent="true"
         android:layout_marginEnd="5dp"
         android:contentDescription="@null"
-        android:src="@drawable/my_files_audio_icon_selector_menu"/>
+        android:src="@drawable/my_files_audio_icon_selector_menu" />
 
     <RelativeLayout
         android:id="@+id/fragment_transfer_detail_files_file_info_container"
@@ -39,10 +39,10 @@
         android:layout_toEndOf="@+id/fragment_transfer_detail_files_file_type_icon"
         android:layout_toStartOf="@+id/fragment_transfer_detail_files_file_play_icon"
         android:gravity="center_vertical"
-        android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingEnd="6dp"
-        android:paddingStart="0dp">
+        android:paddingStart="0dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:id="@+id/fragment_transfer_detail_files_file_name"
@@ -50,45 +50,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:text="@string/transfer_detail_file_dummy"/>
+            android:text="@string/transfer_detail_file_dummy" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_below="@+id/fragment_transfer_detail_files_file_name">
+            android:layout_below="@+id/fragment_transfer_detail_files_file_name"
+            android:orientation="horizontal">
 
             <ProgressBar
                 android:id="@+id/fragment_transfer_detail_files_file_progressbar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-                android:layout_alignParentStart="true"/>
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_files_file_percentage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-                android:layout_toEndOf="@+id/fragment_transfer_detail_files_file_progressbar"
+                android:paddingEnd="55dp"
+                android:paddingStart="8dp"
                 android:text="@string/transfer_detail_percentage_dummy"
                 android:textColor="@color/app_text_primary"
                 android:textSize="@dimen/text_x_small"
-                android:textStyle="bold"
-                android:paddingStart="8dp"
-                android:paddingEnd="55dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_files_file_download_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/fragment_transfer_detail_files_file_name"
-                android:layout_alignParentEnd="true"
                 android:text="@string/transfer_detail_upload_size_dummy"
                 android:textColor="@color/app_text_secondary"
-                android:textSize="@dimen/text_x_small"/>
+                android:textSize="@dimen/text_x_small" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -98,10 +92,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerInParent="true"
+        android:background="@color/transparent"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
-        android:background="@color/transparent"
-        android:src="@drawable/my_files_play_icon"/>
+        android:src="@drawable/my_files_play_icon" />
 
     <ImageView
         android:layout_width="match_parent"
