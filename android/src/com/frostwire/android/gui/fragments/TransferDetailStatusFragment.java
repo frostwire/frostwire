@@ -94,15 +94,10 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
             return;
         }
         completedTextView.setText(uiBittorrentDownload.getProgress() + "%");
-
-        TransferState state = uiBittorrentDownload.getState();
-
-        int timeLeftVisibility = (state == TransferState.DOWNLOADING) ? View.VISIBLE : View.GONE;
-        timeLeftLabelContainer.setVisibility(timeLeftVisibility);
-        timeLeftTextView.setVisibility(timeLeftVisibility);
-        timeLeftDividerLine.setVisibility(timeLeftVisibility);
-        if (timeLeftVisibility == View.VISIBLE) {
+        if (uiBittorrentDownload.getState() == TransferState.DOWNLOADING) {
             timeLeftTextView.setText(seconds2time(uiBittorrentDownload.getETA()));
+        } else {
+            timeLeftTextView.setText("0");
         }
         downloadedTextView.setText(getString(R.string.m_of_n_strings,
                 getBytesInHuman(uiBittorrentDownload.getDl().getTotalBytesReceived()),
