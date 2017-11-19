@@ -256,7 +256,6 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
                 AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
                 UIUtils.showYesNoDialog(v.getContext(),
-                        R.drawable.contextmenu_icon_seed,
                         trackerToRemove.url(),
                         R.string.remove_tracker,
                         (dialog, which) -> {
@@ -270,7 +269,6 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                                 viewHolder.adapterRef.get().notifyDataSetChanged();
                             }
                         });
-
             }
         }
     }
