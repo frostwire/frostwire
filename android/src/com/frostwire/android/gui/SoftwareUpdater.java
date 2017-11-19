@@ -173,7 +173,7 @@ public final class SoftwareUpdater {
 
                 String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
 
-                UIUtils.showYesNoDialog(context, R.drawable.app_icon, message, R.string.update_title, (dialog, which) -> {
+                UIUtils.showYesNoDialog(context, message, R.string.update_title, (dialog, which) -> {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(update.m));
                     context.startActivity(intent);
