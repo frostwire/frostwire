@@ -134,6 +134,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/fragment_transfer_detail_details_total_size_label"
+                android:gravity="end"
                 android:text="@string/number_of_files" />
 
             <TextView
@@ -190,9 +192,9 @@
                 android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
                 android:layout_toEndOf="@+id/fragment_transfer_detail_details_speed_limit_download"
+                android:contentDescription="@null"
                 android:src="@drawable/transfers_triangle_downward"
-                android:tint="@color/app_text_secondary"
-                android:contentDescription="@null"/>
+                android:tint="@color/app_text_secondary" />
 
             <TextView
                 android:id="@+id/fragment_transfer_detail_details_speed_limit_upload"
@@ -212,9 +214,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
                 android:layout_marginTop="5dp"
+                android:contentDescription="@null"
                 android:src="@drawable/transfers_triangle_upward"
-                android:tint="@color/app_text_secondary"
-                android:contentDescription="@null"/>
+                android:tint="@color/app_text_secondary" />
         </RelativeLayout>
 
         <ImageView
