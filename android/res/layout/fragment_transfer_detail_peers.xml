@@ -19,21 +19,21 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <include layout="@layout/view_transfer_detail_progress"/>
+        <include layout="@layout/view_transfer_detail_progress" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null" />
 
         <TextView
             android:id="@+id/fragment_transfer_detail_peers_number"
@@ -44,19 +44,18 @@
             android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical"
-            android:text=""/>
+            android:text="" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/fragment_transfer_detail_peers_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </ScrollView>
