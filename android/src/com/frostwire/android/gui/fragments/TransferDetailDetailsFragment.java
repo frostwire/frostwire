@@ -71,6 +71,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     private CompoundButton.OnCheckedChangeListener onSequentialDownloadCheckboxCheckedListener;
     private View.OnClickListener onCopyToClipboardListener;
     private View.OnClickListener onRateLimitClickListener;
+    private static final int DOWNLOAD_UNLIMITED_VALUE = 0;
+    private static final int UPLOAD_UNLIMITED_VALUE = 0;
 
     public TransferDetailDetailsFragment() {
         super(R.layout.fragment_transfer_detail_details);
@@ -145,7 +147,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             sequentialDownloadCheckBox.setOnCheckedChangeListener(onSequentialDownloadCheckboxCheckedListener);
 
             if (onRateLimitClickListener == null) {
-                onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, getFragmentManager());
+                onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, this, getFragmentManager());
                 downloadSpeedLimit.setOnClickListener(onRateLimitClickListener);
                 downloadSpeedLimitArrow.setOnClickListener(onRateLimitClickListener);
                 uploadSpeedLimit.setOnClickListener(onRateLimitClickListener);
@@ -155,12 +157,12 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             int uploadRateLimit = btDL.getUploadRateLimit();
             if (downloadRateLimit > 0) {
                 downloadSpeedLimit.setText(UIUtils.getBytesInHuman(downloadRateLimit) + "/s");
-            } else {
+            } else if (downloadRateLimit == DOWNLOAD_UNLIMITED_VALUE || downloadRateLimit == -1) {
                 downloadSpeedLimit.setText(R.string.unlimited);
             }
             if (uploadRateLimit > 0) {
                 uploadSpeedLimit.setText(UIUtils.getBytesInHuman(uploadRateLimit) + "/s");
-            } else {
+            } else if (uploadRateLimit == UPLOAD_UNLIMITED_VALUE || uploadRateLimit == -1) {
                 uploadSpeedLimit.setText(R.string.unlimited);
             }
         }
@@ -241,6 +243,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     public static final class SpeedLimitDialog extends DialogFragment {
         private UIBittorrentDownload uiBittorrentDownload;
         private Direction direction;
+        private WeakReference<TransferDetailDetailsFragment> fragmentRef;
 
         enum Direction {
             Download,
@@ -268,8 +271,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         private TextView mCurrentValueTextView;
         private TextView mDialogTitle;
 
-        public static SpeedLimitDialog newInstance(UIBittorrentDownload uiBittorrentDownload, Direction direction) {
-            SpeedLimitDialog dialog = new SpeedLimitDialog().init(uiBittorrentDownload, direction);
+        public static SpeedLimitDialog newInstance(UIBittorrentDownload uiBittorrentDownload, Direction direction, WeakReference<TransferDetailDetailsFragment> fragmentRef) {
+            SpeedLimitDialog dialog = new SpeedLimitDialog().init(uiBittorrentDownload, direction, fragmentRef);
             dialog.setCancelable(true);
             Bundle bundle = new Bundle();
             bundle.putInt(START_RANGE, 1024);
@@ -277,7 +280,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             bundle.putInt(DEFAULT_VALUE, 0);
             bundle.putBoolean(IS_BYTE_RATE, true);
             bundle.putBoolean(SUPPORTS_UNLIMITED, true);
-            bundle.putInt(UNLIMITED_VALUE, 0);
+            bundle.putInt(UNLIMITED_VALUE, direction == Direction.Download ? DOWNLOAD_UNLIMITED_VALUE : UPLOAD_UNLIMITED_VALUE);
             BTDownload dl = uiBittorrentDownload.getDl();
             int rateLimit = direction == Direction.Download ? dl.getDownloadRateLimit() : dl.getUploadRateLimit();
             bundle.putInt(CURRENT_VALUE, rateLimit);
@@ -288,9 +291,10 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         public SpeedLimitDialog() {
         }
 
-        public SpeedLimitDialog init(UIBittorrentDownload uiBittorrentDownload, Direction direction) {
+        public SpeedLimitDialog init(UIBittorrentDownload uiBittorrentDownload, Direction direction, WeakReference<TransferDetailDetailsFragment> fragmentRef) {
             this.uiBittorrentDownload = uiBittorrentDownload;
             this.direction = direction;
+            this.fragmentRef = fragmentRef;
             return this;
         }
 
@@ -334,10 +338,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mSeekbar.setMax(mEndRange);
             int previousValue = 0;
             if (getArguments() != null) {
-                int curVal = getArguments().getInt(CURRENT_VALUE);
-                if (curVal != 0) {
-                    previousValue = curVal;
-                }
+                previousValue = getArguments().getInt(CURRENT_VALUE);
             }
             mSeekbar.setProgress(previousValue);
             mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -381,7 +382,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                     mSeekbar.setProgress(mSeekbar.getMax());
                     mSeekbar.setEnabled(false);
                 } else {
-                    boolean isUnlimited = currentValue == mUnlimitedValue;
+                    boolean isUnlimited = currentValue == mUnlimitedValue || currentValue == -1;
                     if (isUnlimited) {
                         mSeekbar.setProgress(mSeekbar.getMax());
                         mUnlimitedCheckbox.setChecked(true);
@@ -422,7 +423,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             mSkipListeners = true;
             int seekbarValue = mSeekbar.getProgress();
             int currentValue = mUnlimitedCheckbox.isChecked() ? mUnlimitedValue : seekbarValue;
-            updateComponents(currentValue);
+            updateComponents(currentValue); // this turns off mSkipListeners when done
             updateCurrentValueTextView(currentValue);
             mSkipListeners = false;
         }
@@ -450,16 +451,21 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                     }
                 }
             }
+            if (Ref.alive(fragmentRef)) {
+                fragmentRef.get().updateComponents();
+            }
         }
     }
 
     public static final class OnSpeedLimitClickListener implements View.OnClickListener {
         private final UIBittorrentDownload uiBittorrentDownload;
         private final WeakReference<FragmentManager> fragmentManagerRef;
+        private final WeakReference<TransferDetailDetailsFragment> fragmentRef;
 
-        OnSpeedLimitClickListener(UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManager) {
+        OnSpeedLimitClickListener(UIBittorrentDownload uiBittorrentDownload, TransferDetailDetailsFragment fragment, FragmentManager fragmentManager) {
             this.uiBittorrentDownload = uiBittorrentDownload;
             fragmentManagerRef = Ref.weak(fragmentManager);
+            fragmentRef = Ref.weak(fragment);
         }
 
         @Override
@@ -476,7 +482,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                     break;
             }
 
-            SpeedLimitDialog dialog = SpeedLimitDialog.newInstance(uiBittorrentDownload, direction);
+            SpeedLimitDialog dialog = SpeedLimitDialog.newInstance(uiBittorrentDownload, direction, fragmentRef);
             dialog.show(fragmentManagerRef.get(), "SpeedLimitDialog");
         }
     }
