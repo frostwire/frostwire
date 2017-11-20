@@ -50,6 +50,7 @@ import com.frostwire.transfers.TransferState;
 public final class TransferDetailFragment extends AbstractFragment {
 
     private UIBittorrentDownload uiBittorrentDownload;
+    private MenuItem pauseResumeMenuItem;
 
     public TransferDetailFragment() {
         super(R.layout.fragment_transfer_detail);
@@ -63,6 +64,7 @@ public final class TransferDetailFragment extends AbstractFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transfer_detail_menu, menu);
+        pauseResumeMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_pause_resume_seed);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -70,7 +72,7 @@ public final class TransferDetailFragment extends AbstractFragment {
         if (uiBittorrentDownload.getState() == TransferState.FINISHED) {
             return false;
         }
-        return (!isPaused() ||
+        return (!uiBittorrentDownload.isPaused() ||
                 uiBittorrentDownload.getState() == TransferState.SEEDING);
     }
 
@@ -95,21 +97,11 @@ public final class TransferDetailFragment extends AbstractFragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         // R.id.fragment_transfer_detail_menu_delete
-        // R.id.fragment_transfer_detail_menu_pause_resume
-        MenuItem pauseResumeMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_pause_resume);
-        if (isPausable()) {
-            pauseResumeMenuItem.setIcon(R.drawable.action_bar_pause);
-        }
-        if (isResumable()) {
-            // TODO: some sort of Play icon, I guess we use that one below
-            pauseResumeMenuItem.setIcon(R.drawable.action_bar_resume);
-        }
+        updatePauseResumeSeedMenuAction();
+
         // R.id.fragment_transfer_detail_menu_open
         MenuItem openMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_open);
         openMenuItem.setVisible(isOpenable());
-        // R.id.fragment_transfer_detail_menu_seed
-        MenuItem seedMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_seed);
-        seedMenuItem.setVisible(isSeedable());
 
         MenuItem fiatMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_fiat);
         MenuItem bitcoinMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_bitcoin);
@@ -124,6 +116,23 @@ public final class TransferDetailFragment extends AbstractFragment {
         super.onPrepareOptionsMenu(menu);
     }
 
+    public void updatePauseResumeSeedMenuAction() {
+        if (pauseResumeMenuItem == null) {
+            return;
+        }
+
+        // R.id.fragment_transfer_detail_menu_pause_resume
+        if (isPausable()) {
+            pauseResumeMenuItem.setIcon(R.drawable.action_bar_pause);
+        }
+        if (isResumable()) {
+            pauseResumeMenuItem.setIcon(R.drawable.action_bar_resume);
+            if (isSeedable()) {
+                pauseResumeMenuItem.setIcon(R.drawable.action_bar_seed);
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Activity activity = getActivity();
@@ -134,23 +143,19 @@ public final class TransferDetailFragment extends AbstractFragment {
                 // TODO: add an action listener and pass to dialog
                 new CancelMenuAction(activity, uiBittorrentDownload, true, true).onClick(activity);
                 break;
-            case R.id.fragment_transfer_detail_menu_pause_resume:
+            case R.id.fragment_transfer_detail_menu_pause_resume_seed:
                 if (isPausable()) {
                     new PauseDownloadMenuAction(activity, uiBittorrentDownload).onClick(activity);
-                } else if (isResumable()) {
+                } else if (isResumable() || isSeedable()) {
                     new ResumeDownloadMenuAction(activity, uiBittorrentDownload, R.string.resume_torrent_menu_action).onClick(activity);
                 }
+                updatePauseResumeSeedMenuAction();
                 break;
             case R.id.fragment_transfer_detail_menu_open:
                 if (isOpenable()) {
                     String path = uiBittorrentDownload.getSavePath().getAbsolutePath();
                     String mimeType = UIUtils.getMimeType(path);
                     new OpenMenuAction(activity, path, mimeType).onClick(activity);
-                }
-                break;
-            case R.id.fragment_transfer_detail_menu_seed:
-                if (isSeedable()) {
-                    new SeedAction(activity, uiBittorrentDownload).onClick(activity);
                 }
                 break;
             case R.id.fragment_transfer_detail_menu_copy_magnet:

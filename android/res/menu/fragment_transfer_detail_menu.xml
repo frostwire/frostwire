@@ -27,7 +27,7 @@
         android:title="@string/delete"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/fragment_transfer_detail_menu_pause_resume"
+        android:id="@+id/fragment_transfer_detail_menu_pause_resume_seed"
         android:icon="@drawable/action_bar_pause"
         android:orderInCategory="2"
         android:title="@string/transfers_context_menu_pause_stop_all_transfers"
@@ -39,33 +39,27 @@
         android:title="@string/open"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_seed"
-        android:icon="@drawable/contextmenu_icon_seed"
-        android:orderInCategory="4"
-        android:title="@string/seed"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/fragment_transfer_detail_menu_copy_magnet"
         android:icon="@drawable/contextmenu_icon_magnet"
-        android:orderInCategory="6"
+        android:orderInCategory="4"
         android:title="@string/transfers_context_menu_copy_magnet"
         app:showAsAction="never" />
     <item
         android:id="@+id/fragment_transfer_detail_menu_copy_infohash"
         android:icon="@drawable/contextmenu_icon_copy"
-        android:orderInCategory="7"
+        android:orderInCategory="5"
         android:title="@string/transfers_context_menu_copy_infohash"
         app:showAsAction="never" />
     <item
         android:id="@+id/fragment_transfer_detail_menu_donate_fiat"
         android:icon="@drawable/contextmenu_icon_donation_fiat"
-        android:orderInCategory="9"
+        android:orderInCategory="6"
         android:title="@string/send_tip_donation"
         app:showAsAction="never" />
     <item
         android:id="@+id/fragment_transfer_detail_menu_donate_bitcoin"
         android:icon="@drawable/contextmenu_icon_donation_bitcoin"
-        android:orderInCategory="10"
+        android:orderInCategory="7"
         android:title="@string/send_bitcoin_tip"
         app:showAsAction="never" />
 </menu>
