@@ -67,11 +67,15 @@ public final class TransferDetailFragment extends AbstractFragment {
     }
 
     private boolean isPausable() {
-        return !isPaused() || uiBittorrentDownload.getState() == TransferState.SEEDING;
+        if (uiBittorrentDownload.getState() == TransferState.FINISHED) {
+            return false;
+        }
+        return (!isPaused() ||
+                uiBittorrentDownload.getState() == TransferState.SEEDING);
     }
 
     private boolean isResumable() {
-        if (!uiBittorrentDownload.isComplete() && !uiBittorrentDownload.isSeeding() && isPaused()) {
+        if (isPausable()) {
             return false;
         }
         NetworkManager networkManager = NetworkManager.instance();
