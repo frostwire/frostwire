@@ -49,6 +49,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     private UIBittorrentDownload uiBittorrentDownload;
     private SparseArray<String> tabTitles;
     private AbstractTransferDetailFragment[] detailFragments;
+    private TransferDetailFragment transferDetailFragment;
     private int lastSelectedTabIndex;
 
     public TransferDetailActivity() {
@@ -59,7 +60,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     protected void initComponents(Bundle savedInstanceState) {
         super.initComponents(savedInstanceState);
         initUIBittorrentDownload();
-        TransferDetailFragment transferDetailFragment = findFragment(R.id.fragment_transfer_detail);
+        transferDetailFragment = findFragment(R.id.fragment_transfer_detail);
         if (transferDetailFragment != null) {
             transferDetailFragment.setUiBittorrentDownload(uiBittorrentDownload);
         }
@@ -172,6 +173,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             detailFragments[lastSelectedTabIndex]=(AbstractTransferDetailFragment) correspondingActiveFragment;
             currentFragment = detailFragments[lastSelectedTabIndex];
         }
+        if (transferDetailFragment != null) {
+            transferDetailFragment.updatePauseResumeSeedMenuAction();
+        }
+
         try {
             currentFragment.onTime();
         } catch (Throwable t) {
