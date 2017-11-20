@@ -102,7 +102,7 @@ public final class TransferDetailFragment extends AbstractFragment {
         }
         if (isResumable()) {
             // TODO: some sort of Play icon, I guess we use that one below
-            pauseResumeMenuItem.setIcon(R.drawable.contextmenu_icon_play_transfer);
+            pauseResumeMenuItem.setIcon(R.drawable.action_bar_resume);
         }
         // R.id.fragment_transfer_detail_menu_open
         MenuItem openMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_open);
