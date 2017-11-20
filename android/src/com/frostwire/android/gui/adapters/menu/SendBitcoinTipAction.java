@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,31 +39,25 @@ import java.lang.ref.WeakReference;
  * @author aldenml
  */
 public class SendBitcoinTipAction extends MenuAction {
-    final WeakReference<PaymentOptions> poRef;
+    private final String bitcoinAddress;
 
-    public SendBitcoinTipAction(Context context, PaymentOptions po) {
+    public SendBitcoinTipAction(Context context, String bitcoinAddress) {
         super(context, R.drawable.contextmenu_icon_donation_bitcoin, R.string.send_bitcoin_tip);
-        poRef = new WeakReference<>(po);
+        this.bitcoinAddress = bitcoinAddress;
     }
 
     @Override
     public void onClick(Context context) {
-        if (Ref.alive(poRef)) {
-            final PaymentOptions paymentOptions = poRef.get();
-            final String bitcoinAddress = paymentOptions.bitcoin;
-
-            try {
-                String bitcoinUriPrefix = "bitcoin:";
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                final String uri = (!bitcoinAddress.startsWith(bitcoinUriPrefix) ? bitcoinUriPrefix : "") +
-                        bitcoinAddress;
-                intent.setData(Uri.parse(uri));
-                context.startActivity(intent);
-            } catch (Throwable e) {
-                UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
-            }
+        try {
+            String bitcoinUriPrefix = "bitcoin:";
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            final String uri = (!bitcoinAddress.startsWith(bitcoinUriPrefix) ? bitcoinUriPrefix : "") +
+                    bitcoinAddress;
+            intent.setData(Uri.parse(uri));
+            context.startActivity(intent);
+        } catch (Throwable e) {
+            UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
         }
-
         UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
     }
 }

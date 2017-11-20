@@ -248,11 +248,11 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             UIBittorrentDownload uidl = (UIBittorrentDownload) bittorrentDownload;
             if (uidl.hasPaymentOptions()) {
                 PaymentOptions po = uidl.getPaymentOptions();
-                if (po.bitcoin != null) {
-                    items.add(new SendBitcoinTipAction(contextRef.get(), po));
-                }
                 if (po.paypalUrl != null) {
                     items.add(new SendFiatTipAction(contextRef.get(), po.paypalUrl));
+                }
+                if (po.bitcoin != null) {
+                    items.add(new SendBitcoinTipAction(contextRef.get(), po.bitcoin));
                 }
             }
             if (bittorrentDownload.getInfoHash() != null && !"".equals(bittorrentDownload.getInfoHash())) {
