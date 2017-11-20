@@ -63,9 +63,15 @@
         android:title="@string/remove_torrent_and_data"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_donate"
+        android:id="@+id/fragment_transfer_detail_menu_donate_fiat"
         android:icon="@drawable/contextmenu_icon_donation_fiat"
         android:orderInCategory="9"
         android:title="@string/send_tip_donation"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/fragment_transfer_detail_menu_donate_bitcoin"
+        android:icon="@drawable/contextmenu_icon_donation_bitcoin"
+        android:orderInCategory="10"
+        android:title="@string/send_bitcoin_tip"
         app:showAsAction="never" />
 </menu>
