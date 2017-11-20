@@ -169,9 +169,6 @@ public final class TransferDetailFragment extends AbstractFragment {
                         uiBittorrentDownload.getInfoHash()
                 ).onClick(activity);
                 break;
-            case R.id.fragment_transfer_detail_menu_remove_torrent_data:
-
-                break;
             case R.id.fragment_transfer_detail_menu_donate_fiat:
                 new SendFiatTipAction(activity, paymentOptions.paypalUrl).onClick(activity);
                 break;
