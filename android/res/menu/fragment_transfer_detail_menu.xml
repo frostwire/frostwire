@@ -57,12 +57,6 @@
         android:title="@string/transfers_context_menu_copy_infohash"
         app:showAsAction="never" />
     <item
-        android:id="@+id/fragment_transfer_detail_menu_remove_torrent_data"
-        android:icon="@drawable/contextmenu_icon_stop_transfer"
-        android:orderInCategory="8"
-        android:title="@string/remove_torrent_and_data"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/fragment_transfer_detail_menu_donate_fiat"
         android:icon="@drawable/contextmenu_icon_donation_fiat"
         android:orderInCategory="9"
