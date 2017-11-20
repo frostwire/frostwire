@@ -28,6 +28,7 @@ import android.util.SparseArray;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.fragments.TransferDetailDetailsFragment;
 import com.frostwire.android.gui.fragments.TransferDetailFilesFragment;
+import com.frostwire.android.gui.fragments.TransferDetailFragment;
 import com.frostwire.android.gui.fragments.TransferDetailPeersFragment;
 import com.frostwire.android.gui.fragments.TransferDetailPiecesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailStatusFragment;
@@ -58,6 +59,10 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     protected void initComponents(Bundle savedInstanceState) {
         super.initComponents(savedInstanceState);
         initUIBittorrentDownload();
+        TransferDetailFragment transferDetailFragment = findFragment(R.id.fragment_transfer_detail);
+        if (transferDetailFragment != null) {
+            transferDetailFragment.setUiBittorrentDownload(uiBittorrentDownload);
+        }
         initTabTitles();
         initFragments();
         if (detailFragments == null || detailFragments.length <= 0) {

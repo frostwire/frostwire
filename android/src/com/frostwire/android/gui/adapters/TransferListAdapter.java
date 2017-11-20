@@ -274,6 +274,9 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 if (po.paypalUrl != null) {
                     items.add(new SendFiatTipAction(contextRef.get(), po.paypalUrl));
                 }
+                if (po.bitcoin != null) {
+                    items.add(new SendBitcoinTipAction(contextRef.get(), po.bitcoin));
+                }
             }
             if (bittorrentDownload.getInfoHash() != null && !"".equals(bittorrentDownload.getInfoHash())) {
                 items.add(new TransferDetailsMenuAction(contextRef.get(), R.string.show_torrent_details, bittorrentDownload.getInfoHash()));
