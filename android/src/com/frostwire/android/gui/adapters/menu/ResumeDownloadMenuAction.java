@@ -44,7 +44,7 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
 
 
     public ResumeDownloadMenuAction(Context context, BittorrentDownload download, int stringId) {
-        super(context, R.drawable.contextmenu_icon_play_transfer, stringId);
+        super(context, R.drawable.contextmenu_icon_play, stringId);
         this.download = download;
         this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
     }
