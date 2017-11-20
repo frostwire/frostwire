@@ -56,14 +56,14 @@ public final class CancelMenuAction extends MenuAction {
 
 
     public CancelMenuAction(Context context, Transfer transfer, boolean deleteData) {
-        super(context, R.drawable.contextmenu_icon_stop_transfer, (deleteData) ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
+        super(context, R.drawable.contextmenu_icon_trash, (deleteData) ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
         this.transfer = transfer;
         this.deleteData = deleteData;
         this.deleteTorrent = deleteData;
     }
 
     public CancelMenuAction(Context context, BittorrentDownload transfer, boolean deleteTorrent, boolean deleteData) {
-        super(context, R.drawable.contextmenu_icon_stop_transfer, R.string.remove_torrent_and_data);
+        super(context, R.drawable.contextmenu_icon_trash, R.string.remove_torrent_and_data);
         this.transfer = transfer;
         this.deleteTorrent = deleteTorrent;
         this.deleteData = deleteData;
