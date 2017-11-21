@@ -234,7 +234,8 @@ public class IabHelper {
                 if (mDisposed) return;
                 logDebug("Billing service connected.");
                 mService = IInAppBillingService.Stub.asInterface(service);
-                final String packageName = mContext.getPackageName();
+                if (mService != null) {
+                    final String packageName = mContext.getPackageName();
                     new Thread("IabHelper-isBillingSupportedCheck") {
                         @Override
                         public void run() {
@@ -245,21 +246,22 @@ public class IabHelper {
                                 }
                                 return;
                             }
-
                             try {
                                 logDebug("Checking for in-app billing 3 support.");
                                 // check for in-app billing v3 support
-                                int response = mService.isBillingSupported(3, packageName, ITEM_TYPE_INAPP);
-                                if (response != BILLING_RESPONSE_RESULT_OK) {
-                                    if (listener != null)
-                                        listener.onIabSetupFinished(new IabResult(response,
-                                                "Error checking for billing v3 support."));
-                                    // if in-app purchases aren't supported, neither are subscriptions
-                                    mSubscriptionsSupported = false;
-                                    mSubscriptionUpdateSupported = false;
-                                    return;
-                                } else {
-                                    logDebug("In-app billing version 3 supported for " + packageName);
+                                if (mService != null) {
+                                    int response = mService.isBillingSupported(3, packageName, ITEM_TYPE_INAPP);
+                                    if (response != BILLING_RESPONSE_RESULT_OK) {
+                                        if (listener != null)
+                                            listener.onIabSetupFinished(new IabResult(response,
+                                                    "Error checking for billing v3 support."));
+                                        // if in-app purchases aren't supported, neither are subscriptions
+                                        mSubscriptionsSupported = false;
+                                        mSubscriptionUpdateSupported = false;
+                                        return;
+                                    } else {
+                                        logDebug("In-app billing version 3 supported for " + packageName);
+                                    }
                                 }
                             } catch (RemoteException e) {
                                 if (listener != null) {
@@ -269,34 +271,34 @@ public class IabHelper {
                                 e.printStackTrace();
                                 return;
                             }
-
                             // Check for v5 subscriptions support. This is needed for
                             // getBuyIntentToReplaceSku which allows for subscription update
                             try {
-                                int response = mService.isBillingSupported(5, packageName, ITEM_TYPE_SUBS);
-
-                                if (response == BILLING_RESPONSE_RESULT_OK) {
-                                    logDebug("Subscription re-signup AVAILABLE.");
-                                    mSubscriptionUpdateSupported = true;
-                                } else {
-                                    logDebug("Subscription re-signup not available.");
-                                    mSubscriptionUpdateSupported = false;
-                                }
-                                if (mSubscriptionUpdateSupported) {
-                                    mSubscriptionsSupported = true;
-                                } else {
-                                    // check for v3 subscriptions support
-                                    response = mService.isBillingSupported(3, packageName, ITEM_TYPE_SUBS);
+                                if (mService != null) {
+                                    int response = mService.isBillingSupported(5, packageName, ITEM_TYPE_SUBS);
                                     if (response == BILLING_RESPONSE_RESULT_OK) {
-                                        logDebug("Subscriptions AVAILABLE.");
-                                        mSubscriptionsSupported = true;
+                                        logDebug("Subscription re-signup AVAILABLE.");
+                                        mSubscriptionUpdateSupported = true;
                                     } else {
-                                        logDebug("Subscriptions NOT AVAILABLE. Response: " + response);
-                                        mSubscriptionsSupported = false;
+                                        logDebug("Subscription re-signup not available.");
                                         mSubscriptionUpdateSupported = false;
                                     }
+                                    if (mSubscriptionUpdateSupported) {
+                                        mSubscriptionsSupported = true;
+                                    } else {
+                                        // check for v3 subscriptions support
+                                        response = mService.isBillingSupported(3, packageName, ITEM_TYPE_SUBS);
+                                        if (response == BILLING_RESPONSE_RESULT_OK) {
+                                            logDebug("Subscriptions AVAILABLE.");
+                                            mSubscriptionsSupported = true;
+                                        } else {
+                                            logDebug("Subscriptions NOT AVAILABLE. Response: " + response);
+                                            mSubscriptionsSupported = false;
+                                            mSubscriptionUpdateSupported = false;
+                                        }
+                                    }
+                                    mSetupDone = true;
                                 }
-                                mSetupDone = true;
                             } catch (RemoteException e) {
                                 if (listener != null) {
                                     listener.onIabSetupFinished(new IabResult(IABHELPER_REMOTE_EXCEPTION,
@@ -310,6 +312,7 @@ public class IabHelper {
                             }
                         }
                     }.start();
+                }
             }
         };
 
