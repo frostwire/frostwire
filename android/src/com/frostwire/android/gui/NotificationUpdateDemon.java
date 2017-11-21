@@ -133,6 +133,9 @@ public final class NotificationUpdateDemon implements TimerObserver {
                     notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
                 } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
+                } catch (Throwable ignored2) {
+                    // possible android.os.TransactionTooLargeException
+                    ignored2.printStackTrace();
                 }
             }
         }
