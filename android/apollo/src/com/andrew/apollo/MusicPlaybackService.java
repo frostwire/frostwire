@@ -59,7 +59,6 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.Random;
@@ -561,12 +560,7 @@ public class MusicPlaybackService extends Service {
                 // I didn't want to use Engine.instance().getThreadPool() as this might be initialized before EngineService
                 // give this is a service declared in AndroidManifest.xml"
                 // -gubatron
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        initService();
-                    }
-                }).start();
+                new Thread(this::initService).start();
             } catch (Throwable ignored) {}
         }
     }
@@ -832,13 +826,13 @@ public class MusicPlaybackService extends Service {
     /**
      * @return true if serviced was released.
      */
-    private boolean releaseServiceUiAndStop(boolean force) {
+    private void releaseServiceUiAndStop(boolean force) {
         if (mPlayerHandler == null
                 || (!force && isPlaying())
                 || mPausedByTransientLossOfFocus
                 || mPlayerHandler.hasMessages(TRACK_ENDED)) {
             LOG.info("releaseServiceUiAndStop(force=" + force + ") aborted: isPlaying()=" + isPlaying());
-            return false;
+            return;
         }
 
         if (force && isPlaying()) {
@@ -865,7 +859,6 @@ public class MusicPlaybackService extends Service {
             mPreferences.edit().putInt("curpos", -1).apply();
         }
 
-        return true;
     }
 
     private void handleCommandIntent(Intent intent) {
@@ -953,17 +946,13 @@ public class MusicPlaybackService extends Service {
             final Bitmap bitmap = service.getAlbumArt();
 
             // TODO: refactor this really bad code
-            Runnable postExecute = new Runnable() {
-                public void run() {
-                    service.mNotificationHelper.buildNotification(
-                            service.getAlbumName(),
-                            service.getArtistName(),
-                            service.getTrackName(),
-                            service.getAlbumId(),
-                            bitmap,
-                            service.isPlaying());
-                }
-            };
+            Runnable postExecute = () -> service.mNotificationHelper.buildNotification(
+                    service.getAlbumName(),
+                    service.getArtistName(),
+                    service.getTrackName(),
+                    service.getAlbumId(),
+                    bitmap,
+                    service.isPlaying());
             service.mPlayerHandler.post(postExecute);
         }
     }
@@ -994,9 +983,8 @@ public class MusicPlaybackService extends Service {
     /**
      * Called when we receive a ACTION_MEDIA_EJECT notification.
      *
-     * @param storagePath The path to mount point for the removed media
      */
-    private void closeExternalStorageFiles(final String storagePath) {
+    private void closeExternalStorageFiles() {
         stop(true);
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
@@ -1018,17 +1006,19 @@ public class MusicPlaybackService extends Service {
                 @Override
                 public void onReceive(final Context context, final Intent intent) {
                     final String action = intent.getAction();
-                    if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
-                        saveQueue(true);
-                        mQueueIsSaveable = false;
-                        closeExternalStorageFiles(intent.getData().getPath());
-                    } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
-                        mMediaMountedCount++;
-                        mCardId = getCardId();
-                        reloadQueue();
-                        mQueueIsSaveable = true;
-                        notifyChange(QUEUE_CHANGED);
-                        notifyChange(META_CHANGED);
+                    if (action != null) {
+                        if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
+                            saveQueue(true);
+                            mQueueIsSaveable = false;
+                            closeExternalStorageFiles();
+                        } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+                            mMediaMountedCount++;
+                            mCardId = getCardId();
+                            reloadQueue();
+                            mQueueIsSaveable = true;
+                            notifyChange(QUEUE_CHANGED);
+                            notifyChange(META_CHANGED);
+                        }
                     }
                 }
             };
@@ -1132,12 +1122,9 @@ public class MusicPlaybackService extends Service {
             mSimplePlayer = MediaPlayer.create(this, Uri.parse(path));
             final String pathCopy = path;
             mSimplePlayerPlayingFile = path;
-            mSimplePlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mSimplePlayerPlayingFile = null;
-                    notifySimpleStopped(pathCopy);
-                }
+            mSimplePlayer.setOnCompletionListener(mp -> {
+                mSimplePlayerPlayingFile = null;
+                notifySimpleStopped(pathCopy);
             });
             mSimplePlayer.start();
         }
@@ -1198,12 +1185,9 @@ public class MusicPlaybackService extends Service {
                     }
                     final boolean wasPlaying = isPlaying();
                     stop(false);
-                    openCurrentAndNext(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (wasPlaying) {
-                                play();
-                            }
+                    openCurrentAndNext(() -> {
+                        if (wasPlaying) {
+                            play();
                         }
                     });
                 }
@@ -1231,13 +1215,8 @@ public class MusicPlaybackService extends Service {
         }
 
         final int tailsize = mPlayListLen - position;
-        for (int i = tailsize; i > 0; i--) {
-            mPlayList[position + i] = mPlayList[position + i - addlen];
-        }
-
-        for (int i = 0; i < addlen; i++) {
-            mPlayList[position + i] = list[i];
-        }
+        System.arraycopy(mPlayList, position + 1 - addlen, mPlayList, position + 1, tailsize);
+        System.arraycopy(list, 0, mPlayList, position, addlen);
         mPlayListLen += addlen;
         if (mPlayListLen == 0) {
             closeCursor();
@@ -1378,7 +1357,6 @@ public class MusicPlaybackService extends Service {
                                 mIsSupposedToBePlaying = false;
                                 notifyChange(PLAYSTATE_CHANGED);
                             }
-                            return;
                         }
                     } else {
                         if (openNext) {
@@ -1420,7 +1398,7 @@ public class MusicPlaybackService extends Service {
             final int numHistory = mHistory.size();
             int numUnplayed = numTracks;
             for (int i = 0; i < numHistory; i++) {
-                final int idx = mHistory.get(i).intValue();
+                final int idx = mHistory.get(i);
                 if (idx < numTracks && tracks[idx] >= 0) {
                     numUnplayed--;
                     tracks[idx] = -1;
@@ -1530,7 +1508,7 @@ public class MusicPlaybackService extends Service {
         final int toAdd = 7 - (mPlayListLen - (mPlayPos < 0 ? -1 : mPlayPos));
         for (int i = 0; i < toAdd; i++) {
             int lookback = mHistory.size();
-            int idx = -1;
+            int idx;
             while (true) {
                 idx = mShuffler.nextInt(mAutoShuffleList.length);
                 if (!wasRecentlyUsed(idx, lookback)) {
@@ -1583,9 +1561,7 @@ public class MusicPlaybackService extends Service {
             final long[] newlist = new long[size * 2];
             final int len = mPlayList != null ? mPlayList.length : mPlayListLen;
             if (mPlayList != null) {
-                for (int i = 0; i < len; i++) {
-                    newlist[i] = mPlayList[i];
-                }
+                System.arraycopy(mPlayList, 0, newlist, 0, len);
             }
             mPlayList = newlist;
             // FIXME: shrink the array when the needed size is much smaller
@@ -1816,29 +1792,27 @@ public class MusicPlaybackService extends Service {
             final String albumArtistName = musicPlaybackService.getAlbumArtistName();
             final long duration = musicPlaybackService.duration();
             // UI thread portion
-            Runnable postExecute = new Runnable() {
-                public void run() {
-                    if (!Ref.alive(musicPlaybackServiceRef)) {
-                        return;
-                    }
-                    MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
-                    try {
-                        musicPlaybackService.mRemoteControlClient
-                                .editMetadata(true)
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
-                                .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
-                                .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
-                                .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
-                                .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
-                                .apply();
-                    } catch (Throwable t) {
-                        // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
-                    }
-                    // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-                    // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-                    musicPlaybackService.mRemoteControlClient.setPlaybackState(playState);
+            Runnable postExecute = () -> {
+                if (!Ref.alive(musicPlaybackServiceRef)) {
+                    return;
                 }
+                MusicPlaybackService musicPlaybackService1 = musicPlaybackServiceRef.get();
+                try {
+                    musicPlaybackService1.mRemoteControlClient
+                            .editMetadata(true)
+                            .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
+                            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
+                            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
+                            .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
+                            .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
+                            .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
+                            .apply();
+                } catch (Throwable t) {
+                    // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
+                }
+                // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+                // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+                musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState);
             };
             musicPlaybackService.mPlayerHandler.post(postExecute);
         }
@@ -2000,7 +1974,7 @@ public class MusicPlaybackService extends Service {
             }
             if (shufmode != SHUFFLE_NONE) {
                 q = mPreferences.getString("history", "");
-                qlen = q != null ? q.length() : 0;
+                qlen = q.length();
                 if (qlen > 1) {
                     n = 0;
                     shift = 0;
@@ -2096,18 +2070,15 @@ public class MusicPlaybackService extends Service {
             }
             mFileToPlay = path;
             if (mPlayer != null) { // machine state issues in general with original Apollo code
-                mPlayer.setDataSource(mFileToPlay, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mPlayer != null && mPlayer.isInitialized()) {
-                            mOpenFailedCounter = 0;
-                            callback.openFileResult(true);
-                        } else {
-                            stop(true);
-                            callback.openFileResult(false);
-                        }
-
+                mPlayer.setDataSource(mFileToPlay, () -> {
+                    if (mPlayer != null && mPlayer.isInitialized()) {
+                        mOpenFailedCounter = 0;
+                        callback.openFileResult(true);
+                    } else {
+                        stop(true);
+                        callback.openFileResult(false);
                     }
+
                 });
             } else {
                 stop(true);
@@ -2469,7 +2440,7 @@ public class MusicPlaybackService extends Service {
         if (mFavoritesCache != null) {
             synchronized (mFavoritesCache) {
                 final Long id = mFavoritesCache.getSongId(getAudioId());
-                return id != null ? true : false;
+                return id != null;
             }
         }
         return false;
@@ -2509,13 +2480,10 @@ public class MusicPlaybackService extends Service {
                 mPlayPos = mShuffler.nextInt(mPlayListLen);
             }
             mHistory.clear();
-            openCurrentAndNext(new Runnable() {
-                @Override
-                public void run() {
-                    if (oldId != getAudioId()) {
-                        play();
-                        notifyChange(META_CHANGED);
-                    }
+            openCurrentAndNext(() -> {
+                if (oldId != getAudioId()) {
+                    play();
+                    notifyChange(META_CHANGED);
                 }
             });
         }
@@ -2621,12 +2589,9 @@ public class MusicPlaybackService extends Service {
             mPlayPos = pos;
             stop(false);
             mPlayPos = pos;
-            openCurrentAndNext(new Runnable() {
-                @Override
-                public void run() {
-                    play();
-                    notifyChange(META_CHANGED);
-                }
+            openCurrentAndNext(() -> {
+                play();
+                notifyChange(META_CHANGED);
             });
         }
     }
@@ -2655,8 +2620,7 @@ public class MusicPlaybackService extends Service {
                 if (histsize == 0) {
                     return;
                 }
-                final Integer pos = mHistory.remove(histsize - 1);
-                mPlayPos = pos.intValue();
+                mPlayPos = mHistory.remove(histsize - 1);
             } else {
                 if (mPlayPos > 0) {
                     mPlayPos--;
@@ -2665,12 +2629,9 @@ public class MusicPlaybackService extends Service {
                 }
             }
             stop(false);
-            openCurrent(new Runnable() {
-                @Override
-                public void run() {
-                    play();
-                    notifyChange(META_CHANGED);
-                }
+            openCurrent(() -> {
+                play();
+                notifyChange(META_CHANGED);
             });
         }
     }
@@ -2712,9 +2673,7 @@ public class MusicPlaybackService extends Service {
             }
             if (index1 < index2) {
                 final long tmp = mPlayList[index1];
-                for (int i = index1; i < index2; i++) {
-                    mPlayList[i] = mPlayList[i + 1];
-                }
+                System.arraycopy(mPlayList, index1 + 1, mPlayList, index1, index2 - index1);
                 mPlayList[index2] = tmp;
                 if (mPlayPos == index1) {
                     mPlayPos = index2;
@@ -2723,9 +2682,7 @@ public class MusicPlaybackService extends Service {
                 }
             } else if (index2 < index1) {
                 final long tmp = mPlayList[index1];
-                for (int i = index1; i > index2; i--) {
-                    mPlayList[i] = mPlayList[i - 1];
-                }
+                System.arraycopy(mPlayList, index2, mPlayList, index2 + 1, index1 - index2);
                 mPlayList[index2] = tmp;
                 if (mPlayPos == index1) {
                     mPlayPos = index2;
@@ -2767,12 +2724,9 @@ public class MusicPlaybackService extends Service {
                     mPlayListLen = 0;
                     doAutoShuffleUpdate();
                     mPlayPos = 0;
-                    openCurrentAndNext(new Runnable() {
-                        @Override
-                        public void run() {
-                            play();
-                            notifyChange(META_CHANGED);
-                        }
+                    openCurrentAndNext(() -> {
+                        play();
+                        notifyChange(META_CHANGED);
                     });
                     return;
                 } else {
@@ -2793,14 +2747,11 @@ public class MusicPlaybackService extends Service {
         synchronized (this) {
             stop(false);
             mPlayPos = index;
-            openCurrentAndNext(new Runnable() {
-                @Override
-                public void run() {
-                    play();
-                    notifyChange(META_CHANGED);
-                    if (mShuffleMode == SHUFFLE_AUTO) {
-                        doAutoShuffleUpdate();
-                    }
+            openCurrentAndNext(() -> {
+                play();
+                notifyChange(META_CHANGED);
+                if (mShuffleMode == SHUFFLE_AUTO) {
+                    doAutoShuffleUpdate();
                 }
             });
         }
@@ -2822,24 +2773,18 @@ public class MusicPlaybackService extends Service {
                 notifyChange(QUEUE_CHANGED);
                 if (action == NOW) {
                     mPlayPos = mPlayListLen - list.length;
-                    openCurrentAndNext(new Runnable() {
-                        @Override
-                        public void run() {
-                            play();
-                            notifyChange(META_CHANGED);
-                        }
+                    openCurrentAndNext(() -> {
+                        play();
+                        notifyChange(META_CHANGED);
                     });
                     return;
                 }
             }
             if (mPlayPos < 0) {
                 mPlayPos = 0;
-                openCurrentAndNext(new Runnable() {
-                    @Override
-                    public void run() {
-                        play();
-                        notifyChange(META_CHANGED);
-                    }
+                openCurrentAndNext(() -> {
+                    play();
+                    notifyChange(META_CHANGED);
                 });
             }
         }
@@ -2881,9 +2826,8 @@ public class MusicPlaybackService extends Service {
     public Bitmap getAlbumArt() {
         try {
             // Return the cached artwork
-            final Bitmap bitmap = mImageFetcher.getArtwork(getAlbumName(),
+            return mImageFetcher.getArtwork(getAlbumName(),
                     getAlbumId(), getArtistName());
-            return bitmap;
         } catch (Throwable e) {
             e.printStackTrace();
             // due to the lifecycle of android components,
@@ -3128,7 +3072,6 @@ public class MusicPlaybackService extends Service {
                             return;
                         case RESET:
                             mediaPlayer.reset();
-                            return;
                     }
                 } catch (Throwable ignored) {
                 }
@@ -3166,17 +3109,14 @@ public class MusicPlaybackService extends Service {
          *             you want to play
          */
         public void setDataSource(final String path, final Runnable callback) {
-            setDataSourceImpl(mCurrentMediaPlayer, path, new OnPlayerPrepareCallback() {
-                @Override
-                public void onPrepared(boolean result) {
-                    mIsInitialized = result;
-                    if (mIsInitialized) {
-                        setNextDataSource(null);
-                    }
+            setDataSourceImpl(mCurrentMediaPlayer, path, result -> {
+                mIsInitialized = result;
+                if (mIsInitialized) {
+                    setNextDataSource(null);
+                }
 
-                    if (callback != null) {
-                        callback.run();
-                    }
+                if (callback != null) {
+                    callback.run();
                 }
             });
         }
@@ -3234,14 +3174,6 @@ public class MusicPlaybackService extends Service {
                     }
                     player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     player.prepare();
-                } catch (final IOException todo) {
-                    // TODO: notify the user why the file couldn't be opened
-                    callback.onPrepared(false);
-                    return;
-                } catch (final IllegalArgumentException todo) {
-                    // TODO: notify the user why the file couldn't be opened
-                    callback.onPrepared(false);
-                    return;
                 } catch (Throwable e) {
                     // TODO: notify the user why the file couldn't be opened due to an unknown error
                     callback.onPrepared(false);
@@ -3284,19 +3216,15 @@ public class MusicPlaybackService extends Service {
 
             initNextMediaPlayer();
 
-            setDataSourceImpl(mNextMediaPlayer, path, new OnPlayerPrepareCallback() {
-                @Override
-                public void onPrepared(boolean result) {
-                    if (result) {
-                        try {
-                            mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
-                        } catch (Throwable e) {
-                            LOG.error("Media player fatal error", e);
-                            return;
-                        }
-                    } else {
-                        releaseNextMediaPlayer();
+            setDataSourceImpl(mNextMediaPlayer, path, result -> {
+                if (result) {
+                    try {
+                        mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                    } catch (Throwable e) {
+                        LOG.error("Media player fatal error", e);
                     }
+                } else {
+                    releaseNextMediaPlayer();
                 }
             });
         }
@@ -3468,7 +3396,7 @@ public class MusicPlaybackService extends Service {
         public void setAudioSessionId(final int sessionId) {
             try {
                 mCurrentMediaPlayer.setAudioSessionId(sessionId);
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
             }
         }
 
@@ -3481,7 +3409,7 @@ public class MusicPlaybackService extends Service {
             int result = 0;
             try {
                 result = mCurrentMediaPlayer.getAudioSessionId();
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
             }
             return result;
         }
@@ -3499,7 +3427,7 @@ public class MusicPlaybackService extends Service {
                         mCurrentMediaPlayer = new MediaPlayer();
                         mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
                         mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
-                    } catch (Throwable t) {
+                    } catch (Throwable ignored) {
                     }
                     return true;
                 default:
@@ -3545,11 +3473,8 @@ public class MusicPlaybackService extends Service {
         @Override
         public void openFile(final String path) throws RemoteException {
             if (Ref.alive(mService)) {
-                mService.get().openFile(path, new OpenFileResultCallback() {
-                    @Override
-                    public void openFileResult(boolean result) {
-                        // do nothing
-                    }
+                mService.get().openFile(path, result -> {
+                    // do nothing
                 });
             }
         }
