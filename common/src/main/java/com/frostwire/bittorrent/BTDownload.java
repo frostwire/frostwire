@@ -635,7 +635,7 @@ public final class BTDownload implements BittorrentDownload {
         }
         try {
             if (th != null && th.isValid()) {
-                th.saveResumeData();
+                th.saveResumeData(TorrentHandle.SAVE_INFO_DICT);
             }
         } catch (Throwable e) {
             LOG.warn("Error triggering resume data", e);
