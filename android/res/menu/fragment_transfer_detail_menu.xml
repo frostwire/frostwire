@@ -33,6 +33,11 @@
         android:title="@string/transfers_context_menu_pause_stop_all_transfers"
         app:showAsAction="always" />
     <item
+        android:id="@+id/fragment_transfer_detail_menu_clear"
+        android:icon="@drawable/contextmenu_icon_remove_transfer"
+        android:title="@string/clear"
+        />
+    <item
         android:id="@+id/fragment_transfer_detail_menu_open"
         android:icon="@drawable/contextmenu_icon_open"
         android:orderInCategory="3"
