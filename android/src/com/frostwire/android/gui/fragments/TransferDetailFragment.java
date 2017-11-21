@@ -29,14 +29,11 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.adapters.menu.CancelMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
-import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.PauseDownloadMenuAction;
 import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
-import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
@@ -69,11 +66,7 @@ public final class TransferDetailFragment extends AbstractFragment {
     }
 
     private boolean isPausable() {
-        if (uiBittorrentDownload.getState() == TransferState.FINISHED) {
-            return false;
-        }
-        return (!uiBittorrentDownload.isPaused() ||
-                uiBittorrentDownload.getState() == TransferState.SEEDING);
+        return uiBittorrentDownload.getState() != TransferState.FINISHED && (!uiBittorrentDownload.isPaused() || uiBittorrentDownload.getState() == TransferState.SEEDING);
     }
 
     private boolean isResumable() {
@@ -90,18 +83,10 @@ public final class TransferDetailFragment extends AbstractFragment {
         return uiBittorrentDownload.getState() == TransferState.FINISHED;
     }
 
-    private boolean isOpenable() {
-        return uiBittorrentDownload.isComplete() && uiBittorrentDownload.getItems().size() > 0;
-    }
-
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         // R.id.fragment_transfer_detail_menu_delete
         updatePauseResumeSeedMenuAction();
-
-        // R.id.fragment_transfer_detail_menu_open
-        MenuItem openMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_open);
-        openMenuItem.setVisible(isOpenable());
 
         MenuItem fiatMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_fiat);
         MenuItem bitcoinMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_bitcoin);
@@ -153,13 +138,6 @@ public final class TransferDetailFragment extends AbstractFragment {
                 break;
             case R.id.fragment_transfer_detail_menu_clear:
                 new CancelMenuAction(activity, uiBittorrentDownload, false, false).onClick(activity);
-                break;
-            case R.id.fragment_transfer_detail_menu_open:
-                if (isOpenable()) {
-                    String path = uiBittorrentDownload.getSavePath().getAbsolutePath();
-                    String mimeType = UIUtils.getMimeType(path);
-                    new OpenMenuAction(activity, path, mimeType).onClick(activity);
-                }
                 break;
             case R.id.fragment_transfer_detail_menu_copy_magnet:
                 new CopyToClipboardMenuAction(activity,
