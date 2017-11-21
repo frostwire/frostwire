@@ -1215,8 +1215,12 @@ public class MusicPlaybackService extends Service {
         }
 
         final int tailsize = mPlayListLen - position;
-        System.arraycopy(mPlayList, position + 1 - addlen, mPlayList, position + 1, tailsize);
-        System.arraycopy(list, 0, mPlayList, position, addlen);
+        for (int i = tailsize; i > 0; i--) {
+            mPlayList[position + i] = mPlayList[position + i - addlen];
+        }
+        for (int i = 0; i < addlen; i++) {
+            mPlayList[position + i] = list[i];
+        }
         mPlayListLen += addlen;
         if (mPlayListLen == 0) {
             closeCursor();
@@ -1561,7 +1565,9 @@ public class MusicPlaybackService extends Service {
             final long[] newlist = new long[size * 2];
             final int len = mPlayList != null ? mPlayList.length : mPlayListLen;
             if (mPlayList != null) {
-                System.arraycopy(mPlayList, 0, newlist, 0, len);
+                for (int i = 0; i < len; i++) {
+                    newlist[i] = mPlayList[i];
+                }
             }
             mPlayList = newlist;
             // FIXME: shrink the array when the needed size is much smaller
@@ -2673,7 +2679,9 @@ public class MusicPlaybackService extends Service {
             }
             if (index1 < index2) {
                 final long tmp = mPlayList[index1];
-                System.arraycopy(mPlayList, index1 + 1, mPlayList, index1, index2 - index1);
+                for (int i = index1; i < index2; i++) {
+                    mPlayList[i] = mPlayList[i + 1];
+                }
                 mPlayList[index2] = tmp;
                 if (mPlayPos == index1) {
                     mPlayPos = index2;
@@ -2682,7 +2690,9 @@ public class MusicPlaybackService extends Service {
                 }
             } else if (index2 < index1) {
                 final long tmp = mPlayList[index1];
-                System.arraycopy(mPlayList, index2, mPlayList, index2 + 1, index1 - index2);
+                for (int i = index1; i > index2; i--) {
+                    mPlayList[i] = mPlayList[i - 1];
+                }
                 mPlayList[index2] = tmp;
                 if (mPlayPos == index1) {
                     mPlayPos = index2;
