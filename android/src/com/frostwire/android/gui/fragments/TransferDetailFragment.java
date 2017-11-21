@@ -151,6 +151,9 @@ public final class TransferDetailFragment extends AbstractFragment {
                 }
                 updatePauseResumeSeedMenuAction();
                 break;
+            case R.id.fragment_transfer_detail_menu_clear:
+                new CancelMenuAction(activity, uiBittorrentDownload, false, false).onClick(activity);
+                break;
             case R.id.fragment_transfer_detail_menu_open:
                 if (isOpenable()) {
                     String path = uiBittorrentDownload.getSavePath().getAbsolutePath();
