@@ -31,6 +31,7 @@ import com.frostwire.android.gui.adapters.menu.CancelMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.PauseDownloadMenuAction;
 import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
+import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
@@ -131,7 +132,9 @@ public final class TransferDetailFragment extends AbstractFragment {
             case R.id.fragment_transfer_detail_menu_pause_resume_seed:
                 if (isPausable()) {
                     new PauseDownloadMenuAction(activity, uiBittorrentDownload).onClick(activity);
-                } else if (isResumable() || isSeedable()) {
+                } else if (isSeedable()) {
+                    new SeedAction(activity, uiBittorrentDownload).onClick(activity);
+                } else if (isResumable()) {
                     new ResumeDownloadMenuAction(activity, uiBittorrentDownload, R.string.resume_torrent_menu_action).onClick(activity);
                 }
                 updatePauseResumeSeedMenuAction();
