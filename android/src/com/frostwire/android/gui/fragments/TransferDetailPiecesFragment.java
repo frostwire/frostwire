@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.gui.views.HexHiveView;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -46,9 +47,10 @@ import com.frostwire.jlibtorrent.TorrentStatus;
 public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
-    private RecyclerView recyclerView;
+    private HexHiveView hexHiveView;
+    //private RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private PieceAdapter adapter;
+    //private PieceAdapter adapter;
     private int totalPieces;
 
 
@@ -79,8 +81,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         piecesNumberTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_pieces_number);
         pieceSizeTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_piece_size_number);
         progressBar = findView(rootView, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
-        recyclerView = findView(rootView, R.id.fragment_transfer_detail_pieces_recycler_view);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 16));
+        //hexHiveView = findView(rootView, R.id.fragment_transfer_detail_pieces_hexhive_view);
     }
 
     @Override
@@ -92,38 +93,44 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
         PieceIndexBitfield pieces = status.pieces();
-        if (adapter == null && isAdded()) {
-            Resources r = getResources();
+        if (/*adapter == null && */isAdded()) {
+
+            //Resources r = getResources();
+
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
             pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            adapter = new PieceAdapter(torrentInfo.numPieces(),
+
+            /*adapter = new PieceAdapter(torrentInfo.numPieces(),
                     pieces,
                     r.getColor(R.color.basic_blue_highlight),
-                    r.getColor(R.color.basic_gray_dark));
+                    r.getColor(R.color.basic_gray_dark));*/
         }
-        if (adapter != null) {
-            recyclerView.setAdapter(adapter);
+        //if (adapter != null) {
+            //recyclerView.setAdapter(adapter);
             if (status.pieces().count() > 0) {
                 progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                hexHiveView.setVisibility(View.VISIBLE);
+                //recyclerView.setVisibility(View.VISIBLE);
             }
-        }
+        //}
         if (totalPieces == -1) {
             totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
             piecesNumberTextView.setText(totalPieces + "");
         }
         piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
-        if (adapter != null) {
+        //if (adapter != null) {
             if (pieces.count() > 0) {
-                adapter.updateData(pieces);
+                //adapter.updateData(pieces);
                 progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                //recyclerView.setVisibility(View.VISIBLE);
+                hexHiveView.setVisibility(View.VISIBLE);
             } else {
                 progressBar.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                hexHiveView.setVisibility(View.GONE);
+                //recyclerView.setVisibility(View.GONE);
             }
-        }
+        //}
     }
 
     // making this abstraction instead of using 'Boolean'
@@ -140,6 +147,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         }
     }
 
+    /**
     private static final class PieceViewHolder extends RecyclerView.ViewHolder {
         private Piece piece;
         private final ImageView circleView;
@@ -167,7 +175,9 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             circleView.invalidate();
         }
     }
+     */
 
+    /**
     private static final class PieceAdapter extends RecyclerView.Adapter<PieceViewHolder> {
         private final int totalPieces;
         private final int downloadedColor;
@@ -202,5 +212,5 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             this.pieces = pieces;
             notifyDataSetChanged();
         }
-    }
+    }*/
 }
