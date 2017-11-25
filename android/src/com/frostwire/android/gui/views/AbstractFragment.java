@@ -34,7 +34,7 @@ import com.frostwire.util.Logger;
  * @author aldenml
  */
 public abstract class AbstractFragment extends Fragment {
-    private static Logger LOG = Logger.getLogger(AbstractFragment.class);
+    //private static Logger LOG = Logger.getLogger(AbstractFragment.class);
     private final int layoutResId;
 
     private boolean paused;
@@ -46,7 +46,7 @@ public abstract class AbstractFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LOG.info(getClass().getSimpleName() + ".onCreateView()");
+        //LOG.info(getClass().getSimpleName() + ".onCreateView()");
         View rootView = inflater.inflate(layoutResId, container, false);
 
         if (!rootView.isInEditMode()) {
@@ -58,14 +58,14 @@ public abstract class AbstractFragment extends Fragment {
 
     @Override
     public void onResume() {
-        LOG.info(getClass().getSimpleName() + ".onResume()");
+        //LOG.info(getClass().getSimpleName() + ".onResume()");
         paused = false;
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        LOG.info(getClass().getSimpleName() + ".onPause()");
+        //LOG.info(getClass().getSimpleName() + ".onPause()");
         paused = true;
         super.onPause();
     }
