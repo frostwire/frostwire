@@ -19,6 +19,7 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_transfer_detail_progress_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/app_background_body_light"
