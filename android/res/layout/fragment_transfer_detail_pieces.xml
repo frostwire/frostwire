@@ -19,8 +19,9 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -30,12 +31,14 @@
         <include layout="@layout/view_transfer_detail_progress" />
 
         <ImageView
+            android:id="@+id/fragment_transfer_detail_divider_line_1"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
             android:contentDescription="@null" />
 
         <RelativeLayout
+            android:id="@+id/fragment_transfer_detail_pieces_summary_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
@@ -111,9 +114,11 @@
             <com.frostwire.android.gui.views.HexHiveView
                 android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal"
-                android:visibility="visible" />
+                android:visibility="visible"
+                app:hexhive_textSize="30.0"/>
 
         </LinearLayout>
 

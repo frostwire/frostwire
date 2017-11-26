@@ -81,7 +81,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         piecesNumberTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_pieces_number);
         pieceSizeTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_piece_size_number);
         progressBar = findView(rootView, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
-        //hexHiveView = findView(rootView, R.id.fragment_transfer_detail_pieces_hexhive_view);
+        hexHiveView = findView(rootView, R.id.fragment_transfer_detail_pieces_hexhive_view);
     }
 
     @Override

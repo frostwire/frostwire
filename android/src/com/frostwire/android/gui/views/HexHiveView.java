@@ -25,8 +25,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.frostwire.android.R;
 import com.frostwire.util.Logger;
@@ -46,6 +51,10 @@ public class HexHiveView extends View {
     private Paint emptyHexPaint;
     private Paint fullHexPaint;
     private Paint textPaint;
+    private View progressContainer;
+    private View divider;
+    private View piecesSummaryContainer;
+    private ViewPager viewPager;
 
     public HexHiveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -56,15 +65,17 @@ public class HexHiveView extends View {
         int emptyColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_emptyColor, r.getColor(R.color.basic_gray_dark));
         int fullColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_fullColor, r.getColor(R.color.basic_blue_highlight));
         int textColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_textColor, r.getColor(R.color.white));
+        float textSize = typedArray.getFloat(R.styleable.HexHiveView_hexhive_textSize, 20f);
         typedArray.recycle();
-        initPaints(backgroundColor, borderColor, emptyColor, fullColor, textColor);
+        initPaints(backgroundColor, borderColor, emptyColor, fullColor, textColor, textSize);
     }
 
     private void initPaints(int backgroundColor,
                             int borderColor,
                             int emptyColor,
                             int fullColor,
-                            int textColor) {
+                            int textColor,
+                            float textSize) {
         backgroundPaint = new Paint();
         backgroundPaint.setColor(backgroundColor);
 
@@ -79,9 +90,19 @@ public class HexHiveView extends View {
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(textColor);
-        textPaint.setTextSize(14f);
+        textPaint.setTextSize(textSize);
         backgroundPaint = new Paint(0);
         backgroundPaint.setColor(Color.BLACK);
+    }
+
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        viewPager = (ViewPager) getParent().getParent().getParent().getParent();
+        progressContainer = ((ViewGroup) getParent().getParent()).findViewById(R.id.view_transfer_detail_progress_container);
+        divider = ((ViewGroup) getParent().getParent()).findViewById(R.id.fragment_transfer_detail_divider_line_1);
+        piecesSummaryContainer = ((ViewGroup) getParent().getParent()).findViewById(R.id.fragment_transfer_detail_pieces_summary_container);
     }
 
     @Override
@@ -97,8 +118,28 @@ public class HexHiveView extends View {
         int widthSize = resolveSizeAndState(MeasureSpec.getSize(widthMeasureSpec),widthMeasureSpec, 1);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = resolveSizeAndState(MeasureSpec.getSize(heightMeasureSpec), heightMeasureSpec, 0);
-        LOG.info(String.format("onMeasure() -> MeasureSpecs -> EXACTLY(%d), AT_MOST(%d), UNSPECIFIED(%d) ", MeasureSpec.EXACTLY, MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED));
-        LOG.info(String.format("onMeasure() -> { widthMode: %d, widthSize: %d, heightMode: %d, heightSize: %d } ", widthMode, widthSize, heightMode, heightSize));
+
+       if (divider != null && heightSize > 0) {
+           TypedValue outValue = new TypedValue();
+           Resources.Theme theme = getContext().getTheme();
+           int actionBarHeight = 0;
+           int actionBarDividerHeight = 0;
+           if (theme.resolveAttribute(R.attr.actionBarSize, outValue, true)) {
+               actionBarHeight = TypedValue.complexToDimensionPixelOffset(outValue.data, getResources().getDisplayMetrics());
+           }
+           if (theme.resolveAttribute(R.attr.actionBarDivider, outValue, true)) {
+               actionBarDividerHeight = TypedValue.complexToDimensionPixelOffset(outValue.data, getResources().getDisplayMetrics());
+           }
+           View tabLayout = ((LinearLayout) viewPager.getParent()).getChildAt(0);
+           int viewPagerTabsHeight = tabLayout.getHeight() + tabLayout.getPaddingTop() + tabLayout.getPaddingBottom();
+           int progressContainerHeight = progressContainer.getHeight() + progressContainer.getPaddingTop() + progressContainer.getPaddingBottom();
+           int piecesSummaryHeight = ((RelativeLayout) piecesSummaryContainer).getChildAt(0).getHeight() + piecesSummaryContainer.getPaddingTop() + piecesSummaryContainer.getPaddingBottom();;
+           int dividerHeight = divider.getHeight();
+
+           int otherComponentsHeight = actionBarHeight + actionBarDividerHeight + viewPagerTabsHeight + progressContainerHeight + piecesSummaryHeight + dividerHeight;
+
+           heightSize -= otherComponentsHeight ;
+        }
         setMeasuredDimension(widthSize, heightSize);
     }
 
@@ -108,7 +149,7 @@ public class HexHiveView extends View {
         // LETS TRY TO AVOID OBJECT ALLOCATIONS HERE.
         //super.onDraw(canvas);
         //canvas.drawRect(new Rect(0, 0, getWidth(), getHeight()), backgroundPaint);
-        canvas.drawText("HexHiveView", 25, 25, textPaint);
+        canvas.drawText("HexHiveView. width=" + getWidth() + " height=" + getHeight(), 25, 25, textPaint);
     }
 
     @Override
