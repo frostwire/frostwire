@@ -18,109 +18,101 @@
  * limitations under the License.
  */
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            xmlns:app="http://schemas.android.com/apk/res-auto">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <include layout="@layout/view_transfer_detail_progress"/>
+
+    <ImageView
+        android:id="@+id/fragment_transfer_detail_divider_line_1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_line"
+        android:contentDescription="@null"/>
+
+    <RelativeLayout
+        android:id="@+id/fragment_transfer_detail_pieces_summary_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+        android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+        <TextView
+            android:id="@+id/fragment_transfer_detail_pieces_pieces"
+            style="@style/transferDetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/pieces_header"/>
+
+        <TextView
+            android:id="@+id/fragment_transfer_detail_pieces_pieces_number"
+            style="@style/transferDetailText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
+            android:text="@string/transfer_detail_piece_size_dummy"/>
+
+        <TextView
+            android:id="@+id/fragment_transfer_detail_pieces_piece_size"
+            style="@style/transferDetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/fragment_transfer_detail_pieces_pieces"
+            android:gravity="end"
+            android:text="@string/piece_size_header"/>
+
+        <TextView
+            android:id="@+id/fragment_transfer_detail_pieces_piece_size_number"
+            style="@style/transferDetailText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
+            android:text="@string/transfer_detail_speed_small_dummy"/>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/fragment_transfer_detail_pieces_pre_hexhive_divider_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_line"
+        android:contentDescription="@null"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
-        <include layout="@layout/view_transfer_detail_progress" />
-
-        <ImageView
-            android:id="@+id/fragment_transfer_detail_divider_line_1"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:contentDescription="@null" />
-
-        <RelativeLayout
-            android:id="@+id/fragment_transfer_detail_pieces_summary_container"
+        <ProgressBar
+            android:id="@+id/fragment_transfer_detail_pieces_indeterminate_progress_bar"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
-            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+            android:indeterminate="true"
+            android:visibility="gone"/>
 
-            <TextView
-                android:id="@+id/fragment_transfer_detail_pieces_pieces"
-                style="@style/transferDetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:text="@string/pieces_header" />
-
-            <TextView
-                android:id="@+id/fragment_transfer_detail_pieces_pieces_number"
-                style="@style/transferDetailText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/fragment_transfer_detail_pieces_pieces"
-                android:text="@string/transfer_detail_piece_size_dummy" />
-
-            <TextView
-                android:id="@+id/fragment_transfer_detail_pieces_piece_size"
-                style="@style/transferDetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_toEndOf="@+id/fragment_transfer_detail_pieces_pieces"
-                android:gravity="end"
-                android:text="@string/piece_size_header" />
-
-            <TextView
-                android:id="@+id/fragment_transfer_detail_pieces_piece_size_number"
-                style="@style/transferDetailText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_below="@+id/fragment_transfer_detail_pieces_piece_size"
-                android:text="@string/transfer_detail_speed_small_dummy" />
-        </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/fragment_transfer_detail_pieces_pre_hexhive_divider_line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line"
-            android:contentDescription="@null" />
-
-        <LinearLayout
+        <com.frostwire.android.gui.views.HexHiveView
+            android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@color/basic_red"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
-            android:paddingEnd="6dp"
-            android:paddingStart="12dp"
-            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
-
-            <ProgressBar
-                android:id="@+id/fragment_transfer_detail_pieces_indeterminate_progress_bar"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:visibility="visible" />
-
-            <com.frostwire.android.gui.views.HexHiveView
-                android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:visibility="visible"
-                app:hexhive_textSize="30.0"/>
-
-        </LinearLayout>
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="visible"
+            app:hexhive_backgroundColor="@color/basic_blue"
+            app:hexhive_textSize="30.0"/>
 
     </LinearLayout>
-</ScrollView>
+
+</LinearLayout>
