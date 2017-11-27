@@ -111,7 +111,8 @@
             android:padding="10dp"
             android:visibility="visible"
             app:hexhive_backgroundColor="@color/basic_blue"
-            app:hexhive_textSize="30.0"/>
+            app:hexhive_textSize="30.0"
+            app:hexhive_borderWidth="2"/>
 
     </LinearLayout>
 
