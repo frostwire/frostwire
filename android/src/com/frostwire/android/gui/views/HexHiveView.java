@@ -48,6 +48,7 @@ import com.frostwire.util.Logger;
 // we should have a way to update the T[] dataModel
 public class HexHiveView extends View {
     private static final Logger LOG = Logger.getLogger(HexHiveView.class);
+    private static final double SQRT_OF_THREE = 1.7320508075688772;
     private Paint backgroundPaint;
     private Paint hexagonBorderPaint;
     private Paint emptyHexPaint;
@@ -98,15 +99,70 @@ public class HexHiveView extends View {
         if (dimensions == null && getHeight() > 0 && getWidth() > 0) {
             dimensions = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
         }
+        int sideLength = 0;
         if (dimensions != null) {
             canvas.drawRect(dimensions, backgroundPaint);
+            // TODO: Store all these initial parameters in a reusable object
+            sideLength = getHexagonSideLength(dimensions.width()*dimensions.height(),  100);
+            int hexHeight = getHexHeight(sideLength);
+            int hexWidth = getHexWidth(hexHeight);
+            int y = hexWidth/2;
+            for (int i=0; i < 7; i++) {
+                int x = (hexWidth / 2) + (hexWidth * i);
+                drawHexagon(x, y, sideLength, true, canvas, hexagonBorderPaint);
+            }
         }
-        canvas.drawText(String.format("HexHiveView Rect(left=%d, top=%d, right=%d, bottom=%d)", dimensions.left, dimensions.top, dimensions.right, dimensions.bottom), 25 + dimensions.left, 25 + dimensions.top, textPaint);
+        canvas.drawText(String.format("HexHiveView Rect(l=%d,t=%d,r=%d,b=%d)\r\nSideLength=%d", dimensions.left, dimensions.top, dimensions.right, dimensions.bottom, sideLength), 25 + dimensions.left, 25 + dimensions.top, textPaint);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         LOG.info(String.format("onSizeChanged(w=%d, h=%d, oldw=%d, oldh=%d)", w, h, oldw, oldh));
         super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    // Drawing/Geometry functions
+    private int getHexagonSideLength(int canvasArea, int numHexagons) {
+        return (int) Math.sqrt((2*canvasArea)/(numHexagons * SQRT_OF_THREE));
+    }
+
+    /**
+     *
+     * @param out - a re-usable array holding [x,y] of the output corner to avoid object creation/destruction
+     * @param x - center.x of hexagon
+     * @param y - center.y of hexagon
+     * @param sideLength - length of hexagon side
+     * @param sideNumber - from 0 to 5
+     */
+    private void getHexCorner(int[] out, int x, int y, int sideLength, int sideNumber, boolean pointyTopped) {
+        double angle_rad = Math.toRadians(60 * sideNumber + (pointyTopped ? 30 : 0));
+        out[0] = (int) (x + sideLength * Math.cos(angle_rad));
+        out[1] = (int) (y + sideLength * Math.sin(angle_rad));
+    }
+
+    private void drawHexagon(int x, int y, int sideLength, boolean pointyTopped, Canvas canvas, Paint paint) {
+        int[] corner = new int[2];
+        int[] lastCorner = new int[2];
+        for (int i=0; i < 7; i++) {
+            getHexCorner(corner, x, y, sideLength, i, pointyTopped);
+            if (i > 0) {
+                canvas.drawLine(
+                        lastCorner[0],
+                        lastCorner[1],
+                        corner[0],
+                        corner[1],
+                        paint);
+            }
+            lastCorner[0] = corner[0];
+            lastCorner[1] = corner[1];
+        }
+    }
+
+    private int getHexWidth(int height) {
+        return (int) (SQRT_OF_THREE / 2 * height);
+    }
+
+    private int getHexHeight(int sideLength) {
+        return sideLength*2;
     }
 }
