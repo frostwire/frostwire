@@ -18,10 +18,11 @@
  * limitations under the License.
  */
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_transfer_detail_progress_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="115dp"
     android:background="@color/app_background_body_light"
     android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
     android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
