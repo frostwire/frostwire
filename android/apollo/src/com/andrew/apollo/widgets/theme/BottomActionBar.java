@@ -36,13 +36,5 @@ public final class BottomActionBar extends RelativeLayout {
      */
     public BottomActionBar(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        setBackgroundResource(R.drawable.bottom_action_bar);
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        final LinearLayout bottomActionBar = (LinearLayout) findViewById(R.id.bottom_action_bar);
-        bottomActionBar.setBackgroundResource(R.drawable.holo_background_selector);
     }
 }
