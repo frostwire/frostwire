@@ -24,13 +24,9 @@ import com.andrew.apollo.utils.MusicUtils;
  */
 public class ImageFetcher extends ImageWorker {
 
-    public static final int IO_BUFFER_SIZE_BYTES = 1024;
-
     private static final int DEFAULT_MAX_IMAGE_HEIGHT = 1024;
 
     private static final int DEFAULT_MAX_IMAGE_WIDTH = 1024;
-
-    private static final String DEFAULT_HTTP_CACHE_DIR = "http"; //$NON-NLS-1$
 
     private static ImageFetcher sInstance = null;
 
@@ -39,7 +35,7 @@ public class ImageFetcher extends ImageWorker {
      *
      * @param context The {@link Context} to use.
      */
-    public ImageFetcher(final Context context) {
+    private ImageFetcher(final Context context) {
         super(context);
     }
 
@@ -49,7 +45,7 @@ public class ImageFetcher extends ImageWorker {
      * @param context The {@link Context} to use
      * @return A new instance of this class.
      */
-    public static final ImageFetcher getInstance(final Context context) {
+    public static ImageFetcher getInstance(final Context context) {
         if (sInstance == null) {
             sInstance = new ImageFetcher(context.getApplicationContext());
         }
@@ -61,7 +57,7 @@ public class ImageFetcher extends ImageWorker {
      */
     public void loadAlbumImage(final String artistName, final String albumName, final long albumId,
             final ImageView imageView) {
-        loadImage(generateAlbumCacheKey(albumName, artistName), artistName, albumName, albumId, imageView,
+        loadImage(generateAlbumCacheKey(albumName, artistName), artistName, albumId, imageView,
                 ImageType.ALBUM);
     }
 
@@ -70,7 +66,7 @@ public class ImageFetcher extends ImageWorker {
      */
     public void loadCurrentArtwork(final ImageView imageView) {
         loadImage(generateAlbumCacheKey(MusicUtils.getAlbumName(), MusicUtils.getArtistName()),
-                MusicUtils.getArtistName(), MusicUtils.getAlbumName(), MusicUtils.getCurrentAlbumId(),
+                MusicUtils.getArtistName(), MusicUtils.getCurrentAlbumId(),
                 imageView, ImageType.ALBUM);
     }
 
@@ -78,15 +74,7 @@ public class ImageFetcher extends ImageWorker {
      * Used to fetch artist images.
      */
     public void loadArtistImage(final String key, final ImageView imageView) {
-        loadImage(key, key, null, -1, imageView, ImageType.ARTIST);
-    }
-
-    /**
-     * Used to fetch the current artist image.
-     */
-    public void loadCurrentArtistImage(final ImageView imageView) {
-        loadImage(MusicUtils.getArtistName(), MusicUtils.getArtistName(), null, -1, imageView,
-                ImageType.ARTIST);
+        loadImage(key, key, -1, imageView, ImageType.ARTIST);
     }
 
     /**
@@ -118,30 +106,6 @@ public class ImageFetcher extends ImageWorker {
     }
 
     /**
-     * @param keyAlbum The key (album name) used to find the album art to return
-     * @param keyArtist The key (artist name) used to find the album art to return
-     */
-    public Bitmap getCachedArtwork(final String keyAlbum, final String keyArtist) {
-        return getCachedArtwork(keyAlbum, keyArtist,
-                MusicUtils.getIdForAlbum(mContext, keyAlbum, keyArtist));
-    }
-
-    /**
-     * @param keyAlbum The key (album name) used to find the album art to return
-     * @param keyArtist The key (artist name) used to find the album art to return
-     * @param keyId The key (album id) used to find the album art to return
-     */
-    public Bitmap getCachedArtwork(final String keyAlbum, final String keyArtist,
-            final long keyId) {
-        if (mImageCache != null) {
-            return mImageCache.getCachedArtwork(mContext,
-                    generateAlbumCacheKey(keyAlbum, keyArtist),
-                    keyId);
-        }
-        return getDefaultArtwork();
-    }
-
-    /**
      * Finds cached or downloads album art. Used in {@link MusicPlaybackService}
      * to set the current album art in the notification and lock screen
      *
@@ -155,7 +119,7 @@ public class ImageFetcher extends ImageWorker {
         // Check the disk cache
         Bitmap artwork = null;
 
-        if (artwork == null && albumName != null && mImageCache != null) {
+        if (albumName != null && mImageCache != null) {
             artwork = mImageCache.getBitmapFromDiskCache(
                     generateAlbumCacheKey(albumName, artistName));
         }
@@ -174,8 +138,6 @@ public class ImageFetcher extends ImageWorker {
      * width and height.
      *
      * @param filename The full path of the file to decode
-     * @param reqWidth The requested width of the resulting bitmap
-     * @param reqHeight The requested height of the resulting bitmap
      * @return A {@link Bitmap} sampled down from the original with the same
      *         aspect ratio and dimensions that are equal to or greater than the
      *         requested width and height
@@ -213,7 +175,7 @@ public class ImageFetcher extends ImageWorker {
      * @param reqHeight The requested height of the resulting bitmap
      * @return The value to be used for inSampleSize
      */
-    public static final int calculateInSampleSize(final BitmapFactory.Options options,
+    private static int calculateInSampleSize(final BitmapFactory.Options options,
             final int reqWidth, final int reqHeight) {
         /* Raw height and width of image */
         final int height = options.outHeight;
@@ -253,7 +215,6 @@ public class ImageFetcher extends ImageWorker {
      *
      * @param albumName The album name the cache key needs to be generated.
      * @param artistName The artist name the cache key needs to be generated.
-     * @return
      */
     public static String generateAlbumCacheKey(final String albumName, final String artistName) {
         if (albumName == null || artistName == null) {

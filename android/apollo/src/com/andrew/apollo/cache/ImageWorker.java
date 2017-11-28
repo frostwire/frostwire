@@ -59,11 +59,6 @@ public abstract class ImageWorker {
     private final Resources mResources;
 
     /**
-     * First layer of the transition drawable
-     */
-    private final ColorDrawable mCurrentDrawable;
-
-    /**
      * Layer drawable used to cross fade the result from the worker
      */
     private final Drawable[] mArrayDrawable;
@@ -76,19 +71,19 @@ public abstract class ImageWorker {
     /**
      * The Context to use
      */
-    protected Context mContext;
+    Context mContext;
 
     /**
      * Disk and memory caches
      */
-    protected ImageCache mImageCache;
+    ImageCache mImageCache;
 
     /**
      * Constructor of <code>ImageWorker</code>
      *
      * @param context The {@link Context} to use
      */
-    protected ImageWorker(final Context context) {
+    ImageWorker(final Context context) {
         mContext = context.getApplicationContext();
         mResources = mContext.getResources();
         // Create the default artwork
@@ -97,11 +92,9 @@ public abstract class ImageWorker {
         // No filter and no dither makes things much quicker
         mDefaultArtwork.setFilterBitmap(false);
         mDefaultArtwork.setDither(false);
-        // Create the transparent layer for the transition drawable
-        mCurrentDrawable = new ColorDrawable(mResources.getColor(R.color.transparent));
         // A transparent image (layer 0) and the new result (layer 1)
         mArrayDrawable = new Drawable[2];
-        mArrayDrawable[0] = mCurrentDrawable;
+        mArrayDrawable[0] = new ColorDrawable(mResources.getColor(R.color.transparent));
         // XXX The second layer is set in the worker task.
     }
 
@@ -127,7 +120,7 @@ public abstract class ImageWorker {
     /**
      * Adds a new image to the memory and disk caches
      *
-     * @param data The key used to store the image
+     * @param key The key used to store the image
      * @param bitmap The {@link Bitmap} to cache
      */
     public void addBitmapToCache(final String key, final Bitmap bitmap) {
@@ -164,24 +157,9 @@ public abstract class ImageWorker {
         private String mKey;
 
         /**
-         * Artist name param
-         */
-        private String mArtistName;
-
-        /**
-         * Album name parm
-         */
-        private String mAlbumName;
-
-        /**
          * The album ID used to find the corresponding artwork
          */
         private long mAlbumId;
-
-        /**
-         * The URL of an image to download
-         */
-        private String mUrl;
 
         /**
          * Constructor of <code>BitmapWorkerTask</code>
@@ -192,7 +170,7 @@ public abstract class ImageWorker {
         @SuppressWarnings("deprecation")
         public BitmapWorkerTask(final ImageView imageView, final ImageType imageType) {
             imageView.setBackgroundDrawable(mDefaultArtwork);
-            mImageReference = new WeakReference<ImageView>(imageView);
+            mImageReference = new WeakReference<>(imageView);
             mImageType = imageType;
         }
 
@@ -263,7 +241,7 @@ public abstract class ImageWorker {
          *         the ImageView's task still points to this task as well.
          *         Returns null otherwise.
          */
-        private final ImageView getAttachedImageView() {
+        private ImageView getAttachedImageView() {
             final ImageView imageView = mImageReference.get();
             final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
             if (this == bitmapWorkerTask) {
@@ -274,37 +252,6 @@ public abstract class ImageWorker {
     }
 
     /**
-     * Calls {@code cancel()} in the worker task
-     *
-     * @param imageView the {@link ImageView} to use
-     */
-    public static final void cancelWork(final ImageView imageView) {
-        final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
-        if (bitmapWorkerTask != null) {
-            bitmapWorkerTask.cancel(true);
-        }
-    }
-
-    /**
-     * Returns true if the current work has been canceled or if there was no
-     * work in progress on this image view. Returns false if the work in
-     * progress deals with the same data. The work is not stopped in that case.
-     */
-    public static final boolean executePotentialWork(final Object data, final ImageView imageView) {
-        final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
-        if (bitmapWorkerTask != null) {
-            final Object bitmapData = bitmapWorkerTask.mKey;
-            if (bitmapData == null || !bitmapData.equals(data)) {
-                bitmapWorkerTask.cancel(true);
-            } else {
-                // The same work is already in progress
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Used to determine if the current image drawable has an instance of
      * {@link BitmapWorkerTask}
      *
@@ -312,7 +259,7 @@ public abstract class ImageWorker {
      * @return Retrieve the currently active work task (if any) associated with
      *         this {@link ImageView}. null if there is no such task.
      */
-    private static final BitmapWorkerTask getBitmapWorkerTask(final ImageView imageView) {
+    private static BitmapWorkerTask getBitmapWorkerTask(final ImageView imageView) {
         if (imageView != null) {
             final Drawable drawable = imageView.getDrawable();
             if (drawable instanceof AsyncDrawable) {
@@ -337,16 +284,15 @@ public abstract class ImageWorker {
         /**
          * Constructor of <code>AsyncDrawable</code>
          */
-        public AsyncDrawable(final Resources res, final Bitmap bitmap,
-                final BitmapWorkerTask mBitmapWorkerTask) {
+        public AsyncDrawable(BitmapWorkerTask mBitmapWorkerTask) {
             super(Color.TRANSPARENT);
-            mBitmapWorkerTaskReference = new WeakReference<BitmapWorkerTask>(mBitmapWorkerTask);
+            mBitmapWorkerTaskReference = new WeakReference<>(mBitmapWorkerTask);
         }
 
         /**
          * @return The {@link BitmapWorkerTask} associated with this drawable
          */
-        public BitmapWorkerTask getBitmapWorkerTask() {
+        BitmapWorkerTask getBitmapWorkerTask() {
             return mBitmapWorkerTaskReference.get();
         }
     }
@@ -356,13 +302,12 @@ public abstract class ImageWorker {
      *
      * @param key The unique identifier for the image.
      * @param artistName The artist name for the Last.fm API.
-     * @param albumName The album name for the Last.fm API.
      * @param albumId The album art index, to check for missing artwork.
      * @param imageView The {@link ImageView} used to set the cached
      *            {@link Bitmap}.
      * @param imageType The type of image URL to fetch for.
      */
-    protected void loadImage(final String key, final String artistName, final String albumName,
+    void loadImage(final String key, final String artistName,
             final long albumId, final ImageView imageView, final ImageType imageType) {
         if (key == null || mImageCache == null || imageView == null) {
             return;
@@ -370,41 +315,18 @@ public abstract class ImageWorker {
 
         final ImageLoader loader = ImageLoader.getInstance(mContext.getApplicationContext());
         if (ImageType.ALBUM.equals(imageType)) {
-            final Uri albumArtUri = loader.getAlbumArtUri(albumId);
+            final Uri albumArtUri = ImageLoader.getAlbumArtUri(albumId);
             loader.load(albumArtUri, imageView, R.drawable.default_artwork);
         } else if (ImageType.ARTIST.equals(imageType)) {
-            final Uri artistArtUri = loader.getArtistArtUri(artistName);
+            final Uri artistArtUri = ImageLoader.getArtistArtUri(artistName);
             loader.load(artistArtUri, imageView, R.drawable.default_artwork);
         }
-
-        // First, check the memory for the image
-        /**
-        final Bitmap lruBitmap = mImageCache.getBitmapFromMemCache(key);
-        if (lruBitmap != null && imageView != null) {
-            // Bitmap found in memory cache
-            imageView.setImageBitmap(lruBitmap);
-        } else if (executePotentialWork(key, imageView)
-                && imageView != null && !mImageCache.isDiskCachePaused()) {
-            // Otherwise run the worker task
-            final BitmapWorkerTask bitmapWorkerTask = new BitmapWorkerTask(imageView, imageType);
-            final AsyncDrawable asyncDrawable = new AsyncDrawable(mResources, mDefault,
-                    bitmapWorkerTask);
-            imageView.setImageDrawable(asyncDrawable);
-            try {
-                ApolloUtils.execute(false, bitmapWorkerTask, key,
-                        artistName, albumName, String.valueOf(albumId));
-            } catch (RejectedExecutionException e) {
-                // Executor has exhausted queue space, show default artwork
-                imageView.setImageBitmap(getDefaultArtwork());
-            }
-        }*/
     }
 
     /**
      * Used to define what type of image URL to fetch for, artist or album.
      */
     public enum ImageType {
-        ARTIST, ALBUM;
+        ARTIST, ALBUM
     }
-
 }
