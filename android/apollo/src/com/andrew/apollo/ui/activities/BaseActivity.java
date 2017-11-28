@@ -53,7 +53,6 @@ import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
-import com.andrew.apollo.widgets.theme.BottomActionBar;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
@@ -341,7 +340,7 @@ public abstract class BaseActivity extends AbstractActivity
     }
 
     private void setBottomActionBarVisible(boolean visible) {
-        final BottomActionBar bottomActionBar = findViewById(R.id.bottom_action_bar_parent);
+        View bottomActionBar = findViewById(R.id.bottom_action_bar_parent);
         bottomActionBar.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
