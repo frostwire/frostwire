@@ -56,9 +56,4 @@ public final class Config {
 
     /** a long[] with the ids of the tracks involved. */
     public static final String TRACKS = "tracks";
-
-    /**
-     * Play from search intent
-     */
-    public static final String PLAY_FROM_SEARCH = "android.media.action.MEDIA_PLAY_FROM_SEARCH";
 }

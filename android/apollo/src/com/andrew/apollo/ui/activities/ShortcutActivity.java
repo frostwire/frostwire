@@ -116,7 +116,7 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
         musicPlaybackService = IApolloService.Stub.asInterface(service);
 
         // Check for a voice query
-        if (mIntent != null && Config.PLAY_FROM_SEARCH.equals(mIntent.getAction())) {
+        if (mIntent != null && MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH.equals(mIntent.getAction())) {
             getLoaderManager().initLoader(0, null, mSongAlbumArtistQuery);
         } else if (musicPlaybackService != null) {
             AsyncHandler.post(new Runnable() {
