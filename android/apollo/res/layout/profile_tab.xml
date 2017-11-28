@@ -62,12 +62,13 @@
             android:layout_alignParentLeft="true"
             android:background="@color/transparent_black" />
 
-        <com.andrew.apollo.widgets.theme.Colorstrip
+        <View
             android:id="@+id/profile_tab_colorstrip"
             android:layout_width="match_parent"
             android:layout_height="@dimen/profile_indicator_height"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentLeft="true"
+            android:background="@color/holo_blue_light"/>
 
         <View
             android:id="@+id/profile_tab_alpha_overlay"
