@@ -56,7 +56,7 @@ public class SearchLoader extends SongLoader {
         try {
             mCursor = makeCursor(getContext());
         } catch (Throwable ignored) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         // Gather the data
@@ -115,7 +115,7 @@ public class SearchLoader extends SongLoader {
      * @param query The user's query.
      * @return The {@link Cursor} used to perform the search.
      */
-    public static Cursor makeSearchCursor(final Context context, final String query) {
+    private static Cursor makeSearchCursor(final Context context, final String query) {
         return context.getContentResolver().query(
                 Uri.parse("content://media/external/audio/search/fancy/" + Uri.encode(query)),
                 new String[] {

@@ -56,7 +56,7 @@ public class PlaylistSongLoader extends SongLoader {
      * @param playlistID The playlist the songs belong to.
      * @return The {@link Cursor} used to run the song query.
      */
-    public static Cursor makePlaylistSongCursor(final Context context, final Long playlistID) {
+    private static Cursor makePlaylistSongCursor(final Context context, final Long playlistID) {
         final StringBuilder mSelection = new StringBuilder();
         mSelection.append(AudioColumns.IS_MUSIC + "=1");
         mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$

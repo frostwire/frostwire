@@ -52,7 +52,7 @@ public class ArtistSongLoader extends SongLoader {
      * @param artistId The Id of the artist the songs belong to.
      * @return The {@link Cursor} used to run the query.
      */
-    public static Cursor makeArtistSongCursor(final Context context, final Long artistId) {
+    private static Cursor makeArtistSongCursor(final Context context, final Long artistId) {
         // Match the songs up with the artist
         final StringBuilder selection = new StringBuilder();
         selection.append(AudioColumns.IS_MUSIC + "=1");

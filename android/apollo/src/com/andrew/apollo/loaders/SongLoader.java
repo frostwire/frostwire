@@ -31,7 +31,7 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
-    private static Logger LOGGER = Logger.getLogger(SongLoader.class);
+    private static final Logger LOGGER = Logger.getLogger(SongLoader.class);
     /**
      * Constructor of <code>SongLoader</code>
      * 
@@ -53,12 +53,12 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
             mCursor = makeCursor(getContext());
         } catch (Throwable ignored) {
             LOGGER.error("SongLoader.loadInBackground(): " + ignored.getMessage(), ignored);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         if (mCursor == null) {
             //LOGGER.warn("loadInBackground() - cursor == null, returning empty list.");
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         // Gather the data

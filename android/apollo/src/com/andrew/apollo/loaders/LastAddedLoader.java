@@ -17,8 +17,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 
-import com.frostwire.util.Logger;
-
 /**
  * Used to query {MediaStore.Audio.Media.EXTERNAL_CONTENT_URI} and return
  * the Song the user added over the past four of weeks.
@@ -27,7 +25,7 @@ import com.frostwire.util.Logger;
  * @author Angel Leon (gubatron@gmail.com)
  */
 public class LastAddedLoader extends SongLoader {
-    private static Logger LOGGER = Logger.getLogger(LastAddedLoader.class);
+
     /**
      * Constructor of <code>LastAddedHandler</code>
      * 

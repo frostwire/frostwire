@@ -4,15 +4,12 @@ package com.andrew.apollo.loaders;
 import android.content.Context;
 import android.database.AbstractCursor;
 import android.database.Cursor;
-import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 import com.andrew.apollo.utils.MusicUtils;
 
 import java.util.Arrays;
-
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * A custom {@link Cursor} used to return the queue and allow for easy dragging
@@ -40,8 +37,6 @@ public class NowPlayingCursor extends AbstractCursor {
     private long[] mCursorIndexes;
 
     private int mSize;
-
-    private int mCurPos;
 
     private Cursor mQueueCursor;
 
@@ -79,7 +74,6 @@ public class NowPlayingCursor extends AbstractCursor {
         final long id = mNowPlaying[newPosition];
         final int cursorIndex = Arrays.binarySearch(mCursorIndexes, id);
         mQueueCursor.moveToPosition(cursorIndex);
-        mCurPos = newPosition;
         return true;
     }
 
@@ -248,7 +242,6 @@ public class NowPlayingCursor extends AbstractCursor {
             mQueueCursor.moveToNext();
         }
         mQueueCursor.moveToFirst();
-        mCurPos = -1;
 
         int removed = 0;
         for (int i = mNowPlaying.length - 1; i >= 0; i--) {
@@ -265,26 +258,5 @@ public class NowPlayingCursor extends AbstractCursor {
                 mCursorIndexes = null;
             }
         }
-    }
-
-    /**
-     * @param which The position to remove
-     * @return True if sucessfull, false othersise
-     */
-    public boolean removeItem(final int which) {
-        try {
-            if (musicPlaybackService.removeTracks(which, which) == 0) {
-                return false;
-            }
-            int i = which;
-            mSize--;
-            while (i < mSize) {
-                mNowPlaying[i] = mNowPlaying[i + 1];
-                i++;
-            }
-            onMove(-1, mCurPos);
-        } catch (final RemoteException ignored) {
-        }
-        return true;
     }
 }

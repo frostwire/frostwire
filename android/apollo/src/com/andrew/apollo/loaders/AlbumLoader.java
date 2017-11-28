@@ -53,7 +53,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
         try {
             mCursor = makeCursor(getContext());
         } catch (Throwable e) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         // Gather the data

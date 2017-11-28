@@ -86,7 +86,7 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the artist query.
      */
-    public static Cursor makeArtistCursor(final Context context) {
+    private static Cursor makeArtistCursor(final Context context) {
         try {
             return context.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
                     new String[]{

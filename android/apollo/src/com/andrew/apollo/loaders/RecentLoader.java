@@ -45,19 +45,19 @@ public class RecentLoader extends AlbumLoader {
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the album query.
      */
-    public static Cursor makeRecentCursor(final Context context) {
+    private static Cursor makeRecentCursor(final Context context) {
         return RecentStore
                 .getInstance(context)
                 .getReadableDatabase()
                 .query(RecentStoreColumns.NAME,
                         new String[] {
-                                RecentStoreColumns.ID + " as id",  /** 0 - id */
-                                RecentStoreColumns.ID,             /** 1 - albumid */
-                                RecentStoreColumns.ALBUMNAME,      /** 2 - itemname */
-                                RecentStoreColumns.ARTISTNAME,     /** 3 - artistname */
-                                RecentStoreColumns.ALBUMSONGCOUNT, /** 4 - albumsongcount */
-                                RecentStoreColumns.ALBUMYEAR,      /** 5 - albumyear */
-                                RecentStoreColumns.TIMEPLAYED      /** 6 - timeplayed */
+                                RecentStoreColumns.ID + " as id",  /* 0 - id */
+                                RecentStoreColumns.ID,             /* 1 - albumid */
+                                RecentStoreColumns.ALBUMNAME,      /* 2 - itemname */
+                                RecentStoreColumns.ARTISTNAME,     /* 3 - artistname */
+                                RecentStoreColumns.ALBUMSONGCOUNT, /* 4 - albumsongcount */
+                                RecentStoreColumns.ALBUMYEAR,      /* 5 - albumyear */
+                                RecentStoreColumns.TIMEPLAYED      /* 6 - timeplayed */
                         }, null, null, null, null, RecentStoreColumns.TIMEPLAYED + " DESC");
     }
 

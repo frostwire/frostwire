@@ -49,7 +49,7 @@ public class GenreSongLoader extends SongLoader {
      * @param genreId The Id of the genre the songs belong to.
      * @return The {@link Cursor} used to run the query.
      */
-    public static Cursor makeGenreSongCursor(final Context context, final Long genreId) {
+    private static Cursor makeGenreSongCursor(final Context context, final Long genreId) {
         // Match the songs up with the genre
         final StringBuilder selection = new StringBuilder();
         selection.append(MediaStore.Audio.Genres.Members.IS_MUSIC + "=1");
