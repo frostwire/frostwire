@@ -9,7 +9,7 @@ public class Capitalize {
     public Capitalize() {
     }
 
-    public static final String capitalize(String str) {
+    public static String capitalize(String str) {
         return capitalize(str, null);
     }
 
@@ -20,7 +20,7 @@ public class Capitalize {
      * @param delimiters The delimiters
      * @return A captitalized string
      */
-    public static final String capitalize(String str, char... delimiters) {
+    public static String capitalize(String str, char... delimiters) {
         final int delimLen = delimiters == null ? -1 : delimiters.length;
         if (TextUtils.isEmpty(str) || delimLen == 0) {
             return str;
@@ -46,7 +46,7 @@ public class Capitalize {
      * @param delimiters the delimiters
      * @return true if it is a delimiter
      */
-    private static final boolean isDelimiter(char ch, char[] delimiters) {
+    private static boolean isDelimiter(char ch, char[] delimiters) {
         if (delimiters == null) {
             return Character.isWhitespace(ch);
         }

@@ -96,22 +96,6 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
     }
 
     /**
-     * Scrolls the list to the currently playing artist when the user touches
-     * the header in the PagerTitleStrip.
-     */
-    public void scrollToCurrentArtist() {
-        final int currentArtistPosition = getItemPositionByArtist();
-
-        if (currentArtistPosition != 0) {
-            if (isSimpleLayout()) {
-                mListView.setSelection(currentArtistPosition);
-            } else {
-                mGridView.setSelection(currentArtistPosition);
-            }
-        }
-    }
-
-    /**
      * @return The position of an item in the list or grid based on the name of
      * the currently playing artist.
      */

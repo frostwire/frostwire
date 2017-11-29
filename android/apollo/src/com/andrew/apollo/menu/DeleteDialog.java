@@ -96,16 +96,16 @@ public final class DeleteDialog extends DialogFragment {
         final View inflator = inflater.inflate(R.layout.dialog_default, null);
         apolloDeleteFilesDialog.setView(inflator);
 
-        final TextView dialogTitle = (TextView) inflator.findViewById(R.id.dialog_default_title);
+        final TextView dialogTitle = inflator.findViewById(R.id.dialog_default_title);
         dialogTitle.setText(R.string.delete_files_title);
 
-        TextView text = (TextView) inflator.findViewById(R.id.dialog_default_text);
+        TextView text = inflator.findViewById(R.id.dialog_default_text);
         text.setText(R.string.are_you_sure_delete_files_text);
 
-        Button noButton = (Button) inflator.findViewById(R.id.dialog_default_button_no);
+        Button noButton = inflator.findViewById(R.id.dialog_default_button_no);
         noButton.setText(R.string.cancel);
 
-        Button yesButton = (Button) inflator.findViewById(R.id.dialog_default_button_yes);
+        Button yesButton = inflator.findViewById(R.id.dialog_default_button_yes);
         yesButton.setText(R.string.delete);
 
         noButton.setOnClickListener(new NegativeButtonOnClickListener());

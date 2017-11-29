@@ -49,12 +49,6 @@ public class FragmentMenuItems {
     /* Used to delete track(s) */
     public static final int DELETE = 9;
 
-    /* Used to fetch an artist image */
-    public static final int FETCH_ARTIST_IMAGE = 10;
-
-    /* Used to fetch album art */
-    public static final int FETCH_ALBUM_ART = 11;
-
     /* Used to set a track as a ringtone */
     public static final int USE_AS_RINGTONE = 12;
 
@@ -63,9 +57,6 @@ public class FragmentMenuItems {
 
     /* Used to remove a track from a playlist */
     public static final int REMOVE_FROM_PLAYLIST = 14;
-
-    /* Used to remove a track from the queue */
-    public static final int REMOVE_FROM_QUEUE = 15;
 
     /* Used to queue a track to be played next */
     public static final int PLAY_NEXT = 16;

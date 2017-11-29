@@ -321,7 +321,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 // screen. Definitely one of my favorite features.
                 final String name = isArtist() ? mArtistName : mProfileName;
                 final Long id = mArguments.getLong(Config.ID);
-                ApolloUtils.createShortcutIntentAsync(name, mArtistName, id, mType, Ref.weak((Activity) this));
+                ApolloUtils.createShortcutIntentAsync(name, mArtistName, id, mType, Ref.weak(this));
                 return true;
             }
             case R.id.menu_player_shuffle: {

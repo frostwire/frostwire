@@ -71,7 +71,6 @@ public class PhotoSelectionDialog extends DialogFragment {
      */
     @Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-        final String title = getTitle();
         if (mProfileType != null) {
             switch (mProfileType) {
                 case ARTIST:
@@ -114,18 +113,6 @@ public class PhotoSelectionDialog extends DialogFragment {
                         }
                     }
                 }).create();
-    }
-
-    private String getTitle() {
-        String title = null;
-        final Bundle arguments = getArguments();
-        if (arguments != null) {
-            title = arguments.getString(Config.NAME);
-        }
-        if (title == null) {
-            title = getActivity().getString(R.string.unknown);
-        }
-        return title;
     }
 
     /**
