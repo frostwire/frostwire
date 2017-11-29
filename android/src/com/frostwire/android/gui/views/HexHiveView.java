@@ -22,21 +22,15 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.Dimension;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.frostwire.android.R;
-import com.frostwire.util.Logger;
+import com.frostwire.jlibtorrent.PieceIndexBitfield;
 
 /**
  * @author aldenml
@@ -44,23 +38,145 @@ import com.frostwire.util.Logger;
  * @author marcelinkaaa
  *         Created on 11/23/17.
  */
-// TODO: data handling to be done with <T> templates
-// we should have a way to update the T[] dataModel
-public class HexHiveView extends View {
-    private static final Logger LOG = Logger.getLogger(HexHiveView.class);
-    private static final double SQRT_OF_THREE = 1.7320508075688772;
-    private Paint backgroundPaint;
+public class HexHiveView<T> extends View {
+    //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
+    private final boolean DEBUG = true;
     private Paint hexagonBorderPaint;
     private Paint emptyHexPaint;
     private Paint fullHexPaint;
     private Paint textPaint;
-    private Rect dimensions;
+    private DrawingProperties DP;
+    private HexDataAdapter adapter;
+
+    public interface HexDataAdapter<T> {
+        void updateData(T data);
+
+        int getCount();
+
+        boolean isFull(int hexOffset);
+    }
+
+    private final class DrawingProperties {
+        // Painting Area Configuration
+        /**
+         * Drawing area top-left
+         */
+        Point origin;
+
+        /**
+         * Drawing area center
+         */
+        Point center;
+
+        /**
+         * Drawing are bottom-right cornerBuffer
+         */
+        Point end;
+
+        /**
+         * Drawing area dimensions
+         */
+        Rect dimensions;
+
+        /**
+         * Drawing area width
+         */
+        private int width;
+
+        /**
+         * Drawing area height
+         */
+        private int height;
+        // Hexagon Geometry Helpers
+        /**
+         * Number of hexagons to draw
+         */
+        private int numHexs;
+
+        /**
+         * Side length of each hexagon
+         */
+        private float hexSideLength;
+
+        /**
+         * Height of each hexagon
+         */
+        private float hexHeight;
+
+        /**
+         * Width of each hexagon
+         */
+        private float hexWidth;
+
+        /**
+         * Number of hexagons to draw in even rows
+         */
+        private int maxEvenHexagons;
+
+        /**
+         * Number of hexagons to draw in odd rows
+         */
+        private int maxOddHexagons;
+
+        private final Point evenRowOrigin;
+
+        private final Point oddRowOrigin;
+
+        /**
+         * Point object we'll reuse to draw hexagons
+         * (Object creation and destruction must be avoided when calling onDraw())
+         */
+        private final Point hexCenterBuffer = new Point(-1, -1);
+
+        /**
+         * Point object we'll reuse to draw hexagon sides
+         * (Object creation and destruction must be avoided when calling onDraw())
+         */
+        private final Point cornerBuffer = new Point(-1, -1);
+
+        /**
+         * Point object we'll reuse to draw hexagon sides
+         * (Object creation and destruction must be avoided when calling onDraw())
+         */
+        private final Point lastCornerBuffer = new Point(-1, -1);
+
+        DrawingProperties(HexDataAdapter adapter) {
+            if (adapter == null) {
+                throw new RuntimeException("check your logic, you need a data adapter before calling initDrawingProperties");
+            }
+            // The canvas can paint the entire view, if padding has been defined,
+            // we won't draw outside the padded area.
+            dimensions = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+            origin = new Point(dimensions.left, dimensions.top);
+            center = new Point(dimensions.centerX(), dimensions.centerY());
+            end = new Point(dimensions.right, dimensions.bottom);
+            width = dimensions.width();
+            height = dimensions.height();
+            numHexs = adapter.getCount();
+            hexSideLength = getHexagonSideLength(width * height, numHexs);
+            hexHeight = getHexHeight(hexSideLength);
+            hexWidth = getHexWidth(hexSideLength);
+            evenRowOrigin = new Point(
+                    (int) (origin.x + (hexWidth / 2)),
+                    (int) (origin.y + (hexHeight / 2)));
+            // calculate number of hexagons in an even row
+            maxEvenHexagons = 0;
+            int rightSideX = (int) (evenRowOrigin.x + hexWidth / 2);
+            while (rightSideX < end.x) {
+                maxEvenHexagons++;
+                rightSideX += hexWidth;
+            }
+            oddRowOrigin = new Point(
+                    (int) (evenRowOrigin.x + hexWidth / 2),
+                    (int) (evenRowOrigin.y + hexHeight));
+            maxOddHexagons = maxEvenHexagons;
+        }
+    }
 
     public HexHiveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Resources r = getResources();
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.HexHiveView);
-        int backgroundColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_backgroundColor, r.getColor(R.color.basic_blue_dark));
         int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white));
         float borderWidth = typedArray.getFloat(R.styleable.HexHiveView_hexhive_borderWidth, 1.0f);
         int emptyColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_emptyColor, r.getColor(R.color.basic_gray_dark));
@@ -68,18 +184,20 @@ public class HexHiveView extends View {
         int textColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_textColor, r.getColor(R.color.white));
         float textSize = typedArray.getFloat(R.styleable.HexHiveView_hexhive_textSize, 20f);
         typedArray.recycle();
-        initPaints(backgroundColor, borderColor, borderWidth, emptyColor, fullColor, textColor, textSize);
+        initPaints(borderColor, borderWidth, emptyColor, fullColor, textColor, textSize);
     }
 
-    private void initPaints(int backgroundColor,
-                            int borderColor,
+    public void updateData(HexDataAdapter<T> hexDataAdapter) {
+        this.adapter = hexDataAdapter;
+        invalidate();
+    }
+
+    private void initPaints(int borderColor,
                             float borderWidth,
                             int emptyColor,
                             int fullColor,
                             int textColor,
                             float textSize) {
-        backgroundPaint = new Paint();
-        backgroundPaint.setColor(backgroundColor);
         hexagonBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hexagonBorderPaint.setColor(borderColor);
         hexagonBorderPaint.setStrokeWidth(borderWidth);
@@ -94,75 +212,89 @@ public class HexHiveView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // LETS TRY TO AVOID OBJECT ALLOCATIONS HERE.
-        //super.onDraw(canvas);
-        if (dimensions == null && getHeight() > 0 && getWidth() > 0) {
-            dimensions = new Rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getHeight() - getPaddingBottom());
+        // LETS TRY TO AVOID REPEATED OBJECT ALLOCATIONS HERE
+        if (DP == null && getHeight() > 0 && getWidth() > 0 && adapter != null) {
+            DP = new DrawingProperties(adapter);
         }
-        int sideLength = 0;
-        if (dimensions != null) {
-            canvas.drawRect(dimensions, backgroundPaint);
-            // TODO: Store all these initial parameters in a reusable object
-            sideLength = getHexagonSideLength(dimensions.width()*dimensions.height(),  100);
-            int hexHeight = getHexHeight(sideLength);
-            int hexWidth = getHexWidth(hexHeight);
-            int y = hexWidth/2;
-            for (int i=0; i < 7; i++) {
-                int x = (hexWidth / 2) + (hexWidth * i);
-                drawHexagon(x, y, sideLength, true, canvas, hexagonBorderPaint);
+        if (DP == null) {
+            // not ready yet (perhaps during animation or rotation)
+            return;
+        }
+
+        // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
+        DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
+        int drawnHexagons = 0;
+        boolean evenRow = true;
+        for (int i = 0;
+             i <= (evenRow ? DP.maxEvenHexagons : DP.maxOddHexagons) && drawnHexagons < DP.numHexs; // stop condition
+             i++) {
+            drawHexagon(DP, canvas, hexagonBorderPaint);
+            DP.hexCenterBuffer.x += DP.hexWidth;
+            drawnHexagons++;
+            if (i == (evenRow ? DP.maxEvenHexagons : DP.maxOddHexagons) - 1) {
+                evenRow = !evenRow;
+                DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
+                DP.hexCenterBuffer.y += DP.hexHeight;
+                i = 0;
             }
         }
-        canvas.drawText(String.format("HexHiveView Rect(l=%d,t=%d,r=%d,b=%d)\r\nSideLength=%d", dimensions.left, dimensions.top, dimensions.right, dimensions.bottom, sideLength), 25 + dimensions.left, 25 + dimensions.top, textPaint);
-    }
 
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        LOG.info(String.format("onSizeChanged(w=%d, h=%d, oldw=%d, oldh=%d)", w, h, oldw, oldh));
-        super.onSizeChanged(w, h, oldw, oldh);
+        if (DEBUG) {
+            canvas.drawLine(DP.origin.x, DP.origin.y, DP.end.x, DP.origin.y, textPaint); // ---
+            canvas.drawLine(DP.origin.x, DP.origin.y, DP.origin.x, DP.end.y, textPaint); // |
+            canvas.drawLine(DP.end.x, DP.end.y, DP.origin.x, DP.end.y, textPaint); // ---
+            canvas.drawLine(DP.end.x, DP.end.y, DP.end.x, DP.origin.y, textPaint); // ---
+        }
     }
 
     // Drawing/Geometry functions
-    private int getHexagonSideLength(int canvasArea, int numHexagons) {
-        return (int) Math.sqrt((2*canvasArea)/(numHexagons * SQRT_OF_THREE));
+    private float getHexagonSideLength(int canvasArea, int numHexagons) {
+        // if hexagons were squared...
+        double squaredBlockArea = canvasArea / numHexagons;
+        double squareSide = Math.sqrt(squaredBlockArea);
+        // hexagon height > hexagon width, we'll inscribe hexagon inside a square to obtain
+        // desired side length
+        return (float) (squareSide / 2);
     }
 
     /**
-     *
-     * @param out - a re-usable array holding [x,y] of the output corner to avoid object creation/destruction
-     * @param x - center.x of hexagon
-     * @param y - center.y of hexagon
-     * @param sideLength - length of hexagon side
-     * @param sideNumber - from 0 to 5
+     * @param outCorner    - a re-usable Point buffer to output the
+     * @param inCenter     - a reusable Point buffer representing the cente coordinates of a hexagon
+     * @param sideLength   - length of hexagon side
+     * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
      */
-    private void getHexCorner(int[] out, int x, int y, int sideLength, int sideNumber, boolean pointyTopped) {
-        double angle_rad = Math.toRadians(60 * sideNumber + (pointyTopped ? 30 : 0));
-        out[0] = (int) (x + sideLength * Math.cos(angle_rad));
-        out[1] = (int) (y + sideLength * Math.sin(angle_rad));
+    private void getHexCorner(final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
+        double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
+        outCorner.set((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
     }
 
-    private void drawHexagon(int x, int y, int sideLength, boolean pointyTopped, Canvas canvas, Paint paint) {
-        int[] corner = new int[2];
-        int[] lastCorner = new int[2];
-        for (int i=0; i < 7; i++) {
-            getHexCorner(corner, x, y, sideLength, i, pointyTopped);
-            if (i > 0) {
+    private void drawHexagon(final DrawingProperties DP,
+                             final Canvas canvas,
+                             final Paint paint) {
+        //canvas.drawText(String.format("%d,%d", DP.hexCenterBuffer.x, DP.hexCenterBuffer.y), DP.hexCenterBuffer.x, DP.hexCenterBuffer.y, paint);
+        for (int i = 0; i < 7; i++) {
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, i, DP.hexSideLength);
+            if (DP.lastCornerBuffer.x != -1 && DP.lastCornerBuffer.y != -1) {
+                // if we want to make it look like a cube, this is a beginning (drawing lines from the center to the vertice
+                //canvas.drawLine(DP.cornerBuffer.x, DP.cornerBuffer.y, DP.hexCenterBuffer.x, DP.hexCenterBuffer.y, paint);
                 canvas.drawLine(
-                        lastCorner[0],
-                        lastCorner[1],
-                        corner[0],
-                        corner[1],
+                        DP.cornerBuffer.x,
+                        DP.cornerBuffer.y,
+                        DP.lastCornerBuffer.x,
+                        DP.lastCornerBuffer.y,
                         paint);
             }
-            lastCorner[0] = corner[0];
-            lastCorner[1] = corner[1];
+            DP.lastCornerBuffer.set(DP.cornerBuffer.x, DP.cornerBuffer.y);
         }
+        DP.cornerBuffer.set(-1, -1);
+        DP.lastCornerBuffer.set(-1, -1);
     }
 
-    private int getHexWidth(int height) {
-        return (int) (SQRT_OF_THREE / 2 * height);
+    private float getHexWidth(float sideLength) {
+        return (float) Math.cos(Math.toRadians(30)) * (sideLength * 2);
     }
 
-    private int getHexHeight(int sideLength) {
-        return sideLength*2;
+    private float getHexHeight(float sideLength) {
+        return sideLength * 2;
     }
 }
