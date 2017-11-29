@@ -108,11 +108,11 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="15dp"
             android:visibility="visible"
-            app:hexhive_backgroundColor="@color/basic_blue"
+            android:background="@color/basic_blue"
             app:hexhive_textSize="30.0"
-            app:hexhive_borderWidth="2"/>
+            app:hexhive_borderWidth="1"/>
 
     </LinearLayout>
 

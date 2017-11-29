@@ -18,14 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.content.res.Resources;
-import android.graphics.PorterDuff;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,9 +41,8 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
     private HexHiveView hexHiveView;
-    //private RecyclerView recyclerView;
+    private HexHiveView.HexDataAdapter<PieceIndexBitfield> hexDataAdapter;
     private ProgressBar progressBar;
-    //private PieceAdapter adapter;
     private int totalPieces;
 
 
@@ -93,124 +85,59 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
         PieceIndexBitfield pieces = status.pieces();
-        if (/*adapter == null && */isAdded()) {
-
-            //Resources r = getResources();
-
+        if (isAdded()) {
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
             pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-
-            /*adapter = new PieceAdapter(torrentInfo.numPieces(),
-                    pieces,
-                    r.getColor(R.color.basic_blue_highlight),
-                    r.getColor(R.color.basic_gray_dark));*/
+            hexDataAdapter = new PieceAdapter(pieces);
         }
-        //if (adapter != null) {
-            //recyclerView.setAdapter(adapter);
+        if (hexDataAdapter != null) {
+            hexHiveView.updateData(hexDataAdapter);
             if (status.pieces().count() > 0) {
                 progressBar.setVisibility(View.GONE);
                 hexHiveView.setVisibility(View.VISIBLE);
-                //recyclerView.setVisibility(View.VISIBLE);
             }
-        //}
-        if (totalPieces == -1) {
-            totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
-            piecesNumberTextView.setText(totalPieces + "");
-        }
-        piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
-        //if (adapter != null) {
-            if (pieces.count() > 0) {
-                //adapter.updateData(pieces);
-                progressBar.setVisibility(View.GONE);
-                //recyclerView.setVisibility(View.VISIBLE);
-                hexHiveView.setVisibility(View.VISIBLE);
-            } else {
-                progressBar.setVisibility(View.VISIBLE);
-                hexHiveView.setVisibility(View.GONE);
-                //recyclerView.setVisibility(View.GONE);
+
+            if (totalPieces == -1) {
+                totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
+                piecesNumberTextView.setText(totalPieces + "");
             }
-        //}
-    }
-
-    // making this abstraction instead of using 'Boolean'
-    // in case we want to extend functionality to show things
-    // like exact piece size, piece hash, piece availability (before it's downloaded)
-    // This tab could be a lot more rich when the app evolves for Android Desktop/TV
-    private static final class Piece {
-        int offset;
-        boolean downloaded;
-
-        Piece(int offset, boolean downloaded) {
-            this.offset = offset;
-            this.downloaded = downloaded;
+            piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
+            if (hexDataAdapter != null) {
+                if (pieces.count() > 0) {
+                    hexDataAdapter.updateData(pieces);
+                    progressBar.setVisibility(View.GONE);
+                    hexHiveView.setVisibility(View.VISIBLE);
+                } else {
+                    progressBar.setVisibility(View.VISIBLE);
+                    hexHiveView.setVisibility(View.GONE);
+                }
+            }
         }
     }
 
-    /**
-    private static final class PieceViewHolder extends RecyclerView.ViewHolder {
-        private Piece piece;
-        private final ImageView circleView;
-        private final int downloadedColor;
-        private final int notDownloadedColor;
+    final class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
+        private PieceIndexBitfield pieceIndexBitfield;
+        private int count;
 
-        public PieceViewHolder(View itemView, int downloadedColor, int notDownloadedColor) {
-            super(itemView);
-            circleView = itemView.findViewById(R.id.view_transfer_detail_piece_image_view);
-            this.downloadedColor = downloadedColor;
-            this.notDownloadedColor = notDownloadedColor;
+        public PieceAdapter(PieceIndexBitfield pieces) {
+            updateData(pieces);
         }
 
-        public void updatePiece(Piece piece) {
-            if (this.piece == null) {
-                this.piece = piece;
-            } else {
-                this.piece.downloaded = piece.downloaded;
-                this.piece.offset = piece.offset;
-            }
-            if (circleView == null) {
-                return;
-            }
-            circleView.setColorFilter(piece.downloaded ? downloadedColor : notDownloadedColor, PorterDuff.Mode.SRC_IN);
-            circleView.invalidate();
+        @Override
+        public void updateData(PieceIndexBitfield data) {
+            pieceIndexBitfield = data;
+            count = pieceIndexBitfield.endIndex() + 1;
+        }
+
+        @Override
+        public int getCount() {
+            return count;
+        }
+
+        @Override
+        public boolean isFull(int hexOffset) {
+            return pieceIndexBitfield.getBit(hexOffset);
         }
     }
-     */
-
-    /**
-    private static final class PieceAdapter extends RecyclerView.Adapter<PieceViewHolder> {
-        private final int totalPieces;
-        private final int downloadedColor;
-        private final int notDownloadedColor;
-        private PieceIndexBitfield pieces;
-
-        PieceAdapter(int totalPieces, PieceIndexBitfield pieces, int downloadedColor, int notDownloadedColor) {
-            this.totalPieces = totalPieces;
-            this.pieces = pieces;
-            this.downloadedColor = downloadedColor;
-            this.notDownloadedColor = notDownloadedColor;
-        }
-
-        @Override
-        public PieceViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new PieceViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_piece, null), downloadedColor, notDownloadedColor);
-        }
-
-        @Override
-        public void onBindViewHolder(PieceViewHolder holder, int position) {
-            if (pieces != null && pieces.count() > 0 && position <= pieces.endIndex() ) {
-                holder.updatePiece(new Piece(position, pieces.getBit(position)));
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return totalPieces;
-        }
-
-        public void updateData(PieceIndexBitfield pieces) {
-            this.pieces = pieces;
-            notifyDataSetChanged();
-        }
-    }*/
 }
