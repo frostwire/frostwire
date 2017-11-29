@@ -1,8 +1,8 @@
 frostwire (6.6.1) stable; urgency=high
-  * New jlibtorrent 1.2.0.14
+  * New jlibtorrent 1.2.0.15-RC3
   * TPB domain update
 	
- -- FrostWire Team <contact@frostwire.com>  Tue, 14 Nov 2017 13:32:19 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 29 Nov 2017 13:46:08 -0600
 
 frostwire (6.6.0) stable; urgency=high
   * New jlibtorrent 1.2.0.13-RC14, storage and upnp related crashes fixed
