@@ -102,7 +102,6 @@
     </declare-styleable>
 
     <declare-styleable name="HexHiveView">
-        <attr name="hexhive_backgroundColor" format="color"/>
         <attr name="hexhive_hexBorderColor" format="color"/>
         <attr name="hexhive_borderWidth" format="float"/>
         <attr name="hexhive_emptyColor" format="color" />
