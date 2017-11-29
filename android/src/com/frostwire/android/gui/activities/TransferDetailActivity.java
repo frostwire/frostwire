@@ -137,7 +137,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
-        subscription = TimerService.subscribe(this, 2);
+        subscription = TimerService.subscribe(this, 4);
         onTime();
     }
 
