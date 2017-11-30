@@ -109,6 +109,7 @@
         <attr name="hexhive_textColor" format="color"/>
         <attr name="hexhive_debugLinesColor" format="color"/>
         <attr name="hexhive_textSize" format="float"/>
+        <attr name="hexhive_debug" format="boolean" />
     </declare-styleable>
 
 </resources>
