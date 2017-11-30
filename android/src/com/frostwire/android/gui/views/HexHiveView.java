@@ -40,7 +40,7 @@ import com.frostwire.android.R;
  */
 public class HexHiveView<T> extends View {
     //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
-    private final boolean DEBUG = true;
+    private boolean debug = true;
     private Paint hexagonBorderPaint;
     private Paint emptyHexPaint;
     private Paint fullHexPaint;
@@ -183,6 +183,7 @@ public class HexHiveView<T> extends View {
         int debugLinesColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_debugLinesColor, r.getColor(R.color.black));
         int textColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_textColor, r.getColor(R.color.white));
         float textSize = typedArray.getFloat(R.styleable.HexHiveView_hexhive_textSize, 20f);
+        debug = typedArray.getBoolean(R.styleable.HexHiveView_hexhive_debug, false);
         typedArray.recycle();
         initPaints(borderColor, borderWidth, emptyColor, fullColor, debugLinesColor, textColor, textSize);
     }
@@ -239,22 +240,22 @@ public class HexHiveView<T> extends View {
              i < DP.maxHexagonsPerRow && drawnHexagons < DP.numHexs;
              i++) {
             drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint);
-            DP.hexCenterBuffer.x += DP.hexWidth;
+            DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth()*3);
             drawnHexagons++;
             if (i == DP.maxHexagonsPerRow-1) {
                 evenRow = !evenRow;
                 DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-                DP.hexCenterBuffer.y += DP.hexHeight;
+                DP.hexCenterBuffer.y += DP.hexHeight -  (hexagonBorderPaint.getStrokeWidth()*3);
                 if (!evenRow) {
-                    i = 0;
+                    i = 0; // will start at i=1
                 } else {
-                    i = -1;
+                    i = -1; // will start at i=0
                 }
             }
             pieceIndex++;
         }
 
-        if (DEBUG) {
+        if (debug) {
             canvas.drawLine(DP.origin.x, DP.origin.y, DP.end.x, DP.origin.y, debugLinesPaint);
             canvas.drawLine(DP.origin.x, DP.origin.y, DP.origin.x, DP.end.y, debugLinesPaint);
             canvas.drawLine(DP.end.x, DP.end.y, DP.origin.x, DP.end.y, debugLinesPaint);
@@ -265,11 +266,11 @@ public class HexHiveView<T> extends View {
     // Drawing/Geometry functions
     private float getHexagonSideLength(int canvasArea, int numHexagons) {
         // if hexagons were squared...
-        double squaredBlockArea = (canvasArea / numHexagons) * 1.5;
+        double squaredBlockArea = canvasArea / numHexagons;
         double squareSide = Math.sqrt(squaredBlockArea);
-        // hexagon height > hexagon width, we'll inscribe hexagon inside a square to obtain
-        // desired side length
-        return (float) Math.ceil(squareSide / 2);
+        double hexWidth = squareSide;
+        float sideLength = getSideLength((float) hexWidth);
+        return sideLength;
     }
 
     /**
@@ -303,11 +304,15 @@ public class HexHiveView<T> extends View {
         DP.cornerBuffer.set(-1, -1);
     }
 
+    private float getSideLength(float hexWidth) {
+        return (float) (hexWidth / (2 * Math.cos(Math.toRadians(30))));
+    }
+
     private float getHexWidth(float sideLength) {
-        return (float) Math.floor(Math.cos(Math.toRadians(30)) * (sideLength * 2));
+        return (float) Math.cos(Math.toRadians(30)) * (sideLength * 2);
     }
 
     private float getHexHeight(float sideLength) {
-        return (sideLength-1) * 2;
+        return (float) (4 * (Math.sin(Math.toRadians(30)) * sideLength));
     }
 }
