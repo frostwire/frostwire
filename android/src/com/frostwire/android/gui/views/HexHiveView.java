@@ -48,11 +48,14 @@ public class HexHiveView<T> extends View {
     private Paint debugLinesPaint;
     private DrawingProperties DP;
     private HexDataAdapter adapter;
+    private int lastKnownPieceCount;
 
     public interface HexDataAdapter<T> {
         void updateData(T data);
 
-        int getCount();
+        int getTotalHexagonsCount();
+
+        int getFullHexagonsCount();
 
         boolean isFull(int hexOffset);
     }
@@ -153,7 +156,7 @@ public class HexHiveView<T> extends View {
             end = new Point(dimensions.right, dimensions.bottom);
             width = dimensions.width();
             height = dimensions.height();
-            numHexs = adapter.getCount();
+            numHexs = adapter.getTotalHexagonsCount();
             hexSideLength = getHexagonSideLength(width * height, numHexs);
             hexHeight = getHexHeight(hexSideLength) - 2 * hexBorderStrokeWidth;
             hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
@@ -170,6 +173,7 @@ public class HexHiveView<T> extends View {
 
     public HexHiveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        lastKnownPieceCount = -1;
         Resources r = getResources();
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.HexHiveView);
         int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white));
@@ -180,12 +184,15 @@ public class HexHiveView<T> extends View {
         int textColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_textColor, r.getColor(R.color.white));
         float textSize = typedArray.getFloat(R.styleable.HexHiveView_hexhive_textSize, 20f);
         typedArray.recycle();
-        initPaints(borderColor, borderWidth, emptyColor, debugLinesColor, fullColor, textColor, textSize);
+        initPaints(borderColor, borderWidth, emptyColor, fullColor, debugLinesColor, textColor, textSize);
     }
 
     public void updateData(HexDataAdapter<T> hexDataAdapter) {
         this.adapter = hexDataAdapter;
-        invalidate();
+        if (adapter.getFullHexagonsCount() != lastKnownPieceCount) {
+            lastKnownPieceCount = adapter.getFullHexagonsCount();
+            invalidate();
+        }
     }
 
     private void initPaints(int borderColor,
@@ -297,7 +304,7 @@ public class HexHiveView<T> extends View {
     }
 
     private float getHexWidth(float sideLength) {
-        return (float) Math.cos(Math.toRadians(30)) * (sideLength * 2);
+        return (float) Math.floor(Math.cos(Math.toRadians(30)) * (sideLength * 2));
     }
 
     private float getHexHeight(float sideLength) {
