@@ -118,7 +118,8 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
     final class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
         private PieceIndexBitfield pieceIndexBitfield;
-        private int count;
+        private int totalPieces;
+        private int downloadedPieces;
 
         public PieceAdapter(PieceIndexBitfield pieces) {
             updateData(pieces);
@@ -127,12 +128,18 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         @Override
         public void updateData(PieceIndexBitfield data) {
             pieceIndexBitfield = data;
-            count = pieceIndexBitfield.endIndex() + 1;
+            totalPieces = pieceIndexBitfield.endIndex() + 1;
+            downloadedPieces = pieceIndexBitfield.count();
         }
 
         @Override
-        public int getCount() {
-            return count;
+        public int getTotalHexagonsCount() {
+            return totalPieces;
+        }
+
+        @Override
+        public int getFullHexagonsCount() {
+            return downloadedPieces;
         }
 
         @Override
