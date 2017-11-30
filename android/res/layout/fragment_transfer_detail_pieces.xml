@@ -116,7 +116,8 @@
             app:hexhive_hexBorderColor="@color/basic_blue_dark"
             app:hexhive_fullColor="@color/basic_blue_highlight"
             app:hexhive_emptyColor="@color/basic_gray_light"
-            app:hexhive_debugLinesColor="#ffff0000"/>
+            app:hexhive_debugLinesColor="#ffff0000"
+            app:hexhive_debug="true"/>
 
     </LinearLayout>
 
