@@ -21,7 +21,6 @@ package com.frostwire.android.gui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -388,11 +387,6 @@ public final class BuyActivity extends AbstractActivity {
             setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
             finish();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return UIUtils.finishOnHomeOptionItemSelected(this, item);
     }
 
     private boolean isInterstitial() {

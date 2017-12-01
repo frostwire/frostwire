@@ -31,7 +31,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -56,7 +55,6 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -365,23 +363,6 @@ public final class UIUtils {
             dismissCheckButton.setOnClickListener(v -> socialLinksDialog.dismiss());
         }
         socialLinksDialog.show();
-    }
-
-    public static boolean finishOnHomeOptionItemSelected(Activity activity, MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                activity.finish();
-                return true;
-            default:
-                Class<?> superclass = activity.getClass().getSuperclass();
-                try {
-                    Method onOptionsItemSelectedMethod = superclass.getDeclaredMethod("onOptionsItemSelected", MenuItem.class);
-                    return (Boolean) onOptionsItemSelectedMethod.invoke(activity, item);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
-        }
-        return false;
     }
 
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
