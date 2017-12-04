@@ -32,11 +32,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+
+import javax.net.ssl.SSLException;
 
 /**
  * @author gubatron
@@ -251,14 +254,11 @@ public abstract class BaseHttpDownload implements Transfer {
                 complete(TransferState.ERROR_DISK_FULL);
             }
 
-            if (e.getMessage() != null  && e.getMessage().contains("Connection timed out")) {
-                //javax.net.ssl.SSLException: Read error: ssl=0xd5ba0bc0: I/O error during system call, Connection timed out
+            if (e instanceof SSLException) {
                 complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
             }
 
-            // TODO: research here for an actual difference between
-            // no internet and no network
-            if (Platforms.get().networkType() == Platform.NetworkType.NONE) {
+            if (e instanceof UnknownHostException) {
                 complete(TransferState.ERROR_NO_INTERNET);
             }
         }
