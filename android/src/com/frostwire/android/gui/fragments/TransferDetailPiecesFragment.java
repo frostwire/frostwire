@@ -101,16 +101,15 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             if (totalPieces == -1) {
                 totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
                 piecesNumberTextView.setText(totalPieces + "");
+                progressBar.setVisibility(View.VISIBLE);
+                hexHiveView.setVisibility(View.GONE);
             }
             piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
             if (hexDataAdapter != null) {
-                if (pieces.count() > 0) {
+                if (pieces.count() >= 0) {
                     hexDataAdapter.updateData(pieces);
                     progressBar.setVisibility(View.GONE);
                     hexHiveView.setVisibility(View.VISIBLE);
-                } else {
-                    progressBar.setVisibility(View.VISIBLE);
-                    hexHiveView.setVisibility(View.GONE);
                 }
             }
         }
@@ -144,6 +143,9 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
         @Override
         public boolean isFull(int hexOffset) {
+            if (totalPieces == downloadedPieces) {
+                return true;
+            }
             return pieceIndexBitfield.getBit(hexOffset);
         }
     }
