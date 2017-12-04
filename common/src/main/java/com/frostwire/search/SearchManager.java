@@ -17,26 +17,12 @@
 
 package com.frostwire.search;
 
-import com.frostwire.platform.AppSettings;
-import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
-import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.filter.SearchTable;
-import com.frostwire.search.frostclick.FrostClickSearchPerformer;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.pixabay.PixabaySearchPerformer;
-import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
-import com.frostwire.search.torlock.TorLockSearchPerformer;
-import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.tpb.TPBSearchPerformer;
-import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.youtube.YouTubeSearchPerformer;
-import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,7 +45,7 @@ public final class SearchManager {
     private SearchListener listener;
 
     private SearchManager(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
+        this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
         this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
     }
@@ -331,107 +317,4 @@ public final class SearchManager {
             }
         }
     }
-
-    // search engines
-
-    private static final int DEFAULT_SEARCH_PERFORMER_TIMEOUT = 10000;
-
-    private static final SearchEngine YOUTUBE = new SearchEngine("YouTube", AppSettings.SEARCH_YOUTUBE_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new YouTubeSearchPerformer("www.youtube.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", AppSettings.SEARCH_SOUNDCLOUD_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new SoundcloudSearchPerformer("api.sndcdn.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine ARCHIVE = new SearchEngine("Archive", AppSettings.SEARCH_ARCHIVE_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new ArchiveorgSearchPerformer("archive.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine FROSTCLICK = new SearchEngine("FrostClick", AppSettings.SEARCH_FROSTCLICK_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new FrostClickSearchPerformer("api.frostclick.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT, null);
-        }
-    };
-
-    private static final SearchEngine TORLOCK = new SearchEngine("TorLock", AppSettings.SEARCH_TORLOCK_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new TorLockSearchPerformer("www.torlock.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", AppSettings.SEARCH_TORRENTDOWNLOADS_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new TorrentDownloadsSearchPerformer("www.torrentdownloads.me", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", AppSettings.SEARCH_LIMETORRENTS_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine EZTV = new SearchEngine("Eztv", AppSettings.SEARCH_EZTV_ENABLED) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new EztvSearchPerformer("eztv.ag", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine TPB = new SearchEngine("TPB", AppSettings.SEARCH_TBP_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new TPBSearchPerformer("thepiratebay.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine YIFY = new SearchEngine("Yify", AppSettings.SEARCH_YIFY_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    static final SearchEngine ZOOQLE = new SearchEngine("Zooqle", AppSettings.SEARCH_ZOOQLE_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new ZooqleSearchPerformer("zooqle.com", token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    static final SearchEngine PIXABAY = new SearchEngine("Pixabay", AppSettings.SEARCH_PIXABAY_ENABLED, false) {
-        @Override
-        public SearchPerformer newPerformer(long token, String keywords) {
-            return new PixabaySearchPerformer(token, keywords, DEFAULT_SEARCH_PERFORMER_TIMEOUT);
-        }
-    };
-
-    @SuppressWarnings("unused")
-    private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
-            YIFY,
-            YOUTUBE,
-            FROSTCLICK,
-            PIXABAY,
-            TPB,
-            ZOOQLE,
-            SOUNCLOUD,
-            ARCHIVE,
-            LIMETORRENTS,
-            TORLOCK,
-            TORRENTDOWNLOADS,
-            EZTV);
 }
