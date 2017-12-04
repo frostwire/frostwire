@@ -78,12 +78,6 @@ public interface Platform {
         WIFI,
 
         /**
-         * The Default WiMAX data connection.  When active, all data traffic
-         * will use this connection by default.
-         */
-        WIMAX,
-
-        /**
          * The Default Bluetooth data connection. When active, all data traffic
          * will use this connection by default.
          */

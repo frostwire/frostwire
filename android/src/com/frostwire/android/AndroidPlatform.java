@@ -80,10 +80,6 @@ public final class AndroidPlatform extends AbstractPlatform {
             return NetworkType.WIFI;
         }
 
-        if (networkManager.isDataWiMAXUp(connectivityManager)) {
-            return NetworkType.WIMAX;
-        }
-
         return NetworkType.NONE;
     }
 
