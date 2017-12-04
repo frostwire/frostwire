@@ -361,7 +361,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
                 return this.ranges;
             } else {
                 /* unknown range header format! */
-                System.out.println(contentRange + " format is unknown!");
+                //System.out.println(contentRange + " format is unknown!");
             }
         }
         return null;

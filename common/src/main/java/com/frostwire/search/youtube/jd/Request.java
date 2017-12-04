@@ -119,7 +119,7 @@ public abstract class Request {
             okay = true;
         } catch (final IOException e) {
             if (e.toString().contains("end of ZLIB") || e.toString().contains("Premature") || e.toString().contains("Corrupt GZIP trailer")) {
-                System.out.println("Try workaround for " + e);
+                //System.out.println("Try workaround for " + e);
                 okay = true;
             } else {
                 throw e;
@@ -278,7 +278,7 @@ public abstract class Request {
                     this.htmlCode = new String(this.byteArray, "ISO-8859-1");
                     return this.htmlCode;
                 } catch (final Exception e) {
-                    System.out.println("could neither charset: " + useCS + " nor default charset");
+                    //System.out.println("could neither charset: " + useCS + " nor default charset");
                     /* fallback to default charset in error case */
                     this.htmlCode = new String(this.byteArray);
                     return this.htmlCode;

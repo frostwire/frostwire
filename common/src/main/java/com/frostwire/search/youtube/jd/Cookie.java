@@ -109,7 +109,7 @@ public class Cookie {
             return false;
         }
         if (this.hostTime == -1) {
-            System.out.println("Cookie: no HostTime found! ExpireStatus cannot be checked " + this.host + " " + this.key);
+            //System.out.println("Cookie: no HostTime found! ExpireStatus cannot be checked " + this.host + " " + this.key);
             return false;
         } else {
             final long timediff = this.creationTime - this.hostTime;
@@ -153,7 +153,7 @@ public class Cookie {
             return;
         }
         this.expireTime = -1;
-        System.out.println("Cookie: no Format for " + expires + " found!");
+        //System.out.println("Cookie: no Format for " + expires + " found!");
     }
 
     public void setHost(final String host) {
@@ -177,7 +177,7 @@ public class Cookie {
             return;
         }
         this.hostTime = -1;
-        System.out.println("Cookie: no Format for " + date + " found!");
+        //System.out.println("Cookie: no Format for " + date + " found!");
     }
 
     public void setKey(final String key) {
