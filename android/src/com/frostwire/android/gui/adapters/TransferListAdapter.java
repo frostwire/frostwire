@@ -735,7 +735,6 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                 }
             } else if (tag instanceof File) {
                 File path = (File) tag;
-                System.out.println(path);
 
                 if (path.exists()) {
                     UIUtils.openFile(ctx, path);
