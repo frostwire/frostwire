@@ -1,31 +1,28 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.support.v4.provider.DocumentFile;
 
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat_t;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
@@ -49,22 +46,8 @@ public final class AndroidPlatform extends AbstractPlatform {
 
     private static final int VERSION_CODE_LOLLIPOP = 21;
 
-    private final int sdk;
-
     public AndroidPlatform(Application app) {
         super(buildFileSystem(app), new AndroidPaths(app), new AndroidSettings());
-
-        this.sdk = Build.VERSION.SDK_INT;
-    }
-
-    @Override
-    public boolean android() {
-        return true;
-    }
-
-    @Override
-    public int androidVersion() {
-        return sdk;
     }
 
     @Override
@@ -81,8 +64,8 @@ public final class AndroidPlatform extends AbstractPlatform {
      * This method determines if the file {@code f} is protected by
      * the SAF framework because it's in the real external SD card.
      *
-     * @param f
-     * @return
+     * @param f the file
+     * @return if protected by SAF
      */
     public static boolean saf(File f) {
         Platform p = Platforms.get();
@@ -127,7 +110,7 @@ public final class AndroidPlatform extends AbstractPlatform {
 
         private final LollipopFileSystem fs;
 
-        public PosixCalls(LollipopFileSystem fs) {
+        PosixCalls(LollipopFileSystem fs) {
             this.fs = fs;
         }
 
