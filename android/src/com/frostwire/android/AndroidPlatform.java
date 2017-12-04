@@ -68,22 +68,6 @@ public final class AndroidPlatform extends AbstractPlatform {
     }
 
     @Override
-    public NetworkType networkType() {
-        NetworkManager networkManager = NetworkManager.instance();
-        ConnectivityManager connectivityManager = networkManager.getConnectivityManager();
-
-        if (networkManager.isDataMobileUp(connectivityManager)) {
-            return NetworkType.MOBILE;
-        }
-
-        if (networkManager.isDataWIFIUp(connectivityManager)) {
-            return NetworkType.WIFI;
-        }
-
-        return NetworkType.NONE;
-    }
-
-    @Override
     public VPNMonitor vpn() {
         return null;
     }

@@ -46,52 +46,5 @@ public interface Platform {
      */
     int androidVersion();
 
-    /**
-     * Returns the current network type.
-     * <p/>
-     * This is the type of the network that the packages will
-     * be routed through by default.
-     *
-     * @return
-     */
-    NetworkType networkType();
-
     VPNMonitor vpn();
-
-    enum NetworkType {
-
-        /**
-         * The absence of APN.
-         */
-        NONE,
-
-        /**
-         * The Default Mobile data connection.  When active, all data traffic
-         * will use this connection by default.
-         */
-        MOBILE,
-
-        /**
-         * The Default WIFI data connection.  When active, all data traffic
-         * will use this connection by default.
-         */
-        WIFI,
-
-        /**
-         * The Default Bluetooth data connection. When active, all data traffic
-         * will use this connection by default.
-         */
-        BLUETOOTH,
-
-        /**
-         * The Default Ethernet data connection.  When active, all data traffic
-         * will use this connection by default.
-         */
-        ETHERNET,
-
-        /**
-         *
-         */
-        UNKNOWN
-    }
 }

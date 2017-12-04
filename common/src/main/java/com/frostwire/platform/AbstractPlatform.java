@@ -68,9 +68,4 @@ public abstract class AbstractPlatform implements Platform {
     public int androidVersion() {
         return -1;
     }
-
-    @Override
-    public NetworkType networkType() {
-        return NetworkType.UNKNOWN;
-    }
 }
