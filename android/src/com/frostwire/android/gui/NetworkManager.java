@@ -19,9 +19,12 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
@@ -160,20 +163,15 @@ public final class NetworkManager {
         @Override
         public void run() {
             NetworkManager manager = NetworkManager.instance();
-            NetworkStatusListener listener = manager.networkStatusListener;
-
-            if (listener == null) { // early return
+            if (!Ref.alive(manager.contextRef)) {
                 return;
             }
-
+            Application context = manager.contextRef.get();
             ConnectivityManager connectivityManager = manager.getConnectivityManager();
             boolean isDataUp = manager.isDataUp(connectivityManager);
-            boolean isDataWIFIUp = manager.isDataWIFIUp(connectivityManager);
-            boolean isDataMobileUp = manager.isDataMobileUp(connectivityManager);
-            try {
-                listener.onNetworkStatusChange(isDataUp, isDataWIFIUp, isDataMobileUp);
-            } catch (Throwable t) {
-                t.printStackTrace();
+            if (!isDataUp) {
+                Intent intent = new Intent(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
         }
     }

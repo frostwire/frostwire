@@ -348,8 +348,10 @@ public class MainActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver,
-                new IntentFilter(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, intentFilter);
 
         setupDrawer();
 
@@ -371,6 +373,8 @@ public class MainActivity extends AbstractActivity implements
         }
 
         tryOnResumeInterstitial();
+
+        NetworkManager.instance().notifyNetworkStatusListeners();
     }
 
     @Override
@@ -1020,6 +1024,7 @@ public class MainActivity extends AbstractActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+
             if (Constants.ACTION_NOTIFY_UPDATE_AVAILABLE.equals(action)) {
                 boolean value = intent.getBooleanExtra("value", false);
                 Intent mainActivityIntent = getIntent();
@@ -1027,6 +1032,11 @@ public class MainActivity extends AbstractActivity implements
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
                 updateNavigationMenu(value);
+            }
+
+            if (Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION.equals(action)) {
+                UIUtils.showDismissableMessage(findView(android.R.id.content),
+                        R.string.no_data_check_internet_connection);
             }
         }
     }
