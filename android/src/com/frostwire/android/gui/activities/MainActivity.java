@@ -1019,12 +1019,15 @@ public class MainActivity extends AbstractActivity implements
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean value = intent.getBooleanExtra("value", false);
-            Intent mainActivityIntent = getIntent();
-            if (mainActivityIntent != null) {
-                mainActivityIntent.putExtra("updateAvailable", value);
+            String action = intent.getAction();
+            if (Constants.ACTION_NOTIFY_UPDATE_AVAILABLE.equals(action)) {
+                boolean value = intent.getBooleanExtra("value", false);
+                Intent mainActivityIntent = getIntent();
+                if (mainActivityIntent != null) {
+                    mainActivityIntent.putExtra("updateAvailable", value);
+                }
+                updateNavigationMenu(value);
             }
-            updateNavigationMenu(value);
         }
     }
 }
