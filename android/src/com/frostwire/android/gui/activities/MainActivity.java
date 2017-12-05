@@ -135,7 +135,7 @@ public class MainActivity extends AbstractActivity implements
         controller = new MainController(this);
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
-        notifyUpdateReceiver = new UpdateNavigationMenuBroadcastReceiver(this);
+        notifyUpdateReceiver = new UpdateNavigationMenuBroadcastReceiver();
     }
 
     @Override
@@ -1015,23 +1015,16 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private static final class UpdateNavigationMenuBroadcastReceiver extends BroadcastReceiver {
-        private final WeakReference<MainActivity> activityRef;
-
-        UpdateNavigationMenuBroadcastReceiver(MainActivity activity) {
-            activityRef = Ref.weak(activity);
-        }
+    private final class UpdateNavigationMenuBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Ref.alive(activityRef)) {
-                boolean value = intent.getBooleanExtra("value", false);
-                Intent mainActivityIntent = activityRef.get().getIntent();
-                if (mainActivityIntent != null) {
-                    mainActivityIntent.putExtra("updateAvailable", value);
-                }
-                activityRef.get().updateNavigationMenu(value);
+            boolean value = intent.getBooleanExtra("value", false);
+            Intent mainActivityIntent = getIntent();
+            if (mainActivityIntent != null) {
+                mainActivityIntent.putExtra("updateAvailable", value);
             }
+            updateNavigationMenu(value);
         }
     }
 }
