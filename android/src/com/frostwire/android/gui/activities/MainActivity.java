@@ -1023,7 +1023,7 @@ public class MainActivity extends AbstractActivity implements
         LocalBroadcastReceiver() {
             intentFilter = new IntentFilter();
             intentFilter.addAction(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
-            intentFilter.addAction(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
+            intentFilter.addAction(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
         }
 
         public void register(Context context) {
@@ -1047,9 +1047,12 @@ public class MainActivity extends AbstractActivity implements
                 updateNavigationMenu(value);
             }
 
-            if (Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION.equals(action)) {
-                UIUtils.showDismissableMessage(findView(android.R.id.content),
-                        R.string.no_data_check_internet_connection);
+            if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
+                boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
+                if (!isDataUp) {
+                    UIUtils.showDismissableMessage(findView(android.R.id.content),
+                            R.string.no_data_check_internet_connection);
+                }
             }
         }
     }

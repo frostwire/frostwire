@@ -169,10 +169,10 @@ public final class NetworkManager {
             Application context = manager.contextRef.get();
             ConnectivityManager connectivityManager = manager.getConnectivityManager();
             boolean isDataUp = manager.isDataUp(connectivityManager);
-            if (!isDataUp) {
-                Intent intent = new Intent(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-            }
+
+            Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
+            intent.putExtra("isDataUp", isDataUp);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
     }
 }
