@@ -1053,6 +1053,7 @@ public class MainActivity extends AbstractActivity implements
                     UIUtils.showDismissableMessage(findView(android.R.id.content),
                             R.string.no_data_check_internet_connection);
                 }
+                search.setDataUp(isDataUp);
             }
         }
     }

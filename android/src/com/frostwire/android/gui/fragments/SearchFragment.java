@@ -707,6 +707,10 @@ public final class SearchFragment extends AbstractFragment implements
         keywordFilterDrawerView.reset();
     }
 
+    public void setDataUp(boolean value) {
+        searchProgress.setDataUp(value);
+    }
+
     private static class LocalSearchEngineListener implements SearchListener {
 
         private final WeakReference<SearchFragment> searchFragmentRef;

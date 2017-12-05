@@ -52,7 +52,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
 
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
-    private boolean isDataUp;
+    private boolean isDataUp = true;
 
 
     public SearchProgressView(Context context, AttributeSet attrs) {
@@ -63,6 +63,10 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
         super.onRestoreInstanceState(state);
+    }
+
+    public void setDataUp(boolean value) {
+        isDataUp = value;
     }
 
     public void setProgressEnabled(boolean enabled) {
@@ -80,7 +84,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
         buttonCancel.setOnClickListener(l);
     }
 
-    public void showRetryViews() {
+    private void showRetryViews() {
         if (textTryOtherKeywordsOrFilters != null && isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.VISIBLE);
         }
@@ -92,7 +96,7 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
         }
     }
 
-    public void hideRetryViews() {
+    private void hideRetryViews() {
         if (textTryOtherKeywordsOrFilters != null || !isDataUp) {
             textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
