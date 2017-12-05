@@ -126,7 +126,7 @@ public class MainActivity extends AbstractActivity implements
     private MyFilesFragment library;
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
-    private final BroadcastReceiver localBroadcastReceiver;
+    private final LocalBroadcastReceiver localBroadcastReceiver;
     private TimerSubscription playerSubscription;
     private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
 
@@ -348,10 +348,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver, intentFilter);
+        localBroadcastReceiver.register(this);
 
         setupDrawer();
 
@@ -381,7 +378,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onPause() {
         super.onPause();
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
+        localBroadcastReceiver.unregister(this);
 
         if (mainBroadcastReceiver != null) {
             try {
@@ -1020,6 +1017,22 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
+
+        private final IntentFilter intentFilter;
+
+        LocalBroadcastReceiver() {
+            intentFilter = new IntentFilter();
+            intentFilter.addAction(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+            intentFilter.addAction(Constants.ACTION_NOTIFY_CHECK_INTERNET_CONNECTION);
+        }
+
+        public void register(Context context) {
+            LocalBroadcastManager.getInstance(context).registerReceiver(this, intentFilter);
+        }
+
+        public void unregister(Context context) {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+        }
 
         @Override
         public void onReceive(Context context, Intent intent) {
