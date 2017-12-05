@@ -126,7 +126,7 @@ public class MainActivity extends AbstractActivity implements
     private MyFilesFragment library;
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
-    private final BroadcastReceiver notifyUpdateReceiver;
+    private final BroadcastReceiver localBroadcastReceiver;
     private TimerSubscription playerSubscription;
     private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
 
@@ -135,7 +135,7 @@ public class MainActivity extends AbstractActivity implements
         controller = new MainController(this);
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
-        notifyUpdateReceiver = new UpdateNavigationMenuBroadcastReceiver();
+        localBroadcastReceiver = new LocalBroadcastReceiver();
     }
 
     @Override
@@ -348,7 +348,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(notifyUpdateReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(localBroadcastReceiver,
                 new IntentFilter(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE));
 
         setupDrawer();
@@ -377,7 +377,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onPause() {
         super.onPause();
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(notifyUpdateReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(localBroadcastReceiver);
 
         if (mainBroadcastReceiver != null) {
             try {
@@ -1015,7 +1015,7 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private final class UpdateNavigationMenuBroadcastReceiver extends BroadcastReceiver {
+    private final class LocalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
