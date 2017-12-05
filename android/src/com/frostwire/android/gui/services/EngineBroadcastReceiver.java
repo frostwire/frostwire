@@ -243,11 +243,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         Engine.instance().getThreadPool().execute(() -> {
             // sleep for a second, since IPv6 addresses takes time to be reported
             SystemClock.sleep(1000);
-            // TODO: use public java API when available
-            session swig = BTEngine.getInstance().swig();
-            if (swig != null) {
-                swig.reopen_network_sockets();
-            }
+            BTEngine.getInstance().reopenNetworkSockets();
         });
     }
 }
