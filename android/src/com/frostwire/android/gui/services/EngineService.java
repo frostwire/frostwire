@@ -35,7 +35,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
-import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -145,7 +144,6 @@ public class EngineService extends Service implements IEngineService {
         }
         stopServices(false);
         LOG.debug("onDestroy, stopping BTEngine...");
-        NetworkManager.instance().shutdown();
         BTEngine.getInstance().stop();
         LOG.debug("onDestroy, BTEngine stopped");
         ImageLoader.getInstance(this).shutdown();

@@ -1,5 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelinkaaa (@marcelinkaaa)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelinkaaa (@marcelinkaaa)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +19,8 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -32,14 +31,13 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.util.UIUtils;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class SearchProgressView extends LinearLayout implements NetworkManager.NetworkStatusListener {
+public class SearchProgressView extends LinearLayout {
 
     private ProgressBar progressbar;
     private Button buttonCancel;
@@ -53,7 +51,6 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
     private boolean isDataUp = true;
-
 
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -132,11 +129,6 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && textTryFrostWirePlus != null) {
             initTryFrostWirePlusListener();
         }
-
-        // TODO: refactor this, since the single listener pattern does not look good here
-        NetworkManager networkManager = NetworkManager.instance();
-        networkManager.setNetworkStatusListener(this);
-        networkManager.notifyNetworkStatusListeners();
     }
 
     private void initTryFrostWirePlusListener() {
@@ -177,24 +169,6 @@ public class SearchProgressView extends LinearLayout implements NetworkManager.N
 
     public void setKeywordFiltersApplied(boolean filtersApplied) {
         textTryOtherKeywordsOrFilters.setText(filtersApplied ? stringTryChangingAppliedFilters : stringTryOtherKeywords);
-    }
-
-    @Override
-    public void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp) {
-        this.isDataUp = isDataUp;
-        if (!isDataUp) {
-            Runnable uiRunnable = () -> {
-                try {
-                    UIUtils.showDismissableMessage(SearchProgressView.this, R.string.no_data_check_internet_connection);
-                } catch (Throwable ignored) {
-                }
-            };
-            if (Looper.getMainLooper() == Looper.myLooper()) {
-                uiRunnable.run();
-            } else {
-                ((Activity) getContext()).runOnUiThread(uiRunnable);
-            }
-        }
     }
 
     public interface CurrentQueryReporter {

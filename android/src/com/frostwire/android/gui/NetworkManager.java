@@ -38,7 +38,6 @@ import java.lang.ref.WeakReference;
 public final class NetworkManager {
     private final WeakReference<Application> contextRef;
     private boolean tunnelUp;
-    private NetworkStatusListener networkStatusListener;
 
     private static NetworkManager instance;
 
@@ -58,7 +57,6 @@ public final class NetworkManager {
 
     private NetworkManager(Application context) {
         this.contextRef = Ref.weak(context);
-        this.networkStatusListener = null;
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
         detectTunnel();
@@ -141,21 +139,8 @@ public final class NetworkManager {
         return false;
     }
 
-    public void shutdown() {
-        networkStatusListener = null;
-    }
-
-    public void setNetworkStatusListener(NetworkStatusListener networkStatusListener) {
-        this.networkStatusListener = networkStatusListener;
-    }
-
     public void notifyNetworkStatusListeners() {
         Engine.instance().getThreadPool().execute(new NotifyNetworkStatusTask());
-    }
-
-    public interface NetworkStatusListener {
-        /** Called from background thread, listener must do UI changes on UI thread */
-        void onNetworkStatusChange(boolean isDataUp, boolean isDataWiFiUp, boolean isDataMobileUp);
     }
 
     private static final class NotifyNetworkStatusTask implements Runnable {
