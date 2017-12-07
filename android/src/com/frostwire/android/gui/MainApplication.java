@@ -68,6 +68,8 @@ public class MainApplication extends Application {
         setupBTEngine();
 
         NetworkManager.create(this);
+        NetworkManager.instance().queryNetworkStatus();
+
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
 

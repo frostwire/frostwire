@@ -61,9 +61,6 @@ public final class NetworkManager {
     private NetworkManager(Application context) {
         this.pool = Engine.instance().getThreadPool();
         this.contextRef = Ref.weak(context);
-        // detect tunnel as early as possible, but only as
-        // detectTunnel remains a cheap call
-        detectTunnel();
     }
 
     /**
