@@ -99,16 +99,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     default:
                         break;
                 }
-
-                handleVPNDetection();
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
         }
-    }
-
-    private void handleVPNDetection() {
-        Engine.instance().getThreadPool().execute(() -> NetworkManager.instance().detectTunnel());
     }
 
     private void handleActionPhoneStateChanged(Intent intent) {

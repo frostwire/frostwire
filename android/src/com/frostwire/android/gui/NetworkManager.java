@@ -104,7 +104,7 @@ public final class NetworkManager {
         return tunnelUp;
     }
 
-    public void detectTunnel() {
+    private void detectTunnel() {
         // see https://issuetracker.google.com/issues/37091475
         // for more information on possible restrictions in the
         // future
@@ -136,6 +136,7 @@ public final class NetworkManager {
             Application context = manager.contextRef.get();
             ConnectivityManager connectivityManager = manager.getConnectivityManager();
             boolean isDataUp = manager.isDataUp(connectivityManager);
+            manager.detectTunnel();
 
             Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
             intent.putExtra("isDataUp", isDataUp);
