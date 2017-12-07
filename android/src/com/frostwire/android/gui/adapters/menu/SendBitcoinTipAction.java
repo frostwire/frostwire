@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.adapters.menu;
@@ -25,12 +24,8 @@ import android.net.Uri;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
-
-import java.lang.ref.WeakReference;
 
 /**
  * Created on 3/21/15 (on a plane from Ft. Lauderdale to San Francisco)
@@ -38,30 +33,25 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
-public class SendBitcoinTipAction extends MenuAction {
-    final WeakReference<PaymentOptions> poRef;
+public final class SendBitcoinTipAction extends MenuAction {
 
-    public SendBitcoinTipAction(Context context, PaymentOptions po) {
+    private final String bitcoinUrl;
+
+    public SendBitcoinTipAction(Context context, String bitcoinUrl) {
         super(context, R.drawable.contextmenu_icon_donation_bitcoin, R.string.send_bitcoin_tip);
-        poRef = new WeakReference<>(po);
+        this.bitcoinUrl = bitcoinUrl;
     }
 
     @Override
     public void onClick(Context context) {
-        if (Ref.alive(poRef)) {
-            final PaymentOptions paymentOptions = poRef.get();
-            final String bitcoinAddress = paymentOptions.bitcoin;
-
-            try {
-                String bitcoinUriPrefix = "bitcoin:";
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                final String uri = (!bitcoinAddress.startsWith(bitcoinUriPrefix) ? bitcoinUriPrefix : "") +
-                        bitcoinAddress;
-                intent.setData(Uri.parse(uri));
-                context.startActivity(intent);
-            } catch (Throwable e) {
-                UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
-            }
+        try {
+            String bitcoinUriPrefix = "bitcoin:";
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            String uri = (!bitcoinUrl.startsWith(bitcoinUriPrefix) ? bitcoinUriPrefix : "") + bitcoinUrl;
+            intent.setData(Uri.parse(uri));
+            context.startActivity(intent);
+        } catch (Throwable e) {
+            UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
         }
 
         UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
