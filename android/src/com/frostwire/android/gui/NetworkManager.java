@@ -29,12 +29,16 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class NetworkManager {
+
+    private final ExecutorService pool;
+
     private final WeakReference<Application> contextRef;
     private boolean tunnelUp;
 
@@ -55,6 +59,7 @@ public final class NetworkManager {
     }
 
     private NetworkManager(Application context) {
+        this.pool = Engine.instance().getThreadPool();
         this.contextRef = Ref.weak(context);
         // detect tunnel as early as possible, but only as
         // detectTunnel remains a cheap call
@@ -117,7 +122,7 @@ public final class NetworkManager {
     }
 
     public void notifyNetworkStatusListeners() {
-        Engine.instance().getThreadPool().execute(new NotifyNetworkStatusTask());
+        pool.execute(new NotifyNetworkStatusTask());
     }
 
     private static final class NotifyNetworkStatusTask implements Runnable {
