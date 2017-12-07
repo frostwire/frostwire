@@ -61,7 +61,9 @@ public final class NetworkManager {
         detectTunnel();
     }
 
-    /** aka -> isInternetUp */
+    /**
+     * aka -> isInternetUp
+     */
     public boolean isDataUp(ConnectivityManager connectivityManager) {
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
         return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager));
@@ -97,35 +99,11 @@ public final class NetworkManager {
         return tunnelUp;
     }
 
-    // eventually move this to the Platform framework
     public void detectTunnel() {
-        boolean up = isValidInterfaceName("tun0");
-        // if android 7, the above query will fail
         // see https://issuetracker.google.com/issues/37091475
-        if (!up) {
-            up = interfaceNameExists("tun0") || interfaceNameExists("tun1");
-        }
-        tunnelUp = up;
-    }
-
-    private static boolean isValidInterfaceName(String interfaceName) {
-        if (interfaceName == null) {
-            return false;
-        }
-        try {
-            String[] arr = new File("/sys/class/net").list();
-            if (arr == null) {
-                return false;
-            }
-            for (String validName : arr) {
-                if (interfaceName.equals(validName)) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return false;
+        // for more information on possible restrictions in the
+        // future
+        tunnelUp = interfaceNameExists("tun0") || interfaceNameExists("tun1");
     }
 
     private static boolean interfaceNameExists(String name) {
@@ -133,7 +111,7 @@ public final class NetworkManager {
             File f = new File("/sys/class/net/" + name);
             return f.exists();
         } catch (Throwable e) {
-            e.printStackTrace();
+            // ignore
         }
         return false;
     }
