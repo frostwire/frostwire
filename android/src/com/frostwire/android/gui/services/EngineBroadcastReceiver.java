@@ -36,7 +36,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.swig.session;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -119,7 +118,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleNetworkStatusChange() {
-        NetworkManager.instance().notifyNetworkStatusListeners();
+        NetworkManager.instance().queryNetworkStatus();
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {

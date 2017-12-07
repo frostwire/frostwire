@@ -371,7 +371,7 @@ public class MainActivity extends AbstractActivity implements
 
         tryOnResumeInterstitial();
 
-        NetworkManager.instance().notifyNetworkStatusListeners();
+        NetworkManager.instance().queryNetworkStatus();
     }
 
     @Override

@@ -121,11 +121,11 @@ public final class NetworkManager {
         return false;
     }
 
-    public void notifyNetworkStatusListeners() {
-        pool.execute(new NotifyNetworkStatusTask());
+    public void queryNetworkStatus() {
+        pool.execute(new QueryNetworkStatusTask());
     }
 
-    private static final class NotifyNetworkStatusTask implements Runnable {
+    private static final class QueryNetworkStatusTask implements Runnable {
 
         @Override
         public void run() {
