@@ -278,12 +278,11 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     private void populateGroupView(View view, Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
             populateBittorrentDownload(view, (BittorrentDownload) transfer);
+        } else if (transfer instanceof YouTubeDownload ||
+                transfer instanceof SoundcloudDownload) {
+            populateCloudDownload(view, transfer);
         } else if (transfer instanceof HttpDownload) {
             populateHttpDownload(view, (HttpDownload) transfer);
-        } else if (transfer instanceof YouTubeDownload) {
-            populateCloudDownload(view, transfer);
-        } else if (transfer instanceof SoundcloudDownload) {
-            populateCloudDownload(view, transfer);
         }
     }
 
@@ -327,7 +326,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
     }
 
     private boolean isCloudDownload(Object tag) {
-        return tag instanceof HttpDownload || tag instanceof YouTubeDownload || tag instanceof SoundcloudDownload;
+        return tag instanceof HttpDownload || tag instanceof YouTubeDownload;
     }
 
     private String populateBittorrentDownloadMenuActions(BittorrentDownload download, List<MenuAction> items) {
@@ -392,7 +391,7 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
             if (uidl.hasPaymentOptions()) {
                 PaymentOptions po = uidl.getPaymentOptions();
                 if (po.bitcoin != null) {
-                    items.add(new SendBitcoinTipAction(context.get(), po));
+                    items.add(new SendBitcoinTipAction(context.get(), po.bitcoin));
                 }
 
                 if (po.paypalUrl != null) {
@@ -440,10 +439,9 @@ public class TransferListAdapter extends BaseExpandableListAdapter {
                     TransferItem transferItem = bItem.getItems().get(0);
                     path = transferItem.getFile().getAbsolutePath();
                 }
-            } else if (item instanceof Transfer) {
-                Transfer transferItem = item;
-                if (transferItem.getSavePath() != null) {
-                    path = transferItem.getSavePath().getAbsolutePath();
+            } else if (item != null) {
+                if (item.getSavePath() != null) {
+                    path = item.getSavePath().getAbsolutePath();
                 }
             }
 
