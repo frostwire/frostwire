@@ -43,7 +43,6 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 
 import java.util.List;
-import java.util.Objects;
 
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
     private TimerSubscription subscription;
@@ -94,7 +93,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (uiBittorrentDownload == null && (infoHash == null || "".equals(infoHash))) {
             throw new RuntimeException("Invalid infoHash received");
         }
-        if (uiBittorrentDownload == null && !Objects.equals(infoHash, "")) {
+        if (uiBittorrentDownload == null && !"".equals(infoHash)) {
             uiBittorrentDownload = (UIBittorrentDownload)
                     TransferManager.instance().getBittorrentDownload(infoHash);
         }
