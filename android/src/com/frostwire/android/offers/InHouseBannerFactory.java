@@ -89,25 +89,6 @@ public final class InHouseBannerFactory {
                         R.drawable._320x50_frostclick_1,
                         R.drawable._320x50_frostclick_2
                 });
-        SMALL_320x50_DRAWABLES.put(Message.SHOP_GEAR,
-                new Integer[]{
-                        R.drawable._320x50_gear_1,
-                        R.drawable._320x50_gear_2,
-                        R.drawable._320x50_gear_3
-                });
-        SMALL_320x50_DRAWABLES.put(Message.SHOP_HOODIES,
-                new Integer[]{
-                        R.drawable._320x50_hoodie_1
-                });
-        SMALL_320x50_DRAWABLES.put(Message.SHOP_TSHIRT,
-                new Integer[]{
-                        R.drawable._300x250_tshirt_1
-                });
-        SMALL_320x50_DRAWABLES.put(Message.SHOP_STICKERS,
-                new Integer[]{
-                        R.drawable._320x50_stickers_1
-                });
-
     }
 
     private static void initBigDrawables() {
@@ -128,27 +109,6 @@ public final class InHouseBannerFactory {
                         R.drawable._300x250_frostclick_1,
                         R.drawable._300x250_frostclick_2
                 });
-        BIG_300x250_DRAWABLES.put(Message.SHOP_GEAR,
-                new Integer[]{
-                        R.drawable._300x250_gear_1,
-                        R.drawable._300x250_gear_2,
-                        R.drawable._300x250_gear_3,
-                        R.drawable._300x250_gear_4
-                });
-        BIG_300x250_DRAWABLES.put(Message.SHOP_HOODIES,
-                new Integer[]{
-                        R.drawable._300x250_hoodie_1
-                });
-        BIG_300x250_DRAWABLES.put(Message.SHOP_TSHIRT,
-                new Integer[]{
-                        R.drawable._300x250_tshirt_1,
-                        R.drawable._300x250_tshirt_2
-                });
-        BIG_300x250_DRAWABLES.put(Message.SHOP_STICKERS,
-                new Integer[]{
-                        R.drawable._300x250_stickers_1,
-                        R.drawable._300x250_stickers_2
-                });
     }
 
     private static void initClickListeners() {
@@ -162,19 +122,11 @@ public final class InHouseBannerFactory {
             CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));
         }
         CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("http://www.frostclick.com/?from=android-fallback-ad"));
-        CLICK_LISTENERS.put(Message.SHOP_GEAR, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-gear"));
-        CLICK_LISTENERS.put(Message.SHOP_HOODIES, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-hoodies"));
-        CLICK_LISTENERS.put(Message.SHOP_TSHIRT, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-tshirt"));
-        CLICK_LISTENERS.put(Message.SHOP_STICKERS, new URLOpenerClickListener("http://shop.frostwire.com/?from=android-fallback-ad-stickers"));
     }
 
     enum Message {
         AD_REMOVAL,
         FROSTCLICK,
-        SHOP_GEAR,
-        SHOP_HOODIES,
-        SHOP_TSHIRT,
-        SHOP_STICKERS,
         DONATE;
 
         static Message random() {
