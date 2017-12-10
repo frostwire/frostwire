@@ -157,26 +157,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static <TView extends View> TView findView(View view, int id) {
-        return (TView) view.findViewById(id);
-    }
-
-    private void populateGroupView(View view, Transfer transfer) {
-        if (transfer instanceof BittorrentDownload) {
-            populateBittorrentDownload(view, (BittorrentDownload) transfer);
-        } else if (transfer instanceof YouTubeDownload ||
-                transfer instanceof SoundcloudDownload) {
-            populateCloudDownload(view, transfer);
-        } else if (transfer instanceof HttpDownload) {
-            populateHttpDownload(view, (HttpDownload) transfer);
-        }
-    }
-
-    private void populateChildView(View view, TransferItem item) {
-        populateBittorrentDownloadItem(view, item);
-    }
-
     private MenuAdapter getMenuAdapter(View view) {
         Object tag = view.getTag();
         String title = "";
@@ -356,10 +336,10 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     try {
                         if (transfer instanceof BittorrentDownload) {
                             populateBittorrentDownload(listItemLinearLayoutHolder, (BittorrentDownload) transfer);
-                        } else if (transfer instanceof HttpDownload) {
-                            populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
                         } else if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload) {
                             populateCloudDownload(listItemLinearLayoutHolder, transfer);
+                        } else if (transfer instanceof HttpDownload) {
+                            populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
                         }
                     } catch (Throwable e) {
                         LOG.error("Not able to populate group view in expandable list:" + e.getMessage());
@@ -514,6 +494,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             Drawable tipDrawable = (paymentOptions.bitcoin != null) ? r.getDrawable(R.drawable.contextmenu_icon_donation_bitcoin) : r.getDrawable(R.drawable.contextmenu_icon_donation_fiat);
             if (tipDrawable != null) {
                 final int iconHeightInPixels = r.getDimensionPixelSize(R.dimen.view_transfer_list_item_title_left_drawable);
+                //noinspection SuspiciousNameCombination
                 tipDrawable.setBounds(0, 0, iconHeightInPixels, iconHeightInPixels);
                 title.setCompoundDrawables(tipDrawable, null, null, null);
             }
