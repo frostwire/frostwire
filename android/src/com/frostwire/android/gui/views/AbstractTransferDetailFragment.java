@@ -47,7 +47,7 @@ import java.text.DecimalFormatSymbols;
 
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     private static String INFINITY = null;
-    protected final TransferStateStrings transferStateStrings;
+    protected TransferStateStrings transferStateStrings;
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
     protected TorrentHandle torrentHandle;
@@ -69,8 +69,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     protected abstract void ensureComponentsReferenced(View rootView);
 
     protected abstract void updateComponents();
-
-
 
     public String getTabTitle() {
         return tabTitle;
@@ -142,11 +140,21 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (uiBittorrentDownload == null) {
             return;
         }
-        detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
-        detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
-        detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
-        detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
-        detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
+        if (detailProgressTitleTextView != null) {
+            detailProgressTitleTextView.setText(uiBittorrentDownload.getDisplayName());
+        }
+        if (detailProgressProgressBar != null) {
+            detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
+        }
+        if (detailProgressStatusTextView != null && transferStateStrings != null) {
+            detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
+        }
+        if (detailProgressDownSpeedTextView != null) {
+            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
+        }
+        if (detailProgressUpSpeedTextView != null) {
+            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
+        }
     }
 
     /**
@@ -160,6 +168,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
         detailProgressDownSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_down_speed);
         detailProgressUpSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_up_speed);
+        if (transferStateStrings == null) {
+            // this could be initialized to null in the constructor due to possible synchronization conditions
+            transferStateStrings = TransferStateStrings.getInstance(getActivity());
+        }
     }
 
     private void recoverUIBittorrentDownload(String infoHash) {
