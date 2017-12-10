@@ -1,4 +1,4 @@
-FrostWire 1.9.9 build 472 - DEC/04/2017
+FrostWire 1.9.9 build 474 - DEC/10/2017
  - App Startup is faster
  - Multiple freezes fixed, memory leaks fixed, crashes fixed
  - Android Jelly-Bean (<4.4) support dropped, minSdkVersion=19
