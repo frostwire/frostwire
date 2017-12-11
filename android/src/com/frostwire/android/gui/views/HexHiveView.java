@@ -230,7 +230,14 @@ public class HexHiveView<T> extends View {
         int pieceIndex = 0;
         float heightQuarter = DP.hexHeight / 4;
         float threeQuarters = heightQuarter*3;
-        while (pieceIndex < DP.numHexs - 1) {
+
+        // if we have just one piece to draw, we'll draw it in the center
+        if (DP.numHexs == 1) {
+            DP.hexCenterBuffer.x = DP.center.x;
+            DP.hexCenterBuffer.y = DP.center.y;
+        }
+
+        while (pieceIndex < DP.numHexs) {
             drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint);
             pieceIndex++;
             DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
@@ -290,7 +297,18 @@ public class HexHiveView<T> extends View {
         // --------         =                => s = sqrt(-----------------------)
         // 3/2*sqrt(3)*s^2                               3/2*sqrt(3)*numHexagons
         final float preliminarySideLength = (float) Math.sqrt(fullArea / (THREE_HALVES_SQRT_OF_THREE*numHexagons));
-        return (float) (preliminarySideLength * 0.90); // simplest solution, leave 15% room
+
+        float spaceToUse = 0.9f;
+
+        if (numHexagons < 50) {
+            spaceToUse = 0.85f;
+        }
+
+        if (numHexagons < 15) {
+            spaceToUse = 0.8f;
+        }
+
+        return preliminarySideLength * spaceToUse;
     }
 
     private float getHexWidth(float sideLength) {
