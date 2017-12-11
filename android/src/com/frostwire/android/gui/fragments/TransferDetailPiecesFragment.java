@@ -89,7 +89,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
             pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            hexDataAdapter = new PieceAdapter(pieces);
+            hexDataAdapter = new PieceAdapter(torrentInfo.numPieces(), pieces);
         }
         if (hexDataAdapter != null) {
             hexHiveView.updateData(hexDataAdapter);
@@ -99,7 +99,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             }
 
             if (totalPieces == -1) {
-                totalPieces = torrentInfo.numPieces(); // can't rely on this one, let's use the one on the torrent info
+                totalPieces = torrentInfo.numPieces();
                 piecesNumberTextView.setText(totalPieces + "");
                 progressBar.setVisibility(View.VISIBLE);
                 hexHiveView.setVisibility(View.GONE);
@@ -117,17 +117,17 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
     final class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
         private PieceIndexBitfield pieceIndexBitfield;
-        private int totalPieces;
+        private final int totalPieces;
         private int downloadedPieces;
 
-        public PieceAdapter(PieceIndexBitfield pieces) {
+        public PieceAdapter(int totalPieces, PieceIndexBitfield pieces) {
+            this.totalPieces = totalPieces;
             updateData(pieces);
         }
 
         @Override
         public void updateData(PieceIndexBitfield data) {
             pieceIndexBitfield = data;
-            totalPieces = pieceIndexBitfield.endIndex() + 1;
             downloadedPieces = pieceIndexBitfield.count();
         }
 
