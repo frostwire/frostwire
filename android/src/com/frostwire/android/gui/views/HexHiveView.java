@@ -228,6 +228,8 @@ public class HexHiveView<T> extends View {
 
         boolean evenRow = true;
         int pieceIndex = 0;
+        float heightQuarter = DP.hexHeight / 4;
+        float threeQuarters = heightQuarter*3;
         while (pieceIndex < DP.numHexs - 1) {
             drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint);
             pieceIndex++;
@@ -237,7 +239,7 @@ public class HexHiveView<T> extends View {
             if (rightSide >= DP.end.x) {
                 evenRow = !evenRow;
                 DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-                DP.hexCenterBuffer.y += DP.hexHeight - (hexagonBorderPaint.getStrokeWidth()*3) - 5;
+                DP.hexCenterBuffer.y +=  threeQuarters;
             }
         }
 
