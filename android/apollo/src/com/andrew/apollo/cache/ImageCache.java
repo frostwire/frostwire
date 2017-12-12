@@ -31,6 +31,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.andrew.apollo.utils.ApolloUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -167,7 +168,7 @@ public final class ImageCache {
         if (mDiskCache == null || mDiskCache.isClosed()) {
             File diskCacheDir = null;
             try {
-                diskCacheDir = getDiskCacheDir(context, TAG);
+                diskCacheDir = SystemUtils.getCacheDir(context, "apollo-image");
             } catch (NullPointerException e) {
                 Log.e(TAG, "initDiskCache - " + e);
                 // this will probably cause a fail at a later time, but

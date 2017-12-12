@@ -48,15 +48,8 @@ public final class SystemUtils {
     }
 
     public static File getCacheDir(Context context, String directory) {
-        File cache;
-
-        if (isPrimaryExternalStorageMounted()) {
-            cache = context.getExternalCacheDir();
-        } else {
-            cache = context.getCacheDir();
-        }
-
-        return new File(cache, directory);
+        return new File(context.getExternalFilesDir(null),
+                "cache" + File.separator + directory);
     }
 
     /**

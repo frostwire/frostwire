@@ -21,6 +21,7 @@ import android.content.Context;
 
 import com.frostwire.android.util.DiskCache;
 import com.frostwire.android.util.DiskCache.Entry;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlCache;
 import com.frostwire.util.Logger;
 
@@ -42,7 +43,7 @@ public final class DiskCrawlCache implements CrawlCache {
     private DiskCache cache;
 
     DiskCrawlCache(Context context) {
-        this.directory = new File(context.getExternalFilesDir(null), "cache/search");
+        this.directory = SystemUtils.getCacheDir(context, "search");
         this.cache = createDiskCache(directory, MAX_DISK_CACHE_SIZE);
     }
 

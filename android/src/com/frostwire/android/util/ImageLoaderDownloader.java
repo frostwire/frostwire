@@ -78,13 +78,13 @@ final class ImageLoaderDownloader implements Downloader {
     // ------- below code copied from com.squareup.picasso.Utils -------
     // copied here to keep code independence
 
-    private static final String PICASSO_CACHE = "picasso-cache";
+    private static final String PICASSO_CACHE = "picasso-downloader";
     private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
     private static final int JELLY_BEAN_MR2 = 18;
 
     private static File createDefaultCacheDir(Context context) {
-        File cache = new File(context.getApplicationContext().getCacheDir(), PICASSO_CACHE);
+        File cache = SystemUtils.getCacheDir(context, PICASSO_CACHE);
         if (!cache.exists()) {
             //noinspection ResultOfMethodCallIgnored
             cache.mkdirs();
