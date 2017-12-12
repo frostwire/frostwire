@@ -193,7 +193,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return false;
         }
         try {
-            final Class<?> SystemClass = Class.forName("android.provider.Settings$System");
+            final Class<?> SystemClass = android.provider.Settings.System.class;
             final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
             return (boolean) canWriteMethod.invoke(null, context);
         } catch (Throwable t) {
