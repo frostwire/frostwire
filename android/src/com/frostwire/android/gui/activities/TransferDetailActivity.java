@@ -84,7 +84,6 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             viewPager.addOnPageChangeListener(onPageChangeListener);
             TabLayout tabLayout = findViewById(R.id.transfer_detail_tab_layout);
             tabLayout.setupWithViewPager(viewPager);
-            tabLayout.setSmoothScrollingEnabled(false);
         } else {
             throw new RuntimeException("initComponents() Could not get viewPager");
         }
