@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011, 2012, FrostWire(R). All rights reserved.
- 
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,15 +21,12 @@ import android.content.Context;
 
 import com.frostwire.android.util.DiskCache;
 import com.frostwire.android.util.DiskCache.Entry;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlCache;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -41,20 +38,12 @@ public final class DiskCrawlCache implements CrawlCache {
 
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
 
-    private final WeakReference<Context> contextRef;
+    private final File directory;
     private DiskCache cache;
 
-    public DiskCrawlCache(Context context) {
-        contextRef = Ref.weak(context);
-        initDiskCache();
-    }
-
-    private void initDiskCache() {
-        Context context = contextRef.get();
-        if (context != null) {
-            File directory = SystemUtils.getCacheDir(context, "search");
-            this.cache = createDiskCache(directory, MAX_DISK_CACHE_SIZE);
-        }
+    DiskCrawlCache(Context context) {
+        this.directory = new File(context.getExternalFilesDir(null), "cache/search");
+        this.cache = createDiskCache(directory, MAX_DISK_CACHE_SIZE);
     }
 
     @Override
@@ -106,7 +95,7 @@ public final class DiskCrawlCache implements CrawlCache {
         if (cache != null) {
             try {
                 cache.delete();
-                initDiskCache();
+                cache = createDiskCache(directory, MAX_DISK_CACHE_SIZE);
             } catch (Throwable e) {
                 LOG.error("Unable to clear the crawl cache", e);
             }
