@@ -42,13 +42,8 @@ public class HexHiveView<T> extends View {
     //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
     private boolean debug = true;
     private Paint hexagonBorderPaint;
-    private Paint emptyHexPaint;
-
-    private Paint fullHexPaint;
-    private int fullColor;
-    private int darkFullColor;
-    private int lightFullColor;
-
+    private CubePaint emptyHexPaint;
+    private CubePaint fullHexPaint;
     private Paint textPaint;
     private Paint debugLinesPaint;
     private DrawingProperties DP;
@@ -172,6 +167,7 @@ public class HexHiveView<T> extends View {
 
     public HexHiveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setLayerType(LAYER_TYPE_HARDWARE, null);
         lastKnownPieceCount = -1;
         Resources r = getResources();
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.HexHiveView);
@@ -204,28 +200,12 @@ public class HexHiveView<T> extends View {
         hexagonBorderPaint.setStyle(Paint.Style.STROKE);
         hexagonBorderPaint.setColor(borderColor);
         hexagonBorderPaint.setStrokeWidth(0);
-        emptyHexPaint = new Paint();
+        emptyHexPaint = new CubePaint(10);
         emptyHexPaint.setColor(emptyColor);
         emptyHexPaint.setStyle(Paint.Style.FILL);
-        fullHexPaint = new Paint();
+        fullHexPaint = new CubePaint(20);
         fullHexPaint.setColor(fullColor);
         fullHexPaint.setStyle(Paint.Style.FILL);
-
-        int A = (fullColor >> 24) & 0xff; // or color >>> 24
-        int R = (fullColor >> 16) & 0xff;
-        int G = (fullColor >>  8) & 0xff;
-        int B = (fullColor      ) & 0xff;
-        int shades = 20;
-        int darkR = R - shades;
-        int darkG = G - shades;
-        int darkB = B - shades;
-        int lightR = R + shades;
-        int lightG = G + shades;
-        int lightB = B + shades;
-        this.fullColor = fullColor;
-        darkFullColor = (A & 0xff) << 24 | (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
-        lightFullColor = (A & 0xff) << 24 | (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
-
         debugLinesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         debugLinesPaint.setColor(debugLinesColor);
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -258,7 +238,7 @@ public class HexHiveView<T> extends View {
             DP.hexCenterBuffer.y = DP.center.y;
         }
 
-        boolean drawCubes = DP.numHexs <= 150;
+        boolean drawCubes = DP.numHexs <= 600;
 
         while (pieceIndex < DP.numHexs) {
             drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint, drawCubes);
@@ -296,7 +276,7 @@ public class HexHiveView<T> extends View {
     private void drawHexagon(final DrawingProperties DP,
                              final Canvas canvas,
                              final Paint borderPaint,
-                             final Paint fillPaint,
+                             final CubePaint fillPaint,
                              final boolean drawCube) {
         DP.fillPathBuffer.reset();
         for (int i = 0; i < 7; i++) {
@@ -324,7 +304,7 @@ public class HexHiveView<T> extends View {
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
             DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-            fillPaint.setColor(darkFullColor);
+            fillPaint.useDarkColor();
 
             // fill and paint border of face
             canvas.drawPath(DP.fillPathBuffer, fillPaint);
@@ -340,11 +320,11 @@ public class HexHiveView<T> extends View {
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
             DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-            fillPaint.setColor(lightFullColor);
+            fillPaint.useLightColor();
             canvas.drawPath(DP.fillPathBuffer, fillPaint);
             canvas.drawPath(DP.fillPathBuffer, borderPaint);
             DP.fillPathBuffer.reset();
-            fillPaint.setColor(fullColor);
+            fillPaint.useBaseColor();
         }
         DP.cornerBuffer.set(-1, -1);
     }
@@ -376,5 +356,55 @@ public class HexHiveView<T> extends View {
 
     private float getHexHeight(float sideLength) {
         return (float) (4 * (Math.sin(Math.toRadians(30)) * sideLength));
+    }
+
+    private final class CubePaint extends Paint {
+        private int baseColor = -1;
+        private int darkColor = -1;
+        private int lightColor = -1;
+        private final int shades;
+
+        CubePaint(int shades) {
+            super();
+            this.shades = shades;
+        }
+
+        @Override
+        public void setColor(int color) {
+            if (baseColor == -1) {
+                this.baseColor = color;
+                int A = (baseColor >> 24) & 0xff;
+                int R = (baseColor >> 16) & 0xff;
+                int G = (baseColor >> 8) & 0xff;
+                int B = (baseColor) & 0xff;
+                int darkR = Math.max(R - shades, 0);
+                int darkG = Math.max(G - shades, 0);
+                int darkB = Math.max(B - shades, 0);
+                int lightR = Math.min(R + shades, 0xff);
+                int lightG = Math.min(G + shades, 0xff);
+                int lightB = Math.min(B + shades, 0xff);
+                darkColor = (A & 0xff) << 24 | (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
+                lightColor = (A & 0xff) << 24 | (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
+            }
+            super.setColor(color);
+        }
+
+        public void useBaseColor() {
+            if (baseColor != -1) {
+                setColor(baseColor);
+            }
+        }
+
+        public void useDarkColor() {
+            if (darkColor != -1) {
+                setColor(darkColor);
+            }
+        }
+
+        public void useLightColor() {
+            if (lightColor != -1) {
+                setColor(lightColor);
+            }
+        }
     }
 }
