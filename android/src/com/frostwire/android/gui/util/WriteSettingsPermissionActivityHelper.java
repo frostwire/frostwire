@@ -49,8 +49,4 @@ public class WriteSettingsPermissionActivityHelper {
         return requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE &&
                 DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(activity);
     }
-
-    public DangerousPermissionsChecker getWriteSettingsPermissionChecker() {
-        return writeSettingsPermissionChecker;
-    }
 }

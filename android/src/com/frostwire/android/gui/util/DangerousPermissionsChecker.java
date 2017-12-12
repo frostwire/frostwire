@@ -25,7 +25,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -118,7 +120,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean permissionWasGranted = false;
         switch (requestCode) {
             case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
@@ -138,6 +140,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         }
     }
 
+    // TODO: remove this
     public void setPermissionsGrantedCallback(OnPermissionsGrantedCallback onPermissionsGrantedCallback) {
         this.onPermissionsGrantedCallback = onPermissionsGrantedCallback;
     }
@@ -154,8 +157,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return true;
         }
         Activity activity = activityRef.get();
-        return ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
-                ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
+                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
 
     public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity) {
@@ -182,7 +185,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     public static boolean hasPermissionToWriteSettings(Context context) {
         return (Build.VERSION.SDK_INT >= 23) ?
                 DangerousPermissionsChecker.canWriteSettingsAPILevel23(context) :
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
+                ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
     }
 
     private static boolean canWriteSettingsAPILevel23(Context context) {
