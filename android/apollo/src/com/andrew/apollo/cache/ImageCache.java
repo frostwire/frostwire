@@ -25,7 +25,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
@@ -96,7 +95,7 @@ public final class ImageCache {
     /**
      * Used to temporarily pause the disk cache while scrolling
      */
-    public boolean mPauseDiskAccess = false;
+    private boolean mPauseDiskAccess = false;
     private Object mPauseLock = new Object();
 
     static {
@@ -108,7 +107,7 @@ public final class ImageCache {
      *
      * @param context The {@link Context} to use
      */
-    public ImageCache(final Context context) {
+    private ImageCache(final Context context) {
         init(context);
     }
 
@@ -195,7 +194,7 @@ public final class ImageCache {
      *
      * @param context The {@link Context} to use
      */
-    public void initLruCache(final Context context) {
+    private void initLruCache(final Context context) {
         final ActivityManager activityManager = (ActivityManager) context
                 .getSystemService(Context.ACTIVITY_SERVICE);
         final int lruCacheSize = Math.round(MEM_CACHE_DIVIDER * activityManager.getMemoryClass()
@@ -243,7 +242,7 @@ public final class ImageCache {
      * @return An existing retained ImageCache object or a new one if one did
      * not exist
      */
-    public static final ImageCache findOrCreateCache(final Activity activity) {
+    public static ImageCache findOrCreateCache(final Activity activity) {
         // Search for, or create an instance of the non-UI RetainFragment
         final RetainFragment retainFragment = findOrCreateRetainFragment(
                 activity.getFragmentManager());
@@ -265,7 +264,7 @@ public final class ImageCache {
      * @return The existing instance of the {@link Fragment} or the new instance
      * if just created
      */
-    public static final RetainFragment findOrCreateRetainFragment(final FragmentManager fm) {
+    private static RetainFragment findOrCreateRetainFragment(final FragmentManager fm) {
         // Check to see if we have retained the worker fragment
         RetainFragment retainFragment = (RetainFragment) fm.findFragmentByTag(TAG);
         // If not retained, we need to create and add it
@@ -282,7 +281,7 @@ public final class ImageCache {
      * @param data   The key used to store the image
      * @param bitmap The {@link Bitmap} to cache
      */
-    public void addBitmapToCache(final String data, final Bitmap bitmap) {
+    void addBitmapToCache(final String data, final Bitmap bitmap) {
         if (data == null || bitmap == null) {
             return;
         }
@@ -312,11 +311,8 @@ public final class ImageCache {
                 try {
                     if (out != null) {
                         out.close();
-                        out = null;
                     }
-                } catch (final IOException e) {
-                    Log.e(TAG, "addBitmapToCache - " + e);
-                } catch (final IllegalStateException e) {
+                } catch (final Throwable e) {
                     Log.e(TAG, "addBitmapToCache - " + e);
                 }
             }
@@ -329,7 +325,7 @@ public final class ImageCache {
      * @param data   The key identifier
      * @param bitmap The {@link Bitmap} to cache
      */
-    public void addBitmapToMemCache(final String data, final Bitmap bitmap) {
+    private void addBitmapToMemCache(final String data, final Bitmap bitmap) {
         if (data == null || bitmap == null) {
             return;
         }
@@ -345,7 +341,7 @@ public final class ImageCache {
      * @param data Unique identifier for which item to get
      * @return The {@link Bitmap} if found in cache, null otherwise
      */
-    public final Bitmap getBitmapFromMemCache(final String data) {
+    private Bitmap getBitmapFromMemCache(final String data) {
         if (data == null) {
             return null;
         }
@@ -364,7 +360,7 @@ public final class ImageCache {
      * @param data Unique identifier for which item to get
      * @return The {@link Bitmap} if found in cache, null otherwise
      */
-    public final Bitmap getBitmapFromDiskCache(final String data) {
+    final Bitmap getBitmapFromDiskCache(final String data) {
         if (data == null) {
             return null;
         }
@@ -409,7 +405,7 @@ public final class ImageCache {
      * @param data Unique identifier for which item to get
      * @return The {@link Bitmap} if found in cache, null otherwise
      */
-    public final Bitmap getCachedBitmap(final String data) {
+    final Bitmap getCachedBitmap(final String data) {
         if (data == null) {
             return null;
         }
@@ -433,7 +429,7 @@ public final class ImageCache {
      * @param id      The ID of the album to find artwork for
      * @return The artwork for an album
      */
-    public final Bitmap getCachedArtwork(final Context context, final String data, final long id) {
+    final Bitmap getCachedArtwork(final Context context, final String data, final long id) {
         if (context == null || data == null) {
             return null;
         }
@@ -455,7 +451,7 @@ public final class ImageCache {
      * @param albumId The ID of the album to find artwork for
      * @return The artwork for an album
      */
-    public final Bitmap getArtworkFromFile(final Context context, final long albumId) {
+    final Bitmap getArtworkFromFile(final Context context, final long albumId) {
         if (albumId < 0) {
             return null;
         }
@@ -520,7 +516,7 @@ public final class ImageCache {
     /**
      * @param key The key used to identify which cache entries to delete.
      */
-    public void removeFromCache(final String key) {
+    void removeFromCache(final String key) {
         if (key == null) {
             return;
         }
@@ -545,7 +541,7 @@ public final class ImageCache {
      *
      * @param pause True to temporarily pause the disk cache, false otherwise.
      */
-    public void setPauseDiskCache(final boolean pause) {
+    void setPauseDiskCache(final boolean pause) {
         synchronized (mPauseLock) {
             if (mPauseDiskAccess != pause) {
                 mPauseDiskAccess = pause;
@@ -571,55 +567,12 @@ public final class ImageCache {
     }
 
     /**
-     * @return True if the user is scrolling, false otherwise.
-     */
-    public boolean isDiskCachePaused() {
-        return mPauseDiskAccess;
-    }
-
-    /**
-     * Get a usable cache directory (external if available, internal otherwise)
-     *
-     * @param context    The {@link Context} to use
-     * @param uniqueName A unique directory name to append to the cache
-     *                   directory
-     * @return The cache directory
-     */
-    public static final File getDiskCacheDir(final Context context, final String uniqueName) {
-        // getExternalCacheDir(context) returns null if external storage is not ready
-        final String cachePath = getExternalCacheDir(context) != null
-                ? getExternalCacheDir(context).getPath()
-                : context.getCacheDir().getPath();
-        return new File(cachePath, uniqueName);
-    }
-
-    /**
-     * Check if external storage is built-in or removable
-     *
-     * @return True if external storage is removable (like an SD card), false
-     * otherwise
-     */
-    public static final boolean isExternalStorageRemovable() {
-        return Environment.isExternalStorageRemovable();
-    }
-
-    /**
-     * Get the external app cache directory
-     *
-     * @param context The {@link Context} to use
-     * @return The external cache directory
-     */
-    public static final File getExternalCacheDir(final Context context) {
-        return context.getExternalCacheDir();
-    }
-
-    /**
      * Check how much usable space is available at a given path.
      *
      * @param path The path to check
      * @return The space available in bytes
      */
-    public static final long getUsableSpace(final File path) {
+    private static long getUsableSpace(final File path) {
         return path.getUsableSpace();
     }
 
@@ -629,7 +582,7 @@ public final class ImageCache {
      *
      * @param key The key used to store the file
      */
-    public static final String hashKeyForDisk(final String key) {
+    private static String hashKeyForDisk(final String key) {
         String cacheKey;
         try {
             final MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -648,7 +601,7 @@ public final class ImageCache {
      * @return A {@link String} converted from the bytes of a hashable key used
      * to store a filename on the disk, to hex digits.
      */
-    private static final String bytesToHexString(final byte[] bytes) {
+    private static String bytesToHexString(final byte[] bytes) {
         final StringBuilder builder = new StringBuilder();
         for (final byte b : bytes) {
             final String hex = Integer.toHexString(0xFF & b);
@@ -717,14 +670,14 @@ public final class ImageCache {
          *
          * @param maxSize The allowed size of the {@link LruCache}
          */
-        public MemoryCache(final int maxSize) {
+        MemoryCache(final int maxSize) {
             super(maxSize);
         }
 
         /**
          * Get the size in bytes of a bitmap.
          */
-        public static final int getBitmapSize(final Bitmap bitmap) {
+        static int getBitmapSize(final Bitmap bitmap) {
             return bitmap.getByteCount();
         }
 
@@ -735,7 +688,5 @@ public final class ImageCache {
         protected int sizeOf(final String paramString, final Bitmap paramBitmap) {
             return getBitmapSize(paramBitmap);
         }
-
     }
-
 }

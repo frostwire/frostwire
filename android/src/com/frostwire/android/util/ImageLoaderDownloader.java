@@ -34,8 +34,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static android.os.Build.VERSION.SDK_INT;
-
 /**
  * Provides an OkHttp based implementation, but with a custom SSL
  * configuration to ignore/accept any certificate checks or verifications.
@@ -81,7 +79,6 @@ final class ImageLoaderDownloader implements Downloader {
     private static final String PICASSO_CACHE = "picasso-downloader";
     private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
     private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
-    private static final int JELLY_BEAN_MR2 = 18;
 
     private static File createDefaultCacheDir(Context context) {
         File cache = SystemUtils.getCacheDir(context, PICASSO_CACHE);
@@ -97,12 +94,8 @@ final class ImageLoaderDownloader implements Downloader {
 
         try {
             StatFs statFs = new StatFs(dir.getAbsolutePath());
-            //noinspection deprecation
-            long blockCount =
-                    SDK_INT < JELLY_BEAN_MR2 ? (long) statFs.getBlockCount() : statFs.getBlockCountLong();
-            //noinspection deprecation
-            long blockSize =
-                    SDK_INT < JELLY_BEAN_MR2 ? (long) statFs.getBlockSize() : statFs.getBlockSizeLong();
+            long blockCount = statFs.getBlockCountLong();
+            long blockSize = statFs.getBlockSizeLong();
             long available = blockCount * blockSize;
             // Target 2% of the total space.
             size = available / 50;

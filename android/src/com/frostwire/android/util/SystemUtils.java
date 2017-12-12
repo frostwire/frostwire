@@ -87,7 +87,7 @@ public final class SystemUtils {
         long size;
         try {
             StatFs stat = new StatFs(dir.getAbsolutePath());
-            size = ((long) stat.getAvailableBlocks()) * stat.getBlockSize();
+            size = stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
         } catch (Throwable e) {
             size = -1; // system error computing the available storage size
         }
