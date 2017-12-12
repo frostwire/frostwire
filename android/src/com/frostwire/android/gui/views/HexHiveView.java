@@ -43,7 +43,12 @@ public class HexHiveView<T> extends View {
     private boolean debug = true;
     private Paint hexagonBorderPaint;
     private Paint emptyHexPaint;
+
     private Paint fullHexPaint;
+    private int fullColor;
+    private int darkFullColor;
+    private int lightFullColor;
+
     private Paint textPaint;
     private Paint debugLinesPaint;
     private DrawingProperties DP;
@@ -205,6 +210,22 @@ public class HexHiveView<T> extends View {
         fullHexPaint = new Paint();
         fullHexPaint.setColor(fullColor);
         fullHexPaint.setStyle(Paint.Style.FILL);
+
+        int A = (fullColor >> 24) & 0xff; // or color >>> 24
+        int R = (fullColor >> 16) & 0xff;
+        int G = (fullColor >>  8) & 0xff;
+        int B = (fullColor      ) & 0xff;
+        int shades = 20;
+        int darkR = R - shades;
+        int darkG = G - shades;
+        int darkB = B - shades;
+        int lightR = R + shades;
+        int lightG = G + shades;
+        int lightB = B + shades;
+        this.fullColor = fullColor;
+        darkFullColor = (A & 0xff) << 24 | (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
+        lightFullColor = (A & 0xff) << 24 | (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
+
         debugLinesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         debugLinesPaint.setColor(debugLinesColor);
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -237,8 +258,10 @@ public class HexHiveView<T> extends View {
             DP.hexCenterBuffer.y = DP.center.y;
         }
 
+        boolean drawCubes = DP.numHexs <= 150;
+
         while (pieceIndex < DP.numHexs) {
-            drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint);
+            drawHexagon(DP, canvas, hexagonBorderPaint, adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint, drawCubes);
             pieceIndex++;
             DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
 
@@ -270,16 +293,15 @@ public class HexHiveView<T> extends View {
         outCorner.set((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
     }
 
-    // TODO: Pass drawing mode to save up to 50% in lines drawn
-    // FULL, TOP_PARTIAL_5, BOTTOM_PARTIAL_4, BOTTOM_PARTIAL_3
     private void drawHexagon(final DrawingProperties DP,
                              final Canvas canvas,
                              final Paint borderPaint,
-                             final Paint fillPaint) {
+                             final Paint fillPaint,
+                             final boolean drawCube) {
+        DP.fillPathBuffer.reset();
         for (int i = 0; i < 7; i++) {
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, i, DP.hexSideLength);
             if (i==0) {
-                DP.fillPathBuffer.reset();
                 DP.fillPathBuffer.moveTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             } else {
                 DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
@@ -287,6 +309,43 @@ public class HexHiveView<T> extends View {
         }
         canvas.drawPath(DP.fillPathBuffer, fillPaint);
         canvas.drawPath(DP.fillPathBuffer, borderPaint);
+        DP.fillPathBuffer.reset();
+
+        if (drawCube) {
+            // LEFT FACE
+            // bottom corner - 90 degrees (with zero at horizon on the right side)
+            // angles move clockwise
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 2, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            // top left corner - 210 degrees
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            fillPaint.setColor(darkFullColor);
+
+            // fill and paint border of face
+            canvas.drawPath(DP.fillPathBuffer, fillPaint);
+            canvas.drawPath(DP.fillPathBuffer, borderPaint);
+
+            // TOP FACE
+            DP.fillPathBuffer.reset();
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 4, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            fillPaint.setColor(lightFullColor);
+            canvas.drawPath(DP.fillPathBuffer, fillPaint);
+            canvas.drawPath(DP.fillPathBuffer, borderPaint);
+            DP.fillPathBuffer.reset();
+            fillPaint.setColor(fullColor);
+        }
         DP.cornerBuffer.set(-1, -1);
     }
 
