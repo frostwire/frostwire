@@ -381,6 +381,7 @@
     <string name="playing_song_name">Playing %s</string>
     <string name="dummy_nickname" translatable="false">[Nickname]</string>
     <string name="invalid_torrent_file">Invalid Torrent File</string>
+    <string name="invalid_tracker_url">Invalid Tracker URL</string>
     <string name="type_here_to_filter">Type here to filter</string>
     <string name="type_here_to_search">Type here to Search</string>
     <string name="hints_by_google">Hints by Google</string>

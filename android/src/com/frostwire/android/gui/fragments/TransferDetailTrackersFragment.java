@@ -36,6 +36,8 @@ import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.jlibtorrent.AnnounceEntry;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -58,6 +60,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
     private TrackerRecyclerViewAdapter adapter;
     private AddTrackerButtonClickListener addTrackerButtonClickListener;
+    private static final Pattern validTrackerUrlPattern = Pattern.compile("^(https?|udp)://[-a-zA-Z0-9+&@#/%?=~_|!:,\\.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
     @Override
     public void onResume() {
@@ -113,7 +116,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
     private static final class AddTrackerButtonClickListener implements View.OnClickListener, EditTextDialog.TextViewInputDialogCallback {
         private final TorrentHandle torrentHandle;
         private final WeakReference<TrackerRecyclerViewAdapter> adapterRef;
-
+        private WeakReference<View> clickedViewRef;
 
         AddTrackerButtonClickListener(TorrentHandle torrentHandle, TrackerRecyclerViewAdapter adapter) {
             this.torrentHandle = torrentHandle;
@@ -122,6 +125,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
         @Override
         public void onClick(View v) {
+            clickedViewRef = Ref.weak(v);
             UIUtils.showEditTextDialog((Activity) v.getContext(),
                     R.string.enter_valid_tracker_url_here,
                     R.string.add_tracker,
@@ -136,13 +140,17 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         public void onDialogSubmitted(String value, boolean cancelled) {
             if (!cancelled && torrentHandle != null && value != null) {
                 value = value.trim();
-                if (value.startsWith("udp://") || value.startsWith("http://") || value.startsWith("https://")) {
+                Matcher matcher = validTrackerUrlPattern.matcher(value);
+                if (matcher.matches()) {
                     torrentHandle.addTracker(new AnnounceEntry(value));
                     torrentHandle.saveResumeData();
                     torrentHandle.forceReannounce();
                     if (Ref.alive(adapterRef)) {
                         adapterRef.get().notifyDataSetChanged();
                     }
+                } else if (Ref.alive(clickedViewRef)) {
+                    UIUtils.showShortMessage(clickedViewRef.get(), R.string.invalid_tracker_url);
+                    Ref.free(clickedViewRef);
                 }
             }
         }
@@ -213,7 +221,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 TrackerItemViewHolder trackerViewHolder = vhRef.get();
                 if (!cancelled && value != null) {
                     value = value.trim();
-                    if (value.startsWith("udp://") || value.startsWith("http://") || value.startsWith("https://")) {
+                    Matcher matcher = validTrackerUrlPattern.matcher(value);
+                    if (matcher.matches()) {
                         AnnounceEntry newTracker = new AnnounceEntry(value);
                         TorrentHandle th = trackerViewHolder.torrentHandle;
                         List<AnnounceEntry> originalTrackers = th.trackers();
@@ -224,6 +233,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         if (Ref.alive(trackerViewHolder.adapterRef)) {
                             trackerViewHolder.adapterRef.get().notifyDataSetChanged();
                         }
+                    } else {
+                        UIUtils.showShortMessage(vhRef.get().itemView, R.string.invalid_tracker_url);
                     }
                 }
             }
