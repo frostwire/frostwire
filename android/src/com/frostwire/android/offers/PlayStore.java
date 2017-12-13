@@ -22,12 +22,12 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.android.vending.billing.IabHelper;
-import com.android.vending.billing.IabResult;
 import com.android.vending.billing.Inventory;
 import com.android.vending.billing.Purchase;
 import com.android.vending.billing.SkuDetails;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.Debug;
 import com.frostwire.util.Logger;
 
 import java.util.Collections;
@@ -150,7 +150,7 @@ public final class PlayStore extends StoreBase {
         }
 
         helper = new IabHelper(context, base64EncodedPublicKey);
-        helper.enableDebugLogging(true, LOG.getName()); // toggle this value for development
+        helper.enableDebugLogging(Debug.isEnable(), LOG.getName()); // toggle this value for development
 
         helper.startSetup(result -> {
             if (!result.isSuccess()) {
