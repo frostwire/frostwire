@@ -1,8 +1,8 @@
-FrostWire 1.9.9 build 474 - DEC/10/2017
+FrostWire 1.9.9 build 478 - DEC/13/2017
  - App Startup is faster
  - Multiple freezes fixed, memory leaks fixed, crashes fixed
  - Android Jelly-Bean (<4.4) support dropped, minSdkVersion=19
- - Library updates: jlibtorrent 1.2.0.15-RC3, gms 11.6.2, mopub 4.18.0, flexbox 0.3.1, applovin 7.6.0, presage 2.2.4
+ - Library updates: jlibtorrent 1.2.0.15, gms 11.6.2, mopub 4.19.0, flexbox 0.3.1, applovin 7.6.0, presage 2.2.4
  - Image viewer can now go to next and previous pictures with fling gesture
  - Update system refactor, cleanup, updates shown on nav menu
  - New Afrikaans translation
