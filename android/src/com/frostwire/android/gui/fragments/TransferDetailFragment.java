@@ -125,6 +125,7 @@ public final class TransferDetailFragment extends AbstractFragment {
         int itemId = item.getItemId();
         PaymentOptions paymentOptions = uiBittorrentDownload.getPaymentOptions();
         switch (itemId) {
+            // TODO: Add a force re-announce action
             case R.id.fragment_transfer_detail_menu_delete:
                 // TODO: add an action listener and pass to dialog
                 new CancelMenuAction(activity, uiBittorrentDownload, true, true).onClick(activity);
