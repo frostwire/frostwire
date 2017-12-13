@@ -93,6 +93,20 @@ public final class Debug {
     }
 
     /**
+     * Runs the runnable code under strict policy.
+     *
+     * @param r the runnable to execute r.run()
+     */
+    public static void runStrict(Runnable r) {
+        try {
+            setStrictPolicy(true);
+            r.run();
+        } finally {
+            setStrictPolicy(false);
+        }
+    }
+
+    /**
      * Detects if any field/property owned by object can potentially
      * pin a context to memory.
      * <p>

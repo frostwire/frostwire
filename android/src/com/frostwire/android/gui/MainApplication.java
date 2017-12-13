@@ -44,6 +44,8 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
 
+import static com.frostwire.android.util.Debug.runStrict;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -56,9 +58,10 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        runStrict(this::onCreateSafe);
+
         PlayStore.getInstance().initialize(this); // as early as possible
 
-        ignoreHardwareMenu();
         AbstractActivity.setMenuIconsVisible(true);
 
         ConfigurationManager.create(this);
@@ -90,6 +93,10 @@ public class MainApplication extends Application {
         ImageCache.getInstance(this).evictAll();
         ImageLoader.getInstance(this).clear();
         super.onLowMemory();
+    }
+
+    private void onCreateSafe() {
+        ignoreHardwareMenu();
     }
 
     private void ignoreHardwareMenu() {
