@@ -216,7 +216,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 TransferManager.instance().seedFinishedTransfers();
             } else if (fd != null && btDownload == null) {
                 seedFileDescriptor(fd);
-            } else if (btDownload != null && fd == null) {
+            } else if (fd == null) {
                 seedBTDownload();
             }
             if (transferToClear != null) {
