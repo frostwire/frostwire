@@ -37,7 +37,7 @@
         android:id="@+id/fragment_transfer_detail_menu_delete"
         android:icon="@drawable/contextmenu_icon_trash"
         android:orderInCategory="3"
-        android:title="@string/delete"
+        android:title="@string/remove_torrent_and_data"
         app:showAsAction="never"
         />
     <item
