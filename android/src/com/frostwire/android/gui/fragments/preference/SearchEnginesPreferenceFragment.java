@@ -149,17 +149,17 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
 
     @Override
     protected RecyclerView.Adapter onCreateAdapter(PreferenceScreen preferenceScreen) {
-        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen, R.color.app_selection_background, R.color.basic_white);
+        return new CheckedAwarePreferenceGroupAdapter(preferenceScreen);
     }
 
     private static class CheckedAwarePreferenceGroupAdapter extends PreferenceGroupAdapter {
         final int checkedDrawableId;
         final int unCheckedDrawableId;
 
-        CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup, int checkedDrawableId, int unCheckedDrawableId) {
+        CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
             super(preferenceGroup);
-            this.checkedDrawableId = checkedDrawableId;
-            this.unCheckedDrawableId = unCheckedDrawableId;
+            this.checkedDrawableId = R.color.app_selection_background;
+            this.unCheckedDrawableId = R.color.basic_white;
         }
 
         @Override

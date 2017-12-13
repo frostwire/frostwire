@@ -21,7 +21,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
-import android.view.View;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;

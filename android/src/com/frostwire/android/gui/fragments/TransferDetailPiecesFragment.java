@@ -143,10 +143,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
 
         @Override
         public boolean isFull(int hexOffset) {
-            if (totalPieces == downloadedPieces) {
-                return true;
-            }
-            return pieceIndexBitfield.getBit(hexOffset);
+            return totalPieces == downloadedPieces || pieceIndexBitfield.getBit(hexOffset);
         }
     }
 }
