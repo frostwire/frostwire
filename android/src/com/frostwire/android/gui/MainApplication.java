@@ -60,8 +60,6 @@ public class MainApplication extends Application {
 
         runStrict(this::onCreateSafe);
 
-        PlayStore.getInstance().initialize(this); // as early as possible
-
         ConfigurationManager.create(this);
 
         Platforms.set(new AndroidPlatform(this));
@@ -99,6 +97,8 @@ public class MainApplication extends Application {
         ignoreHardwareMenu();
 
         AbstractActivity.setMenuIconsVisible(true);
+
+        PlayStore.getInstance().initialize(this);
     }
 
     private void ignoreHardwareMenu() {
