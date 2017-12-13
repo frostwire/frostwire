@@ -20,8 +20,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -39,9 +37,7 @@ import static com.frostwire.android.gui.util.UIUtils.getBytesInHuman;
 public class TransferDetailStatusFragment extends AbstractTransferDetailFragment {
 
     private TextView completedTextView;
-    private LinearLayout timeLeftLabelContainer;
     private TextView timeLeftTextView;
-    private ImageView timeLeftDividerLine;
     private TextView downloadedTextView;
     private TextView uploadedTextView;
     private TextView shareRatioTextView;
@@ -76,9 +72,7 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
     @Override
     public void ensureComponentsReferenced(View rootView) {
         completedTextView = findView(rootView, R.id.fragment_transfer_detail_status_completion);
-        timeLeftLabelContainer = findView(rootView, R.id.fragment_transfer_detail_status_time_left_container);
         timeLeftTextView = findView(rootView, R.id.fragment_transfer_detail_status_time_left);
-        timeLeftDividerLine = findView(rootView, R.id.fragment_transfer_detail_status_time_left_divider_line);
         downloadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_downloaded);
         uploadedTextView = findView(rootView, R.id.fragment_transfer_detail_status_uploaded);
         shareRatioTextView = findView(rootView, R.id.fragment_transfer_detail_status_share_ratio);
@@ -107,8 +101,8 @@ public class TransferDetailStatusFragment extends AbstractTransferDetailFragment
         peersTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedPeers(), uiBittorrentDownload.getTotalPeers()));
         seedsTextView.setText(getString(R.string.m_of_n_decimals, uiBittorrentDownload.getConnectedSeeds(), uiBittorrentDownload.getTotalSeeds()));
         if (torrentHandle != null) {
-            activeTimeTextView.setText(seconds2time(torrentHandle.status().activeDuration()));
-            seedingTimeTextView.setText(seconds2time(torrentHandle.status().seedingDuration()));
+            activeTimeTextView.setText(seconds2time(torrentHandle.status().activeDuration()/1000));
+            seedingTimeTextView.setText(seconds2time(torrentHandle.status().seedingDuration()/1000));
         }
     }
 }

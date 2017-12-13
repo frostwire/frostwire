@@ -22,6 +22,7 @@ import android.content.Context;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -44,6 +45,9 @@ public final class PauseDownloadMenuAction extends MenuAction {
     public void onClick(Context context) {
         if (!download.isPaused()) {
             download.pause();
+            if (context instanceof TimerObserver) {
+                ((TimerObserver) context).onTime();
+            }
             UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);
         }
     }

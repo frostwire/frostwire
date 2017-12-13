@@ -33,6 +33,7 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
@@ -106,7 +107,7 @@ public final class CancelMenuAction extends MenuAction {
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
 
             int yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question;
-            if (transfer instanceof HttpDownload || transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload) {
+            if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload || transfer instanceof HttpDownload) {
                 yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question_cloud;
             }
 
@@ -138,6 +139,9 @@ public final class CancelMenuAction extends MenuAction {
         @Override
         public void onClick(View view) {
             dlg.cancel();
+            if (dlg.getContext() instanceof TimerObserver) {
+                ((TimerObserver) dlg.getContext()).onTime();
+            }
         }
     }
 
@@ -167,6 +171,9 @@ public final class CancelMenuAction extends MenuAction {
                     deleteData, dlg.getContext());
             Engine.instance().getThreadPool().execute(task);
             dlg.dismiss();
+            if (dlg.getContext() instanceof TimerObserver) {
+                ((TimerObserver) dlg.getContext()).onTime();
+            }
         }
     }
 

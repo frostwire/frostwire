@@ -24,6 +24,8 @@ import android.content.Context;
 
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.transfers.HttpDownload;
 
 /**
  * @author gubatron
@@ -52,6 +54,9 @@ public class CopyToClipboardMenuAction extends MenuAction {
             ClipData clip = ClipData.newPlainText("data", data.toString());
             clipboard.setPrimaryClip(clip);
             UIUtils.showLongMessage(context, messageId);
+        }
+        if (context instanceof TimerObserver) {
+            ((TimerObserver) context).onTime();
         }
     }
 

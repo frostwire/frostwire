@@ -127,15 +127,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         }
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-//        if (uiBittorrentDownload == null && savedInstanceState != null) {
-//            String infoHash = savedInstanceState.getString("infohash");
-//            recoverUIBittorrentDownload(infoHash);
-//        }
-    }
-
     private void updateCommonComponents() {
         if (uiBittorrentDownload == null) {
             return;
