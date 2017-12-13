@@ -62,8 +62,6 @@ public class MainApplication extends Application {
 
         PlayStore.getInstance().initialize(this); // as early as possible
 
-        AbstractActivity.setMenuIconsVisible(true);
-
         ConfigurationManager.create(this);
 
         Platforms.set(new AndroidPlatform(this));
@@ -96,7 +94,11 @@ public class MainApplication extends Application {
     }
 
     private void onCreateSafe() {
+        // some phones still can configure an external button as the
+        // permanent menu key
         ignoreHardwareMenu();
+
+        AbstractActivity.setMenuIconsVisible(true);
     }
 
     private void ignoreHardwareMenu() {
