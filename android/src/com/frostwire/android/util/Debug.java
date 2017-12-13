@@ -134,9 +134,7 @@ public final class Debug {
 
             // BFS variation algorithm
 
-            // noinspection ForLoopReplaceableByForEach
-            for (int i = 0; i < fields.length; i++) {
-                Field f = fields[i];
+            for (Field f : fields) {
                 f.setAccessible(true); // let's hope java 9 ideas don't get inside android
                 Object value = f.get(obj);
 
@@ -154,9 +152,7 @@ public final class Debug {
                 }
             }
 
-            // noinspection ForLoopReplaceableByForEach
-            for (int i = 0; i < fields.length; i++) {
-                Field f = fields[i];
+            for (Field f : fields) {
                 f.setAccessible(true);
                 Object value = f.get(obj);
 
