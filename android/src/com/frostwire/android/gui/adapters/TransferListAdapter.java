@@ -566,7 +566,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             Object transfer = v.getTag();
             if (transfer instanceof UIBittorrentDownload) {
                 String infoHash = ((UIBittorrentDownload) transfer).getInfoHash();
-                new TransferDetailsMenuAction(owner, R.string.show_torrent_details, infoHash).onClick();
+                new TransferDetailsMenuAction(owner, R.string.show_torrent_details, infoHash).setClickedView(v).onClick();
             }
         }
     }

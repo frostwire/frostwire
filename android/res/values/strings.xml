@@ -787,6 +787,7 @@
     <string name="downloaded_n">Downloaded %1$s / </string>
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="rtt_ms">RTT %1$d ms</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

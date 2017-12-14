@@ -25,9 +25,11 @@ import android.net.Uri;
 import android.os.SystemClock;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.IOUtils;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -57,25 +59,26 @@ final class MediaScanner {
         final CountDownLatch finishSignal = new CountDownLatch(paths.size());
 
         MediaScannerConnection.scanFile(context, paths.toArray(new String[0]), null, (path, uri) -> {
-            boolean success = true;
-            if (uri == null) {
-                success = false;
-                failedPaths.add(path);
-            } else {
-                // verify the stored size four faulty scan
-                long size = getSize(context, uri);
-                if (size == 0) {
-                    LOG.warn("Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
+            try {
+                boolean success = true;
+                if (uri == null) {
                     success = false;
                     failedPaths.add(path);
+                } else {
+                    // verify the stored size four faulty scan
+                    long size = getSize(context, uri);
+                    if (size == 0) {
+                        LOG.warn("Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
+                        success = false;
+                        failedPaths.add(path);
+                    }
                 }
+                if (!success) {
+                    LOG.info("Scan failed for path: " + path + ", uri: " + uri);
+                }
+            } finally {
+                finishSignal.countDown();
             }
-
-            if (!success) {
-                LOG.info("Scan failed for path: " + path + ", uri: " + uri);
-            }
-
-            finishSignal.countDown();
         });
 
         try {

@@ -20,10 +20,15 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.TransferDetailActivity;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -33,6 +38,7 @@ import com.frostwire.android.gui.views.MenuAction;
 public class TransferDetailsMenuAction extends MenuAction {
 
     private final String infohash;
+    private WeakReference<View> clickedViewRef; // used for possible toast message
 
     public TransferDetailsMenuAction(Context context, int stringId, String infoHash) {
         super(context, R.drawable.contextmenu_icon_file, stringId);
@@ -41,8 +47,17 @@ public class TransferDetailsMenuAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
-        Intent intent = new Intent(getContext(), TransferDetailActivity.class);
-        intent.putExtra("infoHash", infohash);
-        context.startActivity(intent);
+        if (infohash != null && !"".equals(infohash)) {
+            Intent intent = new Intent(getContext(), TransferDetailActivity.class);
+            intent.putExtra("infoHash", infohash);
+            context.startActivity(intent);
+        } else if (Ref.alive(clickedViewRef)) {
+            UIUtils.showShortMessage(clickedViewRef.get(), R.string.could_not_open_transfer_detail_invalid_infohash);
+        }
+    }
+
+    public TransferDetailsMenuAction setClickedView(View clickedView) {
+        clickedViewRef = Ref.weak(clickedView);
+        return this;
     }
 }
