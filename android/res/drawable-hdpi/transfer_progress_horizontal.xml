@@ -22,21 +22,15 @@
 
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@android:color/transparent" />
+            <solid android:color="@color/basic_gray_medium" />
 
-            <stroke
-                android:width="1px"
-                android:color="#ffa9b4bb" />
+
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
-                <solid android:color="@color/basic_blue_highlight" />
-
-                <stroke
-                    android:width="1px"
-                    android:color="#ffa9b4bb" />
+                <solid android:color="@color/basic_gray_medium" />
             </shape>
         </clip>
     </item>
@@ -45,9 +39,6 @@
             <shape>
                 <solid android:color="@color/basic_blue_highlight" />
 
-                <stroke
-                    android:width="1px"
-                    android:color="#ffa9b4bb" />
             </shape>
         </clip>
     </item>

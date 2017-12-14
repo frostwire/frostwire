@@ -19,6 +19,7 @@ package com.frostwire.android.gui.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -46,7 +47,9 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.uxstats.UXAction;
@@ -159,14 +162,40 @@ public final class UIUtils {
         showShortMessage(context, context.getString(resId, formatArgs));
     }
 
-    public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener) {
-        showYesNoDialog(context, iconId, message, titleId, positiveListener, (dialog, which) -> dialog.dismiss());
+    public static void showYesNoDialog(Context context, String message, int titleId, OnClickListener positiveListener) {
+        showYesNoDialog(context, message, titleId, positiveListener, (dialog, which) -> dialog.dismiss());
     }
 
-    public static void showYesNoDialog(Context context, int iconId, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setIcon(iconId).setMessage(message).setTitle(titleId).setCancelable(false).setPositiveButton(android.R.string.yes, positiveListener).setNegativeButton(android.R.string.no, negativeListener);
-        builder.create().show();
+    public static void showYesNoDialog(Context context, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
+        YesNoDialog yesNoDialog = YesNoDialog.newInstance(message, titleId, message, (byte) 0);
+        yesNoDialog.setOnDialogClickListener((tag, which) -> {
+                    if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
+                        positiveListener.onClick(yesNoDialog.getDialog(), which);
+                    } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
+                        negativeListener.onClick(yesNoDialog.getDialog(), which);
+                    }
+                    yesNoDialog.dismiss();
+                }
+        );
+        yesNoDialog.show(((Activity) context).getFragmentManager());
+    }
+
+    public static void showEditTextDialog(Activity activity,
+                                          int messageStringId,
+                                          int titleStringId,
+                                          int positiveButtonStringId,
+                                          boolean cancelable,
+                                          boolean multilineInput,
+                                          String optionalEditTextValue,
+                                          final EditTextDialog.TextViewInputDialogCallback callback) {
+        new EditTextDialog().
+                init(titleStringId,
+                        messageStringId,
+                        positiveButtonStringId,
+                        cancelable,
+                        multilineInput,
+                        optionalEditTextValue,
+                        callback).show(activity.getFragmentManager());
     }
 
     public static String getBytesInHuman(long size) {
@@ -425,7 +454,7 @@ public final class UIUtils {
      */
     public static boolean diceRollPassesThreshold(ConfigurationManager cm, String thresholdPreferenceKey) {
         int thresholdValue = cm.getInt(thresholdPreferenceKey);
-        int diceRoll = new Random().nextInt(100)+1; //1-100
+        int diceRoll = new Random().nextInt(100) + 1; //1-100
         if (thresholdValue <= 0) {
             LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> false");
             return false;

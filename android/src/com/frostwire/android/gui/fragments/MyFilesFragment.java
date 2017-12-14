@@ -510,7 +510,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
         try {
             byte fileType = (Byte) data[0];
-            List<FileDescriptor> items = (List<FileDescriptor>) data[1];
+            @SuppressWarnings("unchecked") List<FileDescriptor> items = (List<FileDescriptor>) data[1];
             adapter = new FileListAdapter(getActivity(), items, fileType, selectAllModeOn) {
                 @Override
                 protected void onLocalPlay() {

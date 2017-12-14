@@ -20,8 +20,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frostwire.android"
     android:installLocation="auto"
-    android:versionCode="478"
-    android:versionName="1.9.9">
+    android:versionCode="479"
+    android:versionName="2.0.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -157,6 +157,10 @@
             android:excludeFromRecents="true"
             android:label="@string/activity_VPN"
             android:noHistory="true" />
+        <activity
+            android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
+            android:label="@string/title_activity_transfer_detail" />
+
         <!-- apollo activities -->
         <activity
             android:name="com.andrew.apollo.ui.activities.HomeActivity"
@@ -251,7 +255,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <!-- services -->
 
         <service

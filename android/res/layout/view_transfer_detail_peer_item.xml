@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
+        android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
+
+        <TextView
+            android:id="@+id/view_transfer_detail_peer_item_address"
+            style="@style/transferDetailTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:text="@string/transfer_detail_peers_address_dummy" />
+
+        <TextView
+            android:id="@+id/view_transfer_detail_peer_item_rtt"
+            style="@style/TransfersList.Item"
+            android:layout_below="@+id/view_transfer_detail_peer_item_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingTop="2dp"
+            android:text="@string/rtt_ms" />
+
+        <TextView
+            android:id="@+id/view_transfer_detail_peer_item_client"
+            style="@style/TransfersList.Item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_transfer_detail_peer_item_address"
+            android:text="@string/transfer_detail_peers_address_source_dummy" />
+
+        <LinearLayout
+            android:id="@+id/view_transfer_detail_peer_item_download_speed_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/view_transfer_detail_peer_item_rtt"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_peer_item_arrow_down"
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:contentDescription="@null"
+                android:src="@drawable/transfers_triangle_downward"
+                android:tint="@color/basic_gray_text_dark" />
+
+            <TextView
+                android:id="@+id/view_transfer_detail_peer_item_down_speed"
+                style="@style/TransfersList.Item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="left"
+                android:text="@string/transfer_detail_speed_dummy" />
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_peer_items_arrow_up"
+                android:layout_width="wrap_content"
+                android:layout_height="15dp"
+                android:contentDescription="@null"
+                android:src="@drawable/transfers_triangle_upward"
+                android:tint="@color/basic_gray_text_dark" />
+
+            <TextView
+                android:id="@+id/view_transfer_detail_peer_item_up_speed"
+                style="@style/TransfersList.Item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="left"
+                android:text="@string/transfer_detail_speed_dummy" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/view_transfer_detail_peer_source_type"
+            style="@style/TransfersList.Item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_transfer_detail_peer_item_client"
+            android:text="@string/source_type" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_transfer_detail_peer_item_download_speed_container">
+            <TextView
+                android:id="@+id/view_transfer_detail_peer_downloaded"
+                style="@style/TransfersList.Item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="4dp"
+                android:paddingStart="0dp"
+                android:text="@string/downloaded_n" />
+
+            <TextView
+                android:id="@+id/view_transfer_detail_peer_uploaded"
+                style="@style/TransfersList.Item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uploaded_n" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_line"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@null" />
+</RelativeLayout>

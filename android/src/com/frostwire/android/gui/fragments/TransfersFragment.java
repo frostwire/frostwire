@@ -26,6 +26,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,7 +36,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,11 +52,10 @@ import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
-import com.frostwire.android.gui.fragments.preference.TorrentFragment;
+import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.util.ScrollListeners;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
@@ -84,19 +84,22 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
+
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
     private final Comparator<Transfer> transferComparator;
     private final TransferStatus[] tabPositionToTransferStatus;
     private TabLayout tabLayout;
-    private ExpandableListView list;
+    private RecyclerView list;
+    private TransferListAdapter adapter;
+    private RecyclerView.LayoutManager recyclerViewLayoutManager;
+
     private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
     private TextView vpnRichToast;
     private ClearableEditTextView addTransferUrlTextView;
-    private TransferListAdapter adapter;
     private TransferStatus selectedStatus;
     private TimerSubscription subscription;
     private boolean isVPNactive;
@@ -186,7 +189,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
         // Handle item selection
-        setupAdapter();
+        setupAdapter(getActivity());
         switch (item.getItemId()) {
             case R.id.fragment_transfers_menu_add_transfer:
                 toggleAddTransferControls();
@@ -262,7 +265,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
 
         } else if (this.getActivity() != null) {
-            setupAdapter();
+            setupAdapter(this.getActivity());
         }
 
         // mark the selected tab
@@ -426,7 +429,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             }
         });
         list = findView(v, R.id.fragment_transfers_list);
-        list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
+        recyclerViewLayoutManager = new LinearLayoutManager(this.getActivity());
+
+        // TODO: had to comment this out when I switched to RecyclerView
+        //list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
 
         SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
@@ -446,7 +452,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             Context ctx = v12.getContext();
             Intent i = new Intent(ctx, SettingsActivity.class);
             if (showTorrentSettingsOnClick) {
-                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentFragment.class.getName());
+                i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, TorrentPreferenceFragment.class.getName());
                 i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT_TITLE, getString(R.string.torrent_preferences_header));
             }
             ctx.startActivity(i);
@@ -506,10 +512,14 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private void setupAdapter() {
+    private void setupAdapter(Context context) {
+        if (context == null) {
+            return;
+        }
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
         Collections.sort(transfers, transferComparator);
-        adapter = new TransferListAdapter(TransfersFragment.this.getActivity(), transfers);
+        adapter = new TransferListAdapter(context, transfers);
+        list.setLayoutManager(recyclerViewLayoutManager);
         list.setAdapter(adapter);
     }
 

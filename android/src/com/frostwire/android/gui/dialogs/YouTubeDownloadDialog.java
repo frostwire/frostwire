@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -165,11 +164,6 @@ public class YouTubeDownloadDialog extends AbstractConfirmListDialog<SearchResul
         @Override
         public int getItemThumbnailResourceId(SearchResult data) {
             return -1;
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            return super.getView(position, view, parent);
         }
 
         @Override

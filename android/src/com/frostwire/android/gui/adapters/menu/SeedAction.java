@@ -36,6 +36,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
@@ -147,6 +148,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             showSeedingDialog();
         } else {
             seedEm();
+            if (context instanceof TimerObserver) {
+                ((TimerObserver) context).onTime();
+            }
             UIUtils.showTransfersOnDownloadStart(getContext());
         }
     }
@@ -212,7 +216,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 TransferManager.instance().seedFinishedTransfers();
             } else if (fd != null && btDownload == null) {
                 seedFileDescriptor(fd);
-            } else if (btDownload != null && fd == null) {
+            } else if (fd == null) {
                 seedBTDownload();
             }
             if (transferToClear != null) {

@@ -34,40 +34,31 @@
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/app_background_body_dark"
             android:gravity="center|center_vertical"
             android:paddingBottom="20dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
             android:paddingTop="20dp">
 
             <ImageView
-                android:id="@+id/view_transfer_list_item_group_indicator"
+                android:id="@+id/view_transfer_list_item_download_type_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_vertical"
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
                 android:src="@drawable/transfer_menuitem_plus" />
-
-            <ImageView
-                android:id="@+id/view_transfer_list_item_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|center_vertical"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter" />
         </FrameLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:orientation="vertical"
             android:paddingBottom="6dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="0dp"
             android:paddingTop="6dp">
 
             <TextView
@@ -80,10 +71,9 @@
             <ProgressBar
                 android:id="@+id/view_transfer_list_item_progress"
                 android:layout_width="fill_parent"
-                android:layout_height="5dp"
-                android:layout_below="@id/view_transfer_list_item_title"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
+                android:layout_height="3dp"
+                android:layout_marginBottom="7dp"
+                android:layout_marginTop="7dp"
                 android:indeterminateOnly="false"
                 android:progressDrawable="@drawable/transfer_progress_horizontal" />
 
@@ -94,10 +84,9 @@
 
                 <TextView
                     android:id="@+id/view_transfer_list_item_status"
-                    style="@style/TransfersList.Item.Status"
+                    style="@style/TransfersList.Item"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/view_transfer_list_item_title"
                     android:foregroundGravity="left"
                     android:text="@string/dummy_status" />
 
@@ -105,55 +94,66 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:foregroundGravity="right"
-                    android:gravity="right"
+                    android:gravity="end"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/view_transfer_list_item_peers"
-                        style="@style/TransfersList.Item.Status"
+                        style="@style/TransfersList.Item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="4dp"
+                        android:layout_marginEnd="4dp"
                         android:text="@string/dummy_peers" />
 
                     <TextView
-                        style="@style/TransfersList.Item.Status"
+                        style="@style/TransfersList.Item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="-" />
 
                     <TextView
                         android:id="@+id/view_transfer_list_item_seeds"
-                        style="@style/TransfersList.Item.Status"
+                        style="@style/TransfersList.Item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="4dp"
+                        android:layout_marginStart="4dp"
                         android:text="@string/dummy_seeds" />
                 </LinearLayout>
 
 
             </LinearLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/view_transfer_list_item_size"
-                    style="@style/TransferListItemSize"
+                    style="@style/TransfersList.Item"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/view_transfer_detail_peer_item_arrow_down"
                     android:text="@string/dummy_size" />
+
+                <ImageView
+                    android:id="@+id/view_transfer_detail_peer_item_arrow_down"
+                    android:layout_width="wrap_content"
+                    android:layout_height="15dp"
+                    android:layout_toStartOf="@+id/view_transfer_list_item_speed"
+                    android:contentDescription="@null"
+                    android:src="@drawable/transfers_triangle_downward"
+                    android:tint="@color/basic_gray_text_dark" />
 
                 <TextView
                     android:id="@+id/view_transfer_list_item_speed"
-                    style="@style/TransfersList.Item.Status"
-                    android:layout_width="match_parent"
+                    style="@style/TransfersList.Item"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
+                    android:layout_alignParentEnd="true"
                     android:text="@string/dummy_speed" />
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 
@@ -161,16 +161,27 @@
             android:id="@+id/view_transfer_list_item_button_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center|center_vertical"
+            android:layout_gravity="center"
             android:background="@null"
             android:contentDescription="@null"
             android:scaleType="fitCenter"
+            android:visibility="gone"
             android:src="@drawable/my_files_play_icon" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/view_transfer_list_item_button_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:src="@drawable/my_files_details_icon" />
 
+    </LinearLayout>
     <View
+        style="@style/divider_line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#FFDADADA" />
+        android:layout_height="1dp" />
 </LinearLayout>

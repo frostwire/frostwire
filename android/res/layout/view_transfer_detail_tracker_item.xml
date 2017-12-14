@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
+        android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+        android:paddingEnd="0dp"
+        android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/view_transfer_detail_tracker_address"
+            style="@style/transferDetailText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".77"
+            android:text="@string/transfer_detail_trackers_address_dummy" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".23"
+            android:gravity="end">
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_tracker_edit_button"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:contentDescription="@null"
+                android:paddingEnd="2dp"
+                android:paddingStart="0dp"
+                android:src="@drawable/contextmenu_icon_rename" />
+
+            <ImageView
+                android:id="@+id/view_transfer_detail_tracker_remove_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@null"
+                android:paddingEnd="5dp"
+                android:paddingStart="2dp"
+                android:src="@drawable/contextmenu_icon_remove_transfer" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/divider_line"
+        android:contentDescription="@null" />
+</LinearLayout>

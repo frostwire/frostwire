@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_transfer_detail_details_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_transfer_detail_progress" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_storage_path_label"
+                style="@style/transferDetailTitleHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transfer_detail_storage_header" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_storage_path"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_storage_path_label"
+                android:text="@string/transfer_detail_storage_dummy" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox_label"
+                style="@style/transferDetailText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/sequential_download" />
+
+            <CheckBox
+                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_total_size_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="@string/total_size" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_total_size"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_total_size_label"
+                android:layout_marginTop="5dp"
+                android:text="@string/transfer_detail_size_dummy" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_files_number_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/fragment_transfer_detail_details_total_size_label"
+                android:gravity="end"
+                android:text="@string/number_of_files" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_files_number"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_files_number_label"
+                android:layout_marginTop="5dp"
+                android:text="@string/transfer_detail_files_number_dummy" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_speed_limits_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="@string/speed_limits" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_speed_limit_download"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
+                android:layout_marginTop="5dp"
+                android:text="@string/infinity" />
+
+            <ImageView
+                android:id="@+id/fragment_transfer_detail_details_speed_limit_download_arrow"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
+                android:layout_marginTop="5dp"
+                android:layout_toEndOf="@+id/fragment_transfer_detail_details_speed_limit_download"
+                android:contentDescription="@null"
+                android:src="@drawable/transfers_triangle_downward"
+                android:tint="@color/app_text_secondary" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_speed_limit_upload"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
+                android:layout_marginTop="5dp"
+                android:layout_toStartOf="@+id/fragment_transfer_detail_details_speed_limit_upload_arrow"
+                android:text="@string/infinity" />
+
+            <ImageView
+                android:id="@+id/fragment_transfer_detail_details_speed_limit_upload_arrow"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_speed_limits_label"
+                android:layout_marginTop="5dp"
+                android:contentDescription="@null"
+                android:src="@drawable/transfers_triangle_upward"
+                android:tint="@color/app_text_secondary" />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_hash_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hash" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_hash"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_hash_label"
+                android:layout_marginTop="5dp"
+                android:layout_toStartOf="@+id/fragment_transfer_detail_details_hash_copy_button"
+                android:text="@string/transfer_detail_hash_dummy" />
+
+            <ImageButton
+                android:id="@+id/fragment_transfer_detail_details_hash_copy_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/contextmenu_icon_copy" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="8dp"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_magnet_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/magnet" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_magnet"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/fragment_transfer_detail_details_magnet_label"
+                android:layout_marginTop="5dp"
+                android:layout_toStartOf="@+id/fragment_transfer_detail_details_magnet_copy_button"
+                android:maxLines="4"
+                android:text="@string/transfer_detail_hash_dummy" />
+
+            <ImageButton
+                android:id="@+id/fragment_transfer_detail_details_magnet_copy_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="4dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/contextmenu_icon_copy" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_created_on_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/created_on" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_created_on"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transfer_detail_date_dummy" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:id="@+id/fragment_transfer_detail_details_comment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
+            android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingLeft="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingRight="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingStart="@dimen/transfers_detail_page_padding_horizontal"
+            android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_comment_label"
+                style="@style/transferDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:text="@string/comment" />
+
+            <TextView
+                android:id="@+id/fragment_transfer_detail_details_comment"
+                style="@style/transferDetailText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transfer_detail_comment_dummy" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

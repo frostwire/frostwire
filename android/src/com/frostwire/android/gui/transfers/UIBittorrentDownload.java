@@ -82,7 +82,6 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         try {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
         } catch (Throwable ignored) {
-
         }
     }
 
@@ -176,6 +175,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public void remove(boolean deleteTorrent, boolean deleteData) {
         remove(null, deleteTorrent, deleteData);
+    }
+
+    @Override
+    public String getPredominantFileExtension() {
+        return getDl() == null ? "torrent" : getDl().getPredominantFileExtension();
     }
 
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {

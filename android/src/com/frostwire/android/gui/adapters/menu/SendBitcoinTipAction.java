@@ -53,7 +53,6 @@ public final class SendBitcoinTipAction extends MenuAction {
         } catch (Throwable e) {
             UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
         }
-
         UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
     }
 }

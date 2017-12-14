@@ -17,8 +17,23 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.AlertListener;
+import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.PiecesTracker;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.SessionHandle;
+import com.frostwire.jlibtorrent.TorrentFlags;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.PieceFinishedAlert;
+import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
@@ -29,11 +44,18 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author gubatron
@@ -73,6 +95,8 @@ public final class BTDownload implements BittorrentDownload {
     private final PaymentOptions paymentOptions;
 
     private final InnerListener innerListener;
+
+    private String predominantFileExtension;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
@@ -275,6 +299,10 @@ public final class BTDownload implements BittorrentDownload {
         return th.isValid() ? th.status().numPeers() : 0;
     }
 
+    public TorrentHandle getTorrentHandle() {
+        return th;
+    }
+
     public int getTotalPeers() {
         return th.isValid() ? th.status().listPeers() : 0;
     }
@@ -391,6 +419,47 @@ public final class BTDownload implements BittorrentDownload {
 
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
+    }
+
+    @Override
+    public String getPredominantFileExtension() {
+        if (predominantFileExtension == null && th != null) {
+            TorrentInfo torrentInfo = th.torrentFile();
+            if (torrentInfo != null) {
+                FileStorage files = torrentInfo.files();
+                Map<String, Long> extensionByteSums = new HashMap<>();
+                int numFiles = files.numFiles();
+                if (files.paths() != null) {
+                    for (int i = 0; i < numFiles; i++) {
+                        String path = files.filePath(i);
+                        String extension = FilenameUtils.getExtension(path);
+                        if ("".equals(extension)) {
+                            // skip folders
+                            continue;
+                        }
+                        if (extensionByteSums.containsKey(extension)) {
+                            Long bytes = extensionByteSums.get(extension);
+                            extensionByteSums.put(extension, bytes + files.fileSize(i));
+                        } else {
+                            extensionByteSums.put(extension, files.fileSize(i));
+                        }
+                    }
+                    String extensionCandidate = null;
+                    Set<String> exts = extensionByteSums.keySet();
+                    for (String ext : exts) {
+                        if (extensionCandidate == null) {
+                            extensionCandidate = ext;
+                        } else {
+                            if (extensionByteSums.get(ext) > extensionByteSums.get(extensionCandidate)) {
+                                extensionCandidate = ext;
+                            }
+                        }
+                    }
+                    predominantFileExtension = extensionCandidate;
+                }
+            }
+        }
+        return predominantFileExtension;
     }
 
     public BTDownloadListener getListener() {

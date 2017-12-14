@@ -33,6 +33,7 @@ import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
@@ -56,14 +57,18 @@ public final class CancelMenuAction extends MenuAction {
 
 
     public CancelMenuAction(Context context, Transfer transfer, boolean deleteData) {
-        super(context, R.drawable.contextmenu_icon_stop_transfer, (deleteData) ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
+        super(context,
+                deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
+                deleteData ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
         this.transfer = transfer;
         this.deleteData = deleteData;
         this.deleteTorrent = deleteData;
     }
 
     public CancelMenuAction(Context context, BittorrentDownload transfer, boolean deleteTorrent, boolean deleteData) {
-        super(context, R.drawable.contextmenu_icon_stop_transfer, R.string.remove_torrent_and_data);
+        super(context,
+                deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
+                R.string.remove_torrent_and_data);
         this.transfer = transfer;
         this.deleteTorrent = deleteTorrent;
         this.deleteData = deleteData;
@@ -102,7 +107,7 @@ public final class CancelMenuAction extends MenuAction {
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
 
             int yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question;
-            if (transfer instanceof HttpDownload || transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload) {
+            if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload || transfer instanceof HttpDownload) {
                 yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question_cloud;
             }
 
@@ -134,6 +139,9 @@ public final class CancelMenuAction extends MenuAction {
         @Override
         public void onClick(View view) {
             dlg.cancel();
+            if (dlg.getContext() instanceof TimerObserver) {
+                ((TimerObserver) dlg.getContext()).onTime();
+            }
         }
     }
 
@@ -163,6 +171,9 @@ public final class CancelMenuAction extends MenuAction {
                     deleteData, dlg.getContext());
             Engine.instance().getThreadPool().execute(task);
             dlg.dismiss();
+            if (dlg.getContext() instanceof TimerObserver) {
+                ((TimerObserver) dlg.getContext()).onTime();
+            }
         }
     }
 

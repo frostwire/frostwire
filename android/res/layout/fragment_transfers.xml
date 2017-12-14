@@ -49,10 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginRight="6dp"
             android:layout_marginEnd="6dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="6dp"
             android:focusableInTouchMode="true"
             android:visibility="gone"
@@ -97,7 +95,6 @@
         android:id="@+id/fragment_transfers_sd_card_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
         frostwire:rich_notification_icon="@drawable/sd_card_notification"
         frostwire:rich_notification_title="@string/saving_to_sd_card"
@@ -107,7 +104,6 @@
         android:id="@+id/fragment_transfers_internal_memory_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
         frostwire:rich_notification_icon="@drawable/internal_memory_notification"
         frostwire:rich_notification_title="@string/saving_to_internal_memory"
@@ -121,14 +117,14 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <com.frostwire.android.gui.views.TransfersNoSeedsView
                 android:id="@+id/fragment_transfers_no_seeds_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/transfers_seeding_notification_top_padding"
                 android:layout_gravity="center_vertical"
+                android:paddingTop="@dimen/transfers_seeding_notification_top_padding"
                 android:visibility="gone" />
 
         </ScrollView>
@@ -139,14 +135,14 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <ExpandableListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/fragment_transfers_list"
+                style="@style/scrollbar_default_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/scrollbar_default_style"
+                android:childDivider="#00000000"
                 android:divider="@color/transparent"
                 android:dividerHeight="0dp"
-                android:childDivider="#00000000"
                 android:groupIndicator="@null" />
 
         </com.frostwire.android.gui.views.SwipeLayout>
@@ -158,7 +154,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:background="@drawable/toast_vpn_status_bgd"
             android:text="@string/vpn_off_toast_notification" />
@@ -184,9 +179,9 @@
             android:layout_gravity="start|center_vertical"
             android:layout_margin="10dp"
             android:background="@color/transparent"
+            android:contentDescription="@null"
             android:scaleType="fitXY"
-            android:src="@drawable/notification_vpn_off"
-            android:contentDescription="@null" />
+            android:src="@drawable/notification_vpn_off" />
 
         <View
             android:layout_width="1px"
@@ -196,16 +191,13 @@
         <!-- DHT peers -->
         <TextView
             android:id="@+id/fragment_transfers_dht_peers"
+            style="@style/TransfersIndicator"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1.0"
-            android:gravity="center_vertical"
             android:text="@string/dht_contacts"
-            android:textColor="@color/app_text_white"
-            android:textSize="@dimen/text_size_extra_micro" />
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -217,11 +209,8 @@
                 style="@style/TransfersIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/transfers_triangle_downward"
                 android:drawableStart="@drawable/transfers_triangle_downward"
-                android:paddingRight="8dp"
                 android:paddingEnd="8dp"
-                android:paddingLeft="0dp"
                 android:paddingStart="0dp"
                 android:text="@string/dummy_downloads_indicator" />
 
@@ -230,11 +219,8 @@
                 style="@style/TransfersIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/transfers_triangle_upward"
                 android:drawableStart="@drawable/transfers_triangle_upward"
-                android:paddingRight="8dp"
                 android:paddingEnd="8dp"
-                android:paddingLeft="0dp"
                 android:paddingStart="0dp"
                 android:text="@string/dummy_uploads_indicator" />
         </LinearLayout>

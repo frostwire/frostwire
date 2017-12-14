@@ -101,4 +101,14 @@
         <attr name="selectorDrawable" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="HexHiveView">
+        <attr name="hexhive_hexBorderColor" format="color"/>
+        <attr name="hexhive_emptyColor" format="color" />
+        <attr name="hexhive_fullColor" format="color" />
+        <attr name="hexhive_textColor" format="color"/>
+        <attr name="hexhive_debugLinesColor" format="color"/>
+        <attr name="hexhive_textSize" format="float"/>
+        <attr name="hexhive_debug" format="boolean" />
+    </declare-styleable>
+
 </resources>
