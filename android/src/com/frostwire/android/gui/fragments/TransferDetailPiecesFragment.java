@@ -26,6 +26,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
+import com.frostwire.android.util.StopClock;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -44,7 +45,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     private HexHiveView.HexDataAdapter<PieceIndexBitfield> hexDataAdapter;
     private ProgressBar progressBar;
     private int totalPieces;
-
+    private String pieceSizeString;
 
     public TransferDetailPiecesFragment() {
         super(R.layout.fragment_transfer_detail_pieces);
@@ -82,35 +83,56 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
+
+        StopClock.start();
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
+        StopClock.stop("torrentHandle.status(QUERY_PIECES)");
+
+        StopClock.start();
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
+        StopClock.stop("torrentHandle.torrentFile()");
+
+        if (pieceSizeString == null) {
+            pieceSizeString = UIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
+        }
+
+        if (totalPieces == -1) {
+            totalPieces = torrentInfo.numPieces();
+            piecesNumberTextView.setText(totalPieces + "");
+            progressBar.setVisibility(View.VISIBLE);
+            hexHiveView.setVisibility(View.GONE);
+        }
+
+        StopClock.start();
         PieceIndexBitfield pieces = status.pieces();
+        StopClock.stop("status.pieces()");
+
+        StopClock.start();
+        long piecesCount = pieces.count();
+        StopClock.stop("pieces.count()");
         if (isAdded()) {
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
-            pieceSizeTextView.setText(UIUtils.getBytesInHuman(torrentInfo.pieceSize(0)));
-            hexDataAdapter = new PieceAdapter(torrentInfo.numPieces(), pieces);
+            pieceSizeTextView.setText(pieceSizeString);
+            StopClock.start();
+            hexDataAdapter = new PieceAdapter(totalPieces, pieces);
+            StopClock.stop("new PieceAdapter(torrentInfo.numPieces(), pieces)");
         }
         if (hexDataAdapter != null) {
+            StopClock.start();
             hexHiveView.updateData(hexDataAdapter);
-            if (status.pieces().count() > 0) {
+            StopClock.stop("hexHiveView.updateData(hexDataAdapter)");
+            if (piecesCount > 0) {
                 progressBar.setVisibility(View.GONE);
                 hexHiveView.setVisibility(View.VISIBLE);
             }
-
-            if (totalPieces == -1) {
-                totalPieces = torrentInfo.numPieces();
-                piecesNumberTextView.setText(totalPieces + "");
-                progressBar.setVisibility(View.VISIBLE);
-                hexHiveView.setVisibility(View.GONE);
-            }
-            piecesNumberTextView.setText(pieces.count() + "/" + totalPieces);
-            if (hexDataAdapter != null) {
-                if (pieces.count() >= 0) {
-                    hexDataAdapter.updateData(pieces);
-                    progressBar.setVisibility(View.GONE);
-                    hexHiveView.setVisibility(View.VISIBLE);
-                }
+            piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
+            if (hexDataAdapter != null && piecesCount >= 0) {
+                StopClock.start();
+                hexDataAdapter.updateData(pieces);
+                StopClock.stop("hexDataAdapter.updateData(pieces)");
+                progressBar.setVisibility(View.GONE);
+                hexHiveView.setVisibility(View.VISIBLE);
             }
         }
     }
