@@ -28,22 +28,21 @@ import android.os.SystemClock;
  */
 
 
-public class StopClock {
-    private static StopClock instance = new StopClock();
+public class StopWatch {
     long start;
-    private StopClock() {
+    public StopWatch() {
         start = -1;
     }
 
-    public static void start() {
-        instance.start = SystemClock.currentThreadTimeMillis();
+    public void start() {
+        start = SystemClock.currentThreadTimeMillis();
     }
 
-    public static void stop(String methodName) {
-        if (instance.start != -1) {
-            long duration = SystemClock.currentThreadTimeMillis() - instance.start;
-            System.out.println("[StopClock]: " + methodName + " finished in " + duration + " ms");
+    public void stop(String methodName) {
+        if (start != -1) {
+            long duration = SystemClock.currentThreadTimeMillis() - start;
+            System.out.println("[StopWatch]: " + methodName + " finished in " + duration + " ms");
         }
-        instance.start = -1;
+        start = -1;
     }
 }
