@@ -26,7 +26,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
-import com.frostwire.android.util.StopWatch;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -84,14 +83,8 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         }
         progressBar.setVisibility(View.VISIBLE);
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
-        stopWatch.stop("torrentHandle.status(QUERY_PIECES)");
-
-        stopWatch.start();
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
-        stopWatch.stop("torrentHandle.torrentFile()");
 
         if (pieceSizeString == null) {
             pieceSizeString = UIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
@@ -104,34 +97,23 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             hexHiveView.setVisibility(View.GONE);
         }
 
-        stopWatch.start();
         PieceIndexBitfield pieces = status.pieces();
-        stopWatch.stop("status.pieces()");
-
-        stopWatch.start();
         long piecesCount = pieces.count();
-        stopWatch.stop("pieces.count()");
         if (isAdded()) {
             // I do this color look-up only once and pass it down to the view holder
             // otherwise it has to be done thousands of times.
             pieceSizeTextView.setText(pieceSizeString);
-            stopWatch.start();
             hexDataAdapter = new PieceAdapter(totalPieces, pieces);
-            stopWatch.stop("new PieceAdapter(torrentInfo.numPieces(), pieces)");
         }
         if (hexDataAdapter != null) {
-            stopWatch.start();
             hexHiveView.updateData(hexDataAdapter);
-            stopWatch.stop("hexHiveView.updateData(hexDataAdapter)");
             if (piecesCount > 0) {
                 progressBar.setVisibility(View.GONE);
                 hexHiveView.setVisibility(View.VISIBLE);
             }
             piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
             if (hexDataAdapter != null && piecesCount >= 0) {
-                stopWatch.start();
                 hexDataAdapter.updateData(pieces);
-                stopWatch.stop("hexDataAdapter.updateData(pieces)");
                 progressBar.setVisibility(View.GONE);
                 hexHiveView.setVisibility(View.VISIBLE);
             }
