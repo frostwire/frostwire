@@ -122,6 +122,7 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS = "frostwire.prefs.torrent.seed_finished_torrents";
     public static final String PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY = "frostwire.prefs.torrent.seed_finished_torrents_wifi_only";
     public static final String PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES = "frostwire.prefs.torrent.delete_started_torrent_files";
+    public static final String PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX = "frostwire.prefs.torrent.transfer_detail_last_selected_tab_index";
 
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
 

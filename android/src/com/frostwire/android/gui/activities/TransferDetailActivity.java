@@ -26,6 +26,8 @@ import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.fragments.TransferDetailDetailsFragment;
 import com.frostwire.android.gui.fragments.TransferDetailFilesFragment;
 import com.frostwire.android.gui.fragments.TransferDetailFragment;
@@ -71,6 +73,8 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         }
         if (savedInstanceState != null) {
             lastSelectedTabIndex = savedInstanceState.getInt("lastSelectedTabIndex", -1);
+        } else {
+            lastSelectedTabIndex = ConfigurationManager.instance().getInt(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX);
         }
         OnPageChangeListener onPageChangeListener = new OnPageChangeListener(this);
         SectionsPagerAdapter mSectionsPagerAdapter =
@@ -105,8 +109,8 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     private void initTabTitles() {
         tabTitles = new SparseArray<>(6);
-        tabTitles.put(R.string.pieces, getString(R.string.pieces));
         tabTitles.put(R.string.files, getString(R.string.files));
+        tabTitles.put(R.string.pieces, getString(R.string.pieces));
         tabTitles.put(R.string.status, getString(R.string.status));
         tabTitles.put(R.string.details, getString(R.string.details));
         tabTitles.put(R.string.trackers, getString(R.string.trackers));
@@ -122,8 +126,8 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         }
         // to change the order of the tabs, add/remove tabs, just maintain here.
         detailFragments = new AbstractTransferDetailFragment[]{
-                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailFilesFragment().init(this, tabTitles, uiBittorrentDownload),
+                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailStatusFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailDetailsFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailTrackersFragment().init(this, tabTitles, uiBittorrentDownload),
@@ -214,6 +218,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     private void onTabSelected(int position) {
         lastSelectedTabIndex = position;
+        ConfigurationManager.instance().setInt(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX, lastSelectedTabIndex);
     }
 
     @Override
