@@ -20,6 +20,8 @@ package com.frostwire.android.util;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Paint;
+import android.os.LocaleList;
 import android.os.StrictMode;
 import android.view.View;
 
@@ -28,6 +30,7 @@ import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 /**
  * Utility class for runtime debugging.
@@ -134,8 +137,7 @@ public final class Debug {
         }
 
         if (level > 200) {
-            throw new IllegalStateException(
-                    "Too much recursion in hasContext, flatten your objects");
+            throw new IllegalStateException(obj.getClass().getSimpleName() + ".class has too much recursion in hasContext, flatten your objects");
         }
 
         try {
@@ -151,17 +153,13 @@ public final class Debug {
             for (Field f : fields) {
                 f.setAccessible(true); // let's hope java 9 ideas don't get inside android
                 Object value = f.get(obj);
-
-                if (value instanceof Context) {
-                    return true;
+                if (hasNoContext(value)) {
+                    continue;
                 }
-                if (value instanceof Fragment) {
-                    return true;
-                }
-                if (value instanceof View) {
-                    return true;
-                }
-                if (value instanceof Dialog) {
+                if (value instanceof Context ||
+                    value instanceof Fragment ||
+                    value instanceof View ||
+                    value instanceof Dialog) {
                     return true;
                 }
             }
@@ -176,6 +174,7 @@ public final class Debug {
                 }
 
                 if (hasContext(value, level + 1)) {
+                    LOG.info(value + " " + value.getClass().getSimpleName() + " has a Context reference");
                     return true;
                 }
             }
@@ -191,18 +190,14 @@ public final class Debug {
     }
 
     private static boolean hasNoContext(Object obj) {
-        if (obj == null) {
-            return true;
-        } else if (obj instanceof WeakReference<?>) {
-            return true;
-        } else if (obj instanceof Number) {
-            return true;
-        } else if (obj instanceof String) {
-            return true;
-        } else if (obj instanceof Enum) {
-            // avoids infinite recursion checking $VALUES field
-            return true;
-        } else if (obj instanceof Boolean) {
+        if (obj == null ||
+            obj instanceof WeakReference<?> ||
+            obj instanceof Number ||
+            obj instanceof String ||
+            obj instanceof Enum || // avoids infinite recursion checking $VALUES field
+            obj instanceof Boolean ||
+            obj instanceof Paint ||
+            obj instanceof LocaleList) {
             return true;
         }
 
