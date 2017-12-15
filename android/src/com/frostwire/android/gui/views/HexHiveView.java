@@ -50,14 +50,10 @@ import java.lang.ref.WeakReference;
  */
 public class HexHiveView<T> extends View {
     //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
-    private boolean debug = true;
     private Paint hexagonBorderPaint;
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
-    private Paint textPaint;
-    private Paint debugLinesPaint;
     private DrawingProperties DP;
-    private HexDataAdapter adapter;
     private int lastKnownPieceCount;
     private OnAsyncDrawCallback onAsyncDrawcallback;
     private ByteArrayOutputStream compressedBitmapOutputStream;
@@ -100,21 +96,14 @@ public class HexHiveView<T> extends View {
         int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white));
         int emptyColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_emptyColor, r.getColor(R.color.basic_gray_dark));
         int fullColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_fullColor, r.getColor(R.color.basic_blue_highlight));
-        int debugLinesColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_debugLinesColor, r.getColor(R.color.black));
-        int textColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_textColor, r.getColor(R.color.white));
-        float textSize = typedArray.getFloat(R.styleable.HexHiveView_hexhive_textSize, 20f);
-        debug = typedArray.getBoolean(R.styleable.HexHiveView_hexhive_debug, false);
         typedArray.recycle();
-        initPaints(borderColor, emptyColor, fullColor, debugLinesColor, textColor, textSize);
+        initPaints(borderColor, emptyColor, fullColor);
         onAsyncDrawcallback = new OnAsyncDrawCallback(this);
     }
 
     private void initPaints(int borderColor,
                             int emptyColor,
-                            int fullColor,
-                            int debugLinesColor,
-                            int textColor,
-                            float textSize) {
+                            int fullColor) {
         hexagonBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hexagonBorderPaint.setStyle(Paint.Style.STROKE);
         hexagonBorderPaint.setColor(borderColor);
@@ -125,11 +114,6 @@ public class HexHiveView<T> extends View {
         fullHexPaint = new CubePaint(20);
         fullHexPaint.setColor(fullColor);
         fullHexPaint.setStyle(Paint.Style.FILL);
-        debugLinesPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        debugLinesPaint.setColor(debugLinesColor);
-        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(textColor);
-        textPaint.setTextSize(textSize);
     }
 
     @Override
@@ -146,10 +130,9 @@ public class HexHiveView<T> extends View {
     }
 
     public void updateData(HexDataAdapter<T> hexDataAdapter) {
-        this.adapter = hexDataAdapter;
         // LETS TRY TO AVOID REPEATED OBJECT ALLOCATIONS HERE
-        if (DP == null && getHeight() > 0 && getWidth() > 0 && adapter != null) {
-            DP = new DrawingProperties(adapter,
+        if (DP == null && getHeight() > 0 && getWidth() > 0 && hexDataAdapter != null) {
+            DP = new DrawingProperties(hexDataAdapter,
                     hexagonBorderPaint.getStrokeWidth(),
                     getPaddingLeft(),
                     getPaddingTop(),
@@ -160,9 +143,9 @@ public class HexHiveView<T> extends View {
             // not ready yet (perhaps during animation or rotation)
             return;
         }
-        if (adapter.getFullHexagonsCount() != lastKnownPieceCount) {
-            lastKnownPieceCount = adapter.getFullHexagonsCount();
-            HexHiveRenderer renderer = new HexHiveRenderer(getWidth(), getHeight(), DP, adapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
+        if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() != lastKnownPieceCount) {
+            lastKnownPieceCount = hexDataAdapter.getFullHexagonsCount();
+            HexHiveRenderer renderer = new HexHiveRenderer(getWidth(), getHeight(), DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
             Engine.instance().getThreadPool().execute(renderer);
         }
     }
@@ -419,12 +402,6 @@ public class HexHiveView<T> extends View {
                 }
             }
 
-//            if (debug) {
-//                canvas.drawLine(DP.origin.x, DP.origin.y, DP.end.x, DP.origin.y, debugLinesPaint);
-//                canvas.drawLine(DP.origin.x, DP.origin.y, DP.origin.x, DP.end.y, debugLinesPaint);
-//                canvas.drawLine(DP.end.x, DP.end.y, DP.origin.x, DP.end.y, debugLinesPaint);
-//                canvas.drawLine(DP.end.x, DP.end.y, DP.end.x, DP.origin.y, debugLinesPaint);
-//            }
             ByteArrayOutputStream compressedBitmapOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 85, compressedBitmapOutputStream);
             onAsyncDrawCallback.invoke(compressedBitmapOutputStream);
