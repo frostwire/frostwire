@@ -30,7 +30,6 @@ import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 /**
  * Utility class for runtime debugging.
