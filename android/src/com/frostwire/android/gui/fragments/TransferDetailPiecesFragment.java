@@ -120,7 +120,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         }
     }
 
-    final class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
+    private final static class PieceAdapter implements HexHiveView.HexDataAdapter<PieceIndexBitfield> {
         private PieceIndexBitfield pieceIndexBitfield;
         private final int totalPieces;
         private int downloadedPieces;

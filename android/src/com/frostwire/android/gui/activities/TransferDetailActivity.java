@@ -105,12 +105,12 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
 
     private void initTabTitles() {
         tabTitles = new SparseArray<>(6);
+        tabTitles.put(R.string.pieces, getString(R.string.pieces));
         tabTitles.put(R.string.files, getString(R.string.files));
         tabTitles.put(R.string.status, getString(R.string.status));
         tabTitles.put(R.string.details, getString(R.string.details));
         tabTitles.put(R.string.trackers, getString(R.string.trackers));
         tabTitles.put(R.string.peers, getString(R.string.peers));
-        tabTitles.put(R.string.pieces, getString(R.string.pieces));
     }
 
     private void initFragments() {
@@ -122,12 +122,13 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         }
         // to change the order of the tabs, add/remove tabs, just maintain here.
         detailFragments = new AbstractTransferDetailFragment[]{
+                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailFilesFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailStatusFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailDetailsFragment().init(this, tabTitles, uiBittorrentDownload),
                 new TransferDetailTrackersFragment().init(this, tabTitles, uiBittorrentDownload),
-                new TransferDetailPeersFragment().init(this, tabTitles, uiBittorrentDownload),
-                new TransferDetailPiecesFragment().init(this, tabTitles, uiBittorrentDownload)};
+                new TransferDetailPeersFragment().init(this, tabTitles, uiBittorrentDownload)
+        };
     }
 
     @Override
