@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -38,8 +37,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -50,13 +47,13 @@ import java.lang.ref.WeakReference;
  */
 public class HexHiveView<T> extends View {
     //private static final Logger LOG = Logger.getLogger(HexHiveView.class);
+    private Paint bitmapPaint;
     private Paint hexagonBorderPaint;
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
     private DrawingProperties DP;
-    private int lastKnownPieceCount;
     private OnAsyncDrawCallback onAsyncDrawcallback;
-    private ByteArrayOutputStream compressedBitmapOutputStream;
+    private Bitmap compressedBitmap;
 
     private static float getHexWidth(float sideLength) {
         return (float) (Math.sqrt(3) * sideLength);
@@ -90,7 +87,6 @@ public class HexHiveView<T> extends View {
     public HexHiveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setLayerType(LAYER_TYPE_HARDWARE, null);
-        lastKnownPieceCount = -1;
         Resources r = getResources();
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.HexHiveView);
         int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white));
@@ -101,9 +97,14 @@ public class HexHiveView<T> extends View {
         onAsyncDrawcallback = new OnAsyncDrawCallback(this);
     }
 
+    public boolean ready() {
+        return DP != null && compressedBitmap != null;
+    }
+
     private void initPaints(int borderColor,
                             int emptyColor,
                             int fullColor) {
+        bitmapPaint = new Paint();
         hexagonBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         hexagonBorderPaint.setStyle(Paint.Style.STROKE);
         hexagonBorderPaint.setColor(borderColor);
@@ -118,14 +119,11 @@ public class HexHiveView<T> extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // see asyncDraw to see how compressedBitmapOutputStream is created (in a background thread)
+        // see asyncDraw to see how compressedBitmap is created (in a background thread)
         // once that thread is done, it posts an invalidate call on the UI's handler loop.
-        if (compressedBitmapOutputStream != null && compressedBitmapOutputStream.size() > 0) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(compressedBitmapOutputStream.toByteArray(), 0, compressedBitmapOutputStream.size());
-            Paint paint = new Paint();
-            canvas.drawBitmap(bitmap, 0, 0, paint);
-            compressedBitmapOutputStream.reset();
-            compressedBitmapOutputStream = null;
+        if (compressedBitmap != null && !compressedBitmap.isRecycled()) {
+            canvas.drawBitmap(compressedBitmap, 0, 0, bitmapPaint);
+            compressedBitmap.recycle();
         }
     }
 
@@ -143,11 +141,14 @@ public class HexHiveView<T> extends View {
             // not ready yet (perhaps during animation or rotation)
             return;
         }
-        if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() != lastKnownPieceCount) {
-            lastKnownPieceCount = hexDataAdapter.getFullHexagonsCount();
+        if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0) {
             HexHiveRenderer renderer = new HexHiveRenderer(getWidth(), getHeight(), DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
             Engine.instance().getThreadPool().execute(renderer);
         }
+    }
+
+    public void updateCompressedBitmap(Bitmap bitmap) {
+        compressedBitmap = bitmap;
     }
 
     public interface HexDataAdapter<T> {
@@ -317,17 +318,15 @@ public class HexHiveView<T> extends View {
 
     private static final class OnAsyncDrawCallback {
         private final WeakReference<HexHiveView> viewRef;
-
         OnAsyncDrawCallback(HexHiveView view) {
             viewRef = Ref.weak(view);
         }
-        void invoke(ByteArrayOutputStream compressedBitmapOutputStream) {
+        void invoke(Bitmap compressedBitmap) {
             if (Ref.alive(viewRef)) {
                 HexHiveView view = viewRef.get();
-                view.compressedBitmapOutputStream = compressedBitmapOutputStream;
+                view.updateCompressedBitmap(compressedBitmap);
             }
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
+            new Handler(Looper.getMainLooper()).post(() -> {
                 if (Ref.alive(viewRef)) {
                     HexHiveView view = viewRef.get();
                     view.invalidate();
@@ -401,16 +400,13 @@ public class HexHiveView<T> extends View {
                     DP.hexCenterBuffer.y +=  threeQuarters;
                 }
             }
-
-            ByteArrayOutputStream compressedBitmapOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, compressedBitmapOutputStream);
-            onAsyncDrawCallback.invoke(compressedBitmapOutputStream);
+            onAsyncDrawCallback.invoke(bitmap);
         }
 
         // Drawing/Geometry functions
         /**
          * @param outCorner    - a re-usable Point buffer to output the
-         * @param inCenter     - a reusable Point buffer representing the cente coordinates of a hexagon
+         * @param inCenter     - a reusable Point buffer representing the center coordinates of a hexagon
          * @param sideLength   - length of hexagon side
          * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
          */

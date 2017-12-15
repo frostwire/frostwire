@@ -98,9 +98,11 @@
             android:id="@+id/fragment_transfer_detail_pieces_indeterminate_progress_bar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:indeterminate="true"
-            android:visibility="gone"/>
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:visibility="visible"/>
 
         <com.frostwire.android.gui.views.HexHiveView
             android:id="@+id/fragment_transfer_detail_pieces_hexhive_view"
@@ -109,7 +111,7 @@
             android:layout_weight="1"
             android:orientation="horizontal"
             android:padding="15dp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:background="@color/basic_gray_light"
             app:hexhive_hexBorderColor="@color/basic_blue_dark"
             app:hexhive_fullColor="@color/basic_blue_highlight"

@@ -38,6 +38,7 @@ import com.frostwire.jlibtorrent.TorrentStatus;
  */
 
 public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
+    //private static Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
     private HexHiveView hexHiveView;
@@ -106,17 +107,21 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             hexDataAdapter = new PieceAdapter(totalPieces, pieces);
         }
         if (hexDataAdapter != null) {
+            if (piecesCount >= 0) {
+                hexDataAdapter.updateData(pieces);
+            }
+            //noinspection unchecked
             hexHiveView.updateData(hexDataAdapter);
-            if (piecesCount > 0) {
+            if (hexHiveView.ready()) {
                 progressBar.setVisibility(View.GONE);
                 hexHiveView.setVisibility(View.VISIBLE);
+            } else {
+                hexHiveView.setVisibility(View.INVISIBLE);
+                // we use INVISIBLE and not GONE so that hexHiveView can properly initialize
+                // it's DrawingProper object, otherwise when it asks for dimensions it'll receive (0,0).
+                progressBar.setVisibility(View.VISIBLE);
             }
             piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
-            if (hexDataAdapter != null && piecesCount >= 0) {
-                hexDataAdapter.updateData(pieces);
-                progressBar.setVisibility(View.GONE);
-                hexHiveView.setVisibility(View.VISIBLE);
-            }
         }
     }
 
