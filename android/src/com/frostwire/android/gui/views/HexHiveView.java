@@ -121,9 +121,8 @@ public class HexHiveView<T> extends View {
     protected void onDraw(Canvas canvas) {
         // see asyncDraw to see how compressedBitmap is created (in a background thread)
         // once that thread is done, it posts an invalidate call on the UI's handler loop.
-        if (compressedBitmap != null && !compressedBitmap.isRecycled()) {
+        if (compressedBitmap != null) {
             canvas.drawBitmap(compressedBitmap, 0, 0, bitmapPaint);
-            compressedBitmap.recycle();
         }
     }
 

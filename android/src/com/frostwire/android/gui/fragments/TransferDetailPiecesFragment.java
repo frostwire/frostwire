@@ -43,7 +43,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     private TextView pieceSizeTextView;
     private HexHiveView hexHiveView;
     private HexHiveView.HexDataAdapter<PieceIndexBitfield> hexDataAdapter;
-    private ProgressBar progressBar;
+//    private ProgressBar progressBar;
     private int totalPieces;
     private String pieceSizeString;
 
@@ -73,7 +73,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
     public void ensureComponentsReferenced(View rootView) {
         piecesNumberTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_pieces_number);
         pieceSizeTextView = findView(rootView, R.id.fragment_transfer_detail_pieces_piece_size_number);
-        progressBar = findView(rootView, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
+//        progressBar = findView(rootView, R.id.fragment_transfer_detail_pieces_indeterminate_progress_bar);
         hexHiveView = findView(rootView, R.id.fragment_transfer_detail_pieces_hexhive_view);
     }
 
@@ -82,7 +82,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (uiBittorrentDownload == null) {
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setVisibility(View.VISIBLE);
 
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
@@ -94,7 +94,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
         if (totalPieces == -1) {
             totalPieces = torrentInfo.numPieces();
             piecesNumberTextView.setText(totalPieces + "");
-            progressBar.setVisibility(View.VISIBLE);
+            //progressBar.setVisibility(View.VISIBLE);
             hexHiveView.setVisibility(View.GONE);
         }
 
@@ -105,6 +105,7 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             // otherwise it has to be done thousands of times.
             pieceSizeTextView.setText(pieceSizeString);
             hexDataAdapter = new PieceAdapter(totalPieces, pieces);
+            hexHiveView.setVisibility(View.VISIBLE);
         }
         if (hexDataAdapter != null) {
             if (piecesCount >= 0) {
@@ -112,15 +113,6 @@ public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment
             }
             //noinspection unchecked
             hexHiveView.updateData(hexDataAdapter);
-            if (hexHiveView.ready()) {
-                progressBar.setVisibility(View.GONE);
-                hexHiveView.setVisibility(View.VISIBLE);
-            } else {
-                hexHiveView.setVisibility(View.INVISIBLE);
-                // we use INVISIBLE and not GONE so that hexHiveView can properly initialize
-                // it's DrawingProper object, otherwise when it asks for dimensions it'll receive (0,0).
-                progressBar.setVisibility(View.VISIBLE);
-            }
             piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
         }
     }
