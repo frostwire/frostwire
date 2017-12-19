@@ -203,14 +203,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 if (selectedTrackerURL == null) {
                     return;
                 }
-                UIUtils.showEditTextDialog((Activity) v.getContext(),
-                        R.string.enter_valid_tracker_url_here,
-                        R.string.edit_tracker,
-                        R.string.edit,
-                        true,
-                        false,
-                        selectedTrackerURL,
-                        this);
+                if (v.getContext() instanceof Activity) {
+                    UIUtils.showEditTextDialog((Activity) v.getContext(),
+                            R.string.enter_valid_tracker_url_here,
+                            R.string.edit_tracker,
+                            R.string.edit,
+                            true,
+                            false,
+                            selectedTrackerURL,
+                            this);
+                }
             }
 
             @Override
