@@ -35,8 +35,6 @@ import org.limewire.util.I18NConvert;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.text.Normalizer;
 import java.util.*;
 
@@ -61,11 +59,11 @@ public final class SearchMediator {
     /**
      * Query text is too short.
      */
-    public static final int QUERY_TOO_SHORT = 2;
+    private static final int QUERY_TOO_SHORT = 2;
     /**
      * Query text is too long.
      */
-    public static final int QUERY_TOO_LONG = 3;
+    private static final int QUERY_TOO_LONG = 3;
     /**
      * Query xml is too long.
      */
@@ -124,20 +122,22 @@ public final class SearchMediator {
         GUIMediator.addRefreshListener(getSearchResultDisplayer());
 
         // Link up the tabs of results with the filters of the input screen.
-        getSearchResultDisplayer().setSearchListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                SearchResultMediator resultPanel = getSearchResultDisplayer().getSelectedResultPanel();
-                if (resultPanel != null) {
-                    resultPanel.updateFiltersPanel();
-                }
+        getSearchResultDisplayer().setSearchListener(e -> {
+            SearchResultMediator resultPanel = getSearchResultDisplayer().getSelectedResultPanel();
+            if (resultPanel != null) {
+                resultPanel.updateFiltersPanel();
             }
         });
 
-        try {
-            CrawlPagedWebSearchPerformer.setCache(new DatabaseCrawlCache());
-        } catch (Throwable t) {
-            LOG.error("could not set database crawl cache", t);
-        }
+        new Thread(() -> {
+            try {
+                CrawlPagedWebSearchPerformer.setCache(new DatabaseCrawlCache());
+            } catch (Throwable t) {
+                LOG.error("could not set database crawl cache", t);
+            }
+
+        },
+                "CrawlPagedWebSearchPerformer-initializer").start();
 
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 
@@ -236,9 +236,6 @@ public final class SearchMediator {
     /**
      * Validates the a search info and returns {@link #QUERY_VALID} if it is
      * valid.
-     *
-     * @param info
-     * @return one of the static <code>QUERY*</code> fields
      */
     public static int validateInfo(SearchInformation info) {
 
@@ -372,12 +369,10 @@ public final class SearchMediator {
     }
 
     private static void updateSearchIcon(final long token, final boolean active) {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                SearchResultMediator trp = getResultPanelForGUID(token);
-                if (trp != null) {
-                    trp.updateSearchIcon(active);
-                }
+        GUIMediator.safeInvokeAndWait(() -> {
+            SearchResultMediator trp = getResultPanelForGUID(token);
+            if (trp != null) {
+                trp.updateSearchIcon(active);
             }
         });
     }
@@ -433,11 +428,9 @@ public final class SearchMediator {
      */
     static void doDownload(final SearchResultMediator rp) {
         final SearchResultDataLine[] lines = rp.getAllSelectedLines();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                SearchMediator.downloadAll(lines);
-                rp.refresh();
-            }
+        SwingUtilities.invokeLater(() -> {
+            SearchMediator.downloadAll(lines);
+            rp.refresh();
         });
     }
 
@@ -451,17 +444,15 @@ public final class SearchMediator {
 
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
 
-        for (int i = 0; i < lines.length; i++) {
-            if (lines[i] != null) {
-                downloadLine(lines[i]);
+        for (SearchResultDataLine line : lines) {
+            if (line != null) {
+                downloadLine(line);
             }
         }
     }
 
     /**
      * Downloads the given TableLine.
-     *
-     * @param line
      */
     private static void downloadLine(SearchResultDataLine line) {
         if (line == null) {
@@ -503,11 +494,10 @@ public final class SearchMediator {
     /**
      * Returns the <tt>ResultPanel</tt> for the specified GUID.
      *
-     * @param rguid the guid to search for
      * @return the <tt>ResultPanel</tt> that matches the GUID, or null
      * if none match.
      */
-    static SearchResultMediator getResultPanelForGUID(long token) {
+    private static SearchResultMediator getResultPanelForGUID(long token) {
         return getSearchResultDisplayer().getResultPanelForGUID(token);
     }
 
@@ -529,14 +519,14 @@ public final class SearchMediator {
         return RESULT_DISPLAYER;
     }
 
-    public static SearchFilterFactory getSearchFilterFactory() {
+    private static SearchFilterFactory getSearchFilterFactory() {
         if (SEARCH_FILTER_FACTORY == null) {
             SEARCH_FILTER_FACTORY = new SearchFilterFactoryImpl();
         }
         return SEARCH_FILTER_FACTORY;
     }
 
-    public void onResults(final long token, List<? extends SearchResult> results) {
+    private void onResults(final long token, List<? extends SearchResult> results) {
 
         final SearchResultMediator rp = getResultPanelForGUID(token);
 
@@ -553,20 +543,17 @@ public final class SearchMediator {
 
                 final List<UISearchResult> uiResults = convertResults(filtered, se, rp.getQuery());
 
-                GUIMediator.safeInvokeAndWait(new Runnable() {
-                    public void run() {
-                        try {
-                            SearchFilter filter = getSearchFilterFactory().createFilter();
-                            for (UISearchResult sr : uiResults) {
-                                if (filter.allow(sr)) {
-                                    getSearchResultDisplayer().addQueryResult(token, sr, rp);
-                                }
+                GUIMediator.safeInvokeAndWait(() -> {
+                    try {
+                        SearchFilter filter = getSearchFilterFactory().createFilter();
+                        for (UISearchResult sr : uiResults) {
+                            if (filter.allow(sr)) {
+                                getSearchResultDisplayer().addQueryResult(token, sr, rp);
                             }
-                        } catch (Exception e) {
-                            LOG.error("Error adding search result to UI", e);
                         }
+                    } catch (Exception e) {
+                        LOG.error("Error adding search result to UI", e);
                     }
-
                 });
             }
         }

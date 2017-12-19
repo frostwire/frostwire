@@ -54,7 +54,7 @@ public final class CrawlCacheDB {
 
     private static final String TABLE_NAME = "CacheData";
 
-    public static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
+    private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
 
     private final DatabaseHelper databaseHelper;
 
