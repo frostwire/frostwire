@@ -32,6 +32,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -84,7 +85,6 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
@@ -186,7 +186,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
         // Handle item selection
         setupAdapter(getActivity());

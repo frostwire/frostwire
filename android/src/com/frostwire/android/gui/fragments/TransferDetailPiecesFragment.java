@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.fragments;
 
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
@@ -36,8 +35,7 @@ import com.frostwire.jlibtorrent.TorrentStatus;
  * @author aldenml
  * @author marcelinkaaa
  */
-
-public class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
+public final class TransferDetailPiecesFragment extends AbstractTransferDetailFragment {
     //private static Logger LOG = Logger.getLogger(TransferDetailPiecesFragment.class);
     private TextView piecesNumberTextView;
     private TextView pieceSizeTextView;
