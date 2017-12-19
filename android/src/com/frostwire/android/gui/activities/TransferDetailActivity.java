@@ -37,6 +37,7 @@ import com.frostwire.android.gui.fragments.TransferDetailStatusFragment;
 import com.frostwire.android.gui.fragments.TransferDetailTrackersFragment;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
@@ -61,7 +62,11 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         super.initComponents(savedInstanceState);
-        initUIBittorrentDownload();
+        if (!initUIBittorrentDownload()) {
+            UIUtils.showShortMessage(this, R.string.could_not_open_transfer_detail_invalid_infohash);
+            finish();
+            return;
+        }
         transferDetailFragment = findFragment(R.id.fragment_transfer_detail);
         if (transferDetailFragment != null) {
             transferDetailFragment.setUiBittorrentDownload(uiBittorrentDownload);
@@ -93,7 +98,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         }
     }
 
-    private void initUIBittorrentDownload() {
+    private boolean initUIBittorrentDownload() {
         String infoHash = getIntent().getStringExtra("infoHash");
         if (uiBittorrentDownload == null && (infoHash == null || "".equals(infoHash))) {
             throw new RuntimeException("Invalid infoHash received");
@@ -102,9 +107,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             uiBittorrentDownload = (UIBittorrentDownload)
                     TransferManager.instance().getBittorrentDownload(infoHash);
         }
-        if (uiBittorrentDownload == null) {
-            throw new RuntimeException("Could not find matching transfer for infoHash:" + infoHash);
-        }
+        return uiBittorrentDownload != null;
     }
 
     private void initTabTitles() {
