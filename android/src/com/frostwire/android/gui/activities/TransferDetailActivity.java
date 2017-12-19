@@ -101,7 +101,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     private boolean initUIBittorrentDownload() {
         String infoHash = getIntent().getStringExtra("infoHash");
         if (uiBittorrentDownload == null && (infoHash == null || "".equals(infoHash))) {
-            throw new RuntimeException("Invalid infoHash received");
+            return false;
         }
         if (uiBittorrentDownload == null && !"".equals(infoHash)) {
             uiBittorrentDownload = (UIBittorrentDownload)
