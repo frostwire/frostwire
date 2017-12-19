@@ -58,6 +58,9 @@ public final class Engine implements IEngineService {
     // with the main activity resume.
     private boolean pendingStartServices = false;
 
+    private Engine() {
+    }
+
     private static class Loader {
         static final Engine INSTANCE = new Engine();
     }

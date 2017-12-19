@@ -26,6 +26,7 @@ import android.os.StrictMode;
 import android.view.View;
 
 import com.frostwire.android.BuildConfig;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
@@ -87,6 +88,7 @@ public final class Debug {
                     .detectAll()
                     .penaltyLog()
                     .penaltyDeath()
+                    .setClassInstanceLimit(Engine.class, 1)
                     .build();
         }
 
