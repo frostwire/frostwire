@@ -123,10 +123,15 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         setMinimumSize(new Dimension(177,94));
         GUIMediator.addRefreshListener(this);
         initPopupMenuActions();
-        setupModel();
-        setupList();
-        JScrollPane _scrollPane = new JScrollPane(list);
-        add(_scrollPane);
+        LibraryUtils.getExecutor().execute(() -> {
+            setupModel();
+            GUIMediator.safeInvokeLater(()->{
+                setupList();
+                JScrollPane _scrollPane = new JScrollPane(list);
+                add(_scrollPane);
+            });
+        });
+
     }
 
     private void initPopupMenuActions() {
