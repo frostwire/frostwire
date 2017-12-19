@@ -175,7 +175,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         }
     }
 
-    private void ensureTorrentHandle() {
+    protected void ensureTorrentHandle() {
         if (torrentHandle == null && uiBittorrentDownload != null) {
             torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
             if (torrentHandle == null) {

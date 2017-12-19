@@ -80,7 +80,11 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         if (uiBittorrentDownload == null) {
             return;
         }
-        //progressBar.setVisibility(View.VISIBLE);
+
+        ensureTorrentHandle();
+        if (torrentHandle == null) {
+            return;
+        }
 
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
