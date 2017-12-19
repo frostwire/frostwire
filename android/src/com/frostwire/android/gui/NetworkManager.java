@@ -67,8 +67,11 @@ public final class NetworkManager {
      * aka -> isInternetUp
      */
     public boolean isDataUp(ConnectivityManager connectivityManager) {
+        boolean wifiUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
+        boolean mobileUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
+
         // boolean logic trick, since sometimes android reports WIFI and MOBILE up at the same time
-        return (isDataWIFIUp(connectivityManager) != isDataMobileUp(connectivityManager));
+        return wifiUp != mobileUp;
     }
 
     private boolean isNetworkTypeUp(ConnectivityManager connectivityManager, final int NETWORK_TYPE) {
