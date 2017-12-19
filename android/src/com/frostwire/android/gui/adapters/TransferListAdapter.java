@@ -429,7 +429,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             final String downloadStatus = transferStateStrings.get(download.getState());
             status.setText(downloadStatus);
             NetworkManager networkManager = NetworkManager.instance();
-            if (!networkManager.isDataUp(networkManager.getConnectivityManager())) {
+            if (!networkManager.isDataUp(context)) {
                 status.setText(downloadStatus + " (" + view.getResources().getText(R.string.check_internet_connection) + ")");
                 seeds.setText("");
                 peers.setText("");

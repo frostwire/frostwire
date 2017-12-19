@@ -208,7 +208,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                 } else {
                     NetworkManager networkManager = NetworkManager.instance();
-                    if (networkManager.isDataUp(networkManager.getConnectivityManager())) {
+                    if (networkManager.isDataUp(getActivity())) {
                         TransferManager.instance().resumeResumableTransfers();
                     } else {
                         UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
@@ -325,7 +325,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         showTorrentSettingsOnClick = true;
         // No Internet
         NetworkManager networkManager = NetworkManager.instance();
-        if (!networkManager.isDataUp(networkManager.getConnectivityManager())) {
+        if (!networkManager.isDataUp(getActivity())) {
             textDHTPeers.setText(R.string.check_internet_connection);
             return;
         }

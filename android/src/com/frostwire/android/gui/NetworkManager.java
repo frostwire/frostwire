@@ -18,6 +18,7 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -66,7 +67,10 @@ public final class NetworkManager {
     /**
      * aka -> isInternetUp
      */
-    public boolean isDataUp(ConnectivityManager connectivityManager) {
+    public boolean isDataUp(Context context) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
         boolean wifiUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
         boolean mobileUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
 
@@ -134,8 +138,7 @@ public final class NetworkManager {
                 return;
             }
             Application context = manager.contextRef.get();
-            ConnectivityManager connectivityManager = manager.getConnectivityManager();
-            boolean isDataUp = manager.isDataUp(connectivityManager);
+            boolean isDataUp = manager.isDataUp(context);
             manager.detectTunnel();
 
             Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
