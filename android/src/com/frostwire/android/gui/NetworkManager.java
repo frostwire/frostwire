@@ -78,14 +78,8 @@ public final class NetworkManager {
         return wifiUp != mobileUp;
     }
 
-    private boolean isNetworkTypeUp(ConnectivityManager connectivityManager, final int NETWORK_TYPE) {
-        NetworkInfo networkInfo = null;
-        ConnectivityManager connManager1;
-        if (connectivityManager != null) {
-            networkInfo = connectivityManager.getNetworkInfo(NETWORK_TYPE);
-        } else if ((connManager1 = getConnectivityManager()) != null) {
-            networkInfo = connManager1.getNetworkInfo(NETWORK_TYPE);
-        }
+    private boolean isNetworkTypeUp(ConnectivityManager connectivityManager, final int networkType) {
+        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(networkType);
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
