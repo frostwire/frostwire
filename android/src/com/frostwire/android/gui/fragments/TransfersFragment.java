@@ -207,8 +207,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 if (bittorrentDisconnected) {
                     UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                 } else {
-                    NetworkManager networkManager = NetworkManager.instance();
-                    if (networkManager.isDataUp(getActivity())) {
+                    if (NetworkManager.instance().isDataUp()) {
                         TransferManager.instance().resumeResumableTransfers();
                     } else {
                         UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
@@ -324,8 +323,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDHTPeers.setVisibility(View.VISIBLE);
         showTorrentSettingsOnClick = true;
         // No Internet
-        NetworkManager networkManager = NetworkManager.instance();
-        if (!networkManager.isDataUp(getActivity())) {
+        if (!NetworkManager.instance().isDataUp()) {
             textDHTPeers.setText(R.string.check_internet_connection);
             return;
         }

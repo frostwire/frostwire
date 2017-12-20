@@ -83,7 +83,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 DetailedState detailedState = networkInfo.getDetailedState();
                 switch (detailedState) {
                     case CONNECTED:
-                        handleConnectedNetwork(context, networkInfo);
+                        handleConnectedNetwork(networkInfo);
                         handleNetworkStatusChange();
                         reopenNetworkSockets();
                         break;
@@ -127,10 +127,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         Engine.instance().getThreadPool().execute(() -> Engine.instance().stopServices(true));
     }
 
-    private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
+    private void handleConnectedNetwork(NetworkInfo networkInfo) {
         PlayStore.getInstance().refresh();
         NetworkManager networkManager = NetworkManager.instance();
-        if (networkManager.isDataUp(context)) {
+        if (networkManager.isDataUp()) {
             boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.

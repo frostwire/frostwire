@@ -56,8 +56,7 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
         if (bittorrentDisconnected) {
             showBittorrentDisconnectedDialog();
         } else {
-            NetworkManager networkManager = NetworkManager.instance();
-            if (networkManager.isDataUp(context)) {
+            if (NetworkManager.instance().isDataUp()) {
                 if (download.isPaused()) {
                     download.resume();
                     if (context instanceof TimerObserver) {

@@ -71,9 +71,8 @@ public final class NetworkManager {
     /**
      * aka -> isInternetUp
      */
-    public boolean isDataUp(Context context) {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public boolean isDataUp() {
+        ConnectivityManager connectivityManager = getConnectivityManager();
 
         boolean wifiUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
         boolean mobileUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
@@ -97,7 +96,7 @@ public final class NetworkManager {
         return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
     }
 
-    public ConnectivityManager getConnectivityManager() {
+    private ConnectivityManager getConnectivityManager() {
         return (ConnectivityManager) appContext.getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
@@ -131,13 +130,12 @@ public final class NetworkManager {
         @Override
         public void run() {
             NetworkManager manager = NetworkManager.instance();
-            Context context = manager.appContext;
-            boolean isDataUp = manager.isDataUp(context);
+            boolean isDataUp = manager.isDataUp();
             manager.detectTunnel();
 
             Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
             intent.putExtra("isDataUp", isDataUp);
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            LocalBroadcastManager.getInstance(manager.appContext).sendBroadcast(intent);
         }
     }
 }
