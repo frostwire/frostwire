@@ -679,5 +679,7 @@
     <string name="remove_ads">Verwyder advertensies</string>
     <string name="your_connection_has_dropped_stopping_services">Jou Wifi-verbinding het gedaal. Stopdienste.</string>
     <string name="use_tpb_summary">TPB is magneet gebaseer, werk net op Wifi</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Kon nie Oordragbesonderhede, ongeldige InfoHash oopmaak nie</string>
+    <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>
 
 </resources>

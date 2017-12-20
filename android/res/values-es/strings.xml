@@ -730,4 +730,6 @@
     <string name="title_activity_transfer_detail">Detalle de transferencia</string>
     <string name="piece_size_header">Tamaño de la pieza:</string>
     <string name="add_tracker">Añadir tracker</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">No se pudo abrir Detalles de la transferencia, InfoHash no válido</string>
+    <string name="invalid_tracker_url">URL del rastreador no válido</string>
 </resources>

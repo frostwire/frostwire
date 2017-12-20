@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">Niets is momenteel aan het delen</string>
     <string name="seeding_keeps_the_network_healthy">Delen helpt houdt het netwerk gezond</string>
     <string name="seeding_is_currently_disabled">Delen is momenteel uitgeschakeld</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Kon overdrachtgegevens, ongeldige InfoHash, niet openen</string>
+    <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>
 </resources>

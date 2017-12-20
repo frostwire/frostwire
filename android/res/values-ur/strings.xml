@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">فی الحال اشتراک نہیں کیا جا رہا ہے</string>
     <string name="seeding_keeps_the_network_healthy">حصول میں نیٹ ورک کو صحت مند رکھنے میں مدد ملتی ہے</string>
     <string name="seeding_is_currently_disabled">شیئرنگ اب غیر فعال ہے</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">منتقلی کی تفصیلات، غلط معلومات ہش نہیں کھول سکی</string>
 </resources>

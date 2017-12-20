@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">Mikään parhaillaan kylvö</string>
     <string name="seeding_keeps_the_network_healthy">Kylvö auttaa pitämään verkon terveinä</string>
     <string name="seeding_is_currently_disabled">Kylvö on tällä hetkellä poissa käytöstä</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Tiedonsiirto-tietoja ei voi avata, virheellinen InfoHash</string>
 </resources>

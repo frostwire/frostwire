@@ -682,4 +682,6 @@
     <string name="nothing_is_currently_seeding">現在共有しているものはありません</string>
     <string name="seeding_keeps_the_network_healthy">共有はネットワークの健全性を維持します</string>
     <string name="seeding_is_currently_disabled">共有は現在無効です</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">転送の詳細を開くことができませんでした、無効なInfoHash</string>
+    <string name="invalid_tracker_url">無効なトラッカーURL</string>
 </resources>

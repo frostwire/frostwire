@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">Нішто не ў цяперашні час высеву</string>
     <string name="seeding_keeps_the_network_healthy">Пасеў дапамагае трымае сетку здаровым</string>
     <string name="seeding_is_currently_disabled">Пасеў у цяперашні час адключаны</string>
+    <string name="invalid_tracker_url">Недапушчальны URL Tracker</string>
 </resources>

@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">目前没有任何分享</string>
     <string name="seeding_keeps_the_network_healthy">分享有助于保持网络健康</string>
     <string name="seeding_is_currently_disabled">共享目前已被禁用</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">无法打开传输详细信息，无效的InfoHash</string>
+    <string name="invalid_tracker_url">无效的跟踪器网址</string>
 </resources>

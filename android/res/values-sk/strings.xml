@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">V súčasnosti nie je nič zdieľané</string>
     <string name="seeding_keeps_the_network_healthy">Zdieľanie pomáha udržiavať sieť zdravú</string>
     <string name="seeding_is_currently_disabled">Zdieľanie je momentálne zakázané</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Nepodarilo sa otvoriť podrobnosti o prevode, neplatné InfoHash</string>
 </resources>

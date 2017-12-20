@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">Ingenting delas för närvarande</string>
     <string name="seeding_keeps_the_network_healthy">Delning hjälper till att hålla nätverket hälsosamt</string>
     <string name="seeding_is_currently_disabled">Delning är för närvarande inaktiverad</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Kunde inte öppna överföringsinformation, ogiltig InfoHash</string>
 </resources>

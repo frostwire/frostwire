@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">아무것도 현재 시딩 중입니다.</string>
     <string name="seeding_keeps_the_network_healthy">시딩은 네트워크를 건강하게 유지합니다.</string>
     <string name="seeding_is_currently_disabled">시드는 현재 사용할 수 없습니다.</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">전송 세부 정보를 열 수 없습니다. 잘못된 InfoHash입니다.</string>
+    <string name="invalid_tracker_url">Ugyldig Tracker-URL</string>
 </resources>
