@@ -290,7 +290,7 @@
     <string name="transfers_select_all">את כל</string>
     <string name="desktop_transfer_status_cancelled">מבוטל</string>
     <string name="use_icons_to_browse">השתמש בסמלים כדי לעיין בקבצים.</string>
-    <string name="seeds_n">זרעים: s%</string>
+    <string name="seeds_n">זרעים: %s</string>
     <string name="peer_http_download_status_error">שְׁגִיאָה</string>
     <string name="media_type_audio">שֶׁמַע</string>
     <string name="no_wifi_want_to_fix_it_question">אינך מחובר לרשת WiFi.\n\nאיך אתה רוצה להתחבר?</string>

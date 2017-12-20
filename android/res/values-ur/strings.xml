@@ -335,7 +335,7 @@
     <string name="transfers_select_all">تمام</string>
     <string name="desktop_transfer_status_cancelled">منسوخ</string>
     <string name="use_icons_to_browse">فائلوں کو براؤز کرنے کے لئے ماؤس کو آاکنوں استعمال کریں.</string>
-    <string name="seeds_n">بیج: s%</string>
+    <string name="seeds_n">بیج: %s</string>
     <string name="media_type_audio">آڈیو</string>
     <string name="internal_port">اندرونی پورٹ</string>
     <string name="thirty_days">30 دن</string>
@@ -583,7 +583,7 @@
     <string name="saving_to_sd_card">ایسڈی کارڈ میں محفوظ کرنا.</string>
     <string name="cheaper_than_gas">گیس کے مقابلے میں سستی</string>
     <string name="rate_our_app">ہمارے اپلی کیشن کی درجہ بندی کریں</string>
-    <string name="peers_n">ہم عمر: s%</string>
+    <string name="peers_n">ہم عمر: %s</string>
     <string name="play_image_description">کھیلیں</string>
     <string name="transfers_context_menu_stop_delete_data">بند کرو اور ڈیٹا حذف</string>
     <string name="cheaper_than_cigarettes">سگریٹ کے مقابلے میں سستی</string>

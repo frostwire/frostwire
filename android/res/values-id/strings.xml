@@ -322,7 +322,7 @@
     <string name="accept_intent">Saya tidak akan menggunakan FrostWire untuk pelanggaran hak cipta.</string>
     <string name="toast_on_disconnect">Terputus dari BitTorrent. Semua pemindahan BitTorrent telah dihentikan.</string>
     <string name="toast_on_connect">Inti BitTorrent telah dimulai</string>
-    <string name="seeds">Seed: %s</string>
+    <string name="seeds">Seed</string>
     <string name="seeds_n">Seed: %s</string>
     <string name="peers_n">Peer: %s</string>
     <string name="size_unknown">Ukuran tidak diketahui</string>
