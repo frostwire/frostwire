@@ -87,7 +87,8 @@ public final class NetworkManager {
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public boolean isDataMobileUp(ConnectivityManager connectivityManager) {
+    public boolean isDataMobileUp() {
+        ConnectivityManager connectivityManager = getConnectivityManager();
         return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
     }
 

@@ -428,8 +428,7 @@ public final class TransferManager {
     }
 
     public boolean isMobileAndDataSavingsOn() {
-        NetworkManager networkManager = NetworkManager.instance();
-        return networkManager.isDataMobileUp(networkManager.getConnectivityManager()) &&
+        return NetworkManager.instance().isDataMobileUp() &&
                 ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
     }
 

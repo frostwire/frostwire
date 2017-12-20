@@ -154,7 +154,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //
             // mobile up means only mobile data is up and wifi is down.
 
-            if (!networkManager.isDataMobileUp(networkManager.getConnectivityManager()) || useTorrentsOnMobileData) {
+            if (!networkManager.isDataMobileUp() || useTorrentsOnMobileData) {
                 LOG.info("Connected to " + networkInfo.getTypeName());
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
