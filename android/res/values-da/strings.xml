@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">Intet er i øjeblikket såning</string>
     <string name="seeding_keeps_the_network_healthy">Frø hjælper med at holde netværket sund</string>
     <string name="seeding_is_currently_disabled">Deling er for øjeblikket deaktiveret</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Kunne ikke åbne overførselsoplysninger, ugyldige InfoHash</string>
+    <string name="invalid_tracker_url">Ugyldig Tracker-URL</string>
 </resources>

@@ -680,4 +680,6 @@
     <string name="nothing_is_currently_seeding">Ничто в настоящее время не делится</string>
     <string name="seeding_keeps_the_network_healthy">Совместное использование помогает поддерживать работоспособность сети</string>
     <string name="seeding_is_currently_disabled">В настоящее время общий доступ отключен</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Не удалось открыть сведения о передаче, недействительный InfoHash</string>
+    <string name="invalid_tracker_url">Недопустимый URL-адрес трекера</string>
 </resources>

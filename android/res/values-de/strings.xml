@@ -727,4 +727,6 @@
     <string name="title_activity_transfer_detail">Details übertragen</string>
     <string name="piece_size_header">Stück Größe:</string>
     <string name="add_tracker">Tracker hinzufügen</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Überweisungsdetails, ungültiger InfoHash konnte nicht geöffnet werden</string>
+    <string name="invalid_tracker_url">Ungültige Verfolger-URL</string>
 </resources>

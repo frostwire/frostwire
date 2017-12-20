@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">Nic není v současné době setí</string>
     <string name="seeding_keeps_the_network_healthy">Osazení pomáhá udržovat síť zdravou</string>
     <string name="seeding_is_currently_disabled">Sečení je momentálně zakázáno</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Nelze otevřít podrobnosti o přenosu, neplatné InfoHash</string>
+    <string name="invalid_tracker_url">Neplatná URL trasování</string>
 </resources>

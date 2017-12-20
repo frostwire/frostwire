@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">Ingenting deles for tiden</string>
     <string name="seeding_keeps_the_network_healthy">Deling bidrar til å holde nettverket sunt</string>
     <string name="seeding_is_currently_disabled">Deling er for øyeblikket deaktivert</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Kunne ikke åpne Overføringsdetaljer, ugyldig InfoHash</string>
 </resources>

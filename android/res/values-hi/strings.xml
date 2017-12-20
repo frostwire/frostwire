@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">वर्तमान में कुछ भी नहीं है</string>
     <string name="seeding_keeps_the_network_healthy">सेडिंग नेटवर्क को स्वस्थ रखने में मदद करता है</string>
     <string name="seeding_is_currently_disabled">सीडिंग वर्तमान में अक्षम है</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">स्थानान्तरण विवरण नहीं खोला जा सका, अमान्य जानकारीः</string>
+    <string name="invalid_tracker_url">अमान्य ट्रैकर URL</string>
 </resources>

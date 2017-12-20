@@ -679,4 +679,5 @@
     <string name="nothing_is_currently_seeding">Không có gì hiện đang chia sẻ</string>
     <string name="seeding_keeps_the_network_healthy">Chia sẻ giúp giữ cho mạng khỏe mạnh</string>
     <string name="seeding_is_currently_disabled">Chia sẻ hiện bị tắt</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">Không thể mở Chi tiết chuyển khoản, InfoHash không hợp lệ</string>
 </resources>

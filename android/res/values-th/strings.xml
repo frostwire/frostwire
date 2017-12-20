@@ -679,4 +679,6 @@
     <string name="nothing_is_currently_seeding">ไม่มีการแบ่งปันในขณะนี้</string>
     <string name="seeding_keeps_the_network_healthy">การแชร์จะช่วยให้เครือข่ายมีสุขภาพดี</string>
     <string name="seeding_is_currently_disabled">การแบ่งปันกำลังถูกปิดใช้งานอยู่</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">ไม่สามารถเปิดรายละเอียดการโอนข้อมูล, InfoHash ที่ไม่ถูกต้อง</string>
+    <string name="invalid_tracker_url">URL ของเครื่องมือติดตามไม่ถูกต้อง</string>
 </resources>
