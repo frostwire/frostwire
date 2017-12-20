@@ -180,9 +180,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private boolean shouldStopSeeding() {
-        NetworkManager networkManager = NetworkManager.instance();
         return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) ||
-                (!networkManager.isDataWIFIUp(networkManager.getConnectivityManager()) &&
+                (!NetworkManager.instance().isDataWIFIUp() &&
                         ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
     }
 

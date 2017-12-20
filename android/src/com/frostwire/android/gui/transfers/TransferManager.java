@@ -462,8 +462,7 @@ public final class TransferManager {
             }
             boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.instance().isSeedingEnabledOnlyForWifi();
             // TODO: find a better way to express relationship with isSeedingEnabled
-            NetworkManager networkManager = NetworkManager.instance();
-            if (isSeedingEnabledOnlyForWifi && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
+            if (isSeedingEnabledOnlyForWifi && !NetworkManager.instance().isDataWIFIUp()) {
                 return false;
             }
         }

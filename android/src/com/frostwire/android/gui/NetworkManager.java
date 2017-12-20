@@ -92,7 +92,8 @@ public final class NetworkManager {
         return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_MOBILE);
     }
 
-    public boolean isDataWIFIUp(ConnectivityManager connectivityManager) {
+    public boolean isDataWIFIUp() {
+        ConnectivityManager connectivityManager = getConnectivityManager();
         return isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
     }
 

@@ -83,8 +83,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
         SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (Boolean) newValue;
-            NetworkManager networkManager = NetworkManager.instance();
-            if (newVal && !networkManager.isDataWIFIUp(networkManager.getConnectivityManager())) {
+            if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
                 if (TransferManager.instance().isHttpDownloadInProgress()) {
                     YesNoDialog dlg = YesNoDialog.newInstance(
                             CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG,

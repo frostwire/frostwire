@@ -210,8 +210,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             if (!bittorrentDownload.isPaused()) {
                 items.add(new PauseDownloadMenuAction(contextRef.get(), bittorrentDownload));
             } else {
-                NetworkManager networkManager = NetworkManager.instance();
-                boolean wifiIsUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
+                boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
                 boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
                 if (wifiIsUp || bittorrentOnMobileData) {
                     if (!bittorrentDownload.isComplete()) {

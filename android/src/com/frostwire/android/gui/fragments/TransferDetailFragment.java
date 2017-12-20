@@ -74,8 +74,7 @@ public final class TransferDetailFragment extends AbstractFragment {
         if (isPausable()) {
             return false;
         }
-        NetworkManager networkManager = NetworkManager.instance();
-        boolean wifiIsUp = networkManager.isDataWIFIUp(networkManager.getConnectivityManager());
+        boolean wifiIsUp = NetworkManager.instance().isDataWIFIUp();
         boolean bittorrentOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
         return wifiIsUp || bittorrentOnMobileData;
     }
