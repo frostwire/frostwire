@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -26,10 +27,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Ref;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -40,12 +39,17 @@ public final class NetworkManager {
 
     private final ExecutorService pool;
 
-    private final WeakReference<Application> contextRef;
+    private final Context appContext;
     private boolean tunnelUp;
 
+    // this is one of the few justified occasions in which
+    // holding a context in a static field has no problems,
+    // this is a reference to the application context and
+    // greatly improve the API design
+    @SuppressLint("StaticFieldLeak")
     private static NetworkManager instance;
 
-    public synchronized static void create(Application context) {
+    public synchronized static void create(Context context) {
         if (instance != null) {
             return;
         }
@@ -59,9 +63,9 @@ public final class NetworkManager {
         return instance;
     }
 
-    private NetworkManager(Application context) {
+    private NetworkManager(Context context) {
         this.pool = Engine.instance().getThreadPool();
-        this.contextRef = Ref.weak(context);
+        this.appContext = context.getApplicationContext();
     }
 
     /**
@@ -92,10 +96,7 @@ public final class NetworkManager {
     }
 
     public ConnectivityManager getConnectivityManager() {
-        if (!Ref.alive(contextRef)) {
-            return null;
-        }
-        return (ConnectivityManager) contextRef.get().getSystemService(Application.CONNECTIVITY_SERVICE);
+        return (ConnectivityManager) appContext.getSystemService(Application.CONNECTIVITY_SERVICE);
     }
 
     public boolean isTunnelUp() {
@@ -128,10 +129,7 @@ public final class NetworkManager {
         @Override
         public void run() {
             NetworkManager manager = NetworkManager.instance();
-            if (!Ref.alive(manager.contextRef)) {
-                return;
-            }
-            Application context = manager.contextRef.get();
+            Context context = manager.appContext;
             boolean isDataUp = manager.isDataUp(context);
             manager.detectTunnel();
 
