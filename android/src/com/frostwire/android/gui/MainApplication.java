@@ -66,9 +66,6 @@ public class MainApplication extends Application {
 
         setupBTEngine();
 
-        NetworkManager.create(this);
-        NetworkManager.instance().queryNetworkStatus();
-
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
 
@@ -99,6 +96,9 @@ public class MainApplication extends Application {
         AbstractActivity.setMenuIconsVisible(true);
 
         PlayStore.getInstance().initialize(this);
+
+        NetworkManager.create(this);
+        NetworkManager.instance().queryNetworkStatus();
     }
 
     private void ignoreHardwareMenu() {
