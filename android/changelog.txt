@@ -2,6 +2,7 @@ FrostWire 2.0.0 build 482 - DEC/19/2017
  - New Transfer Detail screens for BitTorrent transfers.
  - Faster startup
  - Library updates: jlibtorrent 1.2.0.15, gms 11.6.2, mopub 4.19.0, flexbox 0.3.1, applovin 7.6.1, presage 2.2.4
+ - Translations update
 
 FrostWire 1.9.9 build 478 - DEC/13/2017
  - App Startup is faster
