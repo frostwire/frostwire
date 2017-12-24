@@ -26,7 +26,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
@@ -58,6 +60,8 @@ import com.frostwire.uxstats.UXStats;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -257,6 +261,34 @@ public final class UIUtils {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
             LOG.error("Failed to open file: " + filePath, e);
         }
+    }
+
+    /**
+     * Takes a screenshot of the given view
+     * @return File with jpeg of the screenshot taken. null if there was a problem.
+     */
+    public static File takeScreenshot(View view) {
+        view.setDrawingCacheEnabled(true);
+        Bitmap screenshotBitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+        File screenshotFile = new File(Environment.getExternalStorageDirectory().toString(), "fwPlayerScreenshot.tmp.jpg");
+        if (screenshotFile.exists()) {
+            screenshotFile.delete();
+            try {
+                screenshotFile.createNewFile();
+            } catch (IOException ignore) {
+            }
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(screenshotFile);
+            screenshotBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (Throwable t) {
+            screenshotFile.delete();
+            screenshotFile = null;
+        }
+        return screenshotFile;
     }
 
     public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {

@@ -27,17 +27,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.Albums;
 import android.provider.MediaStore.Audio.Artists;
 import android.provider.MediaStore.Audio.Playlists;
@@ -96,8 +93,6 @@ import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -1169,34 +1164,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        // take screenshot
-        View rootView = getWindow().getDecorView().getRootView();
-        rootView.setDrawingCacheEnabled(true);
-        Bitmap screenshotBitmap = Bitmap.createBitmap(rootView.getDrawingCache());
-        rootView.setDrawingCacheEnabled(false);
-        File screenshotFile = new File(Environment.getExternalStorageDirectory().toString(), "fwPlayerScreenshot.tmp.jpg");
-        if (screenshotFile.exists()) {
-            screenshotFile.delete();
-            try {
-                screenshotFile.createNewFile();
-            } catch (IOException ignore) {
-            }
-        }
-        try {
-            FileOutputStream fos = new FileOutputStream(screenshotFile);
-            screenshotBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (Throwable t) {
-            screenshotFile.delete();
-            screenshotFile = null;
-        }
         final Intent shareIntent = new Intent();
         final String artistName = MusicUtils.getArtistName();
         final String shareMessage = (artistName != null) ? getString(R.string.now_listening_to, trackName, artistName) :
                 getString(R.string.now_listening_to_no_artist_available, trackName);
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+
+        View rootView = getWindow().getDecorView().getRootView();
+        File screenshotFile = UIUtils.takeScreenshot(rootView);
         if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
             shareIntent.setType("image/jpg");
             shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(this, screenshotFile.getAbsolutePath(), false));
