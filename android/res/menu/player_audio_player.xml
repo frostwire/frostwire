@@ -21,14 +21,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_player_audio_player_add_to_playlist"
-        android:icon="@drawable/contextmenu_icon_playlist_add_dark"
-        android:title="@string/add_to_playlist"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/menu_player_audio_player_share"
         android:icon="@drawable/contextmenu_icon_send"
         android:title="@string/menu_share"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_player_audio_player_add_to_playlist"
+        android:icon="@drawable/contextmenu_icon_playlist_add_dark"
+        android:title="@string/add_to_playlist"
         app:showAsAction="never" />
     <item
         android:id="@+id/menu_player_audio_player_equalizer"
