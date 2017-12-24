@@ -67,7 +67,7 @@ public final class TransferDetailFragment extends AbstractFragment {
     }
 
     private boolean isPausable() {
-        return uiBittorrentDownload.getState() != TransferState.FINISHED && (!uiBittorrentDownload.isPaused() || uiBittorrentDownload.getState() == TransferState.SEEDING);
+        return uiBittorrentDownload != null && uiBittorrentDownload.getState() != TransferState.FINISHED && (!uiBittorrentDownload.isPaused() || uiBittorrentDownload.getState() == TransferState.SEEDING);
     }
 
     private boolean isResumable() {
@@ -80,14 +80,15 @@ public final class TransferDetailFragment extends AbstractFragment {
     }
 
     private boolean isSeedable() {
-        return uiBittorrentDownload.getState() == TransferState.FINISHED;
+        return uiBittorrentDownload != null && uiBittorrentDownload.getState() == TransferState.FINISHED;
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        // R.id.fragment_transfer_detail_menu_delete
+        if (uiBittorrentDownload == null) {
+            return;
+        }
         updatePauseResumeSeedMenuAction();
-
         MenuItem fiatMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_fiat);
         MenuItem bitcoinMenuItem = menu.findItem(R.id.fragment_transfer_detail_menu_donate_bitcoin);
         if (!uiBittorrentDownload.hasPaymentOptions()) {
@@ -105,7 +106,6 @@ public final class TransferDetailFragment extends AbstractFragment {
         if (pauseResumeMenuItem == null) {
             return;
         }
-
         if (isPausable()) {
             pauseResumeMenuItem.setIcon(R.drawable.action_bar_pause);
         }
