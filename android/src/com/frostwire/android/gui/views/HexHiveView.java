@@ -127,21 +127,23 @@ public class HexHiveView<T> extends View {
     }
 
     public void updateData(HexDataAdapter<T> hexDataAdapter) {
-        // LETS TRY TO AVOID REPEATED OBJECT ALLOCATIONS HERE
-        if (DP == null && getHeight() > 0 && getWidth() > 0 && hexDataAdapter != null) {
+        int canvasWidth = getWidth();
+        int canvasHeight = getHeight();
+
+        if (DP == null && canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
             DP = new DrawingProperties(hexDataAdapter,
                     hexagonBorderPaint.getStrokeWidth(),
                     getPaddingLeft(),
                     getPaddingTop(),
-                    getWidth() - getPaddingRight(),
-                    getHeight() - getPaddingBottom());
+                    canvasWidth - getPaddingRight(),
+                    canvasHeight - getPaddingBottom());
         }
         if (DP == null) {
             // not ready yet (perhaps during animation or rotation)
             return;
         }
-        if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0) {
-            HexHiveRenderer renderer = new HexHiveRenderer(getWidth(), getHeight(), DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
+        if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
+            HexHiveRenderer renderer = new HexHiveRenderer(canvasWidth, canvasHeight, DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
             Engine.instance().getThreadPool().execute(renderer);
         }
     }
