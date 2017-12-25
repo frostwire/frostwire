@@ -30,6 +30,7 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -1175,7 +1176,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         File screenshotFile = UIUtils.takeScreenshot(rootView);
         if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
             shareIntent.setType("image/jpg");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(this, screenshotFile.getAbsolutePath(), false));
+            boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
+            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(this, screenshotFile.getAbsolutePath(), userFileProvider));
         } else {
             shareIntent.setType("text/plain");
         }
