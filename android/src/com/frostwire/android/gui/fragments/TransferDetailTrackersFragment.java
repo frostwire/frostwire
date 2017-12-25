@@ -272,14 +272,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                         trackerToRemove.url(),
                         R.string.remove_tracker,
                         (dialog, which) -> {
-                            TrackerItemViewHolder viewHolder = vhRef.get();
-                            List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
-                            trackers1.remove(viewHolder.trackerOffset);
-                            viewHolder.torrentHandle.replaceTrackers(trackers1);
-                            viewHolder.torrentHandle.saveResumeData();
-                            viewHolder.torrentHandle.forceReannounce();
-                            if (Ref.alive(viewHolder.adapterRef)) {
-                                viewHolder.adapterRef.get().notifyDataSetChanged();
+                            if (Ref.alive(vhRef)) {
+                                TrackerItemViewHolder viewHolder = vhRef.get();
+                                List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
+                                trackers1.remove(viewHolder.trackerOffset);
+                                viewHolder.torrentHandle.replaceTrackers(trackers1);
+                                viewHolder.torrentHandle.saveResumeData();
+                                viewHolder.torrentHandle.forceReannounce();
+                                if (Ref.alive(viewHolder.adapterRef)) {
+                                    viewHolder.adapterRef.get().notifyDataSetChanged();
+                                }
                             }
                         });
             }
