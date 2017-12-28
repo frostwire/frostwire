@@ -26,7 +26,7 @@ import java.util.List;
 public final class ArchiveorgItem {
     public Object title;
     public String mediatype;
-    public String description;
+    //public Object description;
     public String licenseurl;
     public String publicdate;
     public int downloads;
