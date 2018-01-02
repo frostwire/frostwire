@@ -124,7 +124,7 @@ public final class DiskCrawlCache implements CrawlCache {
             try {
                 size = cache.numEntries();
             } catch (Throwable e) {
-                LOG.error("Unable to get crawl cache size", e);
+                LOG.error("Unable to get crawl cache number of entries", e);
             }
         }
 
