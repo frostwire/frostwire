@@ -37,6 +37,7 @@ public abstract class SQLiteOpenHelper {
 
     private final String dbpath;
     private final SQLiteDatabase db;
+    private String folderpath;
 
     public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version) {
         this(context, name, factory, version, null);
@@ -110,7 +111,7 @@ public abstract class SQLiteOpenHelper {
             StringBuilder sb = new StringBuilder();
             sb.append("jdbc:h2:");
 
-            String folderpath = dbpath + "." + version;
+            folderpath = dbpath + "." + version;
             String fullpath = folderpath + File.separator + name;
             sb.append(fullpath);
 
@@ -126,11 +127,31 @@ public abstract class SQLiteOpenHelper {
             if (create) {
                 onCreate(db);
             }
-
             return db;
         } catch (Throwable e) {
             LOG.error("Error opening the database", e);
             throw new RuntimeException(e);
         }
+    }
+
+    public long sizeInBytes() {
+        if (folderpath != null) {
+            File dbFolder = new File(folderpath);
+            if (dbFolder.exists() && dbFolder.isDirectory()) {
+                return folderSize(dbFolder);
+            }
+        }
+        return 0;
+    }
+
+    private static long folderSize(File directory) {
+        long length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile())
+                length += file.length();
+            else
+                length += folderSize(file);
+        }
+        return length;
     }
 }

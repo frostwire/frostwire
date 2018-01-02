@@ -105,7 +105,7 @@ public class DatabaseCrawlCache implements CrawlCache {
     }
 
     @Override
-    public long size() {
+    public long numEntries() {
         long size = 0;
 
         Cursor c = null;
@@ -131,5 +131,10 @@ public class DatabaseCrawlCache implements CrawlCache {
         }
 
         return size;
+    }
+
+    @Override
+    public long sizeInBytes() {
+        return db.sizeInBytes();
     }
 }

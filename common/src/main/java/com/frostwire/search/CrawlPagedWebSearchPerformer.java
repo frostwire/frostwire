@@ -236,15 +236,26 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
         }
     }
 
-    public static long getCacheSize() {
+    public static long getCacheNumEntries() {
         long result = 0;
         if (cache != null) {
             synchronized (cache) {
-                result = cache.size();
+                result = cache.numEntries();
             }
         }
         return result;
     }
+
+    public static long getCacheSize() {
+        long result = 0;
+        if (cache != null) {
+            synchronized (cache) {
+                result = cache.sizeInBytes();
+            }
+        }
+        return result;
+    }
+
 
     private static long byteArrayToLong(final byte[] src, final int srcPos, final long dstInit, final int dstPos,
                                         final int nBytes) {

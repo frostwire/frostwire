@@ -47,6 +47,7 @@ import java.util.*;
 public final class SearchMediator {
 
     public static final Logger LOG = Logger.getLogger(SearchMediator.class);
+    private final long MAX_CRAWLCACHE_SIZE = 250*1000*1024;
 
     /**
      * Query text is valid.
@@ -131,7 +132,12 @@ public final class SearchMediator {
 
         new Thread(() -> {
             try {
-                CrawlPagedWebSearchPerformer.setCache(new DatabaseCrawlCache());
+                DatabaseCrawlCache databaseCrawlCache = new DatabaseCrawlCache();
+                if (databaseCrawlCache.sizeInBytes() > MAX_CRAWLCACHE_SIZE) {
+                    databaseCrawlCache.clear();
+                    databaseCrawlCache = new DatabaseCrawlCache();
+                }
+                CrawlPagedWebSearchPerformer.setCache(databaseCrawlCache);
             } catch (Throwable t) {
                 LOG.error("could not set database crawl cache", t);
             }
@@ -577,7 +583,7 @@ public final class SearchMediator {
     public long getTotalTorrents() {
         long r = 0;
         try {
-            r = CrawlPagedWebSearchPerformer.getCacheSize();
+            r = CrawlPagedWebSearchPerformer.getCacheNumEntries();
         } catch (Throwable ignored) {
 
         }

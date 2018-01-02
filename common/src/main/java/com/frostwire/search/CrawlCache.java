@@ -33,5 +33,7 @@ public interface CrawlCache {
 
     void clear();
 
-    long size();
+    long numEntries();
+
+    long sizeInBytes();
 }

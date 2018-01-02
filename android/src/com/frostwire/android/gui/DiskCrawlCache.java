@@ -104,11 +104,25 @@ public final class DiskCrawlCache implements CrawlCache {
     }
 
     @Override
-    public long size() {
+    public long sizeInBytes() {
         long size = 0;
         if (cache != null) {
             try {
                 size = cache.size();
+            } catch (Throwable e) {
+                LOG.error("Unable to get crawl cache size", e);
+            }
+        }
+
+        return size;
+    }
+
+    @Override
+    public long numEntries() {
+        long size = 0;
+        if (cache != null) {
+            try {
+                size = cache.numEntries();
             } catch (Throwable e) {
                 LOG.error("Unable to get crawl cache size", e);
             }

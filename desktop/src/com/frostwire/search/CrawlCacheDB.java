@@ -127,6 +127,10 @@ public final class CrawlCacheDB {
         return count;
     }
 
+    public long sizeInBytes() {
+        return databaseHelper.sizeInBytes();
+    }
+
     public static final class Columns {
 
         private Columns() {

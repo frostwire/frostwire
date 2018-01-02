@@ -139,6 +139,11 @@ public final class DiskCache {
         return 0;
     }
 
+    public long numEntries() {
+        return -1; // don't have access to cache.lruEntries.size();
+    }
+
+
     public long maxSize() {
         return cache.getMaxSize();
     }
@@ -169,6 +174,7 @@ public final class DiskCache {
     private String encodeKey(String key) {
         return ByteString.encodeUtf8(key).md5().hex();
     }
+
 
     public static final class Entry implements Closeable {
 
