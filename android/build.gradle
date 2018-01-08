@@ -115,6 +115,10 @@ android {
         plus1.res.srcDirs = ['res-plus1']
     }
 
+    packagingOptions {
+        exclude "**/AlarmReceiver"
+    }
+
     lintOptions {
         abortOnError false
     }
