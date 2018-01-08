@@ -95,7 +95,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
 
         if (totalPieces == -1) {
             totalPieces = torrentInfo.numPieces();
-            piecesNumberTextView.setText(totalPieces + "");
+            piecesNumberTextView.setText(String.valueOf(totalPieces));
             //progressBar.setVisibility(View.VISIBLE);
             hexHiveView.setVisibility(View.GONE);
         }
