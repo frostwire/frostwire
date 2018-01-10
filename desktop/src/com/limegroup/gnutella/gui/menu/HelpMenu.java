@@ -54,9 +54,7 @@ final class HelpMenu extends AbstractMenu {
 
         addSeparator();
 
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/stickers",I18n.tr("Order FrostWire Stickers"),I18n.tr("Order FrostWire stickers, we ship worldwide.")));
-
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/shop",I18n.tr("FrostWire T-Shirts"),I18n.tr("Get a T-shirt, support the project. You'll get also 10 free stickers")));
+        addMenuItem(new OpenLinkAction("http://www.frostwire.com/give",I18n.tr("Support Frostwire"),I18n.tr("Support Frostwire")));
 
         addMenuItem(new OpenLinkAction("http://www.frostclick.com/wp/?from=frostwire" + com.limegroup.gnutella.util.FrostWireUtils.getFrostWireVersion(),
                 "FrostClick.com", I18n.tr("Free Legal Downloads")));
@@ -67,7 +65,7 @@ final class HelpMenu extends AbstractMenu {
 
         addMenuItem(new OpenLinkAction("http://twitter.com/#!/frostwire", I18n.tr("Follow us on Twitter"), I18n.tr("Follow us on Twitter")));
 
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/forum/viewforum.php?f=1", I18n.tr("Foru&m"), I18n.tr("Access the FrostWire Users\' Forum")));
+        addMenuItem(new OpenLinkAction("http://forum.frostwire.com/", I18n.tr("Foru&m"), I18n.tr("Access the FrostWire Users\' Forum")));
 
         addSeparator();
 
