@@ -42,7 +42,7 @@ final class HelpMenu extends AbstractMenu {
     HelpMenu() {
         super(I18n.tr("&Help"));
 
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/?id=faq", I18n.tr("&FAQ"), I18n.tr("Frequently Asked Questions for FrostWire")));
+        addMenuItem(new OpenLinkAction("https://support.frostwire.com/hc/en-us/categories/200015110-FAQs", I18n.tr("&FAQ"), I18n.tr("Frequently Asked Questions for FrostWire")));
 
         addMenuItem(new OpenLinkAction("http://www.frostwire-preview.com/?type=yt&displayName=How%20to%20search%20and%20download%20files%20with%20FrostWire%20Wynwood%20(5.6)%20-%20YouTube&source=YouTube+-+FrostWireVideos&detailsUrl=http://www.youtube.com/watch?v=A0p_DpOjpO8", I18n.tr("How to use FrostWire (Video)"), I18n.tr("How to use FrostWire (Video)")));
 
@@ -54,18 +54,22 @@ final class HelpMenu extends AbstractMenu {
 
         addSeparator();
 
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/give",I18n.tr("Support Frostwire"),I18n.tr("Support Frostwire")));
+        addMenuItem(new OpenLinkAction("http://www.frostwire.com/give?from=desktop-help",I18n.tr("Support FrostWire"),I18n.tr("Support FrostWire")));
 
         addMenuItem(new OpenLinkAction("http://www.frostclick.com/wp/?from=frostwire" + com.limegroup.gnutella.util.FrostWireUtils.getFrostWireVersion(),
                 "FrostClick.com", I18n.tr("Free Legal Downloads")));
 
         addSeparator();
 
-        addMenuItem(new OpenLinkAction("http://www.facebook.com/pages/FrostWire/110265295669948",I18n.tr("FrostWire on Facebook"),I18n.tr("Come and say hi to the community on Facebook")));
+        addMenuItem(new OpenLinkAction("http://www.facebook.com/pages/FrostWire/110265295669948",I18n.tr("Follow us on Facebook"),I18n.tr("Come and say hi to the community on Facebook")));
+
+        addMenuItem(new OpenLinkAction("https://plus.google.com/+frostwire/posts", I18n.tr("Follow us on G+"), I18n.tr("Follow us on G+")));
+
+        addMenuItem(new OpenLinkAction("https://instagram.com/frostwire", I18n.tr("Follow us on Instagram"), I18n.tr("Follow us on Instagram")));
 
         addMenuItem(new OpenLinkAction("http://twitter.com/#!/frostwire", I18n.tr("Follow us on Twitter"), I18n.tr("Follow us on Twitter")));
 
-        addMenuItem(new OpenLinkAction("http://forum.frostwire.com/", I18n.tr("Foru&m"), I18n.tr("Access the FrostWire Users\' Forum")));
+        addMenuItem(new OpenLinkAction("http://forum.frostwire.com/?from=desktop-help", I18n.tr("Foru&m"), I18n.tr("Access the FrostWire Users\' Forum")));
 
         addSeparator();
 
