@@ -165,13 +165,11 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         /*
          The refresh listener for updating the bandwidth usage every second.
         */
-        GUIMediator.addRefreshListener(new RefreshListener() {
-            public void refresh() {
-                if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue()) {
-                    updateBandwidth();
-                }
-                updateCenterPanel();
+        GUIMediator.addRefreshListener(() -> {
+            if (StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue()) {
+                updateBandwidth();
             }
+            updateCenterPanel();
         });
 
         refresh();
@@ -196,6 +194,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private void createInstagramButton() {
         instagramButton = new IconButton("INSTAGRAM");
         initSocialButton(instagramButton, I18n.tr("Follow FrostWire on Instagram"), GUIConstants.INSTAGRAM_FROSTWIRE_URL);
+        instagramButton.setPreferredSize(new Dimension(22, 16));
     }
 
     private void createFacebookButton() {
@@ -205,7 +204,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private void createGooglePlusButton() {
         googlePlusButton = new IconButton("GOOGLEPLUS");
-        googlePlusButton.setPreferredSize(new Dimension(19, 16));
+        googlePlusButton.setPreferredSize(new Dimension(22, 16));
         initSocialButton(googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
     }
 
@@ -221,7 +220,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             @Override
             public String getToolTipText() {
                 boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
-
                 return "<html>" + (seedingStatus ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>") : I18n.tr("<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>") + "</html>");
             }
         };
@@ -310,12 +308,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             BAR.add(createSeparator(), gbc);
             updateSeedingStatus();
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = GridBagConstraints.RELATIVE;
             BAR.add(facebookButton, gbc);
             BAR.add(twitterButton, gbc);
-            BAR.add(instagramButton, gbc);
             BAR.add(googlePlusButton, gbc);
+            BAR.add(instagramButton, gbc);
 
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
             //  make center panel stretchy

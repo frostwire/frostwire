@@ -37,7 +37,7 @@ public class IconButton extends JButton {
      * @param iconName
      * @param horizontalTextPlacement - if true, text will be displayed to the right of the icon.
      */
-    public IconButton(String text, String iconName, boolean horizontalTextPlacement) {
+    IconButton(String text, String iconName, boolean horizontalTextPlacement) {
         this(text, iconName);
         horizontalText = horizontalTextPlacement;
         useTransparentBackground = true;
@@ -46,7 +46,7 @@ public class IconButton extends JButton {
     /**
      * Constructs a new IconButton with the given text & icon name.
      */
-    public IconButton(String text, String iconName) {
+    IconButton(String text, String iconName) {
 	    setRolloverEnabled(true);        
         this.iconName = iconName;
         this.message = text;
@@ -58,7 +58,7 @@ public class IconButton extends JButton {
     /**
      * Constructs a new IconButton with the an icon only.
      */
-    public IconButton(String iconName) {
+    IconButton(String iconName) {
         setRolloverEnabled(true);        
         this.iconName = iconName;
         this.message = "";
@@ -105,11 +105,11 @@ public class IconButton extends JButton {
 		a.addPropertyChangeListener(getListener());
 	}
 	
-	public void setHorizontalText(boolean useHorizontalText) {
+	protected void setHorizontalText(boolean useHorizontalText) {
 	    horizontalText = useHorizontalText;
 	}
 	
-    public void setUseTransparentBackground(boolean transparentBackground) {
+    protected void setUseTransparentBackground(boolean transparentBackground) {
         useTransparentBackground = transparentBackground;
     }
 
