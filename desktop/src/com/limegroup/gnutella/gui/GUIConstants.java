@@ -47,6 +47,7 @@ public final class GUIConstants {
     public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
     public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
     static final String GPLUS_FROSTWIRE_URL = "https://plus.google.com/+frostwire/posts";
+    static final String INSTAGRAM_FROSTWIRE_URL = "https://instagram.com/frostwire";
 
     // Continuous Integration
 

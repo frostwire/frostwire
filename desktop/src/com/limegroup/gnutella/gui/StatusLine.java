@@ -75,6 +75,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private IconButton twitterButton;
     private IconButton facebookButton;
+    private IconButton instagramButton;
     private IconButton googlePlusButton;
 
     private IconButton seedingStatusButton;
@@ -146,6 +147,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         createFacebookButton();
         GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Twitter..."));
         createTwitterButton();
+        createInstagramButton();
         GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on G+..."));
         createGooglePlusButton();
 
@@ -191,6 +193,11 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         initSocialButton(twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
     }
 
+    private void createInstagramButton() {
+        instagramButton = new IconButton("INSTAGRAM");
+        initSocialButton(instagramButton, I18n.tr("Follow FrostWire on Instagram"), GUIConstants.INSTAGRAM_FROSTWIRE_URL);
+    }
+
     private void createFacebookButton() {
         facebookButton = new IconButton("FACEBOOK");
         initSocialButton(facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
@@ -204,13 +211,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
         socialButton.setToolTipText(I18n.tr(toolTipText));
-        socialButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                GUIMediator.openURL(url);
-            }
-        });
+        socialButton.addActionListener(arg0 -> GUIMediator.openURL(url));
     }
 
     private void createSeedingStatusLabel() {
@@ -225,12 +226,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             }
         };
 
-        seedingStatusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_BASIC_KEY);
-            }
-        });
+        seedingStatusButton.addActionListener(e -> GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_BASIC_KEY));
 
         ToolTipManager.sharedInstance().registerComponent(seedingStatusButton);
     }
@@ -318,6 +314,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             gbc.gridx = GridBagConstraints.RELATIVE;
             BAR.add(facebookButton, gbc);
             BAR.add(twitterButton, gbc);
+            BAR.add(instagramButton, gbc);
             BAR.add(googlePlusButton, gbc);
 
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
@@ -482,11 +479,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Updates the status text.
      */
     void setStatusText(final String text) {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                STATUS_COMPONENT.setText(text);
-            }
-        });
+        GUIMediator.safeInvokeAndWait(() -> STATUS_COMPONENT.setText(text));
     }
 
     /**
