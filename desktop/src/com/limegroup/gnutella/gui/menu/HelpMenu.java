@@ -22,6 +22,7 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.OpenLinkAction;
 import org.limewire.util.OSUtils;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -35,9 +36,6 @@ final class HelpMenu extends AbstractMenu {
      * Creates a new <tt>HelpMenu</tt>, using the <tt>key</tt>
      * argument for setting the locale-specific title and
      * accessibility text.
-     *
-     * @param key the key for locale-specific string resources unique
-     *            to the menu
      */
     HelpMenu() {
         super(I18n.tr("&Help"));
@@ -55,6 +53,16 @@ final class HelpMenu extends AbstractMenu {
         addSeparator();
 
         addMenuItem(new OpenLinkAction("http://www.frostwire.com/give?from=desktop-help",I18n.tr("Support FrostWire"),I18n.tr("Support FrostWire")));
+
+        JMenu cryptoCurrenciesMenu = new JMenu(I18n.tr("Support with CryptoCurrencies"));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin", I18n.tr("Bitcoin")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin-cash", I18n.tr("Bitcoin Cash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/ethereum", I18n.tr("Ethereum")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/dash", I18n.tr("Dash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/litecoin", I18n.tr("LiteCoin")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/zcash", I18n.tr("ZCash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin-gold", I18n.tr("Bitcoin Gold")));
+        getMenu().add(cryptoCurrenciesMenu);
 
         addMenuItem(new OpenLinkAction("http://www.frostclick.com/wp/?from=frostwire" + com.limegroup.gnutella.util.FrostWireUtils.getFrostWireVersion(),
                 "FrostClick.com", I18n.tr("Free Legal Downloads")));
@@ -94,7 +102,7 @@ final class HelpMenu extends AbstractMenu {
          */
         private static final long serialVersionUID = -4964160055694967725L;
 
-        public ShowTipOfTheDayAction() {
+        ShowTipOfTheDayAction() {
             super(I18n.tr("Tip of the &Day"));
             putValue(LONG_DESCRIPTION, I18n.tr("Show the Tip of the Day Window"));
         }
@@ -114,7 +122,7 @@ final class HelpMenu extends AbstractMenu {
          */
         private static final long serialVersionUID = 2425666944873627828L;
 
-        public ShowAboutDialogAction() {
+        ShowAboutDialogAction() {
             super(I18n.tr("&About FrostWire"));
             putValue(LONG_DESCRIPTION, I18n.tr("Information about FrostWire"));
         }
