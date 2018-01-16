@@ -1535,7 +1535,18 @@ public final class MusicUtils {
      * @return The last album name played by an artist
      */
     public static String getLastAlbumForArtist(final Context context, final String artistName) {
-//        return RecentStore.getInstance(context).getAlbumName(artistName);
+        return RecentStore.getInstance(context).getAlbumName(artistName);
+
+    }
+
+    /**
+     * Queries {@link RecentSongStore} for the last song played by an artist
+     *
+     * @param context    The {@link Context} to use
+     * @param artistName The artist name
+     * @return The last song name played by an artist
+     */
+    public static String getLastSongForArtist(final Context context, final String artistName) {
         return RecentSongStore.getInstance(context).getSongName(artistName);
     }
 

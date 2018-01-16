@@ -83,7 +83,7 @@ public final class RecentSongStore extends SQLiteOpenHelper {
             values.put(RecentStoreColumns.TIME_PLAYED, System.currentTimeMillis());
 
             writableDatabase.beginTransaction();
-            writableDatabase.delete(RecentStoreColumns.SONG_NAME,
+            writableDatabase.delete(RecentStoreColumns.TABLE_NAME,
                 RecentStoreColumns.ID + " = ?", new String[]{ String.valueOf(songId) });
             writableDatabase.insert(RecentStoreColumns.TABLE_NAME, null, values);
             writableDatabase.setTransactionSuccessful();
