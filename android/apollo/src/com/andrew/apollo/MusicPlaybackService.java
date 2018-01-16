@@ -1680,14 +1680,22 @@ public class MusicPlaybackService extends Service {
 //                musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
                 musicPlaybackService.mRecentsCache = RecentSongStore.getInstance(musicPlaybackService);
             }
-            long albumId = musicPlaybackService.getAlbumId();
-            String albumName = musicPlaybackService.getAlbumName();
-            String artistName = musicPlaybackService.getArtistName();
-            String songCount =  MusicUtils.getSongCountForAlbum(musicPlaybackService, albumId);
-            String releaseDateForAlbum = MusicUtils.getReleaseDateForAlbum(musicPlaybackService, albumId);
+
+//            long albumId = musicPlaybackService.getAlbumId();
+//            String albumName = musicPlaybackService.getAlbumName();
+//            String artistName = musicPlaybackService.getArtistName();
+//            String songCount =  MusicUtils.getSongCountForAlbum(musicPlaybackService, albumId);
+//            String releaseDateForAlbum = MusicUtils.getReleaseDateForAlbum(musicPlaybackService, albumId);
 //            musicPlaybackService.mRecentsCache.addAlbumId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
-            // TODO: Working here, we need to replace ^^ this call with addSongId from RecentSongStore.java
-            musicPlaybackService.mRecentsCache.addSongId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
+
+            long songId = musicPlaybackService.getAudioId();
+            String songName = musicPlaybackService.getTrackName();
+            String artistName = musicPlaybackService.getArtistName();
+            String albumName = musicPlaybackService.getAlbumName();
+            // TODO: find a way to get the total duration for a song
+            int duration = 12;
+            musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
+                    albumName, duration);
         }
     }
 
