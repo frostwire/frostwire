@@ -51,6 +51,7 @@ import android.support.v4.content.ContextCompat;
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
+import com.andrew.apollo.provider.RecentSongStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
@@ -479,8 +480,9 @@ public class MusicPlaybackService extends Service {
     /**
      * Recently listened database
      */
-    private RecentStore mRecentsCache;
+//    private RecentStore mRecentsCache;
 
+    private RecentSongStore mRecentsCache;
     /**
      * Favorites database
      */
@@ -567,7 +569,8 @@ public class MusicPlaybackService extends Service {
 
     private void initService() {
         // Initialize the favorites and recents databases
-        mRecentsCache = RecentStore.getInstance(this);
+//        mRecentsCache = RecentStore.getInstance(this);
+        mRecentsCache = RecentSongStore.getInstance(this);
         mFavoritesCache = FavoritesStore.getInstance(this);
 
         // Initialize the notification helper
@@ -1674,14 +1677,17 @@ public class MusicPlaybackService extends Service {
             }
             MusicPlaybackService musicPlaybackService = musicPlaybackServiceWeakReference.get();
             if (musicPlaybackService.mRecentsCache == null) {
-                musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
+//                musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
+                musicPlaybackService.mRecentsCache = RecentSongStore.getInstance(musicPlaybackService);
             }
             long albumId = musicPlaybackService.getAlbumId();
             String albumName = musicPlaybackService.getAlbumName();
             String artistName = musicPlaybackService.getArtistName();
             String songCount =  MusicUtils.getSongCountForAlbum(musicPlaybackService, albumId);
             String releaseDateForAlbum = MusicUtils.getReleaseDateForAlbum(musicPlaybackService, albumId);
-            musicPlaybackService.mRecentsCache.addAlbumId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
+//            musicPlaybackService.mRecentsCache.addAlbumId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
+            // TODO: Working here, we need to replace ^^ this call with addSongId from RecentSongStore.java
+            musicPlaybackService.mRecentsCache.addSongId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
         }
     }
 

@@ -24,11 +24,15 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 
 import com.andrew.apollo.adapters.AlbumAdapter;
+import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.loaders.RecentLoader;
+import com.andrew.apollo.loaders.RecentSongLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Album;
+import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
@@ -40,7 +44,8 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class RecentFragment extends BaseAlbumFragment {
+//public final class RecentFragment extends BaseAlbumFragment {
+public final class RecentFragment extends BaseSongFragment {
 
     public RecentFragment() {
         super(Fragments.RECENT_FRAGMENT_GROUP_ID, Fragments.RECENT_FRAGMENT_LOADER_ID);
@@ -56,35 +61,50 @@ public final class RecentFragment extends BaseAlbumFragment {
     }
 
     @Override
-    protected AlbumAdapter createAdapter() {
-        int layout;
-        if (isSimpleLayout()) {
-            layout = R.layout.list_item_normal;
-        } else if (isDetailedLayout()) {
-            layout = R.layout.list_item_detailed_no_background;
-        } else {
-            layout = R.layout.grid_items_normal;
-        }
-        return new AlbumAdapter(getActivity(), layout);
+    protected SongAdapter createAdapter() {
+        return new SongAdapter(getActivity(), R.layout.list_item_simple_image);
     }
 
     @Override
     protected String getLayoutTypeName() {
-        return PreferenceUtils.RECENT_LAYOUT;
+        return PreferenceUtils.SIMPLE_LAYOUT;
+    }
+
+//    @Override
+//    public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
+//        return new RecentLoader(getActivity());
+//    }
+
+    @Override
+    public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
+        return new RecentSongLoader(getActivity());
+    }
+//
+//    /**
+//     * Sets up the list view
+//     */
+//    protected void initListView() {
+//        super.initListView();
+//        if (mAdapter != null) {
+//            mAdapter.setTouchPlay(true);
+//        }
+//    }
+
+    @Override
+    protected boolean isSimpleLayout() {
+        return true;
     }
 
     @Override
-    public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
-        return new RecentLoader(getActivity());
+    public void onItemClick(final AdapterView<?> parent, final View view, final int position,
+                            final long id) {
+        onSongItemClick(position);
     }
 
-    /**
-     * Sets up the list view
-     */
-    protected void initListView() {
-        super.initListView();
+    @Override
+    public void onMetaChanged() {
         if (mAdapter != null) {
-            mAdapter.setTouchPlay(true);
+            mAdapter.notifyDataSetChanged();
         }
     }
 }
