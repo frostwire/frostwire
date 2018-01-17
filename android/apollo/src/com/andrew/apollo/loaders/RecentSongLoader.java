@@ -30,14 +30,12 @@ public class RecentSongLoader extends SongLoader {
                 .query(RecentStoreColumns.TABLE_NAME,
                         new String[] {
                                 RecentStoreColumns.ID + " as id",  /* 0 - id */
-                                RecentStoreColumns.ID,             /* 1 - songid */
                                 RecentStoreColumns.SONG_NAME,      /* 2 - songname */
                                 RecentStoreColumns.ARTIST_NAME,    /* 3 - artistname */
                                 RecentStoreColumns.ALBUM_NAME,     /* 4 - albumname */
                                 RecentStoreColumns.DURATION,       /* 5 - duration */
-                                RecentStoreColumns.TIME_PLAYED     /* 6 - timeplayed */
                         }, null, null, null, null,
-                        RecentStoreColumns.TIME_PLAYED + " DESC");
+                        RecentStoreColumns.ID + " DESC");
 
     }
 
