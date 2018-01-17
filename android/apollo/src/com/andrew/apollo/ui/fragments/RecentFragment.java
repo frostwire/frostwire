@@ -96,8 +96,8 @@ public final class RecentFragment extends BaseSongFragment {
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-                            final long id) {
+    public void onItemClick(final AdapterView<?> parent, final View view,
+                            final int position, final long id) {
         onSongItemClick(position);
     }
 

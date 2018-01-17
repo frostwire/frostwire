@@ -46,7 +46,7 @@ public final class RecentSongStore extends SQLiteOpenHelper {
                 + RecentStoreColumns.SONG_NAME + " TEXT NOT NULL,"
                 + RecentStoreColumns.ARTIST_NAME + " TEXT NOT NULL,"
                 + RecentStoreColumns.ALBUM_NAME + " TEXT,"
-                + RecentStoreColumns.DURATION + " TEXT NOT NULL,"
+                + RecentStoreColumns.DURATION + " LONG NOT NULL,"
                 + RecentStoreColumns.TIME_PLAYED + " LONG NOT NULL);"
         );
     }
@@ -66,7 +66,7 @@ public final class RecentSongStore extends SQLiteOpenHelper {
 
     public void addSongId(final Long songId, final String songName,
                           final String artistName, final String albumName,
-                          final int duration) {
+                          final long duration) {
 
         if (songId == null || songName == null || artistName == null || albumName == null ||
                 duration == 0) {

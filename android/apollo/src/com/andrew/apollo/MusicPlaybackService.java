@@ -52,7 +52,6 @@ import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentSongStore;
-import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
@@ -1645,7 +1644,7 @@ public class MusicPlaybackService extends Service {
                 // Add the track to the recently played list.
                 ExecutorService threadPool = Engine.instance().getThreadPool();
                 if (threadPool != null) {
-                    threadPool.execute(new RecentsStoreAddAlbumIdRunnable(musicPlaybackService));
+                    threadPool.execute(new RecentsStoreAddSongIdRunnable(musicPlaybackService));
                 }
 
             } else if (QUEUE_CHANGED.equals(change)) {
@@ -1663,10 +1662,10 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private final static class RecentsStoreAddAlbumIdRunnable implements Runnable {
+    private final static class RecentsStoreAddSongIdRunnable implements Runnable {
         private WeakReference<MusicPlaybackService> musicPlaybackServiceWeakReference;
 
-        RecentsStoreAddAlbumIdRunnable(MusicPlaybackService musicPlaybackService) {
+        RecentsStoreAddSongIdRunnable(MusicPlaybackService musicPlaybackService) {
             musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
         }
 
@@ -1692,8 +1691,7 @@ public class MusicPlaybackService extends Service {
             String songName = musicPlaybackService.getTrackName();
             String artistName = musicPlaybackService.getArtistName();
             String albumName = musicPlaybackService.getAlbumName();
-            // TODO: find a way to get the total duration for a song
-            int duration = 12;
+            long duration =  musicPlaybackService.duration();
             musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
                     albumName, duration);
         }
