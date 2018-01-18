@@ -1539,17 +1539,6 @@ public final class MusicUtils {
     }
 
     /**
-     * Queries {@link RecentStore} for the last song played by an artist
-     *
-     * @param context    The {@link Context} to use
-     * @param artistName The artist name
-     * @return The last song name played by an artist
-     */
-    public static String getLastSongForArtist(final Context context, final String artistName) {
-        return RecentStore.getInstance(context).getSongName(artistName);
-    }
-
-    /**
      * Seeks the current track to a desired position
      *
      * @param position The position to seek to
