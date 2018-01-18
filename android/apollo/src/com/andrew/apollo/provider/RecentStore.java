@@ -21,7 +21,7 @@ import android.text.TextUtils;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 
 /**
- * The {@link RecentlyListenedFragment} is used to display a a grid or list of
+ * The {@link RecentStore} is used to display a a grid or list of
  * recently listened to albums. In order to populate the this grid or list with
  * the correct data, we keep a cache of the album ID, name, and time it was
  * played to be retrieved later.
