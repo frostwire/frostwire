@@ -16,7 +16,6 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
-import com.andrew.apollo.model.Album;
 import com.andrew.apollo.provider.RecentStore;
 
 /**
@@ -59,6 +58,6 @@ public class RecentLoader extends SongLoader {
                                 AudioColumns.ALBUM,          /* 4 - albumname */
                                 AudioColumns.DURATION,       /* 5 - duration */
                         }, null, null, null, null,
-                        RecentStore.RecentStoreColumns.TIME_PLAYED + " DESC");
+                        RecentStore.RecentStoreColumns.LAST_TIME_PLAYED + " DESC");
     }
 }

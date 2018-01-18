@@ -71,7 +71,7 @@ public final class RecentStore extends SQLiteOpenHelper {
                         + AudioColumns.ARTIST + " TEXT NOT NULL,"
                         + AudioColumns.ALBUM + " TEXT,"
                         + AudioColumns.DURATION + " LONG NOT NULL,"
-                        + RecentStoreColumns.TIME_PLAYED + " LONG NOT NULL);"
+                        + RecentStoreColumns.LAST_TIME_PLAYED + " LONG NOT NULL);"
         );
     }
 
@@ -120,7 +120,7 @@ public final class RecentStore extends SQLiteOpenHelper {
             values.put(AudioColumns.ARTIST, artistName != null ? artistName: unknownString);
             values.put(AudioColumns.ALBUM, albumName != null ? albumName: unknownString);
             values.put(AudioColumns.DURATION, duration);
-            values.put(RecentStoreColumns.TIME_PLAYED, System.currentTimeMillis());
+            values.put(RecentStoreColumns.LAST_TIME_PLAYED, System.currentTimeMillis());
 
             writableDatabase.beginTransaction();
             writableDatabase.delete(RecentStoreColumns.TABLE_NAME,
@@ -148,12 +148,12 @@ public final class RecentStore extends SQLiteOpenHelper {
                 BaseColumns._ID,
                 AudioColumns.TITLE,
                 AudioColumns.ARTIST,
-                RecentStoreColumns.TIME_PLAYED
+                RecentStoreColumns.LAST_TIME_PLAYED
         };
         final String selection = AudioColumns.ARTIST + "=?";
         final String[] having = new String[]{ key };
         Cursor cursor = readableDatabase.query(RecentStoreColumns.TABLE_NAME, projection,
-                selection, having,null, null, RecentStoreColumns.TIME_PLAYED +
+                selection, having,null, null, RecentStoreColumns.LAST_TIME_PLAYED +
                         " DESC", null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -185,14 +185,14 @@ public final class RecentStore extends SQLiteOpenHelper {
                 BaseColumns._ID,
                 AudioColumns.ALBUM,
                 AudioColumns.ARTIST,
-                RecentStoreColumns.TIME_PLAYED
+                RecentStoreColumns.LAST_TIME_PLAYED
         };
         final String selection = AudioColumns.ARTIST + "=?";
         final String[] having = new String[]{
                 key
         };
         Cursor cursor = readableDatabase.query(RecentStoreColumns.TABLE_NAME, projection, selection, having,
-                null, null, RecentStoreColumns.TIME_PLAYED + " DESC", null);
+                null, null, RecentStoreColumns.LAST_TIME_PLAYED + " DESC", null);
         if (cursor != null && cursor.moveToFirst()) {
             cursor.moveToFirst();
             final String album = cursor.getString(cursor
@@ -226,6 +226,6 @@ public final class RecentStore extends SQLiteOpenHelper {
         String TABLE_NAME = "songhistory";
 
         /* Time played column */
-        String TIME_PLAYED = "timeplayed";
+        String LAST_TIME_PLAYED = "lasttimeplayed";
     }
 }
