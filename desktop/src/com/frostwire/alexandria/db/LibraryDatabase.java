@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.alexandria.db;
@@ -34,13 +33,10 @@ public class LibraryDatabase {
     public static final int STARRED_PLAYLIST_ID = -3;
     private static final int LIBRARY_DATABASE_VERSION = 4;
 
-    public static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
+    static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
     
-    private final File _databaseFile;
     private final String _name;
-    
     private Connection _connection;
-
     private boolean _closed;
 
     static {
@@ -57,7 +53,6 @@ public class LibraryDatabase {
         }
 
         if (databaseFile != null && databaseFile.isDirectory() && databaseFile.canRead() && databaseFile.canWrite()) {
-            _databaseFile = databaseFile;
             _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
         } else {
@@ -133,28 +128,28 @@ public class LibraryDatabase {
         }
     }
 
-    public synchronized void dump() {
-        if (isClosed()) {
-            return;
-        }
+//    public synchronized void dump() {
+//        if (isClosed()) {
+//            return;
+//        }
+//
+//        try {
+//            new DumpDatabase(this, new File(_databaseFile, "dump.txt")).dump();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        try {
-            new DumpDatabase(this, new File(_databaseFile, "dump.txt")).dump();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void onUpdateDatabase(Connection connection, int oldVersion, int newVersion) {
-        if (oldVersion == 1 && newVersion > 2) {
+    private void onUpdateDatabase(Connection connection, int oldVersion) {
+        if (oldVersion == 1 && LIBRARY_DATABASE_VERSION > 2) {
             setupLuceneIndex(connection);
         }
 
-        if (oldVersion == 2 && newVersion == 3) {
+        if (oldVersion == 2 && LIBRARY_DATABASE_VERSION == 3) {
             setupLuceneIndex(connection);
         }
         
-        if (oldVersion == 3 && newVersion == 4) {
+        if (oldVersion == 3 && LIBRARY_DATABASE_VERSION == 4) {
             setupPlaylistIndexes(connection);
         }
 
@@ -210,7 +205,7 @@ public class LibraryDatabase {
             int version = getDatabaseVersion(connection);
 
             if (version < LIBRARY_DATABASE_VERSION) {
-                onUpdateDatabase(connection, version, LIBRARY_DATABASE_VERSION);
+                onUpdateDatabase(connection, version);
                 try {
                     connection.close();
                 } catch (SQLException e) {

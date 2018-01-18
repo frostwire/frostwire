@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.alexandria;
@@ -24,7 +23,6 @@ import com.frostwire.alexandria.db.LibraryDatabaseEntity;
 import com.frostwire.alexandria.db.PlaylistDB;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -68,15 +66,8 @@ public class Library extends LibraryDatabaseEntity {
     }
 
     public List<Playlist> getPlaylists() {
-        // perform name sort here. It is no the best place
         List<Playlist> list = PlaylistDB.getPlaylists(db);
-        Collections.sort(list, new Comparator<Playlist>() {
-            @Override
-            public int compare(Playlist o1, Playlist o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-
+        list.sort(Comparator.comparing(Playlist::getName));
         return list;
     }
 
@@ -84,9 +75,9 @@ public class Library extends LibraryDatabaseEntity {
         return new Playlist(db, LibraryDatabase.OBJECT_NOT_SAVED_ID, name, description);
     }
 
-    public void dump() {
-        db.dump();
-    }
+//    public void dump() {
+//        db.dump();
+//    }
 
     @Override
     protected void finalize() throws Throwable {
