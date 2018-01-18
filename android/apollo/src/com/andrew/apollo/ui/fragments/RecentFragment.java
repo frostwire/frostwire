@@ -30,6 +30,7 @@ import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.loaders.RecentLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
 import com.andrew.apollo.model.Song;
+import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
@@ -41,7 +42,7 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class RecentFragment extends BaseSongFragment {
+public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
 
     public RecentFragment() {
         super(Fragments.RECENT_FRAGMENT_GROUP_ID, Fragments.RECENT_FRAGMENT_LOADER_ID);
@@ -67,6 +68,12 @@ public final class RecentFragment extends BaseSongFragment {
     }
 
     @Override
+    public void onItemClick(final AdapterView<?> parent, final View view,
+                            final int position, final long id) {
+        onSongItemClick(position);
+    }
+
+    @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new RecentLoader(getActivity());
     }
@@ -82,17 +89,6 @@ public final class RecentFragment extends BaseSongFragment {
 //            mAdapter.setTouchPlay(true);
 //        }
 //    }
-
-    @Override
-    protected boolean isSimpleLayout() {
-        return true;
-    }
-
-    @Override
-    public void onItemClick(final AdapterView<?> parent, final View view,
-                            final int position, final long id) {
-        onSongItemClick(position);
-    }
 
     @Override
     public void onMetaChanged() {
