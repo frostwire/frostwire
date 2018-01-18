@@ -55,6 +55,7 @@ import com.andrew.apollo.provider.RecentSongStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
+import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -1693,7 +1694,7 @@ public class MusicPlaybackService extends Service {
             String albumName = musicPlaybackService.getAlbumName();
             long duration =  musicPlaybackService.duration();
             musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
-                    albumName, duration);
+                    albumName, duration,musicPlaybackService.getString(R.string.unknown));
         }
     }
 

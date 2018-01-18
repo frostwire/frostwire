@@ -2,13 +2,15 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.BaseColumns;
+import android.provider.MediaStore.Audio.AudioColumns;
 
-import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.RecentSongStore;
 import com.andrew.apollo.provider.RecentSongStore.RecentStoreColumns;
 
 
 public class RecentSongLoader extends SongLoader {
+
     /**
      * Constructor of <code>SongLoader</code>
      *
@@ -29,24 +31,13 @@ public class RecentSongLoader extends SongLoader {
                 .getReadableDatabase()
                 .query(RecentStoreColumns.TABLE_NAME,
                         new String[] {
-                                RecentStoreColumns.ID + " as id",  /* 0 - id */
-                                RecentStoreColumns.SONG_NAME,      /* 2 - songname */
-                                RecentStoreColumns.ARTIST_NAME,    /* 3 - artistname */
-                                RecentStoreColumns.ALBUM_NAME,     /* 4 - albumname */
-                                RecentStoreColumns.DURATION,       /* 5 - duration */
+                                BaseColumns._ID + " as id",  /* 0 - id */
+                                AudioColumns.TITLE,      /* 2 - songname */
+                                AudioColumns.ARTIST,    /* 3 - artistname */
+                                AudioColumns.ALBUM,     /* 4 - albumname */
+                                AudioColumns.DURATION,       /* 5 - duration */
                         }, null, null, null, null,
-                        RecentStoreColumns.ID + " DESC");
-
-    }
-
-    protected Song getSongEntryFromCursor(Cursor cursor) {
-        final long songId = cursor.getLong(0);
-        final String songName = cursor.getString(2);
-        final String artistName = cursor.getString(3);
-        final String albumName = cursor.getString(4);
-        final int duration = cursor.getInt(5);
-
-        return new Song(songId, songName, artistName, albumName, duration);
+                        RecentStoreColumns.TIME_PLAYED + " DESC");
 
     }
 }
