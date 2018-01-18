@@ -58,7 +58,6 @@ import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.FavoritesStore.FavoriteColumns;
-import com.andrew.apollo.provider.RecentSongStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
@@ -1540,14 +1539,14 @@ public final class MusicUtils {
     }
 
     /**
-     * Queries {@link RecentSongStore} for the last song played by an artist
+     * Queries {@link RecentStore} for the last song played by an artist
      *
      * @param context    The {@link Context} to use
      * @param artistName The artist name
      * @return The last song name played by an artist
      */
     public static String getLastSongForArtist(final Context context, final String artistName) {
-        return RecentSongStore.getInstance(context).getSongName(artistName);
+        return RecentStore.getInstance(context).getSongName(artistName);
     }
 
     /**
@@ -1672,8 +1671,7 @@ public final class MusicUtils {
                 // Remove from the favorites playlist.
                 FavoritesStore.getInstance(context).removeItem(id);
                 // Remove any items in the recent's database
-//                RecentStore.getInstance(context).removeItem(c.getLong(2));
-                RecentSongStore.getInstance(context).removeItem(c.getLong(2));
+                RecentStore.getInstance(context).removeItem(c.getLong(2));
                 // Remove from all remaining playlists.
                 removeSongFromAllPlaylists(context, id);
                 c.moveToNext();

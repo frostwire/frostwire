@@ -26,12 +26,9 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 
-import com.andrew.apollo.adapters.AlbumAdapter;
 import com.andrew.apollo.adapters.SongAdapter;
 import com.andrew.apollo.loaders.RecentLoader;
-import com.andrew.apollo.loaders.RecentSongLoader;
 import com.andrew.apollo.menu.FragmentMenuItems;
-import com.andrew.apollo.model.Album;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
@@ -44,7 +41,6 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-//public final class RecentFragment extends BaseAlbumFragment {
 public final class RecentFragment extends BaseSongFragment {
 
     public RecentFragment() {
@@ -70,19 +66,16 @@ public final class RecentFragment extends BaseSongFragment {
         return PreferenceUtils.SIMPLE_LAYOUT;
     }
 
-//    @Override
-//    public Loader<List<Album>> onCreateLoader(final int id, final Bundle args) {
-//        return new RecentLoader(getActivity());
-//    }
-
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
-        return new RecentSongLoader(getActivity());
+        return new RecentLoader(getActivity());
     }
-//
-//    /**
-//     * Sets up the list view
-//     */
+
+    /**
+     * Sets up the list view
+     */
+//    TODO: Ask about this method to @gubatron because the current adapter
+//          don't implement setTouchPlay method.
 //    protected void initListView() {
 //        super.initListView();
 //        if (mAdapter != null) {

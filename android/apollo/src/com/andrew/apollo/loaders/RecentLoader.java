@@ -13,9 +13,11 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.provider.BaseColumns;
+import android.provider.MediaStore.Audio.AudioColumns;
+
 import com.andrew.apollo.model.Album;
 import com.andrew.apollo.provider.RecentStore;
-import com.andrew.apollo.provider.RecentStore.RecentStoreColumns;
 
 /**
  * Used to query {@link RecentStore} and return the last listened to albums.
@@ -23,7 +25,7 @@ import com.andrew.apollo.provider.RecentStore.RecentStoreColumns;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
-public class RecentLoader extends AlbumLoader {
+public class RecentLoader extends SongLoader {
 
     /**
      * Constructor of <code>RecentLoader</code>
@@ -49,18 +51,19 @@ public class RecentLoader extends AlbumLoader {
         return RecentStore
                 .getInstance(context)
                 .getReadableDatabase()
-                .query(RecentStoreColumns.NAME,
+                .query(RecentStore.RecentStoreColumns.TABLE_NAME,
                         new String[] {
-                                RecentStoreColumns.ID + " as id",  /* 0 - id */
-                                RecentStoreColumns.ID,             /* 1 - albumid */
-                                RecentStoreColumns.ALBUMNAME,      /* 2 - itemname */
-                                RecentStoreColumns.ARTISTNAME,     /* 3 - artistname */
-                                RecentStoreColumns.ALBUMSONGCOUNT, /* 4 - albumsongcount */
-                                RecentStoreColumns.ALBUMYEAR,      /* 5 - albumyear */
-                                RecentStoreColumns.TIMEPLAYED      /* 6 - timeplayed */
-                        }, null, null, null, null, RecentStoreColumns.TIMEPLAYED + " DESC");
+                                BaseColumns._ID + " as id",  /* 0 - id */
+                                AudioColumns.TITLE,          /* 2 - songname */
+                                AudioColumns.ARTIST,         /* 3 - artistname */
+                                AudioColumns.ALBUM,          /* 4 - albumname */
+                                AudioColumns.DURATION,       /* 5 - duration */
+                        }, null, null, null, null,
+                        RecentStore.RecentStoreColumns.TIME_PLAYED + " DESC");
+
     }
 
+    // TODO: REMOVE THIS THING WHEN you're sure that isn't used
     protected Album getAlbumEntryFromCursor(Cursor cursor) {
         // Copy the album id
         final long id = cursor.getLong(0);

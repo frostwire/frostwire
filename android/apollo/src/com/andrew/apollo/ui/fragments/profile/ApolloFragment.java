@@ -48,7 +48,6 @@ import com.andrew.apollo.model.Genre;
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
-import com.andrew.apollo.provider.RecentSongStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.activities.BaseActivity;
@@ -346,7 +345,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onRemoveFromRecent() {
-        RecentSongStore.getInstance(getActivity()).removeItem(mSelectedId);
+        RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
         MusicUtils.refresh();
         restartLoader(true);
         return true;
