@@ -1685,7 +1685,7 @@ public class MusicPlaybackService extends Service {
             String albumName = musicPlaybackService.getAlbumName();
             long duration =  musicPlaybackService.duration();
             musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
-                    albumName, duration,musicPlaybackService.getString(R.string.unknown));
+                    albumName, duration, musicPlaybackService.getString(R.string.unknown));
         }
     }
 

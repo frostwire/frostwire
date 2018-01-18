@@ -60,22 +60,5 @@ public class RecentLoader extends SongLoader {
                                 AudioColumns.DURATION,       /* 5 - duration */
                         }, null, null, null, null,
                         RecentStore.RecentStoreColumns.TIME_PLAYED + " DESC");
-
-    }
-
-    // TODO: REMOVE THIS THING WHEN you're sure that isn't used
-    protected Album getAlbumEntryFromCursor(Cursor cursor) {
-        // Copy the album id
-        final long id = cursor.getLong(0);
-        // Copy the album name
-        final String albumName = cursor.getString(2);
-        // Copy the artist name
-        final String artist = cursor.getString(3);
-        // Copy the number of songs
-        final int songCount = cursor.getInt(4);
-        // Copy the release year
-        final String year = cursor.getString(5);
-        // Create a new album
-        return new Album(id, albumName, artist, songCount, year);
     }
 }
