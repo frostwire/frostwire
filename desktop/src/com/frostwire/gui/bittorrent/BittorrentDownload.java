@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -334,11 +334,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 }
             }
             //if you have to hide seeds, do so.
-            GUIMediator.safeInvokeLater(new Runnable() {
-                public void run() {
-                    BTDownloadMediator.instance().updateTableFilters();
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
         }
 
         @Override
@@ -376,7 +372,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         }
     }
 
-    //Deletes incomplete files and the save location from the itunes import settings
+    //Deletes incomplete files and the save location from the iTunes import settings
     private void finalCleanup(Set<File> incompleteFiles) {
         if (incompleteFiles != null) {
             for (File f : incompleteFiles) {
@@ -487,30 +483,21 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 return;
             }
 
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (dl instanceof BittorrentDownload &&
-                            TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
-                            showShareTorrentDialog) {
-                        new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
-                    } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
-                        if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
-                                    dl.setDeleteDataWhenRemove(false);
-                                    GUIMediator.safeInvokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            BTDownloadMediator.instance().remove(dl);
-                                            BTDownloadMediator.instance().updateTableFilters();
-                                        }
-                                    });
-                                }
-                            }).start();
-                        }
+            GUIMediator.safeInvokeLater(() -> {
+                if (dl instanceof BittorrentDownload &&
+                        TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
+                        showShareTorrentDialog) {
+                    new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
+                } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
+                    if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
+                        new Thread(() -> {
+                            TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
+                            dl.setDeleteDataWhenRemove(false);
+                            GUIMediator.safeInvokeLater(() -> {
+                                BTDownloadMediator.instance().remove(dl);
+                                BTDownloadMediator.instance().updateTableFilters();
+                            });
+                        }).start();
                     }
                 }
             });

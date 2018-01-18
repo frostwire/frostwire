@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -629,31 +629,27 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentURI(final String uri, final boolean partialDownload) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                BTDownload downloader = new TorrentFetcherDownload(uri, partialDownload);
-                add(downloader);
-            }
+        SwingUtilities.invokeLater(() -> {
+            BTDownload downloader = new TorrentFetcherDownload(uri, partialDownload);
+            add(downloader);
         });
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
         if (VPNDropGuard.canUseBitTorrent()) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        BTEngine.getInstance().download(torrentFile, saveDir, null);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        if (!e.toString().contains("No files selected by user")) {
-                            // could not read torrent file or bad torrent file.
-                            GUIMediator.showError(
-                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
-                        }
+            GUIMediator.safeInvokeLater(() -> {
+                try {
+                    BTEngine.getInstance().download(torrentFile, saveDir, null);
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    if (!e.toString().contains("No files selected by user")) {
+                        // could not read torrent file or bad torrent file.
+                        GUIMediator.showError(
+                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
                     }
-
                 }
+
             });
         }
     }
@@ -675,49 +671,47 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public void openTorrentFile(final File torrentFile, final boolean partialDownload, final Runnable onOpenRunnableForUIThread) {
         if (VPNDropGuard.canUseBitTorrent()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        boolean[] filesSelection = null;
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    boolean[] filesSelection = null;
 
-                        if (partialDownload) {
-                            PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
-                            dlg.setVisible(true);
-                            filesSelection = dlg.getFilesSelection();
-                            if (filesSelection == null) {
-                                return;
-                            }
+                    if (partialDownload) {
+                        PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
+                        dlg.setVisible(true);
+                        filesSelection = dlg.getFilesSelection();
+                        if (filesSelection == null) {
+                            return;
                         }
+                    }
 
-                        if (onOpenRunnableForUIThread != null) {
-                            onOpenRunnableForUIThread.run();
-                        }
+                    if (onOpenRunnableForUIThread != null) {
+                        onOpenRunnableForUIThread.run();
+                    }
 
-                        File saveDir = null;
+                    File saveDir = null;
 
-                        // Check if there's a file named like the torrent in the same folder
-                        // then that means the user wants to seed
-                        String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
+                    // Check if there's a file named like the torrent in the same folder
+                    // then that means the user wants to seed
+                    String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
 
-                        File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
-                        if (seedDataFile.exists()) {
-                            saveDir = torrentFile.getParentFile();
-                        }
+                    File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
+                    if (seedDataFile.exists()) {
+                        saveDir = torrentFile.getParentFile();
+                    }
 
-                        if (saveDir == null) {
-                            BTEngine.getInstance().download(torrentFile, null, filesSelection);
-                        } else {
-                            GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
-                        }
+                    if (saveDir == null) {
+                        BTEngine.getInstance().download(torrentFile, null, filesSelection);
+                    } else {
+                        GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
+                    }
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        if (!e.toString().contains("No files selected by user")) {
-                            // could not read torrent file or bad torrent file.
-                            GUIMediator.showError(
-                                    I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
-                                            torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
-                        }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (!e.toString().contains("No files selected by user")) {
+                        // could not read torrent file or bad torrent file.
+                        GUIMediator.showError(
+                                I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
+                                        torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
                     }
                 }
             });
@@ -725,17 +719,15 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentSearchResult(final TorrentSearchResult sr, final boolean partialDownload) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                TorrentFetcherDownload d;
-                if (!partialDownload && sr instanceof TorrentItemSearchResult) {
-                    String relativePath = ((TorrentItemSearchResult) sr).getFilePath();
-                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), false, relativePath);
-                } else {
-                    d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload);
-                }
-                add(d);
+        GUIMediator.safeInvokeLater(() -> {
+            TorrentFetcherDownload d;
+            if (!partialDownload && sr instanceof TorrentItemSearchResult) {
+                String relativePath = ((TorrentItemSearchResult) sr).getFilePath();
+                d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), false, relativePath);
+            } else {
+                d = new TorrentFetcherDownload(sr.getTorrentUrl(), sr.getReferrerUrl(), sr.getDisplayName(), partialDownload);
             }
+            add(d);
         });
     }
 
@@ -864,16 +856,14 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public void downloadSoundcloudFromTrackUrlOrSearchResult(final String trackUrl, final SoundcloudSearchResult sr) {
         if (sr != null) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                public void run() {
-                    if (isDownloading(sr.getDownloadUrl())) {
-                        DATA_MODEL.remove(sr.getDownloadUrl());
-                        doRefresh();
-                        return;
-                    }
-                    BTDownload downloader = new SoundcloudDownload(sr);
-                    add(downloader);
+            GUIMediator.safeInvokeLater(() -> {
+                if (isDownloading(sr.getDownloadUrl())) {
+                    DATA_MODEL.remove(sr.getDownloadUrl());
+                    doRefresh();
+                    return;
                 }
+                BTDownload downloader = new SoundcloudDownload(sr);
+                add(downloader);
             });
         } else if (trackUrl != null) {
             try {
@@ -899,52 +889,39 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openYouTubeItem(final YouTubeCrawledSearchResult sr) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                if (!isDownloading(sr.getDownloadUrl())) {
-                    BTDownload downloader = new YouTubeDownload(sr);
-                    add(downloader);
-                }
+        GUIMediator.safeInvokeLater(() -> {
+            if (!isDownloading(sr.getDownloadUrl())) {
+                BTDownload downloader = new YouTubeDownload(sr);
+                add(downloader);
             }
         });
     }
 
     public void openSlide(final Slide slide) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                SlideDownload downloader = new SlideDownload(slide);
-                add(downloader);
-            }
+        GUIMediator.safeInvokeLater(() -> {
+            SlideDownload downloader = new SlideDownload(slide);
+            add(downloader);
         });
     }
 
     public void openHttp(final String httpUrl, final String title, final String saveFileAs, final long fileSize) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final HttpDownload downloader = new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true) {
-                    @Override
-                    protected void onComplete() {
-                        final File savedFile = getSaveLocation();
-                        if (savedFile.exists()) {
-                            GUIMediator.safeInvokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    BTDownloadMediator.instance().updateTableFilters();
-                                }
-                            });
+        GUIMediator.safeInvokeLater(() -> {
+            final HttpDownload downloader = new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true) {
+                @Override
+                protected void onComplete() {
+                    final File savedFile = getSaveLocation();
+                    if (savedFile.exists()) {
+                        GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
 
-                            if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
-                                if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                                    iTunesMediator.instance().scanForSongs(savedFile);
-                                }
+                        if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
+                            if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
+                                iTunesMediator.instance().scanForSongs(savedFile);
                             }
                         }
                     }
-                };
-                add(downloader);
-            }
+                }
+            };
+            add(downloader);
         });
     }
 }
