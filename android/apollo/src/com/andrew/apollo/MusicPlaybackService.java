@@ -480,9 +480,8 @@ public class MusicPlaybackService extends Service {
     /**
      * Recently listened database
      */
-//    private RecentStore mRecentsCache;
-
     private RecentStore mRecentsCache;
+
     /**
      * Favorites database
      */
