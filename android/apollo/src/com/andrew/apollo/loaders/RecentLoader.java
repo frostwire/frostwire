@@ -50,7 +50,7 @@ public class RecentLoader extends SongLoader {
         return RecentStore
                 .getInstance(context)
                 .getReadableDatabase()
-                .query(RecentStore.RecentStoreColumns.TABLE_NAME,
+                .query(RecentStore.TABLE_NAME,
                         new String[] {
                                 BaseColumns._ID + " as id",  /* 0 - id */
                                 AudioColumns.TITLE,          /* 2 - songname */

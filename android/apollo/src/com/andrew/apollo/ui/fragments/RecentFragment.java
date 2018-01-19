@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,18 +78,6 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new RecentLoader(getActivity());
     }
-
-    /**
-     * Sets up the list view
-     */
-//    TODO: Ask about this method to @gubatron because the current adapter
-//          don't implement setTouchPlay method.
-//    protected void initListView() {
-//        super.initListView();
-//        if (mAdapter != null) {
-//            mAdapter.setTouchPlay(true);
-//        }
-//    }
 
     @Override
     public void onMetaChanged() {

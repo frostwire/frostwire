@@ -42,6 +42,9 @@ public final class RecentStore extends SQLiteOpenHelper {
 
     /* Name of database file */
     public static final String DATABASE_NAME = "songhistory.db";
+
+    /* Table name */
+    public static final String TABLE_NAME = "songhistory";
     private static RecentStore sInstance = null;
     private final SQLiteDatabase writableDatabase;
     private final SQLiteDatabase readableDatabase;
@@ -65,7 +68,7 @@ public final class RecentStore extends SQLiteOpenHelper {
     public void onCreate(final SQLiteDatabase db) {
         db.execSQL(
                 "CREATE TABLE IF NOT EXISTS "
-                        + RecentStoreColumns.TABLE_NAME + " ("
+                        + TABLE_NAME + " ("
                         + BaseColumns._ID + " LONG NOT NULL,"
                         + AudioColumns.TITLE + " TEXT NOT NULL,"
                         + AudioColumns.ARTIST + " TEXT NOT NULL,"
@@ -80,7 +83,7 @@ public final class RecentStore extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + RecentStoreColumns.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
@@ -123,9 +126,9 @@ public final class RecentStore extends SQLiteOpenHelper {
             values.put(RecentStoreColumns.LAST_TIME_PLAYED, System.currentTimeMillis());
 
             writableDatabase.beginTransaction();
-            writableDatabase.delete(RecentStoreColumns.TABLE_NAME,
+            writableDatabase.delete(TABLE_NAME,
                     BaseColumns._ID + " = ?", new String[]{ String.valueOf(songId) });
-            writableDatabase.insert(RecentStoreColumns.TABLE_NAME, null, values);
+            writableDatabase.insert(TABLE_NAME, null, values);
             writableDatabase.setTransactionSuccessful();
             writableDatabase.endTransaction();
         } catch (Throwable e) {
@@ -137,13 +140,12 @@ public final class RecentStore extends SQLiteOpenHelper {
      * Used to retrieve the most recently listened song for an artist.
      *
      * @param key The key to reference.
-     * @return The most recently listened song for an artist.
+     * @return The most recently listened song name for an artist.
      */
     public String getSongName(final String key) {
         if (TextUtils.isEmpty(key)) {
             return null;
         }
-
         final String[] projection = new String[]{
                 BaseColumns._ID,
                 AudioColumns.TITLE,
@@ -152,7 +154,7 @@ public final class RecentStore extends SQLiteOpenHelper {
         };
         final String selection = AudioColumns.ARTIST + "=?";
         final String[] having = new String[]{ key };
-        Cursor cursor = readableDatabase.query(RecentStoreColumns.TABLE_NAME, projection,
+        Cursor cursor = readableDatabase.query(TABLE_NAME, projection,
                 selection, having,null, null, RecentStoreColumns.LAST_TIME_PLAYED +
                         " DESC", null);
 
@@ -163,11 +165,9 @@ public final class RecentStore extends SQLiteOpenHelper {
             cursor.close();
             return song;
         }
-
         if (cursor != null && !cursor.isClosed()) {
             cursor.close();
         }
-
         return null;
     }
 
@@ -191,7 +191,7 @@ public final class RecentStore extends SQLiteOpenHelper {
         final String[] having = new String[]{
                 key
         };
-        Cursor cursor = readableDatabase.query(RecentStoreColumns.TABLE_NAME, projection, selection, having,
+        Cursor cursor = readableDatabase.query(TABLE_NAME, projection, selection, having,
                 null, null, RecentStoreColumns.LAST_TIME_PLAYED + " DESC", null);
         if (cursor != null && cursor.moveToFirst()) {
             cursor.moveToFirst();
@@ -210,21 +210,18 @@ public final class RecentStore extends SQLiteOpenHelper {
      * Clear the cache.
      */
     public void deleteDatabase() {
-        writableDatabase.delete(RecentStoreColumns.TABLE_NAME, null, null);
+        writableDatabase.delete(TABLE_NAME, null, null);
     }
 
     /**
      * @param albumId The album Id to remove.
      */
     public void removeItem(final long albumId) {
-        writableDatabase.delete(RecentStoreColumns.TABLE_NAME, BaseColumns._ID + " = ?",
+        writableDatabase.delete(TABLE_NAME, BaseColumns._ID + " = ?",
                 new String[]{String.valueOf(albumId)});
     }
 
     public interface RecentStoreColumns {
-        /* Table name */
-        String TABLE_NAME = "songhistory";
-
         /* Time played column */
         String LAST_TIME_PLAYED = "lasttimeplayed";
     }
