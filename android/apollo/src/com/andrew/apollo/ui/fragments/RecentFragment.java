@@ -81,8 +81,6 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
 
     @Override
     public void onMetaChanged() {
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-        }
+        restartLoader(true);
     }
 }
