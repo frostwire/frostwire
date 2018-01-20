@@ -112,7 +112,7 @@ public final class RecentStore extends SQLiteOpenHelper {
                           final String artistName, final String albumName,
                           final long duration, String unknownString) {
 
-        if (songId == null || duration == 0) {
+        if (songId == null || duration <= 0) {
             return ;
         }
 

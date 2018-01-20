@@ -29,6 +29,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -167,5 +168,16 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     @Override
     public int getOffset() {
         return 0;
+    }
+
+    public void setDataList(final List<Song> data) {
+        mDataList.clear();
+        if (data != null) {
+            for (Song song : data) {
+                if (song != null && song.mDuration > 0) {
+                    mDataList.add(song);
+                }
+            }
+        }
     }
 }
