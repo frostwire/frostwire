@@ -34,8 +34,10 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * This class is used to display all of the recently listened to albums by the
@@ -81,6 +83,9 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
 
     @Override
     public void onMetaChanged() {
-        restartLoader(true);
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        if (threadPool != null) {
+            threadPool.execute(() -> restartLoader(true));
+        }
     }
 }
