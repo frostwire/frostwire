@@ -1,5 +1,7 @@
-FrostWire 2.0.1 build 486 - JAN/12/2017
+FrostWire 2.0.1 build 486 - JAN/22/2017
  - Archive.org search fixes
+ - SoundCloud search fixes
+ - Music Player 'Recent' tab fixes, thanks @votaguz
  - Updated Japanese, Korean, Russian, Vietnamese, Belarusian, Bulgarian translations
  - Library updates: build tools 27.0.3, gradle 4.4.1, flexbox 0.3.2
  - Crash fixes, performance upgrades 
