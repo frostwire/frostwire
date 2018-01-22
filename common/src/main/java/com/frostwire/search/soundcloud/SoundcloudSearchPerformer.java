@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ import java.util.List;
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
-    private static final String SOUNDCLOUD_CLIENTID = "w2p3gZDE9uBZm44hI659z80z1Y1lcjnF";
-    private static final String SOUNDCLOUD_APP_VERSION = "1505396504";
+    private static final String SOUNDCLOUD_CLIENTID = "KBuk0RhNCHjjzHf0m6wVb8So4pCQg5jW";
+    private static final String SOUNDCLOUD_APP_VERSION = "1516627364";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
@@ -45,7 +45,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
-        List<SearchResult> result = new LinkedList<SearchResult>();
+        List<SearchResult> result = new LinkedList<>();
 
         SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
 
