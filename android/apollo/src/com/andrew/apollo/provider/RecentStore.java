@@ -16,15 +16,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
+import android.provider.MediaStore.Audio.AudioColumns;
 import android.text.TextUtils;
 
 import com.andrew.apollo.ui.activities.ProfileActivity;
 
 /**
- * The {@link RecentlyListenedFragment} is used to display a a grid or list of
- * recently listened to albums. In order to populate the this grid or list with
- * the correct data, we keep a cache of the album ID, name, and time it was
- * played to be retrieved later.
+ * The {@link RecentStore} is used to display a list of
+ * recently listened songs. In order to populate this list with
+ * the correct data, we keep a cache of the song ID, title, artist, album, duration and time it was
+ * played for last time to be retrieved later.
  * <p>
  * In {@link ProfileActivity}, when viewing the profile for an artist, the first
  * image the carousel header is the last album the user listened to for that
@@ -39,10 +41,11 @@ public final class RecentStore extends SQLiteOpenHelper {
     private static final int VERSION = 1;
 
     /* Name of database file */
-    public static final String DATABASE_NAME = "albumhistory.db";
+    public static final String DATABASE_NAME = "songhistory.db";
 
+    /* Table name */
+    public static final String TABLE_NAME = "songhistory";
     private static RecentStore sInstance = null;
-
     private final SQLiteDatabase writableDatabase;
     private final SQLiteDatabase readableDatabase;
 
@@ -63,12 +66,16 @@ public final class RecentStore extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(final SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + RecentStoreColumns.NAME + " ("
-                + RecentStoreColumns.ID + " LONG NOT NULL," + RecentStoreColumns.ALBUMNAME
-                + " TEXT NOT NULL," + RecentStoreColumns.ARTISTNAME + " TEXT NOT NULL,"
-                + RecentStoreColumns.ALBUMSONGCOUNT + " TEXT NOT NULL,"
-                + RecentStoreColumns.ALBUMYEAR + " TEXT," + RecentStoreColumns.TIMEPLAYED
-                + " LONG NOT NULL);");
+        db.execSQL(
+                "CREATE TABLE IF NOT EXISTS "
+                        + TABLE_NAME + " ("
+                        + BaseColumns._ID + " LONG NOT NULL,"
+                        + AudioColumns.TITLE + " TEXT NOT NULL,"
+                        + AudioColumns.ARTIST + " TEXT NOT NULL,"
+                        + AudioColumns.ALBUM + " TEXT,"
+                        + AudioColumns.DURATION + " LONG NOT NULL,"
+                        + RecentStoreColumns.LAST_TIME_PLAYED + " LONG NOT NULL);"
+        );
     }
 
     /**
@@ -76,7 +83,7 @@ public final class RecentStore extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + RecentStoreColumns.NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
@@ -94,38 +101,74 @@ public final class RecentStore extends SQLiteOpenHelper {
     /**
      * Used to store artist IDs in the database.
      *
-     * @param albumId    album's ID.
+     * @param songId     Song's ID.
+     * @param songName   The song name
+     * @param artistName The artist song name.
      * @param albumName  The album name.
-     * @param artistName The artist album name.
-     * @param songCount  The number of tracks for the album.
-     * @param albumYear  The year the album was released.
+     * @param duration   The song total time playback.
+     * @param unknownString A default placeholder if some information isn't provided.
      */
-    public void addAlbumId(final Long albumId, final String albumName, final String artistName,
-                           final String songCount, final String albumYear) {
-        if (albumId == null || albumName == null || artistName == null || songCount == null) {
-            return;
+    public void addSongId(final Long songId, final String songName,
+                          final String artistName, final String albumName,
+                          final long duration, String unknownString) {
+
+        if (songId == null || duration <= 0) {
+            return ;
         }
+
         try {
             final ContentValues values = new ContentValues(6);
-            values.put(RecentStoreColumns.ID, albumId);
-            values.put(RecentStoreColumns.ALBUMNAME, albumName);
-            values.put(RecentStoreColumns.ARTISTNAME, artistName);
-            values.put(RecentStoreColumns.ALBUMSONGCOUNT, songCount);
-            values.put(RecentStoreColumns.ALBUMYEAR, albumYear);
-            values.put(RecentStoreColumns.TIMEPLAYED, System.currentTimeMillis());
+            values.put(BaseColumns._ID, songId);
+            values.put(AudioColumns.TITLE, songName != null ? songName : unknownString);
+            values.put(AudioColumns.ARTIST, artistName != null ? artistName: unknownString);
+            values.put(AudioColumns.ALBUM, albumName != null ? albumName: unknownString);
+            values.put(AudioColumns.DURATION, duration);
+            values.put(RecentStoreColumns.LAST_TIME_PLAYED, System.currentTimeMillis());
+
             writableDatabase.beginTransaction();
-            writableDatabase.delete(RecentStoreColumns.NAME,
-                    RecentStoreColumns.ID + " = ?",
-                    new String[]{
-                            String.valueOf(albumId)
-                    });
-            writableDatabase.insert(RecentStoreColumns.NAME, null, values);
+            writableDatabase.delete(TABLE_NAME,
+                    BaseColumns._ID + " = ?", new String[]{ String.valueOf(songId) });
+            writableDatabase.insert(TABLE_NAME, null, values);
             writableDatabase.setTransactionSuccessful();
             writableDatabase.endTransaction();
         } catch (Throwable e) {
-            // not critical at all
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Used to retrieve the most recently listened song for an artist.
+     *
+     * @param key The key to reference.
+     * @return The most recently listened song name for an artist.
+     */
+    public String getSongName(final String key) {
+        if (TextUtils.isEmpty(key)) {
+            return null;
+        }
+        final String[] projection = new String[]{
+                BaseColumns._ID,
+                AudioColumns.TITLE,
+                AudioColumns.ARTIST,
+                RecentStoreColumns.LAST_TIME_PLAYED
+        };
+        final String selection = AudioColumns.ARTIST + "=?";
+        final String[] having = new String[]{ key };
+        Cursor cursor = readableDatabase.query(TABLE_NAME, projection,
+                selection, having,null, null, RecentStoreColumns.LAST_TIME_PLAYED +
+                        " DESC", null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            cursor.moveToFirst();
+            final String song = cursor.getString(
+                    cursor.getColumnIndexOrThrow(AudioColumns.TITLE));
+            cursor.close();
+            return song;
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        return null;
     }
 
     /**
@@ -139,21 +182,21 @@ public final class RecentStore extends SQLiteOpenHelper {
             return null;
         }
         final String[] projection = new String[]{
-                RecentStoreColumns.ID,
-                RecentStoreColumns.ALBUMNAME,
-                RecentStoreColumns.ARTISTNAME,
-                RecentStoreColumns.TIMEPLAYED
+                BaseColumns._ID,
+                AudioColumns.ALBUM,
+                AudioColumns.ARTIST,
+                RecentStoreColumns.LAST_TIME_PLAYED
         };
-        final String selection = RecentStoreColumns.ARTISTNAME + "=?";
+        final String selection = AudioColumns.ARTIST + "=?";
         final String[] having = new String[]{
                 key
         };
-        Cursor cursor = readableDatabase.query(RecentStoreColumns.NAME, projection, selection, having,
-                null, null, RecentStoreColumns.TIMEPLAYED + " DESC", null);
+        Cursor cursor = readableDatabase.query(TABLE_NAME, projection, selection, having,
+                null, null, RecentStoreColumns.LAST_TIME_PLAYED + " DESC", null);
         if (cursor != null && cursor.moveToFirst()) {
             cursor.moveToFirst();
             final String album = cursor.getString(cursor
-                    .getColumnIndexOrThrow(RecentStoreColumns.ALBUMNAME));
+                    .getColumnIndexOrThrow(AudioColumns.ALBUM));
             cursor.close();
             return album;
         }
@@ -167,37 +210,19 @@ public final class RecentStore extends SQLiteOpenHelper {
      * Clear the cache.
      */
     public void deleteDatabase() {
-        writableDatabase.delete(RecentStoreColumns.NAME, null, null);
+        writableDatabase.delete(TABLE_NAME, null, null);
     }
 
     /**
      * @param albumId The album Id to remove.
      */
     public void removeItem(final long albumId) {
-        writableDatabase.delete(RecentStoreColumns.NAME, RecentStoreColumns.ID + " = ?",
+        writableDatabase.delete(TABLE_NAME, BaseColumns._ID + " = ?",
                 new String[]{String.valueOf(albumId)});
     }
 
     public interface RecentStoreColumns {
-        /* Table name */
-        String NAME = "albumhistory";
-
-        /* Album IDs column */
-        String ID = "albumid";
-
-        /* Album name column */
-        String ALBUMNAME = "itemname";
-
-        /* Artist name column */
-        String ARTISTNAME = "artistname";
-
-        /* Album song count column */
-        String ALBUMSONGCOUNT = "albumsongcount";
-
-        /* Album year column. It's okay for this to be null */
-        String ALBUMYEAR = "albumyear";
-
         /* Time played column */
-        String TIMEPLAYED = "timeplayed";
+        String LAST_TIME_PLAYED = "lasttimeplayed";
     }
 }

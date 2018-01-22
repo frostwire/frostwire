@@ -150,9 +150,7 @@ public final class MusicBrowserPhoneFragment extends Fragment {
         // Shuffle all
         inflater.inflate(R.menu.player_shuffle, menu);
         // Sort orders
-        if (isRecentPage()) {
-            inflater.inflate(R.menu.player_view_as, menu);
-        } else if (isArtistPage()) {
+        if (isArtistPage()) {
             inflater.inflate(R.menu.player_artist_sort_by, menu);
             inflater.inflate(R.menu.player_view_as, menu);
         } else if (isAlbumPage()) {

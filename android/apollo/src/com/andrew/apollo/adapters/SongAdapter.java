@@ -29,6 +29,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -63,33 +64,38 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         if (mImageFetcher != null && dataHolder != null && Ref.alive(musicViewHolder.mImage)) {
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
-                Engine.instance().getThreadPool().execute(new GetAlbumIdRunnable(getContext(), dataHolder, new Runnable() {
-                    @Override
-                    public void run() {
-                        mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
-                    }
-                }));
+                Engine.instance().getThreadPool().execute(new GetAlbumIdRunnable(getContext(), dataHolder, () -> mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get())));
             } else {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
             }
         }
-        if (musicViewHolder != null && Ref.alive(musicViewHolder.mLineThree)) {
-            musicViewHolder.mLineThree.get().setVisibility(View.GONE);
-        }
-        // Set each song name (line one)
-        musicViewHolder.mLineOne.get().setText(dataHolder.mLineOne);
-        // Set the song duration (line one, right)
-        musicViewHolder.mLineOneRight.get().setText(dataHolder.mLineOneRight);
-        // Set the artist name (line two)
-        musicViewHolder.mLineTwo.get().setText(dataHolder.mLineTwo);
-        if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
-            musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
-            musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
-            musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
-        } else {
-            musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
-            musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
-            musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+        if (musicViewHolder != null) {
+            if (Ref.alive(musicViewHolder.mLineThree)) {
+                musicViewHolder.mLineThree.get().setVisibility(View.GONE);
+            }
+            if (dataHolder != null) {
+                // Set each song name (line one)
+                if (Ref.alive(musicViewHolder.mLineOne)) {
+                    musicViewHolder.mLineOne.get().setText(dataHolder.mLineOne);
+                }
+                // Set the song duration (line one, right)
+                if (Ref.alive(musicViewHolder.mLineOneRight)) {
+                    musicViewHolder.mLineOneRight.get().setText(dataHolder.mLineOneRight);
+                }
+                // Set the artist name (line two)
+                if (Ref.alive(musicViewHolder.mLineTwo)) {
+                    musicViewHolder.mLineTwo.get().setText(dataHolder.mLineTwo);
+                }
+                if (MusicUtils.getCurrentAudioId() == dataHolder.mItemId) {
+                    musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
+                    musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
+                    musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_highlight));
+                } else {
+                    musicViewHolder.mLineOne.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+                    musicViewHolder.mLineOneRight.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+                    musicViewHolder.mLineTwo.get().setTextColor(getContext().getResources().getColor(com.frostwire.android.R.color.app_text_primary));
+                }
+            }
         }
         return convertView;
     }
@@ -167,5 +173,16 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     @Override
     public int getOffset() {
         return 0;
+    }
+
+    public void setDataList(final List<Song> data) {
+        mDataList.clear();
+        if (data != null) {
+            for (Song song : data) {
+                if (song != null && song.mDuration > 0) {
+                    mDataList.add(song);
+                }
+            }
+        }
     }
 }

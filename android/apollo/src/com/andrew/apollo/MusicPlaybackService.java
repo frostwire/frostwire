@@ -55,6 +55,7 @@ import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
+import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -1642,7 +1643,7 @@ public class MusicPlaybackService extends Service {
                 // Add the track to the recently played list.
                 ExecutorService threadPool = Engine.instance().getThreadPool();
                 if (threadPool != null) {
-                    threadPool.execute(new RecentsStoreAddAlbumIdRunnable(musicPlaybackService));
+                    threadPool.execute(new RecentsStoreAddSongIdRunnable(musicPlaybackService));
                 }
 
             } else if (QUEUE_CHANGED.equals(change)) {
@@ -1660,10 +1661,10 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private final static class RecentsStoreAddAlbumIdRunnable implements Runnable {
+    private final static class RecentsStoreAddSongIdRunnable implements Runnable {
         private WeakReference<MusicPlaybackService> musicPlaybackServiceWeakReference;
 
-        RecentsStoreAddAlbumIdRunnable(MusicPlaybackService musicPlaybackService) {
+        RecentsStoreAddSongIdRunnable(MusicPlaybackService musicPlaybackService) {
             musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
         }
 
@@ -1676,12 +1677,14 @@ public class MusicPlaybackService extends Service {
             if (musicPlaybackService.mRecentsCache == null) {
                 musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
             }
-            long albumId = musicPlaybackService.getAlbumId();
-            String albumName = musicPlaybackService.getAlbumName();
+
+            long songId = musicPlaybackService.getAudioId();
+            String songName = musicPlaybackService.getTrackName();
             String artistName = musicPlaybackService.getArtistName();
-            String songCount =  MusicUtils.getSongCountForAlbum(musicPlaybackService, albumId);
-            String releaseDateForAlbum = MusicUtils.getReleaseDateForAlbum(musicPlaybackService, albumId);
-            musicPlaybackService.mRecentsCache.addAlbumId(albumId, albumName, artistName, songCount, releaseDateForAlbum);
+            String albumName = musicPlaybackService.getAlbumName();
+            long duration =  musicPlaybackService.duration();
+            musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
+                    albumName, duration, musicPlaybackService.getString(R.string.unknown));
         }
     }
 
