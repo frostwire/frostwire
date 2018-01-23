@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2012-2017 Andrew Neal, Angel Leon, Alden Torres
+* Copyright (C) 2012-2018 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
 * Licensed under the Apache License, Version 2.0
 * (the "License"); you may not use this file except in compliance with the
 * License. You may obtain a copy of the License at
@@ -486,6 +486,7 @@ public class MusicPlaybackService extends Service {
      * Favorites database
      */
     private FavoritesStore mFavoritesCache;
+    private final Object mFavoritesCacheLock = new Object();
 
     private boolean launchPlayerActivity;
 
@@ -568,8 +569,8 @@ public class MusicPlaybackService extends Service {
 
     private void initService() {
         // Initialize the favorites and recents databases
-        mRecentsCache = RecentStore.getInstance(this);
         mFavoritesCache = FavoritesStore.getInstance(this);
+        mRecentsCache = RecentStore.getInstance(this);
 
         // Initialize the notification helper
         mNotificationHelper = new NotificationHelper(this);
@@ -634,9 +635,10 @@ public class MusicPlaybackService extends Service {
 
         // Initialize the wake lock
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
-        mWakeLock.setReferenceCounted(false);
-
+        if (powerManager != null) {
+            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
+            mWakeLock.setReferenceCounted(false);
+        }
         // Initialize the delayed shutdown intent
         final Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
         shutdownIntent.setAction(SHUTDOWN_ACTION);
@@ -1634,10 +1636,7 @@ public class MusicPlaybackService extends Service {
 
             if (META_CHANGED.equals(change)) {
                 // Increase the play count for favorite songs.
-                if (musicPlaybackService.mFavoritesCache == null) {
-                    musicPlaybackService.mFavoritesCache = FavoritesStore.getInstance(musicPlaybackService);
-                }
-                if (musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
+                if (musicPlaybackService.mFavoritesCache != null && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
                     musicPlaybackService.mFavoritesCache.addSongId(audioId, trackName, albumName, artistName);
                 }
                 // Add the track to the recently played list.
@@ -2447,7 +2446,7 @@ public class MusicPlaybackService extends Service {
      */
     public boolean isFavorite() {
         if (mFavoritesCache != null) {
-            synchronized (mFavoritesCache) {
+            synchronized (mFavoritesCacheLock) {
                 final Long id = mFavoritesCache.getSongId(getAudioId());
                 return id != null;
             }
@@ -2863,8 +2862,6 @@ public class MusicPlaybackService extends Service {
          */
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String command = intent.getStringExtra(CMDNAME);
-
             handleCommandIntent(intent);
         }
     };
