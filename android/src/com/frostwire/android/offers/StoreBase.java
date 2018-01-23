@@ -17,6 +17,8 @@
 
 package com.frostwire.android.offers;
 
+import com.frostwire.android.core.Constants;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,7 +52,11 @@ abstract class StoreBase implements Store {
 
     @Override
     public boolean enabled(String code) {
-        boolean r = false;
+        // the value by default is true if it's BASIC, since the local cache
+        // of the play store can be empty or out of sync
+        // NOTE: no lint fix here for clarity
+        boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
+        boolean r = isBasic ? true : false;
         Iterator<Product> it = products.values().iterator();
 
         while (!r && it.hasNext()) {
