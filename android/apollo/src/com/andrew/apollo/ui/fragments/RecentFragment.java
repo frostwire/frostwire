@@ -88,4 +88,9 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
             threadPool.execute(() -> restartLoader(true));
         }
     }
+
+    @Override
+    public int getEmptyStringId(){
+        return R.string.empty_recent;
+    }
 }

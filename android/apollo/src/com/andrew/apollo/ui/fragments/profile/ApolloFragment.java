@@ -450,7 +450,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             // Set the empty text
             final TextView empty = mRootView.findViewById(R.id.empty);
             if (empty != null) {
-                empty.setText(getString(R.string.empty_music));
+                empty.setText(getString(getEmptyStringId()));
                 if (isSimpleLayout()) {
                     mListView.setEmptyView(empty);
                 } else {
@@ -487,6 +487,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    public int getEmptyStringId(){
+        return R.string.empty_music;
     }
 
     @Override

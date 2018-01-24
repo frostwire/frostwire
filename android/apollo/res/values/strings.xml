@@ -164,6 +164,6 @@
     <string name="empty_last_added">Songs you have added over the last month will be shown here.</string>
     <string name="empty_search">No search results found</string>
     <string name="empty_favorite">Songs you mark as favorites will be shown here.</string>
-    <string name="empty_recent">Albums you have listened to will show up here. Try playing some music.</string>
+    <string name="empty_recent">Songs you have listened to will show up here. Try playing some music.</string>
     <string name="frostwire_player">FrostWire Player</string>
 </resources>
