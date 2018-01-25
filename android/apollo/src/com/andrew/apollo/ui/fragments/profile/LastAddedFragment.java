@@ -66,7 +66,6 @@ public final class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, 
         onSongItemClick(position);
     }
 
-
     @Override
     public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
         super.onLoadFinished(loader, data);

@@ -81,4 +81,10 @@ public final class LastAddedFragment extends ApolloFragment<SongAdapter, Song> {
             mAdapter.notifyDataSetChanged();
         }
     }
+
+    @Override
+    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+        mDefaultFragmentEmptyString = R.string.empty_last_added;
+        super.onLoadFinished(loader, data);
+    }
 }

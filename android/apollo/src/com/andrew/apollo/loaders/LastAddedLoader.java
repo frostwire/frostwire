@@ -37,8 +37,7 @@ public class LastAddedLoader extends SongLoader {
 
     @Override
     public Cursor makeCursor(Context context) {
-        Cursor c = makeLastAddedCursor(getContext());
-        return c;
+        return makeLastAddedCursor(getContext());
     }
 
     /**

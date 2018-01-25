@@ -89,4 +89,10 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
             threadPool.execute(() -> restartLoader(true));
         }
     }
+
+    @Override
+    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+        mDefaultFragmentEmptyString = R.string.empty_recent;
+        super.onLoadFinished(loader, data);
+    }
 }

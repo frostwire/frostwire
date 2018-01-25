@@ -127,6 +127,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected ViewGroup mRootView;
 
+    protected Integer mDefaultFragmentEmptyString = null;
+
     private volatile long lastRestartLoader;
 
     protected abstract T createAdapter();
@@ -450,7 +452,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             // Set the empty text
             final TextView empty = mRootView.findViewById(R.id.empty);
             if (empty != null) {
-                empty.setText(getString(R.string.empty_music));
+                empty.setText((mDefaultFragmentEmptyString != null) ?
+                        mDefaultFragmentEmptyString : R.string.empty_music);
                 if (isSimpleLayout()) {
                     mListView.setEmptyView(empty);
                 } else {
