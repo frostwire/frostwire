@@ -91,7 +91,7 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
 
     @Override
     public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
-        mDefaultFragmentEmptyString = R.string.empty_last_added;
+        mDefaultFragmentEmptyString = R.string.empty_recent;
         super.onLoadFinished(loader, data);
     }
 }
