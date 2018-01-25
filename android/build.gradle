@@ -68,10 +68,16 @@ def changeApkOutput(variant) {
         flavor = 'plus'
     }
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
-    def name = "$project.buildDir/frostwire-android-" + variant.buildType.name + '-' + suffix
+    def name = "frostwire-android-" + variant.buildType.name + '-' + suffix
 
     variant.outputs.all { output ->
-        outputFileName = file(name + '.apk')
+        outputFileName = name + '.apk'
+    }
+    variant.assemble.doLast { assemble ->
+        copy {
+            from variant.outputs*.outputFile
+            into "${project.buildDir}"
+        }
     }
 }
 
