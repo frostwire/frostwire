@@ -5129,7 +5129,7 @@ msgstr "Herramientas de búsqueda"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:739
 msgid "All Free Downloads"
-msgstr "Todas las Descargas gratuitas"
+msgstr "Descargas Gratuitas"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
 msgid "Source"
