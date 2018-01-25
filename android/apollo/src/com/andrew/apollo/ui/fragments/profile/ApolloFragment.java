@@ -1,6 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *            Jose Molina (@votaguz)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +128,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected ViewGroup mRootView;
 
-    protected Integer mDefaultFragmentEmptyString = null;
+    protected int mDefaultFragmentEmptyString = R.string.empty_music;
 
     private volatile long lastRestartLoader;
 
@@ -452,8 +453,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             // Set the empty text
             final TextView empty = mRootView.findViewById(R.id.empty);
             if (empty != null) {
-                empty.setText((mDefaultFragmentEmptyString != null) ?
-                        mDefaultFragmentEmptyString : R.string.empty_music);
+                empty.setText(mDefaultFragmentEmptyString);
                 if (isSimpleLayout()) {
                     mListView.setEmptyView(empty);
                 } else {
