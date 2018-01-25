@@ -1,9 +1,10 @@
 frostwire (6.6.2) stable; urgency=high
-  * New jlibtorrent 1.2.0.15
+  * New jlibtorrent 1.2.0.16-RC3
+  * Fixes SoundCloud search issues
   * Fixes bug that could cause app startup slowdowns
   * Windows, Mac: JRE update (1.8.0_121 to 1.8.0_162)
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 17 Jan 2018 06:20:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 25 Jan 2018 08:37:00 -0600
 
 frostwire (6.6.1) stable; urgency=high
   * New jlibtorrent 1.2.0.15-RC3
