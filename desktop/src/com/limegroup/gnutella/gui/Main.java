@@ -65,14 +65,6 @@ public class Main {
 
         Frame splash = null;
         try {
-            if (OSUtils.isMacOSX()) {
-                if (isOlderThanLeopard()) {
-                    System.setProperty("java.nio.preferSelect", String.valueOf(System.getProperty("java.version").startsWith("1.5")));
-                } else {
-                    System.setProperty("java.nio.preferSelect", "false");
-                }
-            }
-
             // show initial splash screen only if there are no arguments
             if (args == null || args.length == 0)
                 splash = showInitialSplash();
