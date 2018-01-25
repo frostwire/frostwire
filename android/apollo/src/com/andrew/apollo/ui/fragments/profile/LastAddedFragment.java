@@ -67,8 +67,16 @@ public final class LastAddedFragment extends ApolloFragment<ProfileSongAdapter, 
     }
 
     @Override
-    public int getEmptyStringId(){
-        return R.string.empty_last_added;
+    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+        super.onLoadFinished(loader, data);
+        if (data.isEmpty()) {
+            // Set the empty text
+            if (mRootView != null) {
+                final TextView empty = mRootView.findViewById(R.id.empty);
+                empty.setText(getString(R.string.empty_last_added));
+                mListView.setEmptyView(empty);
+            }
+        }
     }
 
     @Override
