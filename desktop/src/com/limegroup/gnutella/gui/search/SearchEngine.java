@@ -68,7 +68,7 @@ public abstract class SearchEngine {
     private static final int ZOOQLE_ID = 21;
     private static final int PIXABAY_ID = 22;
 
-    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.se") {
+    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
