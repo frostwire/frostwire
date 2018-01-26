@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2018-01-25 23:18-0500\n"
+"PO-Revision-Date: 2018-01-26 07:30-0500\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_BR\n"
@@ -3892,11 +3892,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:55
 msgid "Support FrostWire"
-msgstr "Suporte FrostWire"
+msgstr "Apoie FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:57
 msgid "Support with CryptoCurrencies"
-msgstr "Suporte com criptomoedas"
+msgstr "Apoie com criptomoedas"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Bitcoin"
