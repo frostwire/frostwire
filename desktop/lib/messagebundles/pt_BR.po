@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2017-10-29 11:53-0400\n"
+"PO-Revision-Date: 2018-01-25 23:18-0500\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_BR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Launchpad-Export-Date: 2008-08-12 01:29+0000\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 1.8.12\n"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/HideExitDialog.java:49
 msgid "Do you want to hide FrostWire?"
@@ -661,6 +661,8 @@ msgid ""
 "The name of this work, i.e. the titleLabel of a music album, the titleLabel "
 "of a book, the titleLabel of a movie, etc."
 msgstr ""
+"O nome deste trabalho, ou seja, o titleLabel de um álbum de música, o "
+"titleLabel de um livro, o titleLabel de um filme, etc."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:100
 msgid "album name, movie title, book title, game title."
@@ -2443,37 +2445,31 @@ msgstr "Não"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:45
 msgid "Support FrostWire development with a Bitcoin donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de Bitcoin"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Bitcoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:46
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Cash donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de Bitcoin"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Bitcoin Cash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:47
-#, fuzzy
 msgid "Support FrostWire development with an Ether donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de Bitcoin"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Ether"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:48
-#, fuzzy
 msgid "Support FrostWire development with a Dash donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de $1 USD"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Dash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:49
-#, fuzzy
 msgid "Support FrostWire development with a Litecoin donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de Bitcoin"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Litecoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação Paypal"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em ZCash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "Apoiar o desenvolvimento de FrostWire com uma doação de Bitcoin"
+msgstr "Apoie o desenvolvimento do FrostWire com uma doação em Bitcoin Gold"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
@@ -2813,9 +2809,8 @@ msgstr "Criando Indicador de Qualidade de Conexão…"
 
 #. make the 'Language' button
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:135
-#, fuzzy
 msgid "Adding flags here and there..."
-msgstr "Carregando interface do usuário..."
+msgstr "Adicionando bandeiras aqui e ali..."
 
 #. make the 'Firewall Status' label
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:139
@@ -2851,7 +2846,7 @@ msgstr "Segui-nos no @frostwire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:196
 msgid "Follow FrostWire on Instagram"
-msgstr ""
+msgstr "Siga FrostWire no Instagram"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:202
 msgid ""
@@ -3896,67 +3891,60 @@ msgstr ""
 "online"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:55
-#, fuzzy
 msgid "Support FrostWire"
-msgstr "Sobre o FrostWire"
+msgstr "Suporte FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:57
 msgid "Support with CryptoCurrencies"
-msgstr ""
+msgstr "Suporte com criptomoedas"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
-#, fuzzy
 msgid "Bitcoin"
-msgstr "bitcoins"
+msgstr "Bitcoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:59
-#, fuzzy
 msgid "Bitcoin Cash"
-msgstr "bitcoins"
+msgstr "Bitcoin Cash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:60
 msgid "Ethereum"
-msgstr ""
+msgstr "Ethereum"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:61
 msgid "Dash"
-msgstr ""
+msgstr "Dash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:62
 msgid "LiteCoin"
-msgstr ""
+msgstr "LiteCoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:63
 msgid "ZCash"
-msgstr ""
+msgstr "ZCash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:64
-#, fuzzy
 msgid "Bitcoin Gold"
-msgstr "bitcoins"
+msgstr "Bitcoin Gold"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:68
 msgid "Free Legal Downloads"
 msgstr "Downloads Legais Gratuitos"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
-#, fuzzy
 msgid "Follow us on Facebook"
-msgstr "FrostWire no Facebook"
+msgstr "Siga-nos no Facebook"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
 msgid "Come and say hi to the community on Facebook"
 msgstr "Venha e diga oi na comunidade no Facebook"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:74
-#, fuzzy
 msgid "Follow us on G+"
-msgstr "Siga-nos no Twitter"
+msgstr "Siga-nos no G+"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:76
-#, fuzzy
 msgid "Follow us on Instagram"
-msgstr "Siga-nos no Twitter"
+msgstr "Siga-nos no Instagram"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:78
 msgid "Follow us on Twitter"
@@ -4619,7 +4607,7 @@ msgstr "Permitir compartilhamento parcial:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/PlayerPaneItem.java:35
 msgid "FrostWire Media Player"
-msgstr "FrostWire Media Player"
+msgstr "Reprodutor de Mídia de FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/PlayerPaneItem.java:37
 msgid ""
@@ -4887,9 +4875,8 @@ msgid "Maximum number of peers"
 msgstr "Número máximo de colegas conectados por torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:38
-#, fuzzy
 msgid "Maximum active seeds"
-msgstr "Máximo de downloads ativos"
+msgstr "Máximo de sementes ativos"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:40
 msgid "Enable Distributed Hash Table (DHT)"
@@ -4942,9 +4929,8 @@ msgid "Max speed"
 msgstr "Velocidade Máx."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentSaveFolderPaneItem.java:43
-#, fuzzy
 msgid "Choose the folder where downloads will be saved to"
-msgstr "Escolha a pasta onde os dados torrent serão salvos"
+msgstr "Escolha a pasta onde os downloads serão salvos"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentSeedingSettingPaneItem.java:39
 msgid ""
@@ -5091,9 +5077,8 @@ msgid "View in Archive.org"
 msgstr "Ver no Archive.org"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:89
-#, fuzzy
 msgid "View in Pixabay"
-msgstr "Ver no YouTube"
+msgstr "Ver no Pixabay"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:91
 msgid "Close Tab"
@@ -5164,9 +5149,8 @@ msgid "Search tools"
 msgstr "Ferramentas de pesquisa"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:739
-#, fuzzy
 msgid "All Free Downloads"
-msgstr "Downloads Legais Gratuitos"
+msgstr "Downloads Gratuitos"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
 msgid "Source"
