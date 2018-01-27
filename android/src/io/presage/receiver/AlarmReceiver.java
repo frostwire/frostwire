@@ -23,6 +23,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 import io.presage.Presage;
 
@@ -49,14 +52,19 @@ public final class AlarmReceiver extends BroadcastReceiver {
 
     private void onReceiveSafe(Context context, Intent intent) {
         try {
-            Presage.getInstance().setContext(context);
+            final WeakReference<Context> ctxRef = Ref.weak(context);
             // run the task in the background to avoid ANR
-            Engine.instance().getThreadPool().execute(() -> {
-                try {
-                    Presage.getInstance().talkToService((Bundle) intent.getExtras().clone());
-                } catch (Throwable e) {
-                    // just log
-                    e.printStackTrace();
+            Engine.instance().getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        if (Ref.alive(ctxRef)) {
+                            Presage.getInstance().setContext(ctxRef.get());
+                            Presage.getInstance().talkToService((Bundle) intent.getExtras().clone());
+                        }
+                    } catch (Throwable e) {
+                        // just log
+                        e.printStackTrace();
+                    }
                 }
             });
 
