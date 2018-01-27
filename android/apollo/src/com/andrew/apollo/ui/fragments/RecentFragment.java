@@ -36,7 +36,9 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -47,6 +49,8 @@ import java.util.concurrent.ExecutorService;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
+
+    private RestartLoaderRunnable restartLoaderRunnable;
 
     public RecentFragment() {
         super(Fragments.RECENT_FRAGMENT_GROUP_ID, Fragments.RECENT_FRAGMENT_LOADER_ID);
@@ -86,7 +90,10 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
     public void onMetaChanged() {
         ExecutorService threadPool = Engine.instance().getThreadPool();
         if (threadPool != null) {
-            threadPool.execute(() -> restartLoader(true));
+            if (restartLoaderRunnable == null || !restartLoaderRunnable.isAlive()) {
+                restartLoaderRunnable = new RestartLoaderRunnable(this);
+            }
+            threadPool.execute(restartLoaderRunnable);
         }
     }
 
@@ -95,4 +102,26 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
         mDefaultFragmentEmptyString = R.string.empty_recent;
         super.onLoadFinished(loader, data);
     }
+
+    private static class RestartLoaderRunnable implements Runnable {
+
+        private WeakReference<RecentFragment> fragmentRef;
+
+        RestartLoaderRunnable(RecentFragment fragment) {
+            fragmentRef = Ref.weak(fragment);
+        }
+
+        public boolean isAlive() {
+            return Ref.alive(fragmentRef);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(fragmentRef)) {
+                return;
+            }
+            fragmentRef.get().restartLoader();
+        }
+    }
+
 }
