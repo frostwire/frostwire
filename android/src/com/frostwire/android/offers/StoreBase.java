@@ -56,7 +56,8 @@ abstract class StoreBase implements Store {
         // of the play store can be empty or out of sync
         // NOTE: no lint fix here for clarity
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
-        boolean r = isBasic ? true : false;
+        boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+        boolean r = isBasic && !isDevelopment;
         Iterator<Product> it = products.values().iterator();
 
         while (!r && it.hasNext()) {
