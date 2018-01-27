@@ -27,8 +27,10 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -41,6 +43,8 @@ public final class NetworkManager {
 
     private final Context appContext;
     private boolean tunnelUp;
+
+    private WeakReference<ConnectivityManager> connManRef;
 
     // this is one of the few justified occasions in which
     // holding a context in a static field has no problems,
@@ -97,7 +101,10 @@ public final class NetworkManager {
     }
 
     private ConnectivityManager getConnectivityManager() {
-        return (ConnectivityManager) appContext.getSystemService(Application.CONNECTIVITY_SERVICE);
+        if (!Ref.alive(connManRef)) {
+            connManRef = Ref.weak((ConnectivityManager) appContext.getSystemService(Application.CONNECTIVITY_SERVICE));
+        }
+        return connManRef.get();
     }
 
     public boolean isTunnelUp() {
