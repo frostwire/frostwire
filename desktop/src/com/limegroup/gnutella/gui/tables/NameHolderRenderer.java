@@ -47,8 +47,14 @@ public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer 
     }
 
     private void setData(NameHolder value, JTable table, int row) {
-        labelText.setText(value.getLocaleString());
-        syncFontSize(table, labelText);
+        if (labelText != null) {
+            if (value != null) {
+                labelText.setText(value.getLocaleString());
+            }
+            if (table != null) {
+                syncFontSize(table, labelText);
+            }
+        }
     }
 
     @Override
