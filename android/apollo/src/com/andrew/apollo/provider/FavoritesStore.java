@@ -80,7 +80,11 @@ public class FavoritesStore extends SQLiteOpenHelper {
      */
     public static synchronized FavoritesStore getInstance(final Context context) {
         if (sInstance == null) {
-            sInstance = new FavoritesStore(context.getApplicationContext());
+            try {
+                sInstance = new FavoritesStore(context.getApplicationContext());
+            } catch (Throwable ignored) {
+                sInstance = null;
+            }
         }
         return sInstance;
     }

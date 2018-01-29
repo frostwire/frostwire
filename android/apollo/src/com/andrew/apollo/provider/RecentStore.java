@@ -99,7 +99,11 @@ public final class RecentStore extends SQLiteOpenHelper {
      */
     public static synchronized RecentStore getInstance(final Context context) {
         if (sInstance == null) {
-            sInstance = new RecentStore(context.getApplicationContext());
+            try {
+                sInstance = new RecentStore(context.getApplicationContext());
+            } catch (Throwable ignored) {
+                sInstance = null;
+            }
         }
         return sInstance;
     }
