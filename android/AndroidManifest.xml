@@ -346,7 +346,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="io.presage.receiver.NetworkChangeReceiver">
+        <receiver android:name="io.presage.receiver.NetworkChangeReceiver2">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />

@@ -181,7 +181,7 @@ public class EngineService extends Service implements IEngineService {
 
         // third party services
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
-            enableComponent(pm, io.presage.receiver.NetworkChangeReceiver.class, enable);
+            enableComponent(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
             enableComponent(pm, io.presage.receiver.AlarmReceiver.class, enable);
             enableComponent(pm, io.presage.PresageService.class, enable);
         }
