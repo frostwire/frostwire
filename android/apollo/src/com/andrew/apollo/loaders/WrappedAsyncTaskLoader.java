@@ -24,7 +24,7 @@ abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
 
     @Override
     public void deliverResult(D data) {
-        if (!isReset()) {
+        if (!isReset() && data != null) {
             this.mData = data;
             super.deliverResult(data);
         }
