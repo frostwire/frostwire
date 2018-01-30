@@ -29,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class MPlayerWindow extends JFrame {
@@ -517,5 +518,16 @@ public class MPlayerWindow extends JFrame {
 
     void showOverlayControls() {
         showOverlay(true);
+    }
+
+    static Object getPeer(Object obj) {
+        try {
+            Method f = obj.getClass().getDeclaredMethod("getPeer");
+            f.setAccessible(true);
+            return f.invoke(obj);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

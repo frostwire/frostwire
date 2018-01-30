@@ -35,7 +35,7 @@ public class MPlayerWindowLinux extends MPlayerWindow {
 	@Override
 	public long getCanvasComponentHwnd() {
 		@SuppressWarnings("deprecation")
-        XComponentPeer cp = (XComponentPeer) videoCanvas.getPeer();
+        XComponentPeer cp = (XComponentPeer) getPeer(videoCanvas);
         if ((cp instanceof XComponentPeer)) {
             return ((XComponentPeer) cp).getWindow();
         } else {
@@ -46,7 +46,7 @@ public class MPlayerWindowLinux extends MPlayerWindow {
 	@Override
 	public long getHwnd() {
 		@SuppressWarnings("deprecation")
-        XComponentPeer cp = (XComponentPeer) getPeer();
+        XComponentPeer cp = (XComponentPeer) getPeer(this);
         if ((cp instanceof XComponentPeer)) {
             return ((XComponentPeer) cp).getWindow();
         } else {
