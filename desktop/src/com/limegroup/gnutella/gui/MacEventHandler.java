@@ -15,9 +15,10 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.apple.eawt.*;
 import com.frostwire.util.Logger;
 
+import java.awt.*;
+import java.awt.desktop.*;
 import java.io.File;
 import java.util.List;
 
@@ -43,25 +44,25 @@ public class MacEventHandler {
 
     private MacEventHandler() {
 
-        Application app = Application.getApplication();
+        Desktop app = Desktop.getDesktop();
 
         app.setAboutHandler(new AboutHandler() {
             @Override
-            public void handleAbout(AppEvent.AboutEvent aboutEvent) {
+            public void handleAbout(AboutEvent aboutEvent) {
                 MacEventHandler.this.handleAbout();
             }
         });
 
         app.setQuitHandler(new QuitHandler() {
             @Override
-            public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
+            public void handleQuitRequestWith(QuitEvent quitEvent, QuitResponse quitResponse) {
                 handleQuit();
             }
         });
 
         app.setOpenFileHandler(new OpenFilesHandler() {
             @Override
-            public void openFiles(AppEvent.OpenFilesEvent openFilesEvent) {
+            public void openFiles(OpenFilesEvent openFilesEvent) {
                 List<File> files = openFilesEvent.getFiles();
                 if (files != null && files.size() > 0) {
                     File file = files.get(0);
@@ -75,7 +76,7 @@ public class MacEventHandler {
 
         app.setOpenURIHandler(new OpenURIHandler() {
             @Override
-            public void openURI(AppEvent.OpenURIEvent openURIEvent) {
+            public void openURI(OpenURIEvent openURIEvent) {
                 String uri = openURIEvent.getURI().toString();
                 LOG.debug("URI: " + uri);
                 if (uri.startsWith("magnet:?xt=urn:btih")) {
@@ -84,16 +85,16 @@ public class MacEventHandler {
             }
         });
 
-        app.addAppEventListener(new AppReOpenedListener() {
+        /*app.addAppEventListener(new AppReOpenedListener() {
             @Override
-            public void appReOpened(AppEvent.AppReOpenedEvent appReOpenedEvent) {
+            public void appReOpened(AppReOpenedEvent appReOpenedEvent) {
                 handleReopen();
             }
-        });
+        });*/
 
         app.setPreferencesHandler(new PreferencesHandler() {
             @Override
-            public void handlePreferences(AppEvent.PreferencesEvent preferencesEvent) {
+            public void handlePreferences(PreferencesEvent preferencesEvent) {
                 MacEventHandler.this.handlePreferences();
             }
         });
