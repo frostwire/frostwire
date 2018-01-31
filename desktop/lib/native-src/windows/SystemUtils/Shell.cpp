@@ -153,36 +153,6 @@ int SetFileWritable(LPCTSTR path) {
 	return _tchmod(path, _S_IWRITE);
 }
 
-// Returns the tick count when the user last moved the mouse or pressed a key, or 0 on error
-JNIEXPORT jlong JNICALL Java_org_limewire_util_SystemUtils_idleTime(JNIEnv *e, jclass c) {
-	return GetIdleTime();
-}
-DWORD GetIdleTime() {
-
-	// Get a function pointer to GetLastInputInfo() in user32.dll, which won't be there in Windows 98
-	HMODULE module = LoadLibrary(_T("user32.dll")); // If the DLL is already in our process space, LoadLibrary() will just get its handle
-	if (!module) return 0;
-	GetLastInputInfoSignature call = (GetLastInputInfoSignature)GetProcAddress(module, "GetLastInputInfo");
-	if (!call) return 0;
-
-	// Make an 8-byte LASTINPUTINFO structure for GetLastInputInfo() to write its answer in
-	LASTINPUTINFO info;
-	info.cbSize = sizeof(info); // Write the size at the start to tell what version this is
-	info.dwTime = 0;
-
-	// Get the tick count when the user last gave the computer input
-	BOOL result = call(&info);
-	if (!result) return 0; // GetLastInputInfo() returns 0 on error
-	DWORD user = info.dwTime; // Pull out the information the function wrote
-
-	// Get the tick count now
-	DWORD now = GetTickCount();
-
-	// Return the number of milliseconds the user has been away
-	if (user <= now) return now - user;
-	else return ((DWORD)0) - user + now; // Handle the 49.7 day rollover case
-}
-
 // Takes the JNI environment and class
 // The jobject frame is a AWT Component like a JFrame that is backed by a real Windows window
 // bin is the path to the folder that has the file "jawt.dll", like "C:\Program Files\Java\jre1.5.0_05\bin"

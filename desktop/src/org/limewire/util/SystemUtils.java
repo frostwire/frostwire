@@ -53,19 +53,7 @@ public class SystemUtils {
     }
     
     private SystemUtils() {}
-    
-    
-    /**
-     * Returns whether or not the idle time function is supported on this
-     * operating system.
-     * 
-     * @return <tt>true</tt> if we're able to determine the idle time on this
-     *  operating system, otherwise <tt>false</tt>
-     */
-    public static boolean supportsIdleTime() {
-        return isLoaded && (OSUtils.isGoodWindows() || OSUtils.isMacOSX());
-    }
-    
+
     /**
      * Sets a file to be writeable.  Package-access so FileUtils can delegate
      * the filename given should ideally be a canonicalized filename.
@@ -96,7 +84,7 @@ public class SystemUtils {
     }
     
     /** A list of places that getSpecialPath uses. */
-    public static enum SpecialLocations {
+    public enum SpecialLocations {
         DOCUMENTS("Documents"),
         DOWNLOADS("Downloads"),
         APPLICATION_DATA("ApplicationData"),
@@ -441,7 +429,7 @@ public class SystemUtils {
 
     /*
      * The following methods are implemented in C++ code in SystemUtilities.dll.
-     * In addition, setFileWritable(String) and idleTime() may be implemented in FrostWire's native library for another platform, like Mac or Linux.
+     * In addition, setFileWritable(String) may be implemented in FrostWire's native library for another platform, like Mac or Linux.
      * The idea is that the Windows, Mac, and Linux libraries have methods with the same names.
      * Call a method, and it will run platform-specific code to complete the task in the appropriate platform-specific way.
      */
@@ -454,7 +442,6 @@ public class SystemUtils {
     private static final native void openFileParamsNative(String path, String params);
     private static final native boolean recycleNative(String path);
     private static final native int setFileWriteable(String path);
-    private static final native long idleTime();
     private static final native String setWindowIconNative(Component frame, String bin, String icon);
     private static final native String setWindowTopMostNative(Component frame, String bin);
     private static final native boolean flushIconCacheNative();

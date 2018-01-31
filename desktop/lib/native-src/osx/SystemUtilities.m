@@ -45,13 +45,6 @@ JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setFileWriteable
 	return retVal;
 }
 
-
-JNIEXPORT jlong JNICALL Java_org_limewire_util_SystemUtils_idleTime
-  (JNIEnv *env, jclass clazz) {  
-	CFTimeInterval timeInterval = CGEventSourceSecondsSinceLastEventType (kCGEventSourceStateCombinedSessionState, kCGAnyInputEventType);
-	return (jlong)(1000.0 * timeInterval);    
-}
-
 JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setOpenFileLimit0
   (JNIEnv *env, jclass clazz, jint limit) {
     int retval = 0;
