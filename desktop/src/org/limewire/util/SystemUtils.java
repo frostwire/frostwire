@@ -380,14 +380,10 @@ public class SystemUtils {
             return false;
         }
     }
-    
-    public static boolean verifyExecutableSignature(String executablePath, byte[] expectedCertificate) {
-        return (OSUtils.isWindows() && isLoaded) ? verifyExecutableSignatureNative(executablePath, expectedCertificate) : false;
-    }
-    
+
     /**
      * @return the default String that the shell will execute to open
-     * a file with the provided extention.
+     * a file with the provided extension.
      * Only supported on windows.
      */
     public static String getDefaultExtentionHandler(String extention) {
@@ -460,6 +456,4 @@ public class SystemUtils {
     private static final native boolean firewallIsProgramEnabledNative(String path);
     private static final native boolean firewallAddNative(String path, String name);
     private static final native boolean firewallRemoveNative(String path);
-    
-    private static final native boolean verifyExecutableSignatureNative(String executablePath, byte[] expectedCertificate);
 }
