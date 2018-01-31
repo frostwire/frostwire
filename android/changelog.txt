@@ -2,7 +2,7 @@ FrostWire 2.0.1 build 488 - JAN/30/2017
  - Archive.org search fixes
  - SoundCloud search fixes
  - Music Player 'Recent' tab fixes, thanks @votaguz
- - Updated Japanese, Korean, Russian, Vietnamese, Belarusian, Bulgarian translations
+ - Updated Japanese, Korean, Russian, Vietnamese, Belarusian, Bulgarian, Czech translations
  - New jlibtorrent 1.2.0.16, fixes possible crash on application update, performance
  - Library updates: build tools 27.0.3, gradle 4.5, flexbox 0.3.2
  - Crash fixes, performance upgrades 

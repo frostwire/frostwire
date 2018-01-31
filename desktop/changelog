@@ -3,9 +3,9 @@ frostwire (6.6.2) stable; urgency=high
   * Fixes SoundCloud search issues
   * Fixes bug that could cause app startup slowdowns
   * Windows, Mac: JRE update (1.8.0_121 to 1.8.0_162)
-  * Spanish, Portuguese and French translation updates
+  * Spanish, Portuguese, Italian and French translation updates
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 26 Jan 2018 08:02:45 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 31 Jan 2018 11:05:45 -0600
 
 frostwire (6.6.1) stable; urgency=high
   * New jlibtorrent 1.2.0.15-RC3
