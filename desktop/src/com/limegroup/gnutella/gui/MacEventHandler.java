@@ -85,12 +85,12 @@ public class MacEventHandler {
             }
         });
 
-        /*app.addAppEventListener(new AppReOpenedListener() {
+        app.addAppEventListener(new AppReopenedListener() {
             @Override
-            public void appReOpened(AppReOpenedEvent appReOpenedEvent) {
+            public void appReopened(AppReopenedEvent e) {
                 handleReopen();
             }
-        });*/
+        });
 
         app.setPreferencesHandler(new PreferencesHandler() {
             @Override
