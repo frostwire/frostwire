@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 4.17.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2018-01-30 23:29-0500\n"
+"PO-Revision-Date: 2018-01-31 09:27-0500\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -868,7 +868,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:226
 msgid "Start seeding"
-msgstr "Comincia il processo di seeding"
+msgstr "Comincia il processo di distribuzione seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:228
 msgid ""
@@ -878,7 +878,8 @@ msgid ""
 msgstr ""
 "Mandati una notifica come seed per il contenuto catalogato da questo torrent "
 "appena viene creato.\n"
-"Se nessuno e' in seeding, il torrent non funzionera'. (Raccomandato)"
+"Se nessuno e' in distribuzione seme, il torrent non funzionera'. "
+"(Raccomandato)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:231
 msgid "Tracker Announce URLs"
@@ -896,7 +897,7 @@ msgid ""
 msgstr ""
 "Inserisci una lista di URL BitTorrent Tracker validi.\n"
 "Il tuo nuovo torrent sara' annunciato a questi tracker se cominci il "
-"processo di seeding del torrent."
+"processo di distribuzione seme del torrent."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:243
 msgid "Web Seeds Mirror URLs"
@@ -1288,7 +1289,7 @@ msgstr "Scegli un'altra cartella"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:53
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentSeedingSettingPaneItem.java:37
 msgid "Seeding Settings"
-msgstr "Impostazioni Seeding"
+msgstr "Impostazioni Distribuzione Seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:71
 #, fuzzy
@@ -1318,22 +1319,25 @@ msgstr ""
 msgid ""
 "One of the transfers is complete and resuming will cause it to start seeding"
 msgstr ""
-"Uno dei trasferimenti è completa e la ripresa causerà per iniziare sedino"
+"Uno dei trasferimenti è completa e la ripresa causerà per iniziare "
+"distribuzione seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:167
 msgid ""
 "This transfer is already complete, resuming it will cause it to start seeding"
 msgstr ""
-"Tale trasferimento è già completo, riprendendo causerà per iniziare seeding"
+"Tale trasferimento è già completo, riprendendo causerà per iniziare "
+"distribuzione seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:170
 msgid "Do you want to enable torrent seeding?"
-msgstr "Vuoi abilitare torrent sedino?"
+msgstr "Vuoi abilitare distribuzione seme di torrent?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:70
 msgid "SHARE the download url/magnet of this seeding transfer"
 msgstr ""
-"CONDIVIDERE l'URL per il download/magnete di questo trasferimento semina"
+"CONDIVIDERE l'URL per il download/magnete di questo trasferimento di "
+"distribuzione seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:86
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:83
@@ -2872,19 +2876,19 @@ msgstr "FrostWire cerchio su G +"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 msgid "<b>Seeding</b><p>completed torrent downloads.</p>"
-msgstr "<b>Seminando</b><p>download torrent completati."
+msgstr "<b>Distribuzione Seme</b><p>download torrent completati."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 msgid ""
 "<b>Not Seeding</b><p>File chunks might be shared only during a torrent "
 "download.</p>"
 msgstr ""
-"<b>Non seminando</b>.<p>Porzioni di file possono essere condivise solo "
-"durante<p>un download di torrent."
+"<b>Non Distribuzione Seme</b>.<p>Porzioni di file possono essere condivise "
+"solo durante<p>un download di torrent."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:468
 msgid "Not Seeding"
-msgstr "Non seminando"
+msgstr "Non Distribuzione Seme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:487
 msgid "FrostWire has not detected a firewall"
@@ -3149,7 +3153,8 @@ msgid ""
 "Seeding - No Seeding icon at the bottom bar"
 msgstr ""
 "Non vuoi seminare? Vai su Strumenti &gt;  Opzioni &gt;  Bittorrent o "
-"selezionare il Seminando - No semina icona alla barra inferiore"
+"selezionare il Distribuzione Seme - Non Distribuzione Seme icona alla barra "
+"inferiore"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:49
 msgid ""
@@ -3690,20 +3695,22 @@ msgid ""
 "Please select if you want to \"Seed\" or to not \"Seed\" finished downloads. "
 "The link below has more information about \"Seeding\"."
 msgstr ""
-"Scegli una cartella in cui salvare i file scaricati dal network di "
-"BitTorrent.\n"
-"Scegli se vuoi \"Seminare\" o non \"Seminare\" i download completati."
+"Scegliere una cartella dove i file scaricati dalla rete BitTorrent "
+"dovrebbero essere salvati.\n"
+"Si prega di selezionare se si desidera \"Seme\" o a non \"Seme\" finito il "
+"download. Il link qui sotto contiene ulteriori informazioni su "
+"\"Distribuzione Seme\"."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/BitTorrentSettingsWindow.java:107
 msgid "You forgot to select your finished downloads \"Seeding\" setting."
 msgstr ""
-"Hai dimenticato di selezionare finito il vostro download “Sedino” "
-"impostazione."
+"Hai dimenticato di selezionare finito il vostro download “Distribuzione "
+"Seme” impostazione."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/BitTorrentSettingsWindow.java:109
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:49
 msgid "What is \"Seeding\"?"
-msgstr "Che cos'è \"Seeding\"?"
+msgstr "Che cos'è \"Distribuzione Seme\"?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/BitTorrentSettingsWindow.java:123
 #, java-format
@@ -3900,7 +3907,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:49
 msgid "Learn about BitTorrent Seeding"
-msgstr "Scopri di piu' sul Seeding su BitTorrent"
+msgstr "Scopri di piu' sul Distribuzione Seme su BitTorrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:51
 msgid ""
@@ -4958,10 +4965,10 @@ msgid ""
 "file(s). Pieces of the seeded file(s) will be available to everybody. While "
 "downloading pieces are always available to other peers in the swarm."
 msgstr ""
-"Seeding e' il processo tramite cui ci si connette a un torrent quando si ha "
-"un file completo. Pezzi del file seminato saranno disponibili a tutti. "
-"Mentre le parti scaricate sono sempre disponibili ad altre persone nella "
-"rete."
+"Distribuzione Seme e' il processo tramite cui ci si connette a un torrent "
+"quando si ha un file completo. Pezzi del file seminato saranno disponibili a "
+"tutti. Mentre le parti scaricate sono sempre disponibili ad altre persone "
+"nella rete."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:35
 msgid "Anonymous Usage Statistics"
