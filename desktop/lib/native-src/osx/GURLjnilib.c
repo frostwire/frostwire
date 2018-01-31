@@ -13,7 +13,7 @@ static jmethodID mid;
 
 // or build two thin JNI libraries and merge them with lipo to an Universal Binary
 
-#define OS_NATIVE(func)	Java_org_limewire_ui_swing_GURLHandler_##func
+#define OS_NATIVE(func)	Java_com_limegroup_gnutella_gui_GURLHandler_##func
 
 static OSErr NativeCallback(const AppleEvent *appleEvt, AppleEvent* reply, UInt32 refcon) {
     
