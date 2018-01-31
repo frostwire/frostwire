@@ -44,23 +44,7 @@ public class MacOSXUtils {
     }
 
     /**
-     * Gets the full user's name.
-     */
-    public static String getUserName() {
-        if (initialized) {
-            return GetCurrentFullUserName();
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Gets the full user's name.
-     */
-    private static final native String GetCurrentFullUserName();
-
-    /**
      * [Un]registers FrostWire from the startup items list.
      */
-    private static final native void SetLoginStatusNative(boolean allow, String appPath);
+    private static native void SetLoginStatusNative(boolean allow, String appPath);
 }

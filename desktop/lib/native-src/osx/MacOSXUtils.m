@@ -15,17 +15,6 @@ extern "C" {
 
 #define OS_NATIVE(func) Java_com_limegroup_gnutella_util_MacOSXUtils_##func
 
-JNIEXPORT jstring JNICALL OS_NATIVE(GetCurrentFullUserName)
-	(JNIEnv *env, jobject clazz)
-{
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *usernameNSString = NSFullUserName();
-	jstring usernameJString = (*env)->NewStringUTF(env, [usernameNSString UTF8String]);
-	[pool release];
-	
-	return usernameJString;
-}
-
 JNIEXPORT void JNICALL OS_NATIVE(SetLoginStatusNative)
 	(JNIEnv *env, jobject obj, jboolean onoff, jstring path )
 {
