@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 4.17.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2018-01-29 10:03-0500\n"
+"PO-Revision-Date: 2018-01-30 23:19-0500\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: it\n"
@@ -2233,7 +2233,7 @@ msgstr "Annuncio di FrostWire Team"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:252
 msgid "Download Torrent"
-msgstr "Scarica torrent"
+msgstr "Scarica Torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:257
 msgid "Thanks, but not now"
@@ -2296,9 +2296,8 @@ msgid "FrostWire Graphics Designers/Photographers"
 msgstr "Grafici e Designer di FrostWire/Fotografi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:146
-#, fuzzy
 msgid "Thanks to Former FrostWire Developers"
-msgstr "Grazie agli ex Developer di FrostWire"
+msgstr "Grazie agli ex sviluppatori di FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:152
 #, fuzzy
@@ -2480,13 +2479,12 @@ msgid "Support FrostWire development with a Litecoin donation"
 msgstr "Sostenere lo sviluppo FrostWire con una donazione Litecoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Sostenere lo sviluppo FrostWire con una donazione Paypal"
+msgstr "Sostenere lo sviluppo FrostWire con una donazione ZCash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "Sostenere lo sviluppo FrostWire con una donazione Zcash"
+msgstr "Sostenere lo sviluppo FrostWire con una donazione Bitcoin Gold"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
