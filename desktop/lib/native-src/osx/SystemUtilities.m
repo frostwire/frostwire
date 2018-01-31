@@ -18,8 +18,6 @@
 
 // or build two thin JNI libraries and merge them with lipo to an Universal Binary
 
-extern double CGSSecondsSinceLastInputEvent(unsigned long envType);
-
 JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setFileWriteable
   (JNIEnv *env, jclass clazz, jstring fileName) {
 	const char* cFileName;
@@ -43,27 +41,4 @@ JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setFileWriteable
 	// free the memory for the string
 	(*env)->ReleaseStringUTFChars(env, fileName, cFileName);
 	return retVal;
-}
-
-JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setOpenFileLimit0
-  (JNIEnv *env, jclass clazz, jint limit) {
-    int retval = 0;
-	int maxFiles = (int)limit;
-    struct rlimit rl;
-    
-    // retrieve current values.
-    if (getrlimit(RLIMIT_NOFILE, &rl) == -1)
-        rl.rlim_cur = rl.rlim_max = 0;
-
-    // if either are below, raise them as necessary.
-	if (rl.rlim_cur < maxFiles || rl.rlim_max < maxFiles) {
-        // raise only what we need to.
-        if(rl.rlim_cur < maxFiles)
-            rl.rlim_cur = maxFiles;
-        if( rl.rlim_max < maxFiles )
-            rl.rlim_max = maxFiles;
-        // set with new values.
-        retval = setrlimit(RLIMIT_NOFILE, &rl);
-    }
-    return (jint)retval;
 }
