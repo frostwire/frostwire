@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@ public class MediaPlayerWindows extends MediaPlayer {
 
     protected String getPlayerPath() {
         boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("desktop\\build\\libs");
-	String playerPath = (isRelease) ? FrostWireUtils.getFrostWireJarPath() + File.separator + "fwplayer.exe" : "lib/native/fwplayer.exe";
+        String playerPath = (isRelease) ? FrostWireUtils.getFrostWireJarPath() + File.separator + "fwplayer.exe" : "lib/native/fwplayer.exe";
         playerPath = decode(playerPath);
 
         if (!new File(playerPath).exists()) {
-            playerPath = decode("../lib/native/fwplayer.exe");
+            playerPath = decode("lib/native/fwplayer.exe");
         }
         
         return playerPath;
