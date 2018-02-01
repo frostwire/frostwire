@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.OSUtils;
-import sun.swing.SwingUtilities2;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -389,7 +388,10 @@ public final class ThemeMediator {
     private static void applySkinSettings() {
         applyCommonSkinUI();
 
-        fixAAFontSettings();
+        // NOTE: this was necessary in old versions of java 7, it was unmodified
+        // when we migrated to java 8, but the classes has been removed in
+        // java 9.
+        //fixAAFontSettings();
 
         UIManager.put("Tree.leafIcon", UIManager.getIcon("Tree.closedIcon"));
 
@@ -409,12 +411,12 @@ public final class ThemeMediator {
         UIManager.put("Tree.rowHeight", 0);
     }
 
-    private static void fixAAFontSettings() {
-        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-        boolean lafCond = SwingUtilities2.isLocalDisplay();
-        Object aaTextInfo = SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-        defaults.put(SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
-    }
+//    private static void fixAAFontSettings() {
+//        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+//        boolean lafCond = SwingUtilities2.isLocalDisplay();
+//        Object aaTextInfo = SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
+//        defaults.put(SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+//    }
 
     // windows font policy http://msdn.microsoft.com/en-us/library/windows/desktop/aa511282.aspx
     // table of languages http://msdn.microsoft.com/en-us/library/ee825488(v=cs.20).aspx
