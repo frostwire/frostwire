@@ -477,7 +477,7 @@ public class MPlayer extends BaseMediaPlayer {
 
 			doStop(false);
 
-			instance = current_instance = new MPlayerInstance(preferences);
+			instance = current_instance = new MPlayerInstance();
 		}
 
 		reportNewState(MediaPlaybackState.Opening);
@@ -705,7 +705,7 @@ public class MPlayer extends BaseMediaPlayer {
 
 	@Override
 	public Map<String, String> getProperties(String fileOrUrl) {
-		MPlayerInstance instance = new MPlayerInstance(null);
+		MPlayerInstance instance = new MPlayerInstance();
 		final Map<String, String> properties = new HashMap<String, String>();
 
 		instance.doGetProperties(fileOrUrl,
