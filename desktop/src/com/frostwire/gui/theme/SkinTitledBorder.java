@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,6 @@
 
 package com.frostwire.gui.theme;
 
-import sun.swing.SwingUtilities2;
-
-import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -82,13 +79,12 @@ public final class SkinTitledBorder extends TitledBorder {
 
         g.setFont(getFont(c));
 
-        JComponent jc = (c instanceof JComponent) ? (JComponent) c : null;
-        FontMetrics fm = SwingUtilities2.getFontMetrics(jc, g);
+        FontMetrics fm = g.getFontMetrics();
         int fontHeight = fm.getHeight();
         int descent = fm.getDescent();
         int ascent = fm.getAscent();
         int diff;
-        int stringWidth = SwingUtilities2.stringWidth(jc, fm, getTitle());
+        int stringWidth = fm.stringWidth(getTitle());
         Insets insets;
 
         if (border != null) {
@@ -208,7 +204,7 @@ public final class SkinTitledBorder extends TitledBorder {
         }
 
         g.setColor(getTitleColor());
-        SwingUtilities2.drawString(jc, g, getTitle(), textLoc.x, textLoc.y);
+        g.drawString(getTitle(), textLoc.x, textLoc.y);
 
         g.setFont(font);
         g.setColor(color);
