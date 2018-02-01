@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import com.frostwire.gui.player.MediaPlayerListener;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.sun.awt.AWTUtilities;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
@@ -42,8 +41,6 @@ import java.awt.geom.RoundRectangle2D;
  *
  */
 public final class MPlayerOverlayControls extends JDialog implements ProgressSliderListener, AlphaTarget, MediaPlayerListener {
-
-    private static final long serialVersionUID = -6148347816829785754L;
 
     private JSlider volumeSlider;
     private ProgressSlider progressSlider;
@@ -76,10 +73,6 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         } catch (UnsupportedOperationException e) {
             // platform does not support per-pixel translucency
             setBackground(new Color(0, 0, 0));
-        }
-
-        if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
-            AWTUtilities.setWindowOpaque(this, false);
         }
 
         if (OSUtils.isMacOSX()) {
@@ -245,7 +238,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
                 
                 // only on windows/mac handle alpha
                 if (!OSUtils.isLinux()) {
-                    AWTUtilities.setWindowOpacity(MPlayerOverlayControls.this, alpha);
+                    setOpacity(alpha);
                 }
 
                 // set component visibility as appropriate
