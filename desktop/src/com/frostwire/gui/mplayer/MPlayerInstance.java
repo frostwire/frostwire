@@ -63,14 +63,7 @@ MPlayerInstance
 		KEEP_FORCE    // pass the pausing_keep_force prefix
 	};
 	
-	//private PlayerPreferences preferences;
-	
-	public MPlayerInstance(PlayerPreferences preferences) {
-		//this.preferences = preferences;
-	}
-	
-	public static void setBinaryPath(String path) {
-		
+	public MPlayerInstance() {
 	}
 
 	private volatile Process	mPlayerProcess;
@@ -320,7 +313,7 @@ MPlayerInstance
 						} catch (Exception e) {
 							//e.printStackTrace();
 						}
-					};
+					}
 				};
 				stdOutReader.setDaemon(true);
 				stdOutReader.start();
@@ -340,7 +333,7 @@ MPlayerInstance
 						} catch (Exception e) {
 							//e.printStackTrace();
 						}
-					};
+					}
 				};
 				stdErrReader.setDaemon(true);
 				stdErrReader.start();
@@ -405,7 +398,7 @@ MPlayerInstance
 							
 							stop_sem.releaseForever();
 						}
-					};
+					}
 				};
 				stdInWriter.setDaemon(true);
 				stdInWriter.start();
@@ -1021,7 +1014,7 @@ MPlayerInstance
                         } catch (Exception e) {
                             //e.printStackTrace();
                         }
-                    };
+                    }
                 };
                 stdOutReader.setDaemon(true);
                 stdOutReader.start();
