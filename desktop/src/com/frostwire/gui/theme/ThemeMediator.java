@@ -388,11 +388,14 @@ public final class ThemeMediator {
     private static void applySkinSettings() {
         applyCommonSkinUI();
 
+<<<<<<< HEAD
         // NOTE: this was necessary in old versions of java 7, it was unmodified
         // when we migrated to java 8, but the classes has been removed in
         // java 9.
         //fixAAFontSettings();
 
+=======
+>>>>>>> [desktop] saving bits of code for java 9
         UIManager.put("Tree.leafIcon", UIManager.getIcon("Tree.closedIcon"));
 
         // remove split pane borders

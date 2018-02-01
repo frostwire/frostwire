@@ -46,7 +46,7 @@ public class MPlayerComponentJava extends Canvas implements MPlayerComponent {
 			Class<?> cl = Class.forName("sun.awt.windows.WComponentPeer");
 	        java.lang.reflect.Field f = cl.getDeclaredField("hwnd");
 	        f.setAccessible(true); //little reflection hack to access the hwnd from windows.
-	        hWnd = f.getLong(getPeer());
+	        hWnd = f.getLong(MPlayerWindow.getPeer(this));
     	
 		} catch (Exception e) {
 			e.printStackTrace();

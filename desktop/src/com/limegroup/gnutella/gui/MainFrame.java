@@ -15,7 +15,6 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.apple.eawt.FullScreenUtilities;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.tabs.*;
@@ -192,10 +191,6 @@ public final class MainFrame {
 
         if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
             FRAME.addWindowListener(MagnetClipboardListener.getInstance());
-        }
-
-        if (OSUtils.isMacOSX()) {
-            FullScreenUtilities.setWindowCanFullScreen(FRAME, true);
         }
     }
 
