@@ -114,6 +114,10 @@ public final class NavigationMenu {
             TextView title = navViewHeader.findViewById(R.id.nav_view_header_main_title);
             TextView version = navViewHeader.findViewById(R.id.nav_view_header_main_version);
             String basicOrPlus = (String) activity.getText(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);
+            boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+            if (isDevelopment) {
+                basicOrPlus = "Developer";
+            }
             title.setText("FrostWire " + basicOrPlus);
             version.setText(" v" + Constants.FROSTWIRE_VERSION_STRING);
             TextView build = navViewHeader.findViewById(R.id.nav_view_header_main_build);
