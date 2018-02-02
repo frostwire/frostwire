@@ -19,6 +19,9 @@ import com.apple.eawt.*;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.List;
 
 /**
@@ -43,21 +46,11 @@ public class MacEventHandler {
 
     private MacEventHandler() {
 
+        MacOSHandler.setAboutHandler(args -> handleAbout());
+
+        MacOSHandler.setQuitHandler(args -> handleQuit());
+
         Application app = Application.getApplication();
-
-        app.setAboutHandler(new AboutHandler() {
-            @Override
-            public void handleAbout(AppEvent.AboutEvent aboutEvent) {
-                MacEventHandler.this.handleAbout();
-            }
-        });
-
-        app.setQuitHandler(new QuitHandler() {
-            @Override
-            public void handleQuitRequestWith(AppEvent.QuitEvent quitEvent, QuitResponse quitResponse) {
-                handleQuit();
-            }
-        });
 
         app.setOpenFileHandler(new OpenFilesHandler() {
             @Override
@@ -127,5 +120,113 @@ public class MacEventHandler {
 
     private void handlePreferences() {
         GUIMediator.instance().setOptionsVisible(true);
+    }
+
+    private static final class MacOSHandler implements InvocationHandler {
+
+        private static final int javaVersion = javaVersion();
+        private static final Class<?> applicationClass = applicationClass();
+        private static final Object application = applicationObject();
+
+        private final String handlerMethod;
+        private final EventHandler handler;
+
+        private MacOSHandler(String handlerMethod, EventHandler handler) {
+            this.handlerMethod = handlerMethod;
+            this.handler = handler;
+        }
+
+        @Override
+        public final Object invoke(Object proxy, Method method, Object[] args) {
+            if (handlerMethod.equals(method.getName()) && args.length > 0) {
+                handler.handle(args);
+            }
+            return null;
+        }
+
+        private static int javaVersion() {
+            String versionStr = System.getProperty("java.version");
+            if (versionStr.startsWith("1.8")) {
+                return 8;
+            }
+            return -1; // invalid value
+        }
+
+        private static Class<?> applicationClass() {
+            try {
+                if (javaVersion == 8) {
+                    return Class.forName("com.apple.eawt.Application");
+                }
+                if (javaVersion >= 9) {
+                    return Class.forName("com.apple.eawt.Desktop");
+                }
+            } catch (Throwable e) {
+                LOG.error("Error getting application class", e);
+            }
+
+            return null;
+        }
+
+        private static Object applicationObject() {
+            try {
+                Method m = null;
+
+                if (javaVersion == 8) {
+                    m = applicationClass.getDeclaredMethod("getApplication");
+                }
+                if (javaVersion >= 9) {
+                    m = applicationClass.getDeclaredMethod("getDesktop");
+                }
+
+                return m.invoke(null);
+            } catch (Throwable e) {
+                LOG.error("Error creating application instance", e);
+            }
+
+            return null;
+        }
+
+        private static void setEventHandler(String methodName, String handlerName,
+                                            String handlerMethod, EventHandler handler) {
+            try {
+                Class<?> handlerClass = Class.forName(handlerName);
+                Method setMethod = applicationClass.getDeclaredMethod(methodName,
+                        new Class<?>[]{handlerClass});
+
+                MacOSHandler adapter = new MacOSHandler(handlerMethod, handler);
+                Object proxy = Proxy.newProxyInstance(MacOSHandler.class.getClassLoader(),
+                        new Class<?>[]{handlerClass}, adapter);
+                setMethod.invoke(application, new Object[]{proxy});
+            } catch (Throwable e) {
+                LOG.error("Error setting application handler", e);
+            }
+        }
+
+        public static void setAboutHandler(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("setAboutHandler", "com.apple.eawt.AboutHandler",
+                        "handleAbout", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("setAboutHandler", "java.awt.desktop.AboutHandler",
+                        "handleAbout", handler);
+            }
+        }
+
+        public static void setQuitHandler(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("setQuitHandler", "com.apple.eawt.QuitHandler",
+                        "handleQuitRequestWith", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("setQuitHandler", "java.awt.desktop.QuitHandler",
+                        "handleQuitRequestWith", handler);
+            }
+        }
+
+        public interface EventHandler {
+
+            void handle(Object[] args);
+        }
     }
 }
