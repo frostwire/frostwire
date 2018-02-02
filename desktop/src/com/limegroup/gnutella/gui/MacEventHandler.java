@@ -15,13 +15,13 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.apple.eawt.*;
 import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -65,16 +65,11 @@ public class MacEventHandler {
             }
         });
 
-        Application app = Application.getApplication();
-
-        app.setOpenURIHandler(new OpenURIHandler() {
-            @Override
-            public void openURI(AppEvent.OpenURIEvent openURIEvent) {
-                String uri = openURIEvent.getURI().toString();
-                LOG.debug("URI: " + uri);
-                if (uri.startsWith("magnet:?xt=urn:btih")) {
-                    GUIMediator.instance().openTorrentURI(uri, false);
-                }
+        MacOSHandler.setOpenURIHandler(args -> {
+            String uri = MacOSHandler.getURI(args[0]).toString();
+            LOG.debug("URI: " + uri);
+            if (uri.startsWith("magnet:?xt=urn:btih")) {
+                GUIMediator.instance().openTorrentURI(uri, false);
             }
         });
     }
@@ -125,8 +120,12 @@ public class MacEventHandler {
 
         @Override
         public final Object invoke(Object proxy, Method method, Object[] args) {
-            if (handlerMethod.equals(method.getName()) && args.length > 0) {
-                handler.handle(args);
+            try {
+                if (handlerMethod.equals(method.getName()) && args.length > 0) {
+                    handler.handle(args);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error invoking handler", e);
             }
             return null;
         }
@@ -252,11 +251,32 @@ public class MacEventHandler {
             }
         }
 
+        public static void setOpenURIHandler(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("setOpenURIHandler", "com.apple.eawt.OpenURIHandler",
+                        "openURI", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("setOpenURIHandler", "java.awt.desktop.OpenURIHandler",
+                        "openURI", handler);
+            }
+        }
+
         @SuppressWarnings("unchecked")
         public static List<File> getFiles(Object event) {
             try {
                 Method m = event.getClass().getDeclaredMethod("getFiles");
                 return (List<File>) m.invoke(event);
+            } catch (Throwable e) {
+                LOG.error("Error invoking getFiles in event: " + event);
+            }
+            return null;
+        }
+
+        public static URI getURI(Object event) {
+            try {
+                Method m = event.getClass().getDeclaredMethod("getURI");
+                return (URI) m.invoke(event);
             } catch (Throwable e) {
                 LOG.error("Error invoking getFiles in event: " + event);
             }
