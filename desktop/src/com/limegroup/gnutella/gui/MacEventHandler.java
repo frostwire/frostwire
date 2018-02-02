@@ -135,6 +135,9 @@ public class MacEventHandler {
             if (versionStr.startsWith("1.8")) {
                 return 8;
             }
+            if (versionStr.startsWith("9")) {
+                return 9;
+            }
             return -1; // invalid value
         }
 
@@ -144,7 +147,7 @@ public class MacEventHandler {
                     return Class.forName("com.apple.eawt.Application");
                 }
                 if (javaVersion >= 9) {
-                    return Class.forName("com.apple.eawt.Desktop");
+                    return Class.forName("java.awt.Desktop");
                 }
             } catch (Throwable e) {
                 LOG.error("Error getting application class", e);
