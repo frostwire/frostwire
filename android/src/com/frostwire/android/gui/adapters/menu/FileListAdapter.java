@@ -376,6 +376,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                     UIUtils.playEphemeralPlaylist(ctx, fd);
                     UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 } catch (RuntimeException re) {
+                    re.printStackTrace();
                     UIUtils.showShortMessage(ctx, R.string.media_player_failed);
                 }
             }
