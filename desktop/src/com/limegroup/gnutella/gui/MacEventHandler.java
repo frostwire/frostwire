@@ -50,6 +50,10 @@ public class MacEventHandler {
 
         MacOSHandler.setQuitHandler(args -> handleQuit());
 
+        MacOSHandler.setAppReopenedListener(args -> handleReopen());
+
+        MacOSHandler.setPreferencesHandler(args -> handlePreferences());
+
         Application app = Application.getApplication();
 
         app.setOpenFileHandler(new OpenFilesHandler() {
@@ -74,20 +78,6 @@ public class MacEventHandler {
                 if (uri.startsWith("magnet:?xt=urn:btih")) {
                     GUIMediator.instance().openTorrentURI(uri, false);
                 }
-            }
-        });
-
-        app.addAppEventListener(new AppReOpenedListener() {
-            @Override
-            public void appReOpened(AppEvent.AppReOpenedEvent appReOpenedEvent) {
-                handleReopen();
-            }
-        });
-
-        app.setPreferencesHandler(new PreferencesHandler() {
-            @Override
-            public void handlePreferences(AppEvent.PreferencesEvent preferencesEvent) {
-                MacEventHandler.this.handlePreferences();
             }
         });
     }
@@ -190,8 +180,16 @@ public class MacEventHandler {
                                             String handlerMethod, EventHandler handler) {
             try {
                 Class<?> handlerClass = Class.forName(handlerName);
-                Method setMethod = applicationClass.getDeclaredMethod(methodName,
-                        new Class<?>[]{handlerClass});
+                Method setMethod = null;
+
+                try {
+                    setMethod = applicationClass.getDeclaredMethod(methodName,
+                            new Class<?>[]{handlerClass});
+                } catch (NoSuchMethodException ignore) {
+                    // try first interface
+                    setMethod = applicationClass.getDeclaredMethod(methodName,
+                            new Class<?>[]{handlerClass.getInterfaces()[0]});
+                }
 
                 MacOSHandler adapter = new MacOSHandler(handlerMethod, handler);
                 Object proxy = Proxy.newProxyInstance(MacOSHandler.class.getClassLoader(),
@@ -221,6 +219,28 @@ public class MacEventHandler {
             if (javaVersion >= 9) {
                 setEventHandler("setQuitHandler", "java.awt.desktop.QuitHandler",
                         "handleQuitRequestWith", handler);
+            }
+        }
+
+        public static void setAppReopenedListener(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("addAppEventListener", "com.apple.eawt.AppReOpenedListener",
+                        "appReOpened", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("addAppEventListener", "java.awt.desktop.AppReopenedListener",
+                        "appReopened", handler);
+            }
+        }
+
+        public static void setPreferencesHandler(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("setPreferencesHandler", "com.apple.eawt.PreferencesHandler",
+                        "handlePreferences", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("setPreferencesHandler", "java.awt.desktop.PreferencesHandler",
+                        "handlePreferences", handler);
             }
         }
 
