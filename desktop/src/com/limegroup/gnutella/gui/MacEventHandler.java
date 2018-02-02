@@ -54,21 +54,18 @@ public class MacEventHandler {
 
         MacOSHandler.setPreferencesHandler(args -> handlePreferences());
 
-        Application app = Application.getApplication();
-
-        app.setOpenFileHandler(new OpenFilesHandler() {
-            @Override
-            public void openFiles(AppEvent.OpenFilesEvent openFilesEvent) {
-                List<File> files = openFilesEvent.getFiles();
-                if (files != null && files.size() > 0) {
-                    File file = files.get(0);
-                    LOG.debug("File: " + file);
-                    if (file.getName().toLowerCase().endsWith(".torrent")) {
-                        GUIMediator.instance().openTorrentFile(file, false);
-                    }
+        MacOSHandler.setOpenFileHandler(args -> {
+            List<File> files = MacOSHandler.getFiles(args[0]);
+            if (files != null && files.size() > 0) {
+                File file = files.get(0);
+                LOG.debug("File: " + file);
+                if (file.getName().toLowerCase().endsWith(".torrent")) {
+                    GUIMediator.instance().openTorrentFile(file, false);
                 }
             }
         });
+
+        Application app = Application.getApplication();
 
         app.setOpenURIHandler(new OpenURIHandler() {
             @Override
@@ -242,6 +239,28 @@ public class MacEventHandler {
                 setEventHandler("setPreferencesHandler", "java.awt.desktop.PreferencesHandler",
                         "handlePreferences", handler);
             }
+        }
+
+        public static void setOpenFileHandler(EventHandler handler) {
+            if (javaVersion == 8) {
+                setEventHandler("setOpenFileHandler", "com.apple.eawt.OpenFilesHandler",
+                        "openFiles", handler);
+            }
+            if (javaVersion >= 9) {
+                setEventHandler("setOpenFileHandler", "java.awt.desktop.OpenFilesHandler",
+                        "openFiles", handler);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public static List<File> getFiles(Object event) {
+            try {
+                Method m = event.getClass().getDeclaredMethod("getFiles");
+                return (List<File>) m.invoke(event);
+            } catch (Throwable e) {
+                LOG.error("Error invoking getFiles in event: " + event);
+            }
+            return null;
         }
 
         public interface EventHandler {
