@@ -1,0 +1,60 @@
+group 'com.frostwire'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply from: '../common/dependencies.gradle'
+
+sourceCompatibility = 1.8
+
+compileJava {
+    options.encoding = '8859_1'
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url  'http://dl.bintray.com/ijabz/maven'
+    }
+}
+
+dependencies {
+    compile 'com.frostwire:jlibtorrent:1.2.0.16'
+    compile 'io.vertx:vertx-core:3.5.0'
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir '../common/src/main/java'
+            srcDir 'src/main/java'
+        }
+
+        resources {
+            srcDir 'src/resources'
+            include '**/*.properties'
+            include '**/*.png'
+            include '**/*.gif'
+            include '**/*.jpg'
+            include '**/*.html'
+            include '**/*.js'
+            include '**/*.json'
+            exclude '**/*.DS_Store'
+        }
+    }
+}
+
+/**
+jar {
+    archiveName = 'frostwire.jar'
+
+    exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF')
+
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+
+    manifest {
+        attributes 'Main-Class': 'com.frostwire.light.Main'
+    }
+}
+*/
