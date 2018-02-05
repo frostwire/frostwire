@@ -4063,7 +4063,7 @@ public class StringUtils {
         }
         final Object first = iterator.next();
         if (!iterator.hasNext()) {
-            //@SuppressWarnings( "deprecation" ) // ObjectUtils.toString(Object) has been deprecated in 3.2
+            // ObjectUtils.toString(Object) has been deprecated in 3.2
             final
             String result = first != null ? first.toString() : "null";// ObjectUtils.toString(first);
             return result;
@@ -4110,7 +4110,7 @@ public class StringUtils {
         }
         final Object first = iterator.next();
         if (!iterator.hasNext()) {
-            //@SuppressWarnings( "deprecation" ) // ObjectUtils.toString(Object) has been deprecated in 3.2
+            // ObjectUtils.toString(Object) has been deprecated in 3.2
             final String result = first != null ? first.toString() : "null";//ObjectUtils.toString(first);
             return result;
         }
