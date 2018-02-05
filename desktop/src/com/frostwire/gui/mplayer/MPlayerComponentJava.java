@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,30 +29,11 @@ import java.awt.*;
 public class MPlayerComponentJava extends Canvas implements MPlayerComponent {
 
 	public MPlayerComponentJava() {
-		
     }
 	
 	@Override
 	public Component getComponent() {
 		return this;
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public long getWindowID() {
-		long hWnd = 0;
-		
-		try {
-			Class<?> cl = Class.forName("sun.awt.windows.WComponentPeer");
-	        java.lang.reflect.Field f = cl.getDeclaredField("hwnd");
-	        f.setAccessible(true); //little reflection hack to access the hwnd from windows.
-	        hWnd = f.getLong(getPeer());
-    	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return hWnd;
 	}
 
 	@Override

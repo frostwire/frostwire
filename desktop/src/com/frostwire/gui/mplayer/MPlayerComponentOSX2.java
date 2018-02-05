@@ -1,6 +1,6 @@
 /*
  * Created by Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,6 @@ import java.io.File;
  *
  */
 public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, MediaPlayerListener {
-
-    private static final long serialVersionUID = -4871743835162851226L;
 
     static {
         try {
@@ -291,12 +289,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public Component getComponent() {
         return this;
-    }
-
-    @Override
-    public long getWindowID() {
-        // TODO Auto-generated method stub
-        return 0;
     }
 
     private void sendMsg(int messageID) {

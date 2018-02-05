@@ -24,12 +24,9 @@ import java.awt.*;
  * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface MPlayerComponent {
 
 	Component getComponent();
 	boolean toggleFullScreen();
-	
-	long getWindowID();
 }
