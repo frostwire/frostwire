@@ -212,13 +212,12 @@ public final class ResourceManager {
     /**
      * Makes a URL out of a location, as either a file or a resource.
      */
-    @SuppressWarnings("deprecation")
-    private static final URL toURL(String location, boolean file) {
+    private static URL toURL(String location, boolean file) {
         if (file) {
             File f = new File(location);
             if (f.exists()) {
                 try {
-                    return f.toURL();
+                    return f.toURI().toURL();
                 } catch (MalformedURLException murl) {
                     return null;
                 }
