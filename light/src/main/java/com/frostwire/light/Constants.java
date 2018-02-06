@@ -17,9 +17,14 @@
 
 package com.frostwire.light;
 
+import com.frostwire.light.util.FrostWireUtils;
+
+import java.io.File;
+
 public final class Constants {
     public static final int FROSTWIRE_BUILD = 1;
     public static final String FROSTWIRE_VERSION_STRING = "0.1";
+    public static final String JAVA_VERSION = System.getProperty("java.version");
 
     // preference keys
     public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
@@ -84,7 +89,21 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES = "frostwire.prefs.torrent.delete_started_torrent_files";
     public static final String PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX = "frostwire.prefs.torrent.transfer_detail_last_selected_tab_index";
 
+    // The root folder where other user facing folders will be (~/Documents/FrostWire)
+    public static final String PREF_KEY_ROOT_PATH = "frostwire.prefs.root.path";
+
+    // The folder where all downloads will be saved.
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
+    public static final String PREF_KEY_TORRENTS_PATH = "frostwire.prefs.torrents.path";
+    public static final String PREF_KEY_TEMP_PATH = "frostwire.prefs.temp.path";
+    public static final String PREF_KEY_USER_HOME_DIR_PATH = "frostwire.prefs.user_home_dir.path";
+    public static final String PREF_KEY_SETTINGS_DIR_PATH = "frostwire.prefs.settings_dir.path";
+    public static final String PREF_KEY_LIBTORRENT_PATH = "frostwire.prefs.libtorrent.path";
+    public static final String PREF_KEY_UPDATES_PATH = "frostwire.prefs.updates.path";
+
+    // Where .torrents will be saved. "FrostWire/Downloads"
+    public static final File DEFAULT_TORRENTS_DIR = new File (FrostWireUtils.getFrostWireRootFolder(), "Torrents");
+    public static final File DEFAULT_STORAGE_DIR = new File(FrostWireUtils.getFrostWireRootFolder(), "Downloads");
 
     public static final String PREF_KEY_UXSTATS_ENABLED = "frostwire.prefs.uxstats.enabled";
 

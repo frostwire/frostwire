@@ -106,38 +106,4 @@ public final class FrostWireUtils {
 
         return result;
     }
-
-    public static File getUserMusicFolder() {
-        File musicFile;
-        if (OSUtils.isMacOSX()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else if (OSUtils.isWindowsXP()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "My Documents" + File.separator + "My Music");
-        } else if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else if (OSUtils.isUbuntu()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        }
-
-        return musicFile;
-    }
-
-    public static File getUserVideoFolder() {
-        File videoFile;
-        if (OSUtils.isMacOSX()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Movies");
-        } else if (OSUtils.isWindowsXP()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "My Documents" + File.separator + "My Videos");
-        } else if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        } else if (OSUtils.isUbuntu()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        } else {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        }
-
-        return videoFile;
-    }
 }

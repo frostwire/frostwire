@@ -17,6 +17,10 @@
 
 package com.frostwire.light;
 
+import com.frostwire.light.util.CommonUtils;
+import com.frostwire.light.util.FrostWireUtils;
+
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +48,19 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
         defaultValues.put(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP, System.currentTimeMillis());
+
+        // Application Folders
+
+        // Root folder path for User Facing Folders
+        defaultValues.put(Constants.PREF_KEY_ROOT_PATH, FrostWireUtils.getFrostWireRootFolder().getAbsolutePath());
+        defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, new File(defaultValues.get(Constants.PREF_KEY_ROOT_PATH).toString(), "Downloads").getAbsolutePath());
+        defaultValues.put(Constants.PREF_KEY_TORRENTS_PATH, new File(defaultValues.get(Constants.PREF_KEY_ROOT_PATH).toString(), "Torrents").getAbsolutePath());
+
+        // Settings folder path where all settings, preferences, libtorrent working data folder exist.
+        defaultValues.put(Constants.PREF_KEY_SETTINGS_DIR_PATH, CommonUtils.getUserSettingsDir().getAbsolutePath());
+        defaultValues.put(Constants.PREF_KEY_LIBTORRENT_PATH, new File(defaultValues.get(Constants.PREF_KEY_SETTINGS_DIR_PATH).toString(),"libtorrent").getAbsolutePath());
+        defaultValues.put(Constants.PREF_KEY_UPDATES_PATH, new File(defaultValues.get(Constants.PREF_KEY_SETTINGS_DIR_PATH).toString(),"updates").getAbsolutePath());
+        defaultValues.put(Constants.PREF_KEY_USER_HOME_DIR_PATH, CommonUtils.getUserHomeDir().getAbsolutePath());
 
         defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, Constants.FILE_TYPE_AUDIO);
         defaultValues.put(Constants.PREF_KEY_GUI_TOS_ACCEPTED, false);
@@ -100,8 +117,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, 200L);
         defaultValues.put(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX, 1); // pieces
-
-        defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, ""); // /mnt/sdcard
 
         defaultValues.put(Constants.PREF_KEY_UXSTATS_ENABLED, true);
 
