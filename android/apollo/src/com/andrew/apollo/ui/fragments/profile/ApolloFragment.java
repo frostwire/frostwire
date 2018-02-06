@@ -151,37 +151,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
     }
 
-    private final static class OnSongItemClickRunnable<T extends ApolloFragmentAdapter<I>, I> implements Runnable {
-
-        private final WeakReference<Activity> activityRef;
-        private final WeakReference<T> adapterRef;
-        private final int position;
-
-        OnSongItemClickRunnable(final WeakReference<Activity> activityRef,
-                                final WeakReference<T> adapterRef,
-                                final int position) {
-            this.activityRef = activityRef;
-            this.adapterRef = adapterRef;
-            this.position = position;
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (Ref.alive(adapterRef)) {
-                    T adapter = adapterRef.get();
-                    MusicUtils.playAllFromUserItemClick((ArrayAdapter) adapter, position);
-                    adapter.notifyDataSetChanged();
-                }
-                if (Ref.alive(activityRef)) {
-                    NavUtils.openAudioPlayer(activityRef.get());
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
-    }
-
     protected ApolloFragment(int groupId, int loaderId) {
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
@@ -755,5 +724,35 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
         }
         return 0;
+    }
+
+    private final static class OnSongItemClickRunnable<T extends ApolloFragmentAdapter<I>, I> implements Runnable {
+        private final WeakReference<Activity> activityRef;
+        private final WeakReference<T> adapterRef;
+        private final int position;
+
+        OnSongItemClickRunnable(final WeakReference<Activity> activityRef,
+                                final WeakReference<T> adapterRef,
+                                final int position) {
+            this.activityRef = activityRef;
+            this.adapterRef = adapterRef;
+            this.position = position;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (Ref.alive(adapterRef)) {
+                    T adapter = adapterRef.get();
+                    MusicUtils.playAllFromUserItemClick((ArrayAdapter) adapter, position);
+                    adapter.notifyDataSetChanged();
+                }
+                if (Ref.alive(activityRef)) {
+                    NavUtils.openAudioPlayer(activityRef.get());
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 }
