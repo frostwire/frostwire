@@ -61,8 +61,11 @@ import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -141,11 +144,41 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected void onSongItemClick(int position) {
         if (mAdapter != null) {
-            if (mAdapter instanceof ArrayAdapter) {
-                MusicUtils.playAllFromUserItemClick((ArrayAdapter) mAdapter, position);
+            WeakReference<Activity> activityRef = Ref.weak(getActivity());
+            WeakReference<T> adapterRef = Ref.weak(mAdapter);
+            Engine.instance().getThreadPool().
+                    execute(new OnSongItemClickRunnable<>(activityRef,adapterRef, position));
+        }
+    }
+
+    private final static class OnSongItemClickRunnable<T extends ApolloFragmentAdapter<I>, I> implements Runnable {
+
+        private final WeakReference<Activity> activityRef;
+        private final WeakReference<T> adapterRef;
+        private final int position;
+
+        OnSongItemClickRunnable(final WeakReference<Activity> activityRef,
+                                final WeakReference<T> adapterRef,
+                                final int position) {
+            this.activityRef = activityRef;
+            this.adapterRef = adapterRef;
+            this.position = position;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (Ref.alive(adapterRef)) {
+                    T adapter = adapterRef.get();
+                    MusicUtils.playAllFromUserItemClick((ArrayAdapter) adapter, position);
+                    adapter.notifyDataSetChanged();
+                }
+                if (Ref.alive(activityRef)) {
+                    NavUtils.openAudioPlayer(activityRef.get());
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
-            mAdapter.notifyDataSetChanged();
-            NavUtils.openAudioPlayer(getActivity());
         }
     }
 
@@ -369,12 +402,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             title = ((Artist) mItem).mArtistName;
         }
 
-        DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(new DeleteDialog.DeleteDialogCallback() {
-            @Override
-            public void onDelete(long[] id) {
-                restartLoader(true);
-                refresh();
-            }
+        DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(id -> {
+            restartLoader(true);
+            refresh();
         }).show(getFragmentManager(), "DeleteDialog");
         return true;
     }
@@ -676,7 +706,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             return 0;
         }
         for (int i = 0; i < mAdapter.getCount(); i++) {
-            if (((Album) mAdapter.getItem(i)).mAlbumId == albumId) {
+            Album album = (Album) mAdapter.getItem(i);
+            if (album != null && album.mAlbumId == albumId) {
                 return i;
             }
         }
@@ -687,16 +718,16 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * Scrolls the list to the currently playing album when the user touches the
      * header in the PagerTitleStrip
      */
-    public void scrollToCurrentAlbum() {
-        final int currentAlbumPosition = getItemPositionByAlbum();
-        if (currentAlbumPosition != 0) {
-            if (isSimpleLayout()) {
-                mListView.setSelection(currentAlbumPosition);
-            } else {
-                mGridView.setSelection(currentAlbumPosition);
-            }
-        }
-    }
+//    public void scrollToCurrentAlbum() {
+//        final int currentAlbumPosition = getItemPositionByAlbum();
+//        if (currentAlbumPosition != 0) {
+//            if (isSimpleLayout()) {
+//                mListView.setSelection(currentAlbumPosition);
+//            } else {
+//                mGridView.setSelection(currentAlbumPosition);
+//            }
+//        }
+//    }
 
     /**
      * Scrolls the list to the currently playing song when the user touches the
