@@ -34,7 +34,9 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -611,7 +613,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        checkSDPermission();
+        checkSDPermissionAsync();
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -625,27 +627,9 @@ public class MainActivity extends AbstractActivity implements
         SoftwareUpdater.getInstance().checkForUpdate(this);
     }
 
-    private void checkSDPermission() {
-        if (!AndroidPlatform.saf()) {
-            return;
-        }
-
-        try {
-            File data = Platforms.data();
-            File parent = data.getParentFile();
-
-            if (!AndroidPlatform.saf(parent)) {
-                return;
-            }
-            if (!Platforms.fileSystem().canWrite(parent) &&
-                    !SDPermissionDialog.visible) {
-                SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-                dlg.show(getFragmentManager());
-            }
-        } catch (Throwable e) {
-            // we can't do anything about this
-            LOG.error("Unable to detect if we have SD permissions", e);
-        }
+    private void checkSDPermissionAsync() {
+        Engine.instance().getThreadPool().
+                execute(new CheckSDPermissionRunnable(getFragmentManager()));
     }
 
     private void handleSDPermissionDialogClick(int which) {
@@ -1054,6 +1038,44 @@ public class MainActivity extends AbstractActivity implements
                             R.string.no_data_check_internet_connection);
                 }
                 search.setDataUp(isDataUp);
+            }
+        }
+    }
+
+    private final static class CheckSDPermissionRunnable implements Runnable {
+
+        private WeakReference<android.app.FragmentManager> fragmentManagerRef;
+
+        CheckSDPermissionRunnable(android.app.FragmentManager fragmentManager) {
+            fragmentManagerRef = Ref.weak(fragmentManager);
+        }
+
+        @Override
+        public void run() {
+            if (!AndroidPlatform.saf()) {
+                return;
+            }
+            try {
+                File data = Platforms.data();
+                File parent = data.getParentFile();
+
+                if (!AndroidPlatform.saf(parent)) {
+                    return;
+                }
+                if (!Platforms.fileSystem().canWrite(parent) &&
+                        !SDPermissionDialog.visible) {
+                    SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+                    // show dialog on main thread
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(() -> {
+                        if (Ref.alive(fragmentManagerRef)) {
+                            dlg.show(fragmentManagerRef.get());
+                        }
+                    });
+                }
+            } catch (Throwable e) {
+                // we can't do anything about this
+                LOG.error("Unable to detect if we have SD permissions", e);
             }
         }
     }
