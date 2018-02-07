@@ -1,4 +1,4 @@
-FrostWire 2.0.1 build 488 - JAN/30/2017
+FrostWire 2.0.1 build 490 - FEB/06/2018
  - Archive.org search fixes
  - SoundCloud search fixes
  - Music Player 'Recent' tab fixes, thanks @votaguz
