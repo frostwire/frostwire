@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,11 @@ import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.frostwire.util.http.OKHTTPClient;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 import okhttp3.ConnectionPool;
 
@@ -176,39 +178,19 @@ public class EngineService extends Service implements IEngineService {
         PackageManager pm = getPackageManager();
 
         // receivers
-        enableComponent(pm, EngineBroadcastReceiver.class, enable);
-        enableComponent(pm, MediaButtonIntentReceiver.class, enable);
+        enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
+        enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
 
         // third party services
         if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
-            enableComponent(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
-            enableComponent(pm, io.presage.receiver.AlarmReceiver.class, enable);
-            enableComponent(pm, io.presage.PresageService.class, enable);
+            enableComponentAsync(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
+            enableComponentAsync(pm, io.presage.receiver.AlarmReceiver.class, enable);
+            enableComponentAsync(pm, io.presage.PresageService.class, enable);
         }
     }
 
-    private void enableComponent(PackageManager pm, Class<?> clazz, boolean enable) {
-        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-        ComponentName receiver = new ComponentName(this, clazz);
-
-        int currentState = pm.getComponentEnabledSetting(receiver);
-        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-            LOG.info("Receiver " + receiver + " was disabled");
-        } else {
-            LOG.info("Receiver " + receiver + " was enabled");
-        }
-
-        pm.setComponentEnabledSetting(receiver,
-                newState,
-                PackageManager.DONT_KILL_APP);
-
-        currentState = pm.getComponentEnabledSetting(receiver);
-        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-            LOG.info("Receiver " + receiver + " now is disabled");
-        } else {
-            LOG.info("Receiver " + receiver + " now is enabled");
-        }
+    private void enableComponentAsync(PackageManager pm, Class<?> clazz, boolean enable) {
+        Engine.instance().getThreadPool().execute(new EnableComponentRunnable(this, pm, clazz, enable));
     }
 
     public CoreMediaPlayer getMediaPlayer() {
@@ -422,6 +404,62 @@ public class EngineService extends Service implements IEngineService {
                 } catch (Throwable e) {
                     LOG.warn("Error loading notified storage from preference data", e);
                 }
+            }
+        }
+    }
+
+    private static final class EnableComponentRunnable implements Runnable {
+
+        private final WeakReference<EngineService> engineServiceRef;
+        private final WeakReference<PackageManager> pmRef;
+        private final WeakReference<Class<?>> clazzRef;
+        private final boolean enable;
+
+        public EnableComponentRunnable(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
+            this.engineServiceRef = Ref.weak(engineService);
+            this.pmRef = Ref.weak(pm);
+            this.clazzRef = Ref.weak(clazz);
+            this.enable = enable;
+        }
+
+        @Override
+        public void run() {
+            try {
+                int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                if (!Ref.alive(clazzRef)) {
+                    LOG.warn("EnableComponentRunnable(enable=" + enable + ") failed. clazz weak reference dead.");
+                    return;
+                }
+                Class clazz = clazzRef.get();
+                if (!Ref.alive(engineServiceRef)) {
+                    LOG.warn("EnableComponentRunnable(" + clazz.getSimpleName() + ".class, enable=" + enable + ") failed. EngineService weak reference dead.");
+                    return;
+                }
+                EngineService engineService = engineServiceRef.get();
+                ComponentName receiver = new ComponentName(engineService, clazz);
+                if (!Ref.alive(pmRef)) {
+                    LOG.warn("EnableComponentRunnable(" + clazz.getSimpleName() + ".class, enable=" + enable + ") failed. PackageManager weak reference dead.");
+                    return;
+                }
+                PackageManager pm = pmRef.get();
+                int currentState = pm.getComponentEnabledSetting(receiver);
+                if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+                    LOG.info("Receiver " + receiver + " was disabled");
+                } else {
+                    LOG.info("Receiver " + receiver + " was enabled");
+                }
+                pm.setComponentEnabledSetting(receiver,
+                        newState,
+                        PackageManager.DONT_KILL_APP);
+                currentState = pm.getComponentEnabledSetting(receiver);
+                if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+                    LOG.info("Receiver " + receiver + " now is disabled");
+                } else {
+                    LOG.info("Receiver " + receiver + " now is enabled");
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
         }
     }
