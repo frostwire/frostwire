@@ -1,3 +1,8 @@
+frostwire (6.6.3) stable; urgency=high
+  * Zooqle search fixes
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 09 Feb 2018 00:03:32 -0600
+
 frostwire (6.6.2) stable; urgency=high
   * New jlibtorrent 1.2.0.16
   * Fixes SoundCloud search issues
