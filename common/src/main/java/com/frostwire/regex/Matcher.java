@@ -256,6 +256,10 @@ public class Matcher {
         return idx > -1 ? idx + 1 : -1;
     }
 
+    public boolean hasGroup(String groupName) {
+        return groupIndex(groupName) != -1;
+    }
+
     /**
      * Returns the start index of the previous match.
      *

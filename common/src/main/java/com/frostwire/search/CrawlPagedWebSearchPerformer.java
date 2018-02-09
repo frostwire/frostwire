@@ -181,6 +181,10 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     }
 
     private byte[] cacheGet(String key) {
+//        //UNCOMMENT TO TEST/DEBUG SEARCHES THAT KEEP FAILING
+//        if (key.startsWith("failed:")) {
+//            return null;
+//        }
         if (cache != null) {
             synchronized (cache) {
                 return cache.get(key);

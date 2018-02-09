@@ -64,4 +64,9 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     protected List<? extends SearchResult> crawlResult(TPBSearchResult sr, byte[] data) throws Exception {
         return PerformersHelper.crawlTorrent(this, sr, data);
     }
+
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && html.indexOf("Cloudfare") == -1;
+    }
 }

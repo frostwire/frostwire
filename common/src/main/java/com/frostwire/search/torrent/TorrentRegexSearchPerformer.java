@@ -98,7 +98,12 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                             list.add(searchResult);
                         }
                     } else {
-                        LOG.error("Update Necessary: Search broken for " + sr.getClass().getPackage().getName() + "\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" + sr.getDetailsUrl() + "\n\n");
+                        LOG.error("TorrentRegexSearchPerformer.crawlSearchResult(" + sr.getClass().getPackage().getName() + "): Update Necessary: Search broken.\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" +
+                        "pattern: " + htmlDetailPagePattern.toString() + "\n" +
+                        sr.getDetailsUrl() + "\n\n");
+
+                        // comment this when in production
+                        LOG.info("================================================================\n\n"+html);
                     }
                 } catch (Throwable e) {
                     throw new Exception("URL:" + sr.getDetailsUrl() + " (" + e.getMessage() + ")", e);
@@ -109,19 +114,6 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
         }
 
         return list;
-    }
-
-    /**
-     * Give the opportunity to an implementor to specify if the unreduced HTML
-     * that is about to be crawled is a valid one, and not report errors when
-     * there is none.
-     *
-     * @param html the unreduced html
-     * @return {@code true} is valid and allowed to be processed, {@code false}
-     * otherwise.
-     */
-    protected boolean isValidHtml(String html) {
-        return true;
     }
 
     /**

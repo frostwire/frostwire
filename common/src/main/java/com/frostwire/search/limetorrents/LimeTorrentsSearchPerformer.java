@@ -70,4 +70,9 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     protected LimeTorrentsSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new LimeTorrentsSearchResult(sr.getDetailsUrl(), matcher);
     }
+
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && html.indexOf("Cloudfare") == -1;
+    }
 }

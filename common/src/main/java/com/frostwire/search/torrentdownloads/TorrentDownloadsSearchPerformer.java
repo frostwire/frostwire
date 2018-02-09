@@ -68,6 +68,11 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
         return new TorrentDownloadsSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && html.indexOf("Cloudfare") == -1;
+    }
+
 
 /**
  public static void main(String[] args) throws Exception {

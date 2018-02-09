@@ -81,4 +81,9 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
         }
         return r;
     }
+
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && html.indexOf("Cloudfare") == -1;
+    }
 }

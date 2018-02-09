@@ -40,11 +40,28 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
         return PerformersHelper.searchPageHelper(this, reducedPage, regexMaxResults);
     }
 
+    /**
+     * Give the opportunity to an implementor to specify if the unreduced HTML
+     * that is about to be crawled is a valid one, and not report errors when
+     * there is none.
+     *
+     * @param html the unreduced html
+     * @return {@code true} is valid and allowed to be processed, {@code false}
+     * otherwise.
+     */
+    abstract protected boolean isValidHtml(String html);
+
     protected int preliminaryHtmlSuffixOffset(String page) {
+        if (!isValidHtml(page)) {
+            return -1;
+        }
         return page.length();
     }
 
     protected int preliminaryHtmlPrefixOffset(String page) {
+        if (!isValidHtml(page)) {
+            return -1;
+        }
         return 0;
     }
 }

@@ -67,7 +67,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         formData.put("search", "Search");
         String page = post(url, formData);
 
-        return page != null && isValidPage(page) ? page : null;
+        return page != null && isValidHtml(page) ? page : null;
     }
 
     @Override
@@ -88,7 +88,10 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     // EZTV is very simplistic in the search engine
     // just a simple keyword check allows to discard the page
-    private boolean isValidPage(String page) {
+    protected boolean isValidHtml(String html) {
+        if (html == null || html.indexOf("Cloudfare") != -1) {
+            return false;
+        }
         String[] keywords = getKeywords().split(" ");
         String k = null;
         // select the first keyword with length >= 3
@@ -102,7 +105,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
             k = keywords[0];
         }
 
-        int count = StringUtils.countMatches(page.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
+        int count = StringUtils.countMatches(html.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
 
         return count > 9;
     }

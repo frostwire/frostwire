@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  * @author gubatron
  */
 public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<ZooqleSearchResult> {
-
+    //private static final Logger LOG = Logger.getLogger(ZooqleSearchPerformer.class);
     private static final int MAX_RESULTS = 30;
     private static final String PRELIMINARY_RESULTS_REGEX =
             "(?is)<i class=\".*?text-muted2 zqf-small pad-r2\"></i><a class=\".*?small\" href=\"/(?<detailPath>.*?).html\">.*?</a>";
@@ -34,7 +34,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
             "(?is)" +
                     "<h4 id=\"torname\">(?<filename>.*?)<span class=\"text-muted4 pad-r2\">.torrent</span>.*" +
                     "title=\"Torrent cloud statistics\"></i><div class=\"progress prog trans..\" title=\"Seeders: (?<seeds>\\d+).*" +
-                    "title=\"File size\"></i>(?<sizedata>.*)<span class=\"small pad-l2\">.*" + // could be a size, or unknown size, managed on the search result class
+                    "<i class=\"zqf zqf-files text-muted3 pad-r2 trans80\"(?<sizedata>.*?)</span><span class=\"spacer\">.*" +
                     "<i class=\"zqf zqf-time text-muted3 pad-r2 trans80\" title=\"Date indexed\"></i>(?<month>.{3}) (?<day>\\d{1,2}), (?<year>\\d{4}) <span class=\"small pad-l\".*" +
                     "<a rel=\"nofollow\" href=\"magnet:\\?xt=urn:btih:(?<magnet>.*)\"><i class=\"spr dl-magnet pad-r2\"></i>Magnet.*?";
 
@@ -64,21 +64,31 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     @Override
     protected int preliminaryHtmlSuffixOffset(String page) {
-        return page.indexOf("<ul class=\"pagination");
-    }
-
-    @Override
-    protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("id=\"torrent\"><div class=\"panel-body\"");
+        int offset = page.indexOf("Time:");
         if (offset == -1) {
-            return super.htmlPrefixOffset(html);
+            return super.preliminaryHtmlSuffixOffset(page);
         }
         return offset;
     }
 
     @Override
+    protected int htmlPrefixOffset(String html) {
+        if (!isValidHtml(html)) {
+            return -1;
+        }
+        int offset = html.indexOf("<h4 id=\"torname\">");
+        if (offset == -1) {
+            return super.htmlPrefixOffset(html);
+        }
+        return offset-20;
+    }
+
+    @Override
     protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("Related torrents");
+        if (!isValidHtml(html)) {
+            return -1;
+        }
+        int offset = html.indexOf("Language:");
         if (offset == -1) {
             return super.htmlSuffixOffset(html);
         }
@@ -98,14 +108,15 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 ////        String preliminaryResultsString = client.get(URL_PREFIX + "search?q=" + TEST_QUERY_TERM + "&s=ns&v=t&sd=d");
 ////        Pattern preliminaryResultsPattern = Pattern.compile(PRELIMINARY_RESULTS_REGEX);
 ////        SearchMatcher preliminaryMatcher = SearchMatcher.from(preliminaryResultsPattern.matcher(preliminaryResultsString));
-//        int found = 0;
+////        int found = 0;
 ////        while (preliminaryMatcher.find()) {
-//        while (found == 0){
-//            found++;
+////        while (found == 0){
+////            found++;
 ////            String detailsUrl = URL_PREFIX + preliminaryMatcher.group("detailPath") + ".html";
-////            System.out.println("Fetching " + detailsUrl + " ...");
-////            String htmlDetailsString = client.get(new String(detailsUrl.getBytes(), Charset.forName("UTF-8")));
-//            String htmlDetailsString = FileUtils.readFileToString(new File("/Users/foo/zooqle.html"));
+//            String detailsUrl = "https://zooqle.com/foo.html";
+//            System.out.println("Fetching " + detailsUrl + " ...");
+//            //String htmlDetailsString = client.get(new String(detailsUrl.getBytes(), Charset.forName("UTF-8")));
+//            String htmlDetailsString = FileUtils.readFileToString(new File("/Users/foo/Desktop/zooqle.html"));
 //
 //            Pattern htmlDetailPattern = Pattern.compile(HTML_DETAIL_REGEX);
 //            System.out.println("REGEX: " + htmlDetailPattern.toString());
@@ -137,7 +148,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 //                System.out.println("========================================================\n");
 //                System.out.println(htmlDetailsString);
 //                System.out.println("\n========================================================\n");
-//                System.out.println("HTML_DETAIL_REGEX failed on " + detailsUrl);
+//                //System.out.println("HTML_DETAIL_REGEX failed on " + detailsUrl);
 //                System.out.println("HTML_DETAIL_REGEX failed");
 //                System.out.println(HTML_DETAIL_REGEX);
 //                System.out.println("\n========================================================\n");
@@ -146,6 +157,6 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 //            }
 //
 //            System.out.println("========================================================\n");
-//        }
+//        //}
 //    }
 }

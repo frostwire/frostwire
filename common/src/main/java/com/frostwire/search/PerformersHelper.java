@@ -135,7 +135,13 @@ public final class PerformersHelper {
         int sufOffset = suffixOffset;
         if (preOffset == -1 || sufOffset == -1) {
             html = null;
-        } else if (preOffset > 0 || sufOffset < html.length()) {
+        } else if ((preOffset > 0 || sufOffset < html.length())) {
+            if (preOffset > suffixOffset) {
+                LOG.warn("PerformersHelper.reduceHtml() Check your logic: prefixOffset:" + prefixOffset + " > suffixOffset:" + suffixOffset);
+                LOG.info(html);
+                return null;
+            }
+
             html = new String(html.substring(preOffset, sufOffset).toCharArray());
         }
         return html;

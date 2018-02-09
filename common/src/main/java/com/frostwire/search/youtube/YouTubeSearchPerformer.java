@@ -143,6 +143,11 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     }
 
     @Override
+    protected boolean isValidHtml(String html) {
+        return true;
+    }
+
+    @Override
     protected int preliminaryHtmlSuffixOffset(String page) {
         return page.indexOf("<div id=\"footer-container\"");
     }

@@ -69,6 +69,11 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
         return new TorLockSearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
+    @Override
+    protected boolean isValidHtml(String html) {
+        return html != null && html.indexOf("Cloudfare") == -1;
+    }
+
  /*
  public static void main(String[] args) throws Exception {
      String TEST_SEARCH_TERM = "foo bar";

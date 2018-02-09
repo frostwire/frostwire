@@ -33,7 +33,7 @@ import static com.frostwire.search.PerformersHelper.parseInfoHash;
  */
 public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
 
-    private static final String FILE_SIZE_REGEX = "(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)";
+    private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)";
     private static final Pattern FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
 
     private final String filename;
@@ -63,12 +63,12 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     }
 
     private long calculateSize(String sizedata) {
-        if (sizedata.contains("unknown")) {
+        if (sizedata.contains("Filesize yet unknown")) {
             return -1;
         }
-        Matcher matcher = FILE_SIZE_PATTERN.matcher(sizedata);
-        if (matcher.find()) {
-            return calculateSize(matcher.group("size"), matcher.group("sizeUnit"));
+        Matcher fileSizeMatcher = FILE_SIZE_PATTERN.matcher(sizedata);
+        if (fileSizeMatcher.find()) {
+            return calculateSize(fileSizeMatcher.group("size"), fileSizeMatcher.group("sizeUnit"));
         } else {
             return -1;
         }
