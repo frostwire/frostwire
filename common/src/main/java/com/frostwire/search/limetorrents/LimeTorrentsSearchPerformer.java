@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), alejandroarturom
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
-            "(?is)(<h1>|<img.*/> )(?<filename>.*?)</h1>.*?" +
+            "(?is)(<h1>(.*<img.*/> )?)(?<filename>.*?)</h1>.*?" +
                     "<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?) in.*?" +
