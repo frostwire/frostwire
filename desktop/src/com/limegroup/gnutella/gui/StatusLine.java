@@ -271,9 +271,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 remainingWidth = addStatusIndicator(connectionQualityMeter, sepWidth, remainingWidth, gbc);
             }
 
-            vpnStatusRefresher.refresh(); // async call
-
             if (StatusBarSettings.VPN_DISPLAY_ENABLED.getValue()) {
+                vpnStatusRefresher.refresh(); // async call
                 remainingWidth = addStatusIndicator(vpnStatusButton, sepWidth, remainingWidth, gbc);
             }
 
