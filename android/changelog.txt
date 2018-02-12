@@ -1,5 +1,6 @@
-FrostWire 2.0.2 build 491 - FEB/08/2018
+FrostWire 2.0.2 build 491 - FEB/11/2018
  - Zooqle search fixes
+ - TorrentDownloads search fixes
 
 FrostWire 2.0.1 build 490 - FEB/06/2018
  - Archive.org search fixes
