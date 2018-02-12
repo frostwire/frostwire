@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,9 +87,11 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     }
 
     private void updateUIData(SeedingHolder actionsHolder, JTable table, int row, int column) {
-        dl = actionsHolder.getDl();
-        boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);
-        updateSeedingButton(canShareNow);
+        if (actionsHolder != null) {
+            dl = actionsHolder.getDl();
+            boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);
+            updateSeedingButton(canShareNow);
+        }
     }
 
     private void updateSeedingButton(boolean canShareNow) {
