@@ -548,7 +548,11 @@ public class DragSortListView extends ListView {
      */
     @Override
     protected void dispatchDraw(final Canvas canvas) {
-        super.dispatchDraw(canvas);
+        try {
+            super.dispatchDraw(canvas);
+        } catch (IndexOutOfBoundsException iooe) {
+            return;
+        }
 
         if (mFloatView != null) {
             if (mFirstExpPos != mSrcPos) {
