@@ -27,10 +27,10 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  */
 public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer<TorrentDownloadsSearchResult> {
 
-    private static final int MAX_RESULTS = 10;
+    private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"/torrent/([0-9]*?/.*?)\">*?";
     private static final String HTML_REGEX = "(?is).*?<li><a rel=\"nofollow\" href=\"http://itorrents.org/torrent/(?<torrentid>.*?).torrent?(.*?)\">.*?"  +
-            "<span>Name:.?</span>(?<filename>.*?)</a></p>.*?"   +
+            "<span>Name:.?</span>(?<filename>.*?)(<a.*>)?</a></p></div>.*?"   +
             "<span>Total Size:.?</span>(?<filesize>.*?)&nbsp;(?<unit>[A-Z]+)</p></div>.*?"  +
             "<span>Seeds:.?</span>.?(?<seeds>\\d*?)</p></div>.*?" +
             "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
