@@ -1,8 +1,9 @@
 frostwire (6.6.3) stable; urgency=high
   * Zooqle search fixes
   * TorrentDownloads search fixes
+  * LimeTorrents search fixes
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 11 Feb 2018 20:01:20 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 11 Feb 2018 21:23:56 -0600
 
 frostwire (6.6.2) stable; urgency=high
   * New jlibtorrent 1.2.0.16
@@ -16,13 +17,13 @@ frostwire (6.6.2) stable; urgency=high
 frostwire (6.6.1) stable; urgency=high
   * New jlibtorrent 1.2.0.15-RC3
   * TPB domain update
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 29 Nov 2017 13:46:08 -0600
 
 frostwire (6.6.0) stable; urgency=high
   * New jlibtorrent 1.2.0.13-RC14, storage and upnp related crashes fixed
   * Portuguese translation updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 1 Nov 2017 15:09:57 -0600
 
 frostwire (6.5.9) stable; urgency=high
@@ -32,7 +33,7 @@ frostwire (6.5.9) stable; urgency=high
   * New jlibtorrent 1.2.0.13-RC10
   * Fixes 'Send to friend' broken feature, now points to maglnk.xyz domain
   * Malay translation updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 25 Oct 2017 09:44:07 -0600
 
 frostwire (6.5.8) stable; urgency=high
@@ -40,13 +41,13 @@ frostwire (6.5.8) stable; urgency=high
   * Search: New Pixabay image search
   * Search: YT, SC, EZTV, Torlock, Yify, Zooqle fixed
   * Networking: Improved SSL compatibility
-	
+
  -- FrostWire Team <contact@frostwire.com>  Fri, 22 Sep 2017 06:02:12 -0600
 
 frostwire (6.5.7) stable; urgency=high
   * New jlibtorrent 1.2.0.12-RC1
   * Fixes issue with SoundCloud audio preview
-	
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 10 Aug 2017 11:53:00 -0600
 
 frostwire (6.5.6) stable; urgency=high
@@ -55,14 +56,14 @@ frostwire (6.5.6) stable; urgency=high
   * Search: BTJunkie removed
   * Download: Yify magnets can now be found in DHT
   * Fixes OTA update system bug
-	
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 10 Aug 2017 11:53:00 -0600
 
 frostwire (6.5.4) stable; urgency=high
   * YT search fixed
   * Playlist Select-All songs keyboard shortcut bug fixed
   * Slovenian translation update
-	
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 25 Jul 2017 16:03:16 -0600
 
 
@@ -70,7 +71,7 @@ frostwire (6.5.3) stable; urgency=high
   * New jlibtorrent 1.2.0.11-RC1
   * Fixed Thread pool max size issue
   * Serbian, Albanian, Japanese, Korean translations updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 21 Jun 2017 11:19:12 -0600
 
 frostwire (6.5.2) stable; urgency=high
@@ -79,14 +80,14 @@ frostwire (6.5.2) stable; urgency=high
   * Monova, Torlock search engines fixed
   * ExtraTorrent search discontinued, RIP
   * Swedish, Nepalese translations updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 6 Jun 2017 18:20:05 -0600
 
 frostwire (6.5.1) stable; urgency=high
   * YT search fixed
   * Javascript parser updates
   * Romanian, Bulgarian, Bengali, Danish, Greek translations updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 18 May 2017 15:28:55 -0600
 
 frostwire (6.5.0) stable; urgency=high
@@ -94,13 +95,13 @@ frostwire (6.5.0) stable; urgency=high
   * Cleanup, optimizations in transfer managment
   * Swedish translation (thanks Josef Andersson)
   * Simplified Chinese, Vietnamese, Ukrainian, Tagalog, Thai translations updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Mon, 09 May 2017 21:11:42 -0600
 
 frostwire (6.4.9) stable; urgency=high
   * YT search fixes
   * Turkish, Dutch, Russian translations updated
-	
+
  -- FrostWire Team <contact@frostwire.com>  Fri, 28 Apr 2017 21:52:03 -0600
 
 frostwire (6.4.8) stable; urgency=high
@@ -109,7 +110,7 @@ frostwire (6.4.8) stable; urgency=high
   * Monova, TorLock, YT search fixed
   * Mininova search discontinued
   * Freeze/Slowdown on shutdown fixed
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 21 Apr 2017 21:55:45 -0600
 
 frostwire (6.4.7) stable; urgency=high
@@ -117,7 +118,7 @@ frostwire (6.4.7) stable; urgency=high
   * Spanish, Portuguese, French, Italian, German, Dutch translations updated
   * Windows, Mac: JRE update (1.8.0_102 -> 1.8.0_121)
   * BitSnoop search removed
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 05 Apr 2017 04:20:00 -0600
 
 frostwire (6.4.6) stable; urgency=high
@@ -132,9 +133,9 @@ frostwire (6.4.6) stable; urgency=high
   * jlibtorrent version number available in about window
   * ALPHA: New VPN-Drop protection setting. Automatically stop all BitTorrent traffic
     if no VPN connection is available
-	
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 7 Mar 2017 19:45:51 -0600
-	
+
 frostwire (6.4.5) stable; urgency=high
   * New jlibtorrent 1.2.0.6 fixes BitTorrent connectivity issues
 
@@ -258,7 +259,7 @@ frostwire (6.3.0) stable; urgency=high
   * Improved 'Search for Keywords' suggestions for episodic queries.
   * New jlibtorrent 1.1.0.31
   * Spanish, Portuguese translations updated.
-  * Fixes Torlock search. 
+  * Fixes Torlock search.
   * EZTV no longer returns irrelevant results.
   * New Search Engine: TorrentDownloads.me
 
@@ -337,7 +338,7 @@ frostwire (6.1.9) stable; urgency=high
  -- FrostWire Team <contact@frostwire.com>  Mon, 21 Dec 2015 16:52:50 -0500
 
 frostwire (6.1.8) stable; urgency=high
-  * New status/control transfer buttons to Seed and Share transfers.	
+  * New status/control transfer buttons to Seed and Share transfers.
   * New 'Close All Tabs' action for search result tabs.
   * Youtube search updates.
   * Fixes issues with playlists in Library.
@@ -351,7 +352,7 @@ frostwire (6.1.7) stable; urgency=high
   * New 'Close Tab' action for search result tabs.
   * New 'Close Other Tabs' action for search result tabs.
   * New 'Close Tabs to the Right' action for search result tabs.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 11 Nov 2015 05:24:15 -0500
 
 frostwire (6.1.6) stable; urgency=high
@@ -362,7 +363,7 @@ frostwire (6.1.6) stable; urgency=high
   * Fixes TorLock search.
   * Updates to Spanish and Romanian translations.
   * Chat button on header moved to Tools menu. More space for search bar.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 04 Nov 2015 13:04:00 -0500
 
 frostwire (6.1.5) stable; urgency=high
@@ -376,7 +377,7 @@ frostwire (6.1.5) stable; urgency=high
   * When the search options are opened, the keyword textfield is autofocused.
   * Java Runtime upgrade to v1.8.0_60.
   * Codebase cleanup and refactors.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 25 Sep 2015 11:04:00 -0500
 
 frostwire (6.1.4) stable; urgency=high
@@ -385,7 +386,7 @@ frostwire (6.1.4) stable; urgency=high
   * Fixes TorLock search.
   * Considerably faster search source processing (new regex engine).
   * Fixes YouTube search.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Sun, 14 Aug 2015 16:15:00 -0500
 
 frostwire (6.1.3) stable; urgency=high
@@ -397,7 +398,7 @@ frostwire (6.1.3) stable; urgency=high
     downloads differently with jlibtorrent updates.
   * Fixes crash when setting default save folder to the root
     of a drive.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 29 Jul 2015 10:04:32 -0500
 
 frostwire (6.1.2) stable; urgency=high
@@ -410,7 +411,7 @@ frostwire (6.1.2) stable; urgency=high
   * Fixes painting issues when searching Starred audio files on the library.
   * frostwire-jlibtorrent library updates.
   * Library user experience bug fixes.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 24 Jun 2015 11:44:00 -0500
 
 frostwire (6.1.1) stable; urgency=high
@@ -419,7 +420,7 @@ frostwire (6.1.1) stable; urgency=high
   * Monova search fixed.
   * Bitsnoop downloads fixed.
   * BTJunkie downloads fixed.
-  * EZTV search engine removed after scammers took over.	
+  * EZTV search engine removed after scammers took over.
   * YouTube search fixes for non-english users.
   * Russian translation update.
 
@@ -430,7 +431,7 @@ frostwire (6.1.0) stable; urgency=high
   * Domain alias manager removed.
 
  -- FrostWire Team <contact@frostwire.com>  Thu, 7 May 2015 14:31:08 -0500
- 
+
 frostwire (6.0.9) stable; urgency=high
   * Jlibtorrent updates.
   * Crash fixes.
@@ -450,7 +451,7 @@ frostwire (6.0.8) stable; urgency=high
  -- FrostWire Team <contact@frostwire.com>  Fri, 24 Apr 2015 04:44:00 -0500
 
 frostwire (6.0.7) stable; urgency=high
-  * New feature: Preview while you download.	
+  * New feature: Preview while you download.
   * Memory and CPU savings when parsing search results on some search engines.
   * BTJunkie fixed.
   * TPB search fixed.
@@ -480,7 +481,7 @@ frostwire (6.0.6) stable; urgency=high
   * OSX: When shutting down to start the installer for an update
     now the window is focused to make sure the user doesn't get lost during the
     update process.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 17 Feb 2015 14:44:30 -0500
 
 frostwire (6.0.5) stable; urgency=high
