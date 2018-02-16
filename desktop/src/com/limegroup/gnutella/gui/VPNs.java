@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
@@ -26,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * @author gubatron
@@ -34,6 +36,15 @@ import java.io.InputStreamReader;
 public final class VPNs {
     private static Pattern piaKillSwitchRoutePattern = null;
     private static String netstatCmd = null;
+
+    // 17...00 ff 37 58 eb 11 ......TAP-Windows Adapter V9
+    private static final String WINDOWS_NETWORK_INTERFACE_REGEX = "([\\d]+)\\.\\.\\.([0-9a-f ]+)+([\\. ]{1})+(.*)";
+    private static Pattern WINDOWS_NETWORK_INTERFACE_PATTERN = null;
+
+    // 10    266 ::/0                     fe80::9e34:26ff:feef:a506
+    private static final String WINDOWS_ACTIVE_ROUTE_REGEX = "([\\d]{1,2}).*([\\d]{2,3})\\s{1}([0-9a-f\\:/]+)\\s{1}(.*)";
+    private static Pattern WINDOWS_ACTIVE_ROUTE_PATTERN = null;
+
 
     public static boolean isVPNActive() {
         boolean result = false;
@@ -84,17 +95,98 @@ public final class VPNs {
         boolean result = false;
         try {
             String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
-            for (String line : output) {
-                if (line.contains("128.0.0.0") || piaVPNwithKillSwitchOn(line)) {
-                    result = true;
-                    break;
-                }
-            }
+            Interface[] interfaces = parseInterfaces(output);
+            Route[] routes = parseActiveRoutes(output);
+
+            // Try looking for an active PIA Interface
+            
+
         } catch (Throwable t2) {
             result = false;
             t2.printStackTrace();
         }
         return result;
+    }
+
+    private static Interface parseInterface(String line) {
+        if (WINDOWS_NETWORK_INTERFACE_PATTERN == null) {
+            WINDOWS_NETWORK_INTERFACE_PATTERN = Pattern.compile(WINDOWS_NETWORK_INTERFACE_REGEX);
+        }
+        Matcher matcher = WINDOWS_NETWORK_INTERFACE_PATTERN.matcher(line);
+        if (matcher.find()) {
+            return new Interface(Integer.parseInt(matcher.group(1)), matcher.group(4));
+        }
+
+        return null;
+    }
+
+    private static Interface[] parseInterfaces(String[] output) {
+        final String startDelimiter = "Interface List";
+        final String endDelimiter = "===";
+        boolean startDelimeterRead = false;
+        boolean endDelimiterRead = false;
+        final ArrayList<Interface> interfaceList = new ArrayList<>();
+        for (String line : output) {
+            if (!startDelimeterRead) {
+                startDelimeterRead = line.startsWith(startDelimiter);
+                continue;
+            }
+            if (!endDelimiterRead) {
+                endDelimiterRead = line.startsWith(endDelimiter);
+                if (endDelimiterRead) {
+                    break;
+                }
+                Interface iface = parseInterface(line);
+                if (iface != null) {
+                    interfaceList.add(iface);
+                }
+            }
+        }
+        return interfaceList.toArray(new Interface[0]);
+    }
+
+    private static Route parseActiveRoute(String line) {
+        if (WINDOWS_ACTIVE_ROUTE_PATTERN == null) {
+            WINDOWS_ACTIVE_ROUTE_PATTERN = Pattern.compile(WINDOWS_ACTIVE_ROUTE_REGEX);
+        }
+        Matcher matcher = WINDOWS_ACTIVE_ROUTE_PATTERN.matcher(line);
+        if (matcher.find()) {
+            return new Route(Integer.parseInt(matcher.group(1)), matcher.group(3), matcher.group(4));
+        }
+        return null;
+    }
+
+    private static Route[] parseActiveRoutes(String[] output) {
+        final String startDelimiter = "Active Routes";
+        final String endDelimiter = "===";
+        boolean startDelimeterRead = false;
+        boolean endDelimiterRead = false;
+        final ArrayList<Route> routeList = new ArrayList<>();
+        for (String line : output) {
+            if (!startDelimeterRead) {
+                startDelimeterRead = line.startsWith(startDelimiter);
+                continue;
+            }
+            if (!endDelimiterRead) {
+                endDelimiterRead = line.startsWith(endDelimiter);
+                if (endDelimiterRead) {
+                    break;
+                }
+                Route iface = parseActiveRoute(line);
+                if (iface != null) {
+                    routeList.add(iface);
+                }
+            }
+        }
+        return routeList.toArray(new Route[0]);
+    }
+
+    public static void main(String[] args) {
+        String[] netstatTxt = readProcessOutput("cat", "/Users/gubatron/Desktop/netstat.txt").split("\r\n");
+        Interface[] interfaces = parseInterfaces(netstatTxt);
+        Route[] routes = parseActiveRoutes(netstatTxt);
+
+        System.out.println(routes.length);
     }
 
     private static String readProcessOutput(String command, String arguments) {
@@ -126,19 +218,6 @@ public final class VPNs {
         return result;
     }
 
-    private static boolean piaVPNwithKillSwitchOn(String line) {
-        compilePIAKillSwitchPattern(); // lazy-compiles the pattern only once per session
-        return piaKillSwitchRoutePattern.matcher(line).matches();
-    }
-
-    private static void compilePIAKillSwitchPattern() {
-        if (piaKillSwitchRoutePattern == null) {
-            // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
-            // when VPN is active
-            piaKillSwitchRoutePattern = Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
-        }
-    }
-
     private static String getNetstatPath() {
         if (netstatCmd != null) {
             return netstatCmd;
@@ -149,6 +228,26 @@ public final class VPNs {
         }
         netstatCmd = candidate;
         return netstatCmd;
+    }
+
+    private final static class Interface {
+        final int id;
+        final String name;
+        Interface (int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+    
+    private final static class Route {
+        final int id;
+        final String destination;
+        final String gateway;
+        Route(int id, String destination, String gateway) {
+            this.id = id;
+            this.destination = destination;
+            this.gateway = gateway;
+        }
     }
 
 }
