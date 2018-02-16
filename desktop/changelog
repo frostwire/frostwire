@@ -2,8 +2,10 @@ frostwire (6.6.3) stable; urgency=high
   * Zooqle search fixes
   * TorrentDownloads search fixes
   * LimeTorrents search fixes
+  * Fixes false positive VPN connection detection issue in Windows for PIA and Express VPN
+  * jlibtorrent 1.0.2.17 RC-1
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 11 Feb 2018 21:23:56 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 16 Feb 2018 15:15:05 -0600
 
 frostwire (6.6.2) stable; urgency=high
   * New jlibtorrent 1.2.0.16

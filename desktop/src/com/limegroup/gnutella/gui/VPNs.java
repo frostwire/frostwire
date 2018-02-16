@@ -93,20 +93,14 @@ public final class VPNs {
 
     private static boolean isWindowsVPNActive() {
         try {
-            String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
+            String[] output = readProcessOutput("netstat", "-anr").split("\r\n");
             Interface[] interfaces = parseInterfaces(output);
             Route[] routes = parseActiveRoutes(output);
-
-            if (isWindowsPIAActive(interfaces, routes)) {
-                return true;
-            }
-            
-            // TODO: check ExpressVPN
+            return isWindowsPIAActive(interfaces, routes) || isExpressVPNActive(interfaces, routes);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
         }
-        return false;
     }
 
     private static boolean isWindowsPIAActive(final Interface[] interfaces, final Route[] activeRoutes) {
@@ -129,8 +123,18 @@ public final class VPNs {
                 return true;
             }
         }
-
         return false;
+    }
+
+    private static boolean isExpressVPNActive(final Interface[] interfaces, final Route[] activeRoutes) {
+        boolean expressVPNTapAdapterPresent = false;
+        for (Interface iface : interfaces) {
+            if (iface.name.contains("ExpressVPN Tap Adapter")) {
+                expressVPNTapAdapterPresent = true;
+                break;
+            }
+        }
+        return expressVPNTapAdapterPresent && activeRoutes != null && activeRoutes.length == 2;
     }
 
     private static Interface parseInterface(String line) {
