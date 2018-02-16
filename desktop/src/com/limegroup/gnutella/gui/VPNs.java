@@ -182,14 +182,14 @@ public final class VPNs {
     }
 
     private static Route[] parseActiveRoutes(String[] output) {
-        final String startDelimiter = "Active Routes";
+        final String startDelimiter = "If Metric Network Destination      Gateway";
         final String endDelimiter = "===";
         boolean startDelimeterRead = false;
         boolean endDelimiterRead = false;
         final ArrayList<Route> routeList = new ArrayList<>();
         for (String line : output) {
             if (!startDelimeterRead) {
-                startDelimeterRead = line.startsWith(startDelimiter);
+                startDelimeterRead = line.contains(startDelimiter);
                 continue;
             }
             if (!endDelimiterRead) {
