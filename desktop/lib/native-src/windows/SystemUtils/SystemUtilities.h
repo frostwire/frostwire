@@ -26,5 +26,4 @@ CStringA TtoA(LPCTSTR t);
 CString GetJavaString(JNIEnv *e, jstring j);
 jstring MakeJavaString(JNIEnv *e, LPCTSTR t);
 HWND GetJavaWindowHandle(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, CString *message);
-void SetWindowTopMost(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, CString *message);
 void ThrowIOException(JNIEnv *e, LPCTSTR t);

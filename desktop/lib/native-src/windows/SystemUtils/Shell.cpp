@@ -180,33 +180,6 @@ CString SetWindowIcon(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, LPCTSTR i
 	return _T("");
 }
 
-// Takes the JNI environment and class
-// The jobject frame is a AWT Component like a JFrame that is backed by a real Windows window
-// bin is the path to the folder that has the file "jawt.dll", like "C:\Program Files\Java\jre1.5.0_05\bin"
-// Gets the window handle, and moves the window on top of other windows, showing it to the user
-// Returns blank on success, or a text message about what didn't work
-JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_setWindowTopMostNative(JNIEnv *e, jclass c, jobject frame, jstring bin) {
-	return MakeJavaString(e, SetWindowTopMost(e, c, frame, GetJavaString(e, bin)));
-}
-CString SetWindowTopMost(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin) {
-
-	// Get the Window handle from Java
-	CString message;
-	HWND window = GetJavaWindowHandle(e, c, frame, bin, &message);
-	if (!window) return message; // Return the message that tells what happened
-
-	// Move the window to the top without changing its position or size
-	SetWindowPos(
-		window,       // Handle to the window to change
-		HWND_TOPMOST, // Put the window above all non-topmost windows
-		0, 0, 0, 0,   // Don't move or resize the window
-		SWP_NOMOVE |
-		SWP_NOSIZE);
-
-	// Return blank on success
-	return _T("");
-}
-
 // Tell Windows we changed a file type association, so it needs to refresh icons in the shell
 JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_flushIconCacheNative(JNIEnv *e, jclass c) {
 	return FlushIconCache();
