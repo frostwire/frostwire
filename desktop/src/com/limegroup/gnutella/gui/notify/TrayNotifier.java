@@ -4,7 +4,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import org.limewire.util.OSUtils;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,11 +12,10 @@ import java.awt.event.MouseEvent;
  * Puts an icon and menu in the system tray.
  * Works on Windows, Linux, and any other platforms JDIC supports.
  */
-public class TrayNotifier implements NotifyUser {
+public final class TrayNotifier implements NotifyUser {
 	
 	private SystemTray _tray;
 	private TrayIcon _icon;
-	private NotificationWindow notificationWindow;
 	
 	private boolean _supportsTray;
 	
@@ -38,15 +36,12 @@ public class TrayNotifier implements NotifyUser {
 		    iconFileName += "_linux";
 		}
 
-		buildTrayIcon("FrostWire", iconFileName);
-		buildNotificationWindow();
+		buildTrayIcon(iconFileName);
 	}
 
-	private void buildTrayIcon(String desc, String imageFileName) {
-	    //String tip = "FrostWire: Running the Gnutella Network";
-
-	    _icon = new TrayIcon(GUIMediator.getThemeImage(imageFileName).getImage(), 
-				 desc, 
+	private void buildTrayIcon(String imageFileName) {
+	    _icon = new TrayIcon(GUIMediator.getThemeImage(imageFileName).getImage(),
+                "FrostWire",
 				 GUIMediator.getTrayMenu());
 	    
         _icon.addMouseListener(new MouseAdapter() {
@@ -62,9 +57,9 @@ public class TrayNotifier implements NotifyUser {
       _icon.addActionListener(e -> GUIMediator.restoreView());
         
 	    _icon.setImageAutoSize(true);
-	} //buildTrayIcon
+	}
 	
-	private PopupMenu buildPopupMenu() {
+	private void buildPopupMenu() {
 		PopupMenu menu = GUIMediator.getTrayMenu();
 		
 		// restore
@@ -85,17 +80,9 @@ public class TrayNotifier implements NotifyUser {
 		item = new MenuItem(I18n.tr("Exit"));
 		item.addActionListener(e -> GUIMediator.shutdown());
 		menu.add(item);
-		
-		return menu;
 	}
-	
-	private void buildNotificationWindow() {
-		notificationWindow = new NotificationWindow(GUIMediator.getAppFrame());
-		notificationWindow.setLocationOffset(new Dimension(2, 7));
-		notificationWindow.setTitle("FrostWire");
-		notificationWindow.setIcon(GUIMediator.getThemeImage("frosticon.gif"));
-	}
-	
+
+	@Override
 	public boolean showTrayIcon() {
 		if (_tray == null || !supportsSystemTray()) {
 			return false;
@@ -108,29 +95,17 @@ public class TrayNotifier implements NotifyUser {
 	        return false;
 	    }
 
-        // XXX use the actual icon size once the necessary call is available in JDIC 
-        //notificationWindow.setParentSize(_icon.getSize());
-        notificationWindow.setParentSize(new Dimension(22, 22));
-
         return true;
 	}
-	
+
+	@Override
     public boolean supportsSystemTray() {
 		//gub: could be SystemTray.isSupported(), not sure how fast that is though.
 	    return _supportsTray;
     }
 
+    @Override
 	public void hideTrayIcon() {
 		_tray.remove(_icon);
-		notificationWindow.setParentLocation(null);
-		notificationWindow.setParentSize(null);
 	}
-
-	public void hideMessage(Notification notification) {
-		notificationWindow.removeNotification(notification);
-	}
-
-    public void updateUI() {
-        SwingUtilities.updateComponentTreeUI(notificationWindow);
-    }
 }

@@ -19,10 +19,4 @@ public interface NotifyUser {
      * Removes the notification gui object from the desktop.
      */
     void hideTrayIcon();
-
-    /** Hides a message. Does nothing if message is not displayed. */
-	void hideMessage(Notification notification);
-
-	/** Invoked when the theme has changed. */
-    void updateUI();
 }

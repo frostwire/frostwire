@@ -40,11 +40,13 @@ public final class NotifyUserProxy implements NotifyUser {
             _notifier = new BasicNotifier();
         }        
     }
-    
+
+    @Override
     public boolean supportsSystemTray() {
         return _notifier.supportsSystemTray();
     }
 
+    @Override
     public boolean showTrayIcon() {
         if (_inTray)
             return true;
@@ -53,18 +55,11 @@ public final class NotifyUserProxy implements NotifyUser {
         return notify;
     }
 
+    @Override
     public void hideTrayIcon() {
         if (!_inTray)
             return;
         _notifier.hideTrayIcon();
         _inTray = false;
-    }
-
-    public void updateUI() {
-        _notifier.updateUI();
-    }
-    
-    public void hideMessage(Notification notification) {
-        _notifier.hideMessage(notification);
     }
 }
