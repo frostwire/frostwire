@@ -38,9 +38,5 @@ public class SettingsWarningManager {
             msg = I18n.tr("FrostWire has encountered problems in loading your settings.  FrostWire will attempt to use the default values; however, may behave unexpectedly.");
             ResourceManager.resetLoadFailure();
         }
-
-        if (msg != null) {
-            NotifyUserProxy.instance().showMessage(new Notification(msg));
-        }
     }
 }

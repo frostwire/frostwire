@@ -29,11 +29,6 @@ public final class BasicNotifier implements NotifyUser {
 
     public void hideTrayIcon() {}
 
-    public void showMessage(Notification notification) {
-        notificationWindow.addNotification(notification);
-        notificationWindow.showWindow();
-    }
-
 	public void hideMessage(Notification notification) {
 		notificationWindow.removeNotification(notification);
 	}

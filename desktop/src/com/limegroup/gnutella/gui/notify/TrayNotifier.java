@@ -149,23 +149,6 @@ public class TrayNotifier implements NotifyUser {
 		notificationWindow.setParentSize(null);
 	}
 
-	public void showMessage(Notification notification) {
-	    try {
-	        notificationWindow.addNotification(notification);
-	        try {
-	            notificationWindow.setParentLocation(getTryIconLocation(_icon));
-	        } catch (Exception ignore) {
-	            // thrown if the native peer is not found (GUI-273)?
-	        }
-	        notificationWindow.showWindow();
-        } catch (Exception e) {
-            // see GUI-239
-            LOG.error("Disabling notifications due to error", e);
-            UISettings.SHOW_NOTIFICATIONS.setValue(false);
-            notificationWindow.hideWindowImmediately();
-        }
-	}
-
 	public void hideMessage(Notification notification) {
 		notificationWindow.removeNotification(notification);
 	}

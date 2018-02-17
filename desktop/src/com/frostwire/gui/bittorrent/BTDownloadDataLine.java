@@ -400,7 +400,6 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
             } else {
                 return;
             }
-            NotifyUserProxy.instance().showMessage(notification);
         }
     }
 

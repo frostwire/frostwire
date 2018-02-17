@@ -20,9 +20,6 @@ public interface NotifyUser {
      */
     public void hideTrayIcon();
 
-    /** Shows a message if possible. */
-    public void showMessage(Notification notification);
-
     /** Hides a message. Does nothing if message is not displayed. */
 	public void hideMessage(Notification notification);
 

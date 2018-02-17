@@ -69,25 +69,4 @@ public class NotifyUserProxy implements NotifyUser {
     public void hideMessage(Notification notification) {
         _notifier.hideMessage(notification);
     }
-
-    public void showMessage(Notification notification) {
-    	
-        if (notification == null || !UISettings.SHOW_NOTIFICATIONS.getValue()) {
-            return;
-        }
-
-        if (OSUtils.isMacOSX()) {
-            ProcessBuilder pb = new ProcessBuilder("osascript","-e","'display notification \"" + notification.getMessage() + "\"");
-            try {
-                pb.start();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        
-        //_notifier.showMessage(notification);
-        
-    }
-
 }
