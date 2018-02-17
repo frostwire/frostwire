@@ -1,20 +1,19 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.adapters.menu;
@@ -23,6 +22,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -75,14 +76,6 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        int size = files.size();
-        if (adapter != null) {
-            for (int i = 0; i < size; i++) {
-                FileDescriptor fd = files.get(i);
-                adapter.deleteItem(fd);
-            }
-        }
-
         Engine.instance().getThreadPool().execute(new DeleteFilesRunnable(getContext(), adapter, files));
     }
 
@@ -106,6 +99,22 @@ public final class DeleteFileMenuAction extends MenuAction {
             FileListAdapter fileListAdapter = adapterRef.get();
             byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
             Librarian.instance().deleteFiles(contextRef.get(), fileType, new ArrayList<>(files));
+
+            int size = files.size();
+            if (fileListAdapter != null) {
+                for (int i = 0; i < size; i++) {
+                    FileDescriptor fd = files.get(i);
+                    fileListAdapter.deleteItem(fd); // only notifies if in main thread
+                }
+            }
+
+            // we make just one notify call at the end
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                if (Ref.alive(adapterRef)) {
+                    adapterRef.get().notifyDataSetChanged();
+                }
+            });
         }
     }
 

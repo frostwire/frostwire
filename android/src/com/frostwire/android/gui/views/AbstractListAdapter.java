@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(TM). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(TM). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -271,9 +272,15 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             }
             list.add(item);
         }
-        notifyDataSetChanged();
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            notifyDataSetChanged();
+        }
     }
 
+    /**
+     * Note: only calls notifyDataSetChanged if called from the main thread
+     * @param item
+     */
     public void deleteItem(T item) {
         visualList.remove(item);
         if (visualList != list) {
@@ -282,7 +289,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         if (checked.contains(item)) {
             checked.remove(item);
         }
-        notifyDataSetChanged();
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            notifyDataSetChanged();
+        }
     }
 
     public void updateList(List<T> g) {
