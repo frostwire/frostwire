@@ -163,6 +163,7 @@ public final class Librarian {
                 // just in case, as we had similar checks in other code
                 if (fd.fileType == audioMediaType) {
                     trackIdsToDelete.add((long) fd.id);
+                    ids.add(fd.id);
                 }
             }
             // wish I could do just trackIdsToDelete.toArray(new long[0]) ...
@@ -175,6 +176,10 @@ public final class Librarian {
                 MusicUtils.deleteTracks(context, songsArray, false);
             } catch (Throwable t) {
                 t.printStackTrace();
+            }
+        } else {
+            for (FileDescriptor fd : fds) {
+                ids.add(fd.id);
             }
         }
 
