@@ -18,17 +18,12 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.transfers.TransferState;
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconManager;
-import com.limegroup.gnutella.gui.actions.LimeAction;
-import com.limegroup.gnutella.gui.notify.Notification;
-import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.tables.*;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;
 
@@ -100,7 +95,7 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private static final LimeTableColumn SHARE_RATIO_COLUMN;
     private static final LimeTableColumn SEED_TO_PEER_RATIO_COLUMN;
     static final LimeTableColumn DATE_CREATED_COLUMN;
-    static final LimeTableColumn LICENSE_COLUMN;
+    private static final LimeTableColumn LICENSE_COLUMN;
 
     static {
         columns = new ArrayList<>();
@@ -151,7 +146,7 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         return COLUMN_COUNT;
     }
 
-    public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
+    private static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     static {
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, I18n.tr("Checking..."));
@@ -387,51 +382,10 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private void showNotification() {
         if (!notificationShown) {
             notificationShown = true;
-            Notification notification;
             BTDownload theDownload = getInitializeObject();
             if (theDownload.isCompleted()) {
-                Action[] actions = null;
-                File file = getInitializeObject().getSaveLocation();
-                if (file != null) {
-                    actions = new Action[] { new LaunchAction(file), new ShowInLibraryAction(file) };
-                }
-                notification = new Notification(theDownload.getDisplayName(), getIcon(), actions);
                 LibraryMediator.instance().getLibraryExplorer().clearDirectoryHolderCaches();
-            } else {
-                return;
             }
-        }
-    }
-
-    private final class LaunchAction extends AbstractAction {
-        private File file;
-
-        public LaunchAction(File file) {
-            this.file = file;
-            putValue(Action.NAME, I18n.tr("Launch"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Launch Selected Files"));
-            putValue(LimeAction.ICON_NAME, "LIBRARY_LAUNCH");
-        }
-
-        public void actionPerformed(ActionEvent ae) {
-            // It adds and plays the current file to the media library when user clicks from the "Launch" notification Window.        
-            GUIUtils.launchOrEnqueueFile(file, false);
-        }
-    }
-
-    private final class ShowInLibraryAction extends AbstractAction {
-        private File file;
-
-        public ShowInLibraryAction(File file) {
-            this.file = file;
-
-            putValue(Action.NAME, I18n.tr("Show in Library"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Show Download in Library"));
-        }
-
-        public void actionPerformed(ActionEvent ae) {
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-            LibraryMediator.instance().setSelectedFile(file);
         }
     }
 

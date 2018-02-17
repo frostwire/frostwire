@@ -15,8 +15,6 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.limegroup.gnutella.gui.notify.Notification;
-import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 /**
@@ -28,14 +26,12 @@ public class SettingsWarningManager {
      * Warn about load/save problems
      */
     public static void checkSettingsLoadSaveFailure() {
-
-        String msg = null;
-
+        // TODO: implement actual UI notification
         if (FrostWireUtils.hasSettingsLoadSaveFailures()) {
-            msg = I18n.tr("FrostWire has encountered problems in managing your settings.  Your settings changes may not be saved on shutdown.");
+            //msg = I18n.tr("FrostWire has encountered problems in managing your settings.  Your settings changes may not be saved on shutdown.");
             FrostWireUtils.resetSettingsLoadSaveFailures();
         } else if (ResourceManager.hasLoadFailure()) {
-            msg = I18n.tr("FrostWire has encountered problems in loading your settings.  FrostWire will attempt to use the default values; however, may behave unexpectedly.");
+            //msg = I18n.tr("FrostWire has encountered problems in loading your settings.  FrostWire will attempt to use the default values; however, may behave unexpectedly.");
             ResourceManager.resetLoadFailure();
         }
     }

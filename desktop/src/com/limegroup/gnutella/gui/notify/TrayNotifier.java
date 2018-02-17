@@ -1,18 +1,13 @@
 package com.limegroup.gnutella.gui.notify;
 
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Field;
 
 /**
  * Puts an icon and menu in the system tray.
@@ -20,8 +15,6 @@ import java.lang.reflect.Field;
  */
 public class TrayNotifier implements NotifyUser {
 	
-    private static final Logger LOG = Logger.getLogger(DefaultNotificationRenderer.class);
-    
 	private SystemTray _tray;
 	private TrayIcon _icon;
 	private NotificationWindow notificationWindow;
@@ -66,11 +59,7 @@ public class TrayNotifier implements NotifyUser {
         });
         
       // left click restores.  This happens on the awt thread.
-      _icon.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-              GUIMediator.restoreView();
-          }
-      });
+      _icon.addActionListener(e -> GUIMediator.restoreView());
         
 	    _icon.setImageAutoSize(true);
 	} //buildTrayIcon
@@ -80,33 +69,21 @@ public class TrayNotifier implements NotifyUser {
 		
 		// restore
 		MenuItem item = new MenuItem(I18n.tr("Restore"));
-		item.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GUIMediator.restoreView();
-			}
-		});
+		item.addActionListener(e -> GUIMediator.restoreView());
 		menu.add(item);
 		
 		menu.addSeparator();
 		
 		// about box
 		item = new MenuItem(I18n.tr("About"));
-		item.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GUIMediator.showAboutWindow();
-			}
-		});
+		item.addActionListener(e -> GUIMediator.showAboutWindow());
 		menu.add(item);
 		
 		menu.addSeparator();
 		
 		// exit
 		item = new MenuItem(I18n.tr("Exit"));
-		item.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GUIMediator.shutdown();
-			}
-		});
+		item.addActionListener(e -> GUIMediator.shutdown());
 		menu.add(item);
 		
 		return menu;
@@ -155,25 +132,5 @@ public class TrayNotifier implements NotifyUser {
 
     public void updateUI() {
         SwingUtilities.updateComponentTreeUI(notificationWindow);
-    }
-
-    private Point getTryIconLocation(TrayIcon icon) throws Exception {
-        Field peerField = icon.getClass().getDeclaredField("peer");
-        peerField.setAccessible(true);
-
-        Object peer = peerField.get(icon);
-
-        Field eframeField = peer.getClass().getDeclaredField("eframe");
-        eframeField.setAccessible(true);
-
-        Object eframe = eframeField.get(peer);
-
-        Component component = (Component) eframe;
-
-        Point p = component.getLocation();
-
-        SwingUtilities.convertPointToScreen(p, component);
-
-        return p;
     }
 }

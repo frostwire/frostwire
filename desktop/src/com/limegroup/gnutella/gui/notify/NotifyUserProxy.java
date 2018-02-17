@@ -1,13 +1,11 @@
 package com.limegroup.gnutella.gui.notify;
 
-import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.util.OSUtils;
 
 /**
  * This class acts as a proxy for a platform-specific user notification class.
  */
- //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
-public class NotifyUserProxy implements NotifyUser {
+public final class NotifyUserProxy implements NotifyUser {
     /** Singleton */
     private static final NotifyUserProxy INSTANCE = new NotifyUserProxy();
     

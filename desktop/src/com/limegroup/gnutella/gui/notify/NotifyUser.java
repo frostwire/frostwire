@@ -7,23 +7,22 @@ package com.limegroup.gnutella.gui.notify;
 public interface NotifyUser {
     
     /** Returns true if the NotifyUser implementation supports a system tray icon. */
-    public boolean supportsSystemTray();
+    boolean supportsSystemTray();
 
     /**
      * Adds the notification gui object to the desktop.
-     * Returns true if this was succesfully able to add a notification.
+     * Returns true if this was successfully able to add a notification.
      */
-    public boolean showTrayIcon();
+    boolean showTrayIcon();
 
     /**
      * Removes the notification gui object from the desktop.
      */
-    public void hideTrayIcon();
+    void hideTrayIcon();
 
     /** Hides a message. Does nothing if message is not displayed. */
-	public void hideMessage(Notification notification);
+	void hideMessage(Notification notification);
 
 	/** Invoked when the theme has changed. */
-    public void updateUI();
-
+    void updateUI();
 }

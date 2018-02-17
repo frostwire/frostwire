@@ -9,12 +9,11 @@ import java.awt.*;
  * This class handles user notifications for platform that do not support JDIC.
  * It currently displays notifications only.
  */
-//2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
-public final class BasicNotifier implements NotifyUser {   
+public final class BasicNotifier implements NotifyUser {
 
 	private NotificationWindow notificationWindow;
 	
-	public BasicNotifier() {
+	BasicNotifier() {
 		notificationWindow = new NotificationWindow(GUIMediator.getAppFrame());
 		notificationWindow.setLocationOffset(new Dimension(1, 1));
 		notificationWindow.setTitle("FrostWire");
@@ -36,12 +35,4 @@ public final class BasicNotifier implements NotifyUser {
     public void updateUI() {
         SwingUtilities.updateComponentTreeUI(notificationWindow);        
     }
-
-    /**
-     * implements the NotifyUser interface.
-     * currently does nothing, since we have not implemented
-     * a user notification mechanism for non-Windows platforms.
-     */
-    //public void installNotifyCallback(NotifyCallback callback) {}
-
 }
