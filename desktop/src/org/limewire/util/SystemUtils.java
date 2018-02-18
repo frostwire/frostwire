@@ -158,6 +158,14 @@ public class SystemUtils {
         
         return false;
     }
+
+    public static long getWindowHandle(Component frame) {
+        if (OSUtils.isWindows() && isLoaded) {
+            return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
+        }
+
+        return 0;
+    }
     
     public static boolean toggleFullScreen(long hwnd) {
         return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) ? toggleFullScreenNative(hwnd) : false;
@@ -427,6 +435,7 @@ public class SystemUtils {
     private static native boolean recycleNative(String path);
     private static native int setFileWriteable(String path);
     private static native String setWindowIconNative(Component frame, String bin, String icon);
+    private static native long getWindowHandleNative(Component frame, String bin);
     private static native boolean flushIconCacheNative();
     private static native boolean toggleFullScreenNative(long hwnd);
     

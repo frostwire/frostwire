@@ -180,6 +180,12 @@ CString SetWindowIcon(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, LPCTSTR i
 	return _T("");
 }
 
+JNIEXPORT jlong JNICALL Java_org_limewire_util_SystemUtils_getWindowHandleNative(JNIEnv *e, jclass c, jobject frame, jstring bin)
+{
+	CString message;
+	return (jlong)GetJavaWindowHandle(e, c, frame, GetJavaString(e, bin), &message);
+}
+
 // Tell Windows we changed a file type association, so it needs to refresh icons in the shell
 JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_flushIconCacheNative(JNIEnv *e, jclass c) {
 	return FlushIconCache();
