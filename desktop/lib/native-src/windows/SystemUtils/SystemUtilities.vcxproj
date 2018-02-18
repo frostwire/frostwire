@@ -149,7 +149,7 @@
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">C:\Program Files (x86)\Java\jdk1.7.0\include\win32;C:\Program Files (x86)\Java\jdk1.7.0\include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release Unicode|x64'">C:\Program Files (x86)\Java\jdk1.7.0\include\win32;C:\Program Files (x86)\Java\jdk1.7.0\include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Program Files (x86)\Java\jdk1.8.0_162\include\win32;C:\Program Files (x86)\Java\jdk1.8.0_162\include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files (x86)\Java\jdk1.7.0\include\win32;C:\Program Files (x86)\Java\jdk1.7.0\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files (x86)\Java\jdk1.8.0_162\include\win32;C:\Program Files (x86)\Java\jdk1.8.0_162\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

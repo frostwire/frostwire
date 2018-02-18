@@ -177,7 +177,12 @@ HWND GetJavaWindowHandle(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, CStrin
 		*message = _T("Got module");
 
 		// Get a function pointer to JAWT_GetAWT() in the DLL
-		JawtGetAwtSignature JawtGetAwt = (JawtGetAwtSignature)GetProcAddress(module, "_JAWT_GetAWT@8");
+		JawtGetAwtSignature JawtGetAwt = (JawtGetAwtSignature)GetProcAddress(module,
+#if defined(_WIN64)
+			"JAWT_GetAWT");
+#else
+			"_JAWT_GetAWT@8");
+#endif
 		if (JawtGetAwt) {
 			*message = _T("Got signature");
 
