@@ -17,6 +17,8 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.jlibtorrent.EnumNet;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +29,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -92,21 +96,23 @@ public final class VPNs {
 
     private static boolean isWindowsVPNActive() {
         try {
+            List<EnumNet.IpInterface> interfaces2 = EnumNet.enumInterfaces(BTEngine.getInstance());
+            List<EnumNet.IpRoute> routes2 = EnumNet.enumRoutes(BTEngine.getInstance());
             String[] output = readProcessOutput("netstat", "-anr").split("\r\n");
             Interface[] interfaces = parseInterfaces(output);
             Route[] routes = parseActiveRoutes(output);
-            return isWindowsPIAActive(interfaces, routes) || isExpressVPNActive(interfaces, routes);
+            return isWindowsPIAActive(interfaces2, routes2) || isExpressVPNActive(interfaces, routes);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
         }
     }
 
-    private static boolean isWindowsPIAActive(final Interface[] interfaces, final Route[] activeRoutes) {
+    private static boolean isWindowsPIAActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
         // Try looking for an active PIA Interface "TAP-Windows Adapter*"
-        Interface tapWindowsAdapter = null;
-        for (Interface iface : interfaces) {
-            if (iface.name.contains("TAP-Windows Adapter")) {
+        EnumNet.IpInterface tapWindowsAdapter = null;
+        for (EnumNet.IpInterface iface : interfaces) {
+            if (iface.description().contains("TAP-Windows Adapter") && iface.preferred()) {
                 tapWindowsAdapter = iface;
                 break;
             }
@@ -117,8 +123,8 @@ public final class VPNs {
         }
 
         // Look for the tapWindowsAdapter in the list of active routes
-        for (Route route : activeRoutes) {
-            if (route.id == tapWindowsAdapter.id) {
+        for (EnumNet.IpRoute route : routes) {
+            if (route.name().contains(tapWindowsAdapter.name())) {
                 return true;
             }
         }
