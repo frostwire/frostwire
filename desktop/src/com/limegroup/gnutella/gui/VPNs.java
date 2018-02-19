@@ -66,10 +66,9 @@ public final class VPNs {
     private static boolean isPosixVPNActive() {
         boolean result = false;
         try {
-            String netstatCmd = getNetstatPath();
-            String[] output = readProcessOutput(netstatCmd,"-nr").split("\r\n");
-            for (String line : output) {
-                if (line.startsWith("0") && line.contains("tun")) {
+            List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
+            for (EnumNet.IpRoute route : routes) {
+                if (route.destination().toString().equals("0.0.0.0") && route.name().contains("tun")) {
                     result = true;
                     break;
                 }
