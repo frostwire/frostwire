@@ -55,6 +55,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.activities.internal.MainController;
@@ -177,6 +178,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void shutdown() {
+        LocalSearchEngine.instance().cancelSearch();
         Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
