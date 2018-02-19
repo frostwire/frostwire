@@ -26,7 +26,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.StringTokenizer;
 
 /**
  * This class constructs an <tt>Initializer</tt> instance that constructs
@@ -108,9 +107,8 @@ public class Main {
     /**
      * Tries to get a random splash every time. It keeps track of the 
      * last 2 shown splashes to avoid recent collisions.
-     * @return
      */
-    public static final URL getChosenSplashURL() {
+    public static URL getChosenSplashURL() {
         if (CHOSEN_SPLASH_URL != null)
             return CHOSEN_SPLASH_URL;
 
@@ -118,15 +116,6 @@ public class Main {
 
         CHOSEN_SPLASH_URL = ClassLoader.getSystemResource(splashPath);
         return CHOSEN_SPLASH_URL;
-    }
-
-    /** Determines if this is running a Mac OSX lower than Leopard */
-    private static boolean isOlderThanLeopard() {
-        String version = System.getProperty("os.version");
-        StringTokenizer tk = new StringTokenizer(version, ".");
-        int major = Integer.parseInt(tk.nextToken());
-        int minor = Integer.parseInt(tk.nextToken());
-        return major == 10 && minor < 6;
     }
 
     private static String getLinux32JLibtorrentPath() {
