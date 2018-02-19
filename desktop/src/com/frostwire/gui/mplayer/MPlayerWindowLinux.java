@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Erich Pleny (erichpleny)
- * Copyright (c) 2012, FrostWire(R). All rights reserved.
+ * Copyright (c) 2012-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.mplayer;
 
-import sun.awt.X11.XComponentPeer;
+import org.limewire.util.SystemUtils;
 
 import java.awt.*;
 
@@ -28,30 +28,18 @@ import java.awt.*;
  * @author aldenml
  *
  */
-public class MPlayerWindowLinux extends MPlayerWindow {
+public final class MPlayerWindowLinux extends MPlayerWindow {
 
 	private static boolean isFullScreen = false;
 	
 	@Override
 	public long getCanvasComponentHwnd() {
-		@SuppressWarnings("deprecation")
-        XComponentPeer cp = (XComponentPeer) videoCanvas.getPeer();
-        if ((cp instanceof XComponentPeer)) {
-            return ((XComponentPeer) cp).getWindow();
-        } else {
-            return 0;
-        }
+		return SystemUtils.getWindowHandle(videoCanvas);
 	}
 
 	@Override
 	public long getHwnd() {
-		@SuppressWarnings("deprecation")
-        XComponentPeer cp = (XComponentPeer) getPeer();
-        if ((cp instanceof XComponentPeer)) {
-            return ((XComponentPeer) cp).getWindow();
-        } else {
-            return 0;
-        }
+		return SystemUtils.getWindowHandle(this);
 	}
 	
 	@Override

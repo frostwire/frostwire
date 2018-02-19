@@ -41,7 +41,7 @@ public class SystemUtils {
     static {
         boolean canLoad = false;
         try {
-            if ((OSUtils.isWindows() && OSUtils.isGoodWindows()) || OSUtils.isMacOSX()) {
+            if ((OSUtils.isWindows() && OSUtils.isGoodWindows()) || OSUtils.isMacOSX() || OSUtils.isLinux()) {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
@@ -160,7 +160,7 @@ public class SystemUtils {
     }
 
     public static long getWindowHandle(Component frame) {
-        if (OSUtils.isWindows() && isLoaded) {
+        if ((OSUtils.isWindows() || OSUtils.isLinux()) && isLoaded) {
             return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
         }
 
