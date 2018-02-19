@@ -41,9 +41,16 @@ public class SystemUtils {
     static {
         boolean canLoad = false;
         try {
-            if ((OSUtils.isWindows() && OSUtils.isGoodWindows()) || OSUtils.isMacOSX() || OSUtils.isLinux()) {
+            if ((OSUtils.isWindows() && OSUtils.isGoodWindows()) || OSUtils.isMacOSX()) {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
+            }
+            if (OSUtils.isLinux()) {
+                if (OSUtils.isMachineX64()) {
+                    System.loadLibrary("SystemUtilities");
+                } else {
+                    System.loadLibrary("SystemUtilitiesX86");
+                }
             }
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
