@@ -101,7 +101,7 @@ public final class VPNs {
             String[] output = readProcessOutput("netstat", "-anr").split("\r\n");
             Interface[] interfaces = parseInterfaces(output);
             Route[] routes = parseActiveRoutes(output);
-            return isWindowsPIAActive(interfaces2, routes2) || isExpressVPNActive(interfaces, routes);
+            return isWindowsPIAActive(interfaces2, routes2) || isExpressVPNActive(interfaces2, routes2);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
@@ -131,15 +131,15 @@ public final class VPNs {
         return false;
     }
 
-    private static boolean isExpressVPNActive(final Interface[] interfaces, final Route[] activeRoutes) {
+    private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
         boolean expressVPNTapAdapterPresent = false;
-        for (Interface iface : interfaces) {
-            if (iface.name.contains("ExpressVPN Tap Adapter")) {
+        for (EnumNet.IpInterface iface : interfaces) {
+            if (iface.description().contains("ExpressVPN Tap Adapter") && iface.preferred()) {
                 expressVPNTapAdapterPresent = true;
                 break;
             }
         }
-        return expressVPNTapAdapterPresent && activeRoutes != null && activeRoutes.length == 2;
+        return expressVPNTapAdapterPresent;
     }
 
     private static Interface parseInterface(String line) {
