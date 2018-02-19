@@ -19,13 +19,8 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.EnumNet;
-import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -33,8 +28,6 @@ import java.util.List;
  * @author aldenml
  */
 public final class VPNs {
-
-    private static String netstatCmd = null;
 
     public static boolean isVPNActive() {
         boolean result = false;
@@ -54,7 +47,7 @@ public final class VPNs {
      * Destination        Gateway            Flags        Refs      Use   Netif Expire
      * 0/1                10.81.10.5         UGSc            5        0   utun1
      * ...</pre>
-     *
+     * <p>
      * <strong>VPN ON (Linux)</strong>
      * <pre>Kernel IP routing table
      * Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
@@ -123,47 +116,5 @@ public final class VPNs {
             }
         }
         return expressVPNTapAdapterPresent;
-    }
-
-    private static String readProcessOutput(String command, String arguments) {
-        String result = "";
-        ProcessBuilder pb = new ProcessBuilder(command, arguments);
-        pb.redirectErrorStream(true);
-        try {
-            Process process = pb.start();
-            InputStream stdout = process.getInputStream();
-            final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
-            String line;
-
-            try {
-                StringBuilder stringBuilder = new StringBuilder();
-                while ((line = brstdout.readLine()) != null) {
-                    stringBuilder.append(line).append("\r\n");
-                }
-
-                result = stringBuilder.toString();
-            } catch (Exception e) {
-                // ignore
-            } finally {
-                IOUtils.closeQuietly(brstdout);
-                IOUtils.closeQuietly(stdout);
-            }
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
-
-    private static String getNetstatPath() {
-        if (netstatCmd != null) {
-            return netstatCmd;
-        }
-        String candidate = "netstat";
-        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
-            candidate = "/usr/sbin/netstat";
-        }
-        netstatCmd = candidate;
-        return netstatCmd;
     }
 }
