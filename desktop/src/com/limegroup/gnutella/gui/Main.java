@@ -134,7 +134,7 @@ public class Main {
 
         boolean isRelease = !jarPath.contains("frostwire-desktop");
 
-        String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrentx86.so" : "lib/native/libjlibtorrentx86.so");
+        String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrentX86.so" : "lib/native/libjlibtorrentX86.so");
 
         if (!new File(libPath).exists()) {
             libPath = new File(jarPath + File.separator + "../../lib/native/libjlibtorrentx86.so").getAbsolutePath();
