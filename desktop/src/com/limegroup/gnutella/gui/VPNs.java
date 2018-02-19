@@ -19,8 +19,6 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.EnumNet;
-import com.frostwire.regex.Matcher;
-import com.frostwire.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
 
@@ -28,26 +26,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class VPNs {
-    private static Pattern piaKillSwitchRoutePattern = null;
+
     private static String netstatCmd = null;
-
-    // 17...00 ff 37 58 eb 11 ......TAP-Windows Adapter V9
-    private static final String WINDOWS_NETWORK_INTERFACE_REGEX = "([\\d]+)\\.\\.\\.([0-9a-f ]+)+([\\. ]{1})+(.*)";
-    private static Pattern WINDOWS_NETWORK_INTERFACE_PATTERN = null;
-
-    // 10    266 ::/0                     fe80::9e34:26ff:feef:a506
-    private static final String WINDOWS_ACTIVE_ROUTE_REGEX = "([\\d]{1,2}).*([\\d]{2,3})\\s{1}([0-9a-f\\:/]+)\\s{1}(.*)";
-    private static Pattern WINDOWS_ACTIVE_ROUTE_PATTERN = null;
-
 
     public static boolean isVPNActive() {
         boolean result = false;
@@ -96,12 +83,9 @@ public final class VPNs {
 
     private static boolean isWindowsVPNActive() {
         try {
-            List<EnumNet.IpInterface> interfaces2 = EnumNet.enumInterfaces(BTEngine.getInstance());
-            List<EnumNet.IpRoute> routes2 = EnumNet.enumRoutes(BTEngine.getInstance());
-            String[] output = readProcessOutput("netstat", "-anr").split("\r\n");
-            Interface[] interfaces = parseInterfaces(output);
-            Route[] routes = parseActiveRoutes(output);
-            return isWindowsPIAActive(interfaces2, routes2) || isExpressVPNActive(interfaces2, routes2);
+            List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
+            List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
+            return isWindowsPIAActive(interfaces, routes) || isExpressVPNActive(interfaces);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
@@ -131,7 +115,7 @@ public final class VPNs {
         return false;
     }
 
-    private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
+    private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces) {
         boolean expressVPNTapAdapterPresent = false;
         for (EnumNet.IpInterface iface : interfaces) {
             if (iface.description().contains("ExpressVPN Tap Adapter") && iface.preferred()) {
@@ -140,87 +124,6 @@ public final class VPNs {
             }
         }
         return expressVPNTapAdapterPresent;
-    }
-
-    private static Interface parseInterface(String line) {
-        if (WINDOWS_NETWORK_INTERFACE_PATTERN == null) {
-            WINDOWS_NETWORK_INTERFACE_PATTERN = Pattern.compile(WINDOWS_NETWORK_INTERFACE_REGEX);
-        }
-        Matcher matcher = WINDOWS_NETWORK_INTERFACE_PATTERN.matcher(line);
-        if (matcher.find()) {
-            return new Interface(Integer.parseInt(matcher.group(1)), matcher.group(4));
-        }
-
-        return null;
-    }
-
-    private static Interface[] parseInterfaces(String[] output) {
-        final String startDelimiter = "Interface List";
-        final String endDelimiter = "===";
-        boolean startDelimeterRead = false;
-        boolean endDelimiterRead = false;
-        final ArrayList<Interface> interfaceList = new ArrayList<>();
-        for (String line : output) {
-            if (!startDelimeterRead) {
-                startDelimeterRead = line.startsWith(startDelimiter);
-                continue;
-            }
-            if (!endDelimiterRead) {
-                endDelimiterRead = line.startsWith(endDelimiter);
-                if (endDelimiterRead) {
-                    break;
-                }
-                Interface iface = parseInterface(line);
-                if (iface != null) {
-                    interfaceList.add(iface);
-                }
-            }
-        }
-        return interfaceList.toArray(new Interface[0]);
-    }
-
-    private static Route parseActiveRoute(String line) {
-        if (WINDOWS_ACTIVE_ROUTE_PATTERN == null) {
-            WINDOWS_ACTIVE_ROUTE_PATTERN = Pattern.compile(WINDOWS_ACTIVE_ROUTE_REGEX);
-        }
-        Matcher matcher = WINDOWS_ACTIVE_ROUTE_PATTERN.matcher(line);
-        if (matcher.find()) {
-            return new Route(Integer.parseInt(matcher.group(1)), matcher.group(3), matcher.group(4));
-        }
-        return null;
-    }
-
-    private static Route[] parseActiveRoutes(String[] output) {
-        final String startDelimiter = "If Metric Network Destination      Gateway";
-        final String endDelimiter = "===";
-        boolean startDelimeterRead = false;
-        boolean endDelimiterRead = false;
-        final ArrayList<Route> routeList = new ArrayList<>();
-        for (String line : output) {
-            if (!startDelimeterRead) {
-                startDelimeterRead = line.contains(startDelimiter);
-                continue;
-            }
-            if (!endDelimiterRead) {
-                endDelimiterRead = line.startsWith(endDelimiter);
-                if (endDelimiterRead) {
-                    break;
-                }
-                Route iface = parseActiveRoute(line);
-                if (iface != null) {
-                    routeList.add(iface);
-                }
-            }
-        }
-        return routeList.toArray(new Route[0]);
-    }
-
-    public static void main(String[] args) {
-        String[] netstatTxt = readProcessOutput("cat", "/Users/gubatron/Desktop/netstat.txt").split("\r\n");
-        Interface[] interfaces = parseInterfaces(netstatTxt);
-        Route[] routes = parseActiveRoutes(netstatTxt);
-
-        System.out.println(routes.length);
     }
 
     private static String readProcessOutput(String command, String arguments) {
@@ -236,11 +139,12 @@ public final class VPNs {
             try {
                 StringBuilder stringBuilder = new StringBuilder();
                 while ((line = brstdout.readLine()) != null) {
-                    stringBuilder.append(line + "\r\n");
+                    stringBuilder.append(line).append("\r\n");
                 }
 
                 result = stringBuilder.toString();
             } catch (Exception e) {
+                // ignore
             } finally {
                 IOUtils.closeQuietly(brstdout);
                 IOUtils.closeQuietly(stdout);
@@ -263,25 +167,4 @@ public final class VPNs {
         netstatCmd = candidate;
         return netstatCmd;
     }
-
-    private final static class Interface {
-        final int id;
-        final String name;
-        Interface (int id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
-    
-    private final static class Route {
-        final int id;
-        final String destination;
-        final String gateway;
-        Route(int id, String destination, String gateway) {
-            this.id = id;
-            this.destination = destination;
-            this.gateway = gateway;
-        }
-    }
-
 }
