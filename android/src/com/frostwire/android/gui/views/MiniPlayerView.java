@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,6 +37,9 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author gubatron
@@ -154,26 +159,54 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     public void refresherOnTime() {
-        CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
-        if (mp != null) {
-            FileDescriptor fd = mp.getCurrentFD(getContext());
+        Engine.instance().getThreadPool().execute(new RefresherOnTimeRunnable(this));
+    }
 
-            String title = "";
-            String artist = "";
-            refreshComponents();
-            if (fd != null) {
-                title = fd.title;
-                artist = fd.artist;
-                if (getVisibility() == View.GONE) {
-                    setVisibility(View.VISIBLE);
-                }
-            } else {
-                if (getVisibility() == View.VISIBLE) {
-                    setVisibility(View.GONE);
-                }
+    private static class RefresherOnTimeRunnable implements Runnable {
+        private WeakReference<MiniPlayerView> miniPlayerRef;
+
+        RefresherOnTimeRunnable(MiniPlayerView miniPlayerView) {
+            miniPlayerRef = Ref.weak(miniPlayerView);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(miniPlayerRef)) {
+                return;
             }
-            titleText.setText(title);
-            artistText.setText(artist);
+            MiniPlayerView miniPlayer = miniPlayerRef.get();
+            CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
+            if (mp != null) {
+                FileDescriptor fd = mp.getCurrentFD(miniPlayer.getContext());
+
+                Handler handler = new Handler(Looper.getMainLooper());
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!Ref.alive(miniPlayerRef)) {
+                            return;
+                        }
+                        MiniPlayerView miniPlayer = miniPlayerRef.get();
+                        String title = "";
+                        String artist = "";
+                        miniPlayer.refreshComponents();
+                        if (fd != null) {
+                            title = fd.title;
+                            artist = fd.artist;
+                            if (miniPlayer.getVisibility() == View.GONE) {
+                                miniPlayer.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            if (miniPlayer.getVisibility() == View.VISIBLE) {
+                                miniPlayer.setVisibility(View.GONE);
+                            }
+                        }
+                        miniPlayer.titleText.setText(title);
+                        miniPlayer.artistText.setText(artist);
+                    }
+                };
+                handler.post(r);
+            }
         }
     }
 
