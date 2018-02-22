@@ -369,8 +369,8 @@ public final class SoftwareUpdater {
         int interstitialTransferOffersTimeoutInMinutes = 15;
         int interstitialOnResumeFirstDisplayDelayInMinutes = 30;
         int interstitialOnResumeTimeoutInMinutes = 15;
-        int onExitThreshold = 100;
-        int onBackThreshold = 100;
+        int onExitThreshold = 0;
+        int onBackThreshold = 0;
         int onResumeThreshold = 100;
 
         // ux stats
