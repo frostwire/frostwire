@@ -75,6 +75,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
 
         if (Offers.disabledAds()) {
+            OGURY_ENABLED = false;
             LOG.info("loadInterstitial() aborted, ogury not enabled. PlayStore reports no ads");
             return;
         }
