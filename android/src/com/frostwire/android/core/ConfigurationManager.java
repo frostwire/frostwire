@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,6 @@ import java.util.Map.Entry;
  * @author aldenml
  */
 public class ConfigurationManager {
-    /**
-     * @deprecated left for migration purposes, see {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY }
-     */
-    @Deprecated
-    private static final String PREF_KEY_NETWORK_USE_MOBILE_DATA = "frostwire.prefs.network.use_mobile_data";
-
     private final SharedPreferences preferences;
     private final Editor editor;
 
@@ -74,15 +68,15 @@ public class ConfigurationManager {
     }
 
     /**
-     * If the deprecated {@link #PREF_KEY_NETWORK_USE_MOBILE_DATA} is found
+     * If the deprecated {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY} is found
      * it gets migrated to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY and then deleted.
      */
     private void migrateWifiOnlyPreference() {
-        if (!preferences.contains(PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
+        if (!preferences.contains(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
             return;
         }
-        setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(PREF_KEY_NETWORK_USE_MOBILE_DATA));
-        removePreference(PREF_KEY_NETWORK_USE_MOBILE_DATA);
+        setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
+        removePreference(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
     }
 
     private void removePreference(String key) {
