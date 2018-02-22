@@ -18,6 +18,7 @@
 package com.frostwire.android.gui;
 
 import android.app.Application;
+import android.content.Context;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -40,9 +41,11 @@ import com.frostwire.util.Ref;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 
 import static com.frostwire.android.util.Debug.runStrict;
 
@@ -69,10 +72,10 @@ public class MainApplication extends Application {
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
 
-        ImageLoader.start(this, Engine.instance().getThreadPool());
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        ImageLoader.start(this, threadPool);
 
-        CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(this));
-        CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
+        threadPool.execute(new CrawlPagedWebSearchPerformerInitializer(this));
 
         LocalSearchEngine.create();
 
@@ -144,6 +147,24 @@ public class MainApplication extends Application {
             }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
+        }
+    }
+
+    private static class CrawlPagedWebSearchPerformerInitializer implements Runnable {
+        private WeakReference<Context> ctxRef;
+
+        CrawlPagedWebSearchPerformerInitializer(Context context) {
+            ctxRef = Ref.weak(context);
+        }
+
+        @Override
+        public void run() {
+            if (Ref.alive(ctxRef)) {
+                CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(ctxRef.get()));
+            } else {
+                LOG.warn("CrawlPagedWebSearchPerformer cache not set, lost reference to MainApplication");
+            }
+            CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
         }
     }
 }
