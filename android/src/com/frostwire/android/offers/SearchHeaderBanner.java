@@ -311,6 +311,20 @@ public class SearchHeaderBanner extends LinearLayout {
             if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
                 searchHeaderBanner.loadFallbackBanner();
             }
+            if (Ref.alive(searchHeaderBannerRef)) {
+                Context context = searchHeaderBannerRef.get().getContext();
+                PrebidInitializer initializer = PrebidInitializer.getInstance(context);
+                if (initializer.initialized() && initializer.enabled()) {
+                    //TODO: Get the correct ad placement
+                    AdUnit adUnit = initializer.getAdUnits().get(0);
+                    Prebid.attachBids(banner, adUnit.getConfigId(), context);
+                    LOG.info("onBannerFailed: PreBid.attachBids invoked");
+                } else if (!initializer.initialized()) {
+                    LOG.info("onBannerFailed: PreBid not ready yet for attachBids");
+                } else if (initializer.initialized() && !initializer.enabled()) {
+                    LOG.info("onBannerFailed: PreBid disabled");
+                }
+            }
         }
 
         @Override
