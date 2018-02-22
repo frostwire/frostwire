@@ -95,7 +95,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
@@ -690,9 +689,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void onLastDialogButtonPositive() {
-        final int bannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD);
-        final int r = new Random().nextInt(100) + 1;
-        if (r <= bannerThreshold) {
+        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD)) {
             Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
         } else {
             finish();
@@ -700,9 +697,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void onShutdownDialogButtonPositive() {
-        final int bannerThreshold = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD);
-        final int r = new Random().nextInt(100) + 1;
-        if (r <= bannerThreshold) {
+        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD)) {
             Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
         } else {
             shutdown();
