@@ -38,6 +38,9 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
+ * This is the MoPub Custom Banner adapter for AppLovin.
+ * We have the interstitial adapter for MoPub on the standard location com.mopub.mobileads.AppLovinInterstitialAdapter
+ *
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
