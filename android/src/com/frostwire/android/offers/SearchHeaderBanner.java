@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,9 @@ import com.frostwire.util.Ref;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
+import org.prebid.mobile.core.AdUnit;
+import org.prebid.mobile.core.Prebid;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -70,7 +73,9 @@ public class SearchHeaderBanner extends LinearLayout {
         super(context, attrs);
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.view_search_header_banner, this, true);
+        if (inflater != null) {
+            inflater.inflate(R.layout.view_search_header_banner, this, true);
+        }
     }
 
     public void setSearchFragmentReference(SearchFragment searchFragment) {
@@ -270,6 +275,21 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             searchHeaderBanner.setBannerViewVisibility(BannerType.FALLBACK, false);
             searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, true);
+
+            if (Ref.alive(searchHeaderBannerRef)) {
+                Context context = searchHeaderBannerRef.get().getContext();
+                PrebidInitializer initializer = PrebidInitializer.getInstance(context);
+                if (initializer.initialized() && initializer.enabled()) {
+                    //TODO: Get the correct ad placement
+                    AdUnit adUnit = initializer.getAdUnits().get(0);
+                    Prebid.attachBids(banner, adUnit.getConfigId(), context);
+                    LOG.info("onBannerLoaded: PreBid.attachBids invoked");
+                } else if (!initializer.initialized()) {
+                    LOG.info("onBannerLoaded: PreBid not ready yet for attachBids");
+                } else if (initializer.initialized() && !initializer.enabled()) {
+                    LOG.info("onBannerLoaded: PreBid disabled");
+                }
+            }
         }
 
         @Override
