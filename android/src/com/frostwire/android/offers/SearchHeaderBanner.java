@@ -39,9 +39,6 @@ import com.frostwire.util.Ref;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
-import org.prebid.mobile.core.AdUnit;
-import org.prebid.mobile.core.Prebid;
-
 import java.lang.ref.WeakReference;
 
 /**
@@ -74,7 +71,12 @@ public class SearchHeaderBanner extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (inflater != null) {
-            inflater.inflate(R.layout.view_search_header_banner, this, true);
+            try {
+                inflater.inflate(R.layout.view_search_header_banner, this, true);
+            } catch (Throwable t) {
+                moPubBannerListener.onDestroy();
+                inflater.inflate(R.layout.view_search_header_banner, this, true);
+            }
         }
     }
 
@@ -278,7 +280,7 @@ public class SearchHeaderBanner extends LinearLayout {
 
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidInitializer.getInstance(context).onBannerLoaded(context, banner, PrebidInitializer.Placement.SEARCH_HEADER_BANNER);
+                PrebidManager.getInstance(context).onBannerLoaded(context, banner, PrebidManager.Placement.SEARCH_HEADER_BANNER);
             }
         }
 
@@ -303,7 +305,7 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidInitializer.getInstance(context).onBannerFailed(context, banner, PrebidInitializer.Placement.SEARCH_HEADER_BANNER, errorCode);
+                PrebidManager.getInstance(context).onBannerFailed(context, banner, PrebidManager.Placement.SEARCH_HEADER_BANNER, errorCode);
             }
         }
 

@@ -75,6 +75,7 @@ public final class Offers {
                 adNetwork.initialize(activity);
             }
         }
+        PrebidManager.getInstance(activity.getApplicationContext());
         LOG.info("Offers.initAdNetworks() sucess");
     }
 
