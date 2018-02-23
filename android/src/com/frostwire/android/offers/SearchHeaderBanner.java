@@ -74,8 +74,8 @@ public class SearchHeaderBanner extends LinearLayout {
             try {
                 inflater.inflate(R.layout.view_search_header_banner, this, true);
             } catch (Throwable t) {
-                moPubBannerListener.onDestroy();
-                inflater.inflate(R.layout.view_search_header_banner, this, true);
+                LOG.error(t.getMessage(), t);
+                t.printStackTrace();
             }
         }
     }
@@ -162,6 +162,7 @@ public class SearchHeaderBanner extends LinearLayout {
         } catch (Throwable e) {
             LOG.warn("updateComponents(): SearchFragment Mopub banner could not be loaded", e);
             loadFallbackBanner();
+            moPubView.destroy();
         }
         dismissBannerButton.setOnClickListener(new DismissBannerButtonClickListener(this));
     }
@@ -299,6 +300,7 @@ public class SearchHeaderBanner extends LinearLayout {
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
             if (searchHeaderBanner.moPubView != null) {
                 searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, false);
+                searchHeaderBanner.moPubView.destroy();
             }
             if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
                 searchHeaderBanner.loadFallbackBanner();

@@ -57,8 +57,7 @@ public final class PrebidManager {
     public enum Placement {
         SEARCH_HEADER_BANNER, //320x50 (Test)
         AUDIO_PLAYER_BANNER, //300x250 (Test)
-        PREVIEW_BANNER_BIG, //300x250
-        PREVIEW_BANNER_SMALL, //320x50
+        PREVIEW_BANNER, //300x250, 320x50 (horizontal and vertical respectively)
         INTERSTITIAL
     }
 
@@ -107,12 +106,12 @@ public final class PrebidManager {
         BannerAdUnit audioPlayerAdUnit = new BannerAdUnit("5823300", "5823300");
         audioPlayerAdUnit.addSize(300, 250);
         adUnits.add(audioPlayerAdUnit);
-        placementAdUnitHashMap.put(Placement.AUDIO_PLAYER_BANNER, searchHeaderAdUnit);
+        placementAdUnitHashMap.put(Placement.AUDIO_PLAYER_BANNER, audioPlayerAdUnit);
         BannerAdUnit previewBannerAdUnit = new BannerAdUnit("5823309", "5823309");
         previewBannerAdUnit.addSize(300, 250); // horizontal video preview
         previewBannerAdUnit.addSize(320, 50); // vertical audio/video preview
         adUnits.add(previewBannerAdUnit);
-        placementAdUnitHashMap.put(Placement.PREVIEW_BANNER_BIG, searchHeaderAdUnit);
+        placementAdUnitHashMap.put(Placement.PREVIEW_BANNER, previewBannerAdUnit);
     }
 
     public void onBannerLoaded(final Context context, final MoPubView banner, final Placement placement) {
@@ -132,7 +131,7 @@ public final class PrebidManager {
         }
     }
 
-    public void onBannerFailed(Context context, MoPubView banner, Placement placement, MoPubErrorCode errorCode) {
+    public void onBannerFailed(final Context context, final MoPubView banner, final Placement placement, MoPubErrorCode errorCode) {
         if (!manager.initialized()) {
             LOG.info("onBannerFailed: aborted, Prebid not ready yet for attachBids");
             return;
@@ -143,7 +142,7 @@ public final class PrebidManager {
         AdUnit adUnit = getAdUnit(placement);
         if (adUnit != null) {
             Prebid.attachBids(banner, adUnit.getConfigId(), context);
-            LOG.info("onBannerFailed: Prebid.attachBids invoked for placement <" + placement + ">");
+            LOG.info("onBannerFailed: Prebid.attachBids invoked for placement <" + placement + ">, errorCode: " + errorCode);
         } else {
             LOG.warn("onBannerFailed: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
         }
