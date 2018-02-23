@@ -278,17 +278,7 @@ public class SearchHeaderBanner extends LinearLayout {
 
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidInitializer initializer = PrebidInitializer.getInstance(context);
-                if (initializer.initialized() && initializer.enabled()) {
-                    //TODO: Get the correct ad placement
-                    AdUnit adUnit = initializer.getAdUnits().get(0);
-                    Prebid.attachBids(banner, adUnit.getConfigId(), context);
-                    LOG.info("onBannerLoaded: PreBid.attachBids invoked");
-                } else if (!initializer.initialized()) {
-                    LOG.info("onBannerLoaded: PreBid not ready yet for attachBids");
-                } else if (initializer.initialized() && !initializer.enabled()) {
-                    LOG.info("onBannerLoaded: PreBid disabled");
-                }
+                PrebidInitializer.getInstance(context).onBannerLoaded(context, banner, PrebidInitializer.Placement.SEARCH_HEADER_BANNER);
             }
         }
 
@@ -313,17 +303,7 @@ public class SearchHeaderBanner extends LinearLayout {
             }
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidInitializer initializer = PrebidInitializer.getInstance(context);
-                if (initializer.initialized() && initializer.enabled()) {
-                    //TODO: Get the correct ad placement
-                    AdUnit adUnit = initializer.getAdUnits().get(0);
-                    Prebid.attachBids(banner, adUnit.getConfigId(), context);
-                    LOG.info("onBannerFailed: PreBid.attachBids invoked");
-                } else if (!initializer.initialized()) {
-                    LOG.info("onBannerFailed: PreBid not ready yet for attachBids");
-                } else if (initializer.initialized() && !initializer.enabled()) {
-                    LOG.info("onBannerFailed: PreBid disabled");
-                }
+                PrebidInitializer.getInstance(context).onBannerFailed(context, banner, PrebidInitializer.Placement.SEARCH_HEADER_BANNER, errorCode);
             }
         }
 

@@ -28,6 +28,8 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.mopub.mobileads.MoPubErrorCode;
+import com.mopub.mobileads.MoPubView;
 
 import org.prebid.mobile.core.AdUnit;
 import org.prebid.mobile.core.BannerAdUnit;
@@ -53,7 +55,7 @@ public final class PrebidInitializer {
     private final static Object initLock = new Object();
     private static PrebidInitializer initializer = null;
 
-    public static PrebidInitializer getInstance(Context applicationContext) {
+    public static PrebidInitializer getInstance(final Context applicationContext) {
         synchronized (initLock) {
             if (initializer == null) {
                 initializer = new PrebidInitializer(applicationContext);
@@ -103,7 +105,43 @@ public final class PrebidInitializer {
         return new ArrayList<>(adUnits);
     }
 
-    // TODO: Have enums for placements and have getAdUnit(PlacementEnum) method
+    public void onBannerLoaded(final Context context, final MoPubView banner, final Placement placement) {
+        if (!initializer.initialized()) {
+            LOG.info("onBannerLoaded: aborted, Prebid not ready yet for attachBids");
+            return;
+        } else if (!enabled()) {
+            LOG.info("onBannerLoaded: aborted, Prebid disabled");
+            return;
+        }
+        AdUnit adUnit = getAdUnit(placement);
+        Prebid.attachBids(banner, adUnit.getConfigId(), context);
+        LOG.info("onBannerLoaded: PreBid.attachBids invoked");
+    }
+
+    public void onBannerFailed(Context context, MoPubView banner, Placement placement, MoPubErrorCode errorCode) {
+        if (!initializer.initialized()) {
+            LOG.info("onBannerFailed: aborted, Prebid not ready yet for attachBids");
+            return;
+        } else if (!enabled()) {
+            LOG.info("onBannerFailed: aborted, Prebid disabled");
+            return;
+        }
+        AdUnit adUnit = getAdUnit(placement);
+        Prebid.attachBids(banner, adUnit.getConfigId(), context);
+        LOG.info("onBannerFailed: PreBid.attachBids invoked");
+    }
+
+    private AdUnit getAdUnit(final Placement placement) {
+        // TODO: get the AdUnit depending on the placement given
+        return getAdUnits().get(0);
+    }
+
+    public enum Placement {
+        SEARCH_HEADER_BANNER,
+        PREVIEW_BANNER,
+        AUDIO_PLAYER_BANNER,
+        INTERSTITIAL
+    }
 
     private static class BackgroundInitializer implements Runnable {
         private final String ACCOUNT_ID = "01e786a8-b070-4fb3-a21f-a76866f15c80";
@@ -111,9 +149,9 @@ public final class PrebidInitializer {
         private final ArrayList<AdUnit> adUnits;
         private final PrebidInitializer initializer;
 
-        BackgroundInitializer(@NonNull Context applicationContext,
-                              @NonNull ArrayList<AdUnit> adUnits,
-                              @NonNull  PrebidInitializer initializer) {
+        BackgroundInitializer(@NonNull final Context applicationContext,
+                              @NonNull final ArrayList<AdUnit> adUnits,
+                              @NonNull final PrebidInitializer initializer) {
             ctxRef = Ref.weak(applicationContext);
             this.adUnits = adUnits;
             this.initializer = initializer;
