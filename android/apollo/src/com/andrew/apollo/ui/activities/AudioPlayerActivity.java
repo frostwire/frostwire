@@ -86,6 +86,7 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.InHouseBannerFactory;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.PrebidManager;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
@@ -145,12 +146,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             LOG.info("onBannerLoaded()");
             setBannerViewVisibility(mFallbackAd, false);
             setBannerViewVisibility(mMopubAd, true);
+            PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER);
         }
 
         @Override
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed");
             loadFallbackBanner();
+            PrebidManager.getInstance(getApplicationContext()).onBannerFailed(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER, errorCode);
+            banner.destroy();
         }
 
         @Override
@@ -707,6 +711,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             } catch (Throwable e) {
                 LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
                 loadFallbackBanner();
+                mMopubAd.destroy();
             }
         }
     }
