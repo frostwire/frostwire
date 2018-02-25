@@ -67,19 +67,20 @@ public class MainApplication extends Application {
 
         Platforms.set(new AndroidPlatform(this));
 
-        setupBTEngine();
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+
+        threadPool.execute(new BTEngineInitializer());
 
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
 
-        ExecutorService threadPool = Engine.instance().getThreadPool();
         ImageLoader.start(this, threadPool);
 
         threadPool.execute(new CrawlPagedWebSearchPerformerInitializer(this));
 
         LocalSearchEngine.create();
 
-        cleanTemp();
+        threadPool.execute(new TempCleaner());
 
         Librarian.instance().syncMediaStore(Ref.weak(this));
     }
@@ -117,39 +118,6 @@ public class MainApplication extends Application {
         }
     }
 
-    private void setupBTEngine() {
-        SystemPaths paths = Platforms.get().systemPaths();
-
-        BTContext ctx = new BTContext();
-        ctx.homeDir = paths.libtorrent();
-        ctx.torrentsDir = paths.torrents();
-        ctx.dataDir = paths.data();
-        ctx.optimizeMemory = true;
-
-        // port range [37000, 57000]
-        int port0 = 37000 + new Random().nextInt(20000);
-        int port1 = port0 + 10; // 10 retries
-        String iface = "0.0.0.0:%1$d,[::]:%1$d";
-        ctx.interfaces = String.format(Locale.US, iface, port0);
-        ctx.retries = port1 - port0;
-
-        ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-
-        BTEngine.ctx = ctx;
-        BTEngine.getInstance().start();
-    }
-
-    private void cleanTemp() {
-        try {
-            File tmp = Platforms.get().systemPaths().temp();
-            if (tmp.exists()) {
-                FileUtils.cleanDirectory(tmp);
-            }
-        } catch (Throwable e) {
-            LOG.error("Error during setup of temp directory", e);
-        }
-    }
-
     private static class CrawlPagedWebSearchPerformerInitializer implements Runnable {
         private WeakReference<Context> ctxRef;
 
@@ -165,6 +133,43 @@ public class MainApplication extends Application {
                 LOG.warn("CrawlPagedWebSearchPerformer cache not set, lost reference to MainApplication");
             }
             CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
+        }
+    }
+
+    private static class BTEngineInitializer implements Runnable {
+        public void run() {
+            SystemPaths paths = Platforms.get().systemPaths();
+
+            BTContext ctx = new BTContext();
+            ctx.homeDir = paths.libtorrent();
+            ctx.torrentsDir = paths.torrents();
+            ctx.dataDir = paths.data();
+            ctx.optimizeMemory = true;
+
+            // port range [37000, 57000]
+            int port0 = 37000 + new Random().nextInt(20000);
+            int port1 = port0 + 10; // 10 retries
+            String iface = "0.0.0.0:%1$d,[::]:%1$d";
+            ctx.interfaces = String.format(Locale.US, iface, port0);
+            ctx.retries = port1 - port0;
+
+            ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+
+            BTEngine.ctx = ctx;
+            BTEngine.getInstance().start();
+        }
+    }
+
+    private static class TempCleaner implements Runnable {
+        public void run() {
+            try {
+                File tmp = Platforms.get().systemPaths().temp();
+                if (tmp.exists()) {
+                    FileUtils.cleanDirectory(tmp);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error during setup of temp directory", e);
+            }
         }
     }
 }
