@@ -69,7 +69,7 @@ public class MainApplication extends Application {
 
         ExecutorService threadPool = Engine.instance().getThreadPool();
 
-        threadPool.execute(new BTEngineInitializer());
+        threadPool.execute(new BTEngineInitializer(Ref.weak(this)));
 
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
@@ -81,8 +81,6 @@ public class MainApplication extends Application {
         LocalSearchEngine.create();
 
         threadPool.execute(new TempCleaner());
-
-        Librarian.instance().syncMediaStore(Ref.weak(this));
     }
 
     @Override
@@ -137,6 +135,12 @@ public class MainApplication extends Application {
     }
 
     private static class BTEngineInitializer implements Runnable {
+        private final WeakReference<Context> mainAppRef;
+
+        BTEngineInitializer(WeakReference<Context> mainAppRef) {
+            this.mainAppRef = mainAppRef;
+        }
+
         public void run() {
             SystemPaths paths = Platforms.get().systemPaths();
 
@@ -157,6 +161,16 @@ public class MainApplication extends Application {
 
             BTEngine.ctx = ctx;
             BTEngine.getInstance().start();
+
+            syncMediaStore();
+        }
+
+        private void syncMediaStore() {
+            if (Ref.alive(mainAppRef)) {
+                Librarian.instance().syncMediaStore(mainAppRef);
+            } else {
+                LOG.warn("syncMediaStore() failed, lost MainApplication reference");
+            }
         }
     }
 
