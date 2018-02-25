@@ -178,7 +178,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-base:11.6.2'
     implementation('com.mopub:mopub-sdk-banner:4.20.0@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:4.20.0@aar') { transitive = true }
-    implementation 'com.applovin:applovin-sdk:+'
+    implementation 'com.applovin:applovin-sdk:7.8.5'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.17-RC2'
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.17-RC2'
