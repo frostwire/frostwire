@@ -77,7 +77,9 @@ public final class VPNs {
         try {
             List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
-            return isWindowsPIAActive(interfaces, routes) || isExpressVPNActive(interfaces);
+            return isWindowsPIAActive(interfaces, routes) ||
+                    isExpressVPNActive(interfaces) ||
+                    isWindowsCactusVPNActive(interfaces, routes);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
@@ -85,26 +87,11 @@ public final class VPNs {
     }
 
     private static boolean isWindowsPIAActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
-        // Try looking for an active PIA Interface "TAP-Windows Adapter*"
-        EnumNet.IpInterface tapWindowsAdapter = null;
-        for (EnumNet.IpInterface iface : interfaces) {
-            if (iface.description().contains("TAP-Windows Adapter") && iface.preferred()) {
-                tapWindowsAdapter = iface;
-                break;
-            }
-        }
+        return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter");
+    }
 
-        if (tapWindowsAdapter == null) {
-            return false;
-        }
-
-        // Look for the tapWindowsAdapter in the list of active routes
-        for (EnumNet.IpRoute route : routes) {
-            if (route.name().contains(tapWindowsAdapter.name())) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isWindowsCactusVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
+        return isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN");
     }
 
     private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces) {
@@ -116,5 +103,27 @@ public final class VPNs {
             }
         }
         return expressVPNTapAdapterPresent;
+    }
+
+    private static boolean isWindowsVPNAdapterActive(List<EnumNet.IpInterface> interfaces,
+                                                     List<EnumNet.IpRoute> routes, String description) {
+        EnumNet.IpInterface adapter = null;
+        for (EnumNet.IpInterface iface : interfaces) {
+            if (iface.description().contains(description) && iface.preferred()) {
+                adapter = iface;
+                break;
+            }
+        }
+
+        if (adapter == null) {
+            return false;
+        }
+
+        for (EnumNet.IpRoute route : routes) {
+            if (route.name().contains(adapter.name())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
