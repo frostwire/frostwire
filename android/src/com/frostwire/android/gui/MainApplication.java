@@ -160,6 +160,7 @@ public class MainApplication extends Application {
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
 
             BTEngine.ctx = ctx;
+            BTEngine.onCtxSetupComplete();
             BTEngine.getInstance().start();
 
             syncMediaStore();

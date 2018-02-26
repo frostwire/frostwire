@@ -55,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
 import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
@@ -97,6 +99,7 @@ public final class BTEngine extends SessionManager {
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
     private BTEngineListener listener;
+    private final static CountDownLatch ctxSetupLatch = new CountDownLatch(1);
 
     private BTEngine() {
         super(false);
@@ -110,9 +113,20 @@ public final class BTEngine extends SessionManager {
 
     public static BTEngine getInstance() {
         if (ctx == null) {
-            throw new IllegalStateException("BTContext can't be null");
+            try {
+                ctxSetupLatch.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                LOG.error(e.getMessage(), e);
+            }
+            if (ctx == null) {
+                throw new IllegalStateException("BTContext can't be null");
+            }
         }
         return Loader.INSTANCE;
+    }
+
+    public static void onCtxSetupComplete() {
+        ctxSetupLatch.countDown();
     }
 
     public BTEngineListener getListener() {
