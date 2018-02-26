@@ -218,4 +218,15 @@ public final class Debug {
 
         return false;
     }
+
+    public static String getCallingMethodInfo() {
+        Thread currentThread = Thread.currentThread();
+        StackTraceElement[] stackTrace = currentThread.getStackTrace();
+        String caller = "<Thread not scheduled yet>";
+        if (stackTrace.length >= 4) {
+            StackTraceElement stackElement = stackTrace[4];
+            caller = "<" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:"+currentThread.getName()+"(tid="+currentThread.getId()+")>";
+        }
+        return caller;
+    }
 }
