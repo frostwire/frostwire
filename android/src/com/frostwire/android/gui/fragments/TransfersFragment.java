@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -76,6 +77,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -98,6 +100,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TextView textDHTPeers;
     private TextView textDownloads;
     private TextView textUploads;
+    private ImageView vpnStatusIcon;
     private TextView vpnRichToast;
     private ClearableEditTextView addTransferUrlTextView;
     private TransferStatus selectedStatus;
@@ -288,36 +291,66 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
         }
-        //  format strings
-        String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
-        String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
-        // number of uploads (seeding) and downloads
-        int downloads = TransferManager.instance().getActiveDownloads();
-        int uploads = TransferManager.instance().getActiveUploads();
+        Engine.instance().getThreadPool().execute(new StatusBarUpdater(this));
         onCheckDHT();
-        updateStatusBar(sDown, sUp, downloads, uploads);
     }
 
-    private void updateStatusBar(String sDown, String sUp, int downloads, int uploads) {
-        textDownloads.setText(downloads + " @ " + sDown);
-        textUploads.setText(uploads + " @ " + sUp);
-        updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
-    }
+    private static class StatusBarUpdater implements Runnable {
+        private final WeakReference<TransfersFragment> transfersFragmentRef;
 
-    private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-        boolean wasActiveBefore = isVPNactive && !vpnActive;
-        isVPNactive = vpnActive;
-        final ImageView view = findView(getView(), R.id.fragment_transfers_status_vpn_icon);
-        if (view != null) {
-            view.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+        StatusBarUpdater(TransfersFragment transfersFragment) {
+            transfersFragmentRef = Ref.weak(transfersFragment);
         }
-        if (wasActiveBefore) {
-            showVPNRichToast();
+
+        @Override
+        public void run() {
+            if (!Ref.alive(transfersFragmentRef)) {
+                // too late
+                return;
+            }
+            //  format strings
+            final String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
+            final String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
+            // number of uploads (seeding) and downloads
+            final int downloads = TransferManager.instance().getActiveDownloads();
+            final int uploads = TransferManager.instance().getActiveUploads();
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!Ref.alive(transfersFragmentRef)) {
+                        // too late to go back to main thread
+                        return;
+                    }
+                    TransfersFragment transfersFragment = transfersFragmentRef.get();
+                    transfersFragment.textDownloads.setText(downloads + " @ " + sDown);
+                    transfersFragment.textUploads.setText(uploads + " @ " + sUp);
+
+                    // isTunnelUp is pre-calculated on some other thread, instant call
+                    updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
+                }
+            });
+        }
+
+        private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
+            if (!Ref.alive(transfersFragmentRef)) {
+                return;
+            }
+            TransfersFragment transfersFragment = transfersFragmentRef.get();
+            boolean wasActiveBefore = transfersFragment.isVPNactive && !vpnActive;
+            transfersFragment.isVPNactive = vpnActive;
+            if (transfersFragment.vpnStatusIcon != null) {
+                transfersFragment.vpnStatusIcon.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+            }
+            if (wasActiveBefore) {
+                transfersFragment.showVPNRichToast();
+            }
         }
     }
 
     private void onCheckDHT() {
-        if (textDHTPeers == null || !TransfersFragment.this.isAdded()) {
+        if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
             return;
         }
         textDHTPeers.setVisibility(View.VISIBLE);
@@ -339,8 +372,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             textDHTPeers.setText(R.string.bittorrent_off);
             return;
         }
-        boolean dhtEnabled = BTEngine.getInstance().isDhtRunning();
-        long dhtPeers = BTEngine.getInstance().stats().dhtNodes();
+        BTEngine btEngine = BTEngine.getInstance();
+        boolean dhtEnabled = btEngine.isDhtRunning();
+        long dhtPeers = btEngine.stats().dhtNodes();
         // No DHT
         if (!dhtEnabled) {
             textDHTPeers.setVisibility(View.INVISIBLE);
@@ -467,8 +501,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void initVPNStatusButton(View v) {
-        final ImageView vpnStatusButton = findView(v, R.id.fragment_transfers_status_vpn_icon);
-        vpnStatusButton.setOnClickListener(v1 -> {
+        vpnStatusIcon = findView(v, R.id.fragment_transfers_status_vpn_icon);
+        vpnStatusIcon.setOnClickListener(v1 -> {
             Context ctx = v1.getContext();
             Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
             i.setAction(isVPNactive ?
