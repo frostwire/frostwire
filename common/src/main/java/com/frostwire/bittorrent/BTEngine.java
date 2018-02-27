@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
 import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
@@ -116,11 +115,11 @@ public final class BTEngine extends SessionManager {
         if (ctx == null) {
             try {
                 //LOG.info("BTEngine.getInstance() call waiting, called by " + Debug.getCallingMethodInfo());
-                ctxSetupLatch.await(20, TimeUnit.SECONDS);
+                ctxSetupLatch.await();
             } catch (InterruptedException e) {
                 LOG.error(e.getMessage(), e);
             }
-            if (ctx == null) {
+            if (ctx == null && Loader.INSTANCE.isRunning()) {
                 throw new IllegalStateException("BTContext can't be null");
             }
         }
@@ -158,6 +157,14 @@ public final class BTEngine extends SessionManager {
         }
 
         super.start(params);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (ctx == null) {
+            onCtxSetupComplete();
+        }
     }
 
     @Override
