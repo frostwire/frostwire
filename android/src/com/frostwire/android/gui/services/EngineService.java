@@ -235,13 +235,29 @@ public class EngineService extends Service implements IEngineService {
             return;
         }
 
-        state = STATE_STARTING;
+        Engine.instance().getThreadPool().execute(new ResumeBTEngineTask(this));
+    }
 
-        BTEngine.getInstance().resume();
+    private static class ResumeBTEngineTask implements Runnable {
+        private final WeakReference<EngineService> engineServiceRef;
+        private ResumeBTEngineTask(EngineService engineService) {
+            engineServiceRef = Ref.weak(engineService);
+        }
 
-        state = STATE_STARTED;
+        @Override
+        public void run() {
+            if (!Ref.alive(engineServiceRef)) {
+                throw new RuntimeException("No reference to EngineService");
+            }
+            EngineService engineService = engineServiceRef.get();
 
-        LOG.info("Engine started");
+            engineService.state = STATE_STARTING;
+
+            BTEngine.getInstance().resume();
+
+            engineService.state = STATE_STARTED;
+            LOG.info("Engine started");
+        }
     }
 
     public synchronized void stopServices(boolean disconnected) {
