@@ -541,9 +541,8 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        OnSharedPreferenceChangeListener preferenceListener = (sharedPreferences, key) -> {
+        OnSharedPreferenceChangeListener preferenceListener = (sharedPreferences, key) -> Engine.instance().getThreadPool().execute(() -> {
             BTEngine e = BTEngine.getInstance();
-
             if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
                 e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
@@ -557,7 +556,7 @@ public final class TransferManager {
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
                 e.maxPeers((int) ConfigurationManager.instance().getLong(key));
             }
-        };
+        });
         ConfigurationManager.instance().registerOnPreferenceChange(preferenceListener);
     }
 
