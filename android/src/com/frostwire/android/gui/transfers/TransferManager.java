@@ -42,10 +42,12 @@ import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +83,7 @@ public final class TransferManager {
         this.bittorrentDownloadsList = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsMap = new HashMap<>(0);
         this.downloadsToReview = 0;
-        loadTorrents();
+        Engine.instance().getThreadPool().execute(new LoadTorrentsTask(this));
     }
 
     /**
@@ -250,46 +252,6 @@ public final class TransferManager {
                 d.pause();
             }
         }
-    }
-
-    public void loadTorrents() {
-        bittorrentDownloadsList.clear();
-        bittorrentDownloadsMap.clear();
-
-        final BTEngine engine = BTEngine.getInstance();
-
-        engine.setListener(new BTEngineAdapter() {
-            @Override
-            public void downloadAdded(BTEngine engine, BTDownload dl) {
-                String name = dl.getName();
-                if (name != null && name.contains("fetch_magnet")) {
-                    return;
-                }
-
-                File savePath = dl.getSavePath();
-                if (savePath != null && savePath.toString().contains("fetch_magnet")) {
-                    return;
-                }
-                UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
-                bittorrentDownloadsList.add(uiBittorrentDownload);
-                bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
-            }
-
-            @Override
-            public void downloadUpdate(BTEngine engine, BTDownload dl) {
-                try {
-                    BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
-                    if (bittorrentDownload instanceof UIBittorrentDownload) {
-                        UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
-                        bt.updateUI(dl);
-                    }
-                } catch (Throwable e) {
-                    LOG.error("Error updating bittorrent download", e);
-                }
-            }
-        });
-
-        Engine.instance().getThreadPool().execute(new RestoreDownloadsTask());
     }
 
     public boolean remove(Transfer transfer) {
@@ -548,7 +510,7 @@ public final class TransferManager {
         List<Transfer> transfers = new ArrayList<>();
         transfers.addAll(httpDownloads);
         for (Transfer t : transfers) {
-            if (t instanceof Transfer && !t.isComplete() && t.isDownloading()) {
+            if (t != null && !t.isComplete() && t.isDownloading()) {
                 t.remove(false);
             }
         }
@@ -599,11 +561,62 @@ public final class TransferManager {
         ConfigurationManager.instance().registerOnPreferenceChange(preferenceListener);
     }
 
-    private static final class RestoreDownloadsTask implements Runnable {
-
-        @Override
+    private static final class LoadTorrentsTask implements Runnable {
+        private final WeakReference<TransferManager> tmRef;
+        private LoadTorrentsTask(TransferManager tm) {
+            this.tmRef = Ref.weak(tm);
+        }
         public void run() {
-            BTEngine.getInstance().restoreDownloads();
+            if (!Ref.alive(tmRef)) {
+                return;
+            }
+
+            TransferManager tm  = tmRef.get();
+            tm.bittorrentDownloadsList.clear();
+            tm.bittorrentDownloadsMap.clear();
+
+            final BTEngine btEngine = BTEngine.getInstance();
+            btEngine.setListener(new BTEngineAdapter() {
+                @Override
+                public void downloadAdded(BTEngine engine, BTDownload dl) {
+                    String name = dl.getName();
+                    if (name != null && name.contains("fetch_magnet")) {
+                        return;
+                    }
+
+                    File savePath = dl.getSavePath();
+                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
+                        return;
+                    }
+                    if (!Ref.alive(tmRef)) {
+                        LOG.warn("BTEngineAdapter.downloadAdded() could not add download, TransferManager reference lost");
+                        return;
+                    }
+                    TransferManager tm = tmRef.get();
+                    UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(tm, dl);
+                    tm.bittorrentDownloadsList.add(uiBittorrentDownload);
+                    tm.bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                }
+
+                @Override
+                public void downloadUpdate(BTEngine engine, BTDownload dl) {
+                    if (!Ref.alive(tmRef)) {
+                        LOG.warn("BTEngineAdapter.downloadUpdate() aborted, TransferManager reference lost");
+                        return;
+                    }
+                    try {
+                        TransferManager tm = tmRef.get();
+                        BittorrentDownload bittorrentDownload = tm.bittorrentDownloadsMap.get(dl.getInfoHash());
+                        if (bittorrentDownload instanceof UIBittorrentDownload) {
+                            UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;
+                            bt.updateUI(dl);
+                        }
+                    } catch (Throwable e) {
+                        LOG.error("Error updating bittorrent download", e);
+                    }
+                }
+            });
+            btEngine.restoreDownloads();
         }
     }
 }
