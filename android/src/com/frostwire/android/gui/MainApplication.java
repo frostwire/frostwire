@@ -158,7 +158,6 @@ public class MainApplication extends Application {
             ctx.retries = port1 - port0;
 
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
             BTEngine.getInstance().start();
