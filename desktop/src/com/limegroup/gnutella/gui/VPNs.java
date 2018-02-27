@@ -80,7 +80,8 @@ public final class VPNs {
             return isWindowsPIAActive(interfaces, routes) ||
                     isExpressVPNActive(interfaces) ||
                     isWindowsCactusVPNActive(interfaces, routes) ||
-                    isWindowsNordVPNActive(interfaces, routes);
+                    isWindowsNordVPNActive(interfaces, routes) ||
+                    isWindowsAvgVPNActive(interfaces, routes);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
@@ -97,6 +98,10 @@ public final class VPNs {
 
     private static boolean isWindowsNordVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
         return isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN");
+    }
+
+    private static boolean isWindowsAvgVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
+        return isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP");
     }
 
     private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces) {
