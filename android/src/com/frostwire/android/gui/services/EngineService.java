@@ -146,13 +146,15 @@ public class EngineService extends Service implements IEngineService {
             // possible java.lang.SecurityException
         }
         stopServices(false);
-        LOG.debug("onDestroy, stopping BTEngine...");
-        if (BTEngine.ctx == null) {
-            BTEngine.ctx = new BTContext();
-            BTEngine.onCtxSetupComplete();
+
+        if (BTEngine.ctx != null) {
+            LOG.debug("onDestroy, stopping BTEngine...");
+            BTEngine.getInstance().stop();
+            LOG.debug("onDestroy, BTEngine stopped");
+        } else {
+            LOG.debug("onDestoy, BTEngine didn't have a chance to start, no need to stop it");
         }
-        BTEngine.getInstance().stop();
-        LOG.debug("onDestroy, BTEngine stopped");
+
         ImageLoader.getInstance(this).shutdown();
         PlayStore.getInstance().dispose();
         stopOkHttp();
