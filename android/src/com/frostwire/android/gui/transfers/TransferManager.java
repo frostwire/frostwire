@@ -212,6 +212,10 @@ public final class TransferManager {
     }
 
     public long getDownloadsBandwidth() {
+        if (BTEngine.ctx == null) {
+            // too early
+            return 0;
+        }
         long torrentDownloadsBandwidth = BTEngine.getInstance().downloadRate();
         long peerDownloadsBandwidth = 0;
         for (Transfer d : httpDownloads) {
@@ -221,6 +225,10 @@ public final class TransferManager {
     }
 
     public double getUploadsBandwidth() {
+        if (BTEngine.ctx == null) {
+            // too early
+            return 0;
+        }
         return BTEngine.getInstance().uploadRate();
     }
 
