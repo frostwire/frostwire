@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author aldenml
  */
 final class EngineThreadPool extends ThreadPool {
-    //private Logger LOG = Logger.getLogger(EngineThreadPool.class);
+    // private Logger LOG = Logger.getLogger(EngineThreadPool.class);
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
     private static final int MAXIMUM_POOL_SIZE = 4;
