@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
@@ -541,7 +540,12 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        OnSharedPreferenceChangeListener preferenceListener = (sharedPreferences, key) -> Engine.instance().getThreadPool().execute(() -> {
+        ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key));
+    }
+
+    private void onPreferenceChanged(String key) {
+        //LOG.info("onPreferenceChanged(key="+key+")");
+        Engine.instance().getThreadPool().execute(() -> {
             BTEngine e = BTEngine.getInstance();
             if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
                 e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
@@ -557,7 +561,7 @@ public final class TransferManager {
                 e.maxPeers((int) ConfigurationManager.instance().getLong(key));
             }
         });
-        ConfigurationManager.instance().registerOnPreferenceChange(preferenceListener);
+
     }
 
     private static final class LoadTorrentsTask implements Runnable {
