@@ -291,8 +291,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
         }
-        Engine.instance().getThreadPool().execute(new StatusBarUpdater(this));
-        onCheckDHT();
+        if (BTEngine.ctx != null) {
+            Engine.instance().getThreadPool().execute(new StatusBarUpdater(this));
+            onCheckDHT();
+        }
     }
 
     private static class StatusBarUpdater implements Runnable {
