@@ -481,6 +481,7 @@ public final class Initializer {
         ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
 
         BTEngine.ctx = ctx;
+        BTEngine.onCtxSetupComplete();
         BTEngine btEngine = BTEngine.getInstance();
         btEngine.start();
 
