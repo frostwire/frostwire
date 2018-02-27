@@ -1,4 +1,4 @@
-FrostWire 2.0.2 build 495 - FEB/26/2018
+FrostWire 2.0.2 build 496 - FEB/26/2018
  - Application startup is faster
  - Zooqle search fixes
  - TorrentDownloads search fixes
