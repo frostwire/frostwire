@@ -67,13 +67,12 @@ public class MainApplication extends Application {
 
         Platforms.set(new AndroidPlatform(this));
 
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-
-        threadPool.execute(new BTEngineInitializer(Ref.weak(this)));
+        new Thread(new BTEngineInitializer(Ref.weak(this))).start();
 
         Librarian.create();
         Engine.instance().onApplicationCreate(this);
 
+        ExecutorService threadPool = Engine.instance().getThreadPool();
         ImageLoader.start(this, threadPool);
 
         threadPool.execute(new CrawlPagedWebSearchPerformerInitializer(this));
@@ -158,6 +157,12 @@ public class MainApplication extends Application {
             ctx.retries = port1 - port0;
 
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+//            Simulate slow BTContext initialization
+//            try {
+//                Thread.sleep(60000);
+//            } catch (InterruptedException e) {
+//            }
+
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
             BTEngine.getInstance().start();
