@@ -52,6 +52,8 @@ public class MiniPlayerView extends LinearLayout {
     private TextView artistText;
     private ImageView coverImage;
     private ImageView playPauseButton;
+    private boolean isPlaying = false;
+    private long currentAlbumId;
     private final TimerObserver refresher;
 
     public MiniPlayerView(Context context, AttributeSet set) {
@@ -138,7 +140,6 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void refreshAlbumCover() {
-        long currentAlbumId = MusicUtils.getCurrentAlbumId();
         if (currentAlbumId != -1) {
             Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
             ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
@@ -148,9 +149,8 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void refreshPlayPauseIcon() {
-
         int notifierResourceId;
-        if (!MusicUtils.isPlaying()) {
+        if (!isPlaying) {
             notifierResourceId = R.drawable.btn_playback_play_bottom;
         } else {
             notifierResourceId = R.drawable.btn_playback_pause_bottom;
@@ -177,6 +177,9 @@ public class MiniPlayerView extends LinearLayout {
             MiniPlayerView miniPlayer = miniPlayerRef.get();
             CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
             if (mp != null) {
+                miniPlayer.isPlaying = MusicUtils.isPlaying();
+                miniPlayer.currentAlbumId = MusicUtils.getCurrentAlbumId();
+
                 FileDescriptor fd = mp.getCurrentFD(miniPlayer.getContext());
 
                 Handler handler = new Handler(Looper.getMainLooper());
