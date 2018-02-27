@@ -25,17 +25,23 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 
+import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
+import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -77,8 +83,7 @@ public final class Engine implements IEngineService {
      * @param application the application object
      */
     public void onApplicationCreate(Application application) {
-        vibrator = new FWVibrator(application);
-        startEngineService(application);
+        getThreadPool().execute(new EngineServiceStarter(application, this));
     }
 
     @Override
@@ -167,24 +172,29 @@ public final class Engine implements IEngineService {
     private void startEngineService(final Context context) {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
-        context.startService(i);
-        context.bindService(i, connection = new ServiceConnection() {
-            public void onServiceDisconnected(ComponentName name) {
-            }
+        try {
+            context.startService(i);
+            context.bindService(i, connection = new ServiceConnection() {
+                public void onServiceDisconnected(ComponentName name) {
+                }
 
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                // avoids: java.lang.ClassCastException: android.os.BinderProxy cannot be cast to com.frostwire.android.gui.services.EngineService$EngineServiceBinder
-                if (service instanceof EngineServiceBinder) {
-                    Engine.this.service = ((EngineServiceBinder) service).getService();
-                    registerStatusReceiver(context);
-
-                    if (pendingStartServices) {
-                        pendingStartServices = false;
-                        Engine.this.service.startServices();
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    // avoids: java.lang.ClassCastException: android.os.BinderProxy cannot be cast to com.frostwire.android.gui.services.EngineService$EngineServiceBinder
+                    if (service instanceof EngineServiceBinder) {
+                        Engine.this.service = ((EngineServiceBinder) service).getService();
+                        registerStatusReceiver(context);
+                        if (pendingStartServices) {
+                            pendingStartServices = false;
+                            Engine.this.service.startServices();
+                        }
                     }
                 }
-            }
-        }, 0);
+            }, 0);
+        } catch (SecurityException execution) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(()->UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception));
+            execution.printStackTrace();
+        }
     }
 
     private void registerStatusReceiver(Context context) {
@@ -247,6 +257,33 @@ public final class Engine implements IEngineService {
         public boolean isActive() {
             return vibrator != null &&
                     ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+        }
+    }
+
+    private static class EngineServiceStarter implements Runnable {
+        private final WeakReference<Application> appRef;
+        private final WeakReference<Engine> engineRef;
+        private EngineServiceStarter(Application application, Engine engine) {
+            appRef = Ref.weak(application);
+            engineRef = Ref.weak(engine);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(appRef)) {
+                throw new RuntimeException("Engine::EngineServiceStarter aborted, Application reference lost");
+            }
+            if (!Ref.alive(engineRef)) {
+                throw new RuntimeException("Engine::EngineServiceStarter aborted, Engine reference lost");
+            }
+
+            Application application = appRef.get();
+            Engine engine = engineRef.get();
+
+            if (application != null && engine != null) {
+                engine.vibrator = new FWVibrator(application);
+                engine.startEngineService(application);
+            }
         }
     }
 }
