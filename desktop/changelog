@@ -6,9 +6,9 @@ frostwire (6.6.3) stable; urgency=high
   * jlibtorrent 1.0.2.17
   * native updates in preparation for Java 9 compatible release
   * Some VPN detection now being done at the jlibtorrent layer
-  * Cactus VPN detection fixed on Windows
+  * Cactus VPN, Nord VPN, Avg VPN detection fixed on Windows
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 26 Feb 2018 09:07:01 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 27 Feb 2018 15:16:22 -0600
 
 frostwire (6.6.2) stable; urgency=high
   * New jlibtorrent 1.2.0.16
