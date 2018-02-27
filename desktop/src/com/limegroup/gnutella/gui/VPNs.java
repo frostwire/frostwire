@@ -79,7 +79,8 @@ public final class VPNs {
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
             return isWindowsPIAActive(interfaces, routes) ||
                     isExpressVPNActive(interfaces) ||
-                    isWindowsCactusVPNActive(interfaces, routes);
+                    isWindowsCactusVPNActive(interfaces, routes) ||
+                    isWindowsNordVPNActive(interfaces, routes);
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
@@ -92,6 +93,10 @@ public final class VPNs {
 
     private static boolean isWindowsCactusVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
         return isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN");
+    }
+
+    private static boolean isWindowsNordVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
+        return isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN");
     }
 
     private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces) {
