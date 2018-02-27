@@ -32,7 +32,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author aldenml
  */
 final class EngineThreadPool extends ThreadPool {
-
+    //private Logger LOG = Logger.getLogger(EngineThreadPool.class);
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
     private static final int MAXIMUM_POOL_SIZE = 4;
@@ -43,6 +43,7 @@ final class EngineThreadPool extends ThreadPool {
 
     @Override
     public void execute(Runnable command) {
+        //LOG.info("execute (tasks:"+getQueue().size()+") invoked from " + Debug.getCallingMethodInfo());
         verifyTask(command);
         super.execute(command);
     }
