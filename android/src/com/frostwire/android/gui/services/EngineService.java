@@ -41,6 +41,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.bloom_filter_256;
@@ -146,6 +147,10 @@ public class EngineService extends Service implements IEngineService {
         }
         stopServices(false);
         LOG.debug("onDestroy, stopping BTEngine...");
+        if (BTEngine.ctx == null) {
+            BTEngine.ctx = new BTContext();
+            BTEngine.onCtxSetupComplete();
+        }
         BTEngine.getInstance().stop();
         LOG.debug("onDestroy, BTEngine stopped");
         ImageLoader.getInstance(this).shutdown();
