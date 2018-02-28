@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -53,7 +52,7 @@ public final class ApolloUtils {
      * @param context The {@link Context} to use.
      * @return True if the device is in landscape mode, false otherwise.
      */
-    public static final boolean isLandscape(final Context context) {
+    public static boolean isLandscape(final Context context) {
         final int orientation = context.getResources().getConfiguration().orientation;
         return orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
@@ -129,7 +128,7 @@ public final class ApolloUtils {
      * @param activity The {@link Activity} to use.
      * @return A new {@link ImageFetcher} used to fetch images asynchronously.
      */
-    public static final ImageFetcher getImageFetcher(final Activity activity) {
+    public static ImageFetcher getImageFetcher(final Activity activity) {
         final ImageFetcher imageFetcher = ImageFetcher.getInstance(activity);
         imageFetcher.setImageCache(ImageCache.findOrCreateCache(activity));
         return imageFetcher;
@@ -146,64 +145,60 @@ public final class ApolloUtils {
      */
     public static void createShortcutIntentAsync(final String displayName, final String artistName,
                                                  final Long id, final String mimeType, final WeakReference<Activity> context) {
-        Runnable task = new Runnable() {
-            public void run() {
-                final ImageFetcher fetcher = getImageFetcher(context.get());
-                Bitmap bitmap = null;
-                boolean success = true;
-                try {
-                    if (mimeType.equals(MediaStore.Audio.Albums.CONTENT_TYPE)) {
-                        bitmap = fetcher.getCachedBitmap(
-                                ImageFetcher.generateAlbumCacheKey(displayName, artistName));
+        Runnable task = () -> {
+            final ImageFetcher fetcher = getImageFetcher(context.get());
+            Bitmap bitmap;
+            boolean success = true;
+            try {
+                if (mimeType.equals(MediaStore.Audio.Albums.CONTENT_TYPE)) {
+                    bitmap = fetcher.getCachedBitmap(
+                            ImageFetcher.generateAlbumCacheKey(displayName, artistName));
+                } else {
+                    bitmap = fetcher.getCachedBitmap(displayName);
+                }
+                if (bitmap == null) {
+                    bitmap = fetcher.getDefaultArtwork();
+                }
+                //check if activity context is still valid
+                if(Ref.alive(context)) {
+                    final Intent shortcutIntent = new Intent(context.get(), ShortcutActivity.class);
+                    shortcutIntent.setAction(Intent.ACTION_VIEW);
+                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    shortcutIntent.putExtra(Config.ID, id);
+                    shortcutIntent.putExtra(Config.NAME, displayName);
+                    shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
+
+                    // Intent that actually sets the shortcut
+                    final Intent intent = new Intent();
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
+                    intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+                    context.get().sendBroadcast(intent);
+                }
+            } catch (Exception e) {
+                Log.e("ApolloUtils", "createShortcutIntent", e);
+                success = false;
+            }
+
+            final boolean finalSuccess = success;
+
+            if (Ref.alive(context)) {
+                // UI thread portion
+                Runnable postExecute = () -> {
+                    if (finalSuccess) {
+                        AppMsg.makeText(context.get(),
+                                context.get().getString(R.string.pinned_to_home_screen, displayName),
+                                AppMsg.STYLE_CONFIRM).show();
                     } else {
-                        bitmap = fetcher.getCachedBitmap(displayName);
+                        AppMsg.makeText(
+                                context.get(),
+                                context.get().getString(R.string.could_not_be_pinned_to_home_screen, displayName),
+                                AppMsg.STYLE_ALERT).show();
                     }
-                    if (bitmap == null) {
-                        bitmap = fetcher.getDefaultArtwork();
-                    }
-                    //check if activity context is still valid
-                    if(Ref.alive(context)) {
-                        final Intent shortcutIntent = new Intent(context.get(), ShortcutActivity.class);
-                        shortcutIntent.setAction(Intent.ACTION_VIEW);
-                        shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        shortcutIntent.putExtra(Config.ID, id);
-                        shortcutIntent.putExtra(Config.NAME, displayName);
-                        shortcutIntent.putExtra(Config.MIME_TYPE, mimeType);
-
-                        // Intent that actually sets the shortcut
-                        final Intent intent = new Intent();
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
-                        intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
-                        context.get().sendBroadcast(intent);
-                    }
-                } catch (Exception e) {
-                    Log.e("ApolloUtils", "createShortcutIntent", e);
-                    success = false;
-                }
-
-                final boolean finalSuccess = success;
-
-                if (Ref.alive(context)) {
-                    // UI thread portion
-                    Runnable postExecute = new Runnable() {
-                        public void run() {
-                            if (finalSuccess) {
-                                AppMsg.makeText(context.get(),
-                                        context.get().getString(R.string.pinned_to_home_screen, displayName),
-                                        AppMsg.STYLE_CONFIRM).show();
-                            } else {
-                                AppMsg.makeText(
-                                        context.get(),
-                                        context.get().getString(R.string.could_not_be_pinned_to_home_screen, displayName),
-                                        AppMsg.STYLE_ALERT).show();
-                            }
-                        }
-                    };
-                    context.get().runOnUiThread(postExecute);
-                }
+                };
+                context.get().runOnUiThread(postExecute);
             }
         };
         Engine.instance().getThreadPool().execute(task);
