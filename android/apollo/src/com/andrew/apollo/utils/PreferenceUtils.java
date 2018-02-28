@@ -114,7 +114,7 @@ public final class PreferenceUtils {
 
                 return null;
             }
-        }, (Void[]) null);
+        });
     }
 
     /**
@@ -250,7 +250,7 @@ public final class PreferenceUtils {
 
                 return null;
             }
-        }, (Void[]) null);
+        });
     }
 
     /**

@@ -130,7 +130,7 @@ public final class ImageCache {
      * @param context The {@link Context} to use
      */
     private void init(final Context context) {
-        ApolloUtils.execute(new InitDiskCacheAsyncTask(this, context), (Void[]) null);
+        ApolloUtils.execute(new InitDiskCacheAsyncTask(this, context));
         // Set up the memory cache
         initLruCache(context);
     }
@@ -499,7 +499,7 @@ public final class ImageCache {
                 }
                 return null;
             }
-        }, (Void[]) null);
+        });
     }
 
     /**

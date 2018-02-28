@@ -62,13 +62,9 @@ public final class ApolloUtils {
      * Execute an {@link AsyncTask} on a thread pool
      *
      * @param task Task to execute
-     * @param args Optional arguments to pass to
-     *             {@link AsyncTask#execute(Object[])}
-     * @param <T>  Task argument type
      */
-    public static <T> void execute(final AsyncTask<T, ?, ?> task,
-                                   final T... args) {
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args);
+    public static void execute(final AsyncTask<?, ?, ?> task) {
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**
