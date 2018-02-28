@@ -680,7 +680,6 @@
     <string name="seeding_time">وقت البذر</string>
     <string name="working">العمل</string>
     <string name="rtt_ms">RTT %1$d ms</string>
-    <string name="hello_blank_fragment">مرحبا جزء فارغ</string>
     <string name="pieces">قطع</string>
     <string name="upload_limit">حد التحميل</string>
     <string name="enter_valid_tracker_url_here">أدخل عنوان ورل لتعقب صالح هنا</string>

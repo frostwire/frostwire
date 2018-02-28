@@ -679,7 +679,6 @@
     <string name="seeding_time">بار بار</string>
     <string name="working">کام کرنا</string>
     <string name="rtt_ms">RTT %1$d ms</string>
-    <string name="hello_blank_fragment">خالی خالی ٹکڑا</string>
     <string name="one_file_shared">اسی فائل میں FrostWire آلات کو ایک ہی وائی فائی نیٹ ورک پر اشتراک کیا گیا ہے.</string>
     <string name="pieces">ٹکڑے</string>
     <string name="upload_limit">حد تک اپ لوڈ کریں</string>

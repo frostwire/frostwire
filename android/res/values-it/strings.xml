@@ -678,7 +678,6 @@
     <string name="seeding_time">Tempo di semina</string>
     <string name="working">Funzionando</string>
     <string name="rtt_ms">RTT %1$d ms</string>
-    <string name="hello_blank_fragment">Ciao frammento vuoto</string>
     <string name="one_file_shared">Un file è stato condiviso con i dispositivi FrostWire sulla stessa rete Wi-Fi.</string>
     <string name="pieces">Pezzi</string>
     <string name="upload_limit">Carica limite</string>

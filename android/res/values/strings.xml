@@ -498,7 +498,6 @@
     <string name="track">track</string>
     <string name="playlist">playlist</string>
     <string name="are_you_sure_you_want_to_download_the_following">Are you sure you want to download the following %1$s (%2$s)?</string>
-    <string name="prepend_shortcut_label" translatable="false" />
     <string name="menu_enter_shortcut_label">Enter</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="menu_space_shortcut_label">Space</string>

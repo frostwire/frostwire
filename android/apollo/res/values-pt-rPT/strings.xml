@@ -126,6 +126,4 @@
   <string name="empty_search">Pesquisa sem resultados</string>
   <string name="empty_favorite">As músicas que marcar como favoritas serão apresentadas aqui.</string>
   <string name="empty_recent">Os álbuns que ouviu serão apresentados aqui. Tente ouvir alguma música.</string>
-  <string name="haptic_feedback">Feedback Táctil</string>
-  <string name="advertisement">propaganda</string>
 </resources>
