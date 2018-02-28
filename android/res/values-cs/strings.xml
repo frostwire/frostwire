@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Připojit k lokální Wi-Fi sítí peer-to-peer prostřednictvím vysílání(větší provoz na routeru)</string>
     <string name="internet_discovery">Zjišťování Internetu</string>
     <string name="internet_discovery_summary">Připojení ke vzdálených sítí peer-to-peer na internetu.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Od</string>
     <string name="wants_to_share_a_file">chce sdílet soubor</string>
     <string name="translators">Překladatelé</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Připojen pomocí Datového Tarifu</string>
     <string name="send_to_chat">Odeslat do Chatu</string>
     <string name="sent_file_to_chat">Odesláno soubor do Chatu</string>
-    <string name="sent_files_to_chat">Odesláno %d soubory do Chatu</string>
     <string name="choose_wifi_network">Vyberte si Wi-Fi sítí</string>
     <string name="please_update_to_v">Prosím aktualizujte do v. %s</string>
     <string name="cant_open_file">Omlouváme se, ale nevím, jak tento soubor otevřít.</string>

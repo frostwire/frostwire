@@ -28,7 +28,6 @@
     <string name="vpn_not_found">ไม่มี VPN พิจารณาการเข้ารหัสการเชื่อมต่อ</string>
     <string name="azureus_peer_manager_status_finished">เสร็จ</string>
     <string name="activity_mediaplayer_name">Media Player</string>
-    <string name="sent_files_to_chat">ส่ง %d ไฟล์ไปยังพูดคุย</string>
     <string name="your_installation_is_complete">การติดตั้งเสร็จสมบูรณ์</string>
     <string name="error_connection_timed_out">ข้อผิดพลาด: หมดเวลาเชื่อมต่อ/ลดลง ลองอีกครั้ง.</string>
     <string name="im_on_it">ผมกับมัน…</string>
@@ -165,7 +164,6 @@
     <string name="fetching_file_list">รายการดึงข้อมูลที่ใช้ร่วมกัน</string>
     <string name="toast_on_connect">BitTorrent หลักเริ่มต้น</string>
     <string name="help">ช่วยด้วย</string>
-    <string name="meter">m</string>
     <string name="disabled">พิการ</string>
     <string name="cloud_downloads_coming">ขออภัย: เริ่มต้นการดาวน์โหลดเมฆจากที่นี่จะสามารถใช้ได้ในการปรับปรุงต่อไป</string>
     <string name="menu_space_shortcut_label">ช่องว่าง</string>
@@ -357,7 +355,6 @@
     <string name="pictures">ภาพ</string>
     <string name="yes_no_cancel_transfer_question_cloud">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะหยุดและเอาดาวน์โหลดนี้ออกจากรายการหรือไม่</string>
     <string name="cant_open_file">ขออภัยไม่ทราบวิธีการเปิดไฟล์นี้</string>
-    <string name="kilometer">กม.</string>
     <string name="desktop_transfer_status_transferring">การถ่ายโอน</string>
     <string name="download_added_to_queue">1 ไฟล์จะเริ่มต้นการดาวน์โหลด</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent ตัดการเชื่อมต่อ คุณต้องการให้ฉันเริ่มต้นมันสำหรับคุณ?</string>

@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Ingen VPN. Överväga att kryptera anslutning.</string>
     <string name="azureus_peer_manager_status_finished">Färdiga</string>
     <string name="activity_mediaplayer_name">Mediaspelare</string>
-    <string name="sent_files_to_chat">Skickas %d filer till Chat</string>
     <string name="your_installation_is_complete">Installationen är klar.</string>
     <string name="error_connection_timed_out">Fel: anslutningen har avbrutits/sjunkit. Försök igen.</string>
     <string name="im_on_it">Jag är på det…</string>
@@ -167,7 +166,6 @@
     <string name="fetching_file_list">Hämtning lista över delade</string>
     <string name="toast_on_connect">BitTorrent kärna började.</string>
     <string name="help">Hjälp</string>
-    <string name="meter">m</string>
     <string name="disabled">inaktiverad</string>
     <string name="cloud_downloads_coming">Tyvärr: Starta nedladdningar moln härifrån kommer att finnas tillgänglig på ytterligare uppdateringar.</string>
     <string name="menu_space_shortcut_label">Utrymme</string>
@@ -362,7 +360,6 @@
     <string name="pictures">Bilder</string>
     <string name="yes_no_cancel_transfer_question_cloud">Är du säker på att du vill stoppa och ta bort denna hämtning från listan?</string>
     <string name="cant_open_file">Tyvärr, inte vet hur man öppnar den här filen.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Överföra</string>
     <string name="download_added_to_queue">En fil kommer att starta nedladdningen</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent är frånkopplad . Vill du att jag ska starta den för dig?</string>

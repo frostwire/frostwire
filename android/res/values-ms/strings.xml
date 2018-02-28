@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Tiada VPN. Pertimbangkan menyulitkan sambungan.</string>
     <string name="azureus_peer_manager_status_finished">Tamat</string>
     <string name="activity_mediaplayer_name">Pemain media</string>
-    <string name="sent_files_to_chat">Dihantar %d fail ke Dinding</string>
     <string name="your_installation_is_complete">Pemasangan anda selesai.</string>
     <string name="error_connection_timed_out">Ralat: sambungan tamat masa/gugur. Cuba lagi.</string>
     <string name="im_on_it">Saya di atasnya…</string>
@@ -165,7 +164,6 @@
     <string name="fetching_file_list">Senarai Mengambil dikongsi</string>
     <string name="toast_on_connect">BitTorrent teras bermula.</string>
     <string name="help">Bantu</string>
-    <string name="meter">m</string>
     <string name="disabled">Kurang upaya</string>
     <string name="cloud_downloads_coming">Maaf: Bermula muat turun awan dari sini boleh didapati di kemas kini lagi.</string>
     <string name="menu_space_shortcut_label">Ruang</string>
@@ -357,7 +355,6 @@
     <string name="pictures">Gambar</string>
     <string name="yes_no_cancel_transfer_question_cloud">Adakah anda pasti anda mahu berhenti dan mengalih keluar muat turun ini dari senarai?</string>
     <string name="cant_open_file">Maaf, tidak tahu bagaimana untuk membuka fail ini.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Memindahkan</string>
     <string name="download_added_to_queue">1 fail akan mula memuat turun</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">BitTorrent diputuskan. Adakah anda ingin saya untuk memulakan untuk anda?</string>

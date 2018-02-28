@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Не VPN. Помислете за криптиране на връзката.</string>
     <string name="azureus_peer_manager_status_finished">Завършил</string>
     <string name="activity_mediaplayer_name">Медиен плейър</string>
-    <string name="sent_files_to_chat">Изпратени %d файлове за чат</string>
     <string name="your_installation_is_complete">Вашата инсталация е завършена.</string>
     <string name="error_connection_timed_out">Грешка: връзка с изтичане на времето/спадна. Опитай пак.</string>
     <string name="im_on_it">Заемам се…</string>
@@ -165,7 +164,6 @@
     <string name="fetching_file_list">Извличането списък на споделена</string>
     <string name="toast_on_connect">BitTorrent ядро започна.</string>
     <string name="help">Помогне</string>
-    <string name="meter">m</string>
     <string name="disabled">хора с увреждания</string>
     <string name="cloud_downloads_coming">Съжаляваме: Стартиране на облачните сваляне от тук ще бъде на разположение за по-нататъшни актуализации.</string>
     <string name="menu_space_shortcut_label">пространство</string>
@@ -357,7 +355,6 @@
     <string name="pictures">Снимки</string>
     <string name="yes_no_cancel_transfer_question_cloud">Сигурни ли сте че искате да спрете и изтриете изтегления файл от списъка?</string>
     <string name="cant_open_file">За съжаление, не знам как да се отвори този файл.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Прехвърляне</string>
     <string name="download_added_to_queue">1 файл ще започне да се изтегля</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent е изключен. Искате ли да я стартирате за вас?</string>

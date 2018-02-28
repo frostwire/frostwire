@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">प्रसारण (रूटर पर अधिक यातायात) के माध्यम से स्थानीय वाईफ़ाई साथियों को कनेक्ट करें</string>
     <string name="internet_discovery">इंटरनेट डिस्कवरी</string>
     <string name="internet_discovery_summary">इंटरनेट पर दूरस्थ साथियों को कनेक्ट करें.</string>
-    <string name="meter">एम</string>
-    <string name="kilometer">केएम</string>
     <string name="from">द्वारा</string>
     <string name="wants_to_share_a_file">एक फ़ाइल साझा करने के लिए चाहता है</string>
     <string name="translators">अनुवादक</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">डेटा योजना का उपयोग कर जोड़ा</string>
     <string name="send_to_chat">चैट के लिए भेजें</string>
     <string name="sent_file_to_chat">चैट के लिए फ़ाइल भेजें</string>
-    <string name="sent_files_to_chat">ैट के लिए फ़ाइल भेजें %d t</string>
     <string name="choose_wifi_network">वाई - फाई नेटवर्क चुनें</string>
     <string name="please_update_to_v">कृपया वी अद्यतन करें  %s</string>
     <string name="cant_open_file">खेद है, पता नहीं कैसे यह  फाईल खुलता  है .</string>

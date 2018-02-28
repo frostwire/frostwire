@@ -119,7 +119,6 @@
     <string name="vpn_not_found">کوئی VPN. کنکشن کو خفیہ کاری پر غور.</string>
     <string name="azureus_peer_manager_status_finished">ختم</string>
     <string name="activity_mediaplayer_name">میڈیا پلیئر</string>
-    <string name="sent_files_to_chat">مرسلہ چیٹ پر %d فائلوں</string>
     <string name="your_installation_is_complete">آپ کی تنصیب مکمل ہو گیا ہے.</string>
     <string name="error_connection_timed_out">غلطی: کنکشن / وقت ختم گرا. دوبارہ کوشش کریں.</string>
     <string name="im_on_it">میں اس پر ہوں…</string>
@@ -233,7 +232,6 @@
     <string name="fetching_file_list">اشتراک کیا کی بازیابی فہرست</string>
     <string name="toast_on_connect">BitTorrent کے کور کا آغاز کیا.</string>
     <string name="help">مدد</string>
-    <string name="meter">m</string>
     <string name="disabled">معذور افراد</string>
     <string name="cloud_downloads_coming">معذرت: یہاں سے ڈاؤن لوڈ کی بادل شروع میں مزید اپ ڈیٹ پر دستیاب ہو جائے گا.</string>
     <string name="menu_space_shortcut_label">خلائی</string>
@@ -393,7 +391,6 @@
     <string name="vpn_on_toast_notification">آپ کو ایک وی پی این سے منسلک ہیں.</string>
     <string name="haptic_feedback">haptic کی رائے</string>
     <string name="yes_no_cancel_transfer_question_cloud">آپ کو روکنے اور فہرست میں سے یہ ڈاؤن لوڈ ہٹانے کے لیے چاہتے ہیں؟</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">منتقلی</string>
     <string name="download_added_to_queue">1 فائل ڈاؤن لوڈ کرنے شروع کر دیں گے</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">BitTorrent کے منقطع ہے. تم نے مجھے آپ کے لئے یہ شروع کرنے کے لئے پسند کریں گے؟</string>

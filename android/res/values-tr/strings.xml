@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Yerel Wi-Fi uç noktalarına yayınlama (Broadcast) yaparak bağlanın (Router\'da daha fazla trafik)</string>
     <string name="internet_discovery">İnternet Keşfi</string>
     <string name="internet_discovery_summary">İnternet üzerindeki uzak uç noktalarına bağlanın.</string>
-    <string name="meter">mt</string>
-    <string name="kilometer">Km</string>
     <string name="from">Buradan</string>
     <string name="wants_to_share_a_file">bir dosya paylaşmak istiyor</string>
     <string name="translators">Çevirmenler</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Veri Planı kullanılarak bağlandı</string>
     <string name="send_to_chat">Sohbete Gönder</string>
     <string name="sent_file_to_chat">Sohbete Dosya Yönder</string>
-    <string name="sent_files_to_chat">%d adet dosya sohbete gönderildi</string>
     <string name="choose_wifi_network">Bir Wi-Fi ağı seçin</string>
     <string name="please_update_to_v">Lütfen şuna güncelleyin: %s</string>
     <string name="cant_open_file">Üzgünüm, bu dosyayı nasıl açacağımı bilmiyorum.</string>

@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Maak verbinding met lokale Wi-Fi vrienden via (meer verkeer op router)</string>
     <string name="internet_discovery">Internet Ontdekking</string>
     <string name="internet_discovery_summary">Maak verbinding met vrienden op afstand via Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Van</string>
     <string name="wants_to_share_a_file">wil een file delen</string>
     <string name="translators">Vertalers</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Verbonden met gebruik van Data Plan</string>
     <string name="send_to_chat">Verstuur voor Chat</string>
     <string name="sent_file_to_chat">Verstuur file naar Chat</string>
-    <string name="sent_files_to_chat">Verstuurde %d files naar Chat</string>
     <string name="choose_wifi_network">Kies een Wi-Fi netwerk</string>
     <string name="please_update_to_v">Update alsjeblieft naar v. %s</string>
     <string name="cant_open_file">Sorry, weet niet hoe dit file geopend moet worden.</string>

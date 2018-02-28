@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">(اتصل بشبكة واي فاي محلية لأقران عن طريق البث (المزيد من الزحام على الروتر</string>
     <string name="internet_discovery">اكتشاف الإنترنت</string>
     <string name="internet_discovery_summary">اتصل بأقران بعيدين على الإنترنت</string>
-    <string name="meter">م</string>
-    <string name="kilometer">كم</string>
     <string name="from">من</string>
     <string name="wants_to_share_a_file">يرغب في مشاركة ملفات</string>
     <string name="translators">مترجمين</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">اتصال باستخدام خطة بيانات</string>
     <string name="send_to_chat">ارسال للدردشة</string>
     <string name="sent_file_to_chat">ارسال ملف للدردشة</string>
-    <string name="sent_files_to_chat">ارسال %d ملفات للدردشة</string>
     <string name="choose_wifi_network">اختيار شبكة واي فاي</string>
     <string name="please_update_to_v">يرجى التحديث للنسخة %s</string>
     <string name="cant_open_file">.اسف لا أعلم\كيفية فتح هذا الملف</string>

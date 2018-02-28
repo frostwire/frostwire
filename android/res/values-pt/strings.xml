@@ -162,8 +162,6 @@
     <string name="broadcast_discovery_summary">Conecte com colegas locais por Wi-Fi via broadcast (mais tráfego no roteador)</string>
     <string name="internet_discovery">Descoberta da Internet</string>
     <string name="internet_discovery_summary">Conecte com colegas remotos na Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">De</string>
     <string name="wants_to_share_a_file">quer compartilhar um arquivo</string>
     <string name="translators">tradutores</string>
@@ -175,7 +173,6 @@
     <string name="connected_using_dataplan">Conecte usando Data Plan</string>
     <string name="send_to_chat">Envie para o Bate-papo</string>
     <string name="sent_file_to_chat">Envie arquivo para o Bate-papo</string>
-    <string name="sent_files_to_chat">Envie %d arquivos para o Bate-papo</string>
     <string name="choose_wifi_network">Escolha a rede Wi-Fi</string>
     <string name="please_update_to_v">Por favor atualize para v. %s</string>
     <string name="cant_open_file">Desculpe, não sei como abrir esse arquivo.</string>

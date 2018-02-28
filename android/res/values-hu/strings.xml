@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
     <string name="activity_mediaplayer_name">Médialejátszó</string>
-    <string name="sent_files_to_chat">Elküldött %d fájlokat in chat</string>
     <string name="your_installation_is_complete">A telepítés befejezése után.</string>
     <string name="error_connection_timed_out">Hiba: kapcsolat időtúllépés/csökkent. Próbáld újra.</string>
     <string name="im_on_it">Rajta vagyok…</string>
@@ -163,7 +162,6 @@
     <string name="fetching_file_list">Listájának lekérése megosztott</string>
     <string name="toast_on_connect">BitTorrent mag kezdett.</string>
     <string name="help">Segítség</string>
-    <string name="meter">m</string>
     <string name="disabled">tiltva</string>
     <string name="cloud_downloads_coming">Sorry: Kezdő felhő letöltések innen elérhető lesz a további frissítéseket.</string>
     <string name="menu_space_shortcut_label">Tér</string>
@@ -352,7 +350,6 @@
     <string name="pictures">Képek</string>
     <string name="yes_no_cancel_transfer_question_cloud">Biztosan le szeretné állítani és letöltés eltávolítása a listáról?</string>
     <string name="cant_open_file">Sajnálom, nem tudom, hogyan kell megnyitni ezt a fájlt.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Átadó</string>
     <string name="download_added_to_queue">1 fájl elkezdi letölteni</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent megszakad. Szeretné, hogy indítsa el az Ön számára?</string>

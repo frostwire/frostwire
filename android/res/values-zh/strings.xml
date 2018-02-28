@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">通过广播，连接当地无线节点（线路更堵）</string>
     <string name="internet_discovery">互联网探索</string>
     <string name="internet_discovery_summary">在互联网上连接远方节点.</string>
-    <string name="meter">米</string>
-    <string name="kilometer">千米</string>
     <string name="from">从</string>
     <string name="wants_to_share_a_file">想要共享文件</string>
     <string name="translators">翻译人员</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">使用上网计划连接</string>
     <string name="send_to_chat">发送聊天</string>
     <string name="sent_file_to_chat">发送文件聊天</string>
-    <string name="sent_files_to_chat">发送 %的文件聊天</string>
     <string name="choose_wifi_network">选择无线网络</string>
     <string name="please_update_to_v">请更新至 %</string>
     <string name="cant_open_file">很抱歉，不知道如何打开此文件.</string>

@@ -172,8 +172,6 @@
     <string name="broadcast_discovery_summary">Повезали се са локалним Ви-Фи колега преко сервиса (више саобраћаја на рутеру)</string>
     <string name="internet_discovery">Internet Discovery</string>
     <string name="internet_discovery_summary">Повежите са удаљеним вршњацима на Интернету.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">од</string>
     <string name="wants_to_share_a_file">жели да дели датотеке</string>
     <string name="translators">Преводиоци</string>
@@ -185,7 +183,6 @@
     <string name="connected_using_dataplan">Повезани преко плана података</string>
     <string name="send_to_chat">Пошаљи на Цхат</string>
     <string name="sent_file_to_chat">Послао слику на Цхат</string>
-    <string name="sent_files_to_chat">Послао %d фајлова на разговор</string>
     <string name="choose_wifi_network">Изаберите ВиФи мрежа</string>
     <string name="please_update_to_v">Плеасе упдате на верзију %s</string>
     <string name="cant_open_file">Жао ми је, не знам како да отворим овај фајл.</string>

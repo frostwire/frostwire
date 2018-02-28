@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Σύνδεση σε χρήστες στο τοπικό ασύρματο δίκτυο με broadcast (πιο πολλή κίνηση στο router)</string>
     <string name="internet_discovery">Σύνδεση μέσω Internet</string>
     <string name="internet_discovery_summary">Σύνδεση με απομακρυσμένους χρήστες μέσω Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Από</string>
     <string name="wants_to_share_a_file">θέλει να μοιραστεί ένα αρχείο</string>
     <string name="translators">Μεταφραστές</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Συνδεθήκαμε μέσω δικτύου δεδομένων</string>
     <string name="send_to_chat">Αποστολή στο Chat</string>
     <string name="sent_file_to_chat">Το αρχείο στάλθηκε στο Chat</string>
-    <string name="sent_files_to_chat">%d αρχεία στάλθηκαν στο Chat</string>
     <string name="choose_wifi_network">Διάλεξε ένα ασύρματο δίκτυο</string>
     <string name="please_update_to_v">Παρακαλώ κάνε ενημέρωση στην έκδοση v. %s</string>
     <string name="cant_open_file">Συγγνώμη, δεν ξέρω πώς να ανοίξω αυτό το αρχείο.</string>

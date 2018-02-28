@@ -28,7 +28,6 @@
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="activity_mediaplayer_name">נגן מדיה</string>
-    <string name="sent_files_to_chat">נשלח d% קבצים לצ\'\אט</string>
     <string name="your_installation_is_complete">שההתקנה הושלמה.</string>
     <string name="error_connection_timed_out">שגיאה: חיבור הופסק/ירד. נסה שוב.</string>
     <string name="im_on_it">אני מטפל בזה…</string>
@@ -167,7 +166,6 @@
     <string name="fetching_file_list">באחזור רשימה משותף</string>
     <string name="toast_on_connect">הליבה ביטורנט נכתבה.</string>
     <string name="help">עֶזרָה</string>
-    <string name="meter">m</string>
     <string name="disabled">מבוטל מאופשר</string>
     <string name="cloud_downloads_coming">מצטער: החל הורדות ענן מכאן יהיה נגיש עדכונים נוספים.</string>
     <string name="menu_space_shortcut_label">מֶרחָב</string>
@@ -362,7 +360,6 @@
     <string name="pictures">תמונות</string>
     <string name="yes_no_cancel_transfer_question_cloud">האם אתה בטוח שאתה רוצה לעצור להסיר הורדה זו מהרשימה?</string>
     <string name="cant_open_file">מצטער, לא יודע איך לפתוח קובץ זה.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">העברתי</string>
     <string name="download_added_to_queue">1 קובץ יתחיל להוריד</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">ביטורנט מנותק. האם אתה רוצה שתתחיל את זה בשבילך?</string>

@@ -166,8 +166,6 @@
     <string name="broadcast_discovery_summary">Подключаться к пирам, внутри Wi-Fi сети с помощью Broadcast (больше трафика на роутере)</string>
     <string name="internet_discovery">Интернет обнаружение</string>
     <string name="internet_discovery_summary">Подключиться к удаленным пирам в Интернете.</string>
-    <string name="meter">м</string>
-    <string name="kilometer">км</string>
     <string name="from">От</string>
     <string name="wants_to_share_a_file">хочет раздать файл</string>
     <string name="translators">Переводчики</string>
@@ -179,7 +177,6 @@
     <string name="connected_using_dataplan">Подключено с помощью текущего тарифного плана</string>
     <string name="send_to_chat">Отправить в чат</string>
     <string name="sent_file_to_chat">Отправил файл в чат</string>
-    <string name="sent_files_to_chat">Отправил %d файлов в чат</string>
     <string name="choose_wifi_network">Выбрать сеть Wi-Fi</string>
     <string name="please_update_to_v">Пожалуйста, обновитесь до версии %s</string>
     <string name="cant_open_file">Извините, не знаем, чем открыть этот файл.</string>

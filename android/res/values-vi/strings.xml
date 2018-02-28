@@ -163,8 +163,6 @@
     <string name="broadcast_discovery_summary">Kết nối đến mạng Wifi cục bộ ngang hàng qua broadcast tốn thêm lưu lượng trên router)</string>
     <string name="internet_discovery">Tìm hiểu Internet</string>
     <string name="internet_discovery_summary">Kết nối để điều khiển ngang hàng qua Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Đến từ</string>
     <string name="wants_to_share_a_file">muốn chia sẻ một tập tin</string>
     <string name="translators">Người phiên dịch</string>
@@ -176,7 +174,6 @@
     <string name="connected_using_dataplan">Kết nối sử dụng kế hoạch dữ liệuC</string>
     <string name="send_to_chat">Gửi qua Chat</string>
     <string name="sent_file_to_chat">Gửi tập tin qua Chat</string>
-    <string name="sent_files_to_chat">Gửi %d tập tin qua Chat</string>
     <string name="choose_wifi_network">Chọn một mạng Wifi</string>
     <string name="please_update_to_v">Vui lòng Update lên v. %s</string>
     <string name="cant_open_file">Xin lỗi, không thể mở được tập tin này.</string>

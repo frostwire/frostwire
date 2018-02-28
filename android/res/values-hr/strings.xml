@@ -155,14 +155,11 @@
     <string name="simultaneous_uploads">Istovremena slanja</string>
     <string name="simultaneous_uploads_summary">Postavi koliko slanja želite omogućiti u isto vrijeme</string>
     <string name="send_my_geo_location">Šalji moju lokaciju</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Od</string>
     <string name="other_settings">Ostale postavke</string>
     <string name="vibrate_on_finished_download">Vibriraj kad je preuzimanje gotovo</string>
     <string name="use_mobile_data">Koristi 3G/4G za BitTorrent</string>
     <string name="send_to_chat">Pošalji u chat</string>
-    <string name="sent_files_to_chat">Poslano %d datoteka u chat</string>
     <string name="activity_downloads_title_text">Preuzimanja</string>
     <string name="updating">Nadograđujem</string>
     <string name="search_hint">Traži sadržaj</string>

@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">ブロードキャスト経由でローカルのWi-Fi仲間とつながる (ルーターにより多くの通信料)</string>
     <string name="internet_discovery">インターネット・ディスカバリー</string>
     <string name="internet_discovery_summary">インターネットでリモート仲間とつながる</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">送り主</string>
     <string name="wants_to_share_a_file">がファイルの共有を望んでいます</string>
     <string name="translators">翻訳者</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">データプランを使用して接続しています</string>
     <string name="send_to_chat">チャットに送信</string>
     <string name="sent_file_to_chat">チャットにファイルを送信しました</string>
-    <string name="sent_files_to_chat">チャットに%dファイルを送信しました</string>
     <string name="choose_wifi_network">Wi-Fiネットワークを選択してください</string>
     <string name="please_update_to_v">v. %sにアップデートしてください</string>
     <string name="cant_open_file">申し訳ございませんが、このファイルの開き方が分かりません。</string>

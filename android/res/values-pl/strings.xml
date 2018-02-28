@@ -162,8 +162,6 @@
     <string name="broadcast_discovery_summary">Połącz z lokalną siecią hostów Wi-Fi poprzez emisję (większy ruch na routerze)</string>
     <string name="internet_discovery">Wykrywanie Internetu</string>
     <string name="internet_discovery_summary">Połącz z dostępnymi hostami w Internecie.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">z</string>
     <string name="wants_to_share_a_file">chce udostępnić plik</string>
     <string name="translators">Tłumacze</string>
@@ -175,7 +173,6 @@
     <string name="connected_using_dataplan">Podłączony za pomocą Mobilnej Transmisji Danych</string>
     <string name="send_to_chat">Wyślij do Czatu</string>
     <string name="sent_file_to_chat">Wysłano plik na Czat</string>
-    <string name="sent_files_to_chat">Wysłano %d pliki na Czat</string>
     <string name="choose_wifi_network">Wybierz sieć Wi-Fi</string>
     <string name="please_update_to_v">Proszę zaktualizować do w %s</string>
     <string name="cant_open_file">Przepraszam, nie wiem jak otworzyć ten plik.</string>

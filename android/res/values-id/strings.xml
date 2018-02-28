@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Hubungkan dengan rekan Wi-Fi Lokal melalui broadcast (lebih banyak traffic dalam router)</string>
     <string name="internet_discovery">Penemuan Internet</string>
     <string name="internet_discovery_summary">Hubungkan dengan para peer yang jauh di internet</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Dari</string>
     <string name="wants_to_share_a_file">ingin berbagi arsip</string>
     <string name="translators">Para penerjemah</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Terhubung dengan menggunakan Rencana Data</string>
     <string name="send_to_chat">Kirim ke Percakapan</string>
     <string name="sent_file_to_chat">Arsip terkirim ke Percakapan</string>
-    <string name="sent_files_to_chat">Arsip %d terkirim ke Percakapan</string>
     <string name="choose_wifi_network">Pilih jaringan Wi-Fi</string>
     <string name="please_update_to_v">Silahkan Perbarui untuk V. %s</string>
     <string name="cant_open_file">Maaf, tidak tahu cara membuka arsip ini</string>

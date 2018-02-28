@@ -168,8 +168,6 @@
     <string name="broadcast_discovery_summary">Conectar a usuarios locales en la Wi-Fi con broadcast (más tráfico en el router)</string>
     <string name="internet_discovery">Comparte en Internet</string>
     <string name="internet_discovery_summary">Conectar a usuarios remotos por Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">km</string>
     <string name="from">De</string>
     <string name="wants_to_share_a_file">quiere compartir un archivo</string>
     <string name="translators">Traductores</string>
@@ -181,7 +179,6 @@
     <string name="connected_using_dataplan">Conectado usando el Plan de Datos</string>
     <string name="send_to_chat">Enviar al Chat</string>
     <string name="sent_file_to_chat">Enviar archivo al Chat</string>
-    <string name="sent_files_to_chat">Archivos %d enviados al Chat</string>
     <string name="choose_wifi_network">Elige una red Wi-Fi</string>
     <string name="please_update_to_v">Por favor, actualízalo a v. %s</string>
     <string name="cant_open_file">Lo siento, no sé cómo abrir este archivo.</string>
@@ -686,7 +683,6 @@
     <string name="seeding_time">Tiempo compartiendo</string>
     <string name="working">Funcionando</string>
     <string name="rtt_ms">RTT %1$d ms</string>
-    <string name="hello_blank_fragment">Hola fragmento en blanco</string>
     <string name="one_file_shared">Se ha compartido un archivo en dispositivos FrostWire en la misma red Wi-Fi.</string>
     <string name="pieces">Piezas</string>
     <string name="upload_limit">Límite de subida</string>
@@ -727,4 +723,5 @@
     <string name="add_tracker">Añadir tracker</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">No se pudo abrir Detalles de la transferencia, InfoHash no válido</string>
     <string name="invalid_tracker_url">URL del rastreador no válido</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire no pudo iniciarse correctamente por falta de permisos. Por favor ceda los permisos necesarios y reinicie la aplicación</string>
 </resources>

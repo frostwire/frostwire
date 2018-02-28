@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">브로드캐스트를 통해 로컬 친구들과 연결하기 (라우터에 트래픽 증가)</string>
     <string name="internet_discovery">인터넷 찾기</string>
     <string name="internet_discovery_summary">인터넷으로 멀리 있는 친구와 연결하기.</string>
-    <string name="meter">미터</string>
-    <string name="kilometer">킬로미터</string>
     <string name="from">보내는 사람</string>
     <string name="wants_to_share_a_file">파일을 공유하길 원합니다</string>
     <string name="translators">번역가</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">데이터 정책을 통해 연결됨</string>
     <string name="send_to_chat">채팅보관함으로 전송</string>
     <string name="sent_file_to_chat">파일을 채팅보관함으로 전송</string>
-    <string name="sent_files_to_chat">%d개의 파일을 채팅보관함으로 전송</string>
     <string name="choose_wifi_network">무선 인터넷 설정</string>
     <string name="please_update_to_v">v로 업데이트 해주세요 %s</string>
     <string name="cant_open_file">파일을 열 수 없습니다.</string>

@@ -165,8 +165,6 @@
     <string name="broadcast_discovery_summary">Connectez vous sur le Wi-Fi via l\'émission (plus de trafic sur le routeur)</string>
     <string name="internet_discovery">Exploration Internet</string>
     <string name="internet_discovery_summary">Connectez vous sur les pairs à distance par Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">De</string>
     <string name="wants_to_share_a_file">voulez-vous partager un fichier</string>
     <string name="translators">Traducteurs</string>
@@ -178,7 +176,6 @@
     <string name="connected_using_dataplan">Connexion avec votre forfait de données</string>
     <string name="send_to_chat">Envoyer au Chat</string>
     <string name="sent_file_to_chat">Envoyer un fichier au Chat</string>
-    <string name="sent_files_to_chat">Envoyer %d fichiers au Chat</string>
     <string name="choose_wifi_network">Sélectionnez le réseau Wi-Fi</string>
     <string name="please_update_to_v">Veuillez actualiser à v. %s</string>
     <string name="cant_open_file">Désolé, impossible d\'ouvrir ce fichier.</string>

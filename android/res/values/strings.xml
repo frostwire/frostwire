@@ -789,7 +789,5 @@
     <string name="rtt_ms">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions, Please give FrostWire the permissions it requires to function properly.</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
 </resources>

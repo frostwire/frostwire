@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Ні VPN. Розглянемо шифрування з\'єднання.</string>
     <string name="azureus_peer_manager_status_finished">Закінчено</string>
     <string name="activity_mediaplayer_name">Медіа плеєр</string>
-    <string name="sent_files_to_chat">Відправити %d файлів в чат</string>
     <string name="your_installation_is_complete">Ваша установка завершена.</string>
     <string name="error_connection_timed_out">Помилка: тайм-аут підключення/впав. Спробуйте ще раз.</string>
     <string name="im_on_it">Я на ньому…</string>
@@ -163,7 +162,6 @@
     <string name="fetching_file_list">Завантаження списку в загальному доступі</string>
     <string name="toast_on_connect">Ядро BitTorrent почалося.</string>
     <string name="help">Допомога</string>
-    <string name="meter">m</string>
     <string name="disabled">немає активованого</string>
     <string name="cloud_downloads_coming">На жаль: Початок завантаження хмари тут будуть доступні на подальших оновлень.</string>
     <string name="menu_space_shortcut_label">простір</string>
@@ -352,7 +350,6 @@
     <string name="pictures">Фотографії</string>
     <string name="yes_no_cancel_transfer_question_cloud">Ви впевнені, що хочете зупинити і видалити це завантаження зі списку?</string>
     <string name="cant_open_file">На жаль, не знаю, як відкрити цей файл.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Перенесення</string>
     <string name="download_added_to_queue">1 файл почне завантаження</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent відключений. Ви хочете, щоб я почав це для вас?</string>

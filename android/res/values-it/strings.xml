@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Connettiti ai peer Wi-Fi della zona via rete broadcast (più traffico sul router)</string>
     <string name="internet_discovery">Individuazione internet</string>
     <string name="internet_discovery_summary">Connettiti ai peer remoti su internet</string>
-    <string name="meter">metri</string>
-    <string name="kilometer">Km</string>
     <string name="from">Da</string>
     <string name="wants_to_share_a_file">vuole condividere un file</string>
     <string name="translators">Traduttori</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Connesso tramite un Piano dati</string>
     <string name="send_to_chat">Invia alla Chat</string>
     <string name="sent_file_to_chat">Invia il file alla Chat</string>
-    <string name="sent_files_to_chat">Invia %d file alla Chat</string>
     <string name="choose_wifi_network">Scegli una rete Wi-fi</string>
     <string name="please_update_to_v">Aggiornare alla versione %s</string>
     <string name="cant_open_file">Siamo spiacenti ma il file non può essere aperto</string>

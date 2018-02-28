@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Opret forbindelse til lokale Wi-Fi peers via udsendelsen (flere bruger på routeren)</string>
     <string name="internet_discovery">Internet oplevelse</string>
     <string name="internet_discovery_summary">Opret forbindelse til fjernepeers på internettet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">Km</string>
     <string name="from">Fra</string>
     <string name="wants_to_share_a_file">ønsker at dele filen</string>
     <string name="translators">Oversættere</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Forbundet ved hjælp af dataplan</string>
     <string name="send_to_chat">Send til Chat</string>
     <string name="sent_file_to_chat">Send filen til Chat</string>
-    <string name="sent_files_to_chat">Sendt %d filer til Chat</string>
     <string name="choose_wifi_network">Vælg et Wi-Fi netværk</string>
     <string name="please_update_to_v">Opdater venligst til v. %s</string>
     <string name="cant_open_file">Desværre, ved ikke hvordan man åbner denne fil.</string>

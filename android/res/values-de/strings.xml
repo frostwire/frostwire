@@ -164,8 +164,6 @@
     <string name="broadcast_discovery_summary">Mit lokalen WLAN-Peers via Broadcast verbinden (mehr Verkehr auf Router) </string>
     <string name="internet_discovery">Internet-Discovery</string>
     <string name="internet_discovery_summary">Fernverbindung zu Peers im Internet.</string>
-    <string name="meter">m</string>
-    <string name="kilometer">km</string>
     <string name="from">Von</string>
     <string name="wants_to_share_a_file">Möchte eine Datei austauschen</string>
     <string name="translators">Übersetzer</string>
@@ -177,7 +175,6 @@
     <string name="connected_using_dataplan">Verbindung mittels Datendienst</string>
     <string name="send_to_chat">Zum Chat senden</string>
     <string name="sent_file_to_chat">Datei zum Chat senden</string>
-    <string name="sent_files_to_chat">%d Dateien zum Chat senden</string>
     <string name="choose_wifi_network">Wähle ein WLAN-Netzwerk aus.</string>
     <string name="please_update_to_v">Bitte aktualisiere jetzt auf v. %s</string>
     <string name="cant_open_file">Sorry. Ich kann die Datei nicht öffnen.</string>

@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
     <string name="activity_mediaplayer_name">Media Player</string>
-    <string name="sent_files_to_chat">Trimite %d fișiere de chat</string>
     <string name="your_installation_is_complete">Instalarea este completă.</string>
     <string name="error_connection_timed_out">Eroare: conexiunea a expirat / a scăzut. Încearcă din nou.</string>
     <string name="im_on_it">Ma ocup…</string>
@@ -163,7 +162,6 @@
     <string name="fetching_file_list">Lista de partajat încarc</string>
     <string name="toast_on_connect">BitTorrent core a început.</string>
     <string name="help">Ajutor</string>
-    <string name="meter">m</string>
     <string name="disabled">invalid</string>
     <string name="cloud_downloads_coming">Ne pare rău: Pornind de descărcări de nor de aici vor fi disponibile pe actualizări suplimentare.</string>
     <string name="menu_space_shortcut_label">Spaţiu</string>
@@ -352,7 +350,6 @@
     <string name="pictures">Imagini</string>
     <string name="yes_no_cancel_transfer_question_cloud">Sunteți sigur că doriți să opriți și să eliminați această descărcare de pe listă?</string>
     <string name="cant_open_file">Din păcate, nu știu cum se deschide acest fișier.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Transferare</string>
     <string name="download_added_to_queue">1 fișier va începe descărcarea</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent este deconectat. Vrei să-l înceapă pentru tine?</string>

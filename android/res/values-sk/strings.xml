@@ -28,7 +28,6 @@
     <string name="vpn_not_found">No VPN. Zoberme si šifrovanie spojenia.</string>
     <string name="azureus_peer_manager_status_finished">Dokončené</string>
     <string name="activity_mediaplayer_name">Mediálny prehrávač</string>
-    <string name="sent_files_to_chat">Poslal %d súborov do rozprávanie</string>
     <string name="your_installation_is_complete">Vaša inštalácia je dokončená.</string>
     <string name="error_connection_timed_out">Chyba: Pripojenie vypršal/poklesla. Skúste to znova.</string>
     <string name="im_on_it">Idem na to…</string>
@@ -165,7 +164,6 @@
     <string name="fetching_file_list">Načítanie zoznamu zdieľaných</string>
     <string name="toast_on_connect">BitTorrent jadro začalo.</string>
     <string name="help">Pomoc</string>
-    <string name="meter">m</string>
     <string name="disabled">invalidný</string>
     <string name="cloud_downloads_coming">Ospravedlňujeme: Počnúc stiahnutie cloudových odtiaľ budú k dispozícii ďalšie aktualizácie.</string>
     <string name="menu_space_shortcut_label">Miesto</string>
@@ -357,7 +355,6 @@
     <string name="pictures">Obrázky</string>
     <string name="yes_no_cancel_transfer_question_cloud">Ste si istí, že chcete zastaviť a odstrániť toto sťahovanie zo zoznamu?</string>
     <string name="cant_open_file">Je nám ľúto, neviem, ako tento súbor otvoriť.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Prenos</string>
     <string name="download_added_to_queue">1 súbor začne sťahovať</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent je odpojený. Chceli by ste, aby som ho spustiť pre vás?</string>

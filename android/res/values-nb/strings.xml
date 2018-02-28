@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Ingen VPN. Vurdere å kryptere forbindelsen.</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
     <string name="activity_mediaplayer_name">Mediaspiller</string>
-    <string name="sent_files_to_chat">Sendte %d filer til Chat</string>
     <string name="your_installation_is_complete">Installasjonen er fullført.</string>
     <string name="error_connection_timed_out">Feil: tilkobling tids ut/droppet. Prøv igjen.</string>
     <string name="im_on_it">Jeg er på det…</string>
@@ -167,7 +166,6 @@
     <string name="fetching_file_list">Henter liste over delte</string>
     <string name="toast_on_connect">BitTorrent kjerne startet.</string>
     <string name="help">Hjelp</string>
-    <string name="meter">m</string>
     <string name="disabled">deaktivert</string>
     <string name="cloud_downloads_coming">Beklager: Starter cloud nedlastinger herfra vil være tilgjengelig på ytterligere oppdateringer.</string>
     <string name="menu_space_shortcut_label">Plass</string>
@@ -362,7 +360,6 @@
     <string name="pictures">Bilder</string>
     <string name="yes_no_cancel_transfer_question_cloud">Er du sikker på at du vil stoppe og fjerne denne nedlastingen fra listen?</string>
     <string name="cant_open_file">Beklager, vet ikke hvordan du åpner denne filen.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Overføre</string>
     <string name="download_added_to_queue">En fil vil starte nedlastingen</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent er frakoblet. Vil du at jeg skal starte det for deg?</string>

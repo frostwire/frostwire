@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Geen VPN. Oorweeg enkripsieverbinding.</string>
     <string name="azureus_peer_manager_status_finished">Klaar</string>
     <string name="activity_mediaplayer_name">Media Player</string>
-    <string name="sent_files_to_chat">Het %d lêers na Chat gestuur</string>
     <string name="your_installation_is_complete">Jou installasie is voltooi.</string>
     <string name="vpn_client_feature_2_ExpressVPN">Onbeperkte aflaai spoed</string>
     <string name="im_on_it">Ek is besig met dit…</string>
@@ -188,7 +187,6 @@
     <string name="fetching_file_list">Haal lys van gedeelde</string>
     <string name="toast_on_connect">BitTorrent kern begin.</string>
     <string name="help">Hulp</string>
-    <string name="meter">m</string>
     <string name="disabled">gestremde</string>
     <string name="cloud_downloads_coming">Jammer: Begin wolk aflaai van hier sal beskikbaar wees op verdere updates.</string>
     <string name="menu_space_shortcut_label">Spasie</string>
@@ -407,7 +405,6 @@
     <string name="pictures">Pictures</string>
     <string name="yes_no_cancel_transfer_question_cloud">Is jy seker jy wil stop en verwyder hierdie aflaai van die lys?</string>
     <string name="cant_open_file">Jammer, weet nie hoe om hierdie lêer oop te maak nie.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Oordrag</string>
     <string name="download_added_to_queue">1 lêer sal begin aflaai</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Kan nie geselekteerde aksie uitvoer nie aangesien BitTorrent tans ontkoppel word. Wil jy hê ek moet dit vir jou begin?</string>

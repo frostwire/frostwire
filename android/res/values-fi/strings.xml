@@ -28,7 +28,6 @@
     <string name="vpn_not_found">Ei VPN. Mieti salaamalla yhteys.</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
     <string name="activity_mediaplayer_name">Mediasoitin</string>
-    <string name="sent_files_to_chat">Lähetetyt %d tiedostot Chat</string>
     <string name="your_installation_is_complete">Asennus on valmis.</string>
     <string name="error_connection_timed_out">Virhe: yhteyden aikakatkaisu/laski. Yritä uudelleen.</string>
     <string name="im_on_it">Olen sitä…</string>
@@ -167,7 +166,6 @@
     <string name="fetching_file_list">Haetaan lista jaetuista</string>
     <string name="toast_on_connect">BitTorrent ydin alkoi.</string>
     <string name="help">Auttaa</string>
-    <string name="meter">m</string>
     <string name="disabled">pois käytöstä</string>
     <string name="cloud_downloads_coming">Valitettavasti: Alkaen pilvi lataukset täältä on saatavilla uusia päivityksiä.</string>
     <string name="menu_space_shortcut_label">Avaruus</string>
@@ -362,7 +360,6 @@
     <string name="pictures">Kuvat</string>
     <string name="yes_no_cancel_transfer_question_cloud">Oletko varma, että haluat lopettaa ja poistaa tämän ladattavan listasta?</string>
     <string name="cant_open_file">Valitettavasti en tiedä miten avata tiedoston.</string>
-    <string name="kilometer">Km</string>
     <string name="desktop_transfer_status_transferring">Siirtäminen</string>
     <string name="download_added_to_queue">1 tiedosto lataa</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Bittorrent on irrotettu. Haluatko minun aloittaa sen sinulle?</string>
