@@ -72,7 +72,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magneet gekopieer na knipbord</string>
     <string name="buy_uppercase">KOOP</string>
     <string name="saving_to_internal_memory_description">Jy het ook \'n SD kaart (%1$s beskikbaar)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Tik hier om te soek</string>
     <string name="selected">gekies</string>
     <string name="broadcast_discovery_summary">Koppel aan plaaslike Wi-Fi-eweknieë via uitsending (meer verkeer op router)</string>
@@ -311,10 +310,8 @@
     <string name="transfers_context_menu_clear_finished">Maak al die voltooide oordragte skoon</string>
     <string name="files">lêers</string>
     <string name="enable_dht_summary">Gebruik die Distributed Hash Table om torrent-eweknieë aan te kondig/soek</string>
-    <string name="btc">BTC</string>
     <string name="seeding_keeps_the_network_healthy">Saai help hou die netwerk gesond</string>
     <string name="vpn_money_back_ExpressVPN">30-dae geld-terug waarborg</string>
-    <string name="pro">PRO</string>
     <string name="no_results_feedback">Geen resultate is gevind nie.</string>
     <string name="paused_song_name">Onderbreek %s</string>
     <string name="seed">Saad</string>
@@ -455,7 +452,6 @@
     <string name="filter_by_keyword">Filter volgens sleutelwoord…</string>
     <string name="wanna_download_question">Wil jy aflaai?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">WAARSKUWING: Alle lêers wat deur FrostWire gestoor is op die SD-kaart sal uitgevee word deur ANDROID, nie FrostWire nie, as jy die program verwyder.</string>
     <string name="not_sharing_files">deel nie enige lêers nie.</string>
     <string name="vpn_client_feature_3_PIA">Vaste infrastruktuur: wêreldwye dekking</string>
@@ -589,7 +585,6 @@
     <string name="about">Oor</string>
     <string name="playing_song_name">Speel %s</string>
     <string name="seeds">Sade</string>
-    <string name="plus">Plus</string>
     <string name="according_to_settings_i_cant_seed_due_to_data_savings">Volgens jou instellings kan ek nie saai nie, tensy jy op Wi-Fi is as gevolg van data besparing. Die lêer sal gereed wees om outomaties te saai wanneer u terugkom na \'n internet-geaktiveerde Wi-Fi-netwerk.</string>
     <string name="type_here_to_filter">Tik hier om te filter</string>
     <string name="or">of</string>

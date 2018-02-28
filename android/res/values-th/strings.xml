@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">แม่เหล็กคัดลอกไปที่คลิปบอร์ด</string>
     <string name="buy_uppercase">ซื้อ</string>
     <string name="saving_to_internal_memory_description">คุณยังมีการ์ด SD (%1$s ใช้ได้)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">พิมพ์ที่นี่เพื่อค้นหา</string>
     <string name="selected">เลือก</string>
     <string name="broadcast_discovery_summary">เชื่อมต่อไปยังเพื่อนร่วมงาน Wifi ท้องถิ่นผ่านการออกอากาศ (การจราจรเพิ่มเติมเกี่ยวกับเราเตอร์)</string>
@@ -274,7 +273,6 @@
     <string name="transfers_context_menu_clear_finished">ล้างโอนเสร็จแล้วทั้งหมด</string>
     <string name="files">ไฟล์</string>
     <string name="enable_dht_summary">ใช้ตารางแฮชกระจายจะประกาศเพื่อนฝนตกหนัก/ค้นหา</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">ไม่พบผลลัพธ์</string>
     <string name="paused_song_name">หยุดชั่วคราว %s</string>
     <string name="seed">เมล็ดพันธุ์</string>
@@ -401,7 +399,6 @@
     <string name="transfers_context_menu_copy_infohash">คัดลอก InfoHash</string>
     <string name="wanna_download_question">ต้องการที่จะดาวน์โหลด?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">คำเตือน: ไฟล์ทั้งหมดที่บันทึกไว้โดย FrostWire ลงบนการ์ด SD จะถูกลบโดย Android ไม่ FrostWire ถ้าคุณถอนการติดตั้งแอพพลิเค</string>
     <string name="not_sharing_files">ไม่ได้มีการแชร์ไฟล์ใด ๆ</string>
     <string name="sd_permission_no_accessible_path">เส้นทางที่คุณเลือกไว้ใน SD ไม่สามารถเข้าถึงได้อีกต่อไป กดปุ่ม OK เพื่อเลือกอีกครั้ง</string>
@@ -523,7 +520,6 @@
     <string name="about">เกี่ยวกับ</string>
     <string name="playing_song_name">เล่น %s</string>
     <string name="seeds">เมล็ดพันธุ์พืช</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">การถ่ายโอนถูกหยุดชั่วคราวเพราะคุณจะถูกตัด (ตรวจสอบการเชื่อม BitTorrent ในการตั้งค่า)</string>
     <string name="cheaper_than_beer">ราคาถูกกว่าเบียร์</string>
     <string name="type_here_to_filter">พิมพ์ที่นี่เพื่อกรอง</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">เคล็ดลับ: สัมผัสหมายเลขที่เลือกใช้แป้นพิมพ์</string>
     <string name="search_torrent_settings">การค้นหาและการตั้งค่า Torrent</string>
     <string name="general_settings">ทั่วไป</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">ไม่มี WiFi ใช้ได้การถ่ายโอนทั้งหมดได้ถูกหยุด</string>
     <string name="vpn_drop_protection_title">คุ้มครอง VPN ไม่ได้ใช้งาน</string>

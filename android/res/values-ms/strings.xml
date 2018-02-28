@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet disalin ke papan keratan</string>
     <string name="buy_uppercase">BELI</string>
     <string name="saving_to_internal_memory_description">Anda juga mempunyai kad SD (%1$s ada)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Taip di sini untuk Cari</string>
     <string name="selected">dipilih</string>
     <string name="broadcast_discovery_summary">Sambung kepada rakan-rakan Wifi tempatan melalui siaran (lebih banyak lalu lintas pada router)</string>
@@ -274,7 +273,6 @@
     <string name="transfers_context_menu_clear_finished">Kosongkan semua pemindahan selesai</string>
     <string name="files">fail</string>
     <string name="enable_dht_summary">Gunakan Hash Jadual Diedarkan mengumumkan/carian rakan-rakan torrent</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Tiada keputusan dijumpai.</string>
     <string name="paused_song_name">Dihentikan sementara %s</string>
     <string name="seed">Benih</string>
@@ -401,7 +399,6 @@
     <string name="transfers_context_menu_copy_infohash">Salinan InfoHash</string>
     <string name="wanna_download_question">Ingin muat turun?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">AMARAN: Semua fail yang disimpan oleh FrostWire ke dalam kad SD akan dihapuskan OLEH ANDROID, tidak FrostWire, jika anda membuang pemasangan aplikasi.</string>
     <string name="not_sharing_files">tidak berkongsi apa-apa fail.</string>
     <string name="sd_permission_no_accessible_path">Jalan yang anda pilih dalam SD tidak boleh diakses lagi. Tekan OK untuk memilih sekali lagi.</string>
@@ -523,7 +520,6 @@
     <string name="about">Mengenai</string>
     <string name="playing_song_name">Bermain %s</string>
     <string name="seeds">Benih</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Pemindahan itu telah dihentikan seketika kerana anda tidak bersambung. (Periksa sambungan BitTorrent anda dalam Tetapan)</string>
     <string name="cheaper_than_beer">Lebih murah daripada bir</string>
     <string name="type_here_to_filter">Taip di sini untuk menapis</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Petua: sentuhan nombor untuk menggunakan papan kekunci dipilih</string>
     <string name="search_torrent_settings">Cari dan Tetapan Torrent</string>
     <string name="general_settings">Jeneral</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Tiada Wifi ada, semua pemindahan telah berhenti</string>
     <string name="vpn_drop_protection_title">Perlindungan VPN tidak aktif</string>

@@ -67,7 +67,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopiert til utklippstavlen</string>
     <string name="buy_uppercase">KJØPE</string>
     <string name="saving_to_internal_memory_description">Du har også et SD-kort (%1$s tilgjengelig)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Skriv inn her for å søke</string>
     <string name="selected">valgt</string>
     <string name="broadcast_discovery_summary">Koble til lokale Wifi kolleger via kringkasting (mer trafikk på ruter)</string>
@@ -279,8 +278,6 @@
     <string name="transfers_context_menu_clear_finished">Fjerne alle ferdige overføringer</string>
     <string name="files">filer</string>
     <string name="enable_dht_summary">Bruk Distributed Hash Table å kunn/søke torrent jevnaldrende</string>
-    <string name="btc">BTC</string>
-    <string name="pro">PRO</string>
     <string name="no_results_feedback">Ingen resultater ble funnet.</string>
     <string name="paused_song_name">Pauset %s</string>
     <string name="seed">Seed</string>
@@ -407,7 +404,6 @@
     <string name="transfers_context_menu_copy_infohash">Kopier InfoHash</string>
     <string name="wanna_download_question">Ønsker du å laste ned?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">ADVARSEL: Alle filer lagret av Frostwire til SD-kortet vil bli slettet av Android, ikke Frostwire , hvis du avinstallerer programmet.</string>
     <string name="not_sharing_files">er ikke å dele noen filer.</string>
     <string name="sd_permission_no_accessible_path">Banen du valgte i SD er ikke tilgjengelig lenger. Trykk OK for å velge på nytt.</string>
@@ -531,7 +527,6 @@
     <string name="about">Handle om</string>
     <string name="playing_song_name">Spille %s</string>
     <string name="seeds">Seeds</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Overføringen er midlertidig stanset fordi du er frakoblet. (Sjekk BitTorrent-tilkobling i Innstillinger)</string>
     <string name="cheaper_than_beer">Billigere enn øl</string>
     <string name="type_here_to_filter">Skriv inn her for å filtrere</string>

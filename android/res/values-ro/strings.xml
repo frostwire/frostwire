@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet de copiat în clipboard</string>
     <string name="buy_uppercase">CUMPĂRA</string>
     <string name="saving_to_internal_memory_description">De asemenea, aveți un card SD(%1$s disponibil)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Tastați aici pentru a căuta</string>
     <string name="selected">selectat</string>
     <string name="broadcast_discovery_summary">Conectați-vă la colegii WiFi locale prin difuzare (mai mult trafic pe router)</string>
@@ -270,7 +269,6 @@
     <string name="transfers_context_menu_clear_finished">Toate transferurile finite clar</string>
     <string name="files">fișiere</string>
     <string name="enable_dht_summary">Utilizați Distributed Hash tabel pentru a anunța/căutare colegii torrent</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Nu au fost găsite rezultate.</string>
     <string name="paused_song_name">Întrerupt %s</string>
     <string name="seed">Sămânță</string>
@@ -395,7 +393,6 @@
     <string name="transfers_context_menu_copy_infohash">Copiere InfoHash</string>
     <string name="wanna_download_question">Doriți să descărcați?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">ATENȚIE: Toate fișierele salvate de către FrostWire pe card SD va fi șters de către ANDROID, nu FrostWire, dacă dezinstalați aplicația.</string>
     <string name="not_sharing_files">nu este de partajare orice fișiere</string>
     <string name="sd_permission_no_accessible_path">Calea pe care ați selectat în SD nu mai este accesibil. Apăsați OK pentru a selecta din nou.</string>
@@ -513,7 +510,6 @@
     <string name="about">Despre</string>
     <string name="playing_song_name">Redarea %s</string>
     <string name="seeds">Seminte</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Transferul a fost întrerupt, deoarece sunt deconectate. (Verificați conexiunea BitTorrent din Setări)</string>
     <string name="cheaper_than_beer">Mai ieftin decât bere</string>
     <string name="type_here_to_filter">Tastați aici pentru a filtra</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Sfat: atingeți selectat număr pentru a utiliza tastatura</string>
     <string name="search_torrent_settings">Căutați și Setări Torrent</string>
     <string name="general_settings">General</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Wi-Fi nu este disponibil, toate transferurile au fost oprite</string>
     <string name="vpn_drop_protection_title">Protecție VPN este inactivă</string>

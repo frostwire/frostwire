@@ -411,7 +411,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Mıknatıs panoya kopyalandı</string>
     <string name="buy_uppercase">ALIN</string>
     <string name="saving_to_internal_memory_description">Ayrıca bir SD kartınız var (%1$s mevcut)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">seçilmiş</string>
     <string name="add_transfer_label">Bir mıknatıs veya sel URL\'lerini yapıştırın</string>
     <string name="drawer_open">Gezinme çekmecesini aç</string>
@@ -473,7 +472,6 @@
     <string name="best_value">En iyi değeri</string>
     <string name="transfers_context_menu_clear_finished">Bitirilen tüm transferleri sil</string>
     <string name="enable_dht_summary">Torrent arkadaşlarını duyurmak/aramak için Dağıtılmış Hash Tablosunu kullanın</string>
-    <string name="btc">BTC</string>
     <string name="seed">Tohum</string>
     <string name="delete_files">Dosyaları sil</string>
     <string name="vpn_price">ayda $%1$.2f dolardan</string>
@@ -519,7 +517,6 @@
     <string name="ad_free">Reklamsız</string>
     <string name="current_plan">Mevcut plan</string>
     <string name="transfers_context_menu_copy_infohash">InfoHash\'ı kopyala</string>
-    <string name="basic">Basit</string>
     <string name="storage_setting_warning">UYARI: Uygulamayı kaldırırsanız, FrostWire tarafından SD karta kaydedilen tüm dosyalar FrostWire değil, ANDROID tarafından silinir.</string>
     <string name="sd_permission_no_accessible_path">SD\'de seçtiğiniz yola artık erişilemiyor. Tekrar seçmek için Tamam düğmesine basın.</string>
     <string name="select_deselect_all">Tümünü Seç/Seçimi İptal Et</string>
@@ -568,7 +565,6 @@
     <string name="enable_experimental">Deneysel Özellikler</string>
     <string name="file_descriptor_sd_unmounted">Bu dosya SD karta ait, lütfen cihazınıza ekleyin.</string>
     <string name="donate_in_btc">Bitcoins\'e bağış yapın</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Bağlantı kesildiğiniz için aktarma durakladı. (BitTorrent bağlantınızı Ayarlar\'da kontrol edin)</string>
     <string name="cheaper_than_beer">Biradan Daha Ucuz</string>
     <string name="rating_reminder_description">FrostWire\'ı seviyorsanız lütfen bize puan verin.</string>
@@ -617,7 +613,6 @@
     <string name="number_picker_tip">İpucu: klavyeyi kullanmak için seçili numaraya dokunun</string>
     <string name="search_torrent_settings">Arama ve Torrent Ayarları</string>
     <string name="general_settings">Genel</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Wifi yok, tüm aktarmalar durduruldu</string>
     <string name="vpn_drop_protection_title">VPN Koruması devre dışı</string>

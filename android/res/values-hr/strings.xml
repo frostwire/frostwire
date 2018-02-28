@@ -245,7 +245,6 @@
     <string name="desktop_transfer_status_cancelled">Otkazano</string>
     <string name="desktop_transfer_status_unknown">Nepoznato</string>
     <string name="support_frostwire">Podrži FrostWire</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="loading">Učitavam</string>
     <string name="stop">Zaustavi</string>
     <string name="donate_1">Doniraj $1</string>
@@ -269,7 +268,6 @@
     <string name="delete_this_track">Izbriši ovu pjesmu</string>
     <string name="use_torlock">Koristi TorLock</string>
     <string name="use_eztv">Koristi Eztv</string>
-    <string name="btc">BTC</string>
     <string name="transfers_select_downloading">preuzimanje</string>
     <string name="transfers_select_completed">Završeno</string>
     <string name="drawer_open">Otvori navigacijsku ladicu</string>
@@ -484,7 +482,6 @@
     <string name="shutting_down">Gasim…</string>
     <string name="send_bitcoin_tip">Pošalji Bitcoin napojnicu</string>
     <string name="transfers_context_menu_copy_infohash">Kopiraj InfoHash</string>
-    <string name="basic">Osnovno</string>
     <string name="why_we_need_storage_permissions">Zašto nam je potrebna dozvola za pohranu.</string>
     <string name="restarting">Ponovno pokrećem…</string>
     <string name="keep_in_touch">Ostanite u kontaktu!</string>
@@ -492,7 +489,6 @@
     <string name="learn_how_to_get_more_results">Pokušajte FrostWire Plus za više rezultata</string>
     <string name="media_preview">%s pregled</string>
     <string name="send_tip_donation">Pošaljite napojnicu ili donaciju</string>
-    <string name="plus">Plus</string>
     <string name="rating_reminder_description">Ako volite FrostWire molimo odvojite trenutak da nas ocijenite.</string>
     <string name="transfers_context_menu_copy_magnet">Kopiraj magnet poveznicu</string>
     <string name="try_other_keywords">Pokušajte manje/ostale ključne riječi</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Savjet: dodir odabrani broj za korištenje tipkovnice</string>
     <string name="search_torrent_settings">Traži i Torrent Postavke</string>
     <string name="general_settings">General</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Ne WiFi priključak, svi transferi su prestali</string>
     <string name="vpn_drop_protection_title">VPN zaštita nije aktivan</string>

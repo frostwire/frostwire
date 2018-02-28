@@ -67,7 +67,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopieras till Windows urklipp</string>
     <string name="buy_uppercase">KÖPA</string>
     <string name="saving_to_internal_memory_description">Du har också ett SD-kort (%1$s tillgängliga)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Skriv här för att söka</string>
     <string name="selected">vald</string>
     <string name="broadcast_discovery_summary">Ansluta till lokala Wifi kamrater via broadcast (mer trafik på routern)</string>
@@ -279,8 +278,6 @@
     <string name="transfers_context_menu_clear_finished">Rensa alla färdiga överföringar</string>
     <string name="files">filer</string>
     <string name="enable_dht_summary">Använd Distributed Hash Table att tillkännage/sök torrent kamrater</string>
-    <string name="btc">BTC</string>
-    <string name="pro">PRO</string>
     <string name="no_results_feedback">Inga resultat hittades.</string>
     <string name="paused_song_name">Pausas %s</string>
     <string name="seed">Seed</string>
@@ -407,7 +404,6 @@
     <string name="transfers_context_menu_copy_infohash">Kopiera InfoHash</string>
     <string name="wanna_download_question">Vill du ladda ner?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">VARNING: Alla filer som sparats genom FrostWire på SD-kortet kommer att raderas av Android, inte FrostWire, om du avinstallerar appen.</string>
     <string name="not_sharing_files">inte dela filer.</string>
     <string name="sd_permission_no_accessible_path">Den väg du valt i SD är inte längre kan nås. Tryck OK för att välja igen.</string>
@@ -531,7 +527,6 @@
     <string name="about">Handla om</string>
     <string name="playing_song_name">Låt som %s</string>
     <string name="seeds">Seeds</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Överföringen har pausats eftersom du är frånkopplad. (Kontrollera din BitTorrent-anslutning i Inställningar)</string>
     <string name="cheaper_than_beer">Billigare än öl</string>
     <string name="type_here_to_filter">Skriv här för att filtrera</string>

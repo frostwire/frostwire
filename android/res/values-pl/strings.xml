@@ -408,7 +408,6 @@
     <string name="transfers_select_downloading">Pobierane</string>
     <string name="torrent_transfer_enqueued_on_mobile_data">Pobieranie z sieci BitTorrent zacznie się automatycznie kiedy ponownie połączysz się z Wi-Fi. (Sprawdź Ustawienia dotyczące używania 3G/4G.</string>
     <string name="transfers_context_menu_clear_finished">Wyczyść wszystkie zakończone transfery</string>
-    <string name="btc">BTC</string>
     <string name="you_need_a_bitcoin_wallet_app">Musisz zainstalować portfel Bitcoin na twoim urządzeniu aby wysłać darowiznę w BTC.</string>
     <string name="transfers_select_all">Wszystkie</string>
     <string name="torrent_url_added">URL torrentu został dodany to listy transferów.</string>
@@ -474,11 +473,9 @@
     <string name="support">Pomoc</string>
     <string name="enable_dht_summary">Używaj Rozproszonej Tablicy Mieszającej aby ogłosić/wyszukać peery torrentów</string>
     <string name="send_bitcoin_tip">Wyślij Napiwek w Bitcoin</string>
-    <string name="basic">Podstawowy</string>
     <string name="issue_with_tip_donation_uri">Coś jest nie tak z adresem Napiwku</string>
     <string name="enable_dht">Używaj DHT</string>
     <string name="send_tip_donation">Wyślij Napiwek</string>
-    <string name="plus">Plus</string>
     <string name="try_other_keywords">Spróbuj innych słów kluczowych</string>
     <string name="your_installation_is_complete">Twoja instalacja jest gotowa.</string>
     <string name="restarting_summary">FrostWire się teraz zrestartuje aby uaktywnić nadane mu pozwolenia.</string>
@@ -513,7 +510,6 @@
     <string name="request_again">Ponów żądanie</string>
     <string name="unprotected_connection">niezabezpieczone</string>
     <string name="buy_uppercase">KUP</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">wybrane</string>
     <string name="bittorrent_off">BitTorrent wyłączony</string>
     <string name="storage_picker_treeuri_error">Nieoczekiwany błąd wyboru ścieżki przechowywania</string>
@@ -601,7 +597,6 @@
     <string name="number_picker_tip">Wskazówka: Dotknij wybrany numer, aby korzystć z klawiatury</string>
     <string name="search_torrent_settings">Ustawienia Wyszukiwania i Torrentów</string>
     <string name="general_settings">Ustawienia Główne</string>
-    <string name="pro">PRO</string>
     <string name="build">kompilacja</string>
     <string name="data_saving_turn_off_transfers">Wi-fi niedostępna, wszystkie transfery zostały zatrzymane</string>
     <string name="vpn_drop_protection_title">Ochrona VPN nie jest aktywna</string>

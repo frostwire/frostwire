@@ -399,7 +399,6 @@
     <string name="cant_open_file_does_not_exist">Vous ne pouvez pas ouvrir %1$s, n\'existe pas le fichier.</string>
     <string name="drawer_close">Fermer navigation tiroir</string>
     <string name="saving_to_internal_memory_description">Vous avez également une carte SD (%1$s disponible)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="add_transfer_label">Coller un magnet ou torrent URL</string>
     <string name="drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="use_torlock">Utilisez TorLock</string>
@@ -425,7 +424,6 @@
     <string name="torrent_transfer_enqueued_on_mobile_data">Le transfert de torrent va commencer à télécharger automatiquement lorsque vous vous connectez à un réseau Wi-Fi gratuite. (Vérifiez vos préférences de réseau quant à l\'utilisation de données 3G/4G)</string>
     <string name="now_playing">Jouer</string>
     <string name="transfers_context_menu_clear_finished">Effacer tous les transferts terminés</string>
-    <string name="btc">BTC</string>
     <string name="seed">Semence</string>
     <string name="you_need_a_bitcoin_wallet_app">Vous avez besoin d\'un porte-monnaie Bitcoin installé sur votre appareil de soumettre un don de la CTB.</string>
     <string name="transfers_select_all">tous</string>
@@ -533,7 +531,6 @@
     <string name="ad_free">Sans publicité</string>
     <string name="current_plan">Plan actuel</string>
     <string name="transfers_context_menu_copy_infohash">Copie InfoHash</string>
-    <string name="basic">Basic</string>
     <string name="sd_permission_no_accessible_path">Le chemin que vous avez sélectionné dans le SD n\'est plus accessible. Appuyez sur OK pour sélectionner à nouveau.</string>
     <string name="select_deselect_all">Sélectionner/désélectionner</string>
     <string name="canceling">Annulation</string>
@@ -570,7 +567,6 @@
     <string name="media_preview">%s aperçu</string>
     <string name="send_tip_donation">Envoyer pointe/donation</string>
     <string name="enable_experimental">Caractéristiques expérimentales</string>
-    <string name="plus">Plus</string>
     <string name="cheaper_than_beer">Moins cher que la bière</string>
     <string name="rating_reminder_description">Si vous aimez FrostWire s\'il vous plaît prendre un moment pour nous évaluer.</string>
     <string name="free_sponsored_app">App sponsorisés gratuit</string>
@@ -616,7 +612,6 @@
     <string name="number_picker_tip">Astuce: touchez le numéro sélectionné pour utiliser le clavier</string>
     <string name="search_torrent_settings">Paramètres de recherche et de Torrent</string>
     <string name="general_settings">Général</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Pas de Wifi disponible, tous les transferts ont été arrêtés</string>
     <string name="vpn_drop_protection_title">Protection VPN est inactif</string>

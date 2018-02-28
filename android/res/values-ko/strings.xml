@@ -360,7 +360,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">자석이 클립 보드에 복사 됨</string>
     <string name="buy_uppercase">사다</string>
     <string name="saving_to_internal_memory_description">SD 카드도 가지고 있습니다. (%1$s 비어 있는)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">선택된</string>
     <string name="add_transfer_label">자석 또는 토런트 URL 붙여 넣기</string>
     <string name="drawer_open">탐색 창 열기</string>
@@ -442,7 +441,6 @@
     <string name="best_value">최고의 가치</string>
     <string name="transfers_context_menu_clear_finished">완료된 모든 전송 취소</string>
     <string name="enable_dht_summary">토런트 피어를 발표/검색하려면 분산 해시 테이블을 사용하십시오.</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">결과가 없습니다.</string>
     <string name="paused_song_name">일시 중지됨 %s</string>
     <string name="seed">씨</string>
@@ -504,7 +502,6 @@
     <string name="current_plan">현재 계획</string>
     <string name="transfers_context_menu_copy_infohash">InfoHash 복사</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">경고 : FrostWire에서 SD 카드에 저장 한 모든 파일은 앱을 제거하면 FrostWire가 아닌 Android에서 삭제됩니다.</string>
     <string name="sd_permission_no_accessible_path">SD에서 선택한 경로에 더 이상 액세스 할 수 없습니다. OK를 눌러 다시 선택하십시오.</string>
     <string name="select_deselect_all">모두 선택 / 선택 취소</string>
@@ -560,7 +557,6 @@
     <string name="enable_experimental">실험 기능</string>
     <string name="file_descriptor_sd_unmounted">이 파일은 SD 카드에 속하므로 장치에 삽입하십시오.</string>
     <string name="donate_in_btc">비트 코인 기부</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">연결이 끊어져 전송이 일시 중지되었습니다. (설정에서 BitTorrent 연결을 확인하십시오)</string>
     <string name="cheaper_than_beer">맥주보다 쌉니다.</string>
     <string name="block">블록</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">도움말 : 키보드를 사용하려면 선택한 번호를 터치하십시오.</string>
     <string name="search_torrent_settings">검색 및 토런트 설정</string>
     <string name="general_settings">일반</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Wi-Fi를 사용할 수 없으며 모든 전송이 중지되었습니다.</string>
     <string name="vpn_drop_protection_title">VPN 보호가 비활성화 됨</string>

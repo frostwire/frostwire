@@ -67,7 +67,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">מגנט הועתק ללוח</string>
     <string name="buy_uppercase">לִקְנוֹת</string>
     <string name="saving_to_internal_memory_description">(%1$s) כמו  כן יש לך כרטיס SD  זמין</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">הקלד כאן לחיפוש</string>
     <string name="selected">נבחר</string>
     <string name="broadcast_discovery_summary">חבר עמיתי Wifi מקומית באמצעות שידור (יותר תנועה על הנתב)</string>
@@ -279,8 +278,6 @@
     <string name="transfers_context_menu_clear_finished">נקה את כל העברות המוגמרות</string>
     <string name="files">קבצים</string>
     <string name="enable_dht_summary">השתמש בטבלת חשיש מבוזרת להודיע / עמיתי סיקור חיפוש</string>
-    <string name="btc">BTC</string>
-    <string name="pro">PRO</string>
     <string name="no_results_feedback">לא נמצאו תוצאות.</string>
     <string name="paused_song_name">מושהה s%</string>
     <string name="seed">לזרוע</string>
@@ -407,7 +404,6 @@
     <string name="transfers_context_menu_copy_infohash">העתק InfoHash</string>
     <string name="wanna_download_question">רוצה להוריד?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">אזהרה: כל הקבצים השמורים על ידי FrostWire על גבי כרטיס SD תימחק על ידי אנדרואיד, לא FrostWire, אם תסיר את האפליקציה.</string>
     <string name="not_sharing_files">לא משתף את כל קבצים.</string>
     <string name="sd_permission_no_accessible_path">הנתיב שבחרת SD אינו נגיש עוד. לחץ על OK כדי לבחור שוב.</string>
@@ -531,7 +527,6 @@
     <string name="about">על אודות</string>
     <string name="playing_song_name">הַקשָׁבָה s%</string>
     <string name="seeds">Seeds</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">ההעברה הושהתה מפני שאתה מנותק. (בדוק את החיבור ביטורנט שלך הגדרות)</string>
     <string name="cheaper_than_beer">זול יותר מאשר באר</string>
     <string name="type_here_to_filter">הקלד כאן כדי לסנן</string>

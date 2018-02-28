@@ -359,7 +359,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet disalin ke papan klip</string>
     <string name="buy_uppercase">MEMBELI</string>
     <string name="saving_to_internal_memory_description">Anda juga memiliki kartu SD (%1$s bebas)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">terpilih</string>
     <string name="add_transfer_label">Tempelkan magnet atau URL torrent</string>
     <string name="drawer_open">Terbuka laci navigasi</string>
@@ -441,7 +440,6 @@
     <string name="best_value">Nilai terbaik</string>
     <string name="transfers_context_menu_clear_finished">Menghapus semua transfer selesai</string>
     <string name="enable_dht_summary">Gunakan Distributed Hash Table (DHT) mengumumkan/pencari torrent rekan</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Tidak ada hasil yang ditemukan.</string>
     <string name="paused_song_name">Berhenti %s</string>
     <string name="seed">Seed</string>
@@ -503,7 +501,6 @@
     <string name="current_plan">Rencana saat ini.</string>
     <string name="transfers_context_menu_copy_infohash">Salinan InfoHash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">PERINGATAN: Semua file yang disimpan oleh FrostWire ke kartu SD akan dihapus BY ANDROID, tidak FrostWire, jika Anda menghapus aplikasi.</string>
     <string name="sd_permission_no_accessible_path">Jalan yang Anda pilih di SD tersebut tidak dapat diakses lagi. Tekan OK untuk memilih lagi.</string>
     <string name="select_deselect_all">Pilih/Tdk Pilih Semua</string>
@@ -559,7 +556,6 @@
     <string name="enable_experimental">Fitur eksperimental</string>
     <string name="file_descriptor_sd_unmounted">File ini milik kartu SD, silahkan masukkan pada perangkat Anda.</string>
     <string name="donate_in_btc">Menyumbang dalam bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Transfer telah berhenti karena Anda terputus. (Periksa koneksi BitTorrent Anda di Preferensi)</string>
     <string name="cheaper_than_beer">Lebih murah daripada bir</string>
     <string name="block">Blok</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tip: sentuhan yang dipilih nomor menggunakan keyboard</string>
     <string name="search_torrent_settings">Cari dan Pengaturan Torrent</string>
     <string name="general_settings">Jenderal</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Tidak ada Wifi tersedia, semua transfer telah berhenti</string>
     <string name="vpn_drop_protection_title">Perlindungan VPN tidak aktif</string>

@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Магніт скапіяваны ў буфер абмену</string>
     <string name="buy_uppercase">КУПІЦЬ</string>
     <string name="saving_to_internal_memory_description">У вас таксама ёсць SD-карту (%1$s даступны)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Калі ласка, увядзіце тут для пошуку</string>
     <string name="selected">абраны</string>
     <string name="broadcast_discovery_summary">Падключэнне да лакальных аднагодкі Wifi з дапамогай трансляцыі (больш трафіку на маршрутызатары)</string>
@@ -270,7 +269,6 @@
     <string name="transfers_context_menu_clear_finished">Ачысціць ўсе гатовыя пераклады</string>
     <string name="files">файлы</string>
     <string name="enable_dht_summary">З дапамогай размеркаванай Хэш-табліцы, каб абвясціць аб/пошуку торэнт аднагодкам</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Вынікі не былі знойдзеныя.</string>
     <string name="paused_song_name">Прыпынена %s</string>
     <string name="seed">Насеньне</string>
@@ -396,7 +394,6 @@
     <string name="transfers_context_menu_copy_infohash">Капіяваць InfoHash</string>
     <string name="wanna_download_question">Хочаце спампаваць?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">УВАГА: Усе файлы, захаваныя з дапамогай FrostWire на SD-карце будуць выдалены Android, а не FrostWire, калі вы выдаліце прыкладанне.</string>
     <string name="not_sharing_files">не падзяляе якія-небудзь файлы.</string>
     <string name="sd_permission_no_accessible_path">Вы выбралі ў SD шлях не даступны больш. Націсніце кнопку OK, каб выбраць зноў.</string>
@@ -515,7 +512,6 @@
     <string name="about">Аб</string>
     <string name="playing_song_name">Прайграванне %s</string>
     <string name="seeds">Насенне</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Перадача была прыпыненая, таму што вы адлучаны. (Праверце падключэнне да BitTorrent у наладах)</string>
     <string name="cheaper_than_beer">Танней, чым піва</string>
     <string name="type_here_to_filter">Калі ласка, увядзіце тут, каб адфільтраваць</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Рада: сэнсарны абраны нумар для выкарыстання клавіятуры</string>
     <string name="search_torrent_settings">Пошук/Налады Торэнт</string>
     <string name="general_settings">Агульныя налады</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Няма Wi-Fi даступны, усе трансферы не былі спыненыя</string>
     <string name="vpn_drop_protection_title">VPN Абарона выключана</string>

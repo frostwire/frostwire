@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet vágólapra másolva</string>
     <string name="buy_uppercase">VÉTEL</string>
     <string name="saving_to_internal_memory_description">Arra is van egy SD kártya (%1$s elérhető)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Írja ide a kereséshez</string>
     <string name="selected">kiválasztott</string>
     <string name="broadcast_discovery_summary">Csatlakozás helyi Wifi társaik keresztül sugárzott (nagyobb forgalom router)</string>
@@ -270,7 +269,6 @@
     <string name="transfers_context_menu_clear_finished">Törölje az összes kész transzferek</string>
     <string name="files">fájlok</string>
     <string name="enable_dht_summary">Használja a Distributed Hash Table jelentjük/kereső torrent társaik</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Nincs találat.</string>
     <string name="paused_song_name">Megáll %s</string>
     <string name="seed">Seed</string>
@@ -395,7 +393,6 @@
     <string name="transfers_context_menu_copy_infohash">Másolja infohash</string>
     <string name="wanna_download_question">Szeretné letölteni?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">FIGYELMEZTETÉS: A mentett fájlok FrostWire az SD-kártya törlésre kerül az Android, nem FrostWire, ha eltávolítja az alkalmazást.</string>
     <string name="not_sharing_files">nem oszt meg semmilyen fájlt.</string>
     <string name="sd_permission_no_accessible_path">Az útvonal kiválasztott SD nem elérhető többé. Az OK gombbal válassza újra.</string>
@@ -513,7 +510,6 @@
     <string name="about">Körülbelül</string>
     <string name="playing_song_name">Lejátszása %s</string>
     <string name="seeds">Seeds</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Az átadás szünetel, mert nem kapcsolódik. (Ellenőrizze a BitTorrent kapcsolat beállításai)</string>
     <string name="cheaper_than_beer">Olcsóbb, mint a sör</string>
     <string name="type_here_to_filter">Írja ide, hogy kiszűrje</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tipp: touch kiválasztott számot használni billentyűzet</string>
     <string name="search_torrent_settings">Keresés és Torrent Beállítások</string>
     <string name="general_settings">Tábornok</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Nincs wifi minden transzfer volna állítani</string>
     <string name="vpn_drop_protection_title">VPN védelem inaktív</string>

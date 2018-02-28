@@ -372,7 +372,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet zkopírovat do schránky</string>
     <string name="buy_uppercase">KOUPIT</string>
     <string name="saving_to_internal_memory_description">Máte také SD karty (%1$s volný)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">vybraný</string>
     <string name="add_transfer_label">Vložit magnet nebo torrent URL</string>
     <string name="drawer_open">Otevřít navigační panel</string>
@@ -448,7 +447,6 @@
     <string name="best_value">Nejlepší hodnota</string>
     <string name="transfers_context_menu_clear_finished">Zrušte všechny hotové transfery</string>
     <string name="enable_dht_summary">Použijte Distributed Hash Table oznamuje/vyhledávání torrentů vrstevníky</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Nebyly nalezeny žádné výsledky.</string>
     <string name="paused_song_name">Pozastaveno %s</string>
     <string name="seed">Semínko</string>
@@ -507,7 +505,6 @@
     <string name="current_plan">Současný plán</string>
     <string name="transfers_context_menu_copy_infohash">Kopie InfoHash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">POZOR: Všechny soubory uložené FrostWire na SD kartě budou smazána operačním systémem Android, nikoli FrostWire, pokud jste odinstalovat.</string>
     <string name="sd_permission_no_accessible_path">Kterou jste vybrali v SD cesta není přístupný už ne. Stisknutím tlačítka OK výběr znovu.</string>
     <string name="select_deselect_all">Vyberte/Zrušit vše</string>
@@ -561,7 +558,6 @@
     <string name="enable_experimental">Experimentální Funkce</string>
     <string name="file_descriptor_sd_unmounted">Tento soubor patří na SD kartu, vložte ji prosím ve svém zařízení.</string>
     <string name="donate_in_btc">Donate na bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Převod byl pozastaven, protože jste odpojeni. (Zkontrolujte připojení BitTorrent v Nastavení)</string>
     <string name="cheaper_than_beer">Levnější než pivo</string>
     <string name="rating_reminder_description">Pokud máte rádi FrostWire prosím, chvilku nám sazby.</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tip: dotykový zvolen počet používat klávesnici</string>
     <string name="search_torrent_settings">Hledání/Nastavení Torrent</string>
     <string name="general_settings">Obecné nastavení</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">k dispozici Wifi, všechny převody byly zastaveny</string>
     <string name="vpn_drop_protection_title">VPN Ochrana je neaktivní</string>

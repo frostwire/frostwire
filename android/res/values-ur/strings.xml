@@ -148,7 +148,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">مقناطیس کی کلپ بورڈ پر کاپی</string>
     <string name="buy_uppercase">خریدنے</string>
     <string name="saving_to_internal_memory_description">(%1$s free)آپ یہ بھی ایک ایسڈی کارڈ </string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">تلاش کے لئے یہاں ٹائپ کریں</string>
     <string name="selected">منتخب شدہ</string>
     <string name="broadcast_discovery_summary">نشر کے ذریعے مقامی وائی فائی ساتھیوں سے مربوط ہوں (روٹر پر زیادہ ٹریفک)</string>
@@ -325,7 +324,6 @@
     <string name="transfers_context_menu_clear_finished">تمام ختم ٹرانسفر صاف کریں</string>
     <string name="files">فائلوں</string>
     <string name="enable_dht_summary"> تلاش سیلاب کے ساتھیوں کا اعلان کرنے ڈسٹریبیوٹڈ ہیش ٹیبل کا استعمال کریں</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">کوئی نتائج نہیں پائے گئے.</string>
     <string name="paused_song_name">موقوف s%</string>
     <string name="seed">بیجوں</string>
@@ -431,7 +429,6 @@
     <string name="transfers_context_menu_copy_infohash">کاپی InfoHash</string>
     <string name="wanna_download_question">اتارنا کرنے کے لئے چاہتے ہیں؟</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">انتباہ: آپ کو اے پی پی ان انسٹال ہے تو SD کارڈ پر FrostWire طرف سے محفوظ تمام فائلوں، ANDROID، نہ FrostWire طرف سے خارج کر دیا جائے گا.</string>
     <string name="not_sharing_files">کسی بھی فائلوں کا اشتراک نہیں کر رہا ہے.</string>
     <string name="sd_permission_no_accessible_path">راستہ آپ SD میں منتخب نہیں قابل رسائی نہیں ہے. OK دبائیں دوبارہ منتخب کرنے کے لیے.</string>
@@ -538,7 +535,6 @@
     <string name="about">کے بارے میں</string>
     <string name="playing_song_name">چل رہا ہے s%</string>
     <string name="seeds">بیج</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">آپ منقطع ہے کیونکہ ٹرانسفر موقوف کردیا گیا ہے. (کی ترتیبات میں آپ BitTorrent کے کنکشن کی جانچ کریں)</string>
     <string name="cheaper_than_beer">بیئر سے سستا</string>
     <string name="type_here_to_filter">فلٹر کرنے یہاں ٹائپ کریں</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">ترکیب: رابطے کے منتخب کی بورڈ کا استعمال کرنے کے لئے نمبر</string>
     <string name="search_torrent_settings">تلاش اور نامہ ترتیبات</string>
     <string name="general_settings">جنرل</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">آپ کوئی وائی فائی، تمام کی منتقلی کو روکا جا چکے ہیں</string>
     <string name="vpn_drop_protection_title">VPN تحفظ غیر فعال ہے</string>

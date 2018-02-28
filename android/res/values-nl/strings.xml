@@ -372,7 +372,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magneet gekopieerd naar het klembord</string>
     <string name="buy_uppercase">KOPEN</string>
     <string name="saving_to_internal_memory_description">Je hebt ook een SD-kaart (%1$s vrij)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">gekozen</string>
     <string name="add_transfer_label">Plak een magneet of torrent URL</string>
     <string name="drawer_open">Open navigatielade</string>
@@ -447,7 +446,6 @@
     <string name="best_value">Beste waarde</string>
     <string name="transfers_context_menu_clear_finished">Duidelijke alle afgewerkte transfers</string>
     <string name="enable_dht_summary">Gebruik de Distributed Hash Table aan te kondigen/search torrent peers</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Er zijn geen resultaten gevonden.</string>
     <string name="paused_song_name">Onderbroken %s</string>
     <string name="seed">Zaad</string>
@@ -505,7 +503,6 @@
     <string name="current_plan">Huidige plan</string>
     <string name="transfers_context_menu_copy_infohash">Kopieer InfoHash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">WAARSCHUWING: Alle bestanden die zijn opgeslagen door FrostWire op de SD-kaart worden gewist door Android, niet FrostWire, als je de app te verwijderen.</string>
     <string name="sd_permission_no_accessible_path">Het pad dat u in de SD geselecteerde is niet meer toegankelijk. Druk op OK om opnieuw te selecteren.</string>
     <string name="select_deselect_all">Selecteer/Wis alles</string>
@@ -558,7 +555,6 @@
     <string name="enable_experimental">Experimentele functies</string>
     <string name="file_descriptor_sd_unmounted">Dit bestand maakt deel uit van een SD-kaart, gelieve deze op uw apparaat.</string>
     <string name="donate_in_btc">Doneren in Bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">De overdracht is onderbroken omdat u Disconnected bent. (Controleer uw BitTorrent-verbinding in instellingen)</string>
     <string name="cheaper_than_beer">Goedkoper dan bier</string>
     <string name="rating_reminder_description">Als u houdt van FrostWire neem even de tijd om ons te geven.</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tip: aanraking geselecteerde nummer om het toetsenbord te gebruiken</string>
     <string name="search_torrent_settings">Zoek en Torrent-instellingen</string>
     <string name="general_settings">Algemeen</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Geen Wifi beschikbaar, zijn alle transfers gestopt</string>
     <string name="vpn_drop_protection_title">VPN Beveiliging is niet actief</string>

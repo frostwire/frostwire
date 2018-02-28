@@ -373,7 +373,6 @@
     <string name="support_frostwire_summary">Приказати огласе за подршку развоју ове апликације.</string>
     <string name="storage_preference_title">Изаберите меморијску локацију</string>
     <string name="storage_preference_summary">Дефаулт складиштење локација на којој ће бити сачуван фајлова.</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="bittorrent_network_summary">статус везе</string>
     <string name="loading">утовар</string>
     <string name="wifi_sharing">Ви-Фи, Делећи</string>
@@ -425,7 +424,6 @@
     <string name="use_eztv">Користе Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="player_paused_press_and_hold_to_stop">Плаиер застаде. (Савет: Притисните и држите да се заустави)</string>
-    <string name="btc">BTC</string>
     <string name="you_need_a_bitcoin_wallet_app">Треба ти Битцоин новчаник инсталиран на уређају да поднесе БТЦ донацију.</string>
     <string name="transfers_select_all">све</string>
     <string name="transfers_select_downloading">преузимање</string>
@@ -505,8 +503,6 @@
     <string name="issue_with_tip_donation_uri">Нешто није у реду са донације веб адреси</string>
     <string name="enable_dht">Омогући ДХТ</string>
     <string name="enable_dht_summary">Користите Дистрибутед хасх табелу да објави/Поиск Торрент вршњака</string>
-    <string name="basic">Basic</string>
-    <string name="plus">Plus</string>
     <string name="try_other_keywords">Покушајте мање/различите речи</string>
     <string name="learn_how_to_get_more_results">Покушајте FrostWire Plus за више резултата</string>
     <string name="action_menu_overflow_description">Више опција</string>
@@ -615,7 +611,6 @@
     <string name="frostwire_sticker_and_more">FrostWire налепнице и више</string>
     <string name="donate_your_time">Донате време</string>
     <string name="changelog">Changelog</string>
-    <string name="pro">PRO</string>
     <string name="cloud_download_aborted_on_mobile_data">Актуелна поставка спречава преузимање када није на Ви-Фи мрежи</string>
     <string name="delete_started_torrents_summary">Обриши .торрент фајлове након почетка преузимања</string>
     <string name="dismiss">одбацити</string>

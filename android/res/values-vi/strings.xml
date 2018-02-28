@@ -371,7 +371,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet sao chép vào clipboard</string>
     <string name="buy_uppercase">MUA</string>
     <string name="saving_to_internal_memory_description">Bạn cũng có một thẻ SD (%1$s rảnh rang)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">đã chọn</string>
     <string name="add_transfer_label">Dán một nam châm hoặc URL torrent</string>
     <string name="drawer_open">Mở ngăn chuyển hướngn</string>
@@ -447,7 +446,6 @@
     <string name="best_value">Giá trị tốt nhất</string>
     <string name="transfers_context_menu_clear_finished">Xóa tất cả các chuyển thành</string>
     <string name="enable_dht_summary">Sử dụng bảng băm phân tán để công bố đồng nghiệp torrent/tìm kiếm</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Không tim thây kêt quả.</string>
     <string name="paused_song_name">Tạm dừng %s</string>
     <string name="seed">Hạt</string>
@@ -506,7 +504,6 @@
     <string name="current_plan">Kế hoạch hiện tại</string>
     <string name="transfers_context_menu_copy_infohash">Sao chép Infohash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">Chú ý: Tất cả các tập tin được lưu bởi FrostWire vào thẻ SD sẽ bị xóa BẰNG ANDROID, không FrostWire, nếu bạn gỡ bỏ cài đặt các ứng dụng.</string>
     <string name="sd_permission_no_accessible_path">Đường dẫn bạn chọn trong SD không truy cập được nữa. Nhấn OK để chọn lại.</string>
     <string name="select_deselect_all">Chọn/Bỏ chọn tất cả</string>
@@ -560,7 +557,6 @@
     <string name="enable_experimental">Các tính năng thử nghiệm</string>
     <string name="file_descriptor_sd_unmounted">Tập tin này thuộc về một thẻ SD, hãy chèn nó vào điện thoại của bạn.</string>
     <string name="donate_in_btc">Đóng góp trong Bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Việc chuyển giao đã được tạm dừng bởi vì bạn là ngắt kết nối. (Kiểm tra kết nối BitTorrent của bạn trong Cài đặt)</string>
     <string name="cheaper_than_beer">Rẻ hơn so với bia</string>
     <string name="rating_reminder_description">Nếu bạn yêu thích FrostWire xin vui lòng mất một phút để đánh giá chúng tôi.</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Mẹo: cảm ứng chọn số để sử dụng bàn phím</string>
     <string name="search_torrent_settings">Tìm kiếm và Torrent Cài đặt</string>
     <string name="general_settings">Chung</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Không có Wifi có sẵn, tất cả các chuyển đã được dừng lại</string>
     <string name="vpn_drop_protection_title">Bảo vệ VPN là không hoạt động</string>

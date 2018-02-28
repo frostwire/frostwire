@@ -347,7 +347,6 @@
     <string name="clear_search_cache">清除搜索緩存</string>
     <string name="drawer_close">關閉導覽面板</string>
     <string name="saving_to_internal_memory_description">您也有一張 SD 卡（%1$s 可用）</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="add_transfer_label">貼上 Magnet（磁力）鏈接或 Torrent 鏈接</string>
     <string name="drawer_open">打開導覽面板</string>
     <string name="use_torlock">使用 TorLock</string>
@@ -405,7 +404,6 @@
     <string name="desktop_transfer_status_complete">完成</string>
     <string name="help_translate_frostwire">幫忙翻譯 FrostWire</string>
     <string name="transfers_context_menu_clear_finished">清空完成的傳輸</string>
-    <string name="btc">BTC（比特幣）</string>
     <string name="no_results_feedback">未找到結果。\n\n檢查網絡連接或\n嘗試不同的搜索詞。</string>
     <string name="paused_song_name">暫停 %s</string>
     <string name="seed">Seed（種子）</string>
@@ -540,7 +538,6 @@
     <string name="ad_free">无广告</string>
     <string name="current_plan">当前计划</string>
     <string name="transfers_context_menu_copy_infohash">复制信息哈希</string>
-    <string name="basic">基本</string>
     <string name="sd_permission_no_accessible_path">您在SD中选择的路径不再可访问。 按OK再次选择.</string>
     <string name="select_deselect_all">选择/取消选择全部</string>
     <string name="get_vpn_client">获取ExpressVPN</string>
@@ -572,7 +569,6 @@
     <string name="media_preview">%s 预习</string>
     <string name="send_tip_donation">发送捐款</string>
     <string name="enable_experimental">实验特征</string>
-    <string name="plus">加</string>
     <string name="cheaper_than_beer">比啤酒便宜</string>
     <string name="rating_reminder_description">如果你喜欢FrostWire，请花一点时间给我们评分.</string>
     <string name="includes_3_day_free_trial">包括3天免费试用。 推荐的</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">提示：触摸所选的号码以使用键盘</string>
     <string name="search_torrent_settings">搜索和洪流设置</string>
     <string name="general_settings">一般</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">没有可用的Wifi，所有传输都已停止</string>
     <string name="vpn_drop_protection_title">VPN保护无效</string>

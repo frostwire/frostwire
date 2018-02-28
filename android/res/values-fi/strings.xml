@@ -67,7 +67,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopioitu leikepöydälle</string>
     <string name="buy_uppercase">OSTAA</string>
     <string name="saving_to_internal_memory_description">Sinulla on myös SD-kortti (%1$s saatavissa)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Kirjoita tähän Haku</string>
     <string name="selected">valittu</string>
     <string name="broadcast_discovery_summary">Yhdistä paikallinen Wifi ikäisensä kautta lähetys (lisää liikennettä reititin)</string>
@@ -279,8 +278,6 @@
     <string name="transfers_context_menu_clear_finished">Tyhjennä kaikki valmiit siirrot</string>
     <string name="files">tiedostot</string>
     <string name="enable_dht_summary">Käytä Distributed Hash Table ilmoittaa/haku torrent ikäisensä</string>
-    <string name="btc">BTC</string>
-    <string name="pro">PRO</string>
     <string name="no_results_feedback">Tuloksia ei löytynyt.</string>
     <string name="paused_song_name">Keskeytetty %s</string>
     <string name="seed">Seed</string>
@@ -407,7 +404,6 @@
     <string name="transfers_context_menu_copy_infohash">Kopioi InfoHash</string>
     <string name="wanna_download_question">Haluatko ladata?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">VAROITUS: Kaikki tiedostot tallennetaan FrostWire SD-kortin tiedot poistetaan Android, ei FrostWire, jos poistaa sovelluksen.</string>
     <string name="not_sharing_files">ei jaa tiedostot.</string>
     <string name="sd_permission_no_accessible_path">Polku valitsemasi SD-kortti ei ole käytettävissä enää. Paina OK valitaksesi uudelleen.</string>
@@ -531,7 +527,6 @@
     <string name="about">Tietoja</string>
     <string name="playing_song_name">Soivan %s</string>
     <string name="seeds">Seeds</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Siirto on keskeytetty, koska olet katkaistu. (Tarkista BitTorrent-yhteyden asetukset)</string>
     <string name="cheaper_than_beer">Halvempi kuin olut</string>
     <string name="type_here_to_filter">Kirjoita tähän suodattaa</string>

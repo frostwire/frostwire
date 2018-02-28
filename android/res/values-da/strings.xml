@@ -372,7 +372,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopieret til udklipsholderen</string>
     <string name="buy_uppercase">KØBE</string>
     <string name="saving_to_internal_memory_description">Du har også et SD-kort (%1$s ledig)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">valgt</string>
     <string name="add_transfer_label">Indsæt en magnet eller torrent URL</string>
     <string name="drawer_open">Åbent navigation skuffe</string>
@@ -448,7 +447,6 @@
     <string name="best_value">Den bedste pris</string>
     <string name="transfers_context_menu_clear_finished">Ryd alle færdige overførsler</string>
     <string name="enable_dht_summary">Brug Distributed Hash Table at annoncere / søgning torrent jævnaldrende</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Ingen resultater blev fundet.</string>
     <string name="paused_song_name">Midlertidigt afbrudt %s</string>
     <string name="seed">Frø</string>
@@ -507,7 +505,6 @@
     <string name="current_plan">Aktuel plan</string>
     <string name="transfers_context_menu_copy_infohash">Kopier InfoHash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">ADVARSEL: Alle filer gemt af FrostWire på SD-kortet vil blive slettet Android, ikke FrostWire, hvis du afinstallerer den app.</string>
     <string name="sd_permission_no_accessible_path">Stien du valgte i SD er ikke tilgængelig længere. Tryk på OK for at vælge igen.</string>
     <string name="select_deselect_all">Vælg/Fravælg alle</string>
@@ -561,7 +558,6 @@
     <string name="enable_experimental">Eksperimentelle Funktioner</string>
     <string name="file_descriptor_sd_unmounted">Denne fil tilhører et SD-kort, skal du indsætte det på din enhed.</string>
     <string name="donate_in_btc">Doner i bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Overførslen er blevet sat på pause, fordi du er Afbrudt. (Check din BitTorrent-forbindelse i Indstillinger)</string>
     <string name="cheaper_than_beer">Billigere end øl</string>
     <string name="rating_reminder_description">Hvis du elsker FrostWire du tage et øjeblik til at bedømme os.</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tip: Tryk valgte nummer til at bruge tastatur</string>
     <string name="search_torrent_settings">Søg/Torrent Indstillinger</string>
     <string name="general_settings">Generel</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">Ingen Wifi tilgængelig, er alle overførsler blevet stoppet</string>
     <string name="vpn_drop_protection_title">VPN Beskyttelse er inaktiv</string>

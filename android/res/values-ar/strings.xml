@@ -411,7 +411,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">المغناطيس نسخها إلى الحافظة</string>
     <string name="buy_uppercase">يشترى</string>
     <string name="saving_to_internal_memory_description">%1$s حر  لديك أيضا على بطاقة SD</string>
-    <string name="bittorrent">تورنت</string>
     <string name="selected">مختار</string>
     <string name="add_transfer_label">لصق المغناطيس أو URL سيل</string>
     <string name="drawer_open">فتح درج الملاحة</string>
@@ -473,7 +472,6 @@
     <string name="best_value">القيمة الأفضل</string>
     <string name="transfers_context_menu_clear_finished">مسح جميع التحويلات النهائية</string>
     <string name="enable_dht_summary">استخدام جدول تجزئة الموزعة للإعلان عن / بحث الأقران سيل</string>
-    <string name="btc">BTC</string>
     <string name="seed">بذرة</string>
     <string name="delete_files">حذف الملفات</string>
     <string name="vpn_price">$%1$.2f شهريا  من</string>
@@ -519,7 +517,6 @@
     <string name="ad_free">خالية من الاعلانات</string>
     <string name="current_plan">الخطه الحاليه</string>
     <string name="transfers_context_menu_copy_infohash">نسخة InfoHash</string>
-    <string name="basic">الأساسية</string>
     <string name="storage_setting_warning">تحذير: جميع الملفات المحفوظة من قبل برنامج FrostWire على بطاقة SD سيتم حذف بواسطة الروبوت، وليس برنامج FrostWire، إذا قمت بإلغاء تثبيت التطبيق.</string>
     <string name="sd_permission_no_accessible_path">المسار الذي حددته في التنمية المستدامة لا يمكن الوصول إليه بعد الآن. اضغط على موافق لتحديد مرة أخرى.</string>
     <string name="select_deselect_all">اختيار / الغاء اختيار جميع</string>
@@ -568,7 +565,6 @@
     <string name="enable_experimental">الميزات التجريبية</string>
     <string name="file_descriptor_sd_unmounted">هذا الملف ينتمي إلى بطاقة الذاكرة الرقمية المؤمنة، الرجاء إدراجه على جهازك.</string>
     <string name="donate_in_btc">تبرع في bitcoins</string>
-    <string name="plus">زائد</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">تم إيقاف نقل لأنك قطع الاتصال. (تحقق من اتصال تورنت في إعدادات)</string>
     <string name="cheaper_than_beer">أرخص من البيرة</string>
     <string name="rating_reminder_description">إذا كنت تحب برنامج FrostWire يرجى ان نتوقف لحظة لتقيم لنا.</string>
@@ -617,7 +613,6 @@
     <string name="number_picker_tip">نصيحة: لمسة اختيار عدد لاستخدام لوحة المفاتيح</string>
     <string name="search_torrent_settings">بحث/إعدادات السيل</string>
     <string name="general_settings">جنرال لواء</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">لا واي فاي المتاحة، وقد تم إيقاف جميع عمليات نقل</string>
     <string name="vpn_drop_protection_title">حماية VPN هو خارج</string>

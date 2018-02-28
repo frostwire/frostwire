@@ -372,7 +372,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnete copiato negli appunti</string>
     <string name="buy_uppercase">ACQUISTARE</string>
     <string name="saving_to_internal_memory_description">Hai anche una scheda SD (%1$s libero)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="selected">selezionato</string>
     <string name="add_transfer_label">Incollare un magnete o un URL torrente</string>
     <string name="drawer_open">Aprire il cassetto di navigazione</string>
@@ -447,7 +446,6 @@
     <string name="best_value">Miglior valore</string>
     <string name="transfers_context_menu_clear_finished">Cancellare tutti i trasferimenti finiti</string>
     <string name="enable_dht_summary">Utilizzare il Distributed Hash Table di annunciare/ricerca coetanei torrent</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Nessun risultato trovato.</string>
     <string name="paused_song_name">In pausa %s</string>
     <string name="seed">Seminare</string>
@@ -505,7 +503,6 @@
     <string name="current_plan">Piano attuale</string>
     <string name="transfers_context_menu_copy_infohash">Copiare InfoHash</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">ATTENZIONE: Tutti i file salvati dal FrostWire sulla scheda SD sarà cancellato da Android, non FrostWire, se si disinstalla l\'applicazione.</string>
     <string name="sd_permission_no_accessible_path">Il percorso selezionato nella SD non è più accessibile. Premere OK per selezionare di nuovo.</string>
     <string name="select_deselect_all">Selezionare/deselezionare tutti</string>
@@ -558,7 +555,6 @@
     <string name="enable_experimental">Caratteristiche sperimentali</string>
     <string name="file_descriptor_sd_unmounted">Questo file appartiene a una scheda SD, inserire sul vostro dispositivo.</string>
     <string name="donate_in_btc">Donare in bitcoins</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Il trasferimento è stato sospeso perché si è disconnessi. (Controllare la connessione BitTorrent in Preferenze)</string>
     <string name="cheaper_than_beer">Più economico di birra</string>
     <string name="rating_reminder_description">Se amate FrostWire si prega di prendere un momento per votare noi.</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Suggerimento: toccare il numero da usare tastiera selezionata</string>
     <string name="search_torrent_settings">Ricerca e Impostazioni Torrent</string>
     <string name="general_settings">Generale</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">No Wifi disponibile, tutti i trasferimenti sono stati fermati</string>
     <string name="vpn_drop_protection_title">Protezione VPN è inattivo</string>

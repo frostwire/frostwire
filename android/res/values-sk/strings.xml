@@ -66,7 +66,6 @@
     <string name="transfers_context_menu_copy_magnet_copied">Magnet skopírovať do schránky</string>
     <string name="buy_uppercase">KÚPIŤ</string>
     <string name="saving_to_internal_memory_description">Máte tiež SD karty (%1$s k dispozícii)</string>
-    <string name="bittorrent">BitTorrent</string>
     <string name="type_here_to_search">Sem na vyhľadávanie</string>
     <string name="selected">vybraný</string>
     <string name="broadcast_discovery_summary">Pripojenie k miestnej Wifi rovesníkmi prostredníctvom vysielania (väčšiu prevádzku na routeri)</string>
@@ -274,7 +273,6 @@
     <string name="transfers_context_menu_clear_finished">Zrušte všetky hotové transfery</string>
     <string name="files">súbory</string>
     <string name="enable_dht_summary">Použite Distributed Hash Table oznamuje/vyhľadávanie torrentov rovesníkmi</string>
-    <string name="btc">BTC</string>
     <string name="no_results_feedback">Neboli nájdené žiadne výsledky.</string>
     <string name="paused_song_name">Pozastavil %s</string>
     <string name="seed">Osiva</string>
@@ -401,7 +399,6 @@
     <string name="transfers_context_menu_copy_infohash">Kópia InfoHash</string>
     <string name="wanna_download_question">Chcete stiahnuť?</string>
     <string name="twenty_five_dollars">$25</string>
-    <string name="basic">Basic</string>
     <string name="storage_setting_warning">POZOR: Všetky súbory uložené FrostWire na SD karte budú zmazané operačným systémom Android, nie FrostWire, ak ste odinštalovať.</string>
     <string name="not_sharing_files">nie je zdieľanie žiadne súbory.</string>
     <string name="sd_permission_no_accessible_path">Ktorú ste vybrali v SD cesta nie je prístupný už nie. Stlačením tlačidla OK výber znova.</string>
@@ -523,7 +520,6 @@
     <string name="about">O aplikácii</string>
     <string name="playing_song_name">Prehrávanie %s</string>
     <string name="seeds">Semená</string>
-    <string name="plus">Plus</string>
     <string name="torrent_transfer_paused_disconnected_from_bittorrent">Prevod bol pozastavený, pretože ste odpojení. (Skontrolujte pripojenie BitTorrent v Nastavenie)</string>
     <string name="cheaper_than_beer">Lacnejšie ako pivo</string>
     <string name="type_here_to_filter">Píšte tu filtrovať</string>
@@ -615,7 +611,6 @@
     <string name="number_picker_tip">Tip: dotykový zvolený počet používať klávesnicu</string>
     <string name="search_torrent_settings">Vyhľadávanie a nastavenia Torrent</string>
     <string name="general_settings">Všeobecný</string>
-    <string name="pro">PRO</string>
     <string name="build">build</string>
     <string name="data_saving_turn_off_transfers">k dispozícii Wifi, všetky prevody boli zastavené</string>
     <string name="vpn_drop_protection_title">VPN Ochrana je neaktívny</string>
