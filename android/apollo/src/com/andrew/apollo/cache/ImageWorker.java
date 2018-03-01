@@ -167,9 +167,8 @@ public abstract class ImageWorker {
          * @param imageView The {@link ImageView} to use.
          * @param imageType The type of image URL to fetch for.
          */
-        @SuppressWarnings("deprecation")
         public BitmapWorkerTask(final ImageView imageView, final ImageType imageType) {
-            imageView.setBackgroundDrawable(mDefaultArtwork);
+            imageView.setBackground(mDefaultArtwork);
             mImageReference = new WeakReference<>(imageView);
             mImageType = imageType;
         }

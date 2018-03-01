@@ -112,7 +112,6 @@ public final class ApolloUtils {
      */
     public static void doAfterLayout(final View view, final Runnable runnable) {
         final OnGlobalLayoutListener listener = new OnGlobalLayoutListener() {
-            @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
