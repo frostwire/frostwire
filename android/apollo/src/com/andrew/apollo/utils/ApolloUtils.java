@@ -62,7 +62,7 @@ public final class ApolloUtils {
      *
      * @param task Task to execute
      */
-    public static void execute(final AsyncTask<?, ?, ?> task) {
+    public static void execute(AsyncTask<Void, ?, ?> task) {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
