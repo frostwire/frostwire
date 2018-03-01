@@ -173,7 +173,6 @@ android {
 dependencies {
     implementation 'com.android.support:design:27.1.0'
     implementation 'com.android.support:preference-v7:27.1.0'
-    implementation 'com.android.support:support-v13:27.1.0'
     implementation 'com.google.android.gms:play-services-ads-lite:11.6.2'
     implementation 'com.google.android.gms:play-services-base:11.6.2'
     implementation('com.mopub:mopub-sdk-banner:4.20.0@aar') { transitive = true }

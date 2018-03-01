@@ -21,7 +21,7 @@ package com.andrew.apollo.adapters;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
+import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
