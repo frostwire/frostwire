@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+import android.util.LruCache;
 
 import com.andrew.apollo.utils.ApolloUtils;
 import com.frostwire.android.util.SystemUtils;
