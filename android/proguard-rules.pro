@@ -1,6 +1,8 @@
 # presage seems to have passed by proguard already
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
+-dontwarn org.conscrypt.Conscrypt
+-dontwarn org.conscrypt.OpenSSLProvider
 -keep class do.** {*;}
 -keep class for.** {*;}
 -keep class if.** {*;}
