@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.frostwire.util.Logger;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public abstract class AbstractFragment extends Fragment {
-    //private static Logger LOG = Logger.getLogger(AbstractFragment.class);
+
     private final int layoutResId;
 
     private boolean paused;
@@ -46,7 +44,6 @@ public abstract class AbstractFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //LOG.info(getClass().getSimpleName() + ".onCreateView()");
         View rootView = inflater.inflate(layoutResId, container, false);
 
         if (!rootView.isInEditMode()) {
@@ -58,14 +55,12 @@ public abstract class AbstractFragment extends Fragment {
 
     @Override
     public void onResume() {
-        //LOG.info(getClass().getSimpleName() + ".onResume()");
         paused = false;
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        //LOG.info(getClass().getSimpleName() + ".onPause()");
         paused = true;
         super.onPause();
     }
@@ -85,6 +80,7 @@ public abstract class AbstractFragment extends Fragment {
 
     /**
      * onCreateView calls this before it returns the rootView it has just inflated
+     *
      * @param rootView
      * @param savedInstanceState
      */
