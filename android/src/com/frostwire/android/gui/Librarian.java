@@ -85,7 +85,7 @@ public final class Librarian {
     }
 
     public static Librarian instance() {
-        if (instance == null && state.get() == Librarian.State.CREATING) {
+        if (state.get() == Librarian.State.CREATING) {
             try {
                 if (creationLatch.getCount() == 1) {
                     creationLatch.await();
