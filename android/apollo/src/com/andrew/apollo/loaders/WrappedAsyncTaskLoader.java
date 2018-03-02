@@ -26,7 +26,9 @@ abstract class WrappedAsyncTaskLoader<D> extends AsyncTaskLoader<D> {
     public void deliverResult(D data) {
         if (!isReset() && data != null) {
             this.mData = data;
-            super.deliverResult(data);
+            try {
+                super.deliverResult(data);
+            } catch (Throwable t) { /* not much else we can do */ }
         }
         //else { An asynchronous query came in while the loader is stopped }
     }
