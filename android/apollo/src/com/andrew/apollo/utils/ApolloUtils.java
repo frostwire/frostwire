@@ -128,6 +128,9 @@ public final class ApolloUtils {
      * @return A new {@link ImageFetcher} used to fetch images asynchronously.
      */
     public static ImageFetcher getImageFetcher(final Activity activity) {
+        if (activity == null) {
+            return null;
+        }
         final ImageFetcher imageFetcher = ImageFetcher.getInstance(activity);
         imageFetcher.setImageCache(ImageCache.findOrCreateCache(activity));
         return imageFetcher;
@@ -145,6 +148,9 @@ public final class ApolloUtils {
     public static void createShortcutIntentAsync(final String displayName, final String artistName,
                                                  final Long id, final String mimeType, final WeakReference<Activity> context) {
         Runnable task = () -> {
+            if (!Ref.alive(context)) {
+                return;
+            }
             final ImageFetcher fetcher = getImageFetcher(context.get());
             Bitmap bitmap;
             boolean success = true;

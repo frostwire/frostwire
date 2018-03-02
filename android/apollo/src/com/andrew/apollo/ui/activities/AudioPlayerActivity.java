@@ -567,7 +567,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     protected void onStop() {
         super.onStop();
         MusicUtils.notifyForegroundStateChanged(this, false);
-        mImageFetcher.flush();
+        if (mImageFetcher != null) {
+            mImageFetcher.flush();
+        }
     }
 
     @Override
@@ -759,10 +761,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mArtistName.setText(getArtistAndAlbumName());//MusicUtils.getArtistName());
         // Set the total time
         mTotalTime.setText(MusicUtils.makeTimeString(this, MusicUtils.duration() / 1000));
-        // Set the album art
-        mImageFetcher.loadCurrentArtwork(mAlbumArt);
-        // Set the small artwork
-        mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
+
+        if (mImageFetcher != null) {
+            // Set the album art
+            mImageFetcher.loadCurrentArtwork(mAlbumArt);
+            // Set the small artwork
+            mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
+        }
         // Update the current time
         queueNextRefresh(1);
 

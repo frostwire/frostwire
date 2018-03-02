@@ -45,6 +45,7 @@ import com.andrew.apollo.Config;
 import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
+import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.MusicUtils.ServiceToken;
@@ -335,7 +336,10 @@ public abstract class BaseActivity extends AbstractActivity
             // Set the artist name
             mArtistName.setText(MusicUtils.getArtistName());
             // Set the album art
-            ApolloUtils.getImageFetcher(this).loadCurrentArtwork(mAlbumArt);
+            ImageFetcher imageFetcher = ApolloUtils.getImageFetcher(this);
+            if (imageFetcher != null) {
+                imageFetcher.loadCurrentArtwork(mAlbumArt);
+            }
         }
     }
 
