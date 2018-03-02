@@ -183,7 +183,9 @@ public final class Offers {
 
     public static void forceDisabledAds(Context context) {
         FORCED_DISABLED = true;
-        stopAdNetworks(context);
+        if (lastInitAdnetworksInvocationTimestamp != 0) {
+            stopAdNetworks(context);
+        }
     }
 
     /**
