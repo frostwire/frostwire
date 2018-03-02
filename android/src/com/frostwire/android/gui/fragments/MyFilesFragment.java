@@ -104,9 +104,13 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private boolean selectAllModeOn;
     private final Peer peer;
     private View header;
+    private TextView headerTitle;
+    private TextView headerTotal;
     private long lastAdapterRefresh;
     private String previousFilter;
     private final SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
+
+
 
     // given the byte:fileType as the index, this array will match the corresponding UXAction code.
     // no if's necessary, random access -> O(1)
@@ -305,6 +309,8 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         header = inflater.inflate(R.layout.view_my_files_header, null, false);
+        headerTitle = header.findViewById(R.id.view_my_files_header_text_title);
+        headerTotal = header.findViewById(R.id.view_my_files_header_text_total);
         updateHeader();
         return header;
     }
@@ -438,54 +444,72 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            updateHeader();
+        }
+    }
+
     private void updateHeader() {
         if (peer == null) {
             LOG.warn("Something wrong. peer is null");
             return;
         }
-        peer.finger(getActivity(), (context, finger) -> {
-            if (MyFilesFragment.this.isAdded()) {
-                MyFilesFragment.this.getActivity().runOnUiThread(() -> {
-                    if (header != null) {
-                        byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-                        int numTotal = 0;
-                        switch (fileType) {
-                            case Constants.FILE_TYPE_TORRENTS:
-                                numTotal = finger.numTotalTorrentFiles;
-                                break;
-                            case Constants.FILE_TYPE_AUDIO:
-                                numTotal = finger.numTotalAudioFiles;
-                                break;
-                            case Constants.FILE_TYPE_DOCUMENTS:
-                                numTotal = finger.numTotalDocumentFiles;
-                                break;
-                            case Constants.FILE_TYPE_PICTURES:
-                                numTotal = finger.numTotalPictureFiles;
-                                break;
-                            case Constants.FILE_TYPE_RINGTONES:
-                                numTotal = finger.numTotalRingtoneFiles;
-                                break;
-                            case Constants.FILE_TYPE_VIDEOS:
-                                numTotal = finger.numTotalVideoFiles;
-                                break;
-                        }
-                        if (MyFilesFragment.this.isAdded()) {
-                            String fileTypeStr = MyFilesFragment.this.getString(R.string.my_filetype, UIUtils.getFileTypeAsString(MyFilesFragment.this.getResources(), fileType));
-                            TextView title = header.findViewById(R.id.view_my_files_header_text_title);
-                            title.setText(fileTypeStr);
-                        }
-                        TextView total = header.findViewById(R.id.view_my_files_header_text_total);
-                        total.setText("(" + String.valueOf(numTotal) + ")");
+        if (!isVisible()) {
+            return;
+        }
+
+        final byte fileType = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+        if (isAdded() && isVisible()) {
+            String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(getResources(), fileType));
+            headerTitle.setText(fileTypeStr);
+            headerTotal.setText("");
+        }
+        peer.finger(getActivity(),
+                // the finger task will only call this callback if it still has a weak reference to the context
+                (context, finger) -> {
+                    if (isAdded() && isVisible()) {
+                        getActivity().runOnUiThread(() -> {
+                            if (header != null) {
+                                byte fileType2 = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
+                                int numTotal = 0;
+                                switch (fileType2) {
+                                    case Constants.FILE_TYPE_TORRENTS:
+                                        numTotal = finger.numTotalTorrentFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_AUDIO:
+                                        numTotal = finger.numTotalAudioFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_DOCUMENTS:
+                                        numTotal = finger.numTotalDocumentFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_PICTURES:
+                                        numTotal = finger.numTotalPictureFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_RINGTONES:
+                                        numTotal = finger.numTotalRingtoneFiles;
+                                        break;
+                                    case Constants.FILE_TYPE_VIDEOS:
+                                        numTotal = finger.numTotalVideoFiles;
+                                        break;
+                                }
+                                if (fileType != fileType2) {
+                                    String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(MyFilesFragment.this.getResources(), fileType2));
+                                    headerTitle.setText(fileTypeStr);
+                                }
+                                headerTotal.setText("(" + String.valueOf(numTotal) + ")");
+                            }
+                            if (adapter == null) {
+                                clickFileTypeTab(lastFileType);
+                            }
+                            refreshCheckBoxMenuItemVisibility();
+                            MusicUtils.stopSimplePlayer();
+                            restoreListViewScrollPosition();
+                        });
                     }
-                    if (adapter == null) {
-                        MyFilesFragment.this.clickFileTypeTab(lastFileType);
-                    }
-                    MyFilesFragment.this.refreshCheckBoxMenuItemVisibility();
-                    MusicUtils.stopSimplePlayer();
-                    MyFilesFragment.this.restoreListViewScrollPosition();
                 });
-            }
-        });
     }
 
     private void clickFileTypeTab(byte lastFileType) {
