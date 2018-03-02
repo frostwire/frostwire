@@ -231,7 +231,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onResume() {
         super.onResume();
-        initStorageRelatedRichNotifications(getView());
         onTime();
     }
 
@@ -427,6 +426,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
+    /**
+     * NOTE: (Fragment) isVisible() will return false at this point in time. Use onHiddenChange(hidden)
+     */
     @Override
     public void onShow() {
         if (firstTimeShown) {
@@ -434,6 +436,15 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (!NetworkManager.instance().isTunnelUp()) {
                 showVPNRichToast();
             }
+        }
+    }
+
+    /** When onShown() is called the fragment is still not returning isVisible()==true */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            initStorageRelatedRichNotifications(null);
         }
     }
 
@@ -445,7 +456,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
-        initStorageRelatedRichNotifications(v);
+        initStorageRelatedRichNotifications(v); // will hide them and abort half way since we might not be visible
         tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -524,6 +535,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         sdCardNotification.setVisibility(View.GONE);
         RichNotification internalMemoryNotification = findView(v, R.id.fragment_transfers_internal_memory_notification);
         internalMemoryNotification.setVisibility(View.GONE);
+
+        if (!isVisible()) {
+            // this will be invoked later again onResume, don't bother now if it's not visible
+            return;
+        }
+
         if (TransferManager.isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
             String currentPath = ConfigurationManager.instance().getStoragePath();
             boolean inPrivateFolder = currentPath.contains("Android/data");
