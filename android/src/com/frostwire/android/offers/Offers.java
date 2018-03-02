@@ -50,6 +50,7 @@ public final class Offers {
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdnetworksInvocationTimestamp = 0;
+    private static boolean FORCED_DISABLED = false;
 
     private Offers() {
     }
@@ -177,7 +178,12 @@ public final class Offers {
     }
 
     public static boolean disabledAds() {
-        return Products.disabledAds(PlayStore.getInstance());
+        return FORCED_DISABLED || Products.disabledAds(PlayStore.getInstance());
+    }
+
+    public static void forceDisabledAds(Context context) {
+        FORCED_DISABLED = true;
+        stopAdNetworks(context);
     }
 
     /**

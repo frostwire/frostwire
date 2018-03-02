@@ -656,10 +656,12 @@ public class MainActivity extends AbstractActivity implements
         final String lastSeenVersion = ConfigurationManager.instance().getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION);
         if (StringUtils.isNullOrEmpty(lastSeenVersion)) {
             //fresh install
+            Offers.forceDisabledAds(this); // no ads on first session ever
             ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, Constants.FROSTWIRE_VERSION_STRING);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_FIRST_TIME);
         } else if (!Constants.FROSTWIRE_VERSION_STRING.equals(lastSeenVersion)) {
             //just updated.
+            Offers.forceDisabledAds(this); // no ads right after update
             ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, Constants.FROSTWIRE_VERSION_STRING);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_AFTER_UPDATE);
         }
