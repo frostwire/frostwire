@@ -29,7 +29,9 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -132,17 +134,22 @@ public final class SystemUtils {
      */
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?>... serviceClasses) {
         final long startTime = System.currentTimeMillis();
-        Set<Class<?>> serviceClassesNotRunningAnymore = new HashSet<>();
-        while (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
+        Set<Class<?>> servicesRunning = new HashSet<>();
+        for (Class serviceClass : serviceClasses) {
+            servicesRunning.add(serviceClass);
+        }
+        while (!servicesRunning.isEmpty()) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             long timeLeft = timeout - elapsedTime;
-            for (Class serviceClass : serviceClasses) {
+            Iterator<Class<?>> iterator = servicesRunning.iterator();
+            while (iterator != null && iterator.hasNext()) {
+                Class serviceClass = iterator.next();
                 if (isServiceRunning(context, serviceClass)) {
                     LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running. (" + timeLeft + " ms left)");
                     break;
                 } else {
                     LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is shutdown. (" + timeLeft + " ms left)");
-                    serviceClassesNotRunningAnymore.add(serviceClass);
+                    iterator.remove();
                 }
             }
 
@@ -151,8 +158,7 @@ public final class SystemUtils {
                     LOG.info("waitWhileServicesAreRunning(...) timed out, exiting now (" + timeout + "ms)");
                     break;
                 }
-
-                if (serviceClasses.length != serviceClassesNotRunningAnymore.size()) {
+                if (!servicesRunning.isEmpty()) {
                     LOG.info("waitWhileServicesAreRunning(...) zzz... zzz... (150ms)");
                     Thread.sleep(150);
                 } else {
