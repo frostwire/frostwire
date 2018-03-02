@@ -487,7 +487,6 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void cancelSearch() {
         adapter.clear();
-        searchInput.selectTabByMediaType(Constants.FILE_TYPE_AUDIO);
         searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false);
@@ -786,8 +785,10 @@ public final class SearchFragment extends AbstractFragment implements
                 return;
             }
             SearchFragment fragment = fragmentRef.get();
-            ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
-            fragment.adapter.setFileType(mediaTypeId);
+            if (fragment.adapter.getFileType() != mediaTypeId) {
+                ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId);
+                fragment.adapter.setFileType(mediaTypeId);
+            }
             fragment.showSearchView(rootViewRef.get());
         }
 
