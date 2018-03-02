@@ -49,7 +49,7 @@ final class ConfigurationDefaults {
 
     private void load() {
         defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
-        defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, "");//won't know until I see it.
+        defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, "");//won't know until I see it.
         defaultValues.put(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP, System.currentTimeMillis());
 
         defaultValues.put(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD, true);

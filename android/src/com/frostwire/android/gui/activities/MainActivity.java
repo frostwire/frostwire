@@ -362,7 +362,7 @@ public class MainActivity extends AbstractActivity implements
         } else if (!isShutdown()) {
             controller.startWizardActivity();
         }
-        checkLastSeenVersion();
+        checkLastSeenVersionBuild();
         registerMainBroadcastReceiver();
         syncNavigationMenu();
         updateNavigationMenu();
@@ -652,17 +652,18 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkLastSeenVersion() {
-        final String lastSeenVersion = ConfigurationManager.instance().getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION);
-        if (StringUtils.isNullOrEmpty(lastSeenVersion)) {
+    private void checkLastSeenVersionBuild() {
+        final String lastSeenVersionBuild = ConfigurationManager.instance().getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD);
+        final String currentVersionBuild = Constants.FROSTWIRE_VERSION_STRING + "." + Constants.FROSTWIRE_BUILD;
+        if (StringUtils.isNullOrEmpty(lastSeenVersionBuild)) {
             //fresh install
             Offers.forceDisabledAds(this); // no ads on first session ever
-            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, Constants.FROSTWIRE_VERSION_STRING);
+            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_FIRST_TIME);
-        } else if (!Constants.FROSTWIRE_VERSION_STRING.equals(lastSeenVersion)) {
+        } else if (!currentVersionBuild.equals(lastSeenVersionBuild)) {
             //just updated.
             Offers.forceDisabledAds(this); // no ads right after update
-            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION, Constants.FROSTWIRE_VERSION_STRING);
+            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_AFTER_UPDATE);
         }
     }

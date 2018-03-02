@@ -44,7 +44,7 @@ public final class Constants {
 
     // preference keys
     public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
-    public static final String PREF_KEY_CORE_LAST_SEEN_VERSION = "frostwire.prefs.core.last_seen_version";
+    public static final String PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD = "frostwire.prefs.core.last_seen_version_build";
     public static final String PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP = "frostwire.prefs.core.main_application_on_create_timestamp";
 
     public static final String PREF_KEY_NETWORK_ENABLE_DHT = "froswire.prefs.network.enable_dht";
