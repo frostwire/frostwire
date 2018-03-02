@@ -27,7 +27,6 @@ import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.MediaType;
