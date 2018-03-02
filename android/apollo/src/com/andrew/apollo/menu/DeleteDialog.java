@@ -93,19 +93,19 @@ public final class DeleteDialog extends DialogFragment {
 
         final AlertDialog.Builder apolloDeleteFilesDialog = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        final View inflator = inflater.inflate(R.layout.dialog_default, null);
-        apolloDeleteFilesDialog.setView(inflator);
+        final View inflater2 = inflater.inflate(R.layout.dialog_default, null);
+        apolloDeleteFilesDialog.setView(inflater2);
 
-        final TextView dialogTitle = inflator.findViewById(R.id.dialog_default_title);
+        final TextView dialogTitle = inflater2.findViewById(R.id.dialog_default_title);
         dialogTitle.setText(R.string.delete_files_title);
 
-        TextView text = inflator.findViewById(R.id.dialog_default_text);
+        TextView text = inflater2.findViewById(R.id.dialog_default_text);
         text.setText(R.string.are_you_sure_delete_files_text);
 
-        Button noButton = inflator.findViewById(R.id.dialog_default_button_no);
+        Button noButton = inflater2.findViewById(R.id.dialog_default_button_no);
         noButton.setText(R.string.cancel);
 
-        Button yesButton = inflator.findViewById(R.id.dialog_default_button_yes);
+        Button yesButton = inflater2.findViewById(R.id.dialog_default_button_yes);
         yesButton.setText(R.string.delete);
 
         noButton.setOnClickListener(new NegativeButtonOnClickListener());
@@ -134,7 +134,9 @@ public final class DeleteDialog extends DialogFragment {
         @Override
         public void onClick(View view) {
             // Remove the items from the image cache
-            mFetcher.removeFromCache(key);
+            if (mFetcher != null) {
+                mFetcher.removeFromCache(key);
+            }
             // Delete the selected item(s)
             MusicUtils.deleteTracks(getActivity(), mItemList);
 
