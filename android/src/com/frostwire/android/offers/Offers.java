@@ -56,6 +56,10 @@ public final class Offers {
     }
 
     public static void initAdNetworks(Activity activity) {
+        if (FORCED_DISABLED) {
+            LOG.info("Offers.initAdNetworks() aborted, FORCED_DISABLED");
+            return;
+        }
         if (stopAdNetworksIfPurchasedRemoveAds(activity)) {
             LOG.info("Offers.initAdNetworks() aborted, user paid for ad removal.");
             return;
