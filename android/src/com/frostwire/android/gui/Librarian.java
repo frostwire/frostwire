@@ -249,7 +249,7 @@ public final class Librarian {
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FileDescriptor fd) {
-        List<FileDescriptor> fds = Librarian.instance().getFiles(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
+        List<FileDescriptor> fds = getFiles(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
 
         if (fds.size() == 0) { // just in case
             Log.w(TAG, "Logic error creating ephemeral playlist");
@@ -389,7 +389,7 @@ public final class Librarian {
     public List<FileDescriptor> getFiles(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
         String[] whereArgs = new String[]{(exactPathMatch) ? filepath : "%" + filepath + "%"};
-        return Librarian.instance().getFiles(context, fileType, where, whereArgs);
+        return getFiles(context, fileType, where, whereArgs);
     }
 
     private void scan(final Context context, File file, Set<File> ignorableFiles) {
