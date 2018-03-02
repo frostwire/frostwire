@@ -127,7 +127,6 @@ public class SearchInputView extends LinearLayout {
             return;
         }
 
-        mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
         textInput = findViewById(R.id.view_search_input_text_input);
         textInput.setOnKeyListener(textInputListener);
         textInput.setOnActionListener(textInputListener);
@@ -137,7 +136,7 @@ public class SearchInputView extends LinearLayout {
             textInput.setAdapter(adapter);
         }
 
-        updateHint(mediaTypeId);
+        updateHint();
 
         tabLayout = findViewById(R.id.view_search_input_tab_layout_file_type);
         TabLayout.OnTabSelectedListener tabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -156,9 +155,7 @@ public class SearchInputView extends LinearLayout {
             }
         };
         tabLayout.addOnTabSelectedListener(tabSelectedListener);
-        tabItemFileTypeClick(mediaTypeId);
         setFileTypeCountersVisible(false);
-
         dummyFocusView = findViewById(R.id.view_search_input_linearlayout_dummy);
     }
 
@@ -169,6 +166,8 @@ public class SearchInputView extends LinearLayout {
         adapter.discardLastResult();
         String query = textInput.getText().toString().trim();
         if (query.length() > 0) {
+            mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
+            tabItemFileTypeClick(mediaTypeId);
             onSearch(query, mediaTypeId);
         }
         dummyFocusView.requestFocus();
@@ -200,8 +199,7 @@ public class SearchInputView extends LinearLayout {
         }
     }
 
-    private void updateHint(int fileType) {
-        // TODO: random search hint based on fileType
+    private void updateHint() {
         final String searchFiles = getContext().getString(R.string.search_label) + " " + getContext().getString(R.string.files);
         final String orEnterYTorSCUrl = getContext().getString(R.string.or_enter_url);
         textInput.setHint(searchFiles + " " + orEnterYTorSCUrl);
@@ -229,9 +227,7 @@ public class SearchInputView extends LinearLayout {
     }
 
     private void tabItemFileTypeClick(final int fileType) {
-        SearchInputView.this.mediaTypeId = fileType;
-        ConfigurationManager.instance().setLastMediaTypeFilter(fileType);
-        updateHint(fileType);
+        updateHint();
         onMediaTypeSelected(fileType);
     }
 
