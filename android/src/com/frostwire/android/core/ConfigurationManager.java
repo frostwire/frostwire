@@ -66,7 +66,7 @@ public class ConfigurationManager {
     }
 
     public static ConfigurationManager instance() {
-        if (instance == null && state.get() == State.CREATING) {
+        if (state.get() == State.CREATING) {
             try {
                 if (creationLatch.getCount() == 1) {
                     creationLatch.await();
