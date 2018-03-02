@@ -63,8 +63,6 @@ public class ConfigurationManager {
             return;
         }
         instance = new ConfigurationManager(context);
-        state.set(State.CREATED);
-        creationLatch.countDown();
     }
 
     public static ConfigurationManager instance() {
@@ -108,6 +106,8 @@ public class ConfigurationManager {
             cm.defaults = new ConfigurationDefaults();
             cm.initPreferences();
             cm.migrateWifiOnlyPreference();
+            state.set(State.CREATED);
+            creationLatch.countDown();
         }
     }
 
