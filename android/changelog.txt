@@ -1,10 +1,11 @@
-FrostWire 2.0.2 build 498 - MAR/01/2018
+FrostWire 2.0.2 build 499 - MAR/02/2018
  - Application startup is faster
  - Zooqle search fixes
  - TorrentDownloads search fixes
  - LimeTorrents search fixes
  - Library updates: jlibtorrent 1.2.0.17, applovin 7.8.5, ogury 2.2.8, mopub 4.20.0, okhttp 3.10.0, gson 2.8.2, gradle 4.6, support libraries 27.1.0
  - When audio files are deleted from "My Files" they're now cleared from "Recents" in "My Music"
+ - Bug where deleted .torrent files would reappear fixed
  - Urdu translation updated
 
 FrostWire 2.0.1 build 490 - FEB/06/2018
