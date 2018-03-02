@@ -64,11 +64,10 @@ public class SearchHeaderBanner extends LinearLayout {
     private LinearLayout fallbackBannerView;
     private TextView fallbackBannerTextView;
 
-    private final HeaderBannerListener moPubBannerListener;
+    private HeaderBannerListener moPubBannerListener;
 
     public SearchHeaderBanner(Context context, AttributeSet attrs) {
         super(context, attrs);
-        moPubBannerListener = new HeaderBannerListener(this);
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_search_header_banner, this, true);
@@ -82,7 +81,14 @@ public class SearchHeaderBanner extends LinearLayout {
         bannerHeaderLayout = null;
         fallbackBannerView = null;
         fallbackBannerTextView = null;
-        moPubBannerListener.onDestroy(); // calls moPubView.onDestroy() and unregisters its IntentReceiver
+        getMoPubBannerListener().onDestroy(); // calls moPubView.onDestroy() and unregisters its IntentReceiver
+    }
+
+    private HeaderBannerListener getMoPubBannerListener() {
+        if (moPubBannerListener == null) {
+            moPubBannerListener = new HeaderBannerListener(this);
+        }
+        return moPubBannerListener;
     }
 
     private SearchFragment getSearchFragment() {
@@ -122,14 +128,14 @@ public class SearchHeaderBanner extends LinearLayout {
         boolean isPortrait = UIUtils.isPortrait(activity);
         boolean isTablet = UIUtils.isTablet(activity.getResources());
         boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
-        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || isTablet) && diceRollPassed && !moPubBannerListener.tooEarlyToDisplay();
+        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || isTablet) && diceRollPassed && !getMoPubBannerListener().tooEarlyToDisplay();
         if (!bannerVisible) {
             LOG.info("updateComponents(): not eligible for search banner display. adsDisabled=" + adsDisabled +
                     ", screenTallEnough=" + screenTallEnough +
                     ", isPortrait=" + isPortrait +
                     ", isTablet=" + isTablet +
                     ", diceRollPassed=" + diceRollPassed +
-                    ", tooEarlyToDisplay=" + moPubBannerListener.tooEarlyToDisplay());
+                    ", tooEarlyToDisplay=" + getMoPubBannerListener().tooEarlyToDisplay());
             setBannerViewVisibility(BannerType.ALL, false);
             return;
         }
@@ -142,7 +148,7 @@ public class SearchHeaderBanner extends LinearLayout {
         if (currentQuery != null) {
             moPubView.setKeywords(currentQuery);
         }
-        moPubView.setBannerAdListener(moPubBannerListener);
+        moPubView.setBannerAdListener(getMoPubBannerListener());
         try {
             moPubView.loadAd();
             LOG.info("updateComponents(): moPubView.loadAd()");
@@ -186,7 +192,7 @@ public class SearchHeaderBanner extends LinearLayout {
 
     private void onBannerDismiss(BannerType bannerType) {
         if (bannerHeaderLayout != null) {
-            moPubBannerListener.onBannerDismissed(bannerType);
+            getMoPubBannerListener().onBannerDismissed(bannerType);
             if (bannerType == BannerType.MOPUB) {
                 loadFallbackBanner();
             } else if (bannerType == BannerType.FALLBACK) {
@@ -201,7 +207,7 @@ public class SearchHeaderBanner extends LinearLayout {
             setBannerViewVisibility(BannerType.FALLBACK, false);
             return;
         }
-        if (moPubBannerListener.tooEarlyToDisplay()) {
+        if (getMoPubBannerListener().tooEarlyToDisplay()) {
             LOG.info("loadFallbackBanner() aborted. too early to display");
             setBannerViewVisibility(BannerType.ALL, false);
             return;
