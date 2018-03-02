@@ -152,7 +152,7 @@ public class EngineService extends Service implements IEngineService {
             BTEngine.getInstance().stop();
             LOG.debug("onDestroy, BTEngine stopped");
         } else {
-            LOG.debug("onDestoy, BTEngine didn't have a chance to start, no need to stop it");
+            LOG.debug("onDestroy, BTEngine didn't have a chance to start, no need to stop it");
         }
 
         ImageLoader.getInstance(this).shutdown();
