@@ -21,15 +21,22 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Hex;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -38,33 +45,78 @@ import java.util.Map.Entry;
  * @author aldenml
  */
 public class ConfigurationManager {
-    private final SharedPreferences preferences;
-    private final Editor editor;
-
-    private final ConfigurationDefaults defaults;
-
     private static ConfigurationManager instance;
+    private static AtomicReference<State> state = new AtomicReference(State.CREATING);
+    private final static CountDownLatch creationLatch = new CountDownLatch(1);
+    private final ExecutorService pool;
+    private SharedPreferences preferences;
+    private Editor editor;
+    private ConfigurationDefaults defaults;
+
+    private enum State {
+        CREATING,
+        CREATED
+    }
 
     public synchronized static void create(Application context) {
-        if (instance != null) {
+        if (State.CREATED == state.get()  && instance != null) {
             return;
         }
         instance = new ConfigurationManager(context);
+        state.set(State.CREATED);
+        creationLatch.countDown();
     }
 
     public static ConfigurationManager instance() {
-        if (instance == null) {
+        if (instance == null && state.get() == State.CREATING) {
+            try {
+                if (creationLatch.getCount() == 1) {
+                    creationLatch.await();
+                }
+            } catch (InterruptedException e) {
+                if (instance == null) {
+                    throw new RuntimeException("ConfigurationManager not created, creationLatch thread interrupted");
+                }
+            }
+        }
+        if (State.CREATED == state.get() && instance == null) {
             throw new RuntimeException("ConfigurationManager not created");
         }
         return instance;
     }
 
     private ConfigurationManager(Application context) {
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        editor = preferences.edit();
-        defaults = new ConfigurationDefaults();
-        initPreferences();
-        migrateWifiOnlyPreference();
+        pool = Engine.instance().getThreadPool();
+        pool.execute(new Initializer(this, context));
+    }
+
+    private static class Initializer implements Runnable {
+        private final ConfigurationManager cm;
+        private final WeakReference<Application> applicationRef;
+        Initializer(ConfigurationManager configurationManager, Application application) {
+            cm = configurationManager;
+            applicationRef = Ref.weak(application);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(applicationRef)) {
+                throw new RuntimeException("ConfigurationManager.Initializer aborted, no Context available");
+            }
+            cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef.get());
+            cm.editor = cm.preferences.edit();
+            cm.defaults = new ConfigurationDefaults();
+            cm.initPreferences();
+            cm.migrateWifiOnlyPreference();
+        }
+    }
+
+    private void applyInBackground() {
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            pool.execute(() -> editor.apply());
+        } else {
+            editor.apply();
+        }
     }
 
     /**
@@ -82,7 +134,7 @@ public class ConfigurationManager {
     private void removePreference(String key) {
         try {
             editor.remove(key);
-            editor.apply();
+            applyInBackground();
         } catch (Throwable ignore) {
         }
     }
@@ -93,7 +145,7 @@ public class ConfigurationManager {
 
     public void setString(String key, String value) {
         editor.putString(key, value);
-        editor.apply();
+        applyInBackground();
     }
 
     public int getInt(String key) {
@@ -102,7 +154,7 @@ public class ConfigurationManager {
 
     public void setInt(String key, int value) {
         editor.putInt(key, value);
-        editor.apply();
+        applyInBackground();
     }
 
     public long getLong(String key) {
@@ -111,7 +163,7 @@ public class ConfigurationManager {
 
     public void setLong(String key, long value) {
         editor.putLong(key, value);
-        editor.apply();
+        applyInBackground();
     }
 
     public boolean getBoolean(String key) {
@@ -120,7 +172,7 @@ public class ConfigurationManager {
 
     public void setBoolean(String key, boolean value) {
         editor.putBoolean(key, value);
-        editor.apply();
+        applyInBackground();
     }
 
     public File getFile(String key) {
@@ -129,7 +181,7 @@ public class ConfigurationManager {
 
     private void setFile(String key, File value) {
         editor.putString(key, value.getAbsolutePath());
-        editor.apply();
+        applyInBackground();
     }
 
     public byte[] getByteArray(String key) {
@@ -191,7 +243,7 @@ public class ConfigurationManager {
 
     public void setStringArray(String key, String[] values) {
         editor.putString(key, JsonUtils.toJson(values));
-        editor.apply();
+        applyInBackground();
     }
 
     public boolean showTransfersOnDownloadStart() {
@@ -318,5 +370,4 @@ public class ConfigurationManager {
             }
         }
     }
-
 }
