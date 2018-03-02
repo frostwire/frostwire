@@ -27,6 +27,7 @@ import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.MediaType;
@@ -50,6 +51,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The Librarian is in charge of:
@@ -63,18 +66,37 @@ import java.util.Stack;
 public final class Librarian {
 
     private static final String TAG = "FW.Librarian";
-
     private static Librarian instance;
+    private static AtomicReference<Librarian.State> state = new AtomicReference(Librarian.State.CREATING);
+    private final static CountDownLatch creationLatch = new CountDownLatch(1);
+
+    private enum State {
+        CREATING,
+        CREATED
+    }
 
     public synchronized static void create() {
-        if (instance != null) {
+        if (State.CREATED == state.get()  && instance != null) {
             return;
         }
         instance = new Librarian();
+        state.set(Librarian.State.CREATED);
+        creationLatch.countDown();
     }
 
     public static Librarian instance() {
-        if (instance == null) {
+        if (instance == null && state.get() == Librarian.State.CREATING) {
+            try {
+                if (creationLatch.getCount() == 1) {
+                    creationLatch.await();
+                }
+            } catch (InterruptedException e) {
+                if (instance == null) {
+                    throw new RuntimeException("Librarian not created, creationLatch interrupted");
+                }
+            }
+        }
+        if (Librarian.State.CREATED == state.get() && instance == null) {
             throw new RuntimeException("Librarian not created");
         }
         return instance;
