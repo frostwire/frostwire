@@ -278,7 +278,6 @@ public final class SearchFragment extends AbstractFragment implements
             }
         });
         showSearchView(view);
-        showRatingsReminder(view);
     }
 
     private void startMagnetDownload(String magnet) {
@@ -496,6 +495,7 @@ public final class SearchFragment extends AbstractFragment implements
         searchProgress.setProgressEnabled(false);
         showSearchView(getView());
         filterButton.reset(true); // hide=true
+        showRatingsReminder(getView());
         searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
     }
 
