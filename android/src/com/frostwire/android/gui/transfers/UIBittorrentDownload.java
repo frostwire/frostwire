@@ -196,8 +196,12 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private void deleteFilesFromContentResolver(Context context, boolean deleteTorrent) {
         final List<TransferItem> items = getItems();
         final ContentResolver cr = context.getContentResolver();
+        Librarian librarian = Librarian.instance();
+        if (librarian == null) {
+            return;
+        }
         for (TransferItem item : items) {
-            final List<FileDescriptor> fileDescriptors = Librarian.instance().getFiles(context, item.getFile().getAbsolutePath(), true);
+            final List<FileDescriptor> fileDescriptors = librarian.getFiles(context, item.getFile().getAbsolutePath(), true);
             for (FileDescriptor fd : fileDescriptors) {
                 File file = new File(fd.filePath);
                 if (file.isFile()) {
@@ -215,8 +219,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         if (deleteTorrent) {
             File torrent = dl.getTorrentFile();
-            final List<FileDescriptor> fds = Librarian.instance().getFiles(context, torrent.getAbsolutePath(), true);
-            Librarian.instance().deleteFiles(context, Constants.FILE_TYPE_TORRENTS, fds);
+            if (torrent != null) {
+                final List<FileDescriptor> fds = librarian.getFiles(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
+                librarian.deleteFiles(context, Constants.FILE_TYPE_TORRENTS, fds);
+            }
         }
     }
 

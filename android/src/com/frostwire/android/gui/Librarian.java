@@ -37,6 +37,7 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Ref;
 
@@ -215,6 +216,16 @@ public final class Librarian {
         } catch (Throwable e) {
             Log.e(TAG, "Failed to delete files from media store", e);
         }
+        if (fileType == Constants.FILE_TYPE_TORRENTS) {
+            FileSystem fs = Platforms.fileSystem();
+            for (FileDescriptor fd : fds) {
+                try {
+                    fs.delete(new File(fd.filePath));
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+
         UIUtils.broadcastAction(context,
                 Constants.ACTION_FILE_ADDED_OR_REMOVED,
                 new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, fileType));
