@@ -202,6 +202,7 @@ public class ConfigurationManager {
             throw new IllegalStateException("Shared preferences editor can't be null at this moment");
         }
         resetToDefaults(editor, defaults.getDefaultValues());
+        editor.apply();
     }
 
     private void resetToDefault(String key) {
@@ -286,6 +287,7 @@ public class ConfigurationManager {
 
         //there are some configuration values that need to be reset every time to a desired value
         resetToDefaults(editor, defaults.getResetValues());
+        editor.apply();
     }
 
     private void initPreference(String key, Object value, boolean force) {
@@ -370,8 +372,6 @@ public class ConfigurationManager {
                         (value != null ? value.getClass() : "null"));
             }
         }
-
-        editor.apply();
     }
 
     private void setString(Editor editor, String key, String value) {
