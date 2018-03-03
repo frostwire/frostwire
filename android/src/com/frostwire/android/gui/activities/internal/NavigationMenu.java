@@ -96,7 +96,7 @@ public final class NavigationMenu {
         navView.setCheckedItem(menuItemId);
     }
 
-    private NavigationView initNavigationView(final Activity activity) {
+    private NavigationView initNavigationView(final MainActivity activity) {
         NavigationView resultNavView = navView;
         if (navView == null) {
             resultNavView = activity.findViewById(R.id.activity_main_nav_view);
@@ -172,9 +172,9 @@ public final class NavigationMenu {
         hide();
     }
 
-    private void onUpdateButtonClicked(Context context) {
+    private void onUpdateButtonClicked(MainActivity mainActivity) {
         hide();
-        SoftwareUpdater.getInstance().notifyUserAboutUpdate(context);
+        SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
     }
 
     private AdMenuItemView initAdMenuItemListener(final Activity activity) {
