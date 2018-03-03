@@ -20,6 +20,7 @@
 package com.frostwire.android.gui.dialogs;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -40,6 +41,8 @@ public class YesNoDialog extends AbstractDialog {
     private static final String MESSAGE_STRING_KEY = "messageStr";
     private static final String YES_NO_DIALOG_FLAGS = "yesnodialog_flags";
     private String id;
+    private DialogInterface.OnClickListener positiveListener;
+    private DialogInterface.OnClickListener negativeListener;
 
     public YesNoDialog() {
         super(R.layout.dialog_default);
@@ -51,7 +54,6 @@ public class YesNoDialog extends AbstractDialog {
 
     public static YesNoDialog newInstance(String id, int titleId, int messageId, byte dialogFlags) {
         YesNoDialog f = new YesNoDialog();
-
         Bundle args = new Bundle();
         args.putString(ID_KEY, id);
         args.putInt(TITLE_KEY, titleId);
@@ -59,13 +61,12 @@ public class YesNoDialog extends AbstractDialog {
         args.putString(MESSAGE_STRING_KEY, null);
         args.putByte(YES_NO_DIALOG_FLAGS, dialogFlags);
         f.setArguments(args);
-
+        f.initDefaultOnDialogClickListeners();
         return f;
     }
 
     public static YesNoDialog newInstance(String id, int titleId, String message, byte dialogFlags) {
         YesNoDialog f = new YesNoDialog();
-
         Bundle args = new Bundle();
         args.putString(ID_KEY, id);
         args.putInt(TITLE_KEY, titleId);
@@ -73,8 +74,20 @@ public class YesNoDialog extends AbstractDialog {
         args.putString(MESSAGE_STRING_KEY, message);
         args.putByte(YES_NO_DIALOG_FLAGS, dialogFlags);
         f.setArguments(args);
-
+        f.initDefaultOnDialogClickListeners();
         return f;
+    }
+
+    public void initDefaultOnDialogClickListeners() {
+        setOnDialogClickListener((tag, which) -> {
+                    if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
+                        positiveListener.onClick(getDialog(), which);
+                    } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
+                        negativeListener.onClick(getDialog(), which);
+                    }
+                    dismiss();
+                }
+        );
     }
 
 
@@ -121,5 +134,10 @@ public class YesNoDialog extends AbstractDialog {
     @Override
     protected void performDialogClick(String tag, int which) {
         super.performDialogClick(id, which);
+    }
+
+    public void setOnDialogClickListeners(DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
+        this.positiveListener = positiveListener;
+        this.negativeListener = negativeListener;
     }
 }
