@@ -222,7 +222,7 @@ public class ConfigurationManager {
 
     public boolean getBoolean(String key) {
         if (preferences == null) {
-            LOG.error("getLong(key=" + key + ") preferences == null");
+            LOG.error("getBoolean(key=" + key + ") preferences == null");
             throw new IllegalStateException("getBoolean(key="+key+") failed, preferences:SharedPreferences is null");
         }
         return preferences.getBoolean(key, false);
