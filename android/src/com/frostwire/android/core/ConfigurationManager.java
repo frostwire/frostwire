@@ -64,9 +64,7 @@ public class ConfigurationManager {
     public static ConfigurationManager instance() {
         if (state.get() == State.CREATING) {
             try {
-                if (creationLatch.getCount() == 1) {
-                    creationLatch.await();
-                }
+                creationLatch.await();
             } catch (InterruptedException e) {
                 if (instance == null) {
                     throw new RuntimeException("ConfigurationManager not created, creationLatch thread interrupted");

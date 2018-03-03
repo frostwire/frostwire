@@ -87,9 +87,7 @@ public final class Librarian {
     public static Librarian instance() {
         if (state.get() == Librarian.State.CREATING) {
             try {
-                if (creationLatch.getCount() == 1) {
-                    creationLatch.await();
-                }
+                creationLatch.await();
             } catch (InterruptedException e) {
                 if (instance == null) {
                     throw new RuntimeException("Librarian not created, creationLatch interrupted");
