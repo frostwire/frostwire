@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -127,14 +126,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         @Override
         public void onClick(View v) {
             clickedViewRef = Ref.weak(v);
-            UIUtils.showEditTextDialog((Activity) v.getContext(),
-                    R.string.enter_valid_tracker_url_here,
-                    R.string.add_tracker,
-                    R.string.add,
-                    true,
-                    false,
-                    null,
-                    this);
+            if (Ref.alive(adapterRef) && Ref.alive(adapterRef.get().fragmentManagerRef)) {
+                UIUtils.showEditTextDialog(adapterRef.get().fragmentManagerRef.get(),
+                        R.string.enter_valid_tracker_url_here,
+                        R.string.add_tracker,
+                        R.string.add,
+                        true,
+                        false,
+                        null,
+                        this);
+            }
         }
 
         @Override
@@ -163,16 +164,13 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         private final ImageView editButton;
         private final ImageView removeButton;
         private final TorrentHandle torrentHandle;
-        private final WeakReference<FragmentManager> fragmentManagerRef;
         private int trackerOffset;
 
         public TrackerItemViewHolder(final View itemView,
-                                     final WeakReference<FragmentManager> fragmentManagerRef,
                                      final TrackerRecyclerViewAdapter adapter,
                                      final TorrentHandle torrentHandle,
                                      int trackerOffset) {
             super(itemView);
-            this.fragmentManagerRef = fragmentManagerRef;
             adapterRef = Ref.weak(adapter);
             trackerTextView = itemView.findViewById(R.id.view_transfer_detail_tracker_address);
             editButton = itemView.findViewById(R.id.view_transfer_detail_tracker_edit_button);
@@ -207,8 +205,8 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 if (selectedTrackerURL == null) {
                     return;
                 }
-                if (v.getContext() instanceof Activity) {
-                    UIUtils.showEditTextDialog((Activity) v.getContext(),
+                if (Ref.alive(vhRef) && Ref.alive(vhRef.get().adapterRef) && Ref.alive(vhRef.get().adapterRef.get().fragmentManagerRef)) {
+                    UIUtils.showEditTextDialog(vhRef.get().adapterRef.get().fragmentManagerRef.get(),
                             R.string.enter_valid_tracker_url_here,
                             R.string.edit_tracker,
                             R.string.edit,
@@ -216,6 +214,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                             false,
                             selectedTrackerURL,
                             this);
+
                 }
             }
 
@@ -266,13 +265,13 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
             @Override
             public void onClick(View v) {
-                if (!Ref.alive(vhRef) || !Ref.alive(vhRef.get().fragmentManagerRef)) {
+                if (!Ref.alive(vhRef) || !Ref.alive(vhRef.get().adapterRef) || !Ref.alive(vhRef.get().adapterRef.get().fragmentManagerRef)) {
                     return;
                 }
                 int trackerOffset = vhRef.get().trackerOffset;
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
                 AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
-                UIUtils.showYesNoDialog(vhRef.get().fragmentManagerRef.get(),
+                UIUtils.showYesNoDialog(vhRef.get().adapterRef.get().fragmentManagerRef.get(),
                         trackerToRemove.url(),
                         R.string.remove_tracker,
                         (dialog, which) -> {
@@ -304,7 +303,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         @Override
         public TrackerItemViewHolder onCreateViewHolder(ViewGroup parent, int i) {
             View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_tracker_item, parent, false);
-            return new TrackerItemViewHolder(inflatedView, fragmentManagerRef, this, uiBittorrentDownload.getDl().getTorrentHandle(), i);
+            return new TrackerItemViewHolder(inflatedView, this, uiBittorrentDownload.getDl().getTorrentHandle(), i);
         }
 
         @Override
