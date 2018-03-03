@@ -255,8 +255,13 @@ public final class Engine implements IEngineService {
         }
 
         public boolean isActive() {
-            return vibrator != null &&
-                    ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+            boolean hapticFeedback = false;
+            ConfigurationManager cm = ConfigurationManager.instance();
+            if (cm != null) {
+                hapticFeedback = cm.getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
+            }
+            return vibrator != null && hapticFeedback;
+
         }
     }
 

@@ -27,6 +27,7 @@ import android.preference.PreferenceManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Hex;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
@@ -45,8 +46,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author aldenml
  */
 public class ConfigurationManager {
+    private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
     private static ConfigurationManager instance;
-    private static AtomicReference<State> state = new AtomicReference(State.CREATING);
+    private static AtomicReference state = new AtomicReference(State.CREATING);
     private final static CountDownLatch creationLatch = new CountDownLatch(1);
     private final ExecutorService pool;
     private SharedPreferences preferences;
@@ -101,17 +103,30 @@ public class ConfigurationManager {
             if (!Ref.alive(applicationRef)) {
                 throw new RuntimeException("ConfigurationManager.Initializer aborted, no Context available");
             }
-            cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef.get());
-            cm.editor = cm.preferences.edit();
-            cm.defaults = new ConfigurationDefaults();
-            cm.initPreferences();
-            cm.migrateWifiOnlyPreference();
-            state.set(State.CREATED);
-            creationLatch.countDown();
+            try {
+                cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef.get());
+                if (cm.preferences != null) {
+                    cm.editor = cm.preferences.edit();
+                }
+                cm.defaults = new ConfigurationDefaults();
+                cm.initPreferences();
+                cm.migrateWifiOnlyPreference();
+            }
+            catch (Throwable ignored) {
+                LOG.error("Error initializing ConfigurationManager", ignored);
+            }
+            finally {
+                state.set(State.CREATED);
+                creationLatch.countDown();
+            }
         }
     }
 
     private void applyInBackground() {
+        if (editor == null) {
+            LOG.warn("applyInBackground aborted, editor == null");
+            return;
+        }
         if (Looper.getMainLooper() == Looper.myLooper()) {
             pool.execute(() -> editor.apply());
         } else {
@@ -123,8 +138,9 @@ public class ConfigurationManager {
      * If the deprecated {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY} is found
      * it gets migrated to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY and then deleted.
      */
+    @SuppressWarnings("deprecation")
     private void migrateWifiOnlyPreference() {
-        if (!preferences.contains(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
+        if (preferences != null && !preferences.contains(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
             return;
         }
         setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
@@ -136,6 +152,7 @@ public class ConfigurationManager {
             editor.remove(key);
             applyInBackground();
         } catch (Throwable ignore) {
+            LOG.warn("removePreference(key=" + key + ") failed", ignore);
         }
     }
 
@@ -144,8 +161,12 @@ public class ConfigurationManager {
     }
 
     public void setString(String key, String value) {
-        editor.putString(key, value);
-        applyInBackground();
+        try {
+            editor.putString(key, value);
+            applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setString(key=" + key + ", value=" + value + ") failed", ignore);
+        }
     }
 
     public int getInt(String key) {
@@ -153,8 +174,12 @@ public class ConfigurationManager {
     }
 
     public void setInt(String key, int value) {
-        editor.putInt(key, value);
-        applyInBackground();
+        try {
+            editor.putInt(key, value);
+            applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setInt(key=" + key + ", value=" + value + ") failed", ignore);
+        }
     }
 
     public long getLong(String key) {
@@ -162,17 +187,29 @@ public class ConfigurationManager {
     }
 
     public void setLong(String key, long value) {
-        editor.putLong(key, value);
-        applyInBackground();
+        try {
+            editor.putLong(key, value);
+            applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setLong(key=" + key + ", value=" + value + ") failed", ignore);
+        }
     }
 
     public boolean getBoolean(String key) {
-        return preferences.getBoolean(key, false);
+        if (preferences != null) {
+            return preferences.getBoolean(key, false);
+        }
+        LOG.warn("getBoolean defaulting to false, preferences == null");
+        return false;
     }
 
     public void setBoolean(String key, boolean value) {
-        editor.putBoolean(key, value);
-        applyInBackground();
+        try {
+            editor.putBoolean(key, value);
+            applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setBoolean(key=" + key + ", value=" + value + ") failed", ignore);
+        }
     }
 
     public File getFile(String key) {
@@ -180,8 +217,12 @@ public class ConfigurationManager {
     }
 
     private void setFile(String key, File value) {
-        editor.putString(key, value.getAbsolutePath());
-        applyInBackground();
+        try {
+            editor.putString(key, value.getAbsolutePath());
+            applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setFile(key=" + key + ", value=" + value.getAbsolutePath() + ") failed", ignore);
+        }
     }
 
     public byte[] getByteArray(String key) {
@@ -242,8 +283,12 @@ public class ConfigurationManager {
 
 
     public void setStringArray(String key, String[] values) {
+        try {
         editor.putString(key, JsonUtils.toJson(values));
         applyInBackground();
+        } catch (Throwable ignore) {
+            LOG.warn("setStringArray(key=" + key + ", values=...) failed", ignore);
+        }
     }
 
     public boolean showTransfersOnDownloadStart() {
@@ -251,11 +296,15 @@ public class ConfigurationManager {
     }
 
     public void registerOnPreferenceChange(OnSharedPreferenceChangeListener listener) {
-        preferences.registerOnSharedPreferenceChangeListener(listener);
+        if (preferences != null) {
+            preferences.registerOnSharedPreferenceChangeListener(listener);
+        }
     }
 
     public void unregisterOnPreferenceChange(OnSharedPreferenceChangeListener listener) {
-        preferences.unregisterOnSharedPreferenceChangeListener(listener);
+        if (preferences != null) {
+            preferences.unregisterOnSharedPreferenceChangeListener(listener);
+        }
     }
 
     public String getStoragePath() {
@@ -310,43 +359,67 @@ public class ConfigurationManager {
     }
 
     private void initStringPreference(String prefKeyName, String defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initStringPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setString(prefKeyName, defaultValue);
         }
     }
 
     private void initByteArrayPreference(String prefKeyName, byte[] defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initByteArrayPreference(prefKeyName="+prefKeyName+", defaultValue=...) aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setByteArray(prefKeyName, defaultValue);
         }
     }
 
     private void initBooleanPreference(String prefKeyName, boolean defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initBooleanPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setBoolean(prefKeyName, defaultValue);
         }
     }
 
     private void initIntPreference(String prefKeyName, int defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initIntPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setInt(prefKeyName, defaultValue);
         }
     }
 
     private void initLongPreference(String prefKeyName, long defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initLongPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setLong(prefKeyName, defaultValue);
         }
     }
 
     private void initFilePreference(String prefKeyName, File defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if (preferences == null && !force) {
+            LOG.warn("initFilePreference(prefKeyName="+prefKeyName+", defaultValue=...) aborted, preferences == null");
+            return;
+        }
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setFile(prefKeyName, defaultValue);
         }
     }
 
     private void initStringArrayPreference(String prefKeyName, String[] defaultValue, boolean force) {
-        if (!preferences.contains(prefKeyName) || force) {
+        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setStringArray(prefKeyName, defaultValue);
         }
     }

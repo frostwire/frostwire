@@ -67,7 +67,7 @@ public final class Librarian {
 
     private static final String TAG = "FW.Librarian";
     private static Librarian instance;
-    private static AtomicReference<Librarian.State> state = new AtomicReference(Librarian.State.CREATING);
+    private static AtomicReference state = new AtomicReference(State.CREATING);
     private final static CountDownLatch creationLatch = new CountDownLatch(1);
 
     private enum State {
