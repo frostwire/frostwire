@@ -68,9 +68,10 @@ public class MainApplication extends Application {
         Platforms.set(new AndroidPlatform(this));
 
         Librarian.create();
-        new Thread(new BTEngineInitializer(Ref.weak(this))).start();
 
         Engine.instance().onApplicationCreate(this);
+
+        new Thread(new BTEngineInitializer(Ref.weak(this))).start();
 
         ExecutorService threadPool = Engine.instance().getThreadPool();
         ImageLoader.start(this, threadPool);

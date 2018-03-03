@@ -105,17 +105,18 @@ public class ConfigurationManager {
             }
             try {
                 cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef.get());
-                if (cm.preferences != null) {
-                    cm.editor = cm.preferences.edit();
-                }
+                cm.editor = cm.preferences.edit();
                 cm.defaults = new ConfigurationDefaults();
-                cm.initPreferences();
-                cm.migrateWifiOnlyPreference();
+
+                if (cm.editor != null) {
+                    cm.initPreferences();
+                    cm.migrateWifiOnlyPreference();
+                }
             }
-            catch (Throwable ignored) {
-                LOG.error("Error initializing ConfigurationManager", ignored);
-            }
-            finally {
+            catch (Throwable t) {
+                LOG.error("Error initializing ConfigurationManager", t);
+                throw t;
+            } finally {
                 state.set(State.CREATED);
                 creationLatch.countDown();
             }
@@ -158,8 +159,8 @@ public class ConfigurationManager {
 
     public String getString(String key, String defValue) {
         if (preferences == null) {
-            LOG.warn("getString(key="+key+", defValue="+defValue+") preferences == null, returning default value");
-            return defValue;
+            LOG.error("getString(key=" + key + ", defValue=" + defValue + ") preferences == null");
+            throw new IllegalStateException("getString(key="+key+") failed, preferences:SharedPreferences is null");
         }
         return preferences.getString(key, defValue);
     }
@@ -179,8 +180,8 @@ public class ConfigurationManager {
 
     public int getInt(String key, int defValue) {
         if (preferences == null) {
-            LOG.warn("getInt(key="+key+", defValue="+defValue+") preferences == null, returning default value");
-            return defValue;
+            LOG.error("getInt(key=" + key + ", defValue=" + defValue + ") preferences == null");
+            throw new IllegalStateException("getInt(key="+key+") failed, preferences:SharedPreferences is null");
         }
         return preferences.getInt(key, defValue);
     }
@@ -200,8 +201,8 @@ public class ConfigurationManager {
 
     public long getLong(String key, long defValue) {
         if (preferences == null) {
-            LOG.warn("getLong(key="+key+", defValue="+defValue+") preferences == null, returning default value");
-            return defValue;
+            LOG.error("getLong(key=" + key + ", defValue=" + defValue + ") preferences == null");
+            throw new IllegalStateException("getLong(key="+key+") failed, preferences:SharedPreferences is null");
         }
         return preferences.getLong(key, defValue);
     }
@@ -220,11 +221,11 @@ public class ConfigurationManager {
     }
 
     public boolean getBoolean(String key) {
-        if (preferences != null) {
-            return preferences.getBoolean(key, false);
+        if (preferences == null) {
+            LOG.error("getLong(key=" + key + ") preferences == null");
+            throw new IllegalStateException("getBoolean(key="+key+") failed, preferences:SharedPreferences is null");
         }
-        LOG.warn("getBoolean defaulting to false, preferences == null");
-        return false;
+        return preferences.getBoolean(key, false);
     }
 
     public void setBoolean(String key, boolean value) {

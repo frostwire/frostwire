@@ -121,9 +121,6 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
 
-        // it happens that this is called before Application#onCreate
-        ConfigurationManager.create(getApplication());
-
         enableComponents(true);
 
         startPermanentNotificationUpdates();

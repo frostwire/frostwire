@@ -19,6 +19,7 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.os.Environment;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -72,7 +73,7 @@ final class AndroidPaths implements SystemPaths {
     }
 
     private static File storage() {
-        String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH);
+        String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
         if (path.toLowerCase().endsWith("/" + STORAGE_PATH.toLowerCase())) {
             return new File(path);
         } else {
