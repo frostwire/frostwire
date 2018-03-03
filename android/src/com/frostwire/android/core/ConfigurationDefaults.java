@@ -55,7 +55,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP, System.currentTimeMillis());
 
         defaultValues.put(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, Constants.FILE_TYPE_AUDIO);
+        defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, (int) Constants.FILE_TYPE_AUDIO);
         defaultValues.put(Constants.PREF_KEY_GUI_TOS_ACCEPTED, false);
         defaultValues.put(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET, false);
         defaultValues.put(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER, 10);
@@ -77,7 +77,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 0 : 100);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 100 : 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES, 15);
-        defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1l);
+        defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT, false);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,

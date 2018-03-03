@@ -212,19 +212,6 @@ public class ConfigurationManager {
         }
     }
 
-    public File getFile(String key) {
-        return new File(preferences.getString(key, ""));
-    }
-
-    private void setFile(String key, File value) {
-        try {
-            editor.putString(key, value.getAbsolutePath());
-            applyInBackground();
-        } catch (Throwable ignore) {
-            LOG.warn("setFile(key=" + key + ", value=" + value.getAbsolutePath() + ") failed", ignore);
-        }
-    }
-
     public void resetToDefaults() {
         resetToDefaults(defaults.getDefaultValues());
     }
@@ -331,10 +318,11 @@ public class ConfigurationManager {
             initLongPreference(key, (Long) value, force);
         } else if (value instanceof Boolean) {
             initBooleanPreference(key, (Boolean) value, force);
-        } else if (value instanceof File) {
-            initFilePreference(key, (File) value, force);
         } else if (value instanceof String[]) {
             initStringArrayPreference(key, (String[]) value, force);
+        } else {
+            throw new RuntimeException("Unsupported data type for setting: " +
+                    "key = " + key + ", value = " + value.getClass());
         }
     }
 
@@ -378,16 +366,6 @@ public class ConfigurationManager {
         }
     }
 
-    private void initFilePreference(String prefKeyName, File defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initFilePreference(prefKeyName="+prefKeyName+", defaultValue=...) aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setFile(prefKeyName, defaultValue);
-        }
-    }
-
     private void initStringArrayPreference(String prefKeyName, String[] defaultValue, boolean force) {
         if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setStringArray(prefKeyName, defaultValue);
@@ -404,12 +382,13 @@ public class ConfigurationManager {
                 setLong(entry.getKey(), (Long) entry.getValue());
             } else if (entry.getValue() instanceof Boolean) {
                 setBoolean(entry.getKey(), (Boolean) entry.getValue());
-            } else if (entry.getValue() instanceof File) {
-                setFile(entry.getKey(), (File) entry.getValue());
             } else if (entry.getValue() instanceof String[]) {
                 setStringArray(entry.getKey(), (String[]) entry.getValue());
             } else {
-                throw new RuntimeException("Unsupported data type for setting");
+                Object value = entry.getValue();
+                throw new RuntimeException("Unsupported data type for setting: " +
+                        "key = " + entry.getKey() + ", value = " +
+                        (value != null ? value.getClass() : "null"));
             }
         }
     }
