@@ -83,19 +83,16 @@ public class ConfigurationManager {
 
     private static class Initializer implements Runnable {
         private final ConfigurationManager cm;
-        private final WeakReference<Application> applicationRef;
+        private final Application applicationRef;
         Initializer(ConfigurationManager configurationManager, Application application) {
             cm = configurationManager;
-            applicationRef = Ref.weak(application);
+            applicationRef = application;
         }
 
         @Override
         public void run() {
-            if (!Ref.alive(applicationRef)) {
-                throw new RuntimeException("ConfigurationManager.Initializer aborted, no Context available");
-            }
             try {
-                cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef.get());
+                cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef);
                 cm.editor = cm.preferences.edit();
                 cm.defaults = new ConfigurationDefaults();
 

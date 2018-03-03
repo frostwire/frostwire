@@ -17,6 +17,7 @@
 
 package com.frostwire.android.util;
 
+import android.app.Application;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -193,6 +194,7 @@ public final class Debug {
     private static boolean hasNoContext(Object obj) {
         if (obj == null ||
             obj instanceof WeakReference<?> ||
+            obj instanceof Application || // application is an application context
             obj instanceof Number ||
             obj instanceof String ||
             obj instanceof Enum || // avoids infinite recursion checking $VALUES field
