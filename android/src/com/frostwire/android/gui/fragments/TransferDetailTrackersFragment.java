@@ -215,8 +215,9 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 if (selectedTrackerURL == null) {
                     return;
                 }
-                if (Ref.alive(vhRef) && Ref.alive(vhRef.get().adapterRef) && Ref.alive(vhRef.get().adapterRef.get().fragmentManagerRef)) {
-                    UIUtils.showEditTextDialog(vhRef.get().adapterRef.get().fragmentManagerRef.get(),
+                FragmentManager fm;
+                if (Ref.alive(vhRef) && (fm = vhRef.get().getFragmentManager()) != null) {
+                    UIUtils.showEditTextDialog(fm,
                             R.string.enter_valid_tracker_url_here,
                             R.string.edit_tracker,
                             R.string.edit,
@@ -275,13 +276,14 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
             @Override
             public void onClick(View v) {
-                if (!Ref.alive(vhRef) || !Ref.alive(vhRef.get().adapterRef) || !Ref.alive(vhRef.get().adapterRef.get().fragmentManagerRef)) {
+                FragmentManager fm;
+                if (!Ref.alive(vhRef) || (fm = vhRef.get().getFragmentManager()) == null) {
                     return;
                 }
                 int trackerOffset = vhRef.get().trackerOffset;
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
                 AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
-                UIUtils.showYesNoDialog(vhRef.get().adapterRef.get().fragmentManagerRef.get(),
+                UIUtils.showYesNoDialog(fm,
                         trackerToRemove.url(),
                         R.string.remove_tracker,
                         (dialog, which) -> {
