@@ -21,7 +21,6 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import com.frostwire.android.gui.services.Engine;
@@ -33,7 +32,6 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -47,7 +45,6 @@ public class ConfigurationManager {
     private static ConfigurationManager instance;
     private static AtomicReference state = new AtomicReference(State.CREATING);
     private final static CountDownLatch creationLatch = new CountDownLatch(1);
-    private final ExecutorService pool;
     private SharedPreferences preferences;
     private Editor editor;
     private ConfigurationDefaults defaults;
@@ -83,8 +80,7 @@ public class ConfigurationManager {
     }
 
     private ConfigurationManager(Application context) {
-        pool = Engine.instance().getThreadPool();
-        pool.execute(new Initializer(this, context));
+        Engine.instance().getThreadPool().execute(new Initializer(this, context));
     }
 
     private static class Initializer implements Runnable {
@@ -124,11 +120,7 @@ public class ConfigurationManager {
             LOG.warn("applyInBackground aborted, editor == null");
             return;
         }
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            pool.execute(() -> editor.apply());
-        } else {
-            editor.apply();
-        }
+        editor.apply();
     }
 
     public String getString(String key, String defValue) {
