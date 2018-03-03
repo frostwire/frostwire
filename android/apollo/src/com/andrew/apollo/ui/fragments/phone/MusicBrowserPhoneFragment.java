@@ -79,7 +79,7 @@ public final class MusicBrowserPhoneFragment extends Fragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Get the preferences
-        mPreferences = PreferenceUtils.getInstance(getActivity());
+        mPreferences = PreferenceUtils.getInstance();
     }
 
     @Override
@@ -97,8 +97,8 @@ public final class MusicBrowserPhoneFragment extends Fragment {
         }
 
         // Initialize the ViewPager
-        mViewPager = (ViewPager) rootView.findViewById(R.id.fragment_home_phone_pager);
-        // Attch the adapter
+        mViewPager = rootView.findViewById(R.id.fragment_home_phone_pager);
+        // Attach the adapter
         mViewPager.setAdapter(mPagerAdapter);
         // Offscreen pager loading limit
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);

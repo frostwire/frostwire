@@ -72,6 +72,6 @@ public class AlbumSongLoader extends SongLoader {
                         /* 4 */
                         AudioColumns.DURATION
                 }, selection.toString(), null,
-                PreferenceUtils.getInstance(context).getAlbumSongSortOrder());
+                PreferenceUtils.getInstance().getAlbumSongSortOrder());
     }
 }

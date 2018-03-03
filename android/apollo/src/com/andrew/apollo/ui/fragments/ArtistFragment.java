@@ -114,6 +114,6 @@ public final class ArtistFragment extends ApolloFragment<ArtistAdapter, Artist> 
 
     @Override
     protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+        return PreferenceUtils.getInstance().isSimpleLayout(getLayoutTypeName());
     }
 }

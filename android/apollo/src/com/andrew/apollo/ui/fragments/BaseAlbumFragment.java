@@ -49,6 +49,6 @@ public abstract class BaseAlbumFragment extends ApolloFragment<AlbumAdapter, Alb
     }
 
     protected boolean isSimpleLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isSimpleLayout(getLayoutTypeName());
+        return PreferenceUtils.getInstance().isSimpleLayout(getLayoutTypeName());
     }
 }

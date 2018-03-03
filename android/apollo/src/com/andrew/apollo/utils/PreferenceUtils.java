@@ -18,11 +18,6 @@
 
 package com.andrew.apollo.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
@@ -30,12 +25,17 @@ import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistSongFragment;
+import com.frostwire.android.core.ConfigurationManager;
 
 /**
  * A collection of helpers designed to get and set various preferences across
  * Apollo.
  *
+ * These helpers are now a wrapper of more optimized FrostWire ConfigurationManager
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (gubatron)
+ * @author Alden Torres (aldenml)
  */
 public final class PreferenceUtils {
 
@@ -75,25 +75,18 @@ public final class PreferenceUtils {
     public static final String SIMPLE_LAYOUT = "simple";
 
     private static PreferenceUtils sInstance;
+    private final ConfigurationManager cm;
 
-    private final SharedPreferences mPreferences;
-
-    /**
-     * Constructor for <code>PreferenceUtils</code>
-     *
-     * @param context The {@link Context} to use.
-     */
-    public PreferenceUtils(final Context context) {
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    private PreferenceUtils() {
+        cm = ConfigurationManager.instance();
     }
 
     /**
-     * @param context The {@link Context} to use.
      * @return A singleton of this class
      */
-    public static final PreferenceUtils getInstance(final Context context) {
+    public static PreferenceUtils getInstance() {
         if (sInstance == null) {
-            sInstance = new PreferenceUtils(context.getApplicationContext());
+            sInstance = new PreferenceUtils();
         }
         return sInstance;
     }
@@ -105,16 +98,7 @@ public final class PreferenceUtils {
      *              in {@link MusicBrowserPhoneFragment}.
      */
     public void setStartPage(final int value) {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                final SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putInt(START_PAGE, value);
-                editor.apply();
-
-                return null;
-            }
-        });
+        cm.setInt(START_PAGE, value);
     }
 
     /**
@@ -123,7 +107,7 @@ public final class PreferenceUtils {
      * @return The page to start on when the app is opened.
      */
     public final int getStartPage() {
-        return mPreferences.getInt(START_PAGE, DEFAULT_PAGE);
+        return cm.getInt(START_PAGE, DEFAULT_PAGE);
     }
 
     /**
@@ -141,7 +125,7 @@ public final class PreferenceUtils {
     public final String getArtistSortOrder() {
         // This is only to prevent return an invalid field name caused by bug BUGDUMP-21136
         final String defaultSortKey = SortOrder.ArtistSortOrder.ARTIST_A_Z;
-        String key = mPreferences.getString(ARTIST_SORT_ORDER, defaultSortKey);
+        String key = cm.getString(ARTIST_SORT_ORDER, defaultSortKey);
         if (key.equals(SortOrder.ArtistSongSortOrder.SONG_FILENAME)) {
             key = defaultSortKey;
         }
@@ -162,8 +146,7 @@ public final class PreferenceUtils {
      * {@link ArtistSongFragment}
      */
     public final String getArtistSongSortOrder() {
-        return mPreferences.getString(ARTIST_SONG_SORT_ORDER,
-                SortOrder.ArtistSongSortOrder.SONG_A_Z);
+        return cm.getString(ARTIST_SONG_SORT_ORDER, SortOrder.ArtistSongSortOrder.SONG_A_Z);
     }
 
     /**
@@ -180,8 +163,7 @@ public final class PreferenceUtils {
      * {@link ArtistAlbumFragment}
      */
     public final String getArtistAlbumSortOrder() {
-        return mPreferences.getString(ARTIST_ALBUM_SORT_ORDER,
-                SortOrder.ArtistAlbumSortOrder.ALBUM_A_Z);
+        return cm.getString(ARTIST_ALBUM_SORT_ORDER, SortOrder.ArtistAlbumSortOrder.ALBUM_A_Z);
     }
 
     /**
@@ -197,7 +179,7 @@ public final class PreferenceUtils {
      * @return The sort order used for the album list in {@link AlbumFragment}
      */
     public final String getAlbumSortOrder() {
-        return mPreferences.getString(ALBUM_SORT_ORDER, SortOrder.AlbumSortOrder.ALBUM_A_Z);
+        return cm.getString(ALBUM_SORT_ORDER, SortOrder.AlbumSortOrder.ALBUM_A_Z);
     }
 
     /**
@@ -214,8 +196,7 @@ public final class PreferenceUtils {
      * {@link AlbumSongFragment}
      */
     public final String getAlbumSongSortOrder() {
-        return mPreferences.getString(ALBUM_SONG_SORT_ORDER,
-                SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST);
+        return cm.getString(ALBUM_SONG_SORT_ORDER, SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST);
     }
 
     /**
@@ -231,7 +212,7 @@ public final class PreferenceUtils {
      * @return The sort order used for the song list in {@link SongFragment}
      */
     public final String getSongSortOrder() {
-        return mPreferences.getString(SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
+        return cm.getString(SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
     }
 
     /**
@@ -241,16 +222,7 @@ public final class PreferenceUtils {
      * @param value The new layout type
      */
     private void setPreference(final String key, final String value) {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                final SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putString(key, value);
-                editor.apply();
-
-                return null;
-            }
-        });
+        cm.setString(key, value);
     }
 
     /**
@@ -287,7 +259,7 @@ public final class PreferenceUtils {
     public boolean isSimpleLayout(final String which) {
         final String simple = "simple";
         final String defaultValue = "grid";
-        return mPreferences.getString(which, defaultValue).equals(simple);
+        return cm.getString(which, defaultValue).equals(simple);
     }
 
     /**
@@ -297,6 +269,6 @@ public final class PreferenceUtils {
     public boolean isDetailedLayout(final String which) {
         final String detailed = "detailed";
         final String defaultValue = "grid";
-        return mPreferences.getString(which, defaultValue).equals(detailed);
+        return cm.getString(which, defaultValue).equals(detailed);
     }
 }

@@ -71,7 +71,7 @@ public class ArtistAlbumLoader extends AlbumLoader {
                             AlbumColumns.NUMBER_OF_SONGS,
                         /* 4 */
                             AlbumColumns.FIRST_YEAR
-                    }, null, null, PreferenceUtils.getInstance(context).getArtistAlbumSortOrder());
+                    }, null, null, PreferenceUtils.getInstance().getArtistAlbumSortOrder());
         } catch (Throwable e) {
             // ignore any error since it's not critical
             return null;

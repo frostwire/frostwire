@@ -568,7 +568,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     protected boolean isDetailedLayout() {
-        return PreferenceUtils.getInstance(getActivity()).isDetailedLayout(getLayoutTypeName());
+        return PreferenceUtils.getInstance().isDetailedLayout(getLayoutTypeName());
     }
 
     /**

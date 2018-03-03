@@ -98,7 +98,7 @@ public class ArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
                             ArtistColumns.NUMBER_OF_ALBUMS,
                         /* 3 */
                             ArtistColumns.NUMBER_OF_TRACKS
-                    }, null, null, PreferenceUtils.getInstance(context).getArtistSortOrder());
+                    }, null, null, PreferenceUtils.getInstance().getArtistSortOrder());
         } catch (Throwable ignored) {
             // can throw SecurityException which then ends up in RuntimeException crash
             return null;

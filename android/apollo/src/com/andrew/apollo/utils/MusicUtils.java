@@ -627,7 +627,7 @@ public final class MusicUtils {
                 },
                 mSelection.toString(),
                 new String[]{String.valueOf(songId)},
-                PreferenceUtils.getInstance(context).getSongSortOrder());
+                PreferenceUtils.getInstance().getSongSortOrder());
 
         if (cursor != null && cursor.getCount() == 1) {
             cursor.moveToFirst();

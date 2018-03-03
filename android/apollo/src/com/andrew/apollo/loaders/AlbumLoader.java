@@ -106,7 +106,7 @@ public class AlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
                         AlbumColumns.NUMBER_OF_SONGS,
                         /* 4 */
                         AlbumColumns.FIRST_YEAR
-                }, null, null, PreferenceUtils.getInstance(context).getAlbumSortOrder());
+                }, null, null, PreferenceUtils.getInstance().getAlbumSortOrder());
     }
 
     public Cursor makeCursor(final Context context) {

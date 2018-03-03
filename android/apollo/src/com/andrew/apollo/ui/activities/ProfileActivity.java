@@ -122,7 +122,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         super.onCreate(savedInstanceState);
 
         // Get the preferences
-        mPreferences = PreferenceUtils.getInstance(this);
+        mPreferences = PreferenceUtils.getInstance();
 
         // Initialize the image fetcher
         mImageFetcher = ApolloUtils.getImageFetcher(this);

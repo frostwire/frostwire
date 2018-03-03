@@ -156,8 +156,16 @@ public class ConfigurationManager {
         }
     }
 
+    public String getString(String key, String defValue) {
+        if (preferences == null) {
+            LOG.warn("getString(key="+key+", defValue="+defValue+") preferences == null, returning default value");
+            return defValue;
+        }
+        return preferences.getString(key, defValue);
+    }
+
     public String getString(String key) {
-        return preferences.getString(key, null);
+        return getString(key, null);
     }
 
     public void setString(String key, String value) {
@@ -169,8 +177,16 @@ public class ConfigurationManager {
         }
     }
 
+    public int getInt(String key, int defValue) {
+        if (preferences == null) {
+            LOG.warn("getInt(key="+key+", defValue="+defValue+") preferences == null, returning default value");
+            return defValue;
+        }
+        return preferences.getInt(key, defValue);
+    }
+
     public int getInt(String key) {
-        return preferences.getInt(key, 0);
+        return getInt(key, 0);
     }
 
     public void setInt(String key, int value) {
@@ -182,8 +198,16 @@ public class ConfigurationManager {
         }
     }
 
+    public long getLong(String key, long defValue) {
+        if (preferences == null) {
+            LOG.warn("getLong(key="+key+", defValue="+defValue+") preferences == null, returning default value");
+            return defValue;
+        }
+        return preferences.getLong(key, defValue);
+    }
+
     public long getLong(String key) {
-        return preferences.getLong(key, 0);
+        return getLong(key, 0);
     }
 
     public void setLong(String key, long value) {
@@ -284,8 +308,8 @@ public class ConfigurationManager {
 
     public void setStringArray(String key, String[] values) {
         try {
-        editor.putString(key, JsonUtils.toJson(values));
-        applyInBackground();
+            editor.putString(key, JsonUtils.toJson(values));
+            applyInBackground();
         } catch (Throwable ignore) {
             LOG.warn("setStringArray(key=" + key + ", values=...) failed", ignore);
         }
