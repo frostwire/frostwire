@@ -26,9 +26,7 @@ import android.preference.PreferenceManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
@@ -199,7 +197,11 @@ public class ConfigurationManager {
     }
 
     public void resetToDefaults() {
-        resetToDefaults(defaults.getDefaultValues());
+        // TODO: remove this when editor variable is gone
+        if (editor == null) {
+            throw new IllegalStateException("Shared preferences editor can't be null at this moment");
+        }
+        resetToDefaults(editor, defaults.getDefaultValues());
     }
 
     private void resetToDefault(String key) {
@@ -232,7 +234,6 @@ public class ConfigurationManager {
         String s = getString(key);
         return s != null ? JsonUtils.toObject(s, String[].class) : null;
     }
-
 
     public void setStringArray(String key, String[] values) {
         setString(key, JsonUtils.toJson(values));
@@ -284,7 +285,7 @@ public class ConfigurationManager {
         }
 
         //there are some configuration values that need to be reset every time to a desired value
-        resetToDefaults(defaults.getResetValues());
+        resetToDefaults(editor, defaults.getResetValues());
     }
 
     private void initPreference(String key, Object value, boolean force) {
@@ -350,18 +351,18 @@ public class ConfigurationManager {
         }
     }
 
-    private void resetToDefaults(Map<String, Object> map) {
+    private void resetToDefaults(Editor editor, Map<String, Object> map) {
         for (Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof String) {
-                setString(entry.getKey(), (String) entry.getValue());
+                setString(editor, entry.getKey(), (String) entry.getValue());
             } else if (entry.getValue() instanceof Integer) {
-                setInt(entry.getKey(), (Integer) entry.getValue());
+                setInt(editor, entry.getKey(), (Integer) entry.getValue());
             } else if (entry.getValue() instanceof Long) {
-                setLong(entry.getKey(), (Long) entry.getValue());
+                setLong(editor, entry.getKey(), (Long) entry.getValue());
             } else if (entry.getValue() instanceof Boolean) {
-                setBoolean(entry.getKey(), (Boolean) entry.getValue());
+                setBoolean(editor, entry.getKey(), (Boolean) entry.getValue());
             } else if (entry.getValue() instanceof String[]) {
-                setStringArray(entry.getKey(), (String[]) entry.getValue());
+                setStringArray(editor, entry.getKey(), (String[]) entry.getValue());
             } else {
                 Object value = entry.getValue();
                 throw new RuntimeException("Unsupported data type for setting: " +
@@ -369,5 +370,27 @@ public class ConfigurationManager {
                         (value != null ? value.getClass() : "null"));
             }
         }
+
+        editor.apply();
+    }
+
+    private void setString(Editor editor, String key, String value) {
+        editor.putString(key, value);
+    }
+
+    private void setInt(Editor editor, String key, int value) {
+        editor.putInt(key, value);
+    }
+
+    private void setLong(Editor editor, String key, long value) {
+        editor.putLong(key, value);
+    }
+
+    private void setBoolean(Editor editor, String key, boolean value) {
+        editor.putBoolean(key, value);
+    }
+
+    private void setStringArray(Editor editor, String key, String[] values) {
+        setString(editor, key, JsonUtils.toJson(values));
     }
 }
