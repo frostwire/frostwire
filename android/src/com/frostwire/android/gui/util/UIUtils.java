@@ -188,7 +188,7 @@ public final class UIUtils {
         yesNoDialog.show(fragmentManager);
     }
 
-    public static void showEditTextDialog(Activity activity,
+    public static void showEditTextDialog(FragmentManager fragmentManager,
                                           int messageStringId,
                                           int titleStringId,
                                           int positiveButtonStringId,
@@ -203,7 +203,7 @@ public final class UIUtils {
                         cancelable,
                         multilineInput,
                         optionalEditTextValue,
-                        callback).show(activity.getFragmentManager());
+                        callback).show(fragmentManager);
     }
 
     public static String getBytesInHuman(long size) {
