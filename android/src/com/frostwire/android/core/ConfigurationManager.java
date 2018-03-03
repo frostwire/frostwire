@@ -29,7 +29,6 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -243,21 +242,13 @@ public class ConfigurationManager {
     }
 
     public String[] getStringArray(String key) {
-        String jsonStringArray = preferences.getString(key, null);
-        if (jsonStringArray == null) {
-            return null;
-        }
-        return JsonUtils.toObject(jsonStringArray, String[].class);
+        String s = getString(key);
+        return s != null ? JsonUtils.toObject(s, String[].class) : null;
     }
 
 
     public void setStringArray(String key, String[] values) {
-        try {
-            editor.putString(key, JsonUtils.toJson(values));
-            applyInBackground();
-        } catch (Throwable ignore) {
-            LOG.warn("setStringArray(key=" + key + ", values=...) failed", ignore);
-        }
+        setString(key, JsonUtils.toJson(values));
     }
 
     public boolean showTransfersOnDownloadStart() {
