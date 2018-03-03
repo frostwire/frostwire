@@ -17,8 +17,6 @@
 
 package com.frostwire.android.gui;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -86,13 +84,13 @@ public final class SoftwareUpdater {
         return Loader.INSTANCE;
     }
 
-    public void checkForUpdate(final Context context) {
+    public void checkForUpdate(final MainActivity activity) {
         long now = System.currentTimeMillis();
         if (now - updateTimestamp < UPDATE_MESSAGE_TIMEOUT) {
             return;
         }
         updateTimestamp = now;
-        AsyncTask<Void, Void, Boolean> updateTask = new CheckUpdateAsyncTask(this, context);
+        AsyncTask<Void, Void, Boolean> updateTask = new CheckUpdateAsyncTask(this, activity);
         updateTask.execute();
     }
 
@@ -150,7 +148,7 @@ public final class SoftwareUpdater {
         return Platforms.get().systemPaths().update();
     }
 
-    public void notifyUserAboutUpdate(final Context context) {
+    public void notifyUserAboutUpdate(final MainActivity activity) {
         try {
             if (update.a == null) {
                 update.a = UPDATE_ACTION_OTA; // make it the old behavior
@@ -161,22 +159,20 @@ public final class SoftwareUpdater {
                     LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
                     return;
                 }
-
-               // Fresh runs with fast connections might send the broadcast intent before
-               // MainActivity has had a chance to register the broadcast receiver (onResume)
-               // therefore, the menu update icon will only show on the 2nd run only
-               ((MainActivity) context).updateNavigationMenu(true);
-
+                // Fresh runs with fast connections might send the broadcast intent before
+                // MainActivity has had a chance to register the broadcast receiver (onResume)
+                // therefore, the menu update icon will only show on the 2nd run only
+                activity.updateNavigationMenu(true);
                 SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(update.updateMessages, update.changelog);
-                dlg.show(((Activity) context).getFragmentManager());
+                dlg.show(activity.getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
-                String message = StringUtils.getLocaleString(update.marketMessages, context.getString(R.string.update_message));
+                String message = StringUtils.getLocaleString(update.marketMessages, activity.getString(R.string.update_message));
 
-                UIUtils.showYesNoDialog(context, message, R.string.update_title, (dialog, which) -> {
+                UIUtils.showYesNoDialog(activity.getFragmentManager(), message, R.string.update_title, (dialog, which) -> {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(update.m));
-                    context.startActivity(intent);
+                    activity.startActivity(intent);
                 });
             }
         } catch (Throwable e) {
@@ -269,7 +265,7 @@ public final class SoftwareUpdater {
         return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
-    private void updateConfiguration(Update update, Context activityContext) {
+    private void updateConfiguration(Update update, MainActivity mainActivity) {
         if (update.config == null) {
             return;
         }
@@ -308,7 +304,7 @@ public final class SoftwareUpdater {
         VPNStatusDetailActivity.updateVPNOffer(update.config.vpnOffer);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
-        Offers.initAdNetworks((Activity) activityContext);
+        Offers.initAdNetworks(mainActivity);
 
         if (update.config.uxEnabled && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
             String url = "http://ux.frostwire.com/aux";
@@ -393,11 +389,11 @@ public final class SoftwareUpdater {
 
     private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
         private final SoftwareUpdater softwareUpdater;
-        private final WeakReference<Context> contextReference;
+        private final WeakReference<MainActivity> activityWeakReference;
 
-        CheckUpdateAsyncTask(SoftwareUpdater softwareUpdater, Context context) {
+        CheckUpdateAsyncTask(SoftwareUpdater softwareUpdater, MainActivity activity) {
             this.softwareUpdater = softwareUpdater;
-            contextReference = Ref.weak(context);
+            activityWeakReference = Ref.weak(activity);
         }
 
         @Override
@@ -424,8 +420,8 @@ public final class SoftwareUpdater {
                         softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);
                     }
 
-                    if (Ref.alive(contextReference)) {
-                        softwareUpdater.updateConfiguration(softwareUpdater.update, contextReference.get());
+                    if (Ref.alive(activityWeakReference)) {
+                        softwareUpdater.updateConfiguration(softwareUpdater.update, activityWeakReference.get());
                     }
                 } else {
                     LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
@@ -452,13 +448,13 @@ public final class SoftwareUpdater {
         @Override
         protected void onPostExecute(Boolean result) {
             //nav menu or other components always needs to be updated after we read the config.
-            if (Ref.alive(contextReference)) {
-                Context context = contextReference.get();
+            if (Ref.alive(activityWeakReference)) {
+                MainActivity activity = activityWeakReference.get();
                 Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
                 intent.putExtra("value", result);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
                 if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
-                    softwareUpdater.notifyUserAboutUpdate(context);
+                    softwareUpdater.notifyUserAboutUpdate(activity);
                 }
             }
 
