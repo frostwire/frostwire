@@ -19,6 +19,8 @@ package com.frostwire.android.core;
 
 import android.os.Environment;
 
+import com.frostwire.util.Hex;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +50,7 @@ final class ConfigurationDefaults {
     }
 
     private void load() {
-        defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToByteArray(UUID.randomUUID()));
+        defaultValues.put(Constants.PREF_KEY_CORE_UUID, uuidToString(UUID.randomUUID()));
         defaultValues.put(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, "");//won't know until I see it.
         defaultValues.put(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP, System.currentTimeMillis());
 
@@ -143,7 +145,7 @@ final class ConfigurationDefaults {
         resetValues.put(key, defaultValues.get(key));
     }
 
-    private static byte[] uuidToByteArray(UUID uuid) {
+    private static String uuidToString(UUID uuid) {
         long msb = uuid.getMostSignificantBits();
         long lsb = uuid.getLeastSignificantBits();
         byte[] buffer = new byte[16];
@@ -155,6 +157,6 @@ final class ConfigurationDefaults {
             buffer[i] = (byte) (lsb >>> 8 * (7 - i));
         }
 
-        return buffer;
+        return Hex.encode(buffer);
     }
 }

@@ -25,11 +25,9 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Hex;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.StringUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -227,24 +225,6 @@ public class ConfigurationManager {
         }
     }
 
-    public byte[] getByteArray(String key) {
-        String str = getString(key);
-
-        if (StringUtils.isNullOrEmpty(str)) {
-            return null;
-        }
-
-        try {
-            return Hex.decode(str);
-        } catch (Throwable e) {
-            return null;
-        }
-    }
-
-    private void setByteArray(String key, byte[] value) {
-        setString(key, Hex.encode(value));
-    }
-
     public void resetToDefaults() {
         resetToDefaults(defaults.getDefaultValues());
     }
@@ -351,8 +331,6 @@ public class ConfigurationManager {
             initLongPreference(key, (Long) value, force);
         } else if (value instanceof Boolean) {
             initBooleanPreference(key, (Boolean) value, force);
-        } else if (value instanceof byte[]) {
-            initByteArrayPreference(key, (byte[]) value, force);
         } else if (value instanceof File) {
             initFilePreference(key, (File) value, force);
         } else if (value instanceof String[]) {
@@ -367,16 +345,6 @@ public class ConfigurationManager {
         }
         if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
             setString(prefKeyName, defaultValue);
-        }
-    }
-
-    private void initByteArrayPreference(String prefKeyName, byte[] defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initByteArrayPreference(prefKeyName="+prefKeyName+", defaultValue=...) aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setByteArray(prefKeyName, defaultValue);
         }
     }
 
@@ -436,12 +404,12 @@ public class ConfigurationManager {
                 setLong(entry.getKey(), (Long) entry.getValue());
             } else if (entry.getValue() instanceof Boolean) {
                 setBoolean(entry.getKey(), (Boolean) entry.getValue());
-            } else if (entry.getValue() instanceof byte[]) {
-                setByteArray(entry.getKey(), (byte[]) entry.getValue());
             } else if (entry.getValue() instanceof File) {
                 setFile(entry.getKey(), (File) entry.getValue());
             } else if (entry.getValue() instanceof String[]) {
                 setStringArray(entry.getKey(), (String[]) entry.getValue());
+            } else {
+                throw new RuntimeException("Unsupported data type for setting");
             }
         }
     }
