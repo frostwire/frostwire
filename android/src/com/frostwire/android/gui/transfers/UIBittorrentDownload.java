@@ -323,8 +323,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         }
 
         private void pauseSeedingIfNecessary(BTDownload dl) {
-            boolean seedFinishedTorrents = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-            boolean seedFinishedTorrentsOnWifiOnly = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
+            ConfigurationManager CM = ConfigurationManager.instance();
+            boolean seedFinishedTorrents = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
+            boolean seedFinishedTorrentsOnWifiOnly = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
             boolean isDataWIFIUp = NetworkManager.instance().isDataWIFIUp();
             if (!seedFinishedTorrents || (!isDataWIFIUp && seedFinishedTorrentsOnWifiOnly)) {
                 dl.pause();

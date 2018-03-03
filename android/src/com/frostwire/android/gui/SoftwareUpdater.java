@@ -306,7 +306,7 @@ public final class SoftwareUpdater {
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
 
-        if (update.config.uxEnabled && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
+        if (update.config.uxEnabled && CM.getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
             String url = "http://ux.frostwire.com/aux";
             String os = SearchEngine.getOSVersionString();
             String fwversion = Constants.FROSTWIRE_VERSION_STRING;

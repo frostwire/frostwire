@@ -355,8 +355,8 @@ public class MainActivity extends AbstractActivity implements
         localBroadcastReceiver.register(this);
 
         setupDrawer();
-
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+        ConfigurationManager CM = ConfigurationManager.instance();
+        if (CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);
         } else if (!isShutdown()) {
@@ -369,7 +369,7 @@ public class MainActivity extends AbstractActivity implements
 
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
+        if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissionsOrBindMusicService();
         }
 
@@ -653,17 +653,18 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void checkLastSeenVersionBuild() {
-        final String lastSeenVersionBuild = ConfigurationManager.instance().getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD);
+        final ConfigurationManager CM = ConfigurationManager.instance();
+        final String lastSeenVersionBuild = CM.getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD);
         final String currentVersionBuild = Constants.FROSTWIRE_VERSION_STRING + "." + Constants.FROSTWIRE_BUILD;
         if (StringUtils.isNullOrEmpty(lastSeenVersionBuild)) {
             //fresh install
             Offers.forceDisabledAds(this); // no ads on first session ever
-            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
+            CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_FIRST_TIME);
         } else if (!currentVersionBuild.equals(lastSeenVersionBuild)) {
             //just updated.
             Offers.forceDisabledAds(this); // no ads right after update
-            ConfigurationManager.instance().setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
+            CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
             UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_AFTER_UPDATE);
         }
     }

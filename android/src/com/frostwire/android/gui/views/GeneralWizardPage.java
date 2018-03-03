@@ -60,20 +60,22 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
 
     @Override
     public void load() {
-        textStoragePath.setText(ConfigurationManager.instance().getStoragePath());
-        checkSeedFinishedTorrents.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS));
-        checkSeedFinishedTorrentsWifiOnly.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
+        ConfigurationManager CM = ConfigurationManager.instance();
+        textStoragePath.setText(CM.getStoragePath());
+        checkSeedFinishedTorrents.setChecked(CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS));
+        checkSeedFinishedTorrentsWifiOnly.setChecked(CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
         checkSeedFinishedTorrentsWifiOnly.setEnabled(checkSeedFinishedTorrents.isChecked());
         checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
-        checkUXStats.setChecked(ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED));
+        checkUXStats.setChecked(CM.getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED));
         validate();
     }
 
     @Override
     public void finish() {
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, checkSeedFinishedTorrents.isChecked());
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, checkSeedFinishedTorrentsWifiOnly.isChecked());
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_UXSTATS_ENABLED, checkUXStats.isChecked());
+        ConfigurationManager CM = ConfigurationManager.instance();
+        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, checkSeedFinishedTorrents.isChecked());
+        CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, checkSeedFinishedTorrentsWifiOnly.isChecked());
+        CM.setBoolean(Constants.PREF_KEY_UXSTATS_ENABLED, checkUXStats.isChecked());
     }
 
     @Override

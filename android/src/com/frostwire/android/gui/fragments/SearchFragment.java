@@ -184,9 +184,10 @@ public final class SearchFragment extends AbstractFragment implements
             // a big refactor.
             getHeader(getActivity());
         }
+        ConfigurationManager CM = ConfigurationManager.instance();
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
-            searchInput.selectTabByMediaType((byte) ConfigurationManager.instance().getLastMediaTypeFilter());
+            searchInput.selectTabByMediaType((byte) CM.getLastMediaTypeFilter());
             filterButton.reset(false);
             boolean filtersApplied = !adapter.getKeywordFiltersPipeline().isEmpty();
             if (filtersApplied) {
@@ -205,7 +206,7 @@ public final class SearchFragment extends AbstractFragment implements
             list.setOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener());
         }
 
-        if (list != null && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
+        if (list != null && CM.getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
             list.setOnScrollListener(
                     new ComposedOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener(),
                             new DirectionDetectorScrollListener(

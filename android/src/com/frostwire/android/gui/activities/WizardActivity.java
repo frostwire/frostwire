@@ -112,9 +112,10 @@ public class WizardActivity extends AbstractActivity {
             WizardPageView pageView = (WizardPageView) view;
             pageView.finish();
             if (!pageView.hasNext()) {
-                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
-                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE, true);
-                ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, System.currentTimeMillis());
+                ConfigurationManager CM = ConfigurationManager.instance();
+                CM.setBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED, true);
+                CM.setBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE, true);
+                CM.setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, System.currentTimeMillis());
             } else {
                 viewFlipper.showNext();
                 setupViewPage();

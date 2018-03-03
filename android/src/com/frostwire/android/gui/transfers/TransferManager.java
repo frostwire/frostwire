@@ -425,11 +425,12 @@ public final class TransferManager {
         // torrents that are finished because seeding is
         // not enabled, are actually paused
         if (bt.isFinished()) {
-            if (!ConfigurationManager.instance().isSeedFinishedTorrents()) {
+            ConfigurationManager CM = ConfigurationManager.instance();
+            if (!CM.isSeedFinishedTorrents()) {
                 // this implies !isSeedingEnabledOnlyForWifi
                 return false;
             }
-            boolean isSeedingEnabledOnlyForWifi = ConfigurationManager.instance().isSeedingEnabledOnlyForWifi();
+            boolean isSeedingEnabledOnlyForWifi = CM.isSeedingEnabledOnlyForWifi();
             // TODO: find a better way to express relationship with isSeedingEnabled
             if (isSeedingEnabledOnlyForWifi && !NetworkManager.instance().isDataWIFIUp()) {
                 return false;
@@ -547,18 +548,19 @@ public final class TransferManager {
         //LOG.info("onPreferenceChanged(key="+key+")");
         Engine.instance().getThreadPool().execute(() -> {
             BTEngine e = BTEngine.getInstance();
+            ConfigurationManager CM = ConfigurationManager.instance();
             if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                e.downloadRateLimit((int) ConfigurationManager.instance().getLong(key));
+                e.downloadRateLimit((int) CM.getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                e.uploadRateLimit((int) ConfigurationManager.instance().getLong(key));
+                e.uploadRateLimit((int) CM.getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
-                e.maxActiveDownloads((int) ConfigurationManager.instance().getLong(key));
+                e.maxActiveDownloads((int) CM.getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
-                e.maxActiveSeeds((int) ConfigurationManager.instance().getLong(key));
+                e.maxActiveSeeds((int) CM.getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
-                e.maxConnections((int) ConfigurationManager.instance().getLong(key));
+                e.maxConnections((int) CM.getLong(key));
             } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
-                e.maxPeers((int) ConfigurationManager.instance().getLong(key));
+                e.maxPeers((int) CM.getLong(key));
             }
         });
 

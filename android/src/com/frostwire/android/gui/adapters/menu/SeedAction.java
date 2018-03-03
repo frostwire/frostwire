@@ -204,8 +204,9 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private boolean seedingOnlyOnWifiButNoWifi() {
-        return ConfigurationManager.instance().isSeedFinishedTorrents() &&
-                ConfigurationManager.instance().isSeedingEnabledOnlyForWifi() &&
+        ConfigurationManager CM = ConfigurationManager.instance();
+        return CM.isSeedFinishedTorrents() &&
+                CM.isSeedingEnabledOnlyForWifi() &&
                 !NetworkManager.instance().isDataWIFIUp();
     }
 

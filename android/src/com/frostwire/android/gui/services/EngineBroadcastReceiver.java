@@ -131,7 +131,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         PlayStore.getInstance().refresh();
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isDataUp()) {
-            boolean useTorrentsOnMobileData = !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+            ConfigurationManager CM = ConfigurationManager.instance();
+            boolean useTorrentsOnMobileData = !CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
             // "Boolean Master", just for fun.
             // Let a <= "mobile up",
@@ -159,7 +160,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 if (Engine.instance().isDisconnected()) {
                     // avoid ANR error inside a broadcast receiver
 
-                    if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                    if (CM.getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
                             !(networkManager.isTunnelUp() || isNetworkVPN(networkInfo))) {
                         //don't start
                         return;
@@ -180,9 +181,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private boolean shouldStopSeeding() {
-        return !ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) ||
+        ConfigurationManager CM = ConfigurationManager.instance();
+        return !CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS) ||
                 (!NetworkManager.instance().isDataWIFIUp() &&
-                        ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
+                        CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
     }
 
     private void handleMediaMounted(final Context context, Intent intent) {

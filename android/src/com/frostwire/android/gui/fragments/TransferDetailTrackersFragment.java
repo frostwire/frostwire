@@ -191,6 +191,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             this.trackerOffset = trackerOffset;
         }
 
+        public FragmentManager getFragmentManager() {
+            if (!Ref.alive(adapterRef)) {
+                return null;
+            }
+            if (!Ref.alive(adapterRef.get().fragmentManagerRef)) {
+                return null;
+            }
+            return adapterRef.get().fragmentManagerRef.get();
+        }
+
         private static final class OnEditTrackerClicked implements View.OnClickListener, EditTextDialog.TextViewInputDialogCallback {
 
             private final WeakReference<TrackerItemViewHolder> vhRef;

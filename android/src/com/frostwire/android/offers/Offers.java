@@ -164,7 +164,7 @@ public final class Offers {
         final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
         final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
 
-        long lastInterstitialShownTimestamp = ConfigurationManager.instance().getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
+        long lastInterstitialShownTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
         long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
         boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
         boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
