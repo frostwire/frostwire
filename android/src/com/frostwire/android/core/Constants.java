@@ -52,13 +52,6 @@ public final class Constants {
     public static final String PREF_KEY_NETWORK_USE_WIFI_ONLY = "frostwire.prefs.network.use_wifi_only";
     public static final String PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY = "frostwire.prefs.network.bittorrent_on_vpn_only";
 
-    /**
-     * @deprecated left for migration purposes, see {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY }
-     */
-    @Deprecated
-    static final String PREF_KEY_NETWORK_USE_MOBILE_DATA = "frostwire.prefs.network.use_mobile_data";
-
-
     public static final String PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_download_for_torrent_deep_scan";
     public static final String PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.count_rounds_for_torrent_deep_scan";
     public static final String PREF_KEY_SEARCH_INTERVAL_MS_FOR_TORRENT_DEEP_SCAN = "frostwire.prefs.search.interval_ms_for_torrent_deep_scan";

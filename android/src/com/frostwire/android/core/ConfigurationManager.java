@@ -110,7 +110,6 @@ public class ConfigurationManager {
 
                 if (cm.editor != null) {
                     cm.initPreferences();
-                    cm.migrateWifiOnlyPreference();
                 }
             }
             catch (Throwable t) {
@@ -132,28 +131,6 @@ public class ConfigurationManager {
             pool.execute(() -> editor.apply());
         } else {
             editor.apply();
-        }
-    }
-
-    /**
-     * If the deprecated {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY} is found
-     * it gets migrated to the new {@link Constants#PREF_KEY_NETWORK_USE_WIFI_ONLY and then deleted.
-     */
-    @SuppressWarnings("deprecation")
-    private void migrateWifiOnlyPreference() {
-        if (preferences != null && !preferences.contains(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA)) {
-            return;
-        }
-        setBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, !getBoolean(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA));
-        removePreference(Constants.PREF_KEY_NETWORK_USE_MOBILE_DATA);
-    }
-
-    private void removePreference(String key) {
-        try {
-            editor.remove(key);
-            applyInBackground();
-        } catch (Throwable ignore) {
-            LOG.warn("removePreference(key=" + key + ") failed", ignore);
         }
     }
 
