@@ -128,9 +128,6 @@ public final class ApolloUtils {
      * @return A new {@link ImageFetcher} used to fetch images asynchronously.
      */
     public static ImageFetcher getImageFetcher(final Activity activity) {
-        if (activity == null) {
-            return null;
-        }
         final ImageFetcher imageFetcher = ImageFetcher.getInstance(activity);
         imageFetcher.setImageCache(ImageCache.findOrCreateCache(activity));
         return imageFetcher;
