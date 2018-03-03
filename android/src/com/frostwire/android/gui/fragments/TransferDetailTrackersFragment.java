@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -69,7 +70,7 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
             return;
         }
         if (adapter == null && isAdded()) {
-            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload);
+            adapter = new TrackerRecyclerViewAdapter(uiBittorrentDownload, getFragmentManager());
         }
         //ensureComponentsReferenced();
         if (recyclerView.getAdapter() == null) {
@@ -162,13 +163,16 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
         private final ImageView editButton;
         private final ImageView removeButton;
         private final TorrentHandle torrentHandle;
+        private final WeakReference<FragmentManager> fragmentManagerRef;
         private int trackerOffset;
 
         public TrackerItemViewHolder(final View itemView,
+                                     final WeakReference<FragmentManager> fragmentManagerRef,
                                      final TrackerRecyclerViewAdapter adapter,
                                      final TorrentHandle torrentHandle,
                                      int trackerOffset) {
             super(itemView);
+            this.fragmentManagerRef = fragmentManagerRef;
             adapterRef = Ref.weak(adapter);
             trackerTextView = itemView.findViewById(R.id.view_transfer_detail_tracker_address);
             editButton = itemView.findViewById(R.id.view_transfer_detail_tracker_edit_button);
@@ -262,13 +266,13 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
             @Override
             public void onClick(View v) {
-                if (!Ref.alive(vhRef)) {
+                if (!Ref.alive(vhRef) || !Ref.alive(vhRef.get().fragmentManagerRef)) {
                     return;
                 }
                 int trackerOffset = vhRef.get().trackerOffset;
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
                 AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
-                UIUtils.showYesNoDialog(v.getContext(),
+                UIUtils.showYesNoDialog(vhRef.get().fragmentManagerRef.get(),
                         trackerToRemove.url(),
                         R.string.remove_tracker,
                         (dialog, which) -> {
@@ -290,15 +294,17 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
 
     private static final class TrackerRecyclerViewAdapter extends RecyclerView.Adapter<TrackerItemViewHolder> {
         private final UIBittorrentDownload uiBittorrentDownload;
+        private final WeakReference<FragmentManager> fragmentManagerRef;
 
-        public TrackerRecyclerViewAdapter(final UIBittorrentDownload uiBittorrentDownload) {
+        public TrackerRecyclerViewAdapter(final UIBittorrentDownload uiBittorrentDownload, FragmentManager fragmentManger) {
             this.uiBittorrentDownload = uiBittorrentDownload;
+            fragmentManagerRef = Ref.weak(fragmentManger);
         }
 
         @Override
         public TrackerItemViewHolder onCreateViewHolder(ViewGroup parent, int i) {
             View inflatedView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_transfer_detail_tracker_item, parent, false);
-            return new TrackerItemViewHolder(inflatedView, this, uiBittorrentDownload.getDl().getTorrentHandle(), i);
+            return new TrackerItemViewHolder(inflatedView, fragmentManagerRef, this, uiBittorrentDownload.getDl().getTorrentHandle(), i);
         }
 
         @Override
