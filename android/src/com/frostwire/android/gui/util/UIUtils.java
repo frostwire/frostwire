@@ -20,6 +20,7 @@ package com.frostwire.android.gui.util;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -169,11 +170,11 @@ public final class UIUtils {
         showShortMessage(context, context.getString(resId, formatArgs));
     }
 
-    public static void showYesNoDialog(Context context, String message, int titleId, OnClickListener positiveListener) {
-        showYesNoDialog(context, message, titleId, positiveListener, (dialog, which) -> dialog.dismiss());
+    public static void showYesNoDialog(FragmentManager fragmentManager, String message, int titleId, OnClickListener positiveListener) {
+        showYesNoDialog(fragmentManager, message, titleId, positiveListener, (dialog, which) -> dialog.dismiss());
     }
 
-    public static void showYesNoDialog(Context context, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
+    public static void showYesNoDialog(FragmentManager fragmentManager, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
         YesNoDialog yesNoDialog = YesNoDialog.newInstance(message, titleId, message, (byte) 0);
         yesNoDialog.setOnDialogClickListener((tag, which) -> {
                     if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
@@ -184,7 +185,7 @@ public final class UIUtils {
                     yesNoDialog.dismiss();
                 }
         );
-        yesNoDialog.show(((Activity) context).getFragmentManager());
+        yesNoDialog.show(fragmentManager);
     }
 
     public static void showEditTextDialog(Activity activity,
