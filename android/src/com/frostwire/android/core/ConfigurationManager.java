@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
@@ -94,9 +95,8 @@ public class ConfigurationManager {
                 cm.editor = cm.preferences.edit();
                 cm.defaults = new ConfigurationDefaults();
 
-                if (cm.editor != null) {
-                    cm.initPreferences();
-                }
+                cm.initPreferences(cm.preferences, cm.editor);
+                cm.editor.apply();
             }
             catch (Throwable t) {
                 LOG.error("Error initializing ConfigurationManager", t);
@@ -210,7 +210,7 @@ public class ConfigurationManager {
             Map<String, Object> defaultValues = defaults.getDefaultValues();
             if (defaultValues != null && defaultValues.containsKey(key)) {
                 Object defaultValue = defaultValues.get(key);
-                initPreference(key, defaultValue, true);
+                initPreference(preferences, editor, key, defaultValue, true);
             }
         }
     }
@@ -278,78 +278,67 @@ public class ConfigurationManager {
         return getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 
-    private void initPreferences() {
+    private void initPreferences(@NonNull SharedPreferences preferences, @NonNull Editor editor) {
         for (Entry<String, Object> entry : defaults.getDefaultValues().entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            initPreference(key, value, false);
+            initPreference(preferences, editor, key, value, false);
         }
 
         //there are some configuration values that need to be reset every time to a desired value
         resetToDefaults(editor, defaults.getResetValues());
-        editor.apply();
     }
 
-    private void initPreference(String key, Object value, boolean force) {
+    private void initPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                String key, Object value, boolean force) {
         if (value instanceof String) {
-            initStringPreference(key, (String) value, force);
+            initStringPreference(preferences, editor, key, (String) value, force);
         } else if (value instanceof Integer) {
-            initIntPreference(key, (Integer) value, force);
+            initIntPreference(preferences, editor, key, (Integer) value, force);
         } else if (value instanceof Long) {
-            initLongPreference(key, (Long) value, force);
+            initLongPreference(preferences, editor, key, (Long) value, force);
         } else if (value instanceof Boolean) {
-            initBooleanPreference(key, (Boolean) value, force);
+            initBooleanPreference(preferences, editor, key, (Boolean) value, force);
         } else if (value instanceof String[]) {
-            initStringArrayPreference(key, (String[]) value, force);
+            initStringArrayPreference(preferences, editor, key, (String[]) value, force);
         } else {
             throw new RuntimeException("Unsupported data type for setting: " +
                     "key = " + key + ", value = " + value.getClass());
         }
     }
 
-    private void initStringPreference(String prefKeyName, String defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initStringPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setString(prefKeyName, defaultValue);
+    private void initStringPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                      String prefKeyName, String defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setString(editor, prefKeyName, defaultValue);
         }
     }
 
-    private void initBooleanPreference(String prefKeyName, boolean defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initBooleanPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setBoolean(prefKeyName, defaultValue);
+    private void initBooleanPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                       String prefKeyName, boolean defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setBoolean(editor, prefKeyName, defaultValue);
         }
     }
 
-    private void initIntPreference(String prefKeyName, int defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initIntPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setInt(prefKeyName, defaultValue);
+    private void initIntPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                   String prefKeyName, int defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setInt(editor, prefKeyName, defaultValue);
         }
     }
 
-    private void initLongPreference(String prefKeyName, long defaultValue, boolean force) {
-        if (preferences == null && !force) {
-            LOG.warn("initLongPreference(prefKeyName="+prefKeyName+", defaultValue="+defaultValue+") aborted, preferences == null");
-            return;
-        }
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setLong(prefKeyName, defaultValue);
+    private void initLongPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                    String prefKeyName, long defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setLong(editor, prefKeyName, defaultValue);
         }
     }
 
-    private void initStringArrayPreference(String prefKeyName, String[] defaultValue, boolean force) {
-        if ((preferences != null && !preferences.contains(prefKeyName)) || force) {
-            setStringArray(prefKeyName, defaultValue);
+    private void initStringArrayPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
+                                           String prefKeyName, String[] defaultValue, boolean force) {
+        if (!preferences.contains(prefKeyName) || force) {
+            setStringArray(editor, prefKeyName, defaultValue);
         }
     }
 
