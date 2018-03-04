@@ -61,7 +61,6 @@ public class YesNoDialog extends AbstractDialog {
         args.putString(MESSAGE_STRING_KEY, null);
         args.putByte(YES_NO_DIALOG_FLAGS, dialogFlags);
         f.setArguments(args);
-        f.initDefaultOnDialogClickListeners(dialogFlags);
         return f;
     }
 
@@ -74,33 +73,8 @@ public class YesNoDialog extends AbstractDialog {
         args.putString(MESSAGE_STRING_KEY, message);
         args.putByte(YES_NO_DIALOG_FLAGS, dialogFlags);
         f.setArguments(args);
-        f.initDefaultOnDialogClickListeners(dialogFlags);
         return f;
     }
-
-    public void initDefaultOnDialogClickListeners(byte dialogFlags) {
-        setOnDialogClickListener((tag, which) -> {
-                if ((dialogFlags & FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) == FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK) {
-                    dismiss();
-                }
-                if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
-                    positiveListener.onClick(getDialog(), which);
-                } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
-                    negativeListener.onClick(getDialog(), which);
-                }
-                Bundle args = getArguments();
-                id = args.getString(ID_KEY);
-                if (which == Dialog.BUTTON_POSITIVE && positiveListener == null) {
-                    setOnDialogClickListener(null);
-                    performDialogClick(ID_KEY, Dialog.BUTTON_POSITIVE);
-                } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener == null) {
-                    performDialogClick(ID_KEY, Dialog.BUTTON_NEGATIVE);
-                }
-                dismiss();
-            }
-        );
-    }
-
 
     @Override
     protected void initComponents(final Dialog dlg, Bundle savedInstanceState) {
@@ -150,5 +124,20 @@ public class YesNoDialog extends AbstractDialog {
     public void setOnDialogClickListeners(DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
         this.positiveListener = positiveListener;
         this.negativeListener = negativeListener;
+
+        if (positiveListener != null) {
+            setOnDialogClickListener((tag, which) -> {
+                        if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
+                            positiveListener.onClick(getDialog(), which);
+                        } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
+                            negativeListener.onClick(getDialog(), which);
+                        }
+                        dismiss();
+                    }
+            );
+        } else {
+            // uses onDialogClick
+            setOnDialogClickListener(null);
+        }
     }
 }
