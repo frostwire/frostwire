@@ -1164,30 +1164,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * /** Used to shared what the user is currently listening to
      */
     private void shareCurrentTrack() {
-        final long currentAudioId = MusicUtils.getCurrentAudioId();
-        final String trackName = MusicUtils.getTrackName();
-        if (currentAudioId == -1 || trackName == null) {
-            return;
-        }
-
-        final Intent shareIntent = new Intent();
-        final String artistName = MusicUtils.getArtistName();
-        final String shareMessage = (artistName != null) ? getString(R.string.now_listening_to, trackName, artistName) :
-                getString(R.string.now_listening_to_no_artist_available, trackName);
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-
-        View rootView = getWindow().getDecorView().getRootView();
-        File screenshotFile = UIUtils.takeScreenshot(rootView);
-        if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
-            shareIntent.setType("image/jpg");
-            boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
-            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(this, screenshotFile.getAbsolutePath(), userFileProvider));
-        } else {
-            shareIntent.setType("text/plain");
-        }
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_track_using)));
-    }
+        setBannerViewVisibility(mMopubAd, false);
+        setBannerViewVisibility(mFallbackAd, false);
+        Engine.instance().getThreadPool().execute(new TrackScreenshotSharer(this));
+   }
 
     private void toggleFavorite() {
         MusicUtils.toggleFavorite();
