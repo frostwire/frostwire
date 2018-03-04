@@ -1421,4 +1421,44 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
         }
     }
+
+    private static final class TrackScreenshotSharer implements Runnable {
+
+        private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
+
+        TrackScreenshotSharer(AudioPlayerActivity audioPlayerActivity) {
+            audioPlayerActivityRef = Ref.weak(audioPlayerActivity);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(audioPlayerActivityRef)) {
+                return;
+            }
+            final AudioPlayerActivity activity = audioPlayerActivityRef.get();
+            final long currentAudioId = MusicUtils.getCurrentAudioId();
+            final String trackName = MusicUtils.getTrackName();
+            if (currentAudioId == -1 || trackName == null) {
+                return;
+            }
+
+            final Intent shareIntent = new Intent();
+            final String artistName = MusicUtils.getArtistName();
+            final String shareMessage = (artistName != null) ? activity.getString(R.string.now_listening_to, trackName, artistName) :
+                    activity.getString(R.string.now_listening_to_no_artist_available, trackName);
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+
+            View rootView = activity.getWindow().getDecorView().getRootView();
+            File screenshotFile = UIUtils.takeScreenshot(rootView);
+            if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
+                shareIntent.setType("image/jpg");
+                boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
+                shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath(), userFileProvider));
+            } else {
+                shareIntent.setType("text/plain");
+            }
+            activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_track_using)));
+        }
+    }
 }

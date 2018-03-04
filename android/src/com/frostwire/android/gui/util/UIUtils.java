@@ -265,8 +265,18 @@ public final class UIUtils {
      */
     public static File takeScreenshot(View view) {
         view.setDrawingCacheEnabled(true);
-        Bitmap screenshotBitmap = Bitmap.createBitmap(view.getDrawingCache());
+        try {
+            Thread.sleep(300);
+        } catch (Throwable t) {}
+        Bitmap drawingCache = view.getDrawingCache();
+        Bitmap screenshotBitmap = null;
+        if (drawingCache != null) {
+            screenshotBitmap = Bitmap.createBitmap(drawingCache);
+        }
         view.setDrawingCacheEnabled(false);
+        if (screenshotBitmap == null) {
+            return null;
+        }
         File screenshotFile = new File(Environment.getExternalStorageDirectory().toString(), "fwPlayerScreenshot.tmp.jpg");
         if (screenshotFile.exists()) {
             screenshotFile.delete();
