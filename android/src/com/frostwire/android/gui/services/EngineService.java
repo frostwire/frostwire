@@ -517,7 +517,7 @@ public class EngineService extends Service implements IEngineService {
             try {
                 EngineService engineService = engineServiceRef.get();
                 if (engineService.notificationUpdateDemon == null) {
-                    engineService.notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+                    engineService.notificationUpdateDemon = new NotificationUpdateDemon(engineService.getApplicationContext());
                 }
                 engineService.notificationUpdateDemon.start();
             } catch (Throwable t) {
