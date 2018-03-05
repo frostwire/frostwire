@@ -41,7 +41,6 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.bloom_filter_256;
@@ -121,7 +120,7 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
 
-        enableComponents(true);
+        Engine.instance().getThreadPool().execute(new EnableComponentsRunnable(this, true));
 
         startPermanentNotificationUpdates();
 
@@ -135,7 +134,7 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        enableComponents(false);
+        Engine.instance().getThreadPool().execute(new EnableComponentsRunnable(this, false));
         stopPermanentNotificationUpdates();
         try {
             ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
@@ -175,21 +174,6 @@ public class EngineService extends Service implements IEngineService {
             }
         } catch (Throwable e) {
             e.printStackTrace();
-        }
-    }
-
-    private void enableComponents(boolean enable) {
-        PackageManager pm = getPackageManager();
-
-        // receivers
-        enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
-        enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
-
-        // third party services
-        if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
-            enableComponentAsync(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
-            enableComponentAsync(pm, io.presage.receiver.AlarmReceiver.class, enable);
-            enableComponentAsync(pm, io.presage.PresageService.class, enable);
         }
     }
 
@@ -480,6 +464,36 @@ public class EngineService extends Service implements IEngineService {
                 }
             } catch (Throwable t) {
                 t.printStackTrace();
+            }
+        }
+    }
+
+    private static final class EnableComponentsRunnable implements Runnable {
+
+        private final WeakReference<EngineService> engineServiceRef;
+        private final boolean enable;
+
+        EnableComponentsRunnable(EngineService engineService, boolean enable) {
+           engineServiceRef = Ref.weak(engineService);
+           this.enable = enable;
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(engineServiceRef)) {
+                LOG.error("EnableComponentsRunnable(enable=" + enable + ") aborted. EngineService reference lost");
+                return;
+            }
+            EngineService es = engineServiceRef.get();
+            PackageManager pm = es.getPackageManager();
+            // receivers
+            es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
+            es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
+            // third party services
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
+                es.enableComponentAsync(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
+                es.enableComponentAsync(pm, io.presage.receiver.AlarmReceiver.class, enable);
+                es.enableComponentAsync(pm, io.presage.PresageService.class, enable);
             }
         }
     }
