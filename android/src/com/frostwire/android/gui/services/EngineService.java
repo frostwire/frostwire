@@ -116,7 +116,7 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
         threadPool.execute(new EnableComponentsRunnable(this, true));
-        startPermanentNotificationUpdates();
+        threadPool.execute(new PermanentNotificationUpdatesStarter(this));
         return START_STICKY;
     }
 
@@ -127,10 +127,9 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        threadPool.execute(new EnableComponentsRunnable(this, false));
+        new EnableComponentsRunnable(this, false).run();
         stopPermanentNotificationUpdates();
-        threadPool.execute(new NotificationCanceller(this));
+        new NotificationCanceller(this).run();
         stopServices(false);
 
         if (BTEngine.ctx != null) {
@@ -305,13 +304,6 @@ public class EngineService extends Service implements IEngineService {
         return R.drawable.frostwire_notification_flat;
     }
 
-    private void startPermanentNotificationUpdates() {
-        if (notificationUpdateDemon == null) {
-            notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
-        }
-        notificationUpdateDemon.start();
-    }
-
     private void stopPermanentNotificationUpdates() {
         if (notificationUpdateDemon != null) {
             notificationUpdateDemon.stop();
@@ -474,11 +466,15 @@ public class EngineService extends Service implements IEngineService {
                 LOG.error("EnableComponentsRunnable(enable=" + enable + ") aborted. EngineService reference lost");
                 return;
             }
-            EngineService es = engineServiceRef.get();
-            PackageManager pm = es.getPackageManager();
-            // receivers
-            es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
-            es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
+            try {
+                EngineService es = engineServiceRef.get();
+                PackageManager pm = es.getPackageManager();
+                // receivers
+                es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
+                es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
+            } catch (Throwable t) {
+                LOG.warn(t.getMessage(), t);
+            }
         }
     }
 
@@ -502,6 +498,30 @@ public class EngineService extends Service implements IEngineService {
                 }
             } catch (SecurityException ignore) {
                 // new exception in Android 7
+            }
+        }
+    }
+
+    private static class PermanentNotificationUpdatesStarter implements Runnable {
+        private final WeakReference<EngineService> engineServiceRef;
+        PermanentNotificationUpdatesStarter(EngineService engineService) {
+            engineServiceRef = Ref.weak(engineService);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(engineServiceRef)) {
+                LOG.warn("PermanentNotificationUpdatesStarter aborted. EngineService reference lost");
+                return;
+            }
+            try {
+                EngineService engineService = engineServiceRef.get();
+                if (engineService.notificationUpdateDemon == null) {
+                    engineService.notificationUpdateDemon = new NotificationUpdateDemon(getApplicationContext());
+                }
+                engineService.notificationUpdateDemon.start();
+            } catch (Throwable t) {
+                LOG.warn(t.getMessage(), t);
             }
         }
     }
