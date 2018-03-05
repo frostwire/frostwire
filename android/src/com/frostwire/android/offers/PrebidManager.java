@@ -45,7 +45,6 @@ import java.util.HashMap;
 
 public final class PrebidManager {
     private final static Logger LOG = Logger.getLogger(PrebidManager.class);
-    private final String ACCOUNT_ID = "01e786a8-b070-4fb3-a21f-a76866f15c80";
     private boolean initialized = false;
     private boolean enabled = true;
     private final ArrayList<AdUnit> adUnits;
@@ -99,15 +98,15 @@ public final class PrebidManager {
 
     private void initAdUnits() {
         // TODO: Verify code, configId, banner type, dimensions
-        BannerAdUnit searchHeaderAdUnit = new BannerAdUnit("5823281", "5823281");
+        BannerAdUnit searchHeaderAdUnit = new BannerAdUnit("5823281", "7eabcb1d-7376-4ab5-b85c-ce1c0cb12ff1");
         searchHeaderAdUnit.addSize(320, 50);
         adUnits.add(searchHeaderAdUnit);
         placementAdUnitHashMap.put(Placement.SEARCH_HEADER_BANNER, searchHeaderAdUnit);
-        BannerAdUnit audioPlayerAdUnit = new BannerAdUnit("5823300", "5823300");
+        BannerAdUnit audioPlayerAdUnit = new BannerAdUnit("5823300", "e33c1226-2f3a-4ceb-a916-b03f3f7636c0");
         audioPlayerAdUnit.addSize(300, 250);
         adUnits.add(audioPlayerAdUnit);
         placementAdUnitHashMap.put(Placement.AUDIO_PLAYER_BANNER, audioPlayerAdUnit);
-        BannerAdUnit previewBannerAdUnit = new BannerAdUnit("5823309", "5823309");
+        BannerAdUnit previewBannerAdUnit = new BannerAdUnit("5823309", "70c3cef1-5040-45e1-92dc-3136229f233c");
         previewBannerAdUnit.addSize(300, 250); // horizontal video preview
         previewBannerAdUnit.addSize(320, 50); // vertical audio/video preview
         adUnits.add(previewBannerAdUnit);
@@ -163,6 +162,7 @@ public final class PrebidManager {
         try {
             // It's ok to do this in the main thread.
             // The expensive server operation is done in a background executor inside Prebid
+            String ACCOUNT_ID = "01e786a8-b070-4fb3-a21f-a76866f15c80";
             Prebid.init(applicationContext, adUnits, ACCOUNT_ID, Prebid.AdServer.MOPUB, Prebid.Host.APPNEXUS);
             initialized = true;
             enabled = true;
