@@ -108,14 +108,6 @@ public class ConfigurationManager {
         }
     }
 
-    private void applyInBackground() {
-        if (editor == null) {
-            LOG.warn("applyInBackground aborted, editor == null");
-            return;
-        }
-        editor.apply();
-    }
-
     public String getString(String key, String defValue) {
         if (preferences == null) {
             LOG.error("getString(key=" + key + ", defValue=" + defValue + ") preferences == null");
@@ -131,7 +123,7 @@ public class ConfigurationManager {
     public void setString(String key, String value) {
         try {
             editor.putString(key, value);
-            applyInBackground();
+            editor.apply();
         } catch (Throwable ignore) {
             LOG.warn("setString(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -152,7 +144,7 @@ public class ConfigurationManager {
     public void setInt(String key, int value) {
         try {
             editor.putInt(key, value);
-            applyInBackground();
+            editor.apply();
         } catch (Throwable ignore) {
             LOG.warn("setInt(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -173,7 +165,7 @@ public class ConfigurationManager {
     public void setLong(String key, long value) {
         try {
             editor.putLong(key, value);
-            applyInBackground();
+            editor.apply();
         } catch (Throwable ignore) {
             LOG.warn("setLong(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -190,7 +182,7 @@ public class ConfigurationManager {
     public void setBoolean(String key, boolean value) {
         try {
             editor.putBoolean(key, value);
-            applyInBackground();
+            editor.apply();
         } catch (Throwable ignore) {
             LOG.warn("setBoolean(key=" + key + ", value=" + value + ") failed", ignore);
         }
