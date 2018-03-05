@@ -489,12 +489,6 @@ public class EngineService extends Service implements IEngineService {
             // receivers
             es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
             es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
-            // third party services
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT)) {
-                es.enableComponentAsync(pm, io.presage.receiver.NetworkChangeReceiver2.class, enable);
-                es.enableComponentAsync(pm, io.presage.receiver.AlarmReceiver.class, enable);
-                es.enableComponentAsync(pm, io.presage.PresageService.class, enable);
-            }
         }
     }
 }

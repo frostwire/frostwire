@@ -79,7 +79,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES, 15);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
-        defaultValues.put(Constants.PREF_KEY_GUI_OGURY_KILL_ON_EXIT, false);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
