@@ -122,8 +122,7 @@ public class ConfigurationManager {
 
     public void setString(String key, String value) {
         try {
-            editor.putString(key, value);
-            editor.apply();
+            setString(editor, key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setString(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -143,8 +142,7 @@ public class ConfigurationManager {
 
     public void setInt(String key, int value) {
         try {
-            editor.putInt(key, value);
-            editor.apply();
+            setInt(editor, key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setInt(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -164,8 +162,7 @@ public class ConfigurationManager {
 
     public void setLong(String key, long value) {
         try {
-            editor.putLong(key, value);
-            editor.apply();
+            setLong(editor, key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setLong(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -181,8 +178,7 @@ public class ConfigurationManager {
 
     public void setBoolean(String key, boolean value) {
         try {
-            editor.putBoolean(key, value);
-            editor.apply();
+            setBoolean(editor, key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setBoolean(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -229,7 +225,11 @@ public class ConfigurationManager {
     }
 
     public void setStringArray(String key, String[] values) {
-        setString(key, JsonUtils.toJson(values));
+        try {
+            setStringArray(editor, key, values).apply();
+        } catch (Throwable ignore) {
+            LOG.warn("setStringArray(key=" + key + ", value=" + values + ") failed", ignore);
+        }
     }
 
     public boolean showTransfersOnDownloadStart() {
@@ -355,23 +355,23 @@ public class ConfigurationManager {
         }
     }
 
-    private void setString(Editor editor, String key, String value) {
-        editor.putString(key, value);
+    private Editor setString(Editor editor, String key, String value) {
+        return editor.putString(key, value);
     }
 
-    private void setInt(Editor editor, String key, int value) {
-        editor.putInt(key, value);
+    private Editor setInt(Editor editor, String key, int value) {
+        return editor.putInt(key, value);
     }
 
-    private void setLong(Editor editor, String key, long value) {
-        editor.putLong(key, value);
+    private Editor setLong(Editor editor, String key, long value) {
+        return editor.putLong(key, value);
     }
 
-    private void setBoolean(Editor editor, String key, boolean value) {
-        editor.putBoolean(key, value);
+    private Editor setBoolean(Editor editor, String key, boolean value) {
+        return editor.putBoolean(key, value);
     }
 
-    private void setStringArray(Editor editor, String key, String[] values) {
-        setString(editor, key, JsonUtils.toJson(values));
+    private Editor setStringArray(Editor editor, String key, String[] values) {
+        return setString(editor, key, JsonUtils.toJson(values));
     }
 }
