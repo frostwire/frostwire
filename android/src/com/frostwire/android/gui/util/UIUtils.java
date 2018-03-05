@@ -176,7 +176,15 @@ public final class UIUtils {
 
     public static void showYesNoDialog(FragmentManager fragmentManager, String message, int titleId, OnClickListener positiveListener, OnClickListener negativeListener) {
         YesNoDialog yesNoDialog = YesNoDialog.newInstance(message, titleId, message, (byte) 0);
-        yesNoDialog.setOnDialogClickListeners(positiveListener, negativeListener);
+        yesNoDialog.setOnDialogClickListener((tag, which) -> {
+                    if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
+                        positiveListener.onClick(yesNoDialog.getDialog(), which);
+                    } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
+                        negativeListener.onClick(yesNoDialog.getDialog(), which);
+                    }
+                    yesNoDialog.dismiss();
+                }
+        );
         yesNoDialog.show(fragmentManager);
     }
 

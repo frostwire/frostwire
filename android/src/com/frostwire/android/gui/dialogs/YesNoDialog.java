@@ -20,7 +20,6 @@
 package com.frostwire.android.gui.dialogs;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,8 +40,6 @@ public class YesNoDialog extends AbstractDialog {
     private static final String MESSAGE_STRING_KEY = "messageStr";
     private static final String YES_NO_DIALOG_FLAGS = "yesnodialog_flags";
     private String id;
-    private DialogInterface.OnClickListener positiveListener;
-    private DialogInterface.OnClickListener negativeListener;
 
     public YesNoDialog() {
         super(R.layout.dialog_default);
@@ -119,25 +116,5 @@ public class YesNoDialog extends AbstractDialog {
     @Override
     protected void performDialogClick(String tag, int which) {
         super.performDialogClick(id, which);
-    }
-
-    public void setOnDialogClickListeners(DialogInterface.OnClickListener positiveListener, DialogInterface.OnClickListener negativeListener) {
-        this.positiveListener = positiveListener;
-        this.negativeListener = negativeListener;
-
-        if (positiveListener != null) {
-            setOnDialogClickListener((tag, which) -> {
-                        if (which == Dialog.BUTTON_POSITIVE && positiveListener != null) {
-                            positiveListener.onClick(getDialog(), which);
-                        } else if (which == Dialog.BUTTON_NEGATIVE && negativeListener != null) {
-                            negativeListener.onClick(getDialog(), which);
-                        }
-                        dismiss();
-                    }
-            );
-        } else {
-            // uses onDialogClick
-            setOnDialogClickListener(null);
-        }
     }
 }
