@@ -53,6 +53,7 @@ import com.frostwire.util.http.OKHTTPClient;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
 
 import okhttp3.ConnectionPool;
 
@@ -96,15 +97,11 @@ public class EngineService extends Service implements IEngineService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-        } catch (SecurityException ignore) {
-            // new exception in Android 7
-        }
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        threadPool.execute(new NotificationCanceller(this));
         if (intent == null) {
             return START_NOT_STICKY;
         }
-
         if (SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
             new Thread() {
@@ -115,15 +112,11 @@ public class EngineService extends Service implements IEngineService {
             }.start();
             return START_NOT_STICKY;
         }
-
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
-
-        Engine.instance().getThreadPool().execute(new EnableComponentsRunnable(this, true));
-
+        threadPool.execute(new EnableComponentsRunnable(this, true));
         startPermanentNotificationUpdates();
-
         return START_STICKY;
     }
 
@@ -134,13 +127,10 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        Engine.instance().getThreadPool().execute(new EnableComponentsRunnable(this, false));
+        ExecutorService threadPool = Engine.instance().getThreadPool();
+        threadPool.execute(new EnableComponentsRunnable(this, false));
         stopPermanentNotificationUpdates();
-        try {
-            ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancelAll();
-        } catch (Throwable t) {
-            // possible java.lang.SecurityException
-        }
+        threadPool.execute(new NotificationCanceller(this));
         stopServices(false);
 
         if (BTEngine.ctx != null) {
@@ -489,6 +479,30 @@ public class EngineService extends Service implements IEngineService {
             // receivers
             es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
             es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
+        }
+    }
+
+    private static class NotificationCanceller implements Runnable {
+        private final WeakReference<EngineService> engineServiceRef;
+
+        NotificationCanceller(EngineService engineService) {
+            engineServiceRef = Ref.weak(engineService);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(engineServiceRef)) {
+                return;
+            }
+            EngineService engineService = engineServiceRef.get();
+            try {
+                NotificationManager notificationManager = (NotificationManager) engineService.getSystemService(NOTIFICATION_SERVICE);
+                if (notificationManager != null) {
+                    notificationManager.cancelAll();
+                }
+            } catch (SecurityException ignore) {
+                // new exception in Android 7
+            }
         }
     }
 }
