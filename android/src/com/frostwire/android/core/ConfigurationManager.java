@@ -193,16 +193,6 @@ public class ConfigurationManager {
         editor.apply();
     }
 
-    private void resetToDefault(String key) {
-        if (defaults != null) {
-            Map<String, Object> defaultValues = defaults.getDefaultValues();
-            if (defaultValues != null && defaultValues.containsKey(key)) {
-                Object defaultValue = defaultValues.get(key);
-                initPreference(preferences, editor, key, defaultValue, true);
-            }
-        }
-    }
-
     public String getUUIDString() {
         return getString(Constants.PREF_KEY_CORE_UUID);
     }
