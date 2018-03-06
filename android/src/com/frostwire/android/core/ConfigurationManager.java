@@ -286,7 +286,16 @@ public class ConfigurationManager {
         if (preferences.contains(key) && !force) {
             return; // quick return
         }
+        setPreference(editor, key, value);
+    }
 
+    private void resetToDefaults(@NonNull Editor editor, Map<String, Object> map) {
+        for (Entry<String, Object> entry : map.entrySet()) {
+            setPreference(editor, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void setPreference(@NonNull Editor editor, String key, Object value) {
         if (value instanceof String) {
             setString(editor, key, (String) value);
         } else if (value instanceof Integer) {
@@ -299,28 +308,7 @@ public class ConfigurationManager {
             setStringArray(editor, key, (String[]) value);
         } else {
             throw new RuntimeException("Unsupported data type for setting: " +
-                    "key = " + key + ", value = " + value.getClass());
-        }
-    }
-
-    private void resetToDefaults(Editor editor, Map<String, Object> map) {
-        for (Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() instanceof String) {
-                setString(editor, entry.getKey(), (String) entry.getValue());
-            } else if (entry.getValue() instanceof Integer) {
-                setInt(editor, entry.getKey(), (Integer) entry.getValue());
-            } else if (entry.getValue() instanceof Long) {
-                setLong(editor, entry.getKey(), (Long) entry.getValue());
-            } else if (entry.getValue() instanceof Boolean) {
-                setBoolean(editor, entry.getKey(), (Boolean) entry.getValue());
-            } else if (entry.getValue() instanceof String[]) {
-                setStringArray(editor, entry.getKey(), (String[]) entry.getValue());
-            } else {
-                Object value = entry.getValue();
-                throw new RuntimeException("Unsupported data type for setting: " +
-                        "key = " + entry.getKey() + ", value = " +
-                        (value != null ? value.getClass() : "null"));
-            }
+                    "key = " + key + ", value = " + (value != null ? value.getClass() : "null"));
         }
     }
 
