@@ -516,23 +516,12 @@ public final class TransferManager {
         }
     }
 
-    public int getStartedTransfers() {
-        return startedTransfers;
-    }
-
     public int incrementStartedTransfers() {
         return ++startedTransfers;
     }
 
     public void resetStartedTransfers() {
         startedTransfers = 0;
-    }
-
-    /**
-     * @return true if less than 10MB available
-     */
-    static boolean isCurrentMountAlmostFull() {
-        return getCurrentMountAvailableBytes() < 10000000;
     }
 
     static long getCurrentMountAvailableBytes() {
