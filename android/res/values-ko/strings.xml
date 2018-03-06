@@ -720,4 +720,5 @@
     <string name="title_activity_transfer_detail">이체 세부 사항</string>
     <string name="piece_size_header">조각 크기 :</string>
     <string name="add_tracker">추적기 추가</string>
+    <string name="frostwire_start_engine_service_security_exception">권한이 없기 때문에 FrostWire를 제대로 시작할 수 없습니다. 필요한 권한을 부여하고 애플리케이션을 다시 시작하십시오.</string>
 </resources>

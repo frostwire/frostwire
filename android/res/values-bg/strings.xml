@@ -719,4 +719,5 @@
     <string name="title_activity_transfer_detail">Данни за трансфера</string>
     <string name="piece_size_header">Размер на парчето:</string>
     <string name="add_tracker">Добави тракер</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire не можа да започне правилно поради липса на разрешения. Моля, дайте необходимите разрешения и рестартирайте приложението</string>
 </resources>

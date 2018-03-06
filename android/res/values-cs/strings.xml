@@ -720,4 +720,5 @@
     <string name="title_activity_transfer_detail">Podrobnosti o převodu</string>
     <string name="piece_size_header">Velikost kuse:</string>
     <string name="add_tracker">Přidat trackeru</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire nemohl správně spustit kvůli nedostatku oprávnění. Udělujte potřebná oprávnění a restartujte aplikaci</string>
 </resources>

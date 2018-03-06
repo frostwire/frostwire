@@ -719,4 +719,5 @@
     <string name="title_activity_transfer_detail">Chuyển chi tiết</string>
     <string name="piece_size_header">Kích cỡ mảnh:</string>
     <string name="add_tracker">Thêm trình theo dõi</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire không thể bắt đầu đúng do thiếu quyền truy cập. Vui lòng cấp các quyền cần thiết và khởi động lại ứng dụng</string>
 </resources>

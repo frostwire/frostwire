@@ -673,4 +673,5 @@
     <string name="nothing_is_currently_seeding">Şu anda bir şey paylaşmıyor</string>
     <string name="seeding_keeps_the_network_healthy">Paylaşım, şebekenin sağlıklı kalmasını sağlar</string>
     <string name="seeding_is_currently_disabled">Paylaşım şu anda devre dışı</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire, izin eksikliği nedeniyle düzgün başlatılamadı. Lütfen gerekli izinleri verin ve uygulamayı tekrar başlatın.</string>
 </resources>
