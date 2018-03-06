@@ -720,4 +720,5 @@
     <string name="add_tracker">إضافة تعقب</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">تعذر فتح تفاصيل النقل، إنفوهاش غير صالحة</string>
     <string name="invalid_tracker_url">عنوان ورل المقتفي غير صالح</string>
+    <string name="frostwire_start_engine_service_security_exception">فروستوير لا يمكن أن تبدأ بشكل صحيح بسبب عدم وجود أذونات. يرجى منح الأذونات المطلوبة وإعادة تشغيل التطبيق</string>
 </resources>

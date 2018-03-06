@@ -720,4 +720,5 @@
     <string name="add_tracker">Aggiungi tracker</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Impossibile aprire Dettagli trasferimento, InfoHash non valido</string>
     <string name="invalid_tracker_url">URL del tracker non valido</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
 </resources>

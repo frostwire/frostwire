@@ -720,4 +720,5 @@
     <string name="title_activity_transfer_detail">منتقلی کی تفصیل</string>
     <string name="piece_size_header">ٹکڑا سائز:</string>
     <string name="add_tracker">ٹریکر شامل کریں</string>
+    <string name="frostwire_start_engine_service_security_exception">اجازت کی کمی کی وجہ سے FrostWire مناسب طریقے سے شروع نہیں کیا جا سکا. براہ کرم ضروری اجازتوں کی درخواست کریں اور درخواست کو دوبارہ شروع کریں</string>
 </resources>

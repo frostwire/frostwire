@@ -721,4 +721,5 @@
     <string name="title_activity_transfer_detail">転送の詳細</string>
     <string name="piece_size_header">ピースサイズ：</string>
     <string name="add_tracker">トラッカーを追加</string>
+    <string name="frostwire_start_engine_service_security_exception">アクセス許可が不足しているため、FrostWireを正しく起動できませんでした。 必要な権限を付与してアプリケーションを再起動してください</string>
 </resources>

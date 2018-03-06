@@ -673,4 +673,5 @@
     <string name="seeding_is_currently_disabled">共享目前已被禁用</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">无法打开传输详细信息，无效的InfoHash</string>
     <string name="invalid_tracker_url">无效的跟踪器网址</string>
+    <string name="frostwire_start_engine_service_security_exception">由于缺乏权限，FrostWire无法正常启动。 请授予所需的权限并重新启动应用程序</string>
 </resources>

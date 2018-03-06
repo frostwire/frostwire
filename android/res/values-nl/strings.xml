@@ -673,4 +673,5 @@
     <string name="seeding_is_currently_disabled">Delen is momenteel uitgeschakeld</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Kon overdrachtgegevens, ongeldige InfoHash, niet openen</string>
     <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire kan niet goed starten vanwege een gebrek aan rechten. Geef de vereiste machtigingen en start de toepassing opnieuw</string>
 </resources>

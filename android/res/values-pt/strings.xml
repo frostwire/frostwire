@@ -718,4 +718,5 @@
     <string name="add_tracker">Adicionar rastreador</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Não foi possível abrir Detalhes de Transferência, InfoHash inválido</string>
     <string name="invalid_tracker_url">URL do rastreador inválido</string>
+    <string name="frostwire_start_engine_service_security_exception">FrostWire não pôde iniciar corretamente devido à falta de permissões. Por favor, conceda as permissões necessárias e reinicie o aplicativo</string>
 </resources>
