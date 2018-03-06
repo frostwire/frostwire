@@ -674,5 +674,4 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Kon nie Oordragbesonderhede, ongeldige InfoHash oopmaak nie</string>
     <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire kon nie behoorlik begin weens \'n gebrek aan toestemmings nie. Gee asseblief die nodige toestemmings en herbegin die aansoek</string>
-
 </resources>
