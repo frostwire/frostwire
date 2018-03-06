@@ -17,6 +17,7 @@
 
 package com.frostwire.android.core;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -39,13 +40,14 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author gubatron
  * @author aldenml
  */
-public class ConfigurationManager {
+@SuppressLint("CommitPrefEdits") // this is due to a lint false positive
+public final class ConfigurationManager {
+
     private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
     private static ConfigurationManager instance;
     private static AtomicReference state = new AtomicReference(State.CREATING);
     private final static CountDownLatch creationLatch = new CountDownLatch(1);
     private SharedPreferences preferences;
-    private Editor editor;
     private ConfigurationDefaults defaults;
 
     private enum State {
@@ -92,11 +94,9 @@ public class ConfigurationManager {
         public void run() {
             try {
                 cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef);
-                cm.editor = cm.preferences.edit();
                 cm.defaults = new ConfigurationDefaults();
 
-                cm.initPreferences(cm.preferences, cm.editor);
-                cm.editor.apply();
+                cm.initPreferences(cm.preferences);
             }
             catch (Throwable t) {
                 LOG.error("Error initializing ConfigurationManager", t);
@@ -122,7 +122,7 @@ public class ConfigurationManager {
 
     public void setString(String key, String value) {
         try {
-            setString(editor, key, value).apply();
+            setString(preferences.edit(), key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setString(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -142,7 +142,7 @@ public class ConfigurationManager {
 
     public void setInt(String key, int value) {
         try {
-            setInt(editor, key, value).apply();
+            setInt(preferences.edit(), key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setInt(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -162,7 +162,7 @@ public class ConfigurationManager {
 
     public void setLong(String key, long value) {
         try {
-            setLong(editor, key, value).apply();
+            setLong(preferences.edit(), key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setLong(key=" + key + ", value=" + value + ") failed", ignore);
         }
@@ -178,19 +178,14 @@ public class ConfigurationManager {
 
     public void setBoolean(String key, boolean value) {
         try {
-            setBoolean(editor, key, value).apply();
+            setBoolean(preferences.edit(), key, value).apply();
         } catch (Throwable ignore) {
             LOG.warn("setBoolean(key=" + key + ", value=" + value + ") failed", ignore);
         }
     }
 
     public void resetToDefaults() {
-        // TODO: remove this when editor variable is gone
-        if (editor == null) {
-            throw new IllegalStateException("Shared preferences editor can't be null at this moment");
-        }
-        resetToDefaults(editor, defaults.getDefaultValues());
-        editor.apply();
+        resetToDefaults(preferences.edit(), defaults.getDefaultValues()).apply();
     }
 
     public String getUUIDString() {
@@ -216,7 +211,7 @@ public class ConfigurationManager {
 
     public void setStringArray(String key, String[] values) {
         try {
-            setStringArray(editor, key, values).apply();
+            setStringArray(preferences.edit(), key, values).apply();
         } catch (Throwable ignore) {
             LOG.warn("setStringArray(key=" + key + ", value=" + values + ") failed", ignore);
         }
@@ -260,7 +255,9 @@ public class ConfigurationManager {
         return getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
     }
 
-    private void initPreferences(@NonNull SharedPreferences preferences, @NonNull Editor editor) {
+    private void initPreferences(@NonNull SharedPreferences preferences) {
+        Editor editor = preferences.edit();
+
         for (Entry<String, Object> entry : defaults.getDefaultValues().entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -270,13 +267,15 @@ public class ConfigurationManager {
         }
 
         //there are some configuration values that need to be reset every time to a desired value
-        resetToDefaults(editor, defaults.getResetValues());
+        resetToDefaults(editor, defaults.getResetValues()).apply();
     }
 
-    private void resetToDefaults(@NonNull Editor editor, Map<String, Object> map) {
+    private Editor resetToDefaults(@NonNull Editor editor, Map<String, Object> map) {
         for (Entry<String, Object> entry : map.entrySet()) {
             setPreference(editor, entry.getKey(), entry.getValue());
         }
+
+        return editor;
     }
 
     private void setPreference(@NonNull Editor editor, String key, Object value) {
