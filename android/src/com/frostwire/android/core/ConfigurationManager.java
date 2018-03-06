@@ -264,19 +264,13 @@ public class ConfigurationManager {
         for (Entry<String, Object> entry : defaults.getDefaultValues().entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            initPreference(preferences, editor, key, value, false);
+            if (!preferences.contains(key)) {
+                setPreference(editor, key, value);
+            }
         }
 
         //there are some configuration values that need to be reset every time to a desired value
         resetToDefaults(editor, defaults.getResetValues());
-    }
-
-    private void initPreference(@NonNull SharedPreferences preferences, @NonNull Editor editor,
-                                String key, Object value, boolean force) {
-        if (preferences.contains(key) && !force) {
-            return; // quick return
-        }
-        setPreference(editor, key, value);
     }
 
     private void resetToDefaults(@NonNull Editor editor, Map<String, Object> map) {
