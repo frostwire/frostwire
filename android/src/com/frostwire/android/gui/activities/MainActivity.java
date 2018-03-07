@@ -1075,7 +1075,10 @@ public class MainActivity extends AbstractActivity implements
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
                         if (Ref.alive(fragmentManagerRef)) {
-                            dlg.show(fragmentManagerRef.get());
+                            try {
+                                dlg.show(fragmentManagerRef.get());
+                            } catch (IllegalStateException ignored) {
+                            }
                         }
                     });
                 }
