@@ -73,6 +73,12 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         LinkInfo minQuality = null;
 
         for (LinkInfo inf : infos) {
+            if (inf.fmt == 18) {
+                // save this format for the heuristic of selecting audio
+                // from dash or demuxing a video one
+                demuxVideo = inf;
+            }
+
             if (!isDash(inf)) {
                 if (inf.fmt == 18) {
                     minQuality = inf;
@@ -88,9 +94,6 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
                 if (inf.fmt == 140 && dashAudio == null) {// 128k
                     dashAudio = inf;
                 }
-                if (inf.fmt == 22 || inf.fmt == 84) {
-                    demuxVideo = inf;
-                }
             }
         }
 
@@ -98,12 +101,9 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
             list.add(new YouTubeCrawledSearchResult(sr, dashVideo, dashAudio));
         }
 
-        if (dashAudio != null) {
-            list.add(new YouTubeCrawledStreamableSearchResult(sr, null, dashAudio, minQuality));
-        } else {
-            if (demuxVideo != null) {
-                list.add(new YouTubeCrawledStreamableSearchResult(sr, null, demuxVideo, minQuality));
-            }
+        LinkInfo infoAudio = selectFormatForAudio(sr, dashAudio, demuxVideo);
+        if (infoAudio != null) {
+            list.add(new YouTubeCrawledStreamableSearchResult(sr, null, infoAudio, minQuality));
         }
 
         YouTubePackageSearchResult packagedResult = new YouTubePackageSearchResult(sr, list);
@@ -195,6 +195,36 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         } catch (Throwable e) {
             LOG.warn("Error parsing secondary content", e);
         }
+    }
+
+    private LinkInfo selectFormatForAudio(YouTubeSearchResult sr,
+        LinkInfo dashAudio, LinkInfo demuxVideo) {
+
+        if (dashAudio == null)
+            return demuxVideo;
+        if (demuxVideo == null)
+            return dashAudio;
+
+        if (dashAudio.size == -1) {
+            // can't calculate heuristic
+            return dashAudio;
+        }
+
+        double bitRateSum = 0.5 + 96d / 1024d;
+        bitRateSum = bitRateSum * 1024 * 1024; //Mbits to bits.
+        long size = (long) (Math.ceil((bitRateSum * sr.getSize()) / 8));
+
+        // the case that the video track is more or less still
+        if (5 * dashAudio.size > size) {
+            return demuxVideo;
+        }
+
+        // if the length is rather small, use demux anyway
+        if (size < 40000000) {
+            return demuxVideo;
+        }
+
+        return dashAudio;
     }
 
     /*
