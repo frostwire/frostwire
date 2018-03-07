@@ -1217,18 +1217,31 @@ public class MusicPlaybackService extends Service {
             position = mPlayListLen;
         }
 
-        final int tailsize = mPlayListLen - position;
-        for (int i = tailsize; i > 0; i--) {
-            mPlayList[position + i] = mPlayList[position + i - addlen];
+        if (mPlayList != null && mPlayList.length > 0) {
+            final int tailsize = mPlayListLen - position;
+            for (int i = tailsize; i > 0; i--) {
+                if (checkBounds(position + i, mPlayList.length) &&
+                        checkBounds(position + i - addlen, mPlayList.length)) {
+                    mPlayList[position + i] = mPlayList[position + i - addlen];
+                }
+            }
+            for (int i = 0; i < addlen; i++) {
+                if (checkBounds(position + i, mPlayList.length) &&
+                        checkBounds(i, list.length)) {
+                    mPlayList[position + i] = list[i];
+                }
+            }
+            mPlayListLen += addlen;
         }
-        for (int i = 0; i < addlen; i++) {
-            mPlayList[position + i] = list[i];
-        }
-        mPlayListLen += addlen;
+
         if (mPlayListLen == 0) {
             closeCursor();
             notifyChange(META_CHANGED);
         }
+    }
+
+    private boolean checkBounds(int i, int arrayLen) {
+        return i >= 0 && i < arrayLen;
     }
 
     /**
