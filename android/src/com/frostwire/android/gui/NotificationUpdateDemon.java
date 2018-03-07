@@ -22,7 +22,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -213,12 +212,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
             NotificationUpdateDemon updateDemon = updateDemonRef.get();
             if (updateDemon.isScreenOn()) {
                 // the context we have is the main app context, not an activity
-                Handler mainHandler = new Handler(updateDemon.mParentContext.getMainLooper());
-                mainHandler.post(() -> {
-                    if (Ref.alive(updateDemonRef)) {
-                        updateDemonRef.get().updatePermanentStatusNotification();
-                    }
-                });
+                updateDemonRef.get().updatePermanentStatusNotification();
             }
         }
     }
