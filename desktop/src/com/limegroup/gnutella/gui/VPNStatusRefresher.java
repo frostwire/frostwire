@@ -32,6 +32,8 @@ public class VPNStatusRefresher {
 
     private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), true);
 
+    private boolean active = true;
+
     private VPNStatusRefresher() {
     }
 
@@ -49,6 +51,9 @@ public class VPNStatusRefresher {
     }
 
     public void refresh() {
+        if (!active) {
+            return;
+        }
         long now = System.currentTimeMillis();
         long REFRESH_INTERVAL_IN_MILLIS = 20000;
         if (lastRefresh == 0 || (now - lastRefresh >= REFRESH_INTERVAL_IN_MILLIS)) {
@@ -56,11 +61,20 @@ public class VPNStatusRefresher {
             Thread vpnStatusCheckerThread = new Thread("VPNStatus-checker") {
                 @Override
                 public void run() {
+                    if (!active) {
+                        return;
+                    }
                     //possibly blocking code
                     final boolean isVPNActive = VPNs.isVPNActive();
+                    if (!active) {
+                        return;
+                    }
                     GUIMediator.safeInvokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            if (!active) {
+                                return;
+                            }
                             for (VPNStatusListener client : clients) {
                                 try {
                                     client.onStatusUpdated(isVPNActive);
@@ -72,8 +86,13 @@ public class VPNStatusRefresher {
                     });
                 }
             };
+            vpnStatusCheckerThread.setDaemon(true);
             pool.execute(vpnStatusCheckerThread);
         }
+    }
+
+    public void shutdown() {
+        active = false;
     }
 
     interface VPNStatusListener {

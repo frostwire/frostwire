@@ -48,6 +48,7 @@ final class Finalizer {
             public void run() {
                 try {
                     LOG.info("Shutdown thread started");
+                    VPNStatusRefresher.getInstance().shutdown();
                     //LOG.info("Flushing UXStats...");
                     UXStats.instance().flush();
                     //LOG.info("SearchMediator shutting down...");
