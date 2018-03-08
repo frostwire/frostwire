@@ -254,17 +254,47 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
+    private static final class TransferListUpdater implements Runnable {
+        WeakReference<TransfersFragment> fragmentRef;
+        TransferListUpdater(TransfersFragment fragment) {
+            fragmentRef = Ref.weak(fragment);
+        }
+
+        @Override
+        public void run() {
+            if (!Ref.alive(fragmentRef)) {
+                return;
+            }
+            fragmentRef.get().updateTransferList();
+        }
+    }
+
+    private void updateTransferList() {
+        List<Transfer> allTransfers = TransferManager.instance().getTransfers();
+        final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
+        Collections.sort(selectedStatusTransfers, transferComparator);
+
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            // this must happen on the main thread only
+            Activity activity = getActivity();
+            if (isVisible() && isAdded() && activity != null) {
+                activity.runOnUiThread(() -> {
+                    if (adapter != null) {
+                        adapter.updateList(selectedStatusTransfers);
+                    }
+                });
+            }
+        }
+
+        if (selectedStatus == TransferStatus.SEEDING) {
+            handlePossibleSeedingSuggestions(allTransfers);
+        }
+    }
+
     @Override
     public void onTime() {
         if (adapter != null) {
-            List<Transfer> allTransfers = TransferManager.instance().getTransfers();
-            List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
-            Collections.sort(selectedStatusTransfers, transferComparator);
-            adapter.updateList(selectedStatusTransfers);
-            if (selectedStatus == TransferStatus.SEEDING) {
-                handlePossibleSeedingSuggestions(allTransfers);
-            }
-
+            Engine.instance().getThreadPool().execute(new TransferListUpdater(this));
         } else if (this.getActivity() != null) {
             setupAdapter(this.getActivity());
         }
