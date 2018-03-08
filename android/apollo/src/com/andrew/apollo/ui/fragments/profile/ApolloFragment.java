@@ -745,7 +745,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 if (Ref.alive(adapterRef)) {
                     T adapter = adapterRef.get();
                     MusicUtils.playAllFromUserItemClick((ArrayAdapter) adapter, position);
-                    adapter.notifyDataSetChanged();
+                    if (Ref.alive(activityRef)) {
+                        activityRef.get().runOnUiThread(adapter::notifyDataSetChanged);
+                    }
                 }
                 if (Ref.alive(activityRef)) {
                     NavUtils.openAudioPlayer(activityRef.get());
