@@ -275,11 +275,19 @@ public final class UIUtils {
         view.setDrawingCacheEnabled(true);
         try {
             Thread.sleep(300);
-        } catch (Throwable t) {}
-        Bitmap drawingCache = view.getDrawingCache();
+        } catch (Throwable t) {
+        }
+        Bitmap drawingCache = null;
+        try {
+            drawingCache = view.getDrawingCache();
+        } catch (Throwable ignored) {
+        }
         Bitmap screenshotBitmap = null;
         if (drawingCache != null) {
-            screenshotBitmap = Bitmap.createBitmap(drawingCache);
+            try {
+                screenshotBitmap = Bitmap.createBitmap(drawingCache);
+            } catch (Throwable ignored) {
+            }
         }
         view.setDrawingCacheEnabled(false);
         if (screenshotBitmap == null) {
