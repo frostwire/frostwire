@@ -11,6 +11,6 @@ repositories {
 }
 
 dependencies {
-    compile 'com.frostwire:jlibtorrent:1.2.0.8'
+    compile 'com.frostwire:jlibtorrent:1.2.0.17'
     testCompile 'junit:junit:4.12'
 }
