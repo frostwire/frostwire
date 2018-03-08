@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Looper;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -43,6 +44,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author aldenml
@@ -68,7 +72,7 @@ public final class NavigationMenu {
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
         menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
-        refreshMenuRemoveAdsItem();
+        refreshMenuRemoveAdsItemAsync();
     }
 
     public boolean isOpen() {
@@ -186,6 +190,14 @@ public final class NavigationMenu {
         return adMenuItemView;
     }
 
+    private void refreshMenuRemoveAdsItemAsync() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Engine.instance().getThreadPool().execute(new RemoveAdsItemMenuRefresher(this));
+        } else {
+            refreshMenuRemoveAdsItem();
+        }
+    }
+
     private void refreshMenuRemoveAdsItem() {
         // only visible for basic or debug build and if ads have not been disabled.
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
@@ -234,8 +246,21 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            NavigationMenu.this.refreshMenuRemoveAdsItem();
+            NavigationMenu.this.refreshMenuRemoveAdsItemAsync();
             controller.syncNavigationMenu();
+        }
+    }
+
+    private final static class RemoveAdsItemMenuRefresher implements Runnable {
+        private final WeakReference<NavigationMenu> navMenuRef;
+        RemoveAdsItemMenuRefresher(NavigationMenu navMenu) {
+            navMenuRef = Ref.weak(navMenu);
+        }
+        @Override
+        public void run() {
+            if (Ref.alive(navMenuRef)) {
+                navMenuRef.get().refreshMenuRemoveAdsItem();
+            }
         }
     }
 }
