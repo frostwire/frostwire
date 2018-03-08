@@ -321,9 +321,12 @@ public abstract class BaseHttpDownload implements Transfer {
 
     static File buildFile(FileSystem fs, File saveDir, String name) {
         String baseName = FilenameUtils.getBaseName(name);
+        if (baseName.length() > 127) { // the goal is 255, but unsafe after 127 in some systems
+            baseName = baseName.substring(0,127); // end index is exclusive
+        }
         String ext = FilenameUtils.getExtension(name);
 
-        File f = new File(saveDir, name);
+        File f = new File(saveDir, baseName + "." + ext);
         int i = 1;
         while (fs.exists(f) && i < 30) {
             f = new File(saveDir, baseName + " (" + i + ")." + ext);
