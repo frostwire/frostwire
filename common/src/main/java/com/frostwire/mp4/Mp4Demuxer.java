@@ -172,8 +172,10 @@ public final class Mp4Demuxer {
             int pos = (int) in.count();
 
             int skp = chunkOffsetOrg[i] - pos;
-            IO.skip(in, skp, buf);
-            notifyCount(l, in.count());
+            if (skp > 0) {
+                IO.skip(in, skp, buf);
+                notifyCount(l, in.count());
+            }
 
             IO.copy(in, out, chunkSize[i], buf);
             notifyCount(l, in.count());
