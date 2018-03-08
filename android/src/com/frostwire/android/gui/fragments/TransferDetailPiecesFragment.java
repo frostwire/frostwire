@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.HexHiveView;
@@ -80,8 +81,7 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         if (uiBittorrentDownload == null) {
             return;
         }
-
-        ensureTorrentHandle();
+        ensureTorrentHandleAsync();
         if (torrentHandle == null) {
             return;
         }

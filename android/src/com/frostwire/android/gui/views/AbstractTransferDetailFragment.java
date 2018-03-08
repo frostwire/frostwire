@@ -21,6 +21,7 @@ package com.frostwire.android.gui.views;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -83,7 +84,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (activity != null) {
             onAttach(activity);
         }
-        ensureTorrentHandle();
+        ensureTorrentHandleAsync();
         return this;
     }
 
@@ -177,12 +178,20 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infoHash);
             if (bittorrentDownload instanceof UIBittorrentDownload) {
                 uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
-                ensureTorrentHandle();
+                ensureTorrentHandleAsync();
             }
         }
     }
 
-    protected void ensureTorrentHandle() {
+    protected void ensureTorrentHandleAsync() {
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            Engine.instance().getThreadPool().execute(new TorrentHandleEnsurer(this));
+        } else {
+            ensureTorrentHandle();
+        }
+    }
+
+    private void ensureTorrentHandle() {
         if (torrentHandle == null && uiBittorrentDownload != null) {
             torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
             if (torrentHandle == null) {
@@ -256,6 +265,20 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
                 return;
             }
             fragmentRef.get().recoverUIBittorrentDownload(infoHash);
+        }
+    }
+
+    private static final class TorrentHandleEnsurer implements Runnable {
+        private final WeakReference<AbstractTransferDetailFragment> fragmentRef;
+        TorrentHandleEnsurer(AbstractTransferDetailFragment fragment) {
+            fragmentRef = Ref.weak(fragment);
+        }
+        @Override
+        public void run() {
+            if (!Ref.alive(fragmentRef)) {
+                return;
+            }
+            fragmentRef.get().ensureTorrentHandle();
         }
     }
 }
