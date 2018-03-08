@@ -109,7 +109,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (uiBittorrentDownload == null) {
             Intent intent = getActivity().getIntent();
             if (intent != null) {
-                recoverUIBittorrentDownload(intent.getStringExtra("infoHash"));
+                String infoHash = intent.getStringExtra("infoHash");
+                if (infoHash != null && !infoHash.isEmpty()) {
+                    Engine.instance().getThreadPool().execute(new UIBittorrentDownloadRecoverer(this, infoHash));
+                }
             }
             if (uiBittorrentDownload == null) {
                 return;
@@ -118,6 +121,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         updateCommonComponents();
         updateComponents();
     }
+
     // Fragment State serialization = onSaveInstanceState
     // Fragment State deserialization = onActivityCreated
 
