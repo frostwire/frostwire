@@ -955,7 +955,11 @@ public class MainActivity extends AbstractActivity implements
                 MainActivity.class).
                 setAction(Constants.ACTION_SHOW_TRANSFERS).
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        context.startActivity(intent);
+        try {
+            context.startActivity(intent);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     // TODO: refactor and move this method for a common place when needed
