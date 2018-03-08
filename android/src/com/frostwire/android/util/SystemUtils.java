@@ -29,7 +29,6 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -198,7 +197,7 @@ public final class SystemUtils {
             }
         };
 
-        t.setDaemon(true);
+        t.setDaemon(false);
         t.start();
     }
 }
