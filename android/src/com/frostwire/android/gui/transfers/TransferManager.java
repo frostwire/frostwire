@@ -19,6 +19,7 @@ package com.frostwire.android.gui.transfers;
 
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.StatFs;
 
 import com.frostwire.android.R;
@@ -530,7 +531,11 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key));
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key)));
+        } else {
+            ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key));
+        }
     }
 
     private void onPreferenceChanged(String key) {
