@@ -200,6 +200,9 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
     private LinkInfo selectFormatForAudio(YouTubeSearchResult sr,
         LinkInfo dashAudio, LinkInfo demuxVideo) {
 
+        return demuxVideo;
+        // NOTE: code commented just in case we need it later
+        /*
         if (dashAudio == null)
             return demuxVideo;
         if (demuxVideo == null)
@@ -225,6 +228,7 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         }
 
         return dashAudio;
+        */
     }
 
     /*
