@@ -1,4 +1,4 @@
-FrostWire 2.0.2 build 507 - MAR/08/2018
+FrostWire 2.0.2 build 508 - MAR/09/2018
  - Application startup is faster
  - Faster YT downloads
  - Zooqle search fixes
@@ -8,6 +8,7 @@ FrostWire 2.0.2 build 507 - MAR/08/2018
  - When audio files are deleted from "My Files" they're now cleared from "Recents" in "My Music"
  - Bug where deleted .torrent files would reappear fixed
  - Translations updated, Urdu update
+ - Loads of Crash and Freeze fixes
 
 FrostWire 2.0.1 build 490 - FEB/06/2018
  - Archive.org search fixes
