@@ -42,6 +42,8 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormatSymbols;
 
+import static com.frostwire.android.util.Asyncs.invokeAsync;
+
 /**
  * @author aldenml
  * @author gubatron
@@ -93,7 +95,8 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         super.initComponents(rootView, savedInstanceState);
         if (uiBittorrentDownload == null && savedInstanceState != null) {
             String infoHash = savedInstanceState.getString("infohash");
-            Engine.instance().getThreadPool().execute(new UIBittorrentDownloadRecoverer(this, infoHash));
+            invokeAsync(this, AbstractTransferDetailFragment::recoverBittorrentDownload, infoHash);
+            //Engine.instance().getThreadPool().execute(new UIBittorrentDownloadRecoverer(this, infoHash));
         }
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
@@ -250,6 +253,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             return "0%";
         }
         return String.valueOf(100 * ((float) sent / (float) received)) + "%";
+    }
+
+    private static void recoverBittorrentDownload(AbstractTransferDetailFragment fragment, String infoHash) {
+        fragment.recoverUIBittorrentDownload(infoHash);
     }
 
     private static final class UIBittorrentDownloadRecoverer implements Runnable {
