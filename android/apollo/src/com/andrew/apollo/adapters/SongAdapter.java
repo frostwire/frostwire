@@ -17,13 +17,13 @@
 
 package com.andrew.apollo.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.ui.MusicViewHolder.DataHolder;
@@ -31,11 +31,12 @@ import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.ui.fragments.SongFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -70,7 +71,13 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         if (mImageFetcher != null && dataHolder != null && Ref.alive(musicViewHolder.mImage)) {
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
-                Engine.instance().getThreadPool().execute(new GetAlbumIdRunnable(getContext(), dataHolder, () -> mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get())));
+                invokeAsync(
+                        // ResultTask with 2 parameters WeakReference<Context>, AsyncTuple -> AsyncTuple
+                        SongAdapter::updateDataHolderAlbumId,
+                        // 2 params: WeakReference<Context>, AsyncTuple
+                        Ref.weak(getContext()), new AsyncTuple(dataHolder, musicViewHolder, mImageFetcher),
+                        // PostTask<AsyncTuple>
+                        SongAdapter::updateAlbumImage);
             } else {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
             }
@@ -106,30 +113,32 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         return convertView;
     }
 
-    private static class GetAlbumIdRunnable implements Runnable {
-
-        private final WeakReference<Context> ctxRef;
-        private final DataHolder dataHolder;
-        private final WeakReference<Runnable> uiThreadCallback;
-
-
-        GetAlbumIdRunnable(Context context, DataHolder dataHolder, Runnable uiThreadCallback) {
-            ctxRef = Ref.weak(context);
-            this.dataHolder = dataHolder;
-            this.uiThreadCallback = Ref.weak(uiThreadCallback);
+    private static void updateAlbumImage(AsyncTuple holderTuple) {
+        DataHolder dataHolderResult = holderTuple.dataHolder;
+        MusicViewHolder musicViewHolder = holderTuple.musicViewHolder;
+        if (dataHolderResult != null && dataHolderResult.mParentId != -1) {
+            holderTuple.imageFetcher.loadAlbumImage(dataHolderResult.mLineTwo, dataHolderResult.mLineOne, dataHolderResult.mParentId, musicViewHolder.mImage.get());
         }
+    }
 
-        @Override
-        public void run() {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-            if (dataHolder.mParentId == -1) { // perform the query only once for this dataHolder
-                dataHolder.mParentId = MusicUtils.getAlbumIdForSong(ctxRef.get(), dataHolder.mItemId);
-                if (Ref.alive(uiThreadCallback)) {
-                    ((Activity) ctxRef.get()).runOnUiThread(uiThreadCallback.get());
-                }
-            }
+    private static AsyncTuple updateDataHolderAlbumId(WeakReference<Context> ctxRef, AsyncTuple holderTuple) {
+        DataHolder dataHolder = holderTuple.dataHolder;
+        if (dataHolder.mParentId == -1 && Ref.alive(ctxRef)) {
+            dataHolder.mParentId = MusicUtils.getAlbumIdForSong(ctxRef.get(), dataHolder.mItemId);
+            return holderTuple;
+        }
+        return holderTuple;
+    }
+
+    private final static class AsyncTuple {
+        final DataHolder dataHolder;
+        final MusicViewHolder musicViewHolder;
+        final ImageFetcher imageFetcher;
+
+        AsyncTuple(DataHolder dh, MusicViewHolder mvh, ImageFetcher imFetcher) {
+            dataHolder = dh;
+            musicViewHolder = mvh;
+            imageFetcher = imFetcher;
         }
     }
 
