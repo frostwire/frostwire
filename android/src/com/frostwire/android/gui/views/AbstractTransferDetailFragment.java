@@ -28,7 +28,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
@@ -37,9 +36,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.text.DecimalFormatSymbols;
 
 import static com.frostwire.android.util.Asyncs.invokeAsync;
@@ -95,8 +92,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         super.initComponents(rootView, savedInstanceState);
         if (uiBittorrentDownload == null && savedInstanceState != null) {
             String infoHash = savedInstanceState.getString("infohash");
-            invokeAsync(this, AbstractTransferDetailFragment::recoverBittorrentDownload, infoHash);
-            //Engine.instance().getThreadPool().execute(new UIBittorrentDownloadRecoverer(this, infoHash));
+            invokeAsync(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
         }
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
@@ -115,7 +111,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             if (intent != null) {
                 String infoHash = intent.getStringExtra("infoHash");
                 if (infoHash != null && !infoHash.isEmpty()) {
-                    Engine.instance().getThreadPool().execute(new UIBittorrentDownloadRecoverer(this, infoHash));
+                    invokeAsync(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
                 }
             }
             if (uiBittorrentDownload == null) {
@@ -188,7 +184,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     protected void ensureTorrentHandleAsync() {
         if (Looper.getMainLooper() == Looper.myLooper()) {
-            Engine.instance().getThreadPool().execute(new TorrentHandleEnsurer(this));
+            invokeAsync(this, AbstractTransferDetailFragment::ensureTorrentHandle);
         } else {
             ensureTorrentHandle();
         }
@@ -253,39 +249,5 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             return "0%";
         }
         return String.valueOf(100 * ((float) sent / (float) received)) + "%";
-    }
-
-    private static void recoverBittorrentDownload(AbstractTransferDetailFragment fragment, String infoHash) {
-        fragment.recoverUIBittorrentDownload(infoHash);
-    }
-
-    private static final class UIBittorrentDownloadRecoverer implements Runnable {
-        private final String infoHash;
-        private final WeakReference<AbstractTransferDetailFragment> fragmentRef;
-        UIBittorrentDownloadRecoverer(AbstractTransferDetailFragment fragment, String infoHash) {
-            fragmentRef = Ref.weak(fragment);
-            this.infoHash = infoHash;
-        }
-        @Override
-        public void run() {
-            if (!Ref.alive(fragmentRef)) {
-                return;
-            }
-            fragmentRef.get().recoverUIBittorrentDownload(infoHash);
-        }
-    }
-
-    private static final class TorrentHandleEnsurer implements Runnable {
-        private final WeakReference<AbstractTransferDetailFragment> fragmentRef;
-        TorrentHandleEnsurer(AbstractTransferDetailFragment fragment) {
-            fragmentRef = Ref.weak(fragment);
-        }
-        @Override
-        public void run() {
-            if (!Ref.alive(fragmentRef)) {
-                return;
-            }
-            fragmentRef.get().ensureTorrentHandle();
-        }
     }
 }
