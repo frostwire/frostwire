@@ -273,20 +273,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         List<Transfer> allTransfers = TransferManager.instance().getTransfers();
         final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
         Collections.sort(selectedStatusTransfers, transferComparator);
-
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            // this must happen on the main thread only
-            Activity activity = getActivity();
-            if (isVisible() && isAdded() && activity != null) {
-                activity.runOnUiThread(() -> {
-                    if (adapter != null) {
-                        adapter.updateList(selectedStatusTransfers);
-                    }
-                    if (selectedStatus == TransferStatus.SEEDING) {
-                        handlePossibleSeedingSuggestions(allTransfers);
-                    }
-                });
-            }
+        
+        Activity activity = getActivity();
+        if (isVisible() && isAdded() && activity != null) {
+            activity.runOnUiThread(() -> {
+                if (adapter != null) {
+                    adapter.updateList(selectedStatusTransfers);
+                }
+                if (selectedStatus == TransferStatus.SEEDING) {
+                    handlePossibleSeedingSuggestions(allTransfers);
+                }
+            });
         }
     }
 
