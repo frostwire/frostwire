@@ -173,7 +173,7 @@ public final class Mp4Demuxer {
 
             int skp = chunkOffsetOrg[i] - pos;
             if (skp == 0 && i == stco.entry_count - 1) {
-                // we are the end with no more data to copy
+                // we are at the end with no more data to copy
                 continue;
             }
             IO.skip(in, skp, buf);
