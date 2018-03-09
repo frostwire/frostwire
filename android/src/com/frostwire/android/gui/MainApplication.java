@@ -47,6 +47,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 import static com.frostwire.android.util.Debug.runStrict;
 
 /**
@@ -80,7 +81,7 @@ public class MainApplication extends Application {
 
         LocalSearchEngine.create();
 
-        threadPool.execute(new TempCleaner());
+        invokeAsync(MainApplication::cleanTemp);
     }
 
     @Override
@@ -180,16 +181,14 @@ public class MainApplication extends Application {
         }
     }
 
-    private static class TempCleaner implements Runnable {
-        public void run() {
-            try {
-                File tmp = Platforms.get().systemPaths().temp();
-                if (tmp.exists()) {
-                    FileUtils.cleanDirectory(tmp);
-                }
-            } catch (Throwable e) {
-                LOG.error("Error during setup of temp directory", e);
+    private static void cleanTemp() {
+        try {
+            File tmp = Platforms.get().systemPaths().temp();
+            if (tmp.exists()) {
+                FileUtils.cleanDirectory(tmp);
             }
+        } catch (Throwable e) {
+            LOG.error("Error during setup of temp directory", e);
         }
     }
 }
