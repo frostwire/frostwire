@@ -282,12 +282,11 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     if (adapter != null) {
                         adapter.updateList(selectedStatusTransfers);
                     }
+                    if (selectedStatus == TransferStatus.SEEDING) {
+                        handlePossibleSeedingSuggestions(allTransfers);
+                    }
                 });
             }
-        }
-
-        if (selectedStatus == TransferStatus.SEEDING) {
-            handlePossibleSeedingSuggestions(allTransfers);
         }
     }
 
