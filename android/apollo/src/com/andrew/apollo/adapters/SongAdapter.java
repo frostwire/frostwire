@@ -33,7 +33,6 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import static com.frostwire.android.util.Asyncs.invokeAsync;
@@ -72,10 +71,11 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
                 invokeAsync(
-                        // ResultTask with 2 parameters WeakReference<Context>, AsyncTuple -> AsyncTuple
+                        getContext(),
+                        // ContextResultTask1<C=Context, R=AsyncTuple, T1=AsyncTuple>
                         SongAdapter::updateDataHolderAlbumId,
-                        // 2 params: WeakReference<Context>, AsyncTuple
-                        Ref.weak(getContext()), new AsyncTuple(dataHolder, musicViewHolder, mImageFetcher),
+                        // 1 params: AsyncTuple
+                        new AsyncTuple(dataHolder, musicViewHolder, mImageFetcher),
                         // PostTask<AsyncTuple>
                         SongAdapter::updateAlbumImage);
             } else {
@@ -113,21 +113,24 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         return convertView;
     }
 
-    private static void updateAlbumImage(AsyncTuple holderTuple) {
+    // ContextResultTask1<C=Context, R=AsyncTuple, T1=AsyncTuple>
+    private static AsyncTuple updateDataHolderAlbumId(Context context, AsyncTuple holderTuple) {
+        DataHolder dataHolder = holderTuple.dataHolder;
+        if (dataHolder.mParentId == -1) {
+            dataHolder.mParentId = MusicUtils.getAlbumIdForSong(context, dataHolder.mItemId);
+            return holderTuple;
+        }
+        return holderTuple;
+    }
+
+    // ContextPostTask<C=Context, R=AsyncTuple>
+    @SuppressWarnings("unused")
+    private static void updateAlbumImage(Context context, AsyncTuple holderTuple) {
         DataHolder dataHolderResult = holderTuple.dataHolder;
         MusicViewHolder musicViewHolder = holderTuple.musicViewHolder;
         if (dataHolderResult != null && dataHolderResult.mParentId != -1) {
             holderTuple.imageFetcher.loadAlbumImage(dataHolderResult.mLineTwo, dataHolderResult.mLineOne, dataHolderResult.mParentId, musicViewHolder.mImage.get());
         }
-    }
-
-    private static AsyncTuple updateDataHolderAlbumId(WeakReference<Context> ctxRef, AsyncTuple holderTuple) {
-        DataHolder dataHolder = holderTuple.dataHolder;
-        if (dataHolder.mParentId == -1 && Ref.alive(ctxRef)) {
-            dataHolder.mParentId = MusicUtils.getAlbumIdForSong(ctxRef.get(), dataHolder.mItemId);
-            return holderTuple;
-        }
-        return holderTuple;
     }
 
     private final static class AsyncTuple {
