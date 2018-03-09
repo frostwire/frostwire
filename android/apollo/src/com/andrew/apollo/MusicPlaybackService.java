@@ -61,6 +61,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -1416,9 +1417,13 @@ public class MusicPlaybackService extends Service {
             for (int i = 0; i < numTracks; i++) {
                 tracks[i] = i;
             }
-            LinkedList<Integer> historyCopy = new LinkedList();
+            ArrayList<Integer> historyCopy = new ArrayList(mHistory.size());
             synchronized (mHistory) {
-                Collections.copy(historyCopy, mHistory);
+                try {
+                    Collections.copy(historyCopy, mHistory);
+                } catch (Throwable t) {
+                    historyCopy.clear();
+                }
             }
             final int numHistory = historyCopy.size();
             int numUnplayed = numTracks;
