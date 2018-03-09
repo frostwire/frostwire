@@ -107,12 +107,7 @@ public class YouTubeDownload extends BaseHttpDownload {
         } else if (downloadType == DownloadType.DEMUX) {
 
             state = TransferState.DEMUXING;
-            Mp4Demuxer.audio(tempAudio.getAbsoluteFile(), tempPath, buildMp4Info(true), new Mp4Demuxer.DemuxerListener() {
-                @Override
-                public void onRead(long readCount) {
-                    demuxerReadCount = readCount;
-                }
-            });
+            Mp4Demuxer.audio(tempAudio.getAbsoluteFile(), tempPath, buildMp4Info(true), readCount -> demuxerReadCount = readCount);
             moveAndComplete(tempPath, savePath);
 
             FileSystem fs = Platforms.fileSystem();
@@ -153,8 +148,8 @@ public class YouTubeDownload extends BaseHttpDownload {
     public int demuxingProgress() {
         if (state == TransferState.DEMUXING) {
             if (demuxerReadCount > 0) { // in case fmp4 fail
-                long len = tempPath.length();
-                int r = len > 0 ? (int) (demuxerReadCount * 100 / tempPath.length()) : 0;
+                long len = tempAudio.length();
+                int r = len > 0 ? (int) (demuxerReadCount * 100 / len) : 0;
                 return r;
             }
         }
