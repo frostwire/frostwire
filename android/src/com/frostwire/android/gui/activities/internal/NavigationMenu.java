@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -203,7 +204,12 @@ public final class NavigationMenu {
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        menuRemoveAdsItem.setVisibility(visibility);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            menuRemoveAdsItem.setVisibility(visibility);
+        } else {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> menuRemoveAdsItem.setVisibility(visibility) );
+        }
     }
 
     public void onUpdateAvailable() {
