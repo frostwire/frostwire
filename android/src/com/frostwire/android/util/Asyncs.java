@@ -168,7 +168,7 @@ public final class Asyncs {
 
     // only context
 
-    public static <C, R> void invokeAsync(C context, ContextTask<C> task) {
+    public static <C> void invokeAsync(C context, ContextTask<C> task) {
 
         WeakReference<C> ctxRef = Ref.weak(context);
 
