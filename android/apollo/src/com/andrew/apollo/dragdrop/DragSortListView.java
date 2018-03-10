@@ -495,7 +495,7 @@ public class DragSortListView extends ListView {
                         v.addView(child);
                     }
                 } catch (final Exception nullz) {
-
+                    nullz.printStackTrace();
                 }
             } else {
                 final AbsListView.LayoutParams params = new AbsListView.LayoutParams(
@@ -506,7 +506,7 @@ public class DragSortListView extends ListView {
                     child = mAdapter.getView(position, null, v);
                     v.addView(child);
                 } catch (final Exception todo) {
-
+                    todo.printStackTrace();
                 }
             }
             adjustItem(position + getHeaderViewsCount(), v, true);
