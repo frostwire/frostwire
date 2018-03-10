@@ -31,6 +31,12 @@ import com.frostwire.android.gui.services.Engine;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Utility class for runtime debugging.
@@ -122,15 +128,19 @@ public final class Debug {
      */
     public static boolean hasContext(Object obj) {
         try {
-            return hasContext(obj, 0);
+            return hasContext(obj, 0, new TreeSet<>());
         } catch (IllegalStateException e) {
             // don't just rethrow to flatten the stack information
             throw new IllegalStateException(e.getMessage() + ", class=" + obj.getClass().getName());
         }
     }
 
-    private static boolean hasContext(Object obj, int level) {
+    private static boolean hasContext(Object obj, int level, Set<Integer> refs) {
         if (!isEnable()) {
+            return false;
+        }
+
+        if (obj == null) {
             return false;
         }
 
@@ -140,13 +150,14 @@ public final class Debug {
                 obj.getClass().getSimpleName());
         }
 
+        refs.add(obj.hashCode());
+
         try {
             if (hasNoContext(obj)) {
                 return false;
             }
 
-            Class<?> clazz = obj.getClass();
-            Field[] fields = clazz.getDeclaredFields();
+            List<Field> fields = getAllFields(obj);
 
             // BFS variation algorithm
 
@@ -167,13 +178,17 @@ public final class Debug {
             for (Field f : fields) {
                 f.setAccessible(true);
                 Object value = f.get(obj);
-
-                // avoid recursion due to self reference field
-                if (value == obj) {
+                if (value == null) {
                     continue;
                 }
 
-                if (hasContext(value, level + 1)) {
+                // avoid recursion due to a self reference value
+                Integer h = value.hashCode();
+                if (refs.contains(h)) {
+                    continue;
+                }
+
+                if (hasContext(value, level + 1, refs)) {
                     return true;
                 }
             }
@@ -221,4 +236,15 @@ public final class Debug {
 
         return false;
     }
+
+    private static List<Field> getAllFields(Object obj) {
+        List<Field> fields = new LinkedList<>();
+        Class<?> clazz = obj.getClass();
+        while (clazz != Object.class) {
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
+    }
+
 }
