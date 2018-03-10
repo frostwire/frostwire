@@ -209,6 +209,8 @@ public final class Debug {
             return true;
         } else if (clazzName.startsWith("com.sun.")) {
             return true;
+        } else if (clazzName.startsWith("dalvik.")) {
+            return true;
         } else if (clazzName.startsWith("com.frostwire.search.")) {
             return true;
         } else if (clazzName.startsWith("com.frostwire.bittorrent.")) {
