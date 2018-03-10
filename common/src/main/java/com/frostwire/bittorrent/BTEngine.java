@@ -111,10 +111,8 @@ public final class BTEngine extends SessionManager {
     }
 
     public static BTEngine getInstance() {
-        //LOG.info("BTEngine.getInstance() called by " + Debug.getCallingMethodInfo());
         if (ctx == null) {
             try {
-                //LOG.info("BTEngine.getInstance() call waiting, called by " + Debug.getCallingMethodInfo());
                 ctxSetupLatch.await();
             } catch (InterruptedException e) {
                 LOG.error(e.getMessage(), e);
