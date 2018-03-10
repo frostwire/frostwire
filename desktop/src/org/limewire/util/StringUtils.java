@@ -16,10 +16,6 @@
 package org.limewire.util;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.nio.charset.Charset;
 import java.text.Collator;
 import java.util.*;
 
@@ -33,8 +29,6 @@ public class StringUtils {
      * Collator used for internationalization.
      */
     private volatile static Collator COLLATOR;
-
-    private static ThreadLocal<IdentityHashMap<Object, Object>> threadLocal = new ThreadLocal<IdentityHashMap<Object, Object>>();
 
     static {
         COLLATOR = Collator.getInstance(Locale.getDefault());
@@ -63,13 +57,13 @@ public class StringUtils {
      *  StringUtils.contains("abcd", "d*a") ==> false
      *  </pre> 
      */
-    public static final boolean contains(String input, String pattern) {
+    public static boolean contains(String input, String pattern) {
         return contains(input, pattern, false);
     }
 
     /** Exactly like contains(input, pattern), but case is ignored if
      *  ignoreCase==true. */
-    public static final boolean contains(String input, String pattern, boolean ignoreCase) {
+    public static boolean contains(String input, String pattern, boolean ignoreCase) {
         //More efficient algorithms are possible, e.g. a modified version of the
         //Rabin-Karp algorithm, but they are unlikely to be faster with such
         //short strings.  Also, some contant time factors could be shaved by
@@ -112,17 +106,6 @@ public class StringUtils {
         return true;
     }
 
-    public static boolean containsCharacters(String input, char[] chars) {
-        char[] inputChars = input.toCharArray();
-        Arrays.sort(inputChars);
-        for (int i = 0; i < chars.length; i++) {
-            if (Arrays.binarySearch(inputChars, chars[i]) >= 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** 
      * @requires TODO3: fill this in
      * @effects returns the smallest i>=bigStart
@@ -130,7 +113,7 @@ public class StringUtils {
      *  or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
      *  when comparing characters.
      */
-    private static final int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
+    private static int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
         //Equivalent to
         // return big.indexOf(little.substring(littleStart, littleStop), bigStart);
         //but without an allocation.
@@ -173,7 +156,7 @@ public class StringUtils {
      *  Else returns c.
      *  Note that this is <b>not internationalized</b>; but it is fast.
      */
-    public static final char toOtherCase(char c) {
+    private static char toOtherCase(char c) {
         int i = c;
         final int A = 'A'; //65
         final int Z = 'Z'; //90
@@ -217,62 +200,9 @@ public class StringUtils {
     public static String[] split(String s, String delimiters) {
         //Tokenize s based on delimiters, adding to buffer.
         StringTokenizer tokenizer = new StringTokenizer(s, delimiters);
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         while (tokenizer.hasMoreTokens())
             tokens.add(tokenizer.nextToken());
-
-        return tokens.toArray(new String[0]);
-    }
-
-    /**
-     * Exactly like splitNoCoalesce(s, Character.toString(delimiter))
-     */
-    public static String[] splitNoCoalesce(String s, char delimiter) {
-        return splitNoCoalesce(s, Character.toString(delimiter));
-    }
-
-    /**
-     * Similar to split(s, delimiters) except that subsequent delimiters are not
-     * coalesced, so the returned array may contain empty strings.  If s starts
-     * (ends) with a delimiter, the returned array starts (ends) with an empty
-     * strings.  If s contains N delimiters, N+1 strings are always returned.
-     * Examples:
-     *
-    *  <pre>
-     *    split("a//b/ c /","/")=={"a","","b"," c ", ""}
-     *    split("a b", "/")=={"a b"}.
-     *    split("///", "/")=={"","","",""}.
-     *  </pre>
-     *
-     * @return an array A s.t. s.equals(A[0]+d0+A[1]+d1+...+A[N]), where 
-     *  for all dI, dI.size()==1 && delimiters.indexOf(dI)>=0; and for
-     *  all c in A[i], delimiters.indexOf(c)<0
-     */
-    public static String[] splitNoCoalesce(String s, String delimiters) {
-        //Tokenize s based on delimiters, adding to buffer.
-        StringTokenizer tokenizer = new StringTokenizer(s, delimiters, true);
-        List<String> tokens = new ArrayList<String>();
-        //True if last token was a delimiter.  Initialized to true to force
-        //an empty string if s starts with a delimiter.
-        boolean gotDelimiter = true;
-        while (tokenizer.hasMoreTokens()) {
-            String token = tokenizer.nextToken();
-            //Is token a delimiter?
-            if (token.length() == 1 && delimiters.indexOf(token) >= 0) {
-                //If so, add blank only if last token was a delimiter.
-                if (gotDelimiter) {
-                    tokens.add("");
-                }
-                gotDelimiter = true;
-            } else {
-                //If not, add "real" token.
-                tokens.add(token);
-                gotDelimiter = false;
-            }
-        }
-        //Add trailing empty string UNLESS s is the empty string.
-        if (gotDelimiter && !tokens.isEmpty())
-            tokens.add("");
 
         return tokens.toArray(new String[0]);
     }
@@ -318,63 +248,11 @@ public class StringUtils {
     }
 
     /**
-     * Helper method to obtain the starting index of a substring within another
-     * string, ignoring their case.  This method is expensive because it has
-     * to set each character of each string to lower case before doing the
-     * comparison.  Uses the default <code>Locale</code> for case conversion.
-     *
-     * @param str the string in which to search for the <tt>substring</tt>
-     *  argument
-     * @param substring the substring to search for in <tt>str</tt>
-     * @return if the <tt>substring</tt> argument occurs as a substring within
-     *  <tt>str</tt>, then the index of the first character of the first such
-     *  substring is returned; if it does not occur as a substring, -1 is
-     *  returned
-     */
-    public static int indexOfIgnoreCase(String str, String substring) {
-        return indexOfIgnoreCase(str, substring, Locale.getDefault());
-    }
-
-    /**
-     * Helper method to obtain the starting index of a substring within another
-     * string, ignoring their case.  This method is expensive because it has  
-     * to set each character of each string to lower case before doing the 
-     * comparison.
-     * 
-     * @param str the string in which to search for the <tt>substring</tt>
-     *  argument
-     * @param substring the substring to search for in <tt>str</tt>
-     * @param locale the <code>Locale</code> to use when converting the
-     *  case of <code>str</code> and <code>substring</code>.  This is necessary because
-     *  case conversion is <code>Locale</code> specific.
-     * @return if the <tt>substring</tt> argument occurs as a substring within  
-     *  <tt>str</tt>, then the index of the first character of the first such  
-     *  substring is returned; if it does not occur as a substring, -1 is 
-     *  returned
-     */
-    public static int indexOfIgnoreCase(String str, String substring, Locale locale) {
-        // Look for the index after the expensive conversion to lower case.
-        return str.toLowerCase(locale).indexOf(substring.toLowerCase(locale));
-    }
-
-    /**
-     * Utility wrapper for getting a String object out of
-     * byte [] using the ascii encoding.
-     */
-    public static String getASCIIString(byte[] bytes) {
-        return getEncodedString(bytes, "ISO-8859-1");
-    }
-
-    /**
      * Utility wrapper for getting a String object out of
      * byte [] using the UTF-8 encoding.
      */
     public static String getUTF8String(byte[] bytes) {
         return getEncodedString(bytes, "UTF-8");
-    }
-
-    public static String getASCIIString(byte[] bytes, int offset, int length) {
-        return new String(bytes, offset, length, Charset.forName("ISO-8859-1"));
     }
 
     /**
@@ -424,91 +302,6 @@ public class StringUtils {
             }
         }
         return sb.toString();
-    }
-
-    /**                                                                                                                                                                                                           
-     * Creates a string representation of the object <code>thiz</code>.                                                                                                                                           
-     * <p>                                                                                                                                                                                                        
-     * Can optionally be given a whitelist of fields that should be part of the                                                                                                                                   
-     * string output.                                                                                                                                                                                             
-     * <p>                                                                                                                                                                                                        
-     * Note: Should synchronize calling method if the fields of the instance can                                                                                                                                  
-     * be modified by other threads.                                                                                                                                                                              
-     * <p>                                                                                                                                                                                                        
-     * Note: Creates a temporary copy of arrays of primitive elements.                                                                                                                                            
-     * <p>                                                                                                                                                                                                        
-     * Calls {@link Object#toString()} on fields.                                                                                                                                                                 
-     */
-    public static String toString(Object thiz, Object... whitelist) {
-        return toStringBlackAndWhite(thiz, Arrays.asList(whitelist), Collections.emptyList());
-    }
-
-    /**                                                                                                                                                                                                                                                                                                                                                                                   
-     * Creates a string representation of the object <code>thiz</code>.                                                                                                                                                                                                                                                                                                                   
-     * <p>                                                                                                                                                                                                                                                                                                                                                                                
-     * Can optionally be given a blacklist and whitelist of fields that should                                                                                                                                                                                                                                                                                                            
-     * not be part of the string output.                                                                                                                                                                                                                                                                                                                                                  
-     * <p>                                                                                                                                                                                                                                                                                                                                                                                
-     * Note: Should synchronize calling method if the fields of the instance can                                                                                                                                                                                                                                                                                                          
-     * be modified by other threads.                                                                                                                                                                                                                                                                                                                                                      
-     * <p>                                                                                                                                                                                                                                                                                                                                                                                
-     * Note: Creates a temporary copy of arrays of primitive elements.                                                                                                                                                                                                                                                                                                                    
-     * <p>                                                                                                                                                                                                                                                                                                                                                                                
-     * Calls {@link Object#toString()} on fields.                                                                                                                                                                                                                                                                                                                                         
-     */
-    private static String toStringBlackAndWhite(Object thiz, Collection<? extends Object> whitelist, Collection<? extends Object> blacklist) {
-        boolean cleanUp = false;
-        try {
-            IdentityHashMap<Object, Object> handledObjects = threadLocal.get();
-            if (handledObjects == null) {
-                cleanUp = true;
-                handledObjects = new IdentityHashMap<Object, Object>();
-                threadLocal.set(handledObjects);
-            }
-            if (handledObjects.containsKey(thiz)) {
-                return "circular structure";
-            }
-            handledObjects.put(thiz, thiz);
-            Map<String, String> fields = new LinkedHashMap<String, String>();
-            for (Field field : thiz.getClass().getDeclaredFields()) {
-                try {
-                    boolean accessible = field.isAccessible();
-                    field.setAccessible(true);
-                    Object value = field.get(thiz);
-                    field.setAccessible(accessible);
-                    if (!Modifier.isStatic(field.getModifiers()) && !blacklist.contains(value) && (whitelist.isEmpty() || whitelist.contains(value))) {
-                        if (value == null) {
-                            fields.put(field.getName(), String.valueOf(value));
-                        } else {
-                            Class<?> clazz = value.getClass();
-                            if (clazz.isArray()) {
-                                if (!clazz.getComponentType().isPrimitive()) {
-                                    fields.put(field.getName(), String.valueOf(Arrays.asList((Object[]) value)));
-                                } else {
-                                    int length = Array.getLength(value);
-                                    List<Object> copy = new ArrayList<Object>(length);
-                                    for (int i = 0; i < length; i++) {
-                                        copy.add(Array.get(value, i));
-                                    }
-                                    fields.put(field.getName(), String.valueOf(copy));
-                                }
-                            } else {
-                                fields.put(field.getName(), String.valueOf(value));
-                            }
-                        }
-                    }
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            return thiz.getClass().getSimpleName() + " " + fields.toString();
-        } finally {
-            if (cleanUp) {
-                threadLocal.set(null);
-            }
-        }
     }
 
     /**
