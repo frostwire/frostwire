@@ -28,7 +28,6 @@ import android.view.View;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -42,8 +41,6 @@ import java.lang.reflect.Field;
  * @author aldenml
  */
 public final class Debug {
-
-    private static final Logger LOG = Logger.getLogger(Debug.class);
 
     private Debug() {
     }
@@ -128,7 +125,6 @@ public final class Debug {
             return hasContext(obj, 0);
         } catch (IllegalStateException e) {
             // don't just rethrow to flatten the stack information
-            LOG.warn("hasContext() -> " + e.getMessage(), e);
             throw new IllegalStateException(e.getMessage() + ", class=" + obj.getClass().getName());
         }
     }
@@ -139,7 +135,9 @@ public final class Debug {
         }
 
         if (level > 200) {
-            throw new IllegalStateException(obj.getClass().getSimpleName() + ".class has too much recursion in hasContext, flatten your objects");
+            throw new IllegalStateException(
+                "Too much recursion in hasContext, flatten your objects, last object class is " +
+                obj.getClass().getSimpleName());
         }
 
         try {
@@ -176,7 +174,6 @@ public final class Debug {
                 }
 
                 if (hasContext(value, level + 1)) {
-                    LOG.info(value + " " + value.getClass().getSimpleName() + " has a Context reference");
                     return true;
                 }
             }
