@@ -41,54 +41,34 @@ public final class Asyncs {
 
     public static <C, R> void invokeAsync(C context,
         ContextResultTask<C, R> task,
-        ContextPostTask<C, R> post) {
+        ContextResultPostTask<C, R> post) {
 
-        WeakReference<C> ctxRef = Ref.weak(context);
-
-        Engine.instance().getThreadPool().execute(() -> {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-
-            C c = ctxRef.get();
-            R r = task.run(c);
-
-            if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, r));
-            }
-        });
+        invokeAsync(context,
+            (c, args)-> task.run((C)c),
+            (c, args, r) -> post.run((C)c, (R)r)
+            , new Object[0]);
     }
 
-    public static <C, R, T1> void invokeAsync(C context,
-        ContextResultTask1<C, R, T1> task,
+    public static <C, T1, R> void invokeAsync(C context,
+        ContextResultTask1<C, T1, R> task,
         T1 arg1,
-        ContextPostTask<C, R> post) {
+        ContextResultPostTask1<C, T1, R> post) {
 
         invokeAsync(context,
             (c, args)-> task.run((C)c, (T1) args[0]),
-            (c, args, r) -> post.run((C)c, (R)r),
+            (c, args, r) -> post.run((C)c, (T1) args[0], (R)r),
             arg1);
     }
 
-    public static <C, R, T1, T2> void invokeAsync(C context,
-        ContextResultTask2<C, R, T1, T2> task,
+    public static <C, T1, T2, R> void invokeAsync(C context,
+        ContextResultTask2<C, T1, T2, R> task,
         T1 arg1, T2 arg2,
-        ContextPostTask<C, R> post) {
+        ContextResultPostTask2<C, T1, T2, R> post) {
 
-        WeakReference<C> ctxRef = Ref.weak(context);
-
-        Engine.instance().getThreadPool().execute(() -> {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-
-            C c = ctxRef.get();
-            R r = task.run(c, arg1, arg2);
-
-            if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, r));
-            }
-        });
+        invokeAsync(context,
+            (c, args)-> task.run((C)c, (T1) args[0], (T2) args[1]),
+            (c, args, r) -> post.run((C)c, (T1) args[0], (T2) args[1], (R)r),
+            arg1, arg2);
     }
 
     public static <C, R, T1, T2, T3> void invokeAsync(C context,
@@ -113,36 +93,15 @@ public final class Asyncs {
             arg1, arg2, arg3);
     }
 
-    public static <C, R, T1, T2, T3, T4> void invokeAsync(C context,
-        ContextResultTask4<C, R, T1, T2, T3, T4> task,
-        T1 arg1, T2 arg2, T3 arg3, T4 arg4,
-        ContextPostTask<C, R> post) {
-
-        WeakReference<C> ctxRef = Ref.weak(context);
-
-        Engine.instance().getThreadPool().execute(() -> {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-
-            C c = ctxRef.get();
-            R r = task.run(c, arg1, arg2, arg3, arg4);
-
-            if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, r));
-            }
-        });
-    }
-
     public interface ContextResultTask<C, R> {
         R run(C context);
     }
 
-    public interface ContextResultTask1<C, R, T1> {
+    public interface ContextResultTask1<C, T1, R> {
         R run(C context, T1 arg1);
     }
 
-    public interface ContextResultTask2<C, R, T1, T2> {
+    public interface ContextResultTask2<C, T1, T2, R> {
         R run(C context, T1 arg1, T2 arg2);
     }
 
@@ -150,12 +109,16 @@ public final class Asyncs {
         R run(C context, T1 arg1, T2 arg2, T3 arg3);
     }
 
-    public interface ContextResultTask4<C, R, T1, T2, T3, T4> {
-        R run(C context, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    public interface ContextResultPostTask<C, R> {
+        void run(C context, R r);
     }
 
-    public interface ContextPostTask<C, R> {
-        void run(C context, R r);
+    public interface ContextResultPostTask1<C, T1, R> {
+        void run(C context, T1 arg1, R r);
+    }
+
+    public interface ContextResultPostTask2<C, T1, T2, R> {
+        void run(C context, T1 arg1, T2 arg2, R r);
     }
 
     public interface ContextResultPostTask3<C, T1, T2, T3, R> {
