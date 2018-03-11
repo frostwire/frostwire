@@ -94,22 +94,23 @@ public final class Asyncs {
     public static <C, R, T1, T2, T3> void invokeAsync(C context,
         ContextResultTask3<C, R, T1, T2, T3> task,
         T1 arg1, T2 arg2, T3 arg3,
-        ContextPostTask<C, R> post) {
+        ContextResultPostTask3<C, T1, T2, T3, R> post) {
 
-        WeakReference<C> ctxRef = Ref.weak(context);
+        invokeAsync(context,
+            (c, args)-> task.run((C)c, (T1) args[0], (T2) args[1], (T3) args[2]),
+            (c, args, r) -> post.run((C)c, (T1) args[0], (T2) args[1], (T3) args[2], (R)r),
+            arg1, arg2, arg3);
+    }
 
-        Engine.instance().getThreadPool().execute(() -> {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
+    public static <C, T1, T2, T3> void invokeAsync(C context,
+        ContextTask3<C, T1, T2, T3> task,
+        T1 arg1, T2 arg2, T3 arg3,
+        ContextPostTask3<C, T1, T2, T3> post) {
 
-            C c = ctxRef.get();
-            R r = task.run(c, arg1, arg2, arg3);
-
-            if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, r));
-            }
-        });
+        invokeAsync(context,
+            (c, args)-> { task.run((C)c, (T1) args[0], (T2) args[1], (T3) args[2]); return null;},
+            (c, args, r) -> post.run((C)c, (T1) args[0], (T2) args[1], (T3) args[2]),
+            arg1, arg2, arg3);
     }
 
     public static <C, R, T1, T2, T3, T4> void invokeAsync(C context,
@@ -155,6 +156,14 @@ public final class Asyncs {
 
     public interface ContextPostTask<C, R> {
         void run(C context, R r);
+    }
+
+    public interface ContextResultPostTask3<C, T1, T2, T3, R> {
+        void run(C context, T1 arg1, T2 arg2, T3 arg3, R r);
+    }
+
+    public interface ContextPostTask3<C, T1, T2, T3> {
+        void run(C context, T1 arg1, T2 arg2, T3 arg3);
     }
 
     // only context
