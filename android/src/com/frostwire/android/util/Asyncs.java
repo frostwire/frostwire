@@ -31,6 +31,7 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author aldenml
  */
+@SuppressWarnings("unchecked")
 public final class Asyncs {
 
     private Asyncs() {
@@ -63,20 +64,10 @@ public final class Asyncs {
         T1 arg1,
         ContextPostTask<C, R> post) {
 
-        WeakReference<C> ctxRef = Ref.weak(context);
-
-        Engine.instance().getThreadPool().execute(() -> {
-            if (!Ref.alive(ctxRef)) {
-                return;
-            }
-
-            C c = ctxRef.get();
-            R r = task.run(c, arg1);
-
-            if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, r));
-            }
-        });
+        invokeAsync(context,
+            (c, args)-> task.run((C)c, (T1) args[0]),
+            (c, args, r) -> post.run((C)c, (R)r),
+            arg1);
     }
 
     public static <C, R, T1, T2> void invokeAsync(C context,
@@ -397,5 +388,36 @@ public final class Asyncs {
 
     public interface Task4<T1, T2, T3, T4> {
         void run(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    }
+
+    // private helper methods
+
+    private static void invokeAsync(Object context,
+        TaskSupport task,
+        PostSupport post,
+        Object... args) {
+
+        WeakReference<?> ctx = context != null ? Ref.weak(context) : null;
+
+        Engine.instance().getThreadPool().execute(() -> {
+            if (ctx != null && !Ref.alive(ctx)) {
+                return;
+            }
+
+            Object c = ctx != null ? ctx.get() : null;
+            Object r = task.run(c, args);
+
+            if (post != null) {
+                new Handler(Looper.getMainLooper()).post(() -> post.run(c, args, r));
+            }
+        });
+    }
+
+    private interface TaskSupport {
+        Object run(Object context, Object[] args);
+    }
+
+    private interface PostSupport {
+        void run(Object context, Object[] args, Object result);
     }
 }
