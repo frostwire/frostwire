@@ -43,35 +43,78 @@ public final class Logger {
         return name;
     }
 
+    public void info(String msg, boolean showCallingMethodInfo) {
+        jul.logp(INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""));
+    }
+
     public void info(String msg) {
-        jul.logp(INFO, name, "", msg);
+        info(msg, false);
+    }
+
+    public void info(String msg, Throwable e, boolean showCallingMethodInfo) {
+        jul.logp(Level.INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""), e);
     }
 
     public void info(String msg, Throwable e) {
-        jul.logp(Level.INFO, name, "", msg, e);
+        info(msg, e, false);
+    }
+
+    public void warn(String msg, boolean showCallingMethodInfo) {
+        jul.logp(INFO, name, "" + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""), msg);
     }
 
     public void warn(String msg) {
-        jul.logp(INFO, name, "", msg);
+        warn(msg, false);
+    }
+
+    public void warn(String msg, Throwable e, boolean showCallingMethodInfo) {
+        jul.logp(Level.INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""), e);
     }
 
     public void warn(String msg, Throwable e) {
-        jul.logp(Level.INFO, name, "", msg, e);
+        warn(msg, e, false);
+    }
+
+    public void error(String msg, boolean showCallingMethodInfo) {
+        jul.logp(INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""));
     }
 
     public void error(String msg) {
-        jul.logp(INFO, name, "", msg);
+        error(msg, false);
+    }
+
+    public void error(String msg, Throwable e, boolean showCallingMethodInfo) {
+        jul.logp(Level.INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""), e);
     }
 
     public void error(String msg, Throwable e) {
-        jul.logp(Level.INFO, name, "", msg, e);
+        error(msg, e, false);
+    }
+
+    public void debug(String msg, boolean showCallingMethodInfo) {
+        jul.logp(INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""));
     }
 
     public void debug(String msg) {
-        jul.logp(INFO, name, "", msg);
+        debug(msg, false);
+    }
+
+    public void debug(String msg, Throwable e, boolean showCallingMethodInfo) {
+        jul.logp(Level.INFO, name, "", msg + ((showCallingMethodInfo) ? getCallingMethodInfo() : ""), e);
     }
 
     public void debug(String msg, Throwable e) {
-        jul.logp(Level.INFO, name, "", msg, e);
+        debug(msg, e, false);
+    }
+
+    private static String getCallingMethodInfo() {
+        Thread currentThread = Thread.currentThread();
+        StackTraceElement[] stackTrace = currentThread.getStackTrace();
+        String caller = " - <Thread not scheduled yet>";
+        if (stackTrace.length >= 4) {
+            StackTraceElement stackElement = stackTrace[4];
+            caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:"+currentThread.getName()+"(tid="+currentThread.getId()+")>";
+        }
+        return caller;
     }
 }
