@@ -77,42 +77,15 @@ public final class VPNs {
         try {
             List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
-            return isWindowsPIAActive(interfaces, routes) ||
-                    isExpressVPNActive(interfaces) ||
-                    isWindowsCactusVPNActive(interfaces, routes) ||
-                    isWindowsNordVPNActive(interfaces, routes) ||
-                    isWindowsAvgVPNActive(interfaces, routes);
+            return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter") || // PIA
+                    isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN Tap Adapter") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP");
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
         }
-    }
-
-    private static boolean isWindowsPIAActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
-        return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter");
-    }
-
-    private static boolean isWindowsCactusVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
-        return isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN");
-    }
-
-    private static boolean isWindowsNordVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
-        return isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN");
-    }
-
-    private static boolean isWindowsAvgVPNActive(List<EnumNet.IpInterface> interfaces, List<EnumNet.IpRoute> routes) {
-        return isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP");
-    }
-
-    private static boolean isExpressVPNActive(List<EnumNet.IpInterface> interfaces) {
-        boolean expressVPNTapAdapterPresent = false;
-        for (EnumNet.IpInterface iface : interfaces) {
-            if (iface.description().contains("ExpressVPN Tap Adapter") && iface.preferred()) {
-                expressVPNTapAdapterPresent = true;
-                break;
-            }
-        }
-        return expressVPNTapAdapterPresent;
     }
 
     private static boolean isWindowsVPNAdapterActive(List<EnumNet.IpInterface> interfaces,
@@ -127,6 +100,10 @@ public final class VPNs {
 
         if (adapter == null) {
             return false;
+        }
+
+        if (routes == null) { // don't lookup at routes
+            return true;
         }
 
         for (EnumNet.IpRoute route : routes) {
