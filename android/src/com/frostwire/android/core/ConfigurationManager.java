@@ -25,7 +25,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
@@ -33,6 +32,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -78,34 +79,22 @@ public final class ConfigurationManager {
         return instance;
     }
 
-    private ConfigurationManager(Application context) {
-        Engine.instance().getThreadPool().execute(new Initializer(this, context));
+    private void initialize(Application application) {
+        try {
+            preferences = PreferenceManager.getDefaultSharedPreferences(application);
+            defaults = new ConfigurationDefaults();
+            initPreferences(preferences);
+        } catch (Throwable t) {
+            LOG.error("Error initializing ConfigurationManager", t, true);
+            throw t;
+        } finally {
+            state.set(State.CREATED);
+            creationLatch.countDown();
+        }
     }
 
-    private static class Initializer implements Runnable {
-        private final ConfigurationManager cm;
-        private final Application applicationRef;
-        Initializer(ConfigurationManager configurationManager, Application application) {
-            cm = configurationManager;
-            applicationRef = application;
-        }
-
-        @Override
-        public void run() {
-            try {
-                cm.preferences = PreferenceManager.getDefaultSharedPreferences(applicationRef);
-                cm.defaults = new ConfigurationDefaults();
-
-                cm.initPreferences(cm.preferences);
-            }
-            catch (Throwable t) {
-                LOG.error("Error initializing ConfigurationManager", t);
-                throw t;
-            } finally {
-                state.set(State.CREATED);
-                creationLatch.countDown();
-            }
-        }
+    private ConfigurationManager(Application application) {
+        invokeAsync(this::initialize, application);
     }
 
     public String getString(String key, String defValue) {
