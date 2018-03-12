@@ -196,9 +196,10 @@ public final class Debug {
         } catch (IllegalStateException e) {
             throw e;
         } catch (Throwable e) {
-            // in case of a fatal error, this is just a runtime
-            // check under debug, just let it run
-            return false;
+            // look out for changes in Android P
+            // https://developer.android.com/preview/restrictions-non-sdk-interfaces.html
+            // #ramifications_of_keeping_non-sdk_interfaces
+            throw new RuntimeException(e);
         }
     }
 
