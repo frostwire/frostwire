@@ -52,7 +52,7 @@ public final class Logger {
     }
 
     public void info(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
     }
 
     public void info(String msg, Throwable e) {
@@ -68,7 +68,7 @@ public final class Logger {
     }
 
     public void warn(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
     }
 
     public void warn(String msg, Throwable e) {
@@ -100,7 +100,7 @@ public final class Logger {
     }
 
     public void debug(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
     }
 
     public void debug(String msg, Throwable e) {
