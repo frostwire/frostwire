@@ -84,7 +84,7 @@ public final class Logger {
     }
 
     public void error(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
     }
 
     public void error(String msg, Throwable e) {
