@@ -45,9 +45,8 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * @author aldenml
@@ -73,7 +72,7 @@ public final class NavigationMenu {
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
         menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
-        refreshMenuRemoveAdsItemAsync();
+        invokeAsync(this, NavigationMenu::refreshMenuRemoveAdsItem);
     }
 
     public boolean isOpen() {
@@ -191,25 +190,13 @@ public final class NavigationMenu {
         return adMenuItemView;
     }
 
-    private void refreshMenuRemoveAdsItemAsync() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            Engine.instance().getThreadPool().execute(new RemoveAdsItemMenuRefresher(this));
-        } else {
-            refreshMenuRemoveAdsItem();
-        }
-    }
-
     private void refreshMenuRemoveAdsItem() {
         // only visible for basic or debug build and if ads have not been disabled.
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            menuRemoveAdsItem.setVisibility(visibility);
-        } else {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> menuRemoveAdsItem.setVisibility(visibility) );
-        }
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> menuRemoveAdsItem.setVisibility(visibility) );
     }
 
     public void onUpdateAvailable() {
@@ -252,21 +239,8 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            NavigationMenu.this.refreshMenuRemoveAdsItemAsync();
+            invokeAsync(NavigationMenu.this, NavigationMenu::refreshMenuRemoveAdsItem);
             controller.syncNavigationMenu();
-        }
-    }
-
-    private final static class RemoveAdsItemMenuRefresher implements Runnable {
-        private final WeakReference<NavigationMenu> navMenuRef;
-        RemoveAdsItemMenuRefresher(NavigationMenu navMenu) {
-            navMenuRef = Ref.weak(navMenu);
-        }
-        @Override
-        public void run() {
-            if (Ref.alive(navMenuRef)) {
-                navMenuRef.get().refreshMenuRemoveAdsItem();
-            }
         }
     }
 }
