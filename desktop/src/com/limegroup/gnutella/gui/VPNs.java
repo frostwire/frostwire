@@ -81,7 +81,10 @@ public final class VPNs {
                     isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN Tap Adapter") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||
-                    isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP");
+                    isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "SecureLine TAP") || // avast!
+                    isWindowsVPNAdapterActive(interfaces, null, "TAP-Windows Adapter V9") || // IPVanish
+                    isWindowsVPNAdapterActive(interfaces, routes, "CyberGhost"); // CyberGhost
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
