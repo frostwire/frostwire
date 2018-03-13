@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public final class Logger {
     private final java.util.logging.Logger jul;
     private final String name;
 
-    Logger(java.util.logging.Logger jul) {
+    private Logger(java.util.logging.Logger jul) {
         this.jul = jul;
         this.name = jul.getName();
     }
@@ -44,7 +44,7 @@ public final class Logger {
     }
 
     public void info(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
     }
 
     public void info(String msg) {
@@ -52,7 +52,7 @@ public final class Logger {
     }
 
     public void info(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
     }
 
     public void info(String msg, Throwable e) {
@@ -60,7 +60,7 @@ public final class Logger {
     }
 
     public void warn(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
     }
 
     public void warn(String msg) {
@@ -68,7 +68,7 @@ public final class Logger {
     }
 
     public void warn(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
     }
 
     public void warn(String msg, Throwable e) {
@@ -76,7 +76,7 @@ public final class Logger {
     }
 
     public void error(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
     }
 
     public void error(String msg) {
@@ -84,7 +84,7 @@ public final class Logger {
     }
 
     public void error(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
     }
 
     public void error(String msg, Throwable e) {
@@ -92,7 +92,7 @@ public final class Logger {
     }
 
     public void debug(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg));
+        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
     }
 
     public void debug(String msg) {
@@ -100,7 +100,7 @@ public final class Logger {
     }
 
     public void debug(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(new StringBuilder(msg)) : msg), e);
+        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
     }
 
     public void debug(String msg, Throwable e) {
@@ -118,8 +118,7 @@ public final class Logger {
         return caller;
     }
 
-    private static String appendCallingMethodInfo(StringBuilder msgBuilder) {
-        msgBuilder.append(getCallingMethodInfo());
-        return msgBuilder.toString();
+    private static String appendCallingMethodInfo(String msg) {
+        return msg + getCallingMethodInfo();
     }
 }
