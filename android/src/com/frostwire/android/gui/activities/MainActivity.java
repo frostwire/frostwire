@@ -35,9 +35,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -603,7 +601,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        invokeAsync(this, MainActivity::checkSDPermission);
+        invokeAsync(this, MainActivity::checkSDPermission, MainActivity::checkSDPermissionPost);
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -968,35 +966,38 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkSDPermission() {
+    /**
+     * @return true if the SD Permission dialog must be shown
+     */
+    private Boolean checkSDPermission() {
         if (!AndroidPlatform.saf()) {
-            return;
+            return false;
         }
         try {
             File data = Platforms.data();
             File parent = data.getParentFile();
 
             if (!AndroidPlatform.saf(parent)) {
-                return;
+                return false;
             }
-            if (!Platforms.fileSystem().canWrite(parent) &&
-                    !SDPermissionDialog.visible) {
-                SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-                // show dialog on main thread
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(() -> {
-                    FragmentManager fragmentManager = getFragmentManager();
-                    try {
-                        if (fragmentManager != null) {
-                            dlg.show(fragmentManager);
-                        }
-                    } catch (IllegalStateException ignored) {
-                    }
-                });
-            }
+            return (!Platforms.fileSystem().canWrite(parent) && !SDPermissionDialog.visible);
         } catch (Throwable e) {
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
+            return false;
+        }
+    }
+
+    private void checkSDPermissionPost(Boolean showPermissionDialog) {
+        if (showPermissionDialog) {
+            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+            FragmentManager fragmentManager = getFragmentManager();
+            try {
+                if (fragmentManager != null) {
+                    dlg.show(fragmentManager);
+                }
+            } catch (IllegalStateException ignored) {
+            }
         }
     }
 
