@@ -22,6 +22,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -100,6 +101,7 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * @author gubatron
@@ -295,21 +297,7 @@ public class MainActivity extends AbstractActivity implements
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
-            controller.showTransfers(TransferStatus.COMPLETED);
-            TransferManager.instance().clearDownloadsToReview();
-            try {
-                ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED);
-                Bundle extras = intent.getExtras();
-                String downloadCompletePath = extras.getString(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH);
-                if (downloadCompletePath != null) {
-                    File file = new File(downloadCompletePath);
-                    if (file.isFile()) {
-                        UIUtils.openFile(this, file.getAbsoluteFile());
-                    }
-                }
-            } catch (Throwable e) {
-                LOG.warn("Error handling download complete notification", e);
-            }
+            invokeAsync(this, MainActivity::onDownloadCompleteNotification, intent);
         }
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
@@ -615,7 +603,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        checkSDPermissionAsync();
+        invokeAsync(this, MainActivity::checkSDPermission);
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -627,11 +615,6 @@ public class MainActivity extends AbstractActivity implements
             }
         }
         SoftwareUpdater.getInstance().checkForUpdate(this);
-    }
-
-    private void checkSDPermissionAsync() {
-        Engine.instance().getThreadPool().
-                execute(new CheckSDPermissionRunnable(getFragmentManager()));
     }
 
     private void handleSDPermissionDialogClick(int which) {
@@ -962,6 +945,61 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
+    private void onDownloadCompleteNotification(Intent intent) {
+        controller.showTransfers(TransferStatus.COMPLETED);
+        TransferManager.instance().clearDownloadsToReview();
+        try {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancel(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED);
+            }
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                String downloadCompletePath = extras.getString(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH);
+                if (downloadCompletePath != null) {
+                    File file = new File(downloadCompletePath);
+                    if (file.isFile()) {
+                        UIUtils.openFile(this, file.getAbsoluteFile());
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error handling download complete notification", e);
+        }
+    }
+
+    private void checkSDPermission() {
+        if (!AndroidPlatform.saf()) {
+            return;
+        }
+        try {
+            File data = Platforms.data();
+            File parent = data.getParentFile();
+
+            if (!AndroidPlatform.saf(parent)) {
+                return;
+            }
+            if (!Platforms.fileSystem().canWrite(parent) &&
+                    !SDPermissionDialog.visible) {
+                SDPermissionDialog dlg = SDPermissionDialog.newInstance();
+                // show dialog on main thread
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> {
+                    FragmentManager fragmentManager = getFragmentManager();
+                    try {
+                        if (fragmentManager != null) {
+                            dlg.show(fragmentManager);
+                        }
+                    } catch (IllegalStateException ignored) {
+                    }
+                });
+            }
+        } catch (Throwable e) {
+            // we can't do anything about this
+            LOG.error("Unable to detect if we have SD permissions", e);
+        }
+    }
+
     // TODO: refactor and move this method for a common place when needed
     private static String saveViewContent(Context context, Uri uri, String name) {
         InputStream inStream = null;
@@ -1048,47 +1086,6 @@ public class MainActivity extends AbstractActivity implements
                             R.string.no_data_check_internet_connection);
                 }
                 search.setDataUp(isDataUp);
-            }
-        }
-    }
-
-    private final static class CheckSDPermissionRunnable implements Runnable {
-
-        private WeakReference<android.app.FragmentManager> fragmentManagerRef;
-
-        CheckSDPermissionRunnable(android.app.FragmentManager fragmentManager) {
-            fragmentManagerRef = Ref.weak(fragmentManager);
-        }
-
-        @Override
-        public void run() {
-            if (!AndroidPlatform.saf()) {
-                return;
-            }
-            try {
-                File data = Platforms.data();
-                File parent = data.getParentFile();
-
-                if (!AndroidPlatform.saf(parent)) {
-                    return;
-                }
-                if (!Platforms.fileSystem().canWrite(parent) &&
-                        !SDPermissionDialog.visible) {
-                    SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-                    // show dialog on main thread
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(() -> {
-                        if (Ref.alive(fragmentManagerRef)) {
-                            try {
-                                dlg.show(fragmentManagerRef.get());
-                            } catch (IllegalStateException ignored) {
-                            }
-                        }
-                    });
-                }
-            } catch (Throwable e) {
-                // we can't do anything about this
-                LOG.error("Unable to detect if we have SD permissions", e);
             }
         }
     }
