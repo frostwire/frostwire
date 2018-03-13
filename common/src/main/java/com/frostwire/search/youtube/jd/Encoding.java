@@ -20,26 +20,26 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-public class Encoding {
+public final class Encoding {
 
     /**
      * "http://rapidshare.com&#x2F;&#x66;&#x69;&#x6C;&#x65;&#x73;&#x2F;&#x35;&#x34;&#x35;&#x34;&#x31;&#x34;&#x38;&#x35;&#x2F;&#x63;&#x63;&#x66;&#x32;&#x72;&#x73;&#x64;&#x66;&#x2E;&#x72;&#x61;&#x72;"
      * ; Wandelt alle hexkodierten zeichen in diesem Format in normalen text um
      *
-     * @param str
+     * @param str the string to decode
      * @return decoded string
      */
     public static String htmlDecode(String str) {
         if (str == null) { return null; }
         try {
             str = URLDecoder.decode(str, "UTF-8");
-        } catch (final Throwable e) {
-            e.printStackTrace();
+        } catch (Throwable e) {
+            //e.printStackTrace();
         }
         return Encoding.htmlOnlyDecode(str);
     }
 
-    public static String htmlOnlyDecode(String str) {
+    private static String htmlOnlyDecode(String str) {
         if (str == null) { return null; }
         str = HTMLEntities.unhtmlentities(str);
 
@@ -49,15 +49,6 @@ public class Encoding {
         str = HTMLEntities.unhtmlQuotes(str);
         str = HTMLEntities.unhtmlSingleQuotes(str);
         return str;
-    }
-
-    public static boolean isUrlCoded(final String str) {
-        if (str == null) { return false; }
-        try {
-            return URLDecoder.decode(str, "UTF-8").length() != str.length();
-        } catch (final Exception e) {
-            return false;
-        }
     }
 
     public static String urlDecode(String urlcoded, final boolean isUrl) {
