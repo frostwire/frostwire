@@ -82,6 +82,7 @@ public final class PrebidManager {
         if (!UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_PREBID_THRESHOLD)) {
             enabled = false;
             initialized = true;
+            LOG.info("PrebidManager initialization aborted. Dice roll failed");
             return;
         }
         initAdUnits();
@@ -106,7 +107,7 @@ public final class PrebidManager {
         audioPlayerAdUnit.addSize(300, 250);
         adUnits.add(audioPlayerAdUnit);
         placementAdUnitHashMap.put(Placement.AUDIO_PLAYER_BANNER, audioPlayerAdUnit);
-        BannerAdUnit previewBannerAdUnit = new BannerAdUnit("5823309", "70c3cef1-5040-45e1-92dc-3136229f233c");
+        BannerAdUnit previewBannerAdUnit = new BannerAdUnit("12680454", "70c3cef1-5040-45e1-92dc-3136229f233c");
         previewBannerAdUnit.addSize(300, 250); // horizontal video preview
         previewBannerAdUnit.addSize(320, 50); // vertical audio/video preview
         adUnits.add(previewBannerAdUnit);
@@ -123,7 +124,7 @@ public final class PrebidManager {
         }
         AdUnit adUnit = getAdUnit(placement);
         if (adUnit != null) {
-            Prebid.attachBids(banner, adUnit.getConfigId(), context);
+            Prebid.attachBids(banner, adUnit.getCode(), context);
             LOG.info("onBannerLoaded: Prebid.attachBids invoked on placement <" + placement + ">");
         } else {
             LOG.warn("onBannerLoaded: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
@@ -166,6 +167,7 @@ public final class PrebidManager {
             Prebid.init(applicationContext, adUnits, ACCOUNT_ID, Prebid.AdServer.MOPUB, Prebid.Host.APPNEXUS);
             initialized = true;
             enabled = true;
+            LOG.info("initializePrebid(): success");
         } catch (Throwable t) {
             initialized = false;
             t.printStackTrace();
