@@ -969,7 +969,7 @@ public class MainActivity extends AbstractActivity implements
     /**
      * @return true if the SD Permission dialog must be shown
      */
-    private Boolean checkSDPermission() {
+    private boolean checkSDPermission() {
         if (!AndroidPlatform.saf()) {
             return false;
         }
@@ -988,7 +988,7 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkSDPermissionPost(Boolean showPermissionDialog) {
+    private void checkSDPermissionPost(boolean showPermissionDialog) {
         if (showPermissionDialog) {
             SDPermissionDialog dlg = SDPermissionDialog.newInstance();
             FragmentManager fragmentManager = getFragmentManager();
