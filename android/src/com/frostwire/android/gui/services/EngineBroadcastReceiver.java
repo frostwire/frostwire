@@ -34,6 +34,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -83,18 +84,18 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 DetailedState detailedState = networkInfo.getDetailedState();
                 switch (detailedState) {
                     case CONNECTED:
-                        handleConnectedNetwork(networkInfo);
-                        handleNetworkStatusChange();
-                        reopenNetworkSockets();
+                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleConnectedNetwork, networkInfo);
+                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
+                        Asyncs.invokeAsync(EngineBroadcastReceiver::reopenNetworkSockets);
                         break;
                     case DISCONNECTED:
-                        handleDisconnectedNetwork(networkInfo);
-                        handleNetworkStatusChange();
-                        reopenNetworkSockets();
+                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleConnectedNetwork, networkInfo);
+                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
+                        Asyncs.invokeAsync(EngineBroadcastReceiver::reopenNetworkSockets);
                         break;
                     case CONNECTING:
                     case DISCONNECTING:
-                        handleNetworkStatusChange();
+                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
                         break;
                     default:
                         break;
@@ -166,13 +167,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                         return;
                     }
 
-                    Engine.instance().getThreadPool().execute(() -> {
-                        Engine.instance().startServices();
-                        if (shouldStopSeeding()) {
-                            TransferManager.instance().stopSeedingTorrents();
-                        }
-                    });
-
+                    Engine.instance().startServices();
+                    if (shouldStopSeeding()) {
+                        TransferManager.instance().stopSeedingTorrents();
+                    }
                 } else if (shouldStopSeeding()) {
                     TransferManager.instance().stopSeedingTorrents();
                 }
@@ -233,10 +231,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private static void reopenNetworkSockets() {
-        Engine.instance().getThreadPool().execute(() -> {
-            // sleep for a second, since IPv6 addresses takes time to be reported
-            SystemClock.sleep(1000);
-            BTEngine.getInstance().reopenNetworkSockets();
-        });
+        // sleep for a second, since IPv6 addresses takes time to be reported
+        SystemClock.sleep(1000);
+        BTEngine.getInstance().reopenNetworkSockets();
     }
 }
