@@ -22,8 +22,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -33,9 +31,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,39 +73,25 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        Context context = getContext();
-        // TODO: this protection should go away when super.getContext() gets refactored
-        if (context == null) {
-            return;
-        }
-        invokeAsync(context, DeleteFileMenuAction::deleteFilesTask, Ref.weak(adapter), files,
-                DeleteFileMenuAction::adapterNotifyDataSetChanged);
+        invokeAsync(adapter, DeleteFileMenuAction::deleteFilesTask, files,
+                DeleteFileMenuAction::deleteFilesTaskPost);
     }
 
-    private static void deleteFilesTask(Context context, final WeakReference<FileListAdapter> fileListAdapterRef, List<FileDescriptor> files) {
-        if (!Ref.alive(fileListAdapterRef)) {
-            return;
-        }
-        FileListAdapter fileListAdapter = fileListAdapterRef.get();
-        byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
-        Librarian.instance().deleteFiles(context, fileType, new ArrayList<>(files));
+    private static void deleteFilesTask(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
+        byte fileType = fileListAdapter.getFileType();
+        Librarian.instance().deleteFiles(fileListAdapter.getContext(), fileType, new ArrayList<>(files));
 
         int size = files.size();
-        if (fileListAdapter != null) {
-            for (int i = 0; i < size; i++) {
-                try {
-                    FileDescriptor fd = files.get(i);
-                    fileListAdapter.deleteItem(fd); // only notifies if in main thread
-                } catch (Throwable ignored) {}
-            }
+        for (int i = 0; i < size; i++) {
+            try {
+                FileDescriptor fd = files.get(i);
+                fileListAdapter.deleteItem(fd); // only notifies if in main thread
+            } catch (Throwable ignored) {}
         }
     }
 
-    private static void adapterNotifyDataSetChanged(Context context, WeakReference<FileListAdapter> fileListAdapterRef, List<FileDescriptor> files) {
-        if (!Ref.alive(fileListAdapterRef)) {
-            return;
-        }
-        fileListAdapterRef.get().notifyDataSetChanged();
+    private static void deleteFilesTaskPost(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
+        fileListAdapter.notifyDataSetChanged();
     }
 
     @SuppressWarnings("WeakerAccess")
