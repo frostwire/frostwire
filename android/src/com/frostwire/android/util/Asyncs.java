@@ -160,6 +160,30 @@ public final class Asyncs {
             arg1, arg2, arg3);
     }
 
+    public static <C, T1> void invokeAsync(@NonNull C context,
+        ContextTask1<C, T1> task,
+        T1 arg1,
+        ContextPostTask1<C, T1> post) {
+
+        requireContext(context);
+        invokeAsyncSupport(context,
+            (c, args)-> {task.run(c, (T1)args[0]); return null;},
+            (c, args, r) -> post.run(c, (T1)args[0]),
+            arg1);
+    }
+
+    public static <C, T1, T2> void invokeAsync(@NonNull C context,
+        ContextTask2<C, T1, T2> task,
+        T1 arg1, T2 arg2,
+        ContextPostTask2<C, T1, T2> post) {
+
+        requireContext(context);
+        invokeAsyncSupport(context,
+            (c, args)-> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
+            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1]),
+            arg1, arg2);
+    }
+
     public static <C, T1, T2, T3> void invokeAsync(@NonNull C context,
         ContextTask3<C, T1, T2, T3> task,
         T1 arg1, T2 arg2, T3 arg3,
@@ -186,6 +210,14 @@ public final class Asyncs {
 
     public interface ContextTask3<C, T1, T2, T3> {
         void run(C context, T1 arg1, T2 arg2, T3 arg3);
+    }
+
+    public interface ContextPostTask1<C, T1> {
+        void run(C context, T1 arg1);
+    }
+
+    public interface ContextPostTask2<C, T1, T2> {
+        void run(C context, T1 arg1, T2 arg2);
     }
 
     public interface ContextPostTask3<C, T1, T2, T3> {
