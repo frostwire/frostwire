@@ -33,7 +33,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
