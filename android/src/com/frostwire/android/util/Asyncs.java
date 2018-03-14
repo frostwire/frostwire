@@ -19,6 +19,7 @@ package com.frostwire.android.util;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
@@ -39,42 +40,46 @@ public final class Asyncs {
 
     // context + return
 
-    public static <C, R> void invokeAsync(C context,
+    public static <C, R> void invokeAsync(@NonNull C context,
         ContextResultTask<C, R> task,
         ContextResultPostTask<C, R> post) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args)-> task.run(c),
             (c, args, r) -> post.run(c, r));
     }
 
-    public static <C, T1, R> void invokeAsync(C context,
+    public static <C, T1, R> void invokeAsync(@NonNull C context,
         ContextResultTask1<C, T1, R> task,
         T1 arg1,
         ContextResultPostTask1<C, T1, R> post) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args)-> task.run(c, (T1)args[0]),
             (c, args, r) -> post.run(c, (T1)args[0], r),
             arg1);
     }
 
-    public static <C, T1, T2, R> void invokeAsync(C context,
+    public static <C, T1, T2, R> void invokeAsync(@NonNull C context,
         ContextResultTask2<C, T1, T2, R> task,
         T1 arg1, T2 arg2,
         ContextResultPostTask2<C, T1, T2, R> post) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args)-> task.run(c, (T1)args[0], (T2)args[1]),
             (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], r),
             arg1, arg2);
     }
 
-    public static <C, T1, T2, T3, R> void invokeAsync(C context,
+    public static <C, T1, T2, T3, R> void invokeAsync(@NonNull C context,
         ContextResultTask3<C, T1, T2, T3, R> task,
         T1 arg1, T2 arg2, T3 arg3,
         ContextResultPostTask3<C, T1, T2, T3, R> post) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args)-> task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
             (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2], r),
@@ -115,7 +120,8 @@ public final class Asyncs {
 
     // only context
 
-    public static <C> void invokeAsync(C context, ContextTask<C> task) {
+    public static <C> void invokeAsync(@NonNull C context, ContextTask<C> task) {
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args) -> {task.run(c); return null;},
             null);
@@ -125,37 +131,41 @@ public final class Asyncs {
         ContextTask1<C, T1> task,
         T1 arg1) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args) -> {task.run(c, (T1)args[0]); return null;},
             null,
             arg1);
     }
 
-    public static <C, T1, T2> void invokeAsync(C context,
+    public static <C, T1, T2> void invokeAsync(@NonNull C context,
         ContextTask2<C, T1, T2> task,
         T1 arg1, T2 arg2) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args) -> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
             null,
             arg1, arg2);
     }
 
-    public static <C, T1, T2, T3> void invokeAsync(C context,
+    public static <C, T1, T2, T3> void invokeAsync(@NonNull C context,
         ContextTask3<C, T1, T2, T3> task,
         T1 arg1, T2 arg2, T3 arg3) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
             null,
             arg1, arg2, arg3);
     }
 
-    public static <C, T1, T2, T3> void invokeAsync(C context,
+    public static <C, T1, T2, T3> void invokeAsync(@NonNull C context,
         ContextTask3<C, T1, T2, T3> task,
         T1 arg1, T2 arg2, T3 arg3,
         ContextPostTask3<C, T1, T2, T3> post) {
 
+        requireContext(context);
         invokeAsyncSupport(context,
             (c, args)-> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
             (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
@@ -325,6 +335,12 @@ public final class Asyncs {
                 new Handler(Looper.getMainLooper()).post(() -> post.run(c, args, r));
             }
         });
+    }
+
+    private static <C> void requireContext(C context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Argument 'context' can't be null");
+        }
     }
 
     private interface TaskSupport<C, R> {
