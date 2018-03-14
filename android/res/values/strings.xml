@@ -21,11 +21,15 @@
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Disclosure: Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using Private Internet Access to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means that everything you do online while on your device - including <b>downloads, searches, messaging</b> etc - can be monitored and intercepted by anyone on your network - Internet Service Providers, hackers, governments etc.<br><br><b>We STRONGLY recommend using a VPN service</b> - especially whenever downloading or exchanging sensitive information (eg. banking) and while using public wi-fi or mobile data. <br><br> Here are some options that provide reliable service and work well with FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>Private Internet Access</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using one of the services below to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+
+
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touch applied tags to]]></string>
 
     <!-- non HTML tags. -->
@@ -569,7 +573,7 @@
     <string name="frostwire_is_running">FrostWire is running</string>
     <string name="vpn_found">VPN found. Connection encrypted.</string>
     <string name="vpn_not_found">No VPN. Consider encrypting connection.</string>
-    <string name="connection_header_title">Connection status:</string>
+    <string name="connection_header_title">VPN Connection status:</string>
     <string name="unprotected_connection">unprotected</string>
     <string name="protected_connection">VPN-protected</string>
     <string name="protect_my_privacy">Protect my privacy</string>
@@ -787,6 +791,9 @@
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="rtt_ms">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
-
+    <string name="vpn_suggestion_pia">PIA</string>
+    <string name="vpn_suggestion_expressvpn">ExpressVPN</string>
+    <string name="vpn_suggestion_nordvpn">NordVPN</string>
+    <string name="vpn_find_out_more">Find out more</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
 </resources>
