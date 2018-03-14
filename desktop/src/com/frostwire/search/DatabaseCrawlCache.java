@@ -101,6 +101,12 @@ public class DatabaseCrawlCache implements CrawlCache {
             db.delete("", new String[] {});
         } catch (Throwable e) {
             LOG.warn("Error deleting crawl cache: " + e.getMessage());
+            try {
+                // "Wanna play rough?" -Scarface
+                db.factoryReset();
+            } catch (Throwable e2) {
+                LOG.error("DatabaseCrawlCache::clear(): CrawlCache::factoryReset() failed");
+            }
         }
     }
 

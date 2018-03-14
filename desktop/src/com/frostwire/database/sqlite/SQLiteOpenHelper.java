@@ -21,6 +21,7 @@ package com.frostwire.database.sqlite;
 import com.frostwire.content.Context;
 import com.frostwire.database.sqlite.SQLiteDatabase.CursorFactory;
 import com.frostwire.util.Logger;
+import org.limewire.util.FileUtils;
 
 import java.io.File;
 import java.sql.Connection;
@@ -39,13 +40,21 @@ public abstract class SQLiteOpenHelper {
     private final SQLiteDatabase db;
     private String folderpath;
 
-    public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version) {
-        this(context, name, factory, version, null);
-    }
-
     public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version, String extraArgs) {
         dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
+    }
+
+    public void factoryReset() {
+        // dbpath -> /Users/gubatron/Library/Preferences/FrostWire5/dbs/crawldb (not a real folder, the real one is crawldb.<N>
+        File dbFolder = new File(dbpath).getParentFile();
+        if (dbFolder.exists() && dbFolder.isDirectory()) {
+            if (FileUtils.deleteRecursive(dbFolder)) {
+                LOG.info("SQLiteOpenHelper::factoryReset() success deleting " + dbFolder.getAbsolutePath(), true);
+            } else {
+                LOG.error("SQLiteOpenHelper::factoryReset() failure deleting " + dbFolder.getAbsolutePath(), true);
+            }
+        }
     }
 
     public synchronized SQLiteDatabase getWritableDatabase() {
@@ -97,10 +106,7 @@ public abstract class SQLiteOpenHelper {
     }
 
     /**
-     * Called when the database has been opened.  The implementation
-     * should check {@link SQLiteDatabase#isReadOnly} before updating the
-     * database.
-     *
+     * Called when the database has been opened
      * @param db The database.
      */
     public void onOpen(SQLiteDatabase db) {
@@ -116,7 +122,7 @@ public abstract class SQLiteOpenHelper {
             sb.append(fullpath);
 
             if (extraArgs != null) {
-                sb.append(";" + extraArgs);
+                sb.append(";").append(extraArgs);
             }
 
             boolean create = !(new File(folderpath).exists());

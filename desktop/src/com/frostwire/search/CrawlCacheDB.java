@@ -56,9 +56,9 @@ public final class CrawlCacheDB {
 
     private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
 
-    private final DatabaseHelper databaseHelper;
-
     private final static CrawlCacheDB instance = new CrawlCacheDB();
+
+    private DatabaseHelper databaseHelper;
 
     public static CrawlCacheDB instance() {
         return instance;
@@ -127,8 +127,13 @@ public final class CrawlCacheDB {
         return count;
     }
 
-    public long sizeInBytes() {
+    long sizeInBytes() {
         return databaseHelper.sizeInBytes();
+    }
+
+    void factoryReset() {
+        databaseHelper.factoryReset();
+        databaseHelper = new DatabaseHelper(new Context());
     }
 
     public static final class Columns {
