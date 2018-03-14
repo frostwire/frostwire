@@ -300,7 +300,7 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, update.config.onExitThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, update.config.onBackThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, update.config.onResumeThreshold);
-        VPNStatusDetailActivity.updateVPNOffer(update.config.vpnOffer);
+//        VPNStatusDetailActivity.updateVPNOffer(update.config.vpnOffer);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
@@ -374,7 +374,7 @@ public final class SoftwareUpdater {
         int onExitThreshold = 100;
         int onBackThreshold = 100;
         int onResumeThreshold = 100;
-        String vpnOffer = VPNStatusDetailActivity.VPNCompanyInfo.ExpressVPN.name();
+        //String vpnOffer = VPNStatusDetailActivity.VPNCompanyInfo.ExpressVPN.name();
 
         // ux stats
         boolean uxEnabled = false;
