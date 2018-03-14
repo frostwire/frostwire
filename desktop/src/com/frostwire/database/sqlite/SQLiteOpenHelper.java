@@ -21,7 +21,6 @@ package com.frostwire.database.sqlite;
 import com.frostwire.content.Context;
 import com.frostwire.database.sqlite.SQLiteDatabase.CursorFactory;
 import com.frostwire.util.Logger;
-import org.limewire.util.FileUtils;
 
 import java.io.File;
 import java.sql.Connection;
@@ -43,18 +42,6 @@ public abstract class SQLiteOpenHelper {
     public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version, String extraArgs) {
         dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
-    }
-
-    public void factoryReset() {
-        // dbpath -> /Users/gubatron/Library/Preferences/FrostWire5/dbs/crawldb (not a real folder, the real one is crawldb.<N>
-        File dbFolder = new File(dbpath).getParentFile();
-        if (dbFolder.exists() && dbFolder.isDirectory()) {
-            if (FileUtils.deleteRecursive(dbFolder)) {
-                LOG.info("SQLiteOpenHelper::factoryReset() success deleting " + dbFolder.getAbsolutePath(), true);
-            } else {
-                LOG.error("SQLiteOpenHelper::factoryReset() failure deleting " + dbFolder.getAbsolutePath(), true);
-            }
-        }
     }
 
     public synchronized SQLiteDatabase getWritableDatabase() {

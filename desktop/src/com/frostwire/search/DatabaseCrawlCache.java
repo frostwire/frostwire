@@ -98,15 +98,9 @@ public class DatabaseCrawlCache implements CrawlCache {
     @Override
     public synchronized void clear() {
         try {
-            db.delete("", new String[] {});
+            db.truncate();
         } catch (Throwable e) {
-            LOG.warn("Error deleting crawl cache: " + e.getMessage());
-            try {
-                // "Wanna play rough?" -Scarface
-                db.factoryReset();
-            } catch (Throwable e2) {
-                LOG.error("DatabaseCrawlCache::clear(): CrawlCache::factoryReset() failed");
-            }
+            LOG.warn("Error deleting crawl cache: " + e.getMessage(), e);
         }
     }
 

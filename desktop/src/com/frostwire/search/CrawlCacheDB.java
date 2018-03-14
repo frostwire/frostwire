@@ -85,9 +85,7 @@ public final class CrawlCacheDB {
         // Get the database and run the query
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
-
-        return c;
+        return qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
     }
 
     public long insert(ContentValues initialValues) {
@@ -99,9 +97,9 @@ public final class CrawlCacheDB {
             values = new ContentValues();
         }
 
-        Long now = Long.valueOf(System.currentTimeMillis() / 1000);
+        Long now = System.currentTimeMillis() / 1000;
 
-        if (values.containsKey(Columns.DATE_ADDED) == false) {
+        if (!values.containsKey(Columns.DATE_ADDED)) {
             values.put(Columns.DATE_ADDED, now);
         }
 
@@ -113,27 +111,24 @@ public final class CrawlCacheDB {
     public int delete(String where, String[] whereArgs) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-        int count = db.delete(TABLE_NAME, where, whereArgs);
-
-        return count;
+        return db.delete(TABLE_NAME, where, whereArgs);
     }
+
+    void truncate() {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.execSQL("TRUNCATE TABLE " + TABLE_NAME);
+    }
+
 
     public int update(ContentValues values, String where, String[] whereArgs) {
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-        int count = db.update(TABLE_NAME, values, where, whereArgs);
-
-        return count;
+        return db.update(TABLE_NAME, values, where, whereArgs);
     }
 
     long sizeInBytes() {
         return databaseHelper.sizeInBytes();
-    }
-
-    void factoryReset() {
-        databaseHelper.factoryReset();
-        databaseHelper = new DatabaseHelper(new Context());
     }
 
     public static final class Columns {
@@ -142,9 +137,9 @@ public final class CrawlCacheDB {
         }
 
         public static final String ID = "id";
-        public static final String KEY = "key";
+        static final String KEY = "key";
         public static final String DATA = "data";
-        public static final String DATE_ADDED = "dateAdded";
+        static final String DATE_ADDED = "dateAdded";
     }
 
     /**
