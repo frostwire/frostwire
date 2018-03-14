@@ -31,12 +31,12 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
@@ -53,6 +53,8 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * @author gubatron
@@ -236,7 +238,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // due to the android providers getting out of sync.
             }
         } else {
-            buildTorrentAndSeedIt(fd);
+            invokeAsync(this::buildTorrentAndSeedIt,fd);
         }
     }
 
@@ -249,41 +251,27 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void buildTorrentAndSeedIt(final FileDescriptor fd) {
-        Engine.instance().getThreadPool().execute(new BuildTorrentAndSeedTask(fd));
-    }
-
-    private static final class BuildTorrentAndSeedTask implements Runnable {
-
-        private final FileDescriptor fd;
-
-        BuildTorrentAndSeedTask(FileDescriptor fd) {
-            this.fd = fd;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
-                File file = new File(fd.filePath);
-                File saveDir = file.getParentFile();
-                file_storage fs = new file_storage();
-                fs.add_file(file.getName(), file.length());
-                fs.set_name(file.getName());
-                create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
-                // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
-                // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
-                ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
-                ct.set_priv(false);
-                final error_code ec = new error_code();
-                libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
-                final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
-                final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
-                // so the TorrentHandle object is created and added to the libtorrent session.
-                BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
-            } catch (Throwable e) {
-                // TODO: better handling of this error
-                LOG.error("Error creating torrent for seed", e);
-            }
+        try {
+            // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
+            File file = new File(fd.filePath);
+            File saveDir = file.getParentFile();
+            file_storage fs = new file_storage();
+            fs.add_file(file.getName(), file.length());
+            fs.set_name(file.getName());
+            create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
+            // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
+            // as the algorithm in BTDownload.getProgress() doesn't make sense at the moment for merkle torrents.
+            ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
+            ct.set_priv(false);
+            final error_code ec = new error_code();
+            libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+            final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
+            final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
+            // so the TorrentHandle object is created and added to the libtorrent session.
+            BTEngine.getInstance().download(tinfo, saveDir, new boolean[]{true}, null, TransferManager.instance().isDeleteStartedTorrentEnabled());
+        } catch (Throwable e) {
+            // TODO: better handling of this error
+            LOG.error("Error creating torrent for seed", e);
         }
     }
 
