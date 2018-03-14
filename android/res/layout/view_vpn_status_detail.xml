@@ -129,7 +129,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="30dp" />
+                android:paddingTop="30dp"
+                android:paddingBottom="10dp"/>
 
             <!-- Bullet - VPN not required for FrostWire but highly recommended -->
             <TextView
