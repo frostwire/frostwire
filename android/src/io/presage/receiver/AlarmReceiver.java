@@ -22,11 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
-
 import io.presage.Presage;
 
 import static com.frostwire.android.util.Asyncs.invokeAsync;
@@ -56,7 +51,10 @@ public final class AlarmReceiver extends BroadcastReceiver {
             invokeAsync(context, (ctx) -> {
                 try {
                     Presage.getInstance().setContext(ctx);
-                    Presage.getInstance().talkToService((Bundle) intent.getExtras().clone());
+                    Bundle extras = intent.getExtras();
+                    if (extras != null) {
+                        Presage.getInstance().talkToService((Bundle) extras.clone());
+                    }
                 } catch (Throwable e) {
                     // just log
                     e.printStackTrace();
