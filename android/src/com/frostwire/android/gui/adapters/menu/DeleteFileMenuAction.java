@@ -77,7 +77,13 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        invokeAsync(getContext(), DeleteFileMenuAction::deleteFilesTask, Ref.weak(adapter), files);
+        Context context = getContext();
+        // TODO: this protection should go away when super.getContext() gets refactored
+        if (context == null) {
+            return;
+        }
+        invokeAsync(context, DeleteFileMenuAction::deleteFilesTask, Ref.weak(adapter), files,
+                DeleteFileMenuAction::adapterNotifyDataSetChanged);
     }
 
     private static void deleteFilesTask(Context context, final WeakReference<FileListAdapter> fileListAdapterRef, List<FileDescriptor> files) {
@@ -97,19 +103,13 @@ public final class DeleteFileMenuAction extends MenuAction {
                 } catch (Throwable ignored) {}
             }
         }
+    }
 
-        // @aldenml: I tried creating a post task for the invokeAsync but couldn't get it to work
-        // perhaps a new signature is needed for a post task that doesn't depend on any
-        // results from the background task. -gubs
-
-        // we make just one notify call at the end
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
-            if (!Ref.alive(fileListAdapterRef)) {
-                return;
-            }
-            fileListAdapterRef.get().notifyDataSetChanged();
-        });
+    private static void adapterNotifyDataSetChanged(Context context, WeakReference<FileListAdapter> fileListAdapterRef, List<FileDescriptor> files) {
+        if (!Ref.alive(fileListAdapterRef)) {
+            return;
+        }
+        fileListAdapterRef.get().notifyDataSetChanged();
     }
 
     @SuppressWarnings("WeakerAccess")
