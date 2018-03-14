@@ -134,8 +134,10 @@ public final class SearchMediator {
             try {
                 DatabaseCrawlCache databaseCrawlCache = new DatabaseCrawlCache();
                 if (databaseCrawlCache.sizeInBytes() > MAX_CRAWLCACHE_SIZE) {
+                    LOG.info("SearchMediator() - reseting crawl cache, too big");
                     databaseCrawlCache.clear();
                     databaseCrawlCache = new DatabaseCrawlCache();
+                    LOG.info("SearchMediator() - crawl cache reset successful");
                 }
                 CrawlPagedWebSearchPerformer.setCache(databaseCrawlCache);
             } catch (Throwable t) {
