@@ -1,7 +1,8 @@
 frostwire (6.6.4) stable; urgency=high
+  * Fixes Out of memory error trying to clear the search cache database
   * Avast, IPVanish, CyberGhost, Windscribe VPN detection for Windows
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 13 Mar 2018 20:10:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 14 Mar 2018 14:06:00 -0600
 
 frostwire (6.6.3) stable; urgency=high
   * Zooqle search fixes
