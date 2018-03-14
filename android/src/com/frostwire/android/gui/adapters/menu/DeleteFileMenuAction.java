@@ -31,7 +31,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.util.Ref;
@@ -39,6 +38,8 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * @author gubatron
@@ -76,46 +77,39 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        Engine.instance().getThreadPool().execute(new DeleteFilesRunnable(getContext(), adapter, files));
+        invokeAsync(getContext(), DeleteFileMenuAction::deleteFilesTask, Ref.weak(adapter), files);
     }
 
-    private static class DeleteFilesRunnable implements Runnable {
-
-        private final WeakReference<Context> contextRef;
-        private final WeakReference<FileListAdapter> adapterRef;
-        private final List<FileDescriptor> files;
-
-        DeleteFilesRunnable(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
-            contextRef = Ref.weak(context);
-            this.adapterRef = Ref.weak(adapter);
-            this.files = files;
+    private static void deleteFilesTask(Context context, final WeakReference<FileListAdapter> fileListAdapterRef, List<FileDescriptor> files) {
+        if (!Ref.alive(fileListAdapterRef)) {
+            return;
         }
+        FileListAdapter fileListAdapter = fileListAdapterRef.get();
+        byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
+        Librarian.instance().deleteFiles(context, fileType, new ArrayList<>(files));
 
-        @Override
-        public void run() {
-            if (!Ref.alive(contextRef) || !Ref.alive(adapterRef)) {
-                return;
-            }
-            FileListAdapter fileListAdapter = adapterRef.get();
-            byte fileType = (fileListAdapter != null) ? fileListAdapter.getFileType() : files.get(0).fileType;
-            Librarian.instance().deleteFiles(contextRef.get(), fileType, new ArrayList<>(files));
-
-            int size = files.size();
-            if (fileListAdapter != null) {
-                for (int i = 0; i < size; i++) {
+        int size = files.size();
+        if (fileListAdapter != null) {
+            for (int i = 0; i < size; i++) {
+                try {
                     FileDescriptor fd = files.get(i);
                     fileListAdapter.deleteItem(fd); // only notifies if in main thread
-                }
+                } catch (Throwable ignored) {}
             }
-
-            // we make just one notify call at the end
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                if (Ref.alive(adapterRef)) {
-                    adapterRef.get().notifyDataSetChanged();
-                }
-            });
         }
+
+        // @aldenml: I tried creating a post task for the invokeAsync but couldn't get it to work
+        // perhaps a new signature is needed for a post task that doesn't depend on any
+        // results from the background task. -gubs
+
+        // we make just one notify call at the end
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            if (!Ref.alive(fileListAdapterRef)) {
+                return;
+            }
+            fileListAdapterRef.get().notifyDataSetChanged();
+        });
     }
 
     @SuppressWarnings("WeakerAccess")
