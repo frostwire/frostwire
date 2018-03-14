@@ -28,12 +28,12 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
@@ -43,7 +43,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import java.lang.ref.WeakReference;
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * @author gubatron
@@ -80,6 +80,22 @@ public final class CancelMenuAction extends MenuAction {
                 transfer,
                 deleteData, deleteTorrent, this).
                 show(((Activity) getContext()).getFragmentManager());
+    }
+
+    private static void removeTransfer(Context context, Transfer transfer, boolean deleteTorrent,
+                                       boolean deleteData) {
+        if (transfer instanceof UIBittorrentDownload) {
+            ((UIBittorrentDownload) transfer).remove(Ref.weak(context), deleteTorrent, deleteData);
+        } else {
+            transfer.remove(deleteData);
+        }
+        if (context != null) {
+            UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+        }
+        if (context != null) {
+            MainActivity.refreshTransfers(context);
+        }
+        UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
     }
 
     public static class CancelMenuActionDialog extends AbstractDialog {
@@ -167,59 +183,11 @@ public final class CancelMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
-            RemoveTransferTask task = new RemoveTransferTask(transfer, deleteTorrent,
-                    deleteData, dlg.getContext());
-            Engine.instance().getThreadPool().execute(task);
+            invokeAsync(dlg.getContext(), CancelMenuAction::removeTransfer, transfer, deleteTorrent, deleteData);
             dlg.dismiss();
             if (dlg.getContext() instanceof TimerObserver) {
                 ((TimerObserver) dlg.getContext()).onTime();
             }
-        }
-    }
-
-    private static final class RemoveTransferTask implements Runnable {
-
-        // don't hold a hard reference to the transfers, since
-        // it could be a UIBittorrentDownload, and gui objects
-        // indirectly hold references to a context
-        private final WeakReference<Transfer> transferRef;
-        private final boolean deleteTorrent;
-        private final boolean deleteData;
-        private final WeakReference<Context> context;
-
-        RemoveTransferTask(Transfer transfer, boolean deleteTorrent,
-                           boolean deleteData, Context context) {
-            this.transferRef = Ref.weak(transfer);
-            this.deleteTorrent = deleteTorrent;
-            this.deleteData = deleteData;
-            this.context = Ref.weak(context);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(transferRef)) {
-                // this should never happens (unless it's already removed),
-                // since all transfer are keep in the TransferManager list
-                return;
-            }
-
-            Transfer transfer = transferRef.get();
-
-            if (transfer instanceof UIBittorrentDownload) {
-                ((UIBittorrentDownload) transfer).remove(context, deleteTorrent, deleteData);
-            } else {
-                transfer.remove(deleteData);
-            }
-
-            if (Ref.alive(context)) {
-                UIUtils.broadcastAction(context.get(), Constants.ACTION_FILE_ADDED_OR_REMOVED);
-            }
-
-            if (Ref.alive(context)) {
-                MainActivity.refreshTransfers(context.get());
-            }
-
-            UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
         }
     }
 }
