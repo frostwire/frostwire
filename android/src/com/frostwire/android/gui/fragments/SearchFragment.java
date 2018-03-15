@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +71,7 @@ import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.SearchHeaderBanner;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -722,6 +722,7 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void onResults(long token, final List<? extends SearchResult> results) {
             if (Ref.alive(searchFragmentRef)) {
+                //noinspection unchecked
                 searchFragmentRef.get().onSearchResults((List<SearchResult>) results);
             }
         }
@@ -936,13 +937,10 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            NotifyLogicRunnable notifyLogic = new NotifyLogicRunnable(getActivity(), this, keywordFilterDrawerView, filteredHistograms);
-
-            if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().execute(notifyLogic);
-            } else {
-                notifyLogic.run();
-            }
+            Asyncs.invokeAsync(filterButton,
+                    SearchFragment::possiblyWaitInBackgroundToUpdateUI,
+                    keywordFilterDrawerView, filteredHistograms,
+                    SearchFragment::updateUIWithFilteredHistogramsPerFeature);
         }
 
         @Override
@@ -1038,62 +1036,31 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private final static class NotifyLogicRunnable implements Runnable {
-        private final WeakReference<Activity> activityRef;
-        private final WeakReference<FilterToolbarButton> filterToolbarButtonRef;
-        private final WeakReference<KeywordFilterDrawerView> keywordFilterDrawerViewRef;
-        private final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms;
-
-        NotifyLogicRunnable(Activity activity,
-                            FilterToolbarButton filterToolbarButton,
-                            KeywordFilterDrawerView keywordFilterDrawerView,
-                            Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filtered_histograms) {
-            activityRef = Ref.weak(activity);
-            filterToolbarButtonRef = Ref.weak(filterToolbarButton);
-            keywordFilterDrawerViewRef = Ref.weak(keywordFilterDrawerView);
-            filteredHistograms = filtered_histograms;
-        }
-
-        private boolean referencesDead() {
-            return !Ref.alive(activityRef) ||
-                    !Ref.alive(filterToolbarButtonRef) ||
-                    !Ref.alive(keywordFilterDrawerViewRef);
-        }
-
-        @Override
-        public void run() {
-            if (referencesDead()) {
-                return;
-            }
-            FilterToolbarButton filterToolbarButton = filterToolbarButtonRef.get();
-            long timeSinceLastUpdate = System.currentTimeMillis() - filterToolbarButton.lastUIUpdate;
-            if (timeSinceLastUpdate < 500) {
-                try {
-                    Thread.sleep(500L - timeSinceLastUpdate);
-                } catch (InterruptedException ignored) {
-                }
-            }
-            Runnable uiRunnable = () -> {
-                if (referencesDead()) {
-                    return;
-                }
-                FilterToolbarButton filterToolbarButton1 = filterToolbarButtonRef.get();
-                KeywordFilterDrawerView keywordFilterDrawerView = keywordFilterDrawerViewRef.get();
-                filterToolbarButton1.lastUIUpdate = System.currentTimeMillis();
-                // should be safe from concurrent modification exception as new list with filtered elements
-                for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
-                    List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
-                    keywordFilterDrawerView.updateData(
-                            feature,
-                            filteredHistogram);
-                }
-                filterToolbarButton1.updateVisibility();
-                keywordFilterDrawerView.requestLayout();
-            };
-            Activity activity = activityRef.get();
-            if (activity != null) {
-                activity.runOnUiThread(uiRunnable);
+    @SuppressWarnings("unused")
+    private static void possiblyWaitInBackgroundToUpdateUI(FilterToolbarButton filterToolbarButton,
+                                                           KeywordFilterDrawerView keywordFilterDrawerView,
+                                                           Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
+        long timeSinceLastUpdate = System.currentTimeMillis() - filterToolbarButton.lastUIUpdate;
+        if (timeSinceLastUpdate < 500) {
+            try {
+                Thread.sleep(500L - timeSinceLastUpdate);
+            } catch (InterruptedException ignored) {
             }
         }
+    }
+
+    private static void updateUIWithFilteredHistogramsPerFeature(FilterToolbarButton filterToolbarButton,
+                                                                 KeywordFilterDrawerView keywordFilterDrawerView,
+                                                                 Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
+        filterToolbarButton.lastUIUpdate = System.currentTimeMillis();
+        // should be safe from concurrent modification exception as new list with filtered elements
+        for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+            List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
+            keywordFilterDrawerView.updateData(
+                    feature,
+                    filteredHistogram);
+        }
+        filterToolbarButton.updateVisibility();
+        keywordFilterDrawerView.requestLayout();
     }
 }
