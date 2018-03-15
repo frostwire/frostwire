@@ -64,9 +64,9 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             String action = intent.getAction();
 
             if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-                async(context, this::handleMediaMounted, intent);
+                async(context, EngineBroadcastReceiver::handleMediaMounted, intent);
             } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
-                async(this::handleMediaUnmounted, intent);
+                async(this, EngineBroadcastReceiver::handleMediaUnmounted, intent);
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
@@ -74,7 +74,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 // heavy lifting happens in Thread()
                 Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                async(this::handleConnectivityChange, intent);
+                async(this, EngineBroadcastReceiver::handleConnectivityChange, intent);
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
@@ -183,7 +183,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                         CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
     }
 
-    private void handleMediaMounted(final Context context, Intent intent) {
+    private static void handleMediaMounted(final Context context, Intent intent) {
         try {
             String path = intent.getDataString().replace("file://", "");
             if (!SystemUtils.isPrimaryExternalPath(new File(path))) {
