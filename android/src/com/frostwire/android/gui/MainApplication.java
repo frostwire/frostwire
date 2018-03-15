@@ -77,7 +77,7 @@ public class MainApplication extends Application {
         ExecutorService threadPool = Engine.instance().getThreadPool();
         ImageLoader.start(this, threadPool);
 
-        threadPool.execute(new CrawlPagedWebSearchPerformerInitializer(this));
+        invokeAsync(this, this::initializeCrawlPagedWebSearchPerformer);
 
         LocalSearchEngine.create();
 
@@ -101,7 +101,7 @@ public class MainApplication extends Application {
         PlayStore.getInstance().initialize(this);
 
         NetworkManager.create(this);
-        NetworkManager.instance().queryNetworkStatus();
+        invokeAsync(NetworkManager.instance()::queryNetworkStatusBackground);
     }
 
     private void ignoreHardwareMenu() {
@@ -117,24 +117,13 @@ public class MainApplication extends Application {
         }
     }
 
-    private static class CrawlPagedWebSearchPerformerInitializer implements Runnable {
-        private WeakReference<Context> ctxRef;
-
-        CrawlPagedWebSearchPerformerInitializer(Context context) {
-            ctxRef = Ref.weak(context);
-        }
-
-        @Override
-        public void run() {
-            if (Ref.alive(ctxRef)) {
-                CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(ctxRef.get()));
-            } else {
-                LOG.warn("CrawlPagedWebSearchPerformer cache not set, lost reference to MainApplication");
-            }
-            CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
-        }
+    private void initializeCrawlPagedWebSearchPerformer(Context context) {
+        CrawlPagedWebSearchPerformer.setCache(new DiskCrawlCache(context));
+        CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
     }
 
+    // don't try to refactor this into an invokeAsync call since this guy runs on a thread
+    // outside the Engine threadpool
     private static class BTEngineInitializer implements Runnable {
         private final WeakReference<Context> mainAppRef;
 

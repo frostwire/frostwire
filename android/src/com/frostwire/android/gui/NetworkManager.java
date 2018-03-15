@@ -128,21 +128,12 @@ public final class NetworkManager {
         return false;
     }
 
-    public void queryNetworkStatus() {
-        pool.execute(new QueryNetworkStatusTask());
-    }
-
-    private static final class QueryNetworkStatusTask implements Runnable {
-
-        @Override
-        public void run() {
-            NetworkManager manager = NetworkManager.instance();
-            boolean isDataUp = manager.isDataUp();
-            manager.detectTunnel();
-
-            Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
-            intent.putExtra("isDataUp", isDataUp);
-            LocalBroadcastManager.getInstance(manager.appContext).sendBroadcast(intent);
-        }
+    public void queryNetworkStatusBackground() {
+        NetworkManager manager = NetworkManager.instance();
+        boolean isDataUp = manager.isDataUp();
+        manager.detectTunnel();
+        Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
+        intent.putExtra("isDataUp", isDataUp);
+        LocalBroadcastManager.getInstance(manager.appContext).sendBroadcast(intent);
     }
 }
