@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.TouchImageView;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.ImageLoader.Callback;
 import com.frostwire.android.util.SystemUtils;
@@ -62,6 +61,8 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -161,7 +162,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     public void updateData(final FileDescriptor fd, int position) {
         this.fd = fd;
         this.position = position;
-        Asyncs.async(this, ImageViewerFragment::loadSurroundingFileDescriptors);
+        async(this, ImageViewerFragment::loadSurroundingFileDescriptors);
 
         if (actionModeCallback == null) {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd, position);
