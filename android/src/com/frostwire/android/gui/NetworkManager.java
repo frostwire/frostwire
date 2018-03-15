@@ -26,20 +26,16 @@ import android.net.NetworkInfo;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class NetworkManager {
-
-    private final ExecutorService pool;
 
     private final Context appContext;
     private boolean tunnelUp;
@@ -68,7 +64,6 @@ public final class NetworkManager {
     }
 
     private NetworkManager(Context context) {
-        this.pool = Engine.instance().getThreadPool();
         this.appContext = context.getApplicationContext();
     }
 
