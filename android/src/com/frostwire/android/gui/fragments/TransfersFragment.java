@@ -83,6 +83,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.frostwire.android.util.Asyncs.invokeAsync;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -254,43 +256,40 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private static final class TransferListUpdater implements Runnable {
-        WeakReference<TransfersFragment> fragmentRef;
-        TransferListUpdater(TransfersFragment fragment) {
-            fragmentRef = Ref.weak(fragment);
-        }
+    private static class TransfersTuple {
+        final List<Transfer> allTransfers;
+        final List<Transfer> sortedSelectedStatusTransfers;
 
-        @Override
-        public void run() {
-            if (!Ref.alive(fragmentRef)) {
-                return;
-            }
-            fragmentRef.get().updateTransferList();
+        public TransfersTuple(List<Transfer> allTransfers, List<Transfer> selectedStatusTransfers) {
+            this.allTransfers = allTransfers;
+            this.sortedSelectedStatusTransfers = selectedStatusTransfers;
         }
     }
 
-    private void updateTransferList() {
+    private TransfersTuple sortSelectedStatusTransfersInBackground() {
         List<Transfer> allTransfers = TransferManager.instance().getTransfers();
         final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
         Collections.sort(selectedStatusTransfers, transferComparator);
-        
-        Activity activity = getActivity();
-        if (isVisible() && isAdded() && activity != null) {
-            activity.runOnUiThread(() -> {
-                if (adapter != null) {
-                    adapter.updateList(selectedStatusTransfers);
-                }
-                if (selectedStatus == TransferStatus.SEEDING) {
-                    handlePossibleSeedingSuggestions(allTransfers);
-                }
-            });
+        return new TransfersTuple(allTransfers, selectedStatusTransfers);
+    }
+
+    public void updateTransferList(TransfersTuple transfersTuple) {
+        if (isVisible() && isAdded()) {
+            if (adapter != null) {
+                adapter.updateList(transfersTuple.sortedSelectedStatusTransfers);
+            }
+            if (selectedStatus == TransferStatus.SEEDING) {
+                handlePossibleSeedingSuggestions(transfersTuple.allTransfers);
+            }
         }
     }
 
     @Override
     public void onTime() {
         if (adapter != null) {
-            Engine.instance().getThreadPool().execute(new TransferListUpdater(this));
+            invokeAsync(this,
+                    TransfersFragment::sortSelectedStatusTransfersInBackground,
+                    TransfersFragment::updateTransferList);
         } else if (this.getActivity() != null) {
             setupAdapter(this.getActivity());
         }

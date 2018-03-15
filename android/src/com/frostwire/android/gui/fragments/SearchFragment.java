@@ -71,7 +71,6 @@ import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.SearchHeaderBanner;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
