@@ -22,11 +22,10 @@ import android.content.Context;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -59,7 +58,7 @@ public final class Peer {
     }
 
     public void finger(final Context context, final Finger.FingerCallback callback) {
-        Engine.instance().getThreadPool().execute(new FingerTask(context, callback));
+        async(context, this::fingerBackground, callback);
     }
 
     public List<FileDescriptor> browse(final Context context, byte fileType) {
@@ -73,11 +72,7 @@ public final class Peer {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof Peer)) {
-            return false;
-        }
-
-        return hashCode() == o.hashCode();
+        return !(o == null || !(o instanceof Peer)) && hashCode() == o.hashCode();
     }
 
     @Override
@@ -89,29 +84,15 @@ public final class Peer {
         return key;
     }
 
-    private static final class FingerTask implements Runnable {
-
-        private final WeakReference<Context> ctxRef;
-        private final WeakReference<Finger.FingerCallback> cb;
-
-        FingerTask(Context context, Finger.FingerCallback cb) {
-            this.ctxRef = Ref.weak(context);
-            this.cb = Ref.weak(cb);
-        }
-
-        @Override
-        public void run() {
-            if (Ref.alive(ctxRef) && Ref.alive(cb)) {
-                try {
-                    Finger finger = Librarian.instance().finger(ctxRef.get());
-                    if (Ref.alive(ctxRef) && Ref.alive(cb)) {
-                        cb.get().onFinger(ctxRef.get(), finger);
-                    }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    // TODO: fix this the right way!!
-                }
+    private void fingerBackground(Context context, Finger.FingerCallback cb) {
+        try {
+            Finger finger = Librarian.instance().finger(context);
+            if (context != null) {
+                cb.onFinger(context, finger);
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            // TODO: fix this the right way!!
         }
     }
 }
