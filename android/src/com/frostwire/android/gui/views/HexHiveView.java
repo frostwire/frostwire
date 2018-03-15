@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,13 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -52,7 +48,6 @@ public class HexHiveView<T> extends View {
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
     private DrawingProperties DP;
-    private OnAsyncDrawCallback onAsyncDrawcallback;
     private Bitmap compressedBitmap;
 
     private static float getHexWidth(float sideLength) {
@@ -94,7 +89,6 @@ public class HexHiveView<T> extends View {
         int fullColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_fullColor, r.getColor(R.color.basic_blue_highlight));
         typedArray.recycle();
         initPaints(borderColor, emptyColor, fullColor);
-        onAsyncDrawcallback = new OnAsyncDrawCallback(this);
     }
 
     public boolean ready() {
@@ -143,13 +137,11 @@ public class HexHiveView<T> extends View {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            HexHiveRenderer renderer = new HexHiveRenderer(canvasWidth, canvasHeight, DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint, onAsyncDrawcallback);
-            Engine.instance().getThreadPool().execute(renderer);
+            async(this,
+                    HexHiveView::asyncDraw,
+                    new HexHiveRenderer(canvasWidth, canvasHeight, DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint),
+                    HexHiveView::invalidatePostTask);
         }
-    }
-
-    public void updateCompressedBitmap(Bitmap bitmap) {
-        compressedBitmap = bitmap;
     }
 
     public interface HexDataAdapter<T> {
@@ -317,26 +309,7 @@ public class HexHiveView<T> extends View {
         }
     }
 
-    private static final class OnAsyncDrawCallback {
-        private final WeakReference<HexHiveView> viewRef;
-        OnAsyncDrawCallback(HexHiveView view) {
-            viewRef = Ref.weak(view);
-        }
-        void invoke(Bitmap compressedBitmap) {
-            if (Ref.alive(viewRef)) {
-                HexHiveView view = viewRef.get();
-                view.updateCompressedBitmap(compressedBitmap);
-            }
-            new Handler(Looper.getMainLooper()).post(() -> {
-                if (Ref.alive(viewRef)) {
-                    HexHiveView view = viewRef.get();
-                    view.invalidate();
-                }
-            });
-        }
-    }
-
-    private static final class HexHiveRenderer implements Runnable {
+    private static final class HexHiveRenderer {
         private final int canvasWidth;
         private final int canvasHeight;
         private final DrawingProperties DP;
@@ -344,7 +317,6 @@ public class HexHiveView<T> extends View {
         private final Paint hexagonBorderPaint;
         private final CubePaint fullHexPaint;
         private final CubePaint emptyHexPaint;
-        private final OnAsyncDrawCallback onAsyncDrawCallback;
 
         public HexHiveRenderer(final int canvasWidth,
                                final int canvasHeight,
@@ -352,8 +324,7 @@ public class HexHiveView<T> extends View {
                                final HexDataAdapter adapter,
                                final Paint hexagonBorderPaint,
                                final CubePaint fullHexPaint,
-                               final CubePaint emptyHexPaint,
-                               final OnAsyncDrawCallback onAsyncDrawCallback) {
+                               final CubePaint emptyHexPaint) {
             this.canvasWidth = canvasWidth;
             this.canvasHeight = canvasHeight;
             this.DP = DP;
@@ -361,115 +332,108 @@ public class HexHiveView<T> extends View {
             this.hexagonBorderPaint = hexagonBorderPaint;
             this.fullHexPaint = fullHexPaint;
             this.emptyHexPaint = emptyHexPaint;
-            this.onAsyncDrawCallback = onAsyncDrawCallback;
         }
+    }
 
-        @Override
-        public void run() {
-            asyncDraw();
+    private static void asyncDraw(HexHiveView view, HexHiveRenderer renderer) {
+        final DrawingProperties DP = renderer.DP;
+        // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
+        DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
+        boolean evenRow = true;
+        int pieceIndex = 0;
+        float heightQuarter = DP.hexHeight / 4;
+        float threeQuarters = heightQuarter * 3;
+        // if we have just one piece to draw, we'll draw it in the center
+        if (DP.numHexs == 1) {
+            DP.hexCenterBuffer.x = DP.center.x;
+            DP.hexCenterBuffer.y = DP.center.y;
         }
-
-        private void asyncDraw() {
-            // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
-            DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
-
-            boolean evenRow = true;
-            int pieceIndex = 0;
-            float heightQuarter = DP.hexHeight / 4;
-            float threeQuarters = heightQuarter*3;
-
-            // if we have just one piece to draw, we'll draw it in the center
-            if (DP.numHexs == 1) {
-                DP.hexCenterBuffer.x = DP.center.x;
-                DP.hexCenterBuffer.y = DP.center.y;
+        boolean drawCubes = DP.numHexs <= 600;
+        Bitmap bitmap = Bitmap.createBitmap(renderer.canvasWidth, renderer.canvasHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        while (pieceIndex < DP.numHexs) {
+            drawHexagon(DP, canvas, renderer.hexagonBorderPaint, (renderer.adapter.isFull(pieceIndex) ? renderer.fullHexPaint : renderer.emptyHexPaint), drawCubes);
+            pieceIndex++;
+            DP.hexCenterBuffer.x += DP.hexWidth + (renderer.hexagonBorderPaint.getStrokeWidth() * 4);
+            float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (renderer.hexagonBorderPaint.getStrokeWidth() * 3);
+            if (rightSide >= DP.end.x) {
+                evenRow = !evenRow;
+                DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
+                DP.hexCenterBuffer.y += threeQuarters;
             }
+        }
+        view.compressedBitmap = bitmap;
+    }
 
-            boolean drawCubes = DP.numHexs <= 600;
+    // to be executed in main thread
+    private static void invalidatePostTask(HexHiveView view,
+                                           @SuppressWarnings("unused") HexHiveRenderer unusedPassedByAsyncCall) {
+        view.invalidate();
+    }
+    // Drawing/Geometry functions
 
-            Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
+    /**
+     * @param outCorner    - a re-usable Point buffer to output the
+     * @param inCenter     - a reusable Point buffer representing the center coordinates of a hexagon
+     * @param sideLength   - length of hexagon side
+     * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
+     */
+    private static void getHexCorner(final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
+        double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
+        outCorner.set((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
+    }
 
-            while (pieceIndex < DP.numHexs) {
-                drawHexagon(DP, canvas, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
-                pieceIndex++;
-                DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
-
-                float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth/2) + (hexagonBorderPaint.getStrokeWidth()*3);
-                if (rightSide >= DP.end.x) {
-                    evenRow = !evenRow;
-                    DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-                    DP.hexCenterBuffer.y +=  threeQuarters;
-                }
+    private static void drawHexagon(final DrawingProperties DP,
+                                    final Canvas canvas,
+                                    final Paint borderPaint,
+                                    final CubePaint fillPaint,
+                                    final boolean drawCube) {
+        DP.fillPathBuffer.reset();
+        for (int i = 0; i < 7; i++) {
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, i, DP.hexSideLength);
+            if (i == 0) {
+                DP.fillPathBuffer.moveTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            } else {
+                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             }
-            onAsyncDrawCallback.invoke(bitmap);
         }
-
-        // Drawing/Geometry functions
-        /**
-         * @param outCorner    - a re-usable Point buffer to output the
-         * @param inCenter     - a reusable Point buffer representing the center coordinates of a hexagon
-         * @param sideLength   - length of hexagon side
-         * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
-         */
-        private static void getHexCorner(final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
-            double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
-            outCorner.set((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
-        }
-
-        private static void drawHexagon(final DrawingProperties DP,
-                                 final Canvas canvas,
-                                 final Paint borderPaint,
-                                 final CubePaint fillPaint,
-                                 final boolean drawCube) {
+        canvas.drawPath(DP.fillPathBuffer, fillPaint);
+        canvas.drawPath(DP.fillPathBuffer, borderPaint);
+        DP.fillPathBuffer.reset();
+        if (drawCube) {
+            // LEFT FACE
+            // bottom corner - 90 degrees (with zero at horizon on the right side)
+            // angles move clockwise
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 2, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            // top left corner - 210 degrees
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            fillPaint.useDarkColor();
+            // fill and paint border of face
+            canvas.drawPath(DP.fillPathBuffer, fillPaint);
+            canvas.drawPath(DP.fillPathBuffer, borderPaint);
+            // TOP FACE
             DP.fillPathBuffer.reset();
-            for (int i = 0; i < 7; i++) {
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, i, DP.hexSideLength);
-                if (i==0) {
-                    DP.fillPathBuffer.moveTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                } else {
-                    DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                }
-            }
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 4, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            fillPaint.useLightColor();
             canvas.drawPath(DP.fillPathBuffer, fillPaint);
             canvas.drawPath(DP.fillPathBuffer, borderPaint);
             DP.fillPathBuffer.reset();
-
-            if (drawCube) {
-                // LEFT FACE
-                // bottom corner - 90 degrees (with zero at horizon on the right side)
-                // angles move clockwise
-                DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 2, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                // top left corner - 210 degrees
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-                fillPaint.useDarkColor();
-
-                // fill and paint border of face
-                canvas.drawPath(DP.fillPathBuffer, fillPaint);
-                canvas.drawPath(DP.fillPathBuffer, borderPaint);
-
-                // TOP FACE
-                DP.fillPathBuffer.reset();
-                DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 4, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
-                DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-                DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
-                fillPaint.useLightColor();
-                canvas.drawPath(DP.fillPathBuffer, fillPaint);
-                canvas.drawPath(DP.fillPathBuffer, borderPaint);
-                DP.fillPathBuffer.reset();
-                fillPaint.useBaseColor();
-            }
-            DP.cornerBuffer.set(-1, -1);
+            fillPaint.useBaseColor();
         }
+        DP.cornerBuffer.set(-1, -1);
     }
+
 }
