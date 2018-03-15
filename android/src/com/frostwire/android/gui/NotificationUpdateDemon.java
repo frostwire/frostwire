@@ -30,7 +30,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -38,9 +37,8 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -53,7 +51,6 @@ public final class NotificationUpdateDemon implements TimerObserver {
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
     private final Context mParentContext;
-    private final OnTimeRunnable mOnTimeRunnable;
     private TimerSubscription mTimerSubscription;
 
     private RemoteViews notificationViews;
@@ -61,7 +58,6 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     public NotificationUpdateDemon(Context parentContext) {
         mParentContext = parentContext;
-        mOnTimeRunnable = new OnTimeRunnable(this);
         setupNotification();
     }
 
@@ -187,7 +183,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     @Override
     public void onTime() {
-        Engine.instance().getThreadPool().execute(mOnTimeRunnable);
+        async(this, NotificationUpdateDemon::onTimeRefresh);
     }
 
     @SuppressWarnings("deprecation")
@@ -196,24 +192,9 @@ public final class NotificationUpdateDemon implements TimerObserver {
         return pm != null && pm.isScreenOn();
     }
 
-    private static class OnTimeRunnable implements Runnable {
-
-        private final WeakReference<NotificationUpdateDemon> updateDemonRef;
-
-        OnTimeRunnable(NotificationUpdateDemon updateDemon) {
-            updateDemonRef = Ref.weak(updateDemon);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(updateDemonRef)) {
-                return;
-            }
-            NotificationUpdateDemon updateDemon = updateDemonRef.get();
-            if (updateDemon.isScreenOn()) {
-                // the context we have is the main app context, not an activity
-                updateDemonRef.get().updatePermanentStatusNotification();
-            }
+    private void onTimeRefresh() {
+        if (isScreenOn()) {
+            updatePermanentStatusNotification();
         }
     }
 }
