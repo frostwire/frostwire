@@ -102,7 +102,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -938,7 +938,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            invokeAsync(filterButton,
+            async(filterButton,
                     SearchFragment::possiblyWaitInBackgroundToUpdateUI,
                     keywordFilterDrawerView, filteredHistograms,
                     SearchFragment::updateUIWithFilteredHistogramsPerFeature);

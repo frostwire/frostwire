@@ -50,7 +50,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -327,7 +327,7 @@ public final class ImageLoader {
     }
 
     public static void start(MainApplication mainApplication) {
-        invokeAsync(mainApplication, ImageLoader::startImageLoaderBackground);
+        async(mainApplication, ImageLoader::startImageLoaderBackground);
     }
 
     private static void startImageLoaderBackground(MainApplication mainApplication) {

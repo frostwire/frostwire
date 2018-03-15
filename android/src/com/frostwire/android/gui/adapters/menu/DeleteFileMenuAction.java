@@ -35,7 +35,7 @@ import com.frostwire.android.gui.views.MenuAction;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -73,7 +73,7 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        invokeAsync(adapter, DeleteFileMenuAction::deleteFilesTask, files,
+        async(adapter, DeleteFileMenuAction::deleteFilesTask, files,
                 DeleteFileMenuAction::deleteFilesTaskPost);
     }
 

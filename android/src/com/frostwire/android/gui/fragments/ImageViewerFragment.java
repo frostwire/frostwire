@@ -161,7 +161,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     public void updateData(final FileDescriptor fd, int position) {
         this.fd = fd;
         this.position = position;
-        Asyncs.invokeAsync(this, ImageViewerFragment::loadSurroundingFileDescriptors);
+        Asyncs.async(this, ImageViewerFragment::loadSurroundingFileDescriptors);
 
         if (actionModeCallback == null) {
             actionModeCallback = new ImageViewerActionModeCallback(this.fd, position);

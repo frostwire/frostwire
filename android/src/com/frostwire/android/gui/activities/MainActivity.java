@@ -99,7 +99,7 @@ import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -295,7 +295,7 @@ public class MainActivity extends AbstractActivity implements
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
-            invokeAsync(this, MainActivity::onDownloadCompleteNotification, intent);
+            async(this, MainActivity::onDownloadCompleteNotification, intent);
         }
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
@@ -360,7 +360,7 @@ public class MainActivity extends AbstractActivity implements
         }
 
         tryOnResumeInterstitial();
-        invokeAsync(NetworkManager.instance()::queryNetworkStatusBackground);
+        async(NetworkManager.instance()::queryNetworkStatusBackground);
     }
 
     @Override
@@ -600,7 +600,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        invokeAsync(this, MainActivity::checkSDPermission, MainActivity::checkSDPermissionPost);
+        async(this, MainActivity::checkSDPermission, MainActivity::checkSDPermissionPost);
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&

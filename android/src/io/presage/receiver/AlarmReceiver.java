@@ -24,7 +24,7 @@ import android.os.Bundle;
 
 import io.presage.Presage;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.Debug.runStrict;
 
 /**
@@ -48,7 +48,7 @@ public final class AlarmReceiver extends BroadcastReceiver {
 
     private void onReceiveSafe(Context context, Intent intent) {
         try {
-            invokeAsync(context, (ctx) -> {
+            async(context, (ctx) -> {
                 try {
                     Presage.getInstance().setContext(ctx);
                     Bundle extras = intent.getExtras();

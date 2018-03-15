@@ -39,7 +39,7 @@ import com.frostwire.transfers.BittorrentDownload;
 
 import java.text.DecimalFormatSymbols;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -92,7 +92,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         super.initComponents(rootView, savedInstanceState);
         if (uiBittorrentDownload == null && savedInstanceState != null) {
             String infoHash = savedInstanceState.getString("infohash");
-            invokeAsync(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+            async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
         }
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
@@ -111,7 +111,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             if (intent != null) {
                 String infoHash = intent.getStringExtra("infoHash");
                 if (infoHash != null && !infoHash.isEmpty()) {
-                    invokeAsync(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+                    async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
                 }
             }
             if (uiBittorrentDownload == null) {
@@ -184,7 +184,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     protected void ensureTorrentHandleAsync() {
         if (Looper.getMainLooper() == Looper.myLooper()) {
-            invokeAsync(this, AbstractTransferDetailFragment::ensureTorrentHandle);
+            async(this, AbstractTransferDetailFragment::ensureTorrentHandle);
         } else {
             ensureTorrentHandle();
         }

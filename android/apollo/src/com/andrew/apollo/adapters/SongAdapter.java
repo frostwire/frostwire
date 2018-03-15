@@ -35,7 +35,7 @@ import com.frostwire.util.Ref;
 
 import java.util.List;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * This {@link ArrayAdapter} is used to display all of the songs on a user's
@@ -70,11 +70,10 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         if (mImageFetcher != null && dataHolder != null && Ref.alive(musicViewHolder.mImage)) {
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
-                invokeAsync(
-                        getContext(),
-                        SongAdapter::updateDataHolderAlbumId,
-                        dataHolder, musicViewHolder, mImageFetcher,
-                        SongAdapter::updateAlbumImage);
+                async(getContext(),
+                      SongAdapter::updateDataHolderAlbumId,
+                      dataHolder, musicViewHolder, mImageFetcher,
+                      SongAdapter::updateAlbumImage);
             } else {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
             }

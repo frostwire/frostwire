@@ -40,9 +40,9 @@ public final class Asyncs {
 
     // context + return
 
-    public static <C, R> void invokeAsync(@NonNull C context,
-        ContextResultTask<C, R> task,
-        ContextResultPostTask<C, R> post) {
+    public static <C, R> void async(@NonNull C context,
+                                    ContextResultTask<C, R> task,
+                                    ContextResultPostTask<C, R> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -50,10 +50,10 @@ public final class Asyncs {
             (c, args, r) -> post.run(c, r));
     }
 
-    public static <C, T1, R> void invokeAsync(@NonNull C context,
-        ContextResultTask1<C, T1, R> task,
-        T1 arg1,
-        ContextResultPostTask1<C, T1, R> post) {
+    public static <C, T1, R> void async(@NonNull C context,
+                                        ContextResultTask1<C, T1, R> task,
+                                        T1 arg1,
+                                        ContextResultPostTask1<C, T1, R> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -62,10 +62,10 @@ public final class Asyncs {
             arg1);
     }
 
-    public static <C, T1, T2, R> void invokeAsync(@NonNull C context,
-        ContextResultTask2<C, T1, T2, R> task,
-        T1 arg1, T2 arg2,
-        ContextResultPostTask2<C, T1, T2, R> post) {
+    public static <C, T1, T2, R> void async(@NonNull C context,
+                                            ContextResultTask2<C, T1, T2, R> task,
+                                            T1 arg1, T2 arg2,
+                                            ContextResultPostTask2<C, T1, T2, R> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -74,10 +74,10 @@ public final class Asyncs {
             arg1, arg2);
     }
 
-    public static <C, T1, T2, T3, R> void invokeAsync(@NonNull C context,
-        ContextResultTask3<C, T1, T2, T3, R> task,
-        T1 arg1, T2 arg2, T3 arg3,
-        ContextResultPostTask3<C, T1, T2, T3, R> post) {
+    public static <C, T1, T2, T3, R> void async(@NonNull C context,
+                                                ContextResultTask3<C, T1, T2, T3, R> task,
+                                                T1 arg1, T2 arg2, T3 arg3,
+                                                ContextResultPostTask3<C, T1, T2, T3, R> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -120,16 +120,16 @@ public final class Asyncs {
 
     // only context
 
-    public static <C> void invokeAsync(@NonNull C context, ContextTask<C> task) {
+    public static <C> void async(@NonNull C context, ContextTask<C> task) {
         requireContext(context);
         invokeAsyncSupport(context,
             (c, args) -> {task.run(c); return null;},
             null);
     }
 
-    public static <C, T1> void invokeAsync(C context,
-        ContextTask1<C, T1> task,
-        T1 arg1) {
+    public static <C, T1> void async(C context,
+                                     ContextTask1<C, T1> task,
+                                     T1 arg1) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -138,9 +138,9 @@ public final class Asyncs {
             arg1);
     }
 
-    public static <C, T1, T2> void invokeAsync(@NonNull C context,
-        ContextTask2<C, T1, T2> task,
-        T1 arg1, T2 arg2) {
+    public static <C, T1, T2> void async(@NonNull C context,
+                                         ContextTask2<C, T1, T2> task,
+                                         T1 arg1, T2 arg2) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -149,9 +149,9 @@ public final class Asyncs {
             arg1, arg2);
     }
 
-    public static <C, T1, T2, T3> void invokeAsync(@NonNull C context,
-        ContextTask3<C, T1, T2, T3> task,
-        T1 arg1, T2 arg2, T3 arg3) {
+    public static <C, T1, T2, T3> void async(@NonNull C context,
+                                             ContextTask3<C, T1, T2, T3> task,
+                                             T1 arg1, T2 arg2, T3 arg3) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -160,10 +160,10 @@ public final class Asyncs {
             arg1, arg2, arg3);
     }
 
-    public static <C, T1> void invokeAsync(@NonNull C context,
-        ContextTask1<C, T1> task,
-        T1 arg1,
-        ContextPostTask1<C, T1> post) {
+    public static <C, T1> void async(@NonNull C context,
+                                     ContextTask1<C, T1> task,
+                                     T1 arg1,
+                                     ContextPostTask1<C, T1> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -172,10 +172,10 @@ public final class Asyncs {
             arg1);
     }
 
-    public static <C, T1, T2> void invokeAsync(@NonNull C context,
-        ContextTask2<C, T1, T2> task,
-        T1 arg1, T2 arg2,
-        ContextPostTask2<C, T1, T2> post) {
+    public static <C, T1, T2> void async(@NonNull C context,
+                                         ContextTask2<C, T1, T2> task,
+                                         T1 arg1, T2 arg2,
+                                         ContextPostTask2<C, T1, T2> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -184,10 +184,10 @@ public final class Asyncs {
             arg1, arg2);
     }
 
-    public static <C, T1, T2, T3> void invokeAsync(@NonNull C context,
-        ContextTask3<C, T1, T2, T3> task,
-        T1 arg1, T2 arg2, T3 arg3,
-        ContextPostTask3<C, T1, T2, T3> post) {
+    public static <C, T1, T2, T3> void async(@NonNull C context,
+                                             ContextTask3<C, T1, T2, T3> task,
+                                             T1 arg1, T2 arg2, T3 arg3,
+                                             ContextPostTask3<C, T1, T2, T3> post) {
 
         requireContext(context);
         invokeAsyncSupport(context,
@@ -226,17 +226,17 @@ public final class Asyncs {
 
     // only result
 
-    public static <R> void invokeAsync(ResultTask<R> task,
-        ResultPostTask<R> post) {
+    public static <R> void async(ResultTask<R> task,
+                                 ResultPostTask<R> post) {
 
         invokeAsyncSupport(null,
             (c, args)-> task.run(),
             (c, args, r) -> post.run(r));
     }
 
-    public static <T1, R> void invokeAsync(ResultTask1<T1, R> task,
-        T1 arg1,
-        ResultPostTask1<T1, R> post) {
+    public static <T1, R> void async(ResultTask1<T1, R> task,
+                                     T1 arg1,
+                                     ResultPostTask1<T1, R> post) {
 
         invokeAsyncSupport(null,
             (c, args)-> task.run((T1)args[0]),
@@ -244,9 +244,9 @@ public final class Asyncs {
             arg1);
     }
 
-    public static <T1, T2, R> void invokeAsync(ResultTask2<T1, T2, R> task,
-        T1 arg1, T2 arg2,
-        ResultPostTask2<T1, T2, R> post) {
+    public static <T1, T2, R> void async(ResultTask2<T1, T2, R> task,
+                                         T1 arg1, T2 arg2,
+                                         ResultPostTask2<T1, T2, R> post) {
 
         invokeAsyncSupport(null,
             (c, args)-> task.run((T1)args[0], (T2)args[1]),
@@ -254,9 +254,9 @@ public final class Asyncs {
             arg1, arg2);
     }
 
-    public static <T1, T2, T3, R> void invokeAsync(ResultTask3<T1, T2, T3, R> task,
-        T1 arg1, T2 arg2, T3 arg3,
-        ResultPostTask3<T1, T2, T3, R> post) {
+    public static <T1, T2, T3, R> void async(ResultTask3<T1, T2, T3, R> task,
+                                             T1 arg1, T2 arg2, T3 arg3,
+                                             ResultPostTask3<T1, T2, T3, R> post) {
 
         invokeAsyncSupport(null,
             (c, args)-> task.run((T1)args[0], (T2)args[1], (T3)args[2]),
@@ -298,14 +298,14 @@ public final class Asyncs {
 
     // plain
 
-    public static void invokeAsync(Task task) {
+    public static void async(Task task) {
         invokeAsyncSupport(null,
             (c, args)-> {task.run(); return null;},
             null);
     }
 
-    public static <T1> void invokeAsync(Task1<T1> task,
-        T1 arg1) {
+    public static <T1> void async(Task1<T1> task,
+                                  T1 arg1) {
 
         invokeAsyncSupport(null,
             (c, args)-> {task.run((T1)args[0]); return null;},
@@ -313,8 +313,8 @@ public final class Asyncs {
             arg1);
     }
 
-    public static <T1, T2> void invokeAsync(Task2<T1, T2> task,
-        T1 arg1, T2 arg2) {
+    public static <T1, T2> void async(Task2<T1, T2> task,
+                                      T1 arg1, T2 arg2) {
 
         invokeAsyncSupport(null,
             (c, args)-> {task.run((T1)args[0], (T2)args[1]); return null;},
@@ -322,8 +322,8 @@ public final class Asyncs {
             arg1, arg2);
     }
 
-    public static <T1, T2, T3> void invokeAsync(Task3<T1, T2, T3> task,
-        T1 arg1, T2 arg2, T3 arg3) {
+    public static <T1, T2, T3> void async(Task3<T1, T2, T3> task,
+                                          T1 arg1, T2 arg2, T3 arg3) {
         invokeAsyncSupport(null,
             (c, args)-> {task.run((T1)args[0], (T2)args[1], (T3)args[2]); return null;},
             null,

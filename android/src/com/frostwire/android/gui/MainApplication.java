@@ -46,7 +46,7 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.Debug.runStrict;
 
 /**
@@ -75,11 +75,11 @@ public class MainApplication extends Application {
 
         ImageLoader.start(this);
 
-        invokeAsync(this, this::initializeCrawlPagedWebSearchPerformer);
+        async(this, this::initializeCrawlPagedWebSearchPerformer);
 
         LocalSearchEngine.create();
 
-        invokeAsync(MainApplication::cleanTemp);
+        async(MainApplication::cleanTemp);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class MainApplication extends Application {
         PlayStore.getInstance().initialize(this);
 
         NetworkManager.create(this);
-        invokeAsync(NetworkManager.instance()::queryNetworkStatusBackground);
+        async(NetworkManager.instance()::queryNetworkStatusBackground);
     }
 
     private void ignoreHardwareMenu() {
@@ -120,7 +120,7 @@ public class MainApplication extends Application {
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
     }
 
-    // don't try to refactor this into an invokeAsync call since this guy runs on a thread
+    // don't try to refactor this into an async call since this guy runs on a thread
     // outside the Engine threadpool
     private static class BTEngineInitializer implements Runnable {
         private final WeakReference<Context> mainAppRef;

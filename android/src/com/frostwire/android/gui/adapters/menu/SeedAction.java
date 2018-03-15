@@ -36,7 +36,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
@@ -54,7 +53,7 @@ import com.frostwire.util.Ref;
 import java.io.File;
 import java.lang.ref.WeakReference;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -238,7 +237,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // due to the android providers getting out of sync.
             }
         } else {
-            invokeAsync(this::buildTorrentAndSeedIt,fd);
+            async(this::buildTorrentAndSeedIt,fd);
         }
     }
 

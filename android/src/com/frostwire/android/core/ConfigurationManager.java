@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -94,7 +94,7 @@ public final class ConfigurationManager {
     }
 
     private ConfigurationManager(Application application) {
-        invokeAsync(this::initialize, application);
+        async(this::initialize, application);
     }
 
     public String getString(String key, String defValue) {

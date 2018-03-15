@@ -81,7 +81,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -285,7 +285,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onTime() {
         if (adapter != null) {
-            invokeAsync(this,
+            async(this,
                     TransfersFragment::sortSelectedStatusTransfersInBackground,
                     TransfersFragment::updateTransferList);
         } else if (this.getActivity() != null) {
@@ -314,7 +314,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             getActivity().invalidateOptionsMenu();
         }
         if (BTEngine.ctx != null) {
-            invokeAsync(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
+            async(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
             onCheckDHT();
         }
     }

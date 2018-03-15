@@ -42,7 +42,7 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Receives and controls messages from the external world. Depending on the
@@ -64,9 +64,9 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             String action = intent.getAction();
 
             if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-                invokeAsync(context, this::handleMediaMounted, intent);
+                async(context, this::handleMediaMounted, intent);
             } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
-                invokeAsync(this::handleMediaUnmounted, intent);
+                async(this::handleMediaUnmounted, intent);
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
@@ -74,7 +74,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 // heavy lifting happens in Thread()
                 Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                invokeAsync(this::handleConnectivityChange, intent);
+                async(this::handleConnectivityChange, intent);
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);

@@ -42,7 +42,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -182,7 +182,7 @@ public final class CancelMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
-            invokeAsync(dlg.getContext(), CancelMenuAction::removeTransfer, transfer, deleteTorrent, deleteData);
+            async(dlg.getContext(), CancelMenuAction::removeTransfer, transfer, deleteTorrent, deleteData);
             dlg.dismiss();
             if (dlg.getContext() instanceof TimerObserver) {
                 ((TimerObserver) dlg.getContext()).onTime();

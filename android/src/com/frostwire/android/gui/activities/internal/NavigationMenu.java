@@ -46,7 +46,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
 
-import static com.frostwire.android.util.Asyncs.invokeAsync;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -72,7 +72,7 @@ public final class NavigationMenu {
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
         menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
-        invokeAsync(this, NavigationMenu::refreshMenuRemoveAdsItem);
+        async(this, NavigationMenu::refreshMenuRemoveAdsItem);
     }
 
     public boolean isOpen() {
@@ -239,7 +239,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            invokeAsync(NavigationMenu.this, NavigationMenu::refreshMenuRemoveAdsItem);
+            async(NavigationMenu.this, NavigationMenu::refreshMenuRemoveAdsItem);
             controller.syncNavigationMenu();
         }
     }
