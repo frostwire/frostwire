@@ -360,7 +360,7 @@ public class MainActivity extends AbstractActivity implements
         }
 
         tryOnResumeInterstitial();
-        async(NetworkManager.instance()::queryNetworkStatusBackground);
+        async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
     }
 
     @Override

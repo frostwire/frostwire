@@ -99,7 +99,7 @@ public class MainApplication extends Application {
         PlayStore.getInstance().initialize(this);
 
         NetworkManager.create(this);
-        async(NetworkManager.instance()::queryNetworkStatusBackground);
+        async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
     }
 
     private void ignoreHardwareMenu() {

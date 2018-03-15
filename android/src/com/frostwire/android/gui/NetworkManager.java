@@ -123,8 +123,7 @@ public final class NetworkManager {
         return false;
     }
 
-    public void queryNetworkStatusBackground() {
-        NetworkManager manager = NetworkManager.instance();
+    public static void queryNetworkStatusBackground(NetworkManager manager) {
         boolean isDataUp = manager.isDataUp();
         manager.detectTunnel();
         Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);

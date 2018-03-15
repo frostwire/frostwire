@@ -111,7 +111,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleNetworkStatusChange() {
-        NetworkManager.instance().queryNetworkStatusBackground();
+        NetworkManager.queryNetworkStatusBackground(NetworkManager.instance());
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
