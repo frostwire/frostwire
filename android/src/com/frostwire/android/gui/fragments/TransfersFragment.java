@@ -254,30 +254,30 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private static class TransfersTuple {
+    private static class TransfersHolder {
         final List<Transfer> allTransfers;
         final List<Transfer> sortedSelectedStatusTransfers;
 
-        public TransfersTuple(List<Transfer> allTransfers, List<Transfer> selectedStatusTransfers) {
+        public TransfersHolder(List<Transfer> allTransfers, List<Transfer> selectedStatusTransfers) {
             this.allTransfers = allTransfers;
             this.sortedSelectedStatusTransfers = selectedStatusTransfers;
         }
     }
 
-    private TransfersTuple sortSelectedStatusTransfersInBackground() {
+    private TransfersHolder sortSelectedStatusTransfersInBackground() {
         List<Transfer> allTransfers = TransferManager.instance().getTransfers();
         final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
         Collections.sort(selectedStatusTransfers, transferComparator);
-        return new TransfersTuple(allTransfers, selectedStatusTransfers);
+        return new TransfersHolder(allTransfers, selectedStatusTransfers);
     }
 
-    public void updateTransferList(TransfersTuple transfersTuple) {
+    public void updateTransferList(TransfersHolder transfersHolder) {
         if (isVisible() && isAdded()) {
             if (adapter != null) {
-                adapter.updateList(transfersTuple.sortedSelectedStatusTransfers);
+                adapter.updateList(transfersHolder.sortedSelectedStatusTransfers);
             }
             if (selectedStatus == TransferStatus.SEEDING) {
-                TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersTuple.allTransfers);
+                TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersHolder.allTransfers);
                 transfersNoSeedsView.setMode(mode);
             }
         }
