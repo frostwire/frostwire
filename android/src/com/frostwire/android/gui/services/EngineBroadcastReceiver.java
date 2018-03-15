@@ -34,7 +34,6 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -42,6 +41,8 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
+
+import static com.frostwire.android.util.Asyncs.invokeAsync;
 
 /**
  * Receives and controls messages from the external world. Depending on the
@@ -63,43 +64,17 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             String action = intent.getAction();
 
             if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-                handleMediaMounted(context, intent);
-
-                if (Engine.instance().isDisconnected()) {
-                    if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                            !NetworkManager.instance().isTunnelUp()) {
-                        //don't start
-                    } else {
-                        Engine.instance().getThreadPool().execute(() -> Engine.instance().startServices());
-                    }
-                }
+                invokeAsync(context, this::handleMediaMounted, intent);
             } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
-                handleMediaUnmounted(intent);
+                invokeAsync(this::handleMediaUnmounted, intent);
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
+                // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
             } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
+                // heavy lifting happens in Thread()
                 Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-                DetailedState detailedState = networkInfo.getDetailedState();
-                switch (detailedState) {
-                    case CONNECTED:
-                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleConnectedNetwork, networkInfo);
-                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
-                        Asyncs.invokeAsync(EngineBroadcastReceiver::reopenNetworkSockets);
-                        break;
-                    case DISCONNECTED:
-                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleConnectedNetwork, networkInfo);
-                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
-                        Asyncs.invokeAsync(EngineBroadcastReceiver::reopenNetworkSockets);
-                        break;
-                    case CONNECTING:
-                    case DISCONNECTING:
-                        Asyncs.invokeAsync(this, EngineBroadcastReceiver::handleNetworkStatusChange);
-                        break;
-                    default:
-                        break;
-                }
+                invokeAsync(this::handleConnectivityChange, intent);
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
@@ -112,8 +87,31 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info(msg);
     }
 
+    private void handleConnectivityChange(Intent intent) {
+        NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+        DetailedState detailedState = networkInfo.getDetailedState();
+        switch (detailedState) {
+            case CONNECTED:
+                handleConnectedNetwork(networkInfo);
+                handleNetworkStatusChange();
+                reopenNetworkSockets();
+                break;
+            case DISCONNECTED:
+                handleDisconnectedNetwork(networkInfo);
+                handleNetworkStatusChange();
+                reopenNetworkSockets();
+                break;
+            case CONNECTING:
+            case DISCONNECTING:
+                handleNetworkStatusChange();
+                break;
+            default:
+                break;
+        }
+    }
+
     private void handleNetworkStatusChange() {
-        NetworkManager.instance().queryNetworkStatus();
+        NetworkManager.instance().queryNetworkStatusBackground();
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
@@ -193,15 +191,19 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
                 final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
                 if (privateDir.exists() && privateDir.isDirectory()) {
-                    Thread t = new Thread(() -> Platforms.fileSystem().scan(privateDir));
-
-                    t.setName("Private MediaScanning");
-                    t.setDaemon(true);
-                    t.start();
+                    Platforms.fileSystem().scan(privateDir);
                 }
             }
         } catch (Throwable e) {
             e.printStackTrace();
+        }
+        if (Engine.instance().isDisconnected()) {
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
+                !NetworkManager.instance().isTunnelUp()) {
+                //don't start
+            } else {
+                Engine.instance().startServices();
+            }
         }
     }
 
