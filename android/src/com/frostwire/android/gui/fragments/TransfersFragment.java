@@ -277,7 +277,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 adapter.updateList(transfersTuple.sortedSelectedStatusTransfers);
             }
             if (selectedStatus == TransferStatus.SEEDING) {
-                handlePossibleSeedingSuggestions(transfersTuple.allTransfers);
+                TransfersNoSeedsView.Mode mode = handlePossibleSeedingSuggestions(transfersTuple.allTransfers);
+                transfersNoSeedsView.setMode(mode);
             }
         }
     }
@@ -421,18 +422,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         onTime();
     }
 
-    private void handlePossibleSeedingSuggestions(final List<Transfer> transfers) {
+    private TransfersNoSeedsView.Mode handlePossibleSeedingSuggestions(List<Transfer> transfers) {
         if (transfers.isEmpty()) {
-            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
-            return;
+            return TransfersNoSeedsView.Mode.INACTIVE;
         }
         boolean isNotSeeding = !ConfigurationManager.instance().isSeedFinishedTorrents();
         if (isNotSeeding) {
-            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.SEEDING_DISABLED);
+            return TransfersNoSeedsView.Mode.SEEDING_DISABLED;
         } else if (someTransfersFinished(transfers) && noTransfersSeeding(transfers)) {
-            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.SEED_ALL_FINISHED);
+            return TransfersNoSeedsView.Mode.SEED_ALL_FINISHED;
         } else {
-            transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
+            return TransfersNoSeedsView.Mode.INACTIVE;
         }
     }
 
