@@ -27,16 +27,13 @@ import android.os.SystemClock;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -46,6 +43,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -96,13 +95,11 @@ final class UniversalScanner {
         }
 
         public void onMediaScannerConnected() {
-            Runnable onMediaScannerConnectedRunnable = new MediaScannerConnectedRunnable(connection, files);
-
             // do not do this on main thread, causing ANRs
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Engine.instance().getThreadPool().execute(onMediaScannerConnectedRunnable);
+                async(UniversalScanner::onMediaScannerConnected, connection, files);
             } else {
-                onMediaScannerConnectedRunnable.run();
+                UniversalScanner.onMediaScannerConnected(connection, files);
             }
         }
 
@@ -140,37 +137,21 @@ final class UniversalScanner {
         }
     }
 
-    private static final class MediaScannerConnectedRunnable implements Runnable {
-
-        private final WeakReference<MediaScannerConnection> connRef;
-        private final Collection<File> files;
-
-        MediaScannerConnectedRunnable(MediaScannerConnection conn, Collection<File> files) {
-            this.connRef = Ref.weak(conn);
-            this.files = files;
+    private static void onMediaScannerConnected(MediaScannerConnection connection, Collection<File> files) {
+        if (files == null || connection == null) {
+            return;
         }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(connRef)) {
-                return; // early return;
-            }
-            MediaScannerConnection connection = connRef.get();
-            if (files == null || connection == null) {
-                return;
-            }
-            try {
-                /* should only arrive here on connected state, but let's double check since it's possible */
-                if (connection.isConnected() && !files.isEmpty()) {
-                    for (File f : files) {
-                        connection.scanFile(f.getAbsolutePath(), null);
-                    }
+        try {
+            /* should only arrive here on connected state, but let's double check since it's possible */
+            if (connection.isConnected() && !files.isEmpty()) {
+                for (File f : files) {
+                    connection.scanFile(f.getAbsolutePath(), null);
                 }
-            } catch (IllegalStateException e) {
-                LOG.warn("Scanner service wasn't really connected or service was null", e);
-                //should we try to connect again? don't want to end up in endless loop
-                //maybe destroy connection?
             }
+        } catch (IllegalStateException e) {
+            LOG.warn("Scanner service wasn't really connected or service was null", e);
+            //should we try to connect again? don't want to end up in endless loop
+            //maybe destroy connection?
         }
     }
 
