@@ -56,7 +56,6 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
-import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
 
@@ -65,11 +64,12 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -352,7 +352,7 @@ public final class UIUtils {
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
      */
     public static void playEphemeralPlaylist(final Context context, final FileDescriptor fd) {
-        Engine.instance().getThreadPool().execute(new PlayEphemeralPlaylistRunnable(Ref.weak(context), fd));
+        async(context, UIUtils::playEphemeralPlaylistTask, fd);
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
@@ -521,27 +521,14 @@ public final class UIUtils {
         return diceRoll <= thresholdValue;
     }
 
-    private static final class PlayEphemeralPlaylistRunnable implements Runnable {
-        private final WeakReference<Context> ctxRef;
-        private final FileDescriptor fd;
-
-        private PlayEphemeralPlaylistRunnable(WeakReference<Context> ctxRef, FileDescriptor fd) {
-            this.ctxRef = ctxRef;
-            this.fd = fd;
-        }
-
-        @Override
-        public void run() {
-            if (Ref.alive(ctxRef)) {
-                try {
-                    CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
-                    if (mediaPlayer != null) {
-                        mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(ctxRef.get(), fd));
-                    }
-                } catch (Throwable ignored) {
-                    // possible Runtime error thrown by Librarian.instance()
-                }
+    private static void playEphemeralPlaylistTask(Context context, FileDescriptor fd) {
+        try {
+            CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
+            if (mediaPlayer != null) {
+                mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(context, fd));
             }
+        } catch (Throwable ignored) {
+            // possible Runtime error thrown by Librarian.instance()
         }
     }
 }
