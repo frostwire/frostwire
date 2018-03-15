@@ -50,6 +50,8 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
+import static com.frostwire.android.util.Asyncs.invokeAsync;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -324,22 +326,13 @@ public final class ImageLoader {
         picasso.shutdown();
     }
 
-    public static void start(MainApplication mainApplication, ExecutorService threadPool) {
-        threadPool.execute(new ImageLoaderStarter(mainApplication));
+    public static void start(MainApplication mainApplication) {
+        invokeAsync(mainApplication, ImageLoader::startImageLoaderBackground);
     }
 
-    private static final class ImageLoaderStarter implements Runnable {
-        private final WeakReference<MainApplication> mainAppRef;
-
-        ImageLoaderStarter(MainApplication mainApplication) {
-            mainAppRef = Ref.weak(mainApplication);
-        }
-
-        @Override
-        public void run() {
-            if (instance == null && Ref.alive(mainAppRef)) {
-                ImageLoader.getInstance(mainAppRef.get());
-            }
+    private static void startImageLoaderBackground(MainApplication mainApplication) {
+        if (instance == null) {
+            ImageLoader.getInstance(mainApplication);
         }
     }
 

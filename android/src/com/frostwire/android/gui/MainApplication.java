@@ -45,7 +45,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
 
 import static com.frostwire.android.util.Asyncs.invokeAsync;
 import static com.frostwire.android.util.Debug.runStrict;
@@ -74,8 +73,7 @@ public class MainApplication extends Application {
 
         new Thread(new BTEngineInitializer(Ref.weak(this))).start();
 
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        ImageLoader.start(this, threadPool);
+        ImageLoader.start(this);
 
         invokeAsync(this, this::initializeCrawlPagedWebSearchPerformer);
 
