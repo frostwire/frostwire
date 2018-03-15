@@ -21,8 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -37,9 +35,8 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -159,58 +156,36 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     public void refresherOnTime() {
-        Engine.instance().getThreadPool().execute(new RefresherOnTimeRunnable(this));
+        async(this, MiniPlayerView::refreshOnTimerResultTask, MiniPlayerView::refreshOnTimerPostTask);
     }
 
-    private static class RefresherOnTimeRunnable implements Runnable {
-        private WeakReference<MiniPlayerView> miniPlayerRef;
-
-        RefresherOnTimeRunnable(MiniPlayerView miniPlayerView) {
-            miniPlayerRef = Ref.weak(miniPlayerView);
+    private static FileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer) {
+        CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
+        if (mp != null) {
+            miniPlayer.isPlaying = MusicUtils.isPlaying();
+            miniPlayer.currentAlbumId = MusicUtils.getCurrentAlbumId();
+            return mp.getCurrentFD(miniPlayer.getContext());
         }
+        return null;
+    }
 
-        @Override
-        public void run() {
-            if (!Ref.alive(miniPlayerRef)) {
-                return;
+    private static void refreshOnTimerPostTask(MiniPlayerView miniPlayer, FileDescriptor fd) {
+        String title = "";
+        String artist = "";
+        miniPlayer.refreshComponents();
+        if (fd != null) {
+            title = fd.title;
+            artist = fd.artist;
+            if (miniPlayer.getVisibility() == View.GONE) {
+                miniPlayer.setVisibility(View.VISIBLE);
             }
-            MiniPlayerView miniPlayer = miniPlayerRef.get();
-            CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
-            if (mp != null) {
-                miniPlayer.isPlaying = MusicUtils.isPlaying();
-                miniPlayer.currentAlbumId = MusicUtils.getCurrentAlbumId();
-
-                FileDescriptor fd = mp.getCurrentFD(miniPlayer.getContext());
-
-                Handler handler = new Handler(Looper.getMainLooper());
-                Runnable r = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!Ref.alive(miniPlayerRef)) {
-                            return;
-                        }
-                        MiniPlayerView miniPlayer = miniPlayerRef.get();
-                        String title = "";
-                        String artist = "";
-                        miniPlayer.refreshComponents();
-                        if (fd != null) {
-                            title = fd.title;
-                            artist = fd.artist;
-                            if (miniPlayer.getVisibility() == View.GONE) {
-                                miniPlayer.setVisibility(View.VISIBLE);
-                            }
-                        } else {
-                            if (miniPlayer.getVisibility() == View.VISIBLE) {
-                                miniPlayer.setVisibility(View.GONE);
-                            }
-                        }
-                        miniPlayer.titleText.setText(title);
-                        miniPlayer.artistText.setText(artist);
-                    }
-                };
-                handler.post(r);
+        } else {
+            if (miniPlayer.getVisibility() == View.VISIBLE) {
+                miniPlayer.setVisibility(View.GONE);
             }
         }
+        miniPlayer.titleText.setText(title);
+        miniPlayer.artistText.setText(artist);
     }
 
     private void openAudioPlayerActivity() {
