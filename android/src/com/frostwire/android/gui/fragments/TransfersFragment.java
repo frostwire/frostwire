@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -77,7 +76,6 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -316,64 +314,51 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             getActivity().invalidateOptionsMenu();
         }
         if (BTEngine.ctx != null) {
-            Engine.instance().getThreadPool().execute(new StatusBarUpdater(this));
+            invokeAsync(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
             onCheckDHT();
         }
     }
 
-    private static class StatusBarUpdater implements Runnable {
-        private final WeakReference<TransfersFragment> transfersFragmentRef;
-
-        StatusBarUpdater(TransfersFragment transfersFragment) {
-            transfersFragmentRef = Ref.weak(transfersFragment);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(transfersFragmentRef)) {
-                // too late
-                return;
-            }
-            //  format strings
-            final String sDown = UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024);
-            final String sUp = UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024);
-            // number of uploads (seeding) and downloads
-            final int downloads = TransferManager.instance().getActiveDownloads();
-            final int uploads = TransferManager.instance().getActiveUploads();
-
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (!Ref.alive(transfersFragmentRef)) {
-                        // too late to go back to main thread
-                        return;
-                    }
-                    TransfersFragment transfersFragment = transfersFragmentRef.get();
-                    transfersFragment.textDownloads.setText(downloads + " @ " + sDown);
-                    transfersFragment.textUploads.setText(uploads + " @ " + sUp);
-
-                    // isTunnelUp is pre-calculated on some other thread, instant call
-                    updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
-                }
-            });
-        }
-
-        private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
-            if (!Ref.alive(transfersFragmentRef)) {
-                return;
-            }
-            TransfersFragment transfersFragment = transfersFragmentRef.get();
-            boolean wasActiveBefore = transfersFragment.isVPNactive && !vpnActive;
-            transfersFragment.isVPNactive = vpnActive;
-            if (transfersFragment.vpnStatusIcon != null) {
-                transfersFragment.vpnStatusIcon.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
-            }
-            if (wasActiveBefore) {
-                transfersFragment.showVPNRichToast();
-            }
+    private static class StatusBarData {
+        final String sDown;
+        final String sUp;
+        final int downloads;
+        final int uploads;
+        StatusBarData(String sDown, String sUp, int downloads, int uploads) {
+            this.sDown = sDown;
+            this.sUp = sUp;
+            this.downloads = downloads;
+            this.uploads = uploads;
         }
     }
+
+    private StatusBarData getStatusBarDataBackground() {
+        //  format strings
+        return new StatusBarData(UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024),
+                UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024),
+                // number of uploads (seeding) and downloads
+                TransferManager.instance().getActiveDownloads(),
+                TransferManager.instance().getActiveUploads());
+    }
+
+    private void updateStatusBar(StatusBarData statusBarData) {
+        textDownloads.setText(statusBarData.downloads + " @ " + statusBarData.sDown);
+        textUploads.setText(statusBarData.uploads + " @ " + statusBarData.sUp);
+        // isTunnelUp is pre-calculated on some other thread, instant call
+        updateVPNButtonIfStatusChanged(NetworkManager.instance().isTunnelUp());
+    }
+
+    private void updateVPNButtonIfStatusChanged(boolean vpnActive) {
+        boolean wasActiveBefore = isVPNactive && !vpnActive;
+        isVPNactive = vpnActive;
+        if (vpnStatusIcon != null) {
+            vpnStatusIcon.setImageResource(vpnActive ? R.drawable.notification_vpn_on : R.drawable.notification_vpn_off);
+        }
+        if (wasActiveBefore) {
+            showVPNRichToast();
+        }
+    }
+
 
     private void onCheckDHT() {
         if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
