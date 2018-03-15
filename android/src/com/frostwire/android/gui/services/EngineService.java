@@ -48,14 +48,13 @@ import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.http.OKHTTPClient;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.concurrent.ExecutorService;
 
 import okhttp3.ConnectionPool;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -97,8 +96,7 @@ public class EngineService extends Service implements IEngineService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        threadPool.execute(new NotificationCanceller(this));
+        async(this, EngineService::cancelAllNotificationsTask);
         if (intent == null) {
             return START_NOT_STICKY;
         }
@@ -115,8 +113,8 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
-        threadPool.execute(new EnableComponentsRunnable(this, true));
-        threadPool.execute(new PermanentNotificationUpdatesStarter(this));
+        async(this, EngineService::enableComponentsTask, true);
+        async(this, EngineService::startPermanentNotificationUpdatesTask);
         return START_STICKY;
     }
 
@@ -127,9 +125,9 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        new EnableComponentsRunnable(this, false).run();
+        enableComponentsTask(this, false); // we're already on a shutdown thread
         stopPermanentNotificationUpdates();
-        new NotificationCanceller(this).run();
+        cancelAllNotificationsTask(this);
         stopServices(false);
 
         if (BTEngine.ctx != null) {
@@ -158,16 +156,12 @@ public class EngineService extends Service implements IEngineService {
             e.printStackTrace();
         }
         try {
-            synchronized (pool) {
+            synchronized (OKHTTPClient.CONNECTION_POOL) {
                 pool.notifyAll();
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    private void enableComponentAsync(PackageManager pm, Class<?> clazz, boolean enable) {
-        Engine.instance().getThreadPool().execute(new EnableComponentRunnable(this, pm, clazz, enable));
     }
 
     public CoreMediaPlayer getMediaPlayer() {
@@ -212,29 +206,14 @@ public class EngineService extends Service implements IEngineService {
             return;
         }
 
-        Engine.instance().getThreadPool().execute(new ResumeBTEngineTask(this));
+        async(this, EngineService::resumeBTEngineTask);
     }
 
-    private static class ResumeBTEngineTask implements Runnable {
-        private final WeakReference<EngineService> engineServiceRef;
-        private ResumeBTEngineTask(EngineService engineService) {
-            engineServiceRef = Ref.weak(engineService);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(engineServiceRef)) {
-                throw new RuntimeException("No reference to EngineService");
-            }
-            EngineService engineService = engineServiceRef.get();
-
-            engineService.state = STATE_STARTING;
-
-            BTEngine.getInstance().resume();
-
-            engineService.state = STATE_STARTED;
-            LOG.info("Engine started");
-        }
+    private static void resumeBTEngineTask(EngineService engineService) {
+        engineService.state = STATE_STARTING;
+        BTEngine.getInstance().resume();
+        engineService.state = STATE_STARTED;
+        LOG.info("resumeBTEngineTask(): Engine started", true);
     }
 
     public synchronized void stopServices(boolean disconnected) {
@@ -278,7 +257,9 @@ public class EngineService extends Service implements IEngineService {
             notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
-            manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
+            if (manager != null) {
+                manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
+            }
         } catch (Throwable e) {
             LOG.error("Error creating notification for download finished", e);
         }
@@ -394,135 +375,57 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-    private static final class EnableComponentRunnable implements Runnable {
-
-        private final WeakReference<EngineService> engineServiceRef;
-        private final WeakReference<PackageManager> pmRef;
-        private final WeakReference<Class<?>> clazzRef;
-        private final boolean enable;
-
-        public EnableComponentRunnable(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
-            this.engineServiceRef = Ref.weak(engineService);
-            this.pmRef = Ref.weak(pm);
-            this.clazzRef = Ref.weak(clazz);
-            this.enable = enable;
+    private static void enableComponent(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
+        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        ComponentName receiver = new ComponentName(engineService, clazz);
+        int currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " was disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " was enabled");
         }
-
-        @Override
-        public void run() {
-            try {
-                int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                if (!Ref.alive(clazzRef)) {
-                    LOG.warn("EnableComponentRunnable(enable=" + enable + ") failed. clazz weak reference dead.");
-                    return;
-                }
-                Class clazz = clazzRef.get();
-                if (!Ref.alive(engineServiceRef)) {
-                    LOG.warn("EnableComponentRunnable(" + clazz.getSimpleName() + ".class, enable=" + enable + ") failed. EngineService weak reference dead.");
-                    return;
-                }
-                EngineService engineService = engineServiceRef.get();
-                ComponentName receiver = new ComponentName(engineService, clazz);
-                if (!Ref.alive(pmRef)) {
-                    LOG.warn("EnableComponentRunnable(" + clazz.getSimpleName() + ".class, enable=" + enable + ") failed. PackageManager weak reference dead.");
-                    return;
-                }
-                PackageManager pm = pmRef.get();
-                int currentState = pm.getComponentEnabledSetting(receiver);
-                if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                    LOG.info("Receiver " + receiver + " was disabled");
-                } else {
-                    LOG.info("Receiver " + receiver + " was enabled");
-                }
-                pm.setComponentEnabledSetting(receiver,
-                        newState,
-                        PackageManager.DONT_KILL_APP);
-                currentState = pm.getComponentEnabledSetting(receiver);
-                if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                    LOG.info("Receiver " + receiver + " now is disabled");
-                } else {
-                    LOG.info("Receiver " + receiver + " now is enabled");
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+        pm.setComponentEnabledSetting(receiver,
+                newState,
+                PackageManager.DONT_KILL_APP);
+        currentState = pm.getComponentEnabledSetting(receiver);
+        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+            LOG.info("Receiver " + receiver + " now is disabled");
+        } else {
+            LOG.info("Receiver " + receiver + " now is enabled");
         }
     }
 
-    private static final class EnableComponentsRunnable implements Runnable {
-
-        private final WeakReference<EngineService> engineServiceRef;
-        private final boolean enable;
-
-        EnableComponentsRunnable(EngineService engineService, boolean enable) {
-           engineServiceRef = Ref.weak(engineService);
-           this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(engineServiceRef)) {
-                LOG.error("EnableComponentsRunnable(enable=" + enable + ") aborted. EngineService reference lost");
-                return;
-            }
-            try {
-                EngineService es = engineServiceRef.get();
-                PackageManager pm = es.getPackageManager();
-                // receivers
-                es.enableComponentAsync(pm, EngineBroadcastReceiver.class, enable);
-                es.enableComponentAsync(pm, MediaButtonIntentReceiver.class, enable);
-            } catch (Throwable t) {
-                LOG.warn(t.getMessage(), t);
-            }
+    private static void enableComponentsTask(EngineService engineService, boolean enable) {
+        try {
+            PackageManager pm = engineService.getPackageManager();
+            // receivers
+            async(engineService, EngineService::enableComponent, pm, EngineBroadcastReceiver.class, enable);
+            async(engineService, EngineService::enableComponent, pm, MediaButtonIntentReceiver.class, enable);
+        } catch (Throwable t) {
+            LOG.warn(t.getMessage(), t);
         }
     }
 
-    private static class NotificationCanceller implements Runnable {
-        private final WeakReference<EngineService> engineServiceRef;
-
-        NotificationCanceller(EngineService engineService) {
-            engineServiceRef = Ref.weak(engineService);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(engineServiceRef)) {
-                return;
+    private static void cancelAllNotificationsTask(EngineService engineService) {
+        try {
+            NotificationManager notificationManager = (NotificationManager) engineService.getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancelAll();
             }
-            EngineService engineService = engineServiceRef.get();
-            try {
-                NotificationManager notificationManager = (NotificationManager) engineService.getSystemService(NOTIFICATION_SERVICE);
-                if (notificationManager != null) {
-                    notificationManager.cancelAll();
-                }
-            } catch (SecurityException ignore) {
-                // new exception in Android 7
-            }
+        } catch (SecurityException ignore) {
+            // new exception in Android 7
         }
     }
 
-    private static class PermanentNotificationUpdatesStarter implements Runnable {
-        private final WeakReference<EngineService> engineServiceRef;
-        PermanentNotificationUpdatesStarter(EngineService engineService) {
-            engineServiceRef = Ref.weak(engineService);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(engineServiceRef)) {
-                LOG.warn("PermanentNotificationUpdatesStarter aborted. EngineService reference lost");
-                return;
+    private static void startPermanentNotificationUpdatesTask(EngineService engineService) {
+        try {
+            if (engineService.notificationUpdateDemon == null) {
+                engineService.notificationUpdateDemon = new NotificationUpdateDemon(engineService.getApplicationContext());
             }
-            try {
-                EngineService engineService = engineServiceRef.get();
-                if (engineService.notificationUpdateDemon == null) {
-                    engineService.notificationUpdateDemon = new NotificationUpdateDemon(engineService.getApplicationContext());
-                }
-                engineService.notificationUpdateDemon.start();
-            } catch (Throwable t) {
-                LOG.warn(t.getMessage(), t);
-            }
+            engineService.notificationUpdateDemon.start();
+        } catch (Throwable t) {
+            LOG.warn(t.getMessage(), t);
         }
     }
 }
