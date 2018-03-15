@@ -85,7 +85,8 @@ public final class VPNs {
                     isWindowsVPNAdapterActive(interfaces, routes, "SecureLine TAP") || // avast!
                     isWindowsVPNAdapterActive(interfaces, null, "TAP-Windows Adapter V9") || // IPVanish
                     isWindowsVPNAdapterActive(interfaces, routes, "CyberGhost") || // CyberGhost
-                    isWindowsVPNAdapterActive(interfaces, routes, "Windscribe VPN");
+                    isWindowsVPNAdapterActive(interfaces, routes, "Windscribe VPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "PureVPN");
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
