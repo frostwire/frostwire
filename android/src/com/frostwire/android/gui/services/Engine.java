@@ -38,11 +38,11 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.util.Ref;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -83,7 +83,7 @@ public final class Engine implements IEngineService {
      * @param application the application object
      */
     public void onApplicationCreate(Application application) {
-        getThreadPool().execute(new EngineServiceStarter(application, this));
+        async(application, this::engineServiceStarter);
     }
 
     @Override
@@ -265,30 +265,10 @@ public final class Engine implements IEngineService {
         }
     }
 
-    private static class EngineServiceStarter implements Runnable {
-        private final WeakReference<Application> appRef;
-        private final WeakReference<Engine> engineRef;
-        private EngineServiceStarter(Application application, Engine engine) {
-            appRef = Ref.weak(application);
-            engineRef = Ref.weak(engine);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(appRef)) {
-                throw new RuntimeException("Engine::EngineServiceStarter aborted, Application reference lost");
-            }
-            if (!Ref.alive(engineRef)) {
-                throw new RuntimeException("Engine::EngineServiceStarter aborted, Engine reference lost");
-            }
-
-            Application application = appRef.get();
-            Engine engine = engineRef.get();
-
-            if (application != null && engine != null) {
-                engine.vibrator = new FWVibrator(application);
-                engine.startEngineService(application);
-            }
+    private void engineServiceStarter(Application application) {
+        if (application != null) {
+            vibrator = new FWVibrator(application);
+            startEngineService(application);
         }
     }
 }
