@@ -1650,7 +1650,6 @@ public class MusicPlaybackService extends Service {
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
-
         if (mRemoteControlClient == null) {
             LOG.info("mRemoteControlClient is null, review your logic");
             return;
@@ -1678,7 +1677,8 @@ public class MusicPlaybackService extends Service {
                 break;
             case META_CHANGED:
             case QUEUE_CHANGED:
-                changeQueueAsync(playState);
+                // Asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
+                async(this, MusicPlaybackService::changeRemoteControlClientTask, playState);
                 break;
         }
     }
@@ -1687,71 +1687,49 @@ public class MusicPlaybackService extends Service {
         rc.setPlaybackState(playState);
     }
 
-    /**
-     * Function that asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
-     *
-     * @param playState update RemoteControlClient to that state
-     */
-    private void changeQueueAsync(final int playState) {
-        Engine.instance().getThreadPool().execute(new ChangeRemoteControlClient(this, playState));
-    }
-
-    private final static class ChangeRemoteControlClient implements Runnable {
-        private final WeakReference<MusicPlaybackService> musicPlaybackServiceRef;
-        private final int playState;
-
-        ChangeRemoteControlClient(MusicPlaybackService musicPlaybackService, int playState) {
-            musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
-            this.playState = playState;
+    private static void changeRemoteControlClientTask(MusicPlaybackService musicPlaybackService, int playState) {
+        // background portion
+        Bitmap albumArt = musicPlaybackService.getAlbumArt();
+        // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
+        // to make sure not to hand out our cache copy
+        Bitmap.Config config = albumArt.getConfig();
+        if (config == null) {
+            config = Bitmap.Config.ARGB_8888;
         }
+        final Bitmap albumArtCopy = albumArt.copy(config, false);
+        final String artistName = musicPlaybackService.getArtistName();
+        final String albumName = musicPlaybackService.getAlbumName();
+        final String trackName = musicPlaybackService.getTrackName();
+        final String albumArtistName = musicPlaybackService.getAlbumArtistName();
+        final long duration = musicPlaybackService.duration();
 
-        public void run() {
+        // MusicPlayerHandler thread portion, we can't put this as a PostContextTask
+        // in Async.async.
+        final WeakReference<MusicPlaybackService> musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
+        Runnable postExecute = () -> {
             if (!Ref.alive(musicPlaybackServiceRef)) {
                 return;
             }
-            MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
-
-            // background portion
-            Bitmap albumArt = musicPlaybackService.getAlbumArt();
-            // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
-            // to make sure not to hand out our cache copy
-            Bitmap.Config config = albumArt.getConfig();
-            if (config == null) {
-                config = Bitmap.Config.ARGB_8888;
+            MusicPlaybackService musicPlaybackService1 = musicPlaybackServiceRef.get();
+            try {
+                musicPlaybackService1.mRemoteControlClient
+                        .editMetadata(true)
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
+                        .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
+                        .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
+                        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
+                        .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
+                        .apply();
+            } catch (Throwable t) {
+                // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
             }
-            final Bitmap albumArtCopy = albumArt.copy(config, false);
-            final String artistName = musicPlaybackService.getArtistName();
-            final String albumName = musicPlaybackService.getAlbumName();
-            final String trackName = musicPlaybackService.getTrackName();
-            final String albumArtistName = musicPlaybackService.getAlbumArtistName();
-            final long duration = musicPlaybackService.duration();
-            // UI thread portion
-            Runnable postExecute = () -> {
-                if (!Ref.alive(musicPlaybackServiceRef)) {
-                    return;
-                }
-                MusicPlaybackService musicPlaybackService1 = musicPlaybackServiceRef.get();
-                try {
-                    musicPlaybackService1.mRemoteControlClient
-                            .editMetadata(true)
-                            .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
-                            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
-                            .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
-                            .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
-                            .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
-                            .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
-                            .apply();
-                } catch (Throwable t) {
-                    // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
-                }
-                // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-                // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-                musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState);
-            };
-            musicPlaybackService.mPlayerHandler.post(postExecute);
-        }
+            // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
+            // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
+            musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState);
+        };
+        musicPlaybackService.mPlayerHandler.post(postExecute);
     }
-
 
     /**
      * Saves the queue
