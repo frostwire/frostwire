@@ -1035,35 +1035,21 @@ public class MusicPlaybackService extends Service {
     }
 
     private void cancelShutdown() {
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        if (threadPool != null && mAlarmManager != null && mShutdownIntent != null) {
-            threadPool.execute(new CancelShutdownRunnable(this));
+        if (mAlarmManager != null && mShutdownIntent != null) {
+            async(this, MusicPlaybackService::cancelShutdownTask);
         }
     }
 
-    private static class CancelShutdownRunnable implements Runnable {
-        private WeakReference<MusicPlaybackService> musicPlaybackServiceRef;
-
-        CancelShutdownRunnable(MusicPlaybackService musicPlaybackService) {
-            musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(musicPlaybackServiceRef)) {
-                return;
-            }
-            MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
-            if (musicPlaybackService != null && musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
-                if (D)
-                    LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
-                try {
-                    musicPlaybackService.mAlarmManager.cancel(musicPlaybackService.mShutdownIntent);
-                    musicPlaybackService.mShutdownScheduled = false;
-                } catch (Throwable ignored) {
-                    if (D) {
-                        LOG.error(ignored.getMessage(), ignored);
-                    }
+    private static void cancelShutdownTask(MusicPlaybackService musicPlaybackService) {
+        if (musicPlaybackService != null && musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
+            if (D)
+                LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
+            try {
+                musicPlaybackService.mAlarmManager.cancel(musicPlaybackService.mShutdownIntent);
+                musicPlaybackService.mShutdownScheduled = false;
+            } catch (Throwable ignored) {
+                if (D) {
+                    LOG.error(ignored.getMessage(), ignored);
                 }
             }
         }
