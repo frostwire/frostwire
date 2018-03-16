@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -61,12 +60,11 @@ import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.frostwire.util.Ref;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Created on 1/26/16 in a plane.
@@ -144,10 +142,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected void onSongItemClick(int position) {
         if (mAdapter != null) {
-            WeakReference<Activity> activityRef = Ref.weak(getActivity());
-            WeakReference<T> adapterRef = Ref.weak(mAdapter);
-            Engine.instance().getThreadPool().
-                    execute(new OnSongItemClickRunnable<>(activityRef,adapterRef, position));
+            async(this, ApolloFragment::songClickTask, position);
         }
     }
 
@@ -160,7 +155,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         mProfileTabCarousel = activity.findViewById(R.id.activity_profile_base_tab_carousel);
-
         if (activity instanceof BaseActivity) {
             // Register the music status listener
             ((BaseActivity) activity).setMusicStateListenerListener(this);
@@ -179,7 +173,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null, false);
             initGridView();
         }
-
         return mRootView;
     }
 
@@ -198,14 +191,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-
         // Get the position of the selected item
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int mSelectedPosition = info.position - mAdapter.getOffset();
-
         // Create a new song
         mItem = mAdapter.getItem(mSelectedPosition);
-
         // TODO: Remove these mutable properties, parametrize the onMenuEvent handlers.
         if (mItem instanceof Song) {
             Song mSong = (Song) mItem;
@@ -243,38 +233,30 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
 
         }
-
         // Play the selected songs
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection))
                 .setIcon(R.drawable.contextmenu_icon_play);
-
         // Play the next song
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_NEXT, Menu.NONE, getString(R.string.context_menu_play_next))
                 .setIcon(R.drawable.contextmenu_icon_next);
-
         // Add the song/album to the queue
         menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, getString(R.string.add_to_queue))
                 .setIcon(R.drawable.contextmenu_icon_queue_add);
-
         // Add the song to favorite's playlist
         menu.add(GROUP_ID, FragmentMenuItems.ADD_TO_FAVORITES, Menu.NONE, R.string.add_to_favorites)
                 .setIcon(R.drawable.contextmenu_icon_favorite);
-
         // Add the song/album to a playlist
         final SubMenu subMenu =
                 menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST, Menu.NONE, R.string.add_to_playlist)
                         .setIcon(R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
-
         if (mItem instanceof Song) {
             menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE, getString(R.string.context_menu_use_as_ringtone))
                     .setIcon(R.drawable.contextmenu_icon_ringtone);
         }
-
         // More by artist
         menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
                 .setIcon(R.drawable.contextmenu_icon_artist);
-
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
                 .setIcon(R.drawable.contextmenu_icon_trash);
@@ -287,7 +269,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             final long[] songList = mSongList != null ?
                     mSongList :
                     new long[]{mSelectedId};
-
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
                     MusicUtils.playAll(songList, 0, false);
@@ -339,11 +320,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (activity == null) {
             return false;
         }
-
         if (mSelectedId == -1) {
             return false;
         }
-
         WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(getActivity());
         helper.onSetRingtoneOption(getActivity(), mSelectedId, Constants.FILE_TYPE_AUDIO);
         return true;
@@ -360,9 +339,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (songList == null || songList.length == 0) {
             return false;
         }
-
         String title = getResources().getString(R.string.unknown);
-
         if (mItem instanceof Song) {
             title = ((Song) mItem).mSongName;
         } else if (mItem instanceof Album) {
@@ -370,7 +347,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else if (mItem instanceof Artist) {
             title = ((Artist) mItem).mArtistName;
         }
-
         DeleteDialog.newInstance(title, songList, null).setOnDeleteCallback(id -> {
             restartLoader(true);
             refresh();
@@ -448,7 +424,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (data == null || data.isEmpty()) {
             mAdapter.unload();
             mAdapter.notifyDataSetChanged();
-
             // Set the empty text
             final TextView empty = mRootView.findViewById(R.id.empty);
             if (empty != null) {
@@ -461,7 +436,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
             return;
         }
-
         if (mAdapter == null) {
             mAdapter = createAdapter();
             if (isSimpleLayout()) {
@@ -472,21 +446,17 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else {
             mAdapter.unload();
         }
-
         // Start fresh
         if (mAdapter != null) {
             mAdapter.setDataList(data);
-
             mAdapter.setNotifyOnChange(false);
             for (final I item : data) {
                 mAdapter.add(item);
             }
             mAdapter.setNotifyOnChange(true);
-
             if (mAdapter instanceof ApolloFragmentAdapter.Cacheable) {
                 ((ApolloFragmentAdapter.Cacheable) mAdapter).buildCache();
             }
-
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -512,13 +482,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         } else if (mGridView != null) {
             mGridView.setSelection(0);
         }
-
         if (mAdapter != null) {
             mAdapter.clear();
         }
-
         restartLoader(); // this won't be executed if it was recently called. no risk of endless loop.
-
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
@@ -580,14 +547,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
         // Initialize the grid
         mGridView = mRootView.findViewById(R.id.grid_base);
-
         if (mGridView != null && mAdapter != null) {
             // Set the data behind the grid
             mGridView.setAdapter(mAdapter);
             // Set up the helpers
             initAbsListView(mGridView);
         }
-
         if (ApolloUtils.isLandscape(getActivity())) {
             if (isDetailedLayout()) {
                 if (mAdapter != null) {
@@ -621,7 +586,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         list.setOnCreateContextMenuListener(this);
         // Show the albums and songs from the selected artist
         list.setOnItemClickListener(this);
-
         // To help make scrolling smooth
         if (mProfileTabCarousel != null) {
             list.setOnScrollListener(new VerticalScrollListener(null, mProfileTabCarousel, 0));
@@ -666,39 +630,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     };
 
     /**
-     * @return The position of an item in the list or grid based on the id of
-     * the currently playing album.
-     */
-    private int getItemPositionByAlbum() {
-        final long albumId = MusicUtils.getCurrentAlbumId();
-        if (mAdapter == null) {
-            return 0;
-        }
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            Album album = (Album) mAdapter.getItem(i);
-            if (album != null && album.mAlbumId == albumId) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Scrolls the list to the currently playing album when the user touches the
-     * header in the PagerTitleStrip
-     */
-//    public void scrollToCurrentAlbum() {
-//        final int currentAlbumPosition = getItemPositionByAlbum();
-//        if (currentAlbumPosition != 0) {
-//            if (isSimpleLayout()) {
-//                mListView.setSelection(currentAlbumPosition);
-//            } else {
-//                mGridView.setSelection(currentAlbumPosition);
-//            }
-//        }
-//    }
-
-    /**
      * Scrolls the list to the currently playing song when the user touches the
      * header in the PagerTitleStrip
      */
@@ -726,35 +657,15 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         return 0;
     }
 
-    private final static class OnSongItemClickRunnable<T extends ApolloFragmentAdapter<I>, I> implements Runnable {
-        private final WeakReference<Activity> activityRef;
-        private final WeakReference<T> adapterRef;
-        private final int position;
-
-        OnSongItemClickRunnable(final WeakReference<Activity> activityRef,
-                                final WeakReference<T> adapterRef,
-                                final int position) {
-            this.activityRef = activityRef;
-            this.adapterRef = adapterRef;
-            this.position = position;
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (Ref.alive(adapterRef)) {
-                    T adapter = adapterRef.get();
-                    MusicUtils.playAllFromUserItemClick((ArrayAdapter) adapter, position);
-                    if (Ref.alive(activityRef)) {
-                        activityRef.get().runOnUiThread(adapter::notifyDataSetChanged);
-                    }
-                }
-                if (Ref.alive(activityRef)) {
-                    NavUtils.openAudioPlayer(activityRef.get());
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+    private static void songClickTask(final ApolloFragment fragment, int position) {
+        try {
+            ApolloFragmentAdapter adapter = fragment.getAdapter();
+            MusicUtils.playAllFromUserItemClick(adapter, position);
+            Activity activity = fragment.getActivity();
+            activity.runOnUiThread(adapter::notifyDataSetChanged);
+            NavUtils.openAudioPlayer(activity);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 }
