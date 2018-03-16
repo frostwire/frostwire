@@ -64,10 +64,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -915,7 +916,7 @@ public class MusicPlaybackService extends Service {
         }
 
         if (!mAnyActivityInForeground && isPlaying()) {
-            updateNotificationAsync();
+            async(this, MusicPlaybackService::updateNotificationTask);
         } else if (mAnyActivityInForeground) {
             mNotificationHelper.killNotification();
             if (!isPlaying()) {
@@ -924,43 +925,18 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-
-    /**
-     * Asynchronous bitmap fetching for building the notification
-     */
-    private void updateNotificationAsync() {
-        Engine.instance().getThreadPool().execute(new UpdateNotificationTask(this));
-    }
-
-    private static final class UpdateNotificationTask implements Runnable {
-
-        private final WeakReference<MusicPlaybackService> serviceRef;
-
-        UpdateNotificationTask(MusicPlaybackService service) {
-            this.serviceRef = Ref.weak(service);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(serviceRef)) {
-                return; // early return
-            }
-
-            final MusicPlaybackService service = serviceRef.get();
-
-            // background portion
-            final Bitmap bitmap = service.getAlbumArt();
-
-            // TODO: refactor this really bad code
-            Runnable postExecute = () -> service.mNotificationHelper.buildNotification(
-                    service.getAlbumName(),
-                    service.getArtistName(),
-                    service.getTrackName(),
-                    service.getAlbumId(),
-                    bitmap,
-                    service.isPlaying());
-            service.mPlayerHandler.post(postExecute);
-        }
+    private static void updateNotificationTask(MusicPlaybackService service) {
+        // background portion
+        final Bitmap bitmap = service.getAlbumArt();
+        // TODO: refactor this really bad code
+        Runnable postExecute = () -> service.mNotificationHelper.buildNotification(
+                service.getAlbumName(),
+                service.getArtistName(),
+                service.getTrackName(),
+                service.getAlbumId(),
+                bitmap,
+                service.isPlaying());
+        service.mPlayerHandler.post(postExecute);
     }
 
 
@@ -2904,6 +2880,7 @@ public class MusicPlaybackService extends Service {
         }
     };
 
+    // TODO: Check why this isn't being used anywhere. Perhaps should be called in EngineService's shutdown logic
     public static void stopService(Context context) {
         LOG.info("stopService() <static>");
         Intent i = new Intent();

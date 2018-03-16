@@ -31,6 +31,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 import com.andrew.apollo.MediaButtonIntentReceiver;
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
