@@ -28,6 +28,8 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -44,7 +46,7 @@ class StopListener implements View.OnLongClickListener {
     @Override
     public boolean onLongClick(View v) {
         Engine.instance().getVibrator().hapticFeedback();
-        stopMusicAsync(v);
+        async(v, StopListener::stopMusicTask);
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
                 activityRef.get().onBackPressed();
@@ -53,32 +55,12 @@ class StopListener implements View.OnLongClickListener {
         return true;
     }
 
-    private void stopMusicAsync(View v) {
-        Engine.instance().getThreadPool().execute(new StopMusicAsyncTask(v));
-    }
-
-    private static final class StopMusicAsyncTask implements Runnable {
-
-        private final WeakReference<View> vRef;
-
-        StopMusicAsyncTask(View v) {
-            this.vRef = Ref.weak(v);
+    private static void stopMusicTask(View v) {
+        try {
+            MusicUtils.musicPlaybackService.stop();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(vRef)) {
-                return; // early return
-            }
-
-            View v = vRef.get();
-
-            try {
-                MusicUtils.musicPlaybackService.stop();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
-        }
+        v.getContext().sendBroadcast(new Intent(Constants.ACTION_MEDIA_PLAYER_STOPPED));
     }
 }
