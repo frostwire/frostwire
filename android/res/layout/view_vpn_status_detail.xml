@@ -78,49 +78,93 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
                 android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/view_vpn_status_pia"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/pia"
-                    android:padding="5dp"
-                    android:text="@string/vpn_suggestion_pia" />
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/view_vpn_status_expressvpn"
+                    <Button
+                        android:id="@+id/view_vpn_status_pia"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@drawable/vpn_suggestion_button_background_selector"
+                        android:drawableTop="@drawable/pia"
+                        android:padding="5dp"
+                        android:text="@string/vpn_suggestion_pia" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/price_pia" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/expressvpn"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:text="@string/vpn_suggestion_expressvpn" />
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/view_vpn_status_nordvpn"
+                    <Button
+                        android:id="@+id/view_vpn_status_expressvpn"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_toRightOf="@+id/view_vpn_status_pia"
+                        android:background="@drawable/vpn_suggestion_button_background_selector"
+                        android:drawableTop="@drawable/expressvpn"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        android:paddingTop="5dp"
+                        android:text="@string/vpn_suggestion_expressvpn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/price_expressvpn" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/vpn_suggestion_button_background_selector"
-                    android:drawableTop="@drawable/nordvpn"
-                    android:padding="5dp"
-                    android:text="@string/vpn_suggestion_nordvpn" />
+                    android:gravity="center"
+                    android:orientation="vertical">
 
+                    <Button
+                        android:id="@+id/view_vpn_status_nordvpn"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_toRightOf="@+id/view_vpn_status_expressvpn"
+                        android:background="@drawable/vpn_suggestion_button_background_selector"
+                        android:drawableTop="@drawable/nordvpn"
+                        android:padding="5dp"
+                        android:text="@string/vpn_suggestion_nordvpn" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/price_nordvpn" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Protected connection button -->
@@ -129,8 +173,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingTop="30dp"
-                android:paddingBottom="10dp"/>
+                android:textSize="@dimen/text_medium"
+                android:paddingBottom="10dp"
+                android:paddingTop="30dp" />
 
             <!-- Bullet - VPN not required for FrostWire but highly recommended -->
             <TextView
