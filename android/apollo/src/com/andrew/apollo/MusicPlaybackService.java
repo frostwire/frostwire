@@ -2954,43 +2954,29 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer, MediaPlayerRunnable.Action action) {
-        Engine.instance().getThreadPool().execute(new MediaPlayerRunnable(mediaPlayer, action));
+    private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer, MediaPlayerAction action) {
+        async(mediaPlayer, MusicPlaybackService::mediaPlayerAction, action);
     }
 
-    private static final class MediaPlayerRunnable implements Runnable {
-        enum Action {
-            START,
-            RELEASE,
-            RESET
-        }
+    enum MediaPlayerAction {
+        START,
+        RELEASE,
+        RESET
+    }
 
-        private final WeakReference<MediaPlayer> mpRef;
-        private final Action action;
-
-        MediaPlayerRunnable(MediaPlayer mediaPlayer, Action action) {
-            mpRef = Ref.weak(mediaPlayer);
-            this.action = action;
-        }
-
-        @Override
-        public void run() {
-            if (Ref.alive(mpRef)) {
-                MediaPlayer mediaPlayer = mpRef.get();
-                try {
-                    switch (action) {
-                        case START:
-                            mediaPlayer.start();
-                            return;
-                        case RELEASE:
-                            mediaPlayer.release();
-                            return;
-                        case RESET:
-                            mediaPlayer.reset();
-                    }
-                } catch (Throwable ignored) {
-                }
+    private static void mediaPlayerAction(MediaPlayer mediaPlayer, MediaPlayerAction action) {
+        try {
+            switch (action) {
+                case START:
+                    mediaPlayer.start();
+                    return;
+                case RELEASE:
+                    mediaPlayer.release();
+                    return;
+                case RESET:
+                    mediaPlayer.reset();
             }
+        } catch (Throwable ignored) {
         }
     }
 
@@ -3161,7 +3147,7 @@ public class MusicPlaybackService extends Service {
             }
 
             try {
-                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
+                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
             } catch (Throwable e) {
                 LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
             } finally {
@@ -3174,7 +3160,7 @@ public class MusicPlaybackService extends Service {
                 return;
             }
             try {
-                mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
+                mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RELEASE);
             } catch (Throwable e) {
                 LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
             } finally {
@@ -3202,11 +3188,7 @@ public class MusicPlaybackService extends Service {
          * Starts or resumes playback.
          */
         public void start() {
-            if (Looper.myLooper() == Looper.getMainLooper()) {
-                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.START);
-            } else {
-                new MediaPlayerRunnable(mCurrentMediaPlayer, MediaPlayerRunnable.Action.START).run();
-            }
+            mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.START);
         }
 
         /**
@@ -3215,7 +3197,7 @@ public class MusicPlaybackService extends Service {
         public void stop() {
             try {
                 try {
-                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RESET);
+                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RESET);
                 } catch (Throwable ignored) {
                 }
                 mIsInitialized = false;
@@ -3231,7 +3213,7 @@ public class MusicPlaybackService extends Service {
         public void release() {
             stop();
             try {
-                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerRunnable.Action.RELEASE);
+                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
             } catch (Throwable ignored) {
             }
         }
