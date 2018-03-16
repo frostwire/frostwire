@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,14 +95,9 @@ import com.mopub.mobileads.MoPubView;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
-import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.DURATION;
-import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.IS_PLAYING;
-import static com.andrew.apollo.ui.activities.AudioPlayerActivity.MusicServiceRequestRunnable.MusicServiceRequestType.POSITION;
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Apollo's "now playing" interface.
@@ -257,7 +252,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private long lastKnownPosition = 0;
     private long lastKnownDuration = 0;
     private boolean lastKnownIsPlaying = false;
-    private Map<MusicServiceRequestRunnable.MusicServiceRequestType, MusicServiceRequestRunnable> musicServiceRequestRunnables;
 
 
     public AudioPlayerActivity() {
@@ -302,9 +296,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         findView(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
-
-        // this thread collection will be populated as needed, see updateLastKnown()
-        musicServiceRequestRunnables = new HashMap<>();
     }
 
     private void initRemoveAds() {
@@ -401,34 +392,31 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
         MenuInflater menuInflater = getMenuInflater();
-
-        if (menuInflater == null) {
-            return false;
-        }
-
         menuInflater.inflate(R.menu.player_search, menu);
 
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
-        searchView.setSearchableInfo(searchableInfo);
-        // Perform the search
-        searchView.setOnQueryTextListener(new OnQueryTextListener() {
+        if (searchManager != null) {
+            final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
+            searchView.setSearchableInfo(searchableInfo);
+            // Perform the search
+            searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
-            @Override
-            public boolean onQueryTextSubmit(final String query) {
-                // Open the search activity
-                NavUtils.openSearch(AudioPlayerActivity.this, query);
-                return true;
-            }
+                @Override
+                public boolean onQueryTextSubmit(final String query) {
+                    // Open the search activity
+                    NavUtils.openSearch(AudioPlayerActivity.this, query);
+                    return true;
+                }
 
-            @Override
-            public boolean onQueryTextChange(final String newText) {
-                // Nothing to do
-                return false;
-            }
-        });
+                @Override
+                public boolean onQueryTextChange(final String newText) {
+                    // Nothing to do
+                    return false;
+                }
+            });
+        }
 
         // Favorite action
         menuInflater.inflate(R.menu.player_favorite, menu);
@@ -972,65 +960,35 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mCurrentTime.setText(MusicUtils.makeTimeString(this, pos / 1000));
     }
 
-    /**
-     * Calls to MusicUtils.getXXX() are calls to a background music service.
-     * Making these calls in the main thread may call ANRs
-     * These Runnables are here to update local copies of the last known values
-     * asked to the MusicService.
-     */
-    static final class MusicServiceRequestRunnable implements Runnable {
+    enum MusicServiceRequestType {
+        POSITION,
+        DURATION,
+        IS_PLAYING
+    }
 
-        enum MusicServiceRequestType {
-            POSITION,
-            DURATION,
-            IS_PLAYING
+    private static void musicServiceRequestTask(AudioPlayerActivity activity, MusicServiceRequestType requestType) {
+        switch (requestType) {
+            case POSITION:
+                activity.lastKnownPosition = MusicUtils.position();
+                break;
+            case DURATION:
+                activity.lastKnownDuration = MusicUtils.duration();
+                break;
+            case IS_PLAYING:
+                activity.lastKnownIsPlaying = MusicUtils.isPlaying();
+                break;
+            default:
+                break;
         }
+    }
 
-        private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
-        private final MusicServiceRequestType requestType;
-
-        MusicServiceRequestRunnable(AudioPlayerActivity activity, MusicServiceRequestType reqType) {
-            audioPlayerActivityRef = Ref.weak(activity);
-            requestType = reqType;
-        }
-
-        public boolean activityReferenceAlive() {
-            return Ref.alive(audioPlayerActivityRef);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(audioPlayerActivityRef)) {
-                return;
-            }
-            switch (requestType) {
-                case POSITION:
-                    long position = MusicUtils.position();
-                    if (Ref.alive(audioPlayerActivityRef)) {
-                        audioPlayerActivityRef.get().lastKnownPosition = position;
-                    }
-                    break;
-                case DURATION:
-                    long duration = MusicUtils.duration();
-                    if (Ref.alive(audioPlayerActivityRef)) {
-                        audioPlayerActivityRef.get().lastKnownDuration = duration;
-                    }
-                    break;
-                case IS_PLAYING:
-                    boolean isPlaying = MusicUtils.isPlaying();
-                    if (Ref.alive(audioPlayerActivityRef)) {
-                        audioPlayerActivityRef.get().lastKnownIsPlaying = isPlaying;
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
+    private void updateLastKnown(MusicServiceRequestType requestType) {
+        async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
     }
 
     private long lastKnownPosition(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(POSITION);
+            updateLastKnown(MusicServiceRequestType.POSITION);
         } else {
             lastKnownPosition = MusicUtils.position();
         }
@@ -1039,7 +997,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private long lastKnownDuration(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(DURATION);
+            updateLastKnown(MusicServiceRequestType.DURATION);
         } else {
             lastKnownDuration = MusicUtils.duration();
         }
@@ -1048,24 +1006,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private boolean lastKnownIsPlaying(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(IS_PLAYING);
+            updateLastKnown(MusicServiceRequestType.IS_PLAYING);
         } else {
             lastKnownIsPlaying = MusicUtils.isPlaying();
         }
         return lastKnownIsPlaying;
-    }
-
-    private void updateLastKnown(MusicServiceRequestRunnable.MusicServiceRequestType requestType) {
-        MusicServiceRequestRunnable musicServiceRequestRunnable = musicServiceRequestRunnables.get(requestType);
-
-        // Make sure the request thread exists and it contains a live weak reference to this activity
-        if (musicServiceRequestRunnable == null || !musicServiceRequestRunnable.activityReferenceAlive()) {
-            musicServiceRequestRunnables.put(requestType, new MusicServiceRequestRunnable(this, requestType));
-            musicServiceRequestRunnable = musicServiceRequestRunnables.get(requestType);
-        }
-
-        ExecutorService threadPool = Engine.instance().getThreadPool();
-        threadPool.execute(musicServiceRequestRunnable);
     }
 
     /* Used to update the current time string
@@ -1166,8 +1111,32 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private void shareCurrentTrack() {
         setBannerViewVisibility(mMopubAd, false);
         setBannerViewVisibility(mFallbackAd, false);
-        Engine.instance().getThreadPool().execute(new TrackScreenshotSharer(this));
-   }
+        async(this, AudioPlayerActivity::shareTrackScreenshotTask);
+    }
+
+    private static void shareTrackScreenshotTask(AudioPlayerActivity activity) {
+        final long currentAudioId = MusicUtils.getCurrentAudioId();
+        final String trackName = MusicUtils.getTrackName();
+        if (currentAudioId == -1 || trackName == null) {
+            return;
+        }
+        final Intent shareIntent = new Intent();
+        final String artistName = MusicUtils.getArtistName();
+        final String shareMessage = (artistName != null) ? activity.getString(R.string.now_listening_to, trackName, artistName) :
+                activity.getString(R.string.now_listening_to_no_artist_available, trackName);
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+        View rootView = activity.getWindow().getDecorView().getRootView();
+        File screenshotFile = UIUtils.takeScreenshot(rootView);
+        if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
+            shareIntent.setType("image/jpg");
+            boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
+            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath(), userFileProvider));
+        } else {
+            shareIntent.setType("text/plain");
+        }
+        activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_track_using)));
+    }
 
     private void toggleFavorite() {
         MusicUtils.toggleFavorite();
@@ -1177,22 +1146,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     /**
      * Used to scan backwards through the track
      */
-    private final RepeatingImageButton.RepeatListener mRewindListener = new RepeatingImageButton.RepeatListener() {
-        @Override
-        public void onRepeat(final View v, final long howlong, final int repcnt) {
-            scanBackward(repcnt, howlong);
-        }
-    };
+    private final RepeatingImageButton.RepeatListener mRewindListener = (v, howlong, repcnt) -> scanBackward(repcnt, howlong);
 
     /**
      * Used to scan ahead through the track
      */
-    private final RepeatingImageButton.RepeatListener mFastForwardListener = new RepeatingImageButton.RepeatListener() {
-        @Override
-        public void onRepeat(final View v, final long howlong, final int repcnt) {
-            scanForward(repcnt, howlong);
-        }
-    };
+    private final RepeatingImageButton.RepeatListener mFastForwardListener = (v, howlong, repcnt) -> scanForward(repcnt, howlong);
 
     /**
      * Switches from the large album art screen to show the queue and lyric
@@ -1218,19 +1177,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     /**
      * Opens to the current album profile
      */
-    private final OnClickListener mOpenAlbumProfile = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            long albumId = MusicUtils.getCurrentAlbumId();
-            try {
-                NavUtils.openAlbumProfile(AudioPlayerActivity.this,
-                        MusicUtils.getAlbumName(),
-                        MusicUtils.getArtistName(),
-                        albumId,
-                        MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
-            } catch (Throwable ignored) {
-                ignored.printStackTrace();
-            }
+    private final OnClickListener mOpenAlbumProfile = v -> {
+        long albumId = MusicUtils.getCurrentAlbumId();
+        try {
+            NavUtils.openAlbumProfile(AudioPlayerActivity.this,
+                    MusicUtils.getAlbumName(),
+                    MusicUtils.getArtistName(),
+                    albumId,
+                    MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
+        } catch (Throwable ignored) {
+            ignored.printStackTrace();
         }
     };
 
@@ -1314,7 +1270,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
             AudioPlayerActivity activity = mReference.get();
             final String action = intent.getAction();
-
+            if (action == null) {
+                return;
+            }
             switch (action) {
                 case MusicPlaybackService.META_CHANGED:
                     // Current info
@@ -1399,46 +1357,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             } catch (Throwable e) {
                 // ignore
             }
-        }
-    }
-
-    private static final class TrackScreenshotSharer implements Runnable {
-
-        private final WeakReference<AudioPlayerActivity> audioPlayerActivityRef;
-
-        TrackScreenshotSharer(AudioPlayerActivity audioPlayerActivity) {
-            audioPlayerActivityRef = Ref.weak(audioPlayerActivity);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(audioPlayerActivityRef)) {
-                return;
-            }
-            final AudioPlayerActivity activity = audioPlayerActivityRef.get();
-            final long currentAudioId = MusicUtils.getCurrentAudioId();
-            final String trackName = MusicUtils.getTrackName();
-            if (currentAudioId == -1 || trackName == null) {
-                return;
-            }
-
-            final Intent shareIntent = new Intent();
-            final String artistName = MusicUtils.getArtistName();
-            final String shareMessage = (artistName != null) ? activity.getString(R.string.now_listening_to, trackName, artistName) :
-                    activity.getString(R.string.now_listening_to_no_artist_available, trackName);
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-
-            View rootView = activity.getWindow().getDecorView().getRootView();
-            File screenshotFile = UIUtils.takeScreenshot(rootView);
-            if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
-                shareIntent.setType("image/jpg");
-                boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
-                shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath(), userFileProvider));
-            } else {
-                shareIntent.setType("text/plain");
-            }
-            activity.startActivity(Intent.createChooser(shareIntent, activity.getString(R.string.share_track_using)));
         }
     }
 }
