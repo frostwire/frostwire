@@ -1041,7 +1041,7 @@ public class MusicPlaybackService extends Service {
     }
 
     private static void cancelShutdownTask(MusicPlaybackService musicPlaybackService) {
-        if (musicPlaybackService != null && musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
+        if (musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
             if (D)
                 LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
             try {
@@ -1567,111 +1567,69 @@ public class MusicPlaybackService extends Service {
      * Notify the change-receivers that something has changed.
      */
     private void notifyChange(final String change) {
-        NotifyChangeRunnable runnable = new NotifyChangeRunnable(this, change);
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            Engine.instance().getThreadPool().execute(runnable);
+        async(this, MusicPlaybackService::notifyChangeTask, change);
+    }
+
+    private static void notifyChangeTask(MusicPlaybackService musicPlaybackService, String change) {
+        if (D) LOG.info("notifyChange: what = " + change);
+        // Update the lock screen controls
+        musicPlaybackService.updateRemoteControlClient(change);
+        if (POSITION_CHANGED.equals(change)) {
+            return;
+        }
+        final Intent intent = new Intent(change);
+        long audioId = musicPlaybackService.getAudioId();
+        String artistName = musicPlaybackService.getArtistName();
+        String albumName = musicPlaybackService.getAlbumName();
+        String trackName = musicPlaybackService.getTrackName();
+        boolean isPlaying = musicPlaybackService.isPlaying();
+        boolean favorite = musicPlaybackService.isFavorite();
+        intent.putExtra("id", audioId);
+        intent.putExtra("artist", artistName);
+        intent.putExtra("album", albumName);
+        intent.putExtra("track", trackName);
+        intent.putExtra("playing", isPlaying);
+        intent.putExtra("isfavorite", favorite);
+        musicPlaybackService.sendStickyBroadcast(intent);
+        final Intent musicIntent = new Intent(intent);
+        musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
+        musicPlaybackService.sendStickyBroadcast(musicIntent);
+        if (META_CHANGED.equals(change)) {
+            // Increase the play count for favorite songs.
+            if (musicPlaybackService.mFavoritesCache != null && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
+                musicPlaybackService.mFavoritesCache.addSongId(audioId, trackName, albumName, artistName);
+            }
+            // Add the track to the recently played list.
+            ExecutorService threadPool = Engine.instance().getThreadPool();
+            if (threadPool != null) {
+                async(musicPlaybackService, MusicPlaybackService::recentsStoreAddSongIdTask);
+            }
+
+        } else if (QUEUE_CHANGED.equals(change)) {
+            musicPlaybackService.saveQueue(true);
+            if (isPlaying) {
+                musicPlaybackService.setNextTrack();
+            }
         } else {
-            runnable.run();
+            musicPlaybackService.saveQueue(false);
+        }
+        if (PLAYSTATE_CHANGED.equals(change)) {
+            musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
         }
     }
 
-    private final static class NotifyChangeRunnable implements Runnable {
-
-        WeakReference<MusicPlaybackService> musicPlaybackServiceRef;
-        final String change;
-
-        NotifyChangeRunnable(MusicPlaybackService musicPlaybackService, String change) {
-            musicPlaybackServiceRef = Ref.weak(musicPlaybackService);
-            this.change = change;
+    private static void recentsStoreAddSongIdTask(MusicPlaybackService musicPlaybackService) {
+        if (musicPlaybackService.mRecentsCache == null) {
+            musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
         }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(musicPlaybackServiceRef)) {
-                return;
-            }
-            MusicPlaybackService musicPlaybackService = musicPlaybackServiceRef.get();
-            if (D) LOG.info("notifyChange: what = " + change);
-
-            // Update the lock screen controls
-            musicPlaybackService.updateRemoteControlClient(change);
-
-            if (POSITION_CHANGED.equals(change)) {
-                return;
-            }
-
-            final Intent intent = new Intent(change);
-            long audioId = musicPlaybackService.getAudioId();
-            String artistName = musicPlaybackService.getArtistName();
-            String albumName = musicPlaybackService.getAlbumName();
-            String trackName = musicPlaybackService.getTrackName();
-            boolean isPlaying = musicPlaybackService.isPlaying();
-            boolean favorite = musicPlaybackService.isFavorite();
-            intent.putExtra("id", audioId);
-            intent.putExtra("artist", artistName);
-            intent.putExtra("album", albumName);
-            intent.putExtra("track", trackName);
-            intent.putExtra("playing", isPlaying);
-            intent.putExtra("isfavorite", favorite);
-            musicPlaybackService.sendStickyBroadcast(intent);
-
-            final Intent musicIntent = new Intent(intent);
-            musicIntent.setAction(change.replace(APOLLO_PACKAGE_NAME, MUSIC_PACKAGE_NAME));
-            musicPlaybackService.sendStickyBroadcast(musicIntent);
-
-            if (META_CHANGED.equals(change)) {
-                // Increase the play count for favorite songs.
-                if (musicPlaybackService.mFavoritesCache != null && musicPlaybackService.mFavoritesCache.getSongId(audioId) != null) {
-                    musicPlaybackService.mFavoritesCache.addSongId(audioId, trackName, albumName, artistName);
-                }
-                // Add the track to the recently played list.
-                ExecutorService threadPool = Engine.instance().getThreadPool();
-                if (threadPool != null) {
-                    threadPool.execute(new RecentsStoreAddSongIdRunnable(musicPlaybackService));
-                }
-
-            } else if (QUEUE_CHANGED.equals(change)) {
-                musicPlaybackService.saveQueue(true);
-                if (isPlaying) {
-                    musicPlaybackService.setNextTrack();
-                }
-            } else {
-                musicPlaybackService.saveQueue(false);
-            }
-
-            if (PLAYSTATE_CHANGED.equals(change)) {
-                musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
-            }
-        }
-    }
-
-    private final static class RecentsStoreAddSongIdRunnable implements Runnable {
-        private WeakReference<MusicPlaybackService> musicPlaybackServiceWeakReference;
-
-        RecentsStoreAddSongIdRunnable(MusicPlaybackService musicPlaybackService) {
-            musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(musicPlaybackServiceWeakReference)) {
-                return;
-            }
-            MusicPlaybackService musicPlaybackService = musicPlaybackServiceWeakReference.get();
-            if (musicPlaybackService.mRecentsCache == null) {
-                musicPlaybackService.mRecentsCache = RecentStore.getInstance(musicPlaybackService);
-            }
-
-            long songId = musicPlaybackService.getAudioId();
-            String songName = musicPlaybackService.getTrackName();
-            String artistName = musicPlaybackService.getArtistName();
-            String albumName = musicPlaybackService.getAlbumName();
-            long duration =  musicPlaybackService.duration();
-
-            if (musicPlaybackService.mRecentsCache != null) {
-                musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
-                        albumName, duration, musicPlaybackService.getString(R.string.unknown));
-            }
+        long songId = musicPlaybackService.getAudioId();
+        String songName = musicPlaybackService.getTrackName();
+        String artistName = musicPlaybackService.getArtistName();
+        String albumName = musicPlaybackService.getAlbumName();
+        long duration = musicPlaybackService.duration();
+        if (musicPlaybackService.mRecentsCache != null) {
+            musicPlaybackService.mRecentsCache.addSongId(songId, songName, artistName,
+                    albumName, duration, musicPlaybackService.getString(R.string.unknown));
         }
     }
 
