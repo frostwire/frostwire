@@ -25,6 +25,8 @@
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>Private Internet Access</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[  Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare ExpressVPN per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare Private Internet Access per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>La tua vita privata è un diritto umano fondamentale</b>. Una connessione non protetta, tutto ciò che fai online <b>ricerche, messaggistica e download</b>, può essere monitorato e intercettato da chiunque sulla tua rete, ad es. Provider di servizi Internet, hacker, governi.<br><br><b>Raccomandiamo VIVAMENTE di utilizzare un servizio VPN</b> soprattutto quando si scaricano o si scambiano informazioni riservate (ad esempio servizi bancari) e mentre si utilizzano dati Wi-Fi o mobili pubblici. <br><br> Ecco alcune opzioni che forniscono un servizio affidabile e funzionano bene con FrostWire:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non lo sei già, ti consigliamo di utilizzare uno dei seguenti servizi per crittografare la tua connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Impostazioni</string>
     <string name="activity_chat_name">Chat</string>
@@ -721,4 +723,11 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Impossibile aprire Dettagli trasferimento, InfoHash non valido</string>
     <string name="invalid_tracker_url">URL del tracker non valido</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
+    <string name="vpn_suggestion_expressvpn">ExpressVPN</string>
+    <string name="vpn_suggestion_pia">PIA</string>
+    <string name="price_pia">da $6.95</string>
+    <string name="vpn_suggestion_nordvpn">NordVPN</string>
+    <string name="price_nordvpn">da $11.95</string>
+    <string name="price_expressvpn">da $12.95</string>
+    <string name="vpn_find_out_more">Scopri di più</string>
 </resources>
