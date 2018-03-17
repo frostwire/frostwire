@@ -85,15 +85,15 @@
                 <Button
                     android:id="@+id/view_vpn_status_pia"
                     style="?android:attr/borderlessButtonStyle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="72dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="4dp"
                     android:background="@drawable/vpn_suggestion_button_background_selector"
                     android:drawableTop="@drawable/pia"
-                    android:padding="5dp"
-                    android:text="@string/vpn_suggestion_pia" />
+                    android:padding="3dp"
+                    android:text="@string/vpn_suggestion_pia"/>
 
 
                 <Button
@@ -102,16 +102,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="4dp"
                     android:layout_marginRight="5dp"
                     android:layout_toRightOf="@+id/view_vpn_status_pia"
                     android:background="@drawable/vpn_suggestion_button_background_selector"
                     android:drawableTop="@drawable/expressvpn"
+                    android:padding="3dp"
                     android:paddingBottom="5dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
                     android:paddingTop="5dp"
-                    android:text="@string/vpn_suggestion_expressvpn" />
+                    android:text="@string/vpn_suggestion_expressvpn"
+                    android:textSize="@dimen/text_small"/>
 
 
                 <Button
@@ -121,12 +121,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginRight="2dp"
                     android:layout_toRightOf="@+id/view_vpn_status_expressvpn"
                     android:background="@drawable/vpn_suggestion_button_background_selector"
                     android:drawableTop="@drawable/nordvpn"
-                    android:padding="5dp"
-                    android:text="@string/vpn_suggestion_nordvpn" />
+                    android:padding="3dp"
+                    android:paddingTop="15dp"
+                    android:text="@string/vpn_suggestion_nordvpn"
+                    android:textSize="@dimen/text_small"/>
 
 
             </LinearLayout>

@@ -20,13 +20,8 @@
 -->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html">Your privacy is a fundamental human right.</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Disclosure: Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using ExpressVPN to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ An unprotected connection means everything you do online (including <b>searches, messaging, and downloads</b>) may be monitored by anyone on your network and even by your Internet service provider.<br><br>We recommend using Private Internet Access to encrypt your connection and <b>safeguard your privacy</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ An unprotected connection means that everything you do online while on your device - including <b>downloads, searches, messaging</b> etc - can be monitored and intercepted by anyone on your network - Internet Service Providers, hackers, governments etc.<br><br><b>We STRONGLY recommend using a VPN service</b> - especially whenever downloading or exchanging sensitive information (eg. banking) and while using public wi-fi or mobile data. <br><br> Here are some options that provide reliable service and work well with FrostWire:]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using <b>Private Internet Access</b> to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Your privacy is a fundamental human right</b>. An unprotected connection means everything you do online including <b>downloads, searches, messaging</b>, can be monitored and intercepted by anyone on your network, e.g. Internet Service Providers, hackers, governments.<br><br><b>We STRONGLY recommend using a VPN service</b> especially whenever downloading or exchanging sensitive information (e.g. banking) and while using public Wi-Fi or mobile data. <br><br> Here are some options that provide reliable service and work well with FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using one of the services below to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
 
 
@@ -166,8 +161,8 @@
     <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">How other users will see you</string>
     <string name="networking_preferences">Networking Settings</string>
-    <string name="simultaneous_uploads">Simultaneous Wi-fi Uploads</string>
-    <string name="simultaneous_uploads_summary">Set how many Wi-fi sharing uploads you want to allow at the same time.</string>
+    <string name="simultaneous_uploads">Simultaneous Wi-Fi Uploads</string>
+    <string name="simultaneous_uploads_summary">Set how many Wi-Fi sharing uploads you want to allow at the same time.</string>
     <string name="send_my_geo_location">Send my Geo-Location</string>
     <string name="send_my_geo_location_summary">Pings will send your approximate Geo Location to find closest peers.</string>
     <string name="use_upnp_port_mapping">Use automatic Port mapping (UPnP)</string>
@@ -618,7 +613,7 @@
     <string name="enable_seeding">Enable Seeding</string>
     <string name="bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you">Can\'t perform selected action as BitTorrent is currently disconnected. Would you like me to start it for you?</string>
     <string name="seeding_is_currently_disabled_in_settings">Seeding is currently disabled in your settings. Would you like me to enable seeding for you to share this file?</string>
-    <string name="wifi_network_unavailable">Wifi Network Unavailable</string>
+    <string name="wifi_network_unavailable">Wi-fi Network Unavailable</string>
     <string name="mobile_data_saving">Mobile Data Saving</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">According to your settings I can\'t start seeding unless you are on Wi-Fi. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
     <string name="according_to_settings_i_cant_seed_due_to_data_savings">According to your settings I can\'t start seeding unless you are on Wi-Fi due to data savings. The file will be ready for seeding automatically when you get back to an internet enabled Wi-Fi network.</string>
@@ -791,9 +786,9 @@
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="rtt_ms">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
-    <string name="vpn_suggestion_pia">Get PIA</string>
-    <string name="vpn_suggestion_expressvpn">Get ExpressVPN</string>
-    <string name="vpn_suggestion_nordvpn">Get NordVPN</string>
+    <string name="vpn_suggestion_pia">PIA</string>
+    <string name="vpn_suggestion_expressvpn">ExpressVPN</string>
+    <string name="vpn_suggestion_nordvpn">NordVPN</string>
     <string name="vpn_find_out_more">Find out more</string>
     <string name="price_pia">from $6.95</string>
     <string name="price_expressvpn">from $12.95</string>

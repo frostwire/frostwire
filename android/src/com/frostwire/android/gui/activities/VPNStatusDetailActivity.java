@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,6 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
             vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
             // learnVPNText
             learnVPNText.setText(R.string.vpn_find_out_more);
-            // getVPNButtonBottom
         } else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
@@ -86,23 +85,11 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
         learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
 
-        PiaVPN.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.PIA_VPN);
-            }
-        });
+        PiaVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
 
-        ExpressVPN.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_VPN);
-            }
-        });
+        ExpressVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_URL));
 
-        NordVPN.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                UIUtils.openURL(v.getContext(), Constants.NORDVPN_VPN);
-            }
-        });
+        NordVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.NORDVPN_URL));
 
         headerIcon.setOnClickListener(new LearnVPNLink());
         headerStatus.setOnClickListener(new LearnVPNLink());
@@ -111,7 +98,7 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
     private final class LearnVPNLink implements View.OnClickListener {
         public void onClick(View v) {
-            UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_VPN);
+            UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_VPN_URL);
         }
     }
 

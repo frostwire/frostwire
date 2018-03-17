@@ -56,7 +56,6 @@ import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -66,7 +65,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -1600,10 +1598,7 @@ public class MusicPlaybackService extends Service {
                 musicPlaybackService.mFavoritesCache.addSongId(audioId, trackName, albumName, artistName);
             }
             // Add the track to the recently played list.
-            ExecutorService threadPool = Engine.instance().getThreadPool();
-            if (threadPool != null) {
-                async(musicPlaybackService, MusicPlaybackService::recentsStoreAddSongIdTask);
-            }
+            async(musicPlaybackService, MusicPlaybackService::recentsStoreAddSongIdTask);
 
         } else if (QUEUE_CHANGED.equals(change)) {
             musicPlaybackService.saveQueue(true);

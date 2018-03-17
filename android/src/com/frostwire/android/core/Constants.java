@@ -195,11 +195,11 @@ public final class Constants {
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
     public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
 
-    public static final String FROSTWIRE_VPN = "http://www.frostwire.com/vpn";
+    public static final String FROSTWIRE_VPN_URL = "http://www.frostwire.com/vpn";
 
-    public static final String PIA_VPN = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
-    public static final String EXPRESSVPN_VPN = "https://www.linkev.com/internet-security/private-vpn/buy?a_aid=frostwire";
-    public static final String NORDVPN_VPN = "https://go.nordvpn.net/SH14c";
+    public static final String PIA_VPN_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
+    public static final String EXPRESSVPN_URL = "https://www.linkev.com/internet-security/private-vpn/buy?a_aid=frostwire";
+    public static final String NORDVPN_URL = "https://go.nordvpn.net/SH14c";
 
     private Constants() {
     }
