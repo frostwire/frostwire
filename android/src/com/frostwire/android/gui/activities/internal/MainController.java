@@ -83,9 +83,11 @@ public final class MainController {
         }
         MainActivity activity = activityRef.get();
         if (!(activity.getCurrentFragment() instanceof TransfersFragment)) {
-            TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
-            fragment.selectStatusTab(status);
-            switchFragment(R.id.menu_main_transfers);
+            activity.runOnUiThread(() -> {
+                TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
+                fragment.selectStatusTab(status);
+                switchFragment(R.id.menu_main_transfers);
+            });
         }
     }
 

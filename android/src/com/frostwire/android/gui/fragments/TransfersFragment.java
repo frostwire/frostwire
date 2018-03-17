@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -299,7 +300,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (transferStatus == selectedStatus) {
                 TabLayout.Tab tab = tabLayout.getTabAt(i);
                 if (tab != null && !tab.isSelected()) {
-                    tab.select();
+                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                        tab.select();
+                    } else {
+                        try {
+                            getActivity().runOnUiThread(tab::select);
+                        } catch (Throwable ignored) {}
+                    }
                 }
                 break;
             }
