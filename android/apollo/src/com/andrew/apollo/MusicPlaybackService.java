@@ -3013,34 +3013,14 @@ public class MusicPlaybackService extends Service {
                 MusicPlaybackService musicPlaybackService = mService.get();
                 async(musicPlaybackService,
                       MusicPlaybackService.MultiPlayer::setDataSourceTask,
-                      new DataSourceTaskArguments(player,path, callback, this));
-            }
-        }
-
-        // I'm doing this bundle because async takes max 4 parameters and I need 5,
-        // so I'll just pass two.
-        private static final class DataSourceTaskArguments {
-            final MediaPlayer player;
-            final String path;
-            final OnPlayerPrepareCallback callback;
-            final MultiPlayer multiPlayer;
-            private DataSourceTaskArguments(MediaPlayer player,
-                                            String path,
-                                            OnPlayerPrepareCallback callback,
-                                            MultiPlayer multiPlayer) {
-                this.player = player;
-                this.path = path;
-                this.callback = callback;
-                this.multiPlayer = multiPlayer;
+                      player, path, callback, this);
             }
         }
 
         private static void setDataSourceTask(MusicPlaybackService mService,
-                                              DataSourceTaskArguments args) {
-          MediaPlayer player = args.player;
-          String path = args.path;
-          OnPlayerPrepareCallback callback = args.callback;
-          MultiPlayer multiPlayer = args.multiPlayer;
+                                              MediaPlayer player, String path,
+                                              OnPlayerPrepareCallback callback,
+                                              MultiPlayer multiPlayer) {
             try {
                 player.reset();
                 if (mService.launchPlayerActivity) {
