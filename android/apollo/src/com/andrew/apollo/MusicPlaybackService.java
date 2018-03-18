@@ -685,26 +685,9 @@ public class MusicPlaybackService extends Service {
                 | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
                 | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
 
-        // aldenml: Commented due to the nature of the needed refactor
-        // enable when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-        /*
         flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
-
-        mRemoteControlClient.setOnGetPlaybackPositionListener(
-                new RemoteControlClient.OnGetPlaybackPositionListener() {
-            @Override
-            public long onGetPlaybackPosition() {
-                return position();
-            }
-        });
-        mRemoteControlClient.setPlaybackPositionUpdateListener(
-                new RemoteControlClient.OnPlaybackPositionUpdateListener() {
-            @Override
-            public void onPlaybackPositionUpdate(long newPositionMs) {
-                seek(newPositionMs);
-            }
-        });
-        */
+        mRemoteControlClient.setOnGetPlaybackPositionListener(() -> position());
+        mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
 
         mRemoteControlClient.setTransportControlFlags(flags);
     }
@@ -1673,7 +1656,7 @@ public class MusicPlaybackService extends Service {
             case META_CHANGED:
             case QUEUE_CHANGED:
                 // Asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
-                async(this, MusicPlaybackService::changeRemoteControlClientTask, playState);
+                async(this, MusicPlaybackService::changeRemoteControlClientTask, playState, position());
                 break;
         }
     }
@@ -1686,7 +1669,7 @@ public class MusicPlaybackService extends Service {
         }
     }
 
-    private static void changeRemoteControlClientTask(MusicPlaybackService musicPlaybackService, int playState) {
+    private static void changeRemoteControlClientTask(MusicPlaybackService musicPlaybackService, int playState, long position) {
         // background portion
         Bitmap albumArt = musicPlaybackService.getAlbumArt();
         // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
@@ -1723,9 +1706,7 @@ public class MusicPlaybackService extends Service {
             } catch (Throwable t) {
                 // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
             }
-            // when Build.VERSION.SDK_INT >= 18;//Build.VERSION_CODES.JELLY_BEAN_MR2;
-            // use mRemoteControlClient.setPlaybackState(playState, position(), 1.0f);
-            musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState);
+            musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
         };
         musicPlaybackService.mPlayerHandler.post(postExecute);
     }
