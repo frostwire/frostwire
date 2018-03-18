@@ -723,11 +723,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Impossibile aprire Dettagli trasferimento, InfoHash non valido</string>
     <string name="invalid_tracker_url">URL del tracker non valido</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
-    <string name="vpn_suggestion_expressvpn">ExpressVPN</string>
-    <string name="vpn_suggestion_pia">PIA</string>
-    <string name="price_pia">da $6.95</string>
-    <string name="vpn_suggestion_nordvpn">NordVPN</string>
-    <string name="price_nordvpn">da $11.95</string>
-    <string name="price_expressvpn">da $12.95</string>
     <string name="vpn_find_out_more">Scopri di più</string>
 </resources>
