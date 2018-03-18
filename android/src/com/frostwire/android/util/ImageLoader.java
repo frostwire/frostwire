@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.StatFs;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.http.OKHTTPClient;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -50,6 +52,9 @@ import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -60,7 +65,8 @@ public final class ImageLoader {
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
 
-    private static final int MAX_DISK_CACHE_SIZE = 64 * 1024 * 1024; // 64MB
+    // for the ImageCache
+    //private static final int MAX_DISK_CACHE_SIZE = 64 * 1024 * 1024; // 64MB
 
     private static final String SCHEME_IMAGE = "image";
 
@@ -156,7 +162,7 @@ public final class ImageLoader {
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 //memoryCache(cache).
-                downloader(new ImageLoaderDownloader(context.getApplicationContext()));
+                downloader(new ImageLoaderDownloader(createHttpClient(context.getApplicationContext())));
                 //executor(threadPool);
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
@@ -562,5 +568,50 @@ public final class ImageLoader {
                 return null;
             }
         }
+    }
+
+    private static OkHttpClient createHttpClient(Context context) {
+        File cacheDir = createDefaultCacheDir(context);
+        long maxSize = calculateDiskCacheSize(cacheDir);
+
+        Cache cache = new Cache(cacheDir, maxSize);
+
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
+        b = b.cache(cache);
+        b = OKHTTPClient.configNullSsl(b);
+        return b.build();
+    }
+
+    // ------- below code copied from com.squareup.picasso.Utils -------
+    // copied here to keep code independence
+
+    private static final String PICASSO_CACHE = "picasso-cache";
+    private static final int MIN_DISK_CACHE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final int MAX_DISK_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+
+    private static File createDefaultCacheDir(Context context) {
+        File cache = SystemUtils.getCacheDir(context, PICASSO_CACHE);
+        if (!cache.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            cache.mkdirs();
+        }
+        return cache;
+    }
+
+    private static long calculateDiskCacheSize(File dir) {
+        long size = MIN_DISK_CACHE_SIZE;
+
+        try {
+            StatFs statFs = new StatFs(dir.getAbsolutePath());
+            long blockCount = statFs.getBlockCountLong();
+            long blockSize = statFs.getBlockSizeLong();
+            long available = blockCount * blockSize;
+            // Target 2% of the total space.
+            size = available / 50;
+        } catch (IllegalArgumentException ignored) {
+        }
+
+        // Bound inside min/max size for disk cache.
+        return Math.max(Math.min(size, MAX_DISK_CACHE_SIZE), MIN_DISK_CACHE_SIZE);
     }
 }
