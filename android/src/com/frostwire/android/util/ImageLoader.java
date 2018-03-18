@@ -84,7 +84,7 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
-    private final ImageCache cache;
+    //private final ImageCache cache;
     private final Picasso picasso;
 
     private boolean shutdown;
@@ -151,11 +151,11 @@ public final class ImageLoader {
 
     private ImageLoader(Context context) {
         File directory = SystemUtils.getCacheDir(context, "picasso");
-        this.cache = new ImageCache(context, directory, MAX_DISK_CACHE_SIZE);
+        //this.cache = new ImageCache(context, directory, MAX_DISK_CACHE_SIZE);
         ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
-                memoryCache(cache).
+                //memoryCache(cache).
                 downloader(new ImageLoaderDownloader(context.getApplicationContext())).
                 executor(threadPool);
         if (DEBUG_ERRORS) {
@@ -318,7 +318,8 @@ public final class ImageLoader {
     }
 
     public void clear() {
-        cache.clear();
+        //cache.clear();
+        picasso.evictAll();
     }
 
     public void shutdown() {

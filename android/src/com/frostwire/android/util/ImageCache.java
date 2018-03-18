@@ -23,8 +23,8 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 
 import com.frostwire.android.util.DiskCache.Entry;
-import com.squareup.picasso.Cache;
-import com.squareup.picasso.LruCache;
+//import com.squareup.picasso.Cache;
+//import com.squareup.picasso.LruCache;
 
 import org.apache.commons.io.IOUtils;
 
@@ -39,19 +39,19 @@ import static com.frostwire.android.gui.util.UIUtils.isMain;
  * @author gubatron
  * @author aldenml
  */
-final class ImageCache implements Cache {
+final class ImageCache /*implements Cache*/ {
 
     private final DiskCache disk;
-    private final LruCache mem;
+    //private final LruCache mem;
 
     ImageCache(Context context, File directory, long diskSize) {
         this.disk = createDiskCache(directory, diskSize);
-        this.mem = new LruCache(context);
+        //this.mem = new LruCache(context);
     }
 
-    @Override
+    //@Override
     public Bitmap get(String key) {
-        Bitmap bmp = mem.get(key);
+        Bitmap bmp = null;//mem.get(key);
 
         if (bmp == null && !isMain()) {
             bmp = diskGet(key);
@@ -60,31 +60,31 @@ final class ImageCache implements Cache {
         return bmp;
     }
 
-    @Override
+    //@Override
     public void set(String key, Bitmap bitmap) {
-        mem.set(key, bitmap);
+        //mem.set(key, bitmap);
 
         diskPut(key, bitmap);
     }
 
-    @Override
+    //@Override
     public int size() {
-        return mem.size() + diskSize();
+        return /*mem.size()*/ + diskSize();
     }
 
-    @Override
+    //@Override
     public int maxSize() {
-        return mem.maxSize() + diskMaxSize();
+        return /*mem.maxSize()*/ + diskMaxSize();
     }
 
-    @Override
+    //@Override
     public void clear() {
-        mem.clear();
+        //mem.clear();
     }
 
-    @Override
+    //@Override
     public void clearKeyUri(String keyPrefix) {
-        mem.clearKeyUri(keyPrefix);
+        //mem.clearKeyUri(keyPrefix);
     }
 
     private InputStream getInputStream(Bitmap bmp) {
