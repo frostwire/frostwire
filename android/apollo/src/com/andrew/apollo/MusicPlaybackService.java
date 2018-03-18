@@ -1679,7 +1679,11 @@ public class MusicPlaybackService extends Service {
     }
 
     private static void remoteControlClientSetPlaybackStateTask(RemoteControlClient rc, int playState) {
-        rc.setPlaybackState(playState);
+        try {
+            rc.setPlaybackState(playState);
+        } catch (Throwable throwable) {
+            // rare android internal NPE
+        }
     }
 
     private static void changeRemoteControlClientTask(MusicPlaybackService musicPlaybackService, int playState) {
