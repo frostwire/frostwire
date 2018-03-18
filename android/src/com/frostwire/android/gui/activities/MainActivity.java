@@ -809,7 +809,11 @@ public class MainActivity extends AbstractActivity implements
 
     private void switchContent(Fragment fragment, boolean addToStack) {
         hideFragments();
-        getFragmentManager().beginTransaction().show(fragment).commitAllowingStateLoss();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction().show(fragment);
+        try {
+            transaction.commitAllowingStateLoss();
+        } catch (Throwable ignored) {}
+
         if (addToStack && (fragmentsStack.isEmpty() || fragmentsStack.peek() != fragment.getId())) {
             fragmentsStack.push(fragment.getId());
         }
