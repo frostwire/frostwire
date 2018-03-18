@@ -73,8 +73,10 @@ public final class DeleteFileMenuAction extends MenuAction {
     }
 
     private void deleteFiles() {
-        async(adapter, DeleteFileMenuAction::deleteFilesTask, files,
-                DeleteFileMenuAction::deleteFilesTaskPost);
+        if (adapter != null) {
+            async(adapter, DeleteFileMenuAction::deleteFilesTask, files,
+                    DeleteFileMenuAction::deleteFilesTaskPost);
+        }
     }
 
     private static void deleteFilesTask(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
