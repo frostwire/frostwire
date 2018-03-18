@@ -152,12 +152,12 @@ public final class ImageLoader {
     private ImageLoader(Context context) {
         File directory = SystemUtils.getCacheDir(context, "picasso");
         //this.cache = new ImageCache(context, directory, MAX_DISK_CACHE_SIZE);
-        ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
+        //ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
                 //memoryCache(cache).
-                downloader(new ImageLoaderDownloader(context.getApplicationContext())).
-                executor(threadPool);
+                downloader(new ImageLoaderDownloader(context.getApplicationContext()));
+                //executor(threadPool);
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
