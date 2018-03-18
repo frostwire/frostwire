@@ -160,6 +160,17 @@ public final class Asyncs {
             arg1, arg2, arg3);
     }
 
+    public static <C, T1, T2, T3, T4> void async(@NonNull C context,
+                                             ContextTask4<C, T1, T2, T3, T4> task,
+                                             T1 arg1, T2 arg2, T3 arg3, T4 arg4) {
+
+        requireContext(context);
+        invokeAsyncSupport(context,
+            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]); return null;},
+            null,
+            arg1, arg2, arg3, arg4);
+    }
+
     public static <C, T1> void async(@NonNull C context,
                                      ContextTask1<C, T1> task,
                                      T1 arg1,
@@ -210,6 +221,10 @@ public final class Asyncs {
 
     public interface ContextTask3<C, T1, T2, T3> {
         void run(C context, T1 arg1, T2 arg2, T3 arg3);
+    }
+
+    public interface ContextTask4<C, T1, T2, T3, T4> {
+        void run(C context, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
     }
 
     public interface ContextPostTask1<C, T1> {
