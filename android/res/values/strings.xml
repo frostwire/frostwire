@@ -786,12 +786,9 @@
     <string name="uploaded_n">Uploaded %1$s</string>
     <string name="rtt_ms">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
-    <string name="vpn_suggestion_pia">PIA</string>
-    <string name="vpn_suggestion_expressvpn">ExpressVPN</string>
-    <string name="vpn_suggestion_nordvpn">NordVPN</string>
+    <string name="vpn_suggestion_pia" translatable="false">PIA</string>
+    <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
+    <string name="vpn_suggestion_nordvpn" translatable="false">NordVPN</string>
     <string name="vpn_find_out_more">Find out more</string>
-    <string name="price_pia">from $6.95</string>
-    <string name="price_expressvpn">from $12.95</string>
-    <string name="price_nordvpn">from $11.95</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
 </resources>
