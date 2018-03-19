@@ -22,7 +22,6 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.LocaleList;
 import android.os.StrictMode;
 import android.view.View;
 
@@ -211,8 +210,7 @@ public final class Debug {
             obj instanceof String ||
             obj instanceof Enum || // avoids infinite recursion checking $VALUES field
             obj instanceof Boolean ||
-            obj instanceof Paint ||
-            obj instanceof LocaleList) {
+            obj instanceof Paint) {
             return true;
         }
 
@@ -231,6 +229,11 @@ public final class Debug {
         } else if (clazzName.startsWith("com.frostwire.search.")) {
             return true;
         } else if (clazzName.startsWith("com.frostwire.bittorrent.")) {
+            return true;
+        }
+
+        // exclude some classes by name due to API level
+        if (clazzName.startsWith("android.os.LocaleList")) {
             return true;
         }
 
