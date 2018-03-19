@@ -83,8 +83,8 @@ public class NotificationHelper {
      * Call this to build the {@link Notification}.
      */
     public void buildNotification(final String albumName, final String artistName,
-            final String trackName, final Long albumId, final Bitmap albumArt,
-            final boolean isPlaying) {
+                                  final String trackName, final Bitmap albumArt,
+                                  final boolean isPlaying) {
 
         // Default notification layout
         mNotificationTemplate = new RemoteViews(mService.getPackageName(),
@@ -97,7 +97,7 @@ public class NotificationHelper {
         PendingIntent pendingintent = getPendingIntent();
 
         // Notification Builder
-        Notification aNotification = new NotificationCompat.Builder(mService)
+        Notification aNotification = new NotificationCompat.Builder(mService,"")
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
                 .setPriority(Notification.PRIORITY_DEFAULT)
@@ -119,7 +119,10 @@ public class NotificationHelper {
         initExpandedLayout(trackName, albumName, artistName, albumArt);
 
         mNotification = aNotification;
-        mService.startForeground(APOLLO_MUSIC_SERVICE, mNotification);
+        try {
+            mService.startForeground(APOLLO_MUSIC_SERVICE, mNotification);
+        } catch (Throwable ignored) {
+        }
         // TODO: research RuntimeException in Android 7
         // we are getting this error at Bitmap.nativeWriteToParcel(Native Method:0)
         // in very low numbers and only in android 7, better research it
@@ -228,7 +231,7 @@ public class NotificationHelper {
      * @param which Which {@link PendingIntent} to return
      * @return A {@link PendingIntent} ready to control playback
      */
-    private final PendingIntent retrievePlaybackActions(final int which) {
+    private PendingIntent retrievePlaybackActions(final int which) {
         Intent action;
         PendingIntent pendingIntent;
         final ComponentName serviceName = new ComponentName(mService, MusicPlaybackService.class);

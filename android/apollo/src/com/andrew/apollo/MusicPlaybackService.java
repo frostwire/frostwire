@@ -914,7 +914,6 @@ public class MusicPlaybackService extends Service {
                 service.getAlbumName(),
                 service.getArtistName(),
                 service.getTrackName(),
-                service.getAlbumId(),
                 bitmap,
                 service.isPlaying());
         service.mPlayerHandler.post(postExecute);
