@@ -20,7 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tocca i tag applicati a]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Anche se consigliata per i download, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informazione: Anche se consigliata per i download, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>ExpressVPN</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non siete già, si consiglia di utilizzare <b>Private Internet Access</b> per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[  Una connessione non protetta, tutto ciò che fai online (compresi <b>ricerche, messaggistica e download</b>) possono essere monitorati da chiunque sulla rete e anche da parte di provider di servizi Internet.<br><br>Si consiglia di utilizzare ExpressVPN per crittografare la connessione e <b>salvaguardare la vostra vita privata</b>.]]></string>
@@ -463,7 +463,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire non può scrivere nel percorso di memorizzazione selezionato</string>
     <string name="processing_payment">Pagamento in corso, aggiornare in pochi secondi</string>
     <string name="my_music">La mia musica</string>
-    <string name="connection_header_title">Stato della connessione:</string>
+    <string name="connection_header_title">Stato della connessione VPN:</string>
     <string name="error_moving_incomplete">Errore: Moving incompleto</string>
     <string name="torrent_url_added">Torrent URL aggiunto ai trasferimenti.</string>
     <string name="http_download_status_temp_dir_error">Directory temporanea non esiste o non può essere creato</string>

@@ -20,7 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Zveřejnění: Ačkoli doporučen pro vaše stahování, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>Private Internet Access</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
@@ -462,7 +462,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire nelze zapisovat na zvolené cestě skladování</string>
     <string name="processing_payment">Zpracování plateb, osvěžit během několika sekund</string>
     <string name="my_music">Moje hudba</string>
-    <string name="connection_header_title">Stav připojení:</string>
+    <string name="connection_header_title">Stav připojení VPN:</string>
     <string name="error_moving_incomplete">Chyba: Přesunutí Neúplné</string>
     <string name="torrent_url_added">Torrent URL přidána do převodů.</string>
     <string name="http_download_status_temp_dir_error">Dočasný adresář neexistuje nebo nemůže být vytvořen</string>

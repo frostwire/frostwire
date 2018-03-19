@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b></p>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[情報： 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>ExpressVPN</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>Private Internet Access</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
@@ -548,7 +548,7 @@
     <string name="remove_ads_description">広告なしの体験を楽しみ、FrostWireをサポート</string>
     <string name="dummy_title_bold">[大胆なタイトル]</string>
     <string name="processing_payment">支払い処理中、数秒で更新</string>
-    <string name="connection_header_title">接続状態：</string>
+    <string name="connection_header_title">VPN接続ステータス：</string>
     <string name="http_download_status_temp_dir_error">一時ディレクトリが存在しないか、作成できません</string>
     <string name="finishing">仕上げ</string>
     <string name="check_internet_connection">インターネット接続を確認する</string>

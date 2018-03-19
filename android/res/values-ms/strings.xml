@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Walaupun disyorkan untuk muat turun anda, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Maklumat: Walaupun disyorkan untuk muat turun anda, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>ExpressVPN</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>Private Internet Access</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
@@ -310,7 +310,7 @@
     <string name="playing">Bermain</string>
     <string name="torrent_max_downloads">Muat turun maksimum</string>
     <string name="azureus_general_view_no">Tiada</string>
-    <string name="connection_header_title">Status sambungan:</string>
+    <string name="connection_header_title">Status sambungan VPN:</string>
     <string name="azureus_manager_item_checking">Semakan</string>
     <string name="ringtones">Ringtones</string>
     <string name="error_moving_incomplete">Ralat: Moving yang tidak lengkap</string>

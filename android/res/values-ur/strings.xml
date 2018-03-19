@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[افشا: اگرچہ آپ کے ڈاؤن لوڈ کے لئے سفارش کی گئی ہے، آپ کو FrostWire استعمال کرنے کے لئے ایک وی پی این کی ضرورت نہیں ہے.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>ExpressVPN</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>Private Internet Access</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
@@ -354,7 +354,7 @@
     <string name="processing_payment">پروسیسنگ ادائیگی، چند سیکنڈ میں ریفریش</string>
     <string name="my_music">میری موسیقی</string>
     <string name="playing">چل رہا ہے</string>
-    <string name="connection_header_title">کنکشن کی حیثیت:</string>
+    <string name="connection_header_title">وی پی این کنکشن کی حیثیت:</string>
     <string name="ringtones">ٹونز</string>
     <string name="error_moving_incomplete">خرابی: نامکمل و حرکت</string>
     <string name="torrent_url_added">اوپر کے URL کی منتقلی میں شامل کر دیا.</string>

@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоча рекомендується для завантаження, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Розкриття інформації: Хоча рекомендується для завантаження, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>ExpressVPN</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>Private Internet Access</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
@@ -306,7 +306,7 @@
     <string name="playing">Відтворення</string>
     <string name="torrent_max_downloads">Максимальна кількість завантажень</string>
     <string name="azureus_general_view_no">Hi</string>
-    <string name="connection_header_title">Стан з\'єднання:</string>
+    <string name="connection_header_title">Стан з\'єднання VPN:</string>
     <string name="azureus_manager_item_checking">Перевірка</string>
     <string name="ringtones">Мелодії</string>
     <string name="error_moving_incomplete">Помилка: Переміщення неповної</string>

@@ -23,7 +23,7 @@
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>Private Internet Access</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan ExpressVPN om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan Private Internet Access om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informatie: Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste tags aan]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Instellingen</string>
@@ -461,7 +461,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire kan niet schrijven op de geselecteerde opslagpad</string>
     <string name="processing_payment">Verwerking van betaling, te vernieuwen in een paar seconden</string>
     <string name="my_music">Mijn muziek</string>
-    <string name="connection_header_title">Verbindingsstatus:</string>
+    <string name="connection_header_title">VPN-verbindingsstatus:</string>
     <string name="error_moving_incomplete">Fout: Bewegende Incomplete</string>
     <string name="torrent_url_added">Torrent URL toegevoegd aan transfers.</string>
     <string name="http_download_status_temp_dir_error">Tijdelijke map bestaat niet of kan niet worden gemaakt</string>

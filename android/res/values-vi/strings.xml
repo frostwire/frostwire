@@ -461,7 +461,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire không thể viết trên con đường lưu trữ được chọn</string>
     <string name="processing_payment">Thanh toán chế biến, làm mới trong một vài giây</string>
     <string name="my_music">Nhạc của tôi</string>
-    <string name="connection_header_title">Tình trạng kết nối:</string>
+    <string name="connection_header_title">Trạng thái kết nối VPN:</string>
     <string name="error_moving_incomplete">Lỗi: Di chuyển không đầy đủ</string>
     <string name="torrent_url_added">Torrent URL thêm vào chuyển.</string>
     <string name="http_download_status_temp_dir_error">thư mục tạm thời không tồn tại hoặc không thể được tạo ra</string>

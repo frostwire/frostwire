@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Obwohl für Ihre Downloads empfohlen, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Offenlegung: Obwohl für Ihre Downloads empfohlen, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Hinweis:</b> Berühren angewendet Tags]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>ExpressVPN</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>Private Internet Access</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
@@ -471,7 +471,7 @@
     <string name="storage_picker_treeuri_cant_write">Frostwire kann auf dem ausgewählten Speicherpfad nicht schreiben</string>
     <string name="processing_payment">Die Verarbeitung Zahlung, aktualisieren Sie in wenigen Sekunden</string>
     <string name="my_music">Meine Musik</string>
-    <string name="connection_header_title">Verbindungsstatus:</string>
+    <string name="connection_header_title">VPN-Verbindungsstatus:</string>
     <string name="error_moving_incomplete">Fehler: Verschieben von Incomplete</string>
     <string name="torrent_url_added">Torrent-URL hinzugefügt, um Transfers.</string>
     <string name="http_download_status_temp_dir_error">Temporäres Verzeichnis existiert nicht oder kann nicht erstellt werden</string>

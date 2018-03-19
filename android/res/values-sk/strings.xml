@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Hoci odporúčaná pre sťahovanie, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Zverejnenie: Hoci odporúčaná pre sťahovanie, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dotknite sa aplikovaných značiek na]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>Private Internet Access</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
@@ -310,7 +310,7 @@
     <string name="playing">Prehrávanie</string>
     <string name="torrent_max_downloads">Maximálny počet stiahnutí</string>
     <string name="azureus_general_view_no">Nie</string>
-    <string name="connection_header_title">Stav pripojenia:</string>
+    <string name="connection_header_title">Stav pripojenia VPN:</string>
     <string name="azureus_manager_item_checking">Kontrola</string>
     <string name="ringtones">Zvonenia</string>
     <string name="error_moving_incomplete">Chyba: Presunutie Neúplné</string>

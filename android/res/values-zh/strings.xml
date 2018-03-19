@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[披露： 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>Private Internet Access</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
@@ -514,7 +514,6 @@
     <string name="dummy_title_bold">[粗体标题]</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire无法在所选的存储路径上写入</string>
     <string name="processing_payment">处理付款，在几秒钟内刷新</string>
-    <string name="connection_header_title">连接状态：</string>
     <string name="http_download_status_temp_dir_error">临时目录不存在或无法创建</string>
     <string name="notify_frostwire_is_running_summary">显示含有转移状态的永久Android通知</string>
     <string name="storage_path">存储路径</string>
@@ -674,4 +673,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">无法打开传输详细信息，无效的InfoHash</string>
     <string name="invalid_tracker_url">无效的跟踪器网址</string>
     <string name="frostwire_start_engine_service_security_exception">由于缺乏权限，FrostWire无法正常启动。 请授予所需的权限并重新启动应用程序</string>
+    <string name="connection_header_title">VPN连接状态：</string>
 </resources>

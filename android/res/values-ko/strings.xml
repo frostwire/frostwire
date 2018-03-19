@@ -19,7 +19,7 @@
   */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[정보: 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>Private Internet Access</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
@@ -458,7 +458,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire가 선택한 저장 경로에 쓸 수 없습니다.</string>
     <string name="processing_payment">결제 처리 중, 몇 초 후에 새로 고침</string>
     <string name="my_music">내 음악</string>
-    <string name="connection_header_title">연결 상태 :</string>
+    <string name="connection_header_title">VPN 연결 상태 :</string>
     <string name="error_moving_incomplete">오류 : 미완료로 이동 중</string>
     <string name="torrent_url_added">토런트 URL이 전송에 추가되었습니다.</string>
     <string name="http_download_status_temp_dir_error">임시 디렉토리가 없거나 만들 수 없습니다.</string>
