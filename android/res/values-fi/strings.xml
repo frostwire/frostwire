@@ -315,7 +315,7 @@
     <string name="playing">Soivan</string>
     <string name="torrent_max_downloads">Enimmäismäärä lataukset</string>
     <string name="azureus_general_view_no">Ei</string>
-    <string name="connection_header_title">Yhteyden tila:</string>
+    <string name="connection_header_title">VPN-yhteyden tila:</string>
     <string name="azureus_manager_item_checking">Tarkistetaan</string>
     <string name="ringtones">Ringtones</string>
     <string name="error_moving_incomplete">Virhe: Liukuvien Keskeneräinen</string>

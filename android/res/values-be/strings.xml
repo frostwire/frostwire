@@ -24,7 +24,7 @@
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць ExpressVPN для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць Private Internet Access для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>інфармацыя:</b> Націсніце ўжытыя тэгі да]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Раскрыццё інфармацыі: Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
     <string name="vpn_not_found">Няма VPN. Разгледзім шыфраванне злучэння.</string>
     <string name="azureus_peer_manager_status_finished">Скончана</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -306,7 +306,7 @@
     <string name="playing">Прайграванне</string>
     <string name="torrent_max_downloads">Максімальную колькасць загрузак</string>
     <string name="azureus_general_view_no">Няма</string>
-    <string name="connection_header_title">Стан злучэння:</string>
+    <string name="connection_header_title">VPN статус злучэння:</string>
     <string name="azureus_manager_item_checking">Праверка</string>
     <string name="ringtones">Мелодыі</string>
     <string name="error_moving_incomplete">Памылка: Moving Няпоўнае</string>

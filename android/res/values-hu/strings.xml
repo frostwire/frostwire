@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Közzététel: Bár ajánlott a letöltéseket, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>Private Internet Access</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
@@ -306,7 +306,7 @@
     <string name="playing">Lejátszása</string>
     <string name="torrent_max_downloads">Maximális letöltések</string>
     <string name="azureus_general_view_no">Nem</string>
-    <string name="connection_header_title">A kapcsolat állapota:</string>
+    <string name="connection_header_title">VPN kapcsolat állapota:</string>
     <string name="azureus_manager_item_checking">Ellenőrzése</string>
     <string name="ringtones">Csengőhangok</string>
     <string name="error_moving_incomplete">Hiba: Mozgó Befejezetlen</string>

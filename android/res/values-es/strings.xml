@@ -21,7 +21,7 @@
 <resources>
     <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
     <string name="your_privacy_is_a_fundamental_right_html"><![CDATA[<b>Tu privacidad es un derecho humano fundamental.</b>]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p><b> *NO HACE FALTA TENER UN VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.</p>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Información: <b>NO HACE FALTA TENER UN VPN para usar FrostWire </b> pero LO RECOMENDAMOS ENORMEMENTE para proteger tu privacidad.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toca las etiquetas aplicadas para]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si no lo estás, te recomendamos usar <b>ExpressVPN</b> para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Una conexión desprotegida significa que todo lo que haces en línea (incluyendo <b>búsquedas, mensajería, y descargas</b>) podrían ser monitoreadas por cualquiera en tu red e incluso por tu proveedor de Internet.<br><br>Recomendamos usar ExpressVPN para encriptar tu conexión y <b>proteger tu privacidad</b>.]]></string>

@@ -21,7 +21,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touchez les étiquettes appliqués à]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Divulgation: Bien que recommandée pour vos téléchargements, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>protéger votre vie privée</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>Private Internet Access</b> pour chiffrer votre connexion et <b>protéger votre vie privée</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Une connexion non protégée signifie tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.r.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
@@ -506,7 +506,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire ne peut pas écrire sur le chemin de stockage sélectionné</string>
     <string name="processing_payment">Paiement en cours, rafraîchir en quelques secondes</string>
     <string name="my_music">Ma musique</string>
-    <string name="connection_header_title">Statut de connexion:</string>
+    <string name="connection_header_title">Statut de la connexion VPN:</string>
     <string name="error_moving_incomplete">Erreur: Déplacement incomplet</string>
     <string name="http_download_status_temp_dir_error">N\'existe pas répertoire temporaire ou ne peut pas être créé</string>
     <string name="notify_frostwire_is_running_summary">Afficher une notification Android permanente avec le statut des transferts</string>

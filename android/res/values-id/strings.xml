@@ -19,7 +19,7 @@
 
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Meskipun dianjurkan untuk download Anda, <b>Anda tidak perlu VPN untuk menggunakan FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informasi: Meskipun dianjurkan untuk download Anda, <b>Anda tidak perlu VPN untuk menggunakan FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>ExpressVPN</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>Private Internet Access</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
@@ -457,7 +457,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire tidak bisa menulis di jalan penyimpanan yang dipilih</string>
     <string name="processing_payment">Pembayaran pengolahan, menyegarkan dalam beberapa detik</string>
     <string name="my_music">Lagu saya</string>
-    <string name="connection_header_title">Status koneksi:</string>
+    <string name="connection_header_title">Status koneksi VPN:</string>
     <string name="error_moving_incomplete">Kesalahan: Pindah lengkap</string>
     <string name="torrent_url_added">Torrent URL ditambahkan ke transfer.</string>
     <string name="http_download_status_temp_dir_error">Direktori sementara tidak ada atau tidak dapat dibuat</string>

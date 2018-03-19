@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[प्रकटीकरण हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>Private Internet Access</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
@@ -454,7 +454,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire से चयनित भंडारण के रास्ते पर नहीं लिख सकते हैं</string>
     <string name="processing_payment">प्रसंस्करण भुगतान, कुछ ही सेकंड में ताज़ा</string>
     <string name="my_music">मेरा संगीत</string>
-    <string name="connection_header_title">संपर्क स्थिति:</string>
+    <string name="connection_header_title">वीपीएन कनेक्शन की स्थिति:</string>
     <string name="error_moving_incomplete">त्रुटि: दो या दो से चल रहा है</string>
     <string name="torrent_url_added">टोरेंट यूआरएल स्थानान्तरण के लिए कहा।</string>
     <string name="http_download_status_temp_dir_error">अस्थायी निर्देशिका मौजूद नहीं है या नहीं बनाया जा सकता</string>

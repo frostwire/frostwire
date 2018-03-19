@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Dezvăluire: Cu toate că este recomandat pentru descărcarea, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Atingeți etichetele aplicate la]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>Private Internet Access</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
@@ -306,7 +306,7 @@
     <string name="playing">Redarea</string>
     <string name="torrent_max_downloads">Download-uri maxime</string>
     <string name="azureus_general_view_no">Nu</string>
-    <string name="connection_header_title">Starea conexiunii</string>
+    <string name="connection_header_title">Starea conexiunii VPN:</string>
     <string name="azureus_manager_item_checking">Verificare</string>
     <string name="ringtones">Tonuri de apel</string>
     <string name="error_moving_incomplete">Eroare: Mutarea incompletă</string>

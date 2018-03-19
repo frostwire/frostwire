@@ -18,7 +18,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toque etiquetas aplicadas para]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Divulgação: Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>ExpressVPN</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.  ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>Private Internet Access</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de ExpressVPN para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
@@ -519,7 +519,7 @@
     <string name="dummy_title_bold">[Título em negrito]</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire não pode escrever no caminho de armazenamento selecionado</string>
     <string name="processing_payment">O pagamento está sendo processado, refrescar em poucos segundos</string>
-    <string name="connection_header_title">Estado da ligação:</string>
+    <string name="connection_header_title">Estado da ligação do VPN:</string>
     <string name="http_download_status_temp_dir_error">Diretório temporário não existe ou não pode ser criado, </string>
     <string name="notify_frostwire_is_running_summary">Mostrar uma notificação Android permanente com estatuto de transferências</string>
     <string name="storage_path">Caminho de armazenamento</string>

@@ -315,7 +315,7 @@
     <string name="playing">הַקשָׁבָה</string>
     <string name="torrent_max_downloads">הורדות מרביות</string>
     <string name="azureus_general_view_no">לא</string>
-    <string name="connection_header_title">סטטוס חיבור:</string>
+    <string name="connection_header_title">סטטוס חיבור VPN:</string>
     <string name="azureus_manager_item_checking">בדיקת</string>
     <string name="ringtones">רינגטונים</string>
     <string name="error_moving_incomplete">שגיאה: העברה שלמה</string>

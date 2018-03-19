@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[การเปิดเผยข้อมูล: แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>Private Internet Access</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
@@ -310,7 +310,7 @@
     <string name="playing">เล่น</string>
     <string name="torrent_max_downloads">ดาวน์โหลดแม็กซ์</string>
     <string name="azureus_general_view_no">ไม่</string>
-    <string name="connection_header_title">สถานะการเชื่อมต่อ:</string>
+    <string name="connection_header_title">สถานะการเชื่อมต่อ VPN:</string>
     <string name="azureus_manager_item_checking">การตรวจสอบ</string>
     <string name="ringtones">เสียงเรียกเข้า</string>
     <string name="error_moving_incomplete">ข้อผิดพลาด: การย้ายที่ไม่สมบูรณ์</string>

@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Bilgilendirme: İndirmeleriniz için önerilse de, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>ExpressVPN</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Bir VPN kullanarak internete bağlısınız. <br><br> Zaten yapmadıysanız kullanmanızı öneririz <b>Private Internet Access</b> bağlantınızı şifrelemek ve <b>gizliliğinizi korumak</b>. ]]></string>
@@ -481,7 +481,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire seçilen saklama yolunda yazamaz</string>
     <string name="processing_payment">Ödeme işleme, birkaç saniye içinde yenileme</string>
     <string name="my_music">Benim müziğim</string>
-    <string name="connection_header_title">Bağlantı durumu:</string>
+    <string name="connection_header_title">VPN bağlantısı durumu:</string>
     <string name="error_moving_incomplete">Hata: Eksik Taşıma</string>
     <string name="torrent_url_added">Transferlere Torrent URL eklendi.</string>
     <string name="http_download_status_temp_dir_error">Geçici dizin yok veya oluşturulamıyor</string>

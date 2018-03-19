@@ -20,7 +20,7 @@
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tryk på anvendte tags til]]></string>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Selvom anbefalet til dine downloads, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Afsløring: Selvom anbefalet til dine downloads, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>ExpressVPN</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du har forbindelse til internettet via en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge <b>Private Internet Access</b> til at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En ubeskyttet forbindelse betyder alt hvad du gør online (inklusive <b>søgninger, messaging, og downloads</b>) kan overvåges af alle på dit netværk og endda af din internetudbyder.<br><br>Vi anbefaler at bruge ExpressVPN at kryptere din forbindelse og <b>beskytte dine personlige oplysninger</b>.]]></string>
@@ -50,7 +50,7 @@
     <string name="clear_finished">Slet færdig emne</string>
     <string name="support_free_software">Støt gratis software</string>
     <string name="show_love">Kan lide FrostWire?</string>
-    <string name="waiting">Venter...</string>
+    <string name="waiting">Venter…</string>
     <string name="use_icons_to_browse">Brug ikoner til gennemse filerne.</string>
     <string name="type_to_filter_results">Skriv for at filtrere resultater.</string>
     <string name="fetching_file_list">Henter liste med delt</string>
@@ -462,7 +462,7 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire kan ikke skrive på den valgte opbevaring sti</string>
     <string name="processing_payment">Behandling betaling, opdatere i et par sekunder</string>
     <string name="my_music">Mit musik</string>
-    <string name="connection_header_title">Tilslutning status:</string>
+    <string name="connection_header_title">VPN-forbindelsesstatus:</string>
     <string name="error_moving_incomplete">Fejl: Flytning Ufuldstændig</string>
     <string name="torrent_url_added">Torrent URL tilføjet til overførsler.</string>
     <string name="http_download_status_temp_dir_error">Midlertidig mappe eksisterer ikke eller kan ikke oprettes</string>

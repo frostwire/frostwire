@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Razotkrivanje: Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>Private Internet Access</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
@@ -539,7 +539,7 @@
     <string name="dummy_title_bold">[Bold Title]</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire ne mogu pisati o odabranom putu za pohranu</string>
     <string name="processing_payment">Obrada plaćanja, osvježiti u nekoliko sekundi</string>
-    <string name="connection_header_title">Status veze:</string>
+    <string name="connection_header_title">Status VPN veze:</string>
     <string name="http_download_status_temp_dir_error">Privremeni katalog ne postoji ili se ne može kreirati</string>
     <string name="distraction_free_search_results_summary">Sakrij UI komponente pokazati više rezultata. Potrebno je ponovno pokretanje aplikacije stupiti na snagu.</string>
     <string name="notify_frostwire_is_running_summary">Prikaži trajni Android obavijest sa statusom transfera</string>

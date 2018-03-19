@@ -533,7 +533,7 @@
     <string name="dummy_title_bold">[Bold Title]</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire nie może zachować pliku na wybranej ścieżce zachowywania</string>
     <string name="processing_payment">Przyjmuję płatność, odśwież za kilka sekund</string>
-    <string name="connection_header_title">Status połączenia:</string>
+    <string name="connection_header_title">Status połączenia VPN:</string>
     <string name="http_download_status_temp_dir_error">Folder tymczasowy nie istnieje lub nie może być stworzony</string>
     <string name="notify_frostwire_is_running_summary">Pokaż stałe powiadomienie Androida ze statusem transferów </string>
     <string name="storage_path">Ścieżka Zachowyania</string>
