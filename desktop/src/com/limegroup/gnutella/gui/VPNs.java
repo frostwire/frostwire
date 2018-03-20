@@ -32,6 +32,11 @@ public final class VPNs {
     public static boolean isVPNActive() {
         boolean result = false;
 
+        if (BTEngine.getInstance().swig() == null) {
+            // still not started or already stopped
+            return false;
+        }
+
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
             result = isPosixVPNActive();
         } else if (OSUtils.isWindows()) {
