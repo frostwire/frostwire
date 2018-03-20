@@ -182,7 +182,7 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.17'
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.17'
     implementation 'com.google.android:flexbox:0.3.2'
-    implementation 'org.prebid:prebid-mobile-sdk:[0,1)'
+    implementation 'org.prebid:prebid-mobile-sdk:0.2.0'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
     //    exclude group: 'com.android.support', module: 'support-annotations'
