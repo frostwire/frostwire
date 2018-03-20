@@ -1,8 +1,10 @@
 frostwire (6.6.4) stable; urgency=high
   * Fixes Out of memory error trying to clear the search cache database
   * Avast, IPVanish, CyberGhost, PureVPN, Windscribe VPN detection for Windows
+  * Fixes crash checking VPN status
+  * Fixes possible crash on shutdown
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 15 Mar 2018 12:56:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 20 Mar 2018 04:20:00 -0600
 
 frostwire (6.6.3) stable; urgency=high
   * Zooqle search fixes
