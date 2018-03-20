@@ -54,10 +54,25 @@ public final class PrebidManager {
     private static PrebidManager manager = null;
 
     public enum Placement {
-        SEARCH_HEADER_BANNER, //320x50 (Test)
-        AUDIO_PLAYER_BANNER, //300x250 (Test)
-        PREVIEW_BANNER, //300x250, 320x50 (horizontal and vertical respectively)
-        INTERSTITIAL
+        SEARCH_HEADER_BANNER_320_50(     "13003736", "7eabcb1d-7376-4ab5-b85c-ce1c0cb12ff1", 320, 250),
+        AUDIO_PLAYER_BANNER_300_250(     "13003143", "e33c1226-2f3a-4ceb-a916-b03f3f7636c0", 300, 250),
+        PREVIEW_BANNER_LANDSCAPE_300_250("13003723", "70c3cef1-5040-45e1-92dc-3136229f233c", 300, 250),
+        PREVIEW_BANNER_PORTRAIT_320_50  ("13003738", "f51741c4-3a6e-4705-a6b9-0acad35bcff9", 320, 50);
+
+        //INTERSTITIAL_MOBILE("13003741","<config pending>"),
+        //INTERSTITIAL_TABLET("13003742","<config pending>")
+
+        private final String placementIdCode;
+        private final String configId;
+        private final int width;
+        private final int height;
+
+        Placement(String placementIdCode, String configId, int width, int height) {
+            this.placementIdCode = placementIdCode;
+            this.configId = configId;
+            this.width = width;
+            this.height = height;
+        }
     }
 
     public static PrebidManager getInstance(final Context applicationContext) {
@@ -98,21 +113,20 @@ public final class PrebidManager {
     }
 
     private void initAdUnits() {
-        // TODO: Verify code, configId, banner type, dimensions
-        BannerAdUnit searchHeaderAdUnit = new BannerAdUnit("5823281", "7eabcb1d-7376-4ab5-b85c-ce1c0cb12ff1");
-        searchHeaderAdUnit.addSize(320, 50);
-        adUnits.add(searchHeaderAdUnit);
-        placementAdUnitHashMap.put(Placement.SEARCH_HEADER_BANNER, searchHeaderAdUnit);
-        BannerAdUnit audioPlayerAdUnit = new BannerAdUnit("5823300", "e33c1226-2f3a-4ceb-a916-b03f3f7636c0");
-        audioPlayerAdUnit.addSize(300, 250);
-        adUnits.add(audioPlayerAdUnit);
-        placementAdUnitHashMap.put(Placement.AUDIO_PLAYER_BANNER, audioPlayerAdUnit);
-        BannerAdUnit previewBannerAdUnit = new BannerAdUnit("12680454", "70c3cef1-5040-45e1-92dc-3136229f233c");
-        previewBannerAdUnit.addSize(300, 250); // horizontal video preview
-        previewBannerAdUnit.addSize(320, 50); // vertical audio/video preview
-        adUnits.add(previewBannerAdUnit);
-        placementAdUnitHashMap.put(Placement.PREVIEW_BANNER, previewBannerAdUnit);
+        initBanner(Placement.SEARCH_HEADER_BANNER_320_50);
+        initBanner(Placement.AUDIO_PLAYER_BANNER_300_250);
+        initBanner(Placement.PREVIEW_BANNER_PORTRAIT_320_50);
+        initBanner(Placement.PREVIEW_BANNER_PORTRAIT_320_50);
     }
+
+    private void initBanner(Placement placement) {
+        BannerAdUnit bannerAdUnit = new BannerAdUnit(placement.placementIdCode, placement.configId);
+        bannerAdUnit.addSize(placement.width, placement.height);
+        adUnits.add(bannerAdUnit);
+        placementAdUnitHashMap.put(placement, bannerAdUnit);
+    }
+
+    // TODO: Interstitial Placement support -> initInterstitial(Placement)
 
     public void onBannerLoaded(final Context context, final MoPubView banner, final Placement placement) {
         if (!manager.initialized()) {

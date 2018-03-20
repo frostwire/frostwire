@@ -146,14 +146,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             LOG.info("onBannerLoaded()");
             setBannerViewVisibility(mFallbackAd, false);
             setBannerViewVisibility(mMopubAd, true);
-            PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER);
+            PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
         }
 
         @Override
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed");
             loadFallbackBanner();
-            PrebidManager.getInstance(getApplicationContext()).onBannerFailed(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER, errorCode);
+            PrebidManager.getInstance(getApplicationContext()).onBannerFailed(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250, errorCode);
             banner.destroy();
         }
 

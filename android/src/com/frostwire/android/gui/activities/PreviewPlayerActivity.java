@@ -103,6 +103,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private MoPubView mopubView;
     private ImageView fallbackImageView;
     private boolean mopubLoaded = false;
+    private boolean isVertical;
 
     public PreviewPlayerActivity() {
         super(R.layout.activity_preview_player);
@@ -223,7 +224,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         mopubView.setTesting(false);
         mopubView.setAutorefreshEnabled(true);
-        boolean isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mopubView.setAdUnitId(isVertical ? "a8be0cad4ad0419dbb19601aef3a18d2" : "2fd0fafe3d3c4d668385a620caaa694e");
         mopubView.setKeywords("music,audio,ringtone,video,music video");
         mopubView.setBannerAdListener(new MoPubView.BannerAdListener() {
@@ -233,13 +234,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 if (!isFullScreen) {
                     setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, mopubView);
                     fallbackImageView.setVisibility(View.GONE);
-                    PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(PreviewPlayerActivity.this, banner, PrebidManager.Placement.PREVIEW_BANNER);
+                    PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(PreviewPlayerActivity.this, banner, isVertical ? PrebidManager.Placement.PREVIEW_BANNER_PORTRAIT_320_50 : PrebidManager.Placement.PREVIEW_BANNER_LANDSCAPE_300_250);
                 }
             }
 
             @Override
             public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                PrebidManager.getInstance(getApplicationContext()).onBannerFailed(PreviewPlayerActivity.this, banner, PrebidManager.Placement.PREVIEW_BANNER, errorCode);
+                PrebidManager.getInstance(getApplicationContext()).onBannerFailed(PreviewPlayerActivity.this, banner, isVertical ? PrebidManager.Placement.PREVIEW_BANNER_PORTRAIT_320_50 : PrebidManager.Placement.PREVIEW_BANNER_LANDSCAPE_300_250, errorCode);
                 destroyMopubView(); // mopubLoaded = false, also hides the ad-header view ("advertisement")
 
                 if (!Offers.disabledAds()) {
