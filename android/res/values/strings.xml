@@ -20,8 +20,8 @@
 -->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Disclosure: Although recommended for your downloads, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Your privacy is a fundamental human right</b>. An unprotected connection means everything you do online including <b>downloads, searches, messaging</b>, can be monitored and intercepted by anyone on your network, e.g. Internet Service Providers, hackers, governments.<br><br><b>We STRONGLY recommend using a VPN service</b> especially whenever downloading or exchanging sensitive information (e.g. banking) and while using public Wi-Fi or mobile data. <br><br> Here are some options that provide reliable service and work well with FrostWire:]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Disclosure:</b> Although recommended for your downloads, especially whenever downloading or exchanging sensitive information (e.g. banking) and while using public Wi-Fi or mobile data, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Your privacy is a fundamental human right</b>. An unprotected connection means everything you do online including <b>downloads, searches, messaging</b>, can be monitored and intercepted by anyone on your network, e.g. Internet Service Providers, hackers, governments.<br><br><b>We STRONGLY recommend using a VPN service</b>. <br> Here are some options that provide reliable service and work well with FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ You\'re connected to the Internet using a VPN. <br><br> If you are not already, we recommend using one of the services below to encrypt your connection and <b>safeguard your privacy</b>. ]]></string>
 
 
