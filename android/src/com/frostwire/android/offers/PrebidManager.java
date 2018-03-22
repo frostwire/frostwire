@@ -116,7 +116,7 @@ public final class PrebidManager {
         initBanner(Placement.SEARCH_HEADER_BANNER_320_50);
         initBanner(Placement.AUDIO_PLAYER_BANNER_300_250);
         initBanner(Placement.PREVIEW_BANNER_PORTRAIT_320_50);
-        initBanner(Placement.PREVIEW_BANNER_PORTRAIT_320_50);
+        initBanner(Placement.PREVIEW_BANNER_LANDSCAPE_300_250);
     }
 
     private void initBanner(Placement placement) {
