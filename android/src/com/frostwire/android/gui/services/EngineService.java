@@ -103,7 +103,7 @@ public class EngineService extends Service implements IEngineService {
         }
         if (SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
-            new Thread() {
+            new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
                 @Override
                 public void run() {
                     shutdownSupport();

@@ -535,7 +535,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
         surface = new Surface(surfaceTexture);
-        Thread t = new Thread() {
+        Thread t = new Thread("PreviewPlayerActivity-onSurfaceTextureAvailable") {
             @Override
             public void run() {
                 final String url = getFinalUrl(streamUrl);
