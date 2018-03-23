@@ -40,12 +40,12 @@ public class ThreadPool extends ThreadPoolExecutor {
     private final String name;
 
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(name, daemon));
+        super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
         this.name = name;
     }
 
     public ThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(name, daemon));
+        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
         this.name = name;
     }
 
@@ -84,18 +84,15 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     private static final class PoolThreadFactory implements ThreadFactory {
-        private final String name;
         private final boolean daemon;
 
-        public PoolThreadFactory(String name, boolean daemon) {
-            this.name = name;
+        public PoolThreadFactory(boolean daemon) {
             this.daemon = daemon;
         }
 
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
-            t.setName(name);
             t.setDaemon(daemon);
 
             return t;
