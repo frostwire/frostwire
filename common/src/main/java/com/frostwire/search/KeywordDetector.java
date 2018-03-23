@@ -289,7 +289,7 @@ public final class KeywordDetector {
                 // are there any tasks left?
                 if (histogramUpdateRequests.size() > 0) {
                     long timeSinceLastFinished = System.currentTimeMillis() - lastHistogramUpdateRequestFinished.get();
-                    LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + histogramUpdateRequests.size());
+                    //LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + histogramUpdateRequests.size());
                     if (timeSinceLastFinished > HISTOGRAM_REQUEST_TASK_DELAY_IN_MS) {
                         // take next request in line
                         HistogramUpdateRequestTask histogramUpdateRequestTask;
