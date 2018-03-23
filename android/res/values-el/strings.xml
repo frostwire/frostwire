@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Αποκάλυψη: Αν και συνιστάται για τις λήψεις σας, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Αποκάλυψη:</b> Αν και συνιστάται για τις λήψεις σας, ιδίως όταν κάνετε λήψη ή ανταλλάσσετε ευαίσθητες πληροφορίες (π.χ. τραπεζικά) και ενώ χρησιμοποιείτε δημόσια δεδομένα Wi-Fi ή κινητά, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>Private Internet Access</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>

@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[การเปิดเผยข้อมูล: แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>การเปิดเผยข้อมูล:</b> แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณโดยเฉพาะอย่างยิ่งเมื่อดาวน์โหลดหรือแลกเปลี่ยนข้อมูลที่สำคัญ (เช่นธนาคาร) และในขณะที่ใช้ Wi-Fi สาธารณะหรือข้อมูลมือถือ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>Private Internet Access</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>

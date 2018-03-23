@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Razotkrivanje: Iako je preporučeno za download, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Razotkrivanje:</b> Iako je preporučeno za download, osobito pri svakom preuzimanju ili razmjeni osjetljivih informacija (npr. bankarstva) i tijekom korištenja javnih Wi-Fi ili mobilnih podataka, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>Private Internet Access</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>

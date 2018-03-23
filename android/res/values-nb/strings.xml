@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informasjon: Selv anbefalt for nedlastingene dine, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasjon:</b> Selv anbefalt for nedlastingene dine, spesielt når du laster ned eller bytter sensitiv informasjon (for eksempel bank) og mens du bruker offentlig Wi-Fi eller mobildata, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>ExpressVPN</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>Private Internett Access</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>

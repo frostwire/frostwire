@@ -19,7 +19,7 @@
  */
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Vaikka suositellaan latauksia, <b>sinun ei tarvitse VPN käyttää FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Julkaiseminen:</b> Vaikka suosittelemme latauksillemme, varsinkin kun lataat tai vaihdat arkaluonteisia tietoja (esim. pankkitoimintaa) ja käyttäessäsi julkisia Wi-Fi- tai mobiilitietoja, <b>sinun ei tarvitse käyttää VPN: tä FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>ExpressVPN</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>Private Internet Access</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
