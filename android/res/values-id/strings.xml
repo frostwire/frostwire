@@ -19,7 +19,7 @@
 
 -->
 <resources>
-    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informasi: Meskipun dianjurkan untuk download Anda, <b>Anda tidak perlu VPN untuk menggunakan FrostWire. </b>]]></string>
+    <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasi:</b> Meskipun dianjurkan untuk download Anda, terutama setiap kali mengunduh atau menukar informasi sensitif (misalnya perbankan) dan saat menggunakan Wi-Fi publik atau data seluler, <b>Anda tidak perlu VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>ExpressVPN</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
     <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>Private Internet Access</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
