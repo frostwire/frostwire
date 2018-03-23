@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,13 @@
 
 package com.frostwire.util;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -34,12 +40,12 @@ public class ThreadPool extends ThreadPoolExecutor {
     private final String name;
 
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
+        super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(name, daemon));
         this.name = name;
     }
 
     public ThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
+        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(name, daemon));
         this.name = name;
     }
 
@@ -60,7 +66,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     public static ExecutorService newThreadPool(String name, int maxThreads, boolean daemon) {
-        ThreadPool pool = new ThreadPool(name, maxThreads, new LinkedBlockingQueue<Runnable>(), daemon);
+        ThreadPool pool = new ThreadPool(name, maxThreads, new LinkedBlockingQueue<>(), daemon);
         return Executors.unconfigurableExecutorService(pool);
     }
 
@@ -69,7 +75,7 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     public static ExecutorService newThreadPool(String name, boolean daemon) {
-        ThreadPool pool = new ThreadPool(name, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), daemon);
+        ThreadPool pool = new ThreadPool(name, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), daemon);
         return Executors.unconfigurableExecutorService(pool);
     }
 
@@ -78,17 +84,18 @@ public class ThreadPool extends ThreadPoolExecutor {
     }
 
     private static final class PoolThreadFactory implements ThreadFactory {
-
+        private final String name;
         private final boolean daemon;
 
-        public PoolThreadFactory(boolean daemon) {
+        public PoolThreadFactory(String name, boolean daemon) {
+            this.name = name;
             this.daemon = daemon;
         }
 
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
-
+            t.setName(name);
             t.setDaemon(daemon);
 
             return t;
