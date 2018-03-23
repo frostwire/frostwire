@@ -75,9 +75,9 @@ public final class KeywordDetector {
     public KeywordDetector() {
         histoHashMaps = new HashMap<>();
         histogramUpdateRequestsDispatcher = new HistogramUpdateRequestDispatcher();
-        histoHashMaps.put(Feature.SEARCH_SOURCE, new HistoHashMap<String>());
-        histoHashMaps.put(Feature.FILE_EXTENSION, new HistoHashMap<String>());
-        histoHashMaps.put(Feature.FILE_NAME, new HistoHashMap<String>());
+        histoHashMaps.put(Feature.SEARCH_SOURCE, new HistoHashMap<>());
+        histoHashMaps.put(Feature.FILE_EXTENSION, new HistoHashMap<>());
+        histoHashMaps.put(Feature.FILE_NAME, new HistoHashMap<>());
     }
 
     public int totalHistogramKeys() {
@@ -265,10 +265,19 @@ public final class KeywordDetector {
             }
 
             synchronized (histogramUpdateRequests) {
-                if (histogramUpdateRequests.size() > 0) {
+                histogramUpdateRequests.add(0, updateRequestTask);
+                if (histogramUpdateRequests.size() > 4) {
+                    // All these acrobatics are because histogramUpdateRequests.sublist implementations always yield a concurrent modification exception
+                    // when they're trying to obtain their internal array
+                    Object[] requestsArray = histogramUpdateRequests.toArray();
+                    ArrayList<HistogramUpdateRequestTask> head = new ArrayList<>(4);
+                    head.add((HistogramUpdateRequestTask) requestsArray[0]);
+                    head.add((HistogramUpdateRequestTask) requestsArray[1]);
+                    head.add((HistogramUpdateRequestTask) requestsArray[2]);
+                    head.add((HistogramUpdateRequestTask) requestsArray[3]);
                     histogramUpdateRequests.clear();
+                    histogramUpdateRequests.addAll(head);
                 }
-                histogramUpdateRequests.add(updateRequestTask);
             }
 
             signalLoopLock();
@@ -280,7 +289,7 @@ public final class KeywordDetector {
                 // are there any tasks left?
                 if (histogramUpdateRequests.size() > 0) {
                     long timeSinceLastFinished = System.currentTimeMillis() - lastHistogramUpdateRequestFinished.get();
-                    //LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + histogramUpdateRequests.size());
+                    LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + histogramUpdateRequests.size());
                     if (timeSinceLastFinished > HISTOGRAM_REQUEST_TASK_DELAY_IN_MS) {
                         // take next request in line
                         HistogramUpdateRequestTask histogramUpdateRequestTask;

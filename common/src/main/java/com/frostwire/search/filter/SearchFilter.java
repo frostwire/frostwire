@@ -35,12 +35,7 @@ public interface SearchFilter {
 
     SearchFilter NONE = new SearchFilter() {
 
-        private Comparator<SearchResult> CMP = new Comparator<SearchResult>() {
-            @Override
-            public int compare(SearchResult o1, SearchResult o2) {
-                return 0;
-            }
-        };
+        private Comparator<SearchResult> CMP = (o1, o2) -> 0;
 
         @Override
         public FilterKey key(SearchResult sr) {

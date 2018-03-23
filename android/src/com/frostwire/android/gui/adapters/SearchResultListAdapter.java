@@ -230,10 +230,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         ArrayList<SearchResult> keywordFiltered = new ArrayList<>();
         List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
         for (SearchResult sr : results) {
-            MediaType mt;
             String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
-
-            mt = MediaType.getMediaTypeForExtension(extension);
+            MediaType mt = MediaType.getMediaTypeForExtension(extension);
 
             if ("youtube".equals(extension)) {
                 mt = MediaType.getVideoMediaType();

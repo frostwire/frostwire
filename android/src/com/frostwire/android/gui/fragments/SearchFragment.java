@@ -499,6 +499,7 @@ public final class SearchFragment extends AbstractFragment implements
         filterButton.reset(true); // hide=true
         showRatingsReminder(getView());
         searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
+        keywordDetector.shutdownHistogramUpdateRequestDispatcher();
     }
 
     private void showSearchView(View view) {
