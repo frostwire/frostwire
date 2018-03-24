@@ -28,7 +28,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Ref;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -42,7 +41,6 @@ public final class NetworkManager {
 
     private final Context appContext;
     private boolean tunnelUp;
-    private static InterfaceNameQueryingMethod interfaceQueryingMethod = InterfaceNameQueryingMethod.UNSET;
 
     private WeakReference<ConnectivityManager> connManRef;
 
@@ -52,12 +50,6 @@ public final class NetworkManager {
     // greatly improve the API design
     @SuppressLint("StaticFieldLeak")
     private static NetworkManager instance;
-
-    private enum InterfaceNameQueryingMethod {
-        UNSET,
-        READ_SYS_CLASS_NET_FOLDER,
-        NETWORK_INTERFACE_GET_NETWORK_INTERFACES
-    }
 
     public synchronized static void create(Context context) {
         if (instance != null) {
@@ -117,47 +109,24 @@ public final class NetworkManager {
     }
 
     private void detectTunnel() {
-        // see https://issuetracker.google.com/issues/37091475
-        // for more information on possible restrictions in the
-        // future
-        if (interfaceQueryingMethod == InterfaceNameQueryingMethod.UNSET) {
-            decideInterfaceQueryingMethod();
-        }
         tunnelUp = interfaceNameExists("tun0") || interfaceNameExists("tun1");
     }
 
-    private void decideInterfaceQueryingMethod() {
-        File sysClassNet = new File("/sys/class/net");
-        if (!sysClassNet.canRead()) {
-            interfaceQueryingMethod = InterfaceNameQueryingMethod.NETWORK_INTERFACE_GET_NETWORK_INTERFACES;
-        } else {
-            interfaceQueryingMethod = InterfaceNameQueryingMethod.READ_SYS_CLASS_NET_FOLDER;
-        }
-    }
-
     private static boolean interfaceNameExists(String name) {
-        if (interfaceQueryingMethod == InterfaceNameQueryingMethod.NETWORK_INTERFACE_GET_NETWORK_INTERFACES) {
-            try {
-                Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-                if (networkInterfaces != null) {
-                    while (networkInterfaces.hasMoreElements()) {
-                        NetworkInterface networkInterface = networkInterfaces.nextElement();
-                        if (name.equals(networkInterface.getName())) {
-                            return true;
-                        }
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            if (networkInterfaces != null) {
+                while (networkInterfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = networkInterfaces.nextElement();
+                    if (name.equals(networkInterface.getName())) {
+                        return true;
                     }
                 }
-            } catch (SocketException e) {
-                return false;
             }
-        } else if (interfaceQueryingMethod == InterfaceNameQueryingMethod.READ_SYS_CLASS_NET_FOLDER) {
-            try {
-                File f = new File("/sys/class/net/" + name);
-                return f.exists();
-            } catch (Throwable e) {
-                // ignore
-            }
+        } catch (SocketException e) {
+            return false;
         }
+
         return false;
     }
 
