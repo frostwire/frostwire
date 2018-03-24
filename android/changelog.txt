@@ -1,4 +1,4 @@
-FrostWire 2.0.2 build 512 - MAR/21/2018
+FrostWire 2.0.2 build 513 - MAR/23/2018
  - Application startup is faster
  - Faster YT downloads
  - Zooqle search fixes
