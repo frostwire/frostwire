@@ -1068,13 +1068,15 @@ public class MusicPlaybackService extends Service {
         }
         if (!path.equals(justStoppedFile)) {
             mSimplePlayer = MediaPlayer.create(this, Uri.parse(path));
-            final String pathCopy = path;
-            mSimplePlayerPlayingFile = path;
-            mSimplePlayer.setOnCompletionListener(mp -> {
-                mSimplePlayerPlayingFile = null;
-                notifySimpleStopped(pathCopy);
-            });
-            mSimplePlayer.start();
+            if (mSimplePlayer != null) {
+                final String pathCopy = path;
+                mSimplePlayerPlayingFile = path;
+                mSimplePlayer.setOnCompletionListener(mp -> {
+                    mSimplePlayerPlayingFile = null;
+                    notifySimpleStopped(pathCopy);
+                });
+                mSimplePlayer.start();
+            }
         }
     }
 
