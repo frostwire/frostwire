@@ -30,8 +30,9 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -109,25 +110,39 @@ public final class NetworkManager {
     }
 
     private void detectTunnel() {
-        tunnelUp = interfaceNameExists("tun0") || interfaceNameExists("tun1");
+        List<String> names = getInterfaceNames();
+        tunnelUp = interfaceNameExists(names, "tun0") || interfaceNameExists(names, "tun1");
     }
 
-    private static boolean interfaceNameExists(String name) {
+    private static boolean interfaceNameExists(List<String> names, String name) {
+        for (String s : names) {
+            if (s.contains(name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static List<String> getInterfaceNames() {
+        List<String> names = new LinkedList<>();
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             if (networkInterfaces != null) {
                 while (networkInterfaces.hasMoreElements()) {
                     NetworkInterface networkInterface = networkInterfaces.nextElement();
-                    if (name.equals(networkInterface.getName())) {
-                        return true;
+                    String name = networkInterface.getName();
+                    if (name != null) {
+                        names.add(name);
                     }
                 }
             }
-        } catch (SocketException e) {
-            return false;
+        } catch (Throwable e) {
+            // ignore
+            // important, but no need to crash the app
         }
 
-        return false;
+        return names;
     }
 
     public static void queryNetworkStatusBackground(NetworkManager manager) {
