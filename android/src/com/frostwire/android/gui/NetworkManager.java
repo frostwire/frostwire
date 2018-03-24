@@ -111,7 +111,10 @@ public final class NetworkManager {
 
     private void detectTunnel() {
         List<String> names = getInterfaceNames();
-        tunnelUp = interfaceNameExists(names, "tun0") || interfaceNameExists(names, "tun1");
+        tunnelUp = interfaceNameExists(names, "tun0") ||
+                interfaceNameExists(names, "tun1") ||
+                interfaceNameExists(names, "tap0") ||
+                interfaceNameExists(names, "tap1");
     }
 
     private static boolean interfaceNameExists(List<String> names, String name) {
