@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[정보: 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>ExpressVPN</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 사용하지 않으 셨다면 사용을 권장합니다 <b>Private Internet Access</b> 연결을 암호화하고 <b>개인 정보 보호</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>ExpressVPN을 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 보호되지 않은 연결은 온라인에서하는 모든 것을 의미합니다. (포함 <b>검색, 메시징 및 다운로드</b>) 는 네트워크의 모든 사용자와 인터넷 서비스 공급자가 모니터 할 수 있습니다.<br><br>Private Internet Access 사용하여 연결을 암호화하고 <b>개인 정보 보호</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
     <string name="activity_chat_name">채팅</string>
@@ -583,7 +579,6 @@
     <string name="six_months">6 개월</string>
     <string name="storage_picker_treeuri_not_directory">선택한 경로가 디렉토리가 아닙니다.</string>
     <string name="protect_my_privacy">내 개인 정보 보호</string>
-    <string name="your_privacy_is_a_fundamental_right_html">귀하의 개인 정보는 근본적인 인권입니다.</string>
     <string name="keep_the_project_alive">프로젝트를 살아있게해라</string>
     <string name="remove_ads">광고를 제거하다</string>
     <string name="use_tpb_summary">TPB는 마그넷 기반으로 Wifi에서만 작동합니다</string>

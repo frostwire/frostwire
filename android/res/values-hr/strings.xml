@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Razotkrivanje:</b> Iako je preporučeno za download, osobito pri svakom preuzimanju ili razmjeni osjetljivih informacija (npr. bankarstva) i tijekom korištenja javnih Wi-Fi ili mobilnih podataka, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>ExpressVPN</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jeste li povezani s internetom putem VPN. <br><br> Ako već niste, preporučujemo korištenje <b>Private Internet Access</b> za šifriranje vezu i <b>zaštititi svoju privatnost</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje ExpressVPN za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Nezaštićen veza znači sve što radite na internetu (uključujući <b>pretraživanja, poruke i preuzimanja</b>) može se pratiti bilo tko na mreži, pa čak i od davatelja internetskih usluga.<br><br>Preporučamo korištenje Private Internet Access za šifriranje vezu i <b>zaštititi svoju privatnost</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
     <string name="activity_chat_name">Razgovor</string>
@@ -594,7 +590,6 @@
     <string name="six_months">6 mjeseci</string>
     <string name="storage_picker_treeuri_not_directory">Odabrani put nije imenik</string>
     <string name="protect_my_privacy">Zaštitite svoju privatnost</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Vaša privatnost je temeljno ljudsko pravo.</string>
     <string name="keep_the_project_alive">Držite projekta živ</string>
     <string name="remove_ads">Makni reklame</string>
     <string name="cloud_download_aborted_on_mobile_data">Trenutna postavka onemogućuje preuzimanje kada niste na mreži Wifi</string>

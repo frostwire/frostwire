@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>ExpressVPN</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Bạn đang kết nối với Internet sử dụng một VPN. <br><br> Nếu bạn chưa có, chúng tôi khuyên bạn sử dụng <b>Private Internet Access</b> để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[  Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng ExpressVPN để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Một kết nối không an toàn có nghĩa là tất cả mọi thứ bạn làm trực tuyến (kể cả <b>tìm kiếm, tin nhắn, và tải về</b>) có thể được theo dõi bởi bất cứ ai trên mạng của bạn và thậm chí bởi nhà cung cấp dịch vụ Internet của bạn.<br><br>Chúng tôi khuyên bạn nên sử dụng Private Internet Access để mã hóa kết nối của bạn và <b>bảo vệ sự riêng tư của bạn</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
     <string name="activity_chat_name">Chat</string>
@@ -583,7 +579,6 @@
     <string name="six_months">6 tháng</string>
     <string name="storage_picker_treeuri_not_directory">Các con đường lựa chọn không phải là một thư mục</string>
     <string name="protect_my_privacy">Bảo vệ sự riêng tư của tôi</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Riêng tư của bạn là một quyền con người cơ bản.</string>
     <string name="keep_the_project_alive">Giữ dự án sống</string>
     <string name="remove_ads">Loại bỏ các quảng cáo</string>
     <string name="use_tpb_summary">TPB là nam châm dựa, chỉ hoạt động trên Wifi</string>

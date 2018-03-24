@@ -20,13 +20,8 @@
 -->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html">Ваша конфиденциальность является одним из основных прав человека.</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Раскрытие информации:</b> Хотя для ваших загрузок рекомендуется использовать, особенно при загрузке или обмене конфиденциальной информацией (например, банковской) и при использовании общедоступных Wi-Fi или мобильных данных, <b>, вам не нужна VPN для использования FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Прикоснитесь к приложенным тегам к]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Вы подключены к Интернету с помощью VPN. <br><br> Если вы не сделали, мы рекомендуем использовать <b>ExpressVPN</b> зашифровать соединение и <b>обеспечения конфиденциальности</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Вы подключены к Интернету с помощью VPN. <br><br> Если вы не сделали, мы рекомендуем использовать <b>Private Internet Access</b> зашифровать соединение и <b>обеспечения конфиденциальности</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Незащищенное соединение означает, что все, что вы делаете в Интернете (в том числе <b> поиск, обмен сообщениями и скачивание </b>), может контролироваться любым в вашей сети и даже вашим интернет-провайдером. <br> <br> Мы рекомендуем использовать ExpressVPN Для шифрования вашего соединения и <b> защиты вашей конфиденциальности </b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Незащищенное соединение означает, что все, что вы делаете в Интернете (в том числе <b> поиск, обмен сообщениями и скачивание </b>), может контролироваться любым в вашей сети и даже вашим интернет-провайдером. <br> <br> Мы рекомендуем использовать Private Internet Access Для шифрования вашего соединения и <b> защиты вашей конфиденциальности </b>.]]></string>
     <string name="activity_preferences_name">Настройки</string>
     <string name="activity_chat_name">Чат</string>
     <string name="activity_downloads_name">Активные загрузки</string>

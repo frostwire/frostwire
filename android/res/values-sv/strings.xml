@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Avslöjande:</b> Även rekommenderas för dina nedladdningar, speciellt när du hämtar eller byter känslig information (t ex bank) och när du använder offentlig Wi-Fi eller mobil data, <b>du behöver inte en VPN att använda Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Peka på använda taggar till]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>ExpressVPN</b> att kryptera din anslutning och <b>skydda din integritet</b>.  ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du är ansluten till Internet via en VPN. <br><br> Om du inte redan, rekommenderar vi att du använder <b>Private Internet Access</b> att kryptera din anslutning och <b>skydda din integritet</b>.  ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder ExpressVPN att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En oskyddad anslutning betyder allt du gör på nätet (inklusive <b>sökningar, meddelanden och nedladdningar</b>) kan övervakas av någon i nätverket och även av din Internetleverantör.<br><br>Vi rekommenderar att du använder Private Internet Access att kryptera din anslutning och <b>skydda din integritet</b>.]]></string>
     <string name="vpn_not_found">Ingen VPN. Överväga att kryptera anslutning.</string>
     <string name="azureus_peer_manager_status_finished">Färdiga</string>
     <string name="activity_mediaplayer_name">Mediaspelare</string>
@@ -598,7 +594,6 @@
     <string name="share_finished_downloads">Dela färdiga nedladdningar på Wifi</string>
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Överföringar</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Din integritet är en grundläggande mänsklig rättighet.</string>
     <string name="keep_the_project_alive">Hålla projektet vid liv</string>
     <string name="show_love">Älskar Frostwire?</string>
     <string name="remove_ads">Ta bort annonser</string>

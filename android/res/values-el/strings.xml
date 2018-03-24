@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Αποκάλυψη:</b> Αν και συνιστάται για τις λήψεις σας, ιδίως όταν κάνετε λήψη ή ανταλλάσσετε ευαίσθητες πληροφορίες (π.χ. τραπεζικά) και ενώ χρησιμοποιείτε δημόσια δεδομένα Wi-Fi ή κινητά, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>ExpressVPN</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Έχετε συνδεθεί με το Internet χρησιμοποιώντας ένα VPN. <br><br> Εάν δεν είστε ήδη, σας συνιστούμε να χρησιμοποιείτε <b>Private Internet Access</b> για την κρυπτογράφηση της σύνδεσής σας και <b>διαφύλαξη του απορρήτου σας</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε ExpressVPN να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Μία ακάλυπτος σύνδεση σημαίνει ό, τι κάνετε σε απευθείας σύνδεση (συμπεριλαμβανομένου <b>αναζητήσεις, μηνύματα, και λήψεις</b>) μπορεί να παρακολουθείται από οποιονδήποτε στο δίκτυό σας, ακόμα και από τον πάροχο υπηρεσιών Διαδικτύου σας.<br><br>Σας προτείνουμε να χρησιμοποιείτε Private Internet Access να κρυπτογραφήσετε τη σύνδεσή σας και <b> διαφύλαξη του απορρήτου σας</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="activity_chat_name">Chat</string>
@@ -586,7 +582,6 @@
     <string name="six_months">6 μήνες</string>
     <string name="storage_picker_treeuri_not_directory">Η επιλεγμένη διαδρομή δεν είναι κατάλογος</string>
     <string name="protect_my_privacy">Προστασία της ιδιωτικής ζωής μου</string>
-    <string name="your_privacy_is_a_fundamental_right_html">προστασία της ιδιωτικής ζωής σας είναι ένα θεμελιώδες ανθρώπινο δικαίωμα.</string>
     <string name="keep_the_project_alive">Κρατήστε το έργο ζωντανό</string>
     <string name="remove_ads">Αφαίρεσε τις διαφημίσεις</string>
     <string name="frostwire_sticker_and_more">FrostWire αυτοκόλλητα και πολλά άλλα</string>

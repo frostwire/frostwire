@@ -19,10 +19,6 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toque etiquetas aplicadas para]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Divulgação: Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>ExpressVPN</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.  ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de <b>Private Internet Access</b> para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de ExpressVPN para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[  Uma conexão desprotegida significa que tudo que você faz online (incluindo <b>buscas, mensagens e downloads</b>) pode ser monitorado por qualquer pessoa na rede e até mesmo pelo seu provedor de serviços de Internet.<br><br>Recomendamos o uso de Private Internet Access para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Sua privacidade é um direito humano fundamental</b>. Uma conexão desprotegida significa que tudo que você faz online <b>buscas, mensagens e downloads</b>, pode ser monitorado e interceptado por qualquer pessoa em sua rede, por exemplo, provedores de serviços de Internet, hackers, governos.<br><br><b>Recomendamos ALTAMENTE o uso de um serviço VPN</b> especialmente ao baixar ou trocar informações confidenciais (por exemplo, bancos) e ao usar Wi-Fi público ou dados móveis. <br><br> Aqui estão algumas opções que fornecem um serviço confiável e funcionam bem com o FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de um dos serviços abaixo para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
     <string name="application_label">FrostWire</string>
@@ -581,7 +577,6 @@
     <string name="six_months">6 meses</string>
     <string name="storage_picker_treeuri_not_directory">O caminho selecionado não é um diretório</string>
     <string name="protect_my_privacy">Proteger a minha privacidade</string>
-    <string name="your_privacy_is_a_fundamental_right_html">A sua privacidade é um direito humano fundamental.</string>
     <string name="keep_the_project_alive">Manter vivo o Projeto</string>
     <string name="remove_ads">Remova os anúncios</string>
     <string name="advertisement">propaganda</string>

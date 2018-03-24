@@ -500,7 +500,6 @@
     <string name="transfers_context_menu_copy_magnet">Skopiuj Magnet</string>
     <string name="thank_you">Wielkie Dzięki!</string>
     <string name="rate_our_app">Oceń Aplikację</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Twoja prywatność jest podstawowym prawem człowieka.</string>
     <string name="learn_more">Dowiedz się więcej</string>
     <string name="vpn_not_found">Brak VPNu. Polecamy zaszyfrowanie polączenia.</string>
     <string name="error_connection_timed_out">Błąd: przekroczono limit czasu połączenia. Spróbuj jeszcze raz. </string>

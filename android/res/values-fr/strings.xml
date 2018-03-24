@@ -22,10 +22,6 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touchez les étiquettes appliqués à]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Divulgation:</b> Bien que recommandée pour vos téléchargements, en particulier lors du téléchargement ou de l\'échange d\'informations sensibles (par exemple bancaires) et lors de l\'utilisation de Wi-Fi publics ou de données mobiles, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>ExpressVPN</b> pour chiffrer votre connexion et <b>protéger votre vie privée</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si vous n\'êtes pas déjà, nous vous recommandons d\'utiliser <b>Private Internet Access</b> pour chiffrer votre connexion et <b>protéger votre vie privée</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Une connexion non protégée signifie tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.r.<br><br>Nous vous recommandons d\'utiliser ExpressVPN pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Une connexion non protégée signifie tout ce que vous faites en ligne (y compris <b>recherches, messagerie et téléchargements</b>) peut être contrôlée par une personne sur votre réseau et même par votre fournisseur de services Internet.r.<br><br>Nous vous recommandons d\'utiliser Private Internet Access pour chiffrer votre connexion et <b>préserver votre vie privée</b>.]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Votre vie privée est un droit humain fondamental</b>. Une connexion non protégée signifie tout ce que vous faites en ligne <b>recherches, messagerie et téléchargements</b>, peut être surveillé et intercepté par n\'importe qui sur votre réseau, par ex. Fournisseurs de services Internet, hackers, gouvernements.<br><br><b>Nous recommandons fortement d\'utiliser un service VPN</b>. <br> Voici quelques options qui fournissent un service fiable et fonctionnent bien avec FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si ce n\'est déjà fait, nous vous recommandons d\'utiliser l\'un des services ci-dessous pour crypter votre connexion et <b>protéger votre vie privée</b>. ]]></string>
     <string name="application_label">FrostWire</string>
@@ -584,7 +580,6 @@
     <string name="six_months">6 mois</string>
     <string name="storage_picker_treeuri_not_directory">Le chemin sélectionné est pas un répertoire</string>
     <string name="protect_my_privacy">Protéger ma vie privée</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Votre vie privée est un droit humain fondamental.</string>
     <string name="keep_the_project_alive">Gardez le projet en vie</string>
     <string name="remove_ads">Supprimer les annonces</string>
     <string name="advertisement">publicité</string>

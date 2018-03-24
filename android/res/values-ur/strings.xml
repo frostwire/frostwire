@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[افشا: اگرچہ آپ کے ڈاؤن لوڈ کے لئے سفارش کی گئی ہے، آپ کو FrostWire استعمال کرنے کے لئے ایک وی پی این کی ضرورت نہیں ہے.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>ExpressVPN</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ آپ وی پی این کا استعمال کرتے ہوئے انٹرنیٹ سے منسلک ہیں. <br> <br> اگر آپ پہلے ہی نہیں ہیں تو ہم آپ کے کنکشن کو خفیہ کرنے کیلئے <b>Private Internet Access</b> استعمال کرتے ہیں اور <b> اپنی رازداری کی حفاظت </b> کی سفارش کرتے ہیں. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ ایک غیر متوقع کنکشن کا مطلب یہ ہے کہ آپ آن لائن سب کچھ کرتے ہیں (<b> تلاش، پیغام رسانی اور ڈاؤن لوڈز </b> سمیت) بھی آپ کے نیٹ ورک پر کسی اور کی طرف سے بھی آپ کے انٹرنیٹ سروس فراہم کرنے والے کی طرف سے نگرانی کی جا سکتی ہے. <br> <br> ہم  ExpressVPN کو اپنے کنکشن کو خفیہ کرنے اور <b> اپنی رازداری کی حفاظت </b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ ایک غیر متوقع کنکشن کا مطلب یہ ہے کہ آپ آن لائن سب کچھ کرتے ہیں (<b> تلاش، پیغام رسانی اور ڈاؤن لوڈز </b> سمیت) بھی آپ کے نیٹ ورک پر کسی اور کی طرف سے بھی آپ کے انٹرنیٹ سروس فراہم کرنے والے کی طرف سے نگرانی کی جا سکتی ہے. <br> <br> ہم  Private Internet Access کو اپنے کنکشن کو خفیہ کرنے اور <b> اپنی رازداری کی حفاظت </b>.]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
     <string name="activity_chat_name">بات چیت</string>
     <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
@@ -592,7 +588,6 @@
     <string name="protect_my_privacy">میری رازداری کا تحفظ</string>
     <string name="ringtone_set">رنگ ٹون طے</string>
     <string name="transfers">ٹرانسفر</string>
-    <string name="your_privacy_is_a_fundamental_right_html">آپ کی پرائیویسی کی ایک بنیادی انسانی حق ہے.</string>
     <string name="keep_the_project_alive">پروجیکٹ زندہ رکھنے کے</string>
     <string name="show_love">FrostWire پسند ہے؟</string>
     <string name="remove_ads">اشتھارات ہٹا</string>

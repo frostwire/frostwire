@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[प्रकटीकरण हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>ExpressVPN</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ आप इंटरनेट का उपयोग करते हुए एक वीपीएन से जुड़े रहे हैं। <br><br> आप पहले से ही नहीं कर रहे हैं, हम उपयोग करने की सिफारिश <b>Private Internet Access</b> अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश ExpressVPN अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ एक असुरक्षित कनेक्शन सब कुछ आप ऑनलाइन कर का मतलब (समेत <b>खोजों, संदेश, और डाउनलोड</b>) अपने नेटवर्क पर और यहां तक कि अपने इंटरनेट सेवा प्रदाता द्वारा किसी के द्वारा नजर रखी जा सकती है।<br><br>हम उपयोग करने की सिफारिश Private Internet Access अपने कनेक्शन एन्क्रिप्ट करने के लिए और <b>आपकी गोपनीयता की रक्षा</b>.]]></string>
     <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
     <string name="activity_chat_name">बातचीत</string>
@@ -580,7 +576,6 @@
     <string name="six_months">6 महीने</string>
     <string name="storage_picker_treeuri_not_directory">चयनित पथ एक निर्देशिका नहीं है</string>
     <string name="protect_my_privacy">मेरी गोपनीयता की सुरक्षा</string>
-    <string name="your_privacy_is_a_fundamental_right_html">आपकी गोपनीयता एक मौलिक मानवाधिकार है।</string>
     <string name="keep_the_project_alive">परियोजना को जीवित रखें</string>
     <string name="remove_ads">विज्ञापन हटाएँ</string>
     <string name="use_tpb_summary">TPB चुंबक आधारित है, केवल वाईफाई पर काम करता है</string>

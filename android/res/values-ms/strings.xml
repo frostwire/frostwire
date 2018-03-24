@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Maklumat:</b> Walaupun disyorkan untuk muat turun anda, terutamanya apabila memuat turun atau menukar maklumat sensitif (cth. perbankan) dan semasa menggunakan data Wi-Fi awam atau mudah alih, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>ExpressVPN</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda bersambung ke Internet menggunakan VPN. <br><br> Jika anda bukan lagi, kami mencadangkan menggunakan <b>Private Internet Access</b> untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan ExpressVPN untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Sambungan yang tidak dilindungi bermakna semua yang anda lakukan dalam talian (termasuk <b>cari, mesej, dan muat turun</b>) boleh dipantau oleh sesiapa sahaja di rangkaian anda dan juga oleh pembekal perkhidmatan Internet anda.<br><br>Kami mengesyorkan menggunakan Private Internet Access untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>.]]></string>
     <string name="vpn_not_found">Tiada VPN. Pertimbangkan menyulitkan sambungan.</string>
     <string name="azureus_peer_manager_status_finished">Tamat</string>
     <string name="activity_mediaplayer_name">Pemain media</string>
@@ -591,7 +587,6 @@
     <string name="share_finished_downloads">Berkongsi muat turun selesai pada Wifi</string>
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Pemindahan</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Privasi anda adalah hak asasi manusia.</string>
     <string name="keep_the_project_alive">Memastikan projek itu hidup</string>
     <string name="show_love">Cinta FrostWire?</string>
     <string name="remove_ads">Mengeluarkan iklan</string>

@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Розкриття інформації:</b> Хоча рекомендується для завантаження, особливо коли ви завантажуєте або обмінюєтесь конфіденційною інформацією (наприклад, банківською діяльністю) та під час користування загальнодоступними Wi-Fi або мобільними даними, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>ExpressVPN</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Ви підключені до Інтернету за допомогою VPN. <br><br> Якщо ви не зробили, ми рекомендуємо використовувати <b>Private Internet Access</b> зашифрувати з\'єднання і <b>забезпечення конфіденційності</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати ExpressVPN для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Незахищений з\'єднання означає все, що ви робите в Інтернеті (включаючи <b>виконує пошук, обмін повідомленнями і завантаження</b>) може контролюватися кимось у вашій мережі і навіть вашим провайдером послуг Інтернету.<br><br>Ми рекомендуємо використовувати Private Internet Access для шифрування з\'єднання і <b>захистити вашу приватне життя</b>.]]></string>
     <string name="vpn_not_found">Ні VPN. Розглянемо шифрування з\'єднання.</string>
     <string name="azureus_peer_manager_status_finished">Закінчено</string>
     <string name="activity_mediaplayer_name">Медіа плеєр</string>
@@ -581,7 +577,6 @@
     <string name="share_finished_downloads">Частка закінчили завантаження на Wi-Fi</string>
     <string name="ringtone_set">Мелодія набір</string>
     <string name="transfers">Перекази</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Ваша конфіденційність є фундаментальним правом людини.</string>
     <string name="keep_the_project_alive">Тримайте проект живий</string>
     <string name="show_love">Любов FrostWire?</string>
     <string name="remove_ads">видалити оголошення</string>

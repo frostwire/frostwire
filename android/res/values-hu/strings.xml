@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Közzététel:</b> Bár ajánlott a letöltéseket, különösen akkor, ha érzékeny információk (például banki szolgáltatások) letöltése és cseréje, valamint nyilvános Wi-Fi vagy mobil adat használata közben, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>ExpressVPN</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Te kapcsolódik az internethez VPN. <br><br> Ha még nem, javasoljuk a <b>Private Internet Access</b> hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a ExpressVPN hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Egy védett kapcsolat azt jelenti, mindent, amit csinál az interneten (beleértve a <b>keresést, üzenetküldő és letöltések</b>) lehet követni bárki a hálózaton, és még az internet-szolgáltató.<br><br>Javasoljuk a Private Internet Access hogy titkosítja a kapcsolatot, és <b>ön személyi adatainak védelmében</b>.]]></string>
     <string name="vpn_not_found">Nem VPN. Tekintsük titkosítása kapcsolatot.</string>
     <string name="azureus_peer_manager_status_finished">Befejezett</string>
     <string name="activity_mediaplayer_name">Médialejátszó</string>
@@ -581,7 +577,6 @@
     <string name="share_finished_downloads">Megosztása befejezett letöltések Wifi</string>
     <string name="ringtone_set">Csengőhang beállítása</string>
     <string name="transfers">Átigazolások</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Az Ön adatainak védelme alapvető emberi jog.</string>
     <string name="keep_the_project_alive">Hogy a projekt életben</string>
     <string name="show_love">Szerelem FrostWire?</string>
     <string name="remove_ads">Hirdetések eltávolítása</string>

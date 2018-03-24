@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[情報： 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>ExpressVPN</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだお持ちでない場合は、 <b>Private Internet Access</b> あなたの接続を暗号化する <b>あなたのプライバシーを守る</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 保護されていない接続とは、オンラインで行うすべてのことを意味します (を含む <b>検索、メッセージング、ダウンロード</b>) ネットワーク上の誰でも、インターネットサービスプロバイダによって監視されている可能性があります。<br><br>ExpressVPNを使用して接続を暗号化することをお勧めします <b>あなたのプライバシーを守る</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 保護されていない接続とは、オンラインで行うすべてのことを意味します (を含む <b>検索、メッセージング、ダウンロード</b>) ネットワーク上の誰でも、インターネットサービスプロバイダによって監視されている可能性があります。<br><br>Private Internet Access <b>あなたのプライバシーを守る</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
     <string name="activity_chat_name">チャット</string>
@@ -519,7 +515,6 @@
     <string name="storage_picker_treeuri_error">ストレージのパスを選択時に予期しないエラー</string>
     <string name="storage_path">ストレージのパス</string>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
-    <string name="your_privacy_is_a_fundamental_right_html">あなたのプライバシーは基本的人権です。</string>
     <string name="learn_more">さらに詳細</string>
     <string name="error_connection_timed_out">エラー：接続のタイムアウト/ドロップ。 再試行する。</string>
     <string name="all_free_downloads">すべての無料ダウンロード</string>

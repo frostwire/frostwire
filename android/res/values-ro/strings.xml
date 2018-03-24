@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Dezvăluire:</b> Cu toate că este recomandat pentru descărcarea, în special atunci când descarcă sau schimbă informații sensibile (de exemplu, bancare) și în timp ce utilizează date publice Wi-Fi sau mobile, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Atingeți etichetele aplicate la]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>ExpressVPN</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sunteți conectat la Internet folosind un VPN. <br><br> Daca nu sunteti deja, vă recomandăm să folosiți <b>Private Internet Access</b> pentru a cripta conexiunea și <b>proteja confidențialitatea</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați ExpressVPN pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ O conexiune neprotejat înseamnă tot ceea ce face on-line (inclusiv <b>căutări, mesagerie și descărcări</b>) poate fi monitorizată de oricine din rețea și poate chiar și de către furnizorul de servicii Internet.<br><br>Vă recomandăm să utilizați Private Internet Access pentru a cripta conexiunea și <b>proteja confidențialitatea</b>.]]></string>
     <string name="vpn_not_found">Nici VPN. Luați în considerare criptarea conexiunii.</string>
     <string name="azureus_peer_manager_status_finished">Terminat</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -581,7 +577,6 @@
     <string name="share_finished_downloads">Partajați materiale descărcate de pe Wi-Fi</string>
     <string name="ringtone_set">Setare ton de apel</string>
     <string name="transfers">Transferurile</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Intimitatea ta este un drept fundamental al omului.</string>
     <string name="keep_the_project_alive">A se păstra în viață proiectul</string>
     <string name="show_love">Iubesc FrostWire?</string>
     <string name="remove_ads">Elimina anunțurile</string>

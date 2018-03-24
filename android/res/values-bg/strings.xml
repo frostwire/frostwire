@@ -20,10 +20,6 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Разкриване:</b> Въпреки че се препоръчва за вашите файлове за изтегляне, особено когато изтегляте или обменяте чувствителна информация (например банкиране) и докато използвате обществени Wi-Fi или мобилни данни, <b>Вие не се нуждаят от VPN, за да използвате FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Вие сте свързани към Интернет с помощта на VPN. <br><br> Ако не сте вече, ние препоръчваме да използвате <b>ExpressVPN</b> за криптиране на връзката си и <b>защитите личните си данни</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Вие сте свързани към Интернет с помощта на VPN. <br><br> Ако не сте вече, ние препоръчваме да използвате <b>Private Internet Access</b> за криптиране на връзката си и <b>защитите личните си данни</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Един незащитена връзка означава, че всичко, което правите онлайн (включително <b>търсения, съобщения и файлове за изтегляне</b>) може да се наблюдава от някой във вашата мрежа и дори от вашия интернет доставчик.<br><br>Препоръчваме ви да използвате ExpressVPN за криптиране на връзката си и <b>защитите личните си данни</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Един незащитена връзка означава, че всичко, което правите онлайн (включително <b>търсения, съобщения и файлове за изтегляне</b>) може да се наблюдава от някой във вашата мрежа и дори от вашия интернет доставчик.<br><br>Препоръчваме ви да използвате Private Internet Access за криптиране на връзката си и <b>защитите личните си данни</b>.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Докоснете приложените маркери до]]></string>
     <string name="vpn_not_found">Не VPN. Помислете за криптиране на връзката.</string>
     <string name="azureus_peer_manager_status_finished">Завършил</string>
@@ -591,7 +587,6 @@
     <string name="share_finished_downloads">Споделете завършени изтегляния за Wifi</string>
     <string name="ringtone_set">Мелодия набор</string>
     <string name="transfers">Трансфери</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Вашият личен живот е основно човешко право.</string>
     <string name="keep_the_project_alive">Дръжте проекта жив!</string>
     <string name="show_love">Любовта FrostWire?</string>
     <string name="remove_ads">Премахни рекламите</string>

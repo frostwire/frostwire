@@ -19,10 +19,6 @@
  */
 -->
 <resources>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>ExpressVPN</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ U bent verbonden met het internet via een VPN. <br><br> Als u nog niet bent, raden wij u aan <b>Private Internet Access</b> om uw verbinding te versleutelen en <b>bescherm uw privacy</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan ExpressVPN om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Een onbeveiligde verbinding betekent dat alles wat je online doet (inclusief <b>zoekopdrachten, messaging, en downloads</b>) kan worden gecontroleerd door iedereen op uw netwerk en zelfs door uw Internet service provider.<br><br>Wij raden u aan Private Internet Access om uw verbinding te versleutelen en <b>bescherm uw privacy</b>.]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informatie: Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste tags aan]]></string>
     <string name="application_label">FrostWire</string>
@@ -580,7 +576,6 @@
     <string name="six_months">6 months</string>
     <string name="storage_picker_treeuri_not_directory">De geselecteerde pad is geen map</string>
     <string name="protect_my_privacy">Bescherm ik mijn levenssfeer</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Uw levenssfeer is een fundamenteel mensenrecht.</string>
     <string name="keep_the_project_alive">Houd het project in leven</string>
     <string name="remove_ads">Verwijder advertenties</string>
     <string name="use_tpb_summary">TPB is de magneet gebaseerd, werkt alleen op de website Wifi</string>

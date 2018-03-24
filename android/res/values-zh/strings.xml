@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[披露： 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>ExpressVPN</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ 您已使用VPN连接到互联网。 <br><br> 如果你还没有，我们建议使用 <b>Private Internet Access</b> 加密您的连接和 <b>保护您的隐私</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用ExpressVPN加密您的连接和 <b>保护您的隐私</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ 不受保护的连接意味着您在线进行的一切 (包含 <b>搜索，消息传递和下载</b>) 可能由您的网络上的任何人，甚至由您的互联网服务提供商监控。<br><br>我们建议使用Private Internet Access加密您的连接和 <b>保护您的隐私</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
     <string name="activity_chat_name">聊天</string>
@@ -580,7 +576,6 @@
     <string name="six_months">6个月</string>
     <string name="storage_picker_treeuri_not_directory">所选路径不是目录</string>
     <string name="protect_my_privacy">保护我的隐私</string>
-    <string name="your_privacy_is_a_fundamental_right_html">您的隐私是一项基本人权.</string>
     <string name="keep_the_project_alive">保持项目活动</string>
     <string name="remove_ads">移除广告</string>
     <string name="advertisement">廣告</string>

@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>การเปิดเผยข้อมูล:</b> แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณโดยเฉพาะอย่างยิ่งเมื่อดาวน์โหลดหรือแลกเปลี่ยนข้อมูลที่สำคัญ (เช่นธนาคาร) และในขณะที่ใช้ Wi-Fi สาธารณะหรือข้อมูลมือถือ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>ExpressVPN</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณไม่ได้อยู่ที่เราขอแนะนำให้ใช้ <b>Private Internet Access</b> ในการเข้ารหัสและการเชื่อมต่อของคุณ <b>ปกป้องความเป็นส่วนตัวของคุณ</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ ExpressVPN การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ การเชื่อมต่อที่ไม่มีการป้องกันหมายความว่าทุกอย่างที่คุณทำออนไลน์ (รวมไปถึง <b>การค้นหา, ข้อความ, และการดาวน์โหลด</b>) อาจจะได้รับการตรวจสอบโดยทุกคนในเครือข่ายของคุณและแม้กระทั่งโดยผู้ให้บริการอินเทอร์เน็ตของคุณ<br><br>เราขอแนะนำให้ใช้ Private Internet Access การเข้ารหัสการเชื่อมต่อและปกป้องความเป็นส่วนตัวของคุณ.]]></string>
     <string name="vpn_not_found">ไม่มี VPN พิจารณาการเข้ารหัสการเชื่อมต่อ</string>
     <string name="azureus_peer_manager_status_finished">เสร็จ</string>
     <string name="activity_mediaplayer_name">Media Player</string>
@@ -591,7 +587,6 @@
     <string name="share_finished_downloads">แบ่งปันดาวน์โหลดสำเร็จรูปใน WiFi</string>
     <string name="ringtone_set">ตั้งเสียงเรียกเข้า</string>
     <string name="transfers">บริการรถรับส่ง</string>
-    <string name="your_privacy_is_a_fundamental_right_html">ความเป็นส่วนตัวของคุณเป็นสิทธิมนุษยชนขั้นพื้นฐาน</string>
     <string name="keep_the_project_alive">ให้โครงการยังมีชีวิตอยู่</string>
     <string name="show_love">รัก FrostWire?</string>
     <string name="remove_ads">ลบโฆษณา</string>

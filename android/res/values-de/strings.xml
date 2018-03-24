@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Offenlegung:</b> Obwohl für Ihre Downloads empfohlen, insbesondere beim Herunterladen oder Austausch sensibler Informationen (z. B. Bankgeschäfte) und bei der Nutzung öffentlicher Wi-Fi- oder mobiler Daten, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Hinweis:</b> Berühren angewendet Tags]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>ExpressVPN</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Sie sind mit dem Internet verbunden, um ein VPN. <br><br> Wenn Sie nicht bereits sind, empfehlen wir <b>Private Internet Access</b> verwenden verschlüsseln Sie Ihre Verbindung und <b>Schutz Ihrer Privatsphäre</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Eine ungeschützte Verbindung bedeutet, alles, was Sie online tun (einschließlich <b>Suchen, Messaging und Downloads</b>) kann von jedem im Netzwerk überwacht werden und sogar von Ihrem Internet-Service-Provider.<br><br>Wir empfehlen die Verwendung von Express-VPN-Verbindung zum Verschlüsseln und <b>Schutz Ihrer Privatsphäre</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Eine ungeschützte Verbindung bedeutet, alles, was Sie online tun (einschließlich <b>Suchen, Messaging und Downloads</b>) kann von jedem im Netzwerk überwacht werden und sogar von Ihrem Internet-Service-Provider.<br><br>Wir empfehlen die Verwendung von Private-Internet-Access-Verbindung zum Verschlüsseln und <b>Schutz Ihrer Privatsphäre</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Einstellungen</string>
     <string name="activity_chat_name">Chat</string>
@@ -580,7 +576,6 @@
     <string name="six_months">6 Monate</string>
     <string name="storage_picker_treeuri_not_directory">Der ausgewählte Pfad ist kein Verzeichnis</string>
     <string name="protect_my_privacy">Schützen Sie meine Privatsphäre</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Ihre Privatsphäre ist ein Grundrecht.</string>
     <string name="keep_the_project_alive">Halten Sie das Projekt lebendig</string>
     <string name="remove_ads">Anzeigen entfernen</string>
     <string name="use_tpb_summary">TPB ist Magnet basiert, funktioniert nur auf der Wifi</string>

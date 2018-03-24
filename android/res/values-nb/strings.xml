@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasjon:</b> Selv anbefalt for nedlastingene dine, spesielt når du laster ned eller bytter sensitiv informasjon (for eksempel bank) og mens du bruker offentlig Wi-Fi eller mobildata, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>ExpressVPN</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Du er koblet til Internett via en VPN. <br><br> Hvis du ikke allerede, anbefaler vi at du bruker <b>Private Internett Access</b> å kryptere forbindelsen og <b>ivareta personvernet</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke ExpressVPN å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ En ubeskyttet forbindelse betyr alt du gjør på nettet (inkludert <b>søk, meldinger og nedlastinger</b>) kan overvåkes av alle på nettverket og selv av Internett-leverandøren.<br><br>Vi anbefaler å bruke Private Internett Access å kryptere forbindelsen og <b>ivareta personvernet</b>.]]></string>
     <string name="vpn_not_found">Ingen VPN. Vurdere å kryptere forbindelsen.</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
     <string name="activity_mediaplayer_name">Mediaspiller</string>
@@ -598,7 +594,6 @@
     <string name="share_finished_downloads">Del ferdige nedlastinger på Wifi</string>
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Overganger</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Ditt personvern er en grunnleggende menneskerettighet.</string>
     <string name="keep_the_project_alive">Holde prosjektet i live</string>
     <string name="show_love">Elsker Frostwire?</string>
     <string name="remove_ads">Fjern annonser</string>

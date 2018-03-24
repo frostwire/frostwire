@@ -19,10 +19,6 @@
  */
 -->
 <resources>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Вы падлучаныя да Інтэрнэту з дапамогай VPN. <br><br> Калі вы не зрабілі, мы рэкамендуем выкарыстоўваць <b>ExpressVPN</b>  каб зашыфраваць злучэнне і <b>абараніць вашу прыватную жыццё</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Вы падлучаныя да Інтэрнэту з дапамогай VPN. <br><br> Калі вы не зрабілі, мы рэкамендуем выкарыстоўваць <b>Private Internet Access</b>  каб зашыфраваць злучэнне і <b>абараніць вашу прыватную жыццё</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць ExpressVPN для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце (уключаючы <b>выконвае пошук, абмен паведамленнямі і загрузкі</b>) можа кантралявацца кім-небудзь у вашай сеткі і нават вашым пастаўшчыком інтэрнэт-паслуг.<br><br>Мы рэкамендуем выкарыстоўваць Private Internet Access для шыфравання злучэння і <b>забеспячэння прыватнасці</b>.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>інфармацыя:</b> Націсніце ўжытыя тэгі да]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Раскрыццё інфармацыі: Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
     <string name="vpn_not_found">Няма VPN. Разгледзім шыфраванне злучэння.</string>
@@ -583,7 +579,6 @@
     <string name="share_finished_downloads">Доля гатовых загрузкі на Wi-Fi</string>
     <string name="ringtone_set">Мелодыя набор</string>
     <string name="transfers">Пераклады</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Ваша канфідэнцыяльнасць з\'яўляецца фундаментальным правам чалавека.</string>
     <string name="keep_the_project_alive">Трымаеце праект жывы</string>
     <string name="show_love">Каханне FrostWire?</string>
     <string name="remove_ads">выдаліць аб\'явы</string>

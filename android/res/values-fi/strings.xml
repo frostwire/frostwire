@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Julkaiseminen:</b> Vaikka suosittelemme latauksillemme, varsinkin kun lataat tai vaihdat arkaluonteisia tietoja (esim. pankkitoimintaa) ja käyttäessäsi julkisia Wi-Fi- tai mobiilitietoja, <b>sinun ei tarvitse käyttää VPN: tä FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>ExpressVPN</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Olet yhteydessä internetiin VPN. <br><br> Jos et ole jo, suosittelemme <b>Private Internet Access</b> salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme ExpressVPN salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Suojaamattomassa yhteydessä tarkoittaa kaikkea teet verkossa (mukaan lukien <b>hakuja, messaging, ja lataukset</b>) voidaan seurata kuka tahansa verkon ja jopa Internet-palveluntarjoajan.<br><br>Suosittelemme Private Internet Access salata yhteyden ja <b>turvata yksityisyyttäsi</b>. ]]></string>
     <string name="vpn_not_found">Ei VPN. Mieti salaamalla yhteys.</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
     <string name="activity_mediaplayer_name">Mediasoitin</string>
@@ -598,7 +594,6 @@
     <string name="share_finished_downloads">Jaa päättynyt ladattavista Wifi</string>
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Siirrot</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Asiakkaiden tietosuoja on perusihmisoikeus.</string>
     <string name="keep_the_project_alive">Pidä projekti elossa</string>
     <string name="show_love">Rakkaus FrostWire?</string>
     <string name="remove_ads">Poista mainokset</string>

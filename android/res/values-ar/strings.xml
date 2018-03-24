@@ -20,10 +20,6 @@
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام ExpressVPN لتشفير اتصالك و حماية خصوصيتك. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام Private Internet Access لتشفير اتصالك وحماية خصوصيتك. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ اتصال غير محمي يعني كل شيء تفعله على شبكة الإنترنت (بما فيها عمليات البحث، والرسائل، وتنزيل) قد يخضع للمراقبة من قبل أي شخص على الشبكة وحتى من قبل مزود خدمة الإنترنت الخاص بك.<br><br>نوصي باستخدام Private Internet Access لتشفير اتصالك و حماية خصوصيتك. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ كنت متصلا بالإنترنت باستخدام VPN. إذا لم تكن بالفعل، ونحن نوصي باستخدام ExpressVPN لتشفير اتصالك وحماية خصوصيتك. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
@@ -585,7 +581,6 @@
     <string name="six_months">6 اشهر</string>
     <string name="storage_picker_treeuri_not_directory">المسار المحدد ليس دليلا</string>
     <string name="protect_my_privacy">حماية خصوصيتي</string>
-    <string name="your_privacy_is_a_fundamental_right_html">خصوصيتك هي حق أساسي من حقوق الإنسان.</string>
     <string name="keep_the_project_alive">تبقي على قيد الحياة مشروع</string>
     <string name="remove_ads">ازالة الاعلانات</string>
     <string name="use_tpb_summary">TPB هو المغناطيس مقرها، يعمل فقط على واي فاي</string>

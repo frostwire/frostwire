@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasi:</b> Meskipun dianjurkan untuk download Anda, terutama setiap kali mengunduh atau menukar informasi sensitif (misalnya perbankan) dan saat menggunakan Wi-Fi publik atau data seluler, <b>Anda tidak perlu VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>ExpressVPN</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum, sebaiknya gunakan <b>Private Internet Access</b> untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Koneksi tanpa kondom berarti semua yang Anda lakukan secara online (termasuk <b>pencarian, pesan, dan download</b>) dapat dipantau oleh siapa saja di jaringan Anda dan bahkan oleh penyedia layanan Internet Anda.<br><br>Kami merekomendasikan menggunakan ExpressVPN untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Koneksi tanpa kondom berarti semua yang Anda lakukan secara online (termasuk <b>pencarian, pesan, dan download</b>) dapat dipantau oleh siapa saja di jaringan Anda dan bahkan oleh penyedia layanan Internet Anda.<br><br>Kami merekomendasikan menggunakan Private Internet Access untuk mengenkripsi koneksi Anda dan <b>melindungi privasi Anda</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
     <string name="activity_chat_name">Percakapan</string>
@@ -583,7 +579,6 @@
     <string name="storage_picker_treeuri_not_directory">Jalur yang dipilih bukan sebuah direktori</string>
     <string name="protect_my_privacy">Melindungi privasi saya</string>
     <string name="transfers">Transfers</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Privasi Anda adalah hak asasi manusia.</string>
     <string name="keep_the_project_alive">Menjaga proyek hidup</string>
     <string name="remove_ads">Hilangkan iklan</string>
     <string name="use_tpb_summary">TPB adalah magnet berdasarkan, bekerja hanya pada Wifi</string>

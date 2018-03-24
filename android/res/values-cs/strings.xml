@@ -21,10 +21,6 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Zveřejnění:</b> Ačkoli doporučen pro vaše stahování, zejména při každém stahování nebo výměně citlivých informací (např. bankovnictví) a při používání veřejných Wi-Fi nebo mobilních dat, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>ExpressVPN</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Jste připojeni k Internetu pomocí VPN. <br><br> Pokud jste tak již neučinili, doporučujeme použít <b>Private Internet Access</b> k zašifrování připojení a <b>ochránili svoje soukromí</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat ExpressVPN k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Nechráněný spojení znamená, že všechno, co děláte on-line (počítaje v to <b>hledání, zasílání zpráv a stahování</b>) může být sledován kýmkoli v síti a dokonce i ze strany poskytovatele připojení k Internetu.<br><br>Doporučujeme používat Private Internet Access k zašifrování připojení a <b>ochránili svoje soukromí</b>.]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
     <string name="activity_chat_name">Chat</string>
@@ -583,7 +579,6 @@
     <string name="six_months">6 měsíců</string>
     <string name="storage_picker_treeuri_not_directory">Vybraná cesta není adresář</string>
     <string name="protect_my_privacy">Chránit své soukromí</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Vaše soukromí je základním lidským právem.</string>
     <string name="keep_the_project_alive">Udržujte projektu živý</string>
     <string name="remove_ads">Odstranit reklamy</string>
     <string name="use_tpb_summary">TPB je magnet na bázi funguje pouze na Wifi</string>

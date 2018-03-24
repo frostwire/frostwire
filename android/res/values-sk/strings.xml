@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Zverejnenie:</b> Hoci odporúčaná pre sťahovanie, najmä pri sťahovaní alebo výmene citlivých informácií (napr. bankovníctva) a pri používaní verejných dát Wi-Fi alebo mobilných údajov, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dotknite sa aplikovaných značiek na]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>ExpressVPN</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ Ste pripojení na Internet pomocou VPN. <br><br> If you are not already, we recommend using <b>Private Internet Access</b> na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ Nechránený spojenie znamená, že všetko, čo robíte on-line (vrátane <b>vyhľadávania, posielanie správ a sťahovanie</b>) môže byť sledovaný kýmkoľvek v sieti a dokonca aj zo strany poskytovateľa pripojenia na Internet.<br><br>Odporúčame používať ExpressVPN na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>.]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ Nechránený spojenie znamená, že všetko, čo robíte on-line (vrátane <b>vyhľadávania, posielanie správ a sťahovanie</b>) môže byť sledovaný kýmkoľvek v sieti a dokonca aj zo strany poskytovateľa pripojenia na Internet.<br><br>Odporúčame používať Private Internet Access na zašifrovanie pripojenia a <b>ochránili svoje súkromie</b>.]]></string>
     <string name="vpn_not_found">No VPN. Zoberme si šifrovanie spojenia.</string>
     <string name="azureus_peer_manager_status_finished">Dokončené</string>
     <string name="activity_mediaplayer_name">Mediálny prehrávač</string>
@@ -591,7 +587,6 @@
     <string name="share_finished_downloads">Zdieľať hotové k stiahnutiu na Wifi</string>
     <string name="ringtone_set">Vyzváňanie set</string>
     <string name="transfers">Prevody</string>
-    <string name="your_privacy_is_a_fundamental_right_html">Vaše súkromie je základným ľudským právom.</string>
     <string name="keep_the_project_alive">Udržujte projektu živý</string>
     <string name="show_love">Láske FrostWire?</string>
     <string name="remove_ads">Odstrániť reklamy</string>

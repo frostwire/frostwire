@@ -21,10 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[ * למרות המומלץ עבור הורדות שלך,אתה לא צריך VPN להשתמש FrostWire ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> גע בתגים שחלים על]]></string>
-    <string name="protected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[ אתה מחובר לאינטרנט באמצעות VPN. אם אתה כבר לא, אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך ולשמור על הפרטיות שלך. ]]></string>
-    <string name="protected_connections_visibility_bullet_html_PIA"><![CDATA[ אתה מחובר לאינטרנט באמצעות VPN. אם אתה כבר לא, אנו ממליצים להשתמש ב- Private Internet Access כדי להצפין את החיבור שלך ולשמור על הפרטיות שלך. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_ExpressVPN"><![CDATA[חיבור לא מוגן פירושו כל מה שאתה עושה באינטרנט (כולל <b/> חיפושים, הודעות והורדות <b>) יכול להיות מנוטר על ידי כל אחד ברשת שלך ואפילו על ידי ספק שירותי האינטרנט שלך. <br> <br> אנו ממליצים להשתמש ב- ExpressVPN כדי להצפין את החיבור שלך <b/> לשמור על הפרטיות שלך <b>. ]]></string>
-    <string name="unprotected_connections_visibility_bullet_html_PIA"><![CDATA[ חיבור לא מוגן פירושו כל מה שאתה עושה באינטרנט (כולל <b/> חיפושים, הודעות והורדות <b>) יכול להיות מנוטר על ידי כל אחד ברשת שלך ואפילו על ידי ספק שירותי האינטרנט שלך. <br> <br> אנו ממליצים להשתמש ב- Private Internet Access כדי להצפין את החיבור שלך <b/> לשמור על הפרטיות שלך <b>. ]]></string>
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="activity_mediaplayer_name">נגן מדיה</string>
@@ -598,7 +594,6 @@
     <string name="share_finished_downloads">שתף הורדות מוגמרות על Wifi</string>
     <string name="ringtone_set">סט רינגטונים</string>
     <string name="transfers">העברות</string>
-    <string name="your_privacy_is_a_fundamental_right_html">הפרטיות שלך היא אחת מזכויות אדם בסיסיות.</string>
     <string name="keep_the_project_alive">שמור את הפרויקט בחיים</string>
     <string name="show_love">אהבת FrostWire?</string>
     <string name="remove_ads">הסר פרסומות</string>
