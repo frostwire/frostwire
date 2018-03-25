@@ -3089,13 +3089,14 @@ public class MusicPlaybackService extends Service {
         }
 
         private void initNextMediaPlayer() {
-            mNextMediaPlayer = new MediaPlayer();
-            mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
-
-            try {
-                mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
-            } catch (Throwable e) {
-                LOG.error("Media player Illegal State exception", e);
+            if (Ref.alive(mService)) {
+                mNextMediaPlayer = new MediaPlayer();
+                mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
+                try {
+                    mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
+                } catch (Throwable e) {
+                    LOG.error("Media player Illegal State exception", e);
+                }
             }
         }
 
