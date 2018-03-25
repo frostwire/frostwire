@@ -150,7 +150,11 @@ public class MainActivity extends AbstractActivity implements
         } else if (keyCode == KeyEvent.KEYCODE_MENU) {
             toggleDrawer();
         } else {
-            return super.onKeyDown(keyCode, event);
+            try {
+                return super.onKeyDown(keyCode, event);
+            } catch (NullPointerException npe) {
+                return false;
+            }
         }
         return true;
     }
