@@ -242,13 +242,15 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         } else {
             // Set the shuffle all title to "play all" if a playlist.
             final MenuItem shuffle = menu.findItem(R.id.menu_player_shuffle);
-            String title;
-            if (isFavorites() || isLastAdded() || isPlaylist()) {
-                title = getString(R.string.menu_play_all);
-            } else {
-                title = getString(R.string.menu_shuffle);
+            if (shuffle != null) {
+                String title;
+                if (isFavorites() || isLastAdded() || isPlaylist()) {
+                    title = getString(R.string.menu_play_all);
+                } else {
+                    title = getString(R.string.menu_shuffle);
+                }
+                shuffle.setTitle(title);
             }
-            shuffle.setTitle(title);
         }
 
         return super.onPrepareOptionsMenu(menu);
