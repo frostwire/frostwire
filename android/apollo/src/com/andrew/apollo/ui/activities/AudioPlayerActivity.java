@@ -387,8 +387,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             final MenuItem effects = menu.findItem(R.id.menu_player_audio_player_equalizer);
             effects.setVisible(false);
         }
-        menu.findItem(R.id.menu_player_favorite).setIcon(MusicUtils.isFavorite() ?
-                R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
+        MenuItem favoriteMenuItem = menu.findItem(R.id.menu_player_favorite);
+        if (favoriteMenuItem != null) {
+            favoriteMenuItem.setIcon(MusicUtils.isFavorite() ?
+                    R.drawable.ic_action_favorite_selected : R.drawable.ic_action_favorite);
+        }
         return true;
     }
 
