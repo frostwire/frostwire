@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -132,13 +134,35 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             if (fileNameTextView == null) {
                 initComponents();
             }
-            fileTypeImageView.setImageResource(MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
-            fileNameTextView.setText(transferItem.getName());
-            fileProgressBar.setProgress(transferItem.getProgress());
-            fileProgressTextView.setText(transferItem.getProgress() + "%");
-            fileSizeTextView.setText(UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));
-            playButtonImageView.setTag(transferItem);
-            updatePlayButtonVisibility(transferItem);
+            final Bundle bundle = new Bundle();
+            async(this,
+                  TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
+                  transferItem,
+                  bundle,
+                  TransferDetailFilesTransferItemViewHolder::updateTransferDataPost );
+        }
+
+        private static void updateTransferDataTask(TransferDetailFilesTransferItemViewHolder holder,
+                                                   final TransferItem transferItem,
+                                                   final Bundle bundleResult) {
+            bundleResult.putInt("fileTypeIconId", MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
+            bundleResult.putInt("progress", transferItem.getProgress());
+            bundleResult.putString("downloadedPercentage", UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));
+            bundleResult.putBoolean("isComplete", transferItem.isComplete());
+            bundleResult.putSerializable("previewFile", previewFile((BTDownloadItem) transferItem));
+        }
+
+        private static void updateTransferDataPost(TransferDetailFilesTransferItemViewHolder holder,
+                                                   TransferItem transferItem,
+                                                   Bundle bundle) {
+            holder.fileTypeImageView.setImageResource(bundle.getInt("fileTypeIconId"));
+            holder.fileNameTextView.setText(transferItem.getName());
+            int progress = bundle.getInt("progress");
+            holder.fileProgressBar.setProgress(progress);
+            holder.fileProgressTextView.setText(progress + "%");
+            holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
+            holder.playButtonImageView.setTag(transferItem);
+            holder.updatePlayButtonVisibility(bundle.getBoolean("isComplete"), (File) bundle.getSerializable("previewFile"));
         }
 
         private void initComponents() {
@@ -152,11 +176,11 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             playButtonImageView.setOnClickListener(new OpenOnClickListener(itemView.getContext()));
         }
 
-        private void updatePlayButtonVisibility(TransferItem item) {
-            if (item.isComplete()) {
+        private void updatePlayButtonVisibility(boolean isComplete, File previewFile) {
+            if (isComplete) {
                 playButtonImageView.setVisibility(View.VISIBLE);
             } else {
-                playButtonImageView.setVisibility(previewFile((BTDownloadItem) item) != null ? View.VISIBLE : View.GONE);
+                playButtonImageView.setVisibility(previewFile != null ? View.VISIBLE : View.GONE);
             }
         }
     }
