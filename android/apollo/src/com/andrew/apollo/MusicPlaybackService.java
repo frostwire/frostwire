@@ -686,7 +686,7 @@ public class MusicPlaybackService extends Service {
                 | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
 
         flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
-        mRemoteControlClient.setOnGetPlaybackPositionListener(() -> position());
+        mRemoteControlClient.setOnGetPlaybackPositionListener(this::position);
         mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
 
         mRemoteControlClient.setTransportControlFlags(flags);
