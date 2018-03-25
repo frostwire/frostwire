@@ -669,4 +669,5 @@
     <string name="seeding_keeps_the_network_healthy">Paylaşım, şebekenin sağlıklı kalmasını sağlar</string>
     <string name="seeding_is_currently_disabled">Paylaşım şu anda devre dışı</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire, izin eksikliği nedeniyle düzgün başlatılamadı. Lütfen gerekli izinleri verin ve uygulamayı tekrar başlatın.</string>
+    <string name="vpn_find_out_more">Daha fazlasını bul</string>
 </resources>

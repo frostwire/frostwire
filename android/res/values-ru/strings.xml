@@ -717,4 +717,5 @@
     <string name="piece_size_header">Размер части:</string>
     <string name="add_tracker">Добавить трекер</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire не смог запустить должным образом из-за отсутствия разрешений. Предоставьте необходимые разрешения и перезапустите приложение.</string>
+    <string name="vpn_find_out_more">Узнать больше</string>
 </resources>

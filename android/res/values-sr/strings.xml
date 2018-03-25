@@ -673,4 +673,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Није могуће отворити Детаљи преноса, неважећи ИнфоХасх</string>
     <string name="invalid_tracker_url">Неважећа УРЛ адреса Трацкер</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire није могао да ради правилно због недостатка дозвола. Молимо да дате потребне дозволе и поново покрените апликацију</string>
+    <string name="vpn_find_out_more">Откриј више</string>
 </resources>

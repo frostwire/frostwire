@@ -667,4 +667,5 @@
     <string name="seeding_keeps_the_network_healthy">Спільний доступ допомагає зберегти мережу здоровою</string>
     <string name="seeding_is_currently_disabled">Спільний доступ в даний момент вимкнено</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire не вдалося запустити належним чином через відсутність дозволів. Будь ласка, надайте необхідні дозволи та перезапустіть програму</string>
+    <string name="vpn_find_out_more">Дізнатися більше</string>
 </resources>
