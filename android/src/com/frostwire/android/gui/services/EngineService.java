@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
@@ -64,6 +65,7 @@ import static com.frostwire.android.util.Asyncs.async;
 public class EngineService extends Service implements IEngineService {
 
     public final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
+    public final static String FROSTWIRE_NOTIFICATION_CHANNEL_ID = String.valueOf(FROSTWIRE_STATUS_NOTIFICATION);
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
@@ -248,13 +250,16 @@ public class EngineService extends Service implements IEngineService {
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
             PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification notification = new Notification.Builder(context)
+            Notification.Builder builder = new Notification.Builder(context)
                     .setWhen(System.currentTimeMillis())
                     .setContentText(getString(R.string.download_finished))
                     .setContentTitle(getString(R.string.download_finished))
                     .setSmallIcon(getNotificationIcon())
-                    .setContentIntent(pi)
-                    .build();
+                    .setContentIntent(pi);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId(EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+            }
+            Notification notification = builder.build();
             notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;

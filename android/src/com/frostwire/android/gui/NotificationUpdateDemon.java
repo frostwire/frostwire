@@ -22,6 +22,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -30,7 +31,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.TimerObserver;
@@ -38,6 +38,8 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.util.Logger;
 
+import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID;
+import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_STATUS_NOTIFICATION;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -76,7 +78,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
             try {
-                manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                manager.cancel(FROSTWIRE_STATUS_NOTIFICATION);
             } catch (SecurityException t) {
                 // possible java.lang.SecurityException
             }
@@ -109,7 +111,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
                     try {
-                        manager.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                        manager.cancel(FROSTWIRE_STATUS_NOTIFICATION);
                     } catch (SecurityException ignored) {
                         // possible java.lang.SecurityException
                     }
@@ -125,7 +127,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 try {
-                    notificationManager.notify(EngineService.FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+                    notificationManager.notify(FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
                 } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
                 } catch (Throwable ignored2) {
@@ -149,12 +151,17 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
-
-        Notification notification = new NotificationCompat.Builder(mParentContext, "").
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mParentContext, "").
                 setSmallIcon(R.drawable.frostwire_notification_flat).
                 setContentIntent(showFrostWireIntent).
-                setContent(remoteViews).
-                build();
+                setContent(remoteViews);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+        }
+
+        Notification notification = builder.build();
+
         notification.flags |= Notification.FLAG_NO_CLEAR;
 
         notificationViews = remoteViews;
