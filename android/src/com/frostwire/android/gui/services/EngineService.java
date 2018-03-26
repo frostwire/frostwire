@@ -27,12 +27,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 
 import com.andrew.apollo.MediaButtonIntentReceiver;
-import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -250,16 +249,13 @@ public class EngineService extends Service implements IEngineService {
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
             PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification.Builder builder = new Notification.Builder(context)
+            Notification notification = new NotificationCompat.Builder(context, EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setWhen(System.currentTimeMillis())
                     .setContentText(getString(R.string.download_finished))
                     .setContentTitle(getString(R.string.download_finished))
                     .setSmallIcon(getNotificationIcon())
-                    .setContentIntent(pi);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                builder.setChannelId(EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-            }
-            Notification notification = builder.build();
+                    .setContentIntent(pi)
+                    .build();
             notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;

@@ -22,7 +22,6 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.EngineService;
 
 import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID;
 
@@ -100,16 +99,14 @@ public class NotificationHelper {
         PendingIntent pendingintent = getPendingIntent();
 
         // Notification Builder
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mService, "")
+        Notification aNotification = new NotificationCompat.Builder(mService, FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
                 .setPriority(Notification.PRIORITY_DEFAULT)
                 .setVisibility(VISIBILITY_PUBLIC)
-                .setContent(mNotificationTemplate);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            builder.setChannelId(FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-        }
-        Notification aNotification = builder.build();
+                .setContent(mNotificationTemplate)
+                .build();
+
         // Control playback from the notification
         initPlaybackActions(isPlaying);
 

@@ -22,7 +22,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
@@ -151,16 +150,11 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mParentContext, "").
+        Notification notification = new NotificationCompat.Builder(mParentContext, FROSTWIRE_NOTIFICATION_CHANNEL_ID).
                 setSmallIcon(R.drawable.frostwire_notification_flat).
                 setContentIntent(showFrostWireIntent).
-                setContent(remoteViews);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-        }
-
-        Notification notification = builder.build();
+                setContent(remoteViews).
+                build();
 
         notification.flags |= Notification.FLAG_NO_CLEAR;
 

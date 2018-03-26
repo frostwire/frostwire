@@ -1,4 +1,4 @@
-FrostWire 2.0.2 build 514 - MAR/25/2018
+FrostWire 2.0.2 build 515 - MAR/26/2018
  - Application startup is faster
  - Faster YT downloads
  - Zooqle search fixes
@@ -10,6 +10,7 @@ FrostWire 2.0.2 build 514 - MAR/25/2018
  - Translations updated, Urdu update
  - Loads of Crash and Freeze fixes
  - VPN detection and offering updates
+ - Notifications work again on Android 8.0
 
 FrostWire 2.0.1 build 490 - FEB/06/2018
  - Archive.org search fixes
