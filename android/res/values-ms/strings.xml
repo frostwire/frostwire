@@ -667,4 +667,5 @@
     <string name="seeding_keeps_the_network_healthy">Perkongsian membantu mengekalkan rangkaian yang sihat</string>
     <string name="seeding_is_currently_disabled">Perkongsian kini dilumpuhkan</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire tidak dapat dimulakan dengan betul kerana kurang mendapat kebenaran. Sila berikan kebenaran yang diperlukan dan mulakan semula aplikasi</string>
+    <string name="vpn_find_out_more">Ketahui lebih lanjut</string>
 </resources>

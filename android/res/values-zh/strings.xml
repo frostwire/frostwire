@@ -669,4 +669,5 @@
     <string name="invalid_tracker_url">无效的跟踪器网址</string>
     <string name="frostwire_start_engine_service_security_exception">由于缺乏权限，FrostWire无法正常启动。 请授予所需的权限并重新启动应用程序</string>
     <string name="connection_header_title">VPN连接状态：</string>
+    <string name="vpn_find_out_more">了解更多</string>
 </resources>

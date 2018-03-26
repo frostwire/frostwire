@@ -668,4 +668,5 @@
     <string name="seeding_is_currently_disabled">Delning är för närvarande inaktiverad</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Kunde inte öppna överföringsinformation, ogiltig InfoHash</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire kunde inte starta korrekt på grund av brist på behörigheter. Vänligen ge erforderliga behörigheter och starta om programmet</string>
+    <string name="vpn_find_out_more">Få reda på mer</string>
 </resources>

@@ -716,4 +716,5 @@
     <string name="piece_size_header">Кавалак Памер:</string>
     <string name="add_tracker">Дадаць трэкер</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire не можа запусціцца з-за адсутнасці дазволаў. Калі ласка, падайце неабходныя дазволы і перазапусціць прыкладанне</string>
+    <string name="vpn_find_out_more">Даведайцеся больш</string>
 </resources>

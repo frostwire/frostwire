@@ -666,4 +666,5 @@
     <string name="nothing_is_currently_seeding">Saat ini tidak ada penyemaian</string>
     <string name="seeding_keeps_the_network_healthy">Berbagi membantu menjaga jaringan tetap sehat</string>
     <string name="seeding_is_currently_disabled">Berbagi saat ini dinonaktifkan</string>
+    <string name="vpn_find_out_more">Temukan lebih banyak lagi</string>
 </resources>

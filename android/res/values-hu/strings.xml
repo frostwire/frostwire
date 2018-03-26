@@ -667,4 +667,5 @@
     <string name="seeding_keeps_the_network_healthy">A megosztás segít fenntartani a hálózatot</string>
     <string name="seeding_is_currently_disabled">A megosztás jelenleg ki van kapcsolva</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Nem sikerült megnyitni az átviteli adatokat, érvénytelen InfoHash-ot</string>
+    <string name="vpn_find_out_more">Tudjon meg többet</string>
 </resources>

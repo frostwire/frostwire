@@ -669,4 +669,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Kunne ikke åbne overførselsoplysninger, ugyldige InfoHash</string>
     <string name="invalid_tracker_url">Ugyldig Tracker-URL</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire kunne ikke starte korrekt på grund af manglende tilladelser. Giv venligst de nødvendige tilladelser og genstart ansøgningen</string>
+    <string name="vpn_find_out_more">Find ud af mere</string>
 </resources>
