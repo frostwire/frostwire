@@ -173,7 +173,9 @@ public final class ApolloUtils {
 
                     // Intent that actually sets the shortcut
                     final Intent intent = new Intent();
-                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                    if (bitmap != null) {
+                        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapUtils.resizeAndCropCenter(bitmap, 96));
+                    }
                     intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
                     intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, displayName);
                     intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
