@@ -19,33 +19,72 @@
 package com.frostwire.light;
 
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 
 public final class ConfigurationManager {
-    private final ConfigurationDefaults defaults;
-    private final Preferences preferences;
-    private final LinkedHashSet<String> initializedKeys;
+    private final static Logger LOG = Logger.getLogger(ConfigurationManager.class);
+    private ConfigurationDefaults defaults;
+    private Preferences preferences;
+    private LinkedHashSet<String> initializedKeys;
+    private static ConfigurationManager instance;
+    private static AtomicReference state = new AtomicReference(State.CREATING);
+    private final static CountDownLatch creationLatch = new CountDownLatch(1);
 
-    private static class Loader {
-        static final ConfigurationManager instance = new ConfigurationManager();
+    private enum State {
+        CREATING,
+        CREATED
+    }
+
+    /** There should only be one call to this method in the entire app.
+     * Ideally all calls to ConfigurationManager.instance() should be done in background threads since initialization
+     * could in theory take time.
+     */
+    public static void create() {
+        if (State.CREATED == state.get()  && instance != null) {
+            return;
+        }
+        instance = new ConfigurationManager();
     }
 
     private ConfigurationManager() {
-        defaults = new ConfigurationDefaults();
-        preferences = Preferences.userRoot().node("com.frostwire.light");
-        initializedKeys = new LinkedHashSet<>();
-        initPreferences();
+        new Thread(this::initialize, "ConfigurationManager-initialize").start();
+    }
+
+    private void initialize() {
+        try {
+            defaults = new ConfigurationDefaults();
+            preferences = Preferences.userRoot().node("com.frostwire.light");
+            initializedKeys = new LinkedHashSet<>();
+            initPreferences();
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        } finally {
+            state.set(State.CREATED);
+            creationLatch.countDown();
+        }
     }
 
     public static ConfigurationManager instance() {
-        if (Loader.instance == null) {
+        if (state.get() == State.CREATING) {
+            try {
+                creationLatch.await();
+            } catch (InterruptedException e) {
+                if (instance == null) {
+                    throw new RuntimeException("ConfigurationManager not created, creationLatch thread interrupted");
+                }
+            }
+        }
+        if (State.CREATED == state.get() && instance == null) {
             throw new RuntimeException("ConfigurationManager not created");
         }
-        return Loader.instance;
+        return instance;
     }
 
     private void removePreference(String key) {
@@ -193,8 +232,6 @@ public final class ConfigurationManager {
         }
     }
 
-
-
     private void resetToDefaults(Map<String, Object> map) {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             if (entry.getValue() instanceof String) {
@@ -213,5 +250,13 @@ public final class ConfigurationManager {
                 setStringArray(entry.getKey(), (String[]) entry.getValue());
             }
         }
+    }
+
+    public static void main(String[] args) {
+        ConfigurationManager.create();
+        new Thread(ConfigurationManager::instance).start();
+        new Thread(ConfigurationManager::instance).start();
+        new Thread(ConfigurationManager::instance).start();
+        new Thread(ConfigurationManager::instance).start();
     }
 }
