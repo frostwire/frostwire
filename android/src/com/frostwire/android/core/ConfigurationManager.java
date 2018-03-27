@@ -18,7 +18,6 @@
 package com.frostwire.android.core;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -26,15 +25,15 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -52,19 +51,40 @@ public final class ConfigurationManager {
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
 
+    private static final Object lock = new Object();
+    private static Future<ConfigurationManager> instance2;
+
+    public static void create(@NonNull Context context) {
+        synchronized (lock) {
+            if (instance2 == null) {
+                instance2 = Engine.instance().getThreadPool().submit(() ->
+                        new ConfigurationManager(context.getApplicationContext())
+                );
+            }
+        }
+    }
+
+    public static ConfigurationManager instance() {
+        try {
+            return instance2.get();
+        } catch (Throwable e) {
+            throw new RuntimeException("ConfigurationManager not created", e);
+        }
+    }
+
     private enum State {
         CREATING,
         CREATED
     }
 
-    public synchronized static void create(@NonNull Context context) {
+    public synchronized static void createOld(@NonNull Context context) {
         if (State.CREATED == state.get() && instance != null) {
             return;
         }
         instance = new ConfigurationManager(context.getApplicationContext());
     }
 
-    public static ConfigurationManager instance() {
+    public static ConfigurationManager instanceOld() {
         if (state.get() == State.CREATING) {
             try {
                 creationLatch.await();
@@ -95,7 +115,7 @@ public final class ConfigurationManager {
     }
 
     private ConfigurationManager(Context context) {
-        async(this::initialize, context);
+        initialize(context);
     }
 
     public String getString(String key, String defValue) {
