@@ -19,6 +19,7 @@ package com.frostwire.android.core;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -56,11 +57,11 @@ public final class ConfigurationManager {
         CREATED
     }
 
-    public synchronized static void create(Application context) {
+    public synchronized static void create(@NonNull Context context) {
         if (State.CREATED == state.get() && instance != null) {
             return;
         }
-        instance = new ConfigurationManager(context);
+        instance = new ConfigurationManager(context.getApplicationContext());
     }
 
     public static ConfigurationManager instance() {
@@ -79,9 +80,9 @@ public final class ConfigurationManager {
         return instance;
     }
 
-    private void initialize(Application application) {
+    private void initialize(Context context) {
         try {
-            preferences = PreferenceManager.getDefaultSharedPreferences(application);
+            preferences = PreferenceManager.getDefaultSharedPreferences(context);
             defaults = new ConfigurationDefaults();
             initPreferences(preferences);
         } catch (Throwable t) {
@@ -93,8 +94,8 @@ public final class ConfigurationManager {
         }
     }
 
-    private ConfigurationManager(Application application) {
-        async(this::initialize, application);
+    private ConfigurationManager(Context context) {
+        async(this::initialize, context);
     }
 
     public String getString(String key, String defValue) {
