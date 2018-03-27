@@ -251,12 +251,4 @@ public final class ConfigurationManager {
             }
         }
     }
-
-    public static void main(String[] args) {
-        ConfigurationManager.create();
-        new Thread(ConfigurationManager::instance).start();
-        new Thread(ConfigurationManager::instance).start();
-        new Thread(ConfigurationManager::instance).start();
-        new Thread(ConfigurationManager::instance).start();
-    }
 }
