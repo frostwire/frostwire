@@ -31,9 +31,7 @@ import com.frostwire.util.Logger;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -45,19 +43,17 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class ConfigurationManager {
 
     private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
-    private static ConfigurationManager instance;
-    private static AtomicReference state = new AtomicReference(State.CREATING);
-    private final static CountDownLatch creationLatch = new CountDownLatch(1);
+
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
 
     private static final Object lock = new Object();
-    private static Future<ConfigurationManager> instance2;
+    private static Future<ConfigurationManager> instance;
 
     public static void create(@NonNull Context context) {
         synchronized (lock) {
-            if (instance2 == null) {
-                instance2 = Engine.instance().getThreadPool().submit(() ->
+            if (instance == null) {
+                instance = Engine.instance().getThreadPool().submit(() ->
                         new ConfigurationManager(context.getApplicationContext())
                 );
             }
@@ -66,56 +62,16 @@ public final class ConfigurationManager {
 
     public static ConfigurationManager instance() {
         try {
-            return instance2.get();
+            return instance.get();
         } catch (Throwable e) {
             throw new RuntimeException("ConfigurationManager not created", e);
         }
     }
 
-    private enum State {
-        CREATING,
-        CREATED
-    }
-
-    public synchronized static void createOld(@NonNull Context context) {
-        if (State.CREATED == state.get() && instance != null) {
-            return;
-        }
-        instance = new ConfigurationManager(context.getApplicationContext());
-    }
-
-    public static ConfigurationManager instanceOld() {
-        if (state.get() == State.CREATING) {
-            try {
-                creationLatch.await();
-            } catch (InterruptedException e) {
-                if (instance == null) {
-                    throw new RuntimeException("ConfigurationManager not created, creationLatch thread interrupted");
-                }
-            }
-        }
-        if (State.CREATED == state.get() && instance == null) {
-            throw new RuntimeException("ConfigurationManager not created");
-        }
-        return instance;
-    }
-
-    private void initialize(Context context) {
-        try {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            defaults = new ConfigurationDefaults();
-            initPreferences(preferences);
-        } catch (Throwable t) {
-            LOG.error("Error initializing ConfigurationManager", t, true);
-            throw t;
-        } finally {
-            state.set(State.CREATED);
-            creationLatch.countDown();
-        }
-    }
-
     private ConfigurationManager(Context context) {
-        initialize(context);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        defaults = new ConfigurationDefaults();
+        initPreferences(preferences);
     }
 
     public String getString(String key, String defValue) {
