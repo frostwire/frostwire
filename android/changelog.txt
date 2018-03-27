@@ -4,7 +4,7 @@ FrostWire 2.0.2 build 515 - MAR/26/2018
  - Zooqle search fixes
  - TorrentDownloads search fixes
  - LimeTorrents search fixes
- - Library updates: jlibtorrent 1.2.0.17, applovin 7.8.5, ogury 2.2.8, mopub 4.20.0, okhttp 3.10.0, gson 2.8.2, gradle 4.6, support libraries 27.1.0
+ - Library updates: jlibtorrent 1.2.0.17, applovin 7.8.5, ogury 2.2.8, mopub 4.20.0, okhttp 3.10.0, gson 2.8.2, gradle 4.6, gradle plugin 3.1.0, support libraries 27.1.0, gms 12.0.0
  - When audio files are deleted from "My Files" they're now cleared from "Recents" in "My Music"
  - Bug where deleted .torrent files would reappear fixed
  - Translations updated, Urdu update
