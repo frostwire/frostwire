@@ -57,7 +57,7 @@ public final class ConfigurationManager {
     }
 
     public synchronized static void create(Application context) {
-        if (State.CREATED == state.get()  && instance != null) {
+        if (State.CREATED == state.get() && instance != null) {
             return;
         }
         instance = new ConfigurationManager(context);
@@ -100,7 +100,7 @@ public final class ConfigurationManager {
     public String getString(String key, String defValue) {
         if (preferences == null) {
             LOG.error("getString(key=" + key + ", defValue=" + defValue + ") preferences == null");
-            throw new IllegalStateException("getString(key="+key+") failed, preferences:SharedPreferences is null");
+            throw new IllegalStateException("getString(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
         return preferences.getString(key, defValue);
     }
@@ -120,7 +120,7 @@ public final class ConfigurationManager {
     public int getInt(String key, int defValue) {
         if (preferences == null) {
             LOG.error("getInt(key=" + key + ", defValue=" + defValue + ") preferences == null");
-            throw new IllegalStateException("getInt(key="+key+") failed, preferences:SharedPreferences is null");
+            throw new IllegalStateException("getInt(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
         return preferences.getInt(key, defValue);
     }
@@ -140,7 +140,7 @@ public final class ConfigurationManager {
     public long getLong(String key, long defValue) {
         if (preferences == null) {
             LOG.error("getLong(key=" + key + ", defValue=" + defValue + ") preferences == null");
-            throw new IllegalStateException("getLong(key="+key+") failed, preferences:SharedPreferences is null");
+            throw new IllegalStateException("getLong(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
         return preferences.getLong(key, defValue);
     }
@@ -160,7 +160,7 @@ public final class ConfigurationManager {
     public boolean getBoolean(String key) {
         if (preferences == null) {
             LOG.error("getBoolean(key=" + key + ") preferences == null");
-            throw new IllegalStateException("getBoolean(key="+key+") failed, preferences:SharedPreferences is null");
+            throw new IllegalStateException("getBoolean(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
         return preferences.getBoolean(key, false);
     }
