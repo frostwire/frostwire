@@ -32,6 +32,8 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -56,6 +58,7 @@ public final class Main {
     }
 
     private Main() {
+        ConfigurationManager.create();
         ConfigurationManager configurationManager = ConfigurationManager.instance();
         final Map<ExecutorID, ExecutorService> EXECUTORS = initExecutorServices(configurationManager);
         setupBTEngineAsync(configurationManager, EXECUTORS);
@@ -106,22 +109,27 @@ public final class Main {
             aboutBuffer.appendString(JsonUtils.toJson(aboutMap));
 
             Vertx VERTX = Vertx.vertx(new VertxOptions().setWorkerPoolSize(4));
+
             HttpServerOptions httpServerOptions = new HttpServerOptions();
             //httpServerOptions.setSsl(true);
-            int randomPort = new Random(System.currentTimeMillis()).nextInt(1001) + 6969;
+            int randomPort = 9191; //new Random(System.currentTimeMillis()).nextInt(1001) + 6969;
             httpServerOptions.setPort(randomPort);
             HttpServer httpServer = VERTX.createHttpServer(httpServerOptions);
             httpServer.websocketHandler(websocket -> {
-                if (websocket.path().equals("/about")) {
+                if (websocket.path().equals("/wsabout")) {
                     websocket.end(aboutBuffer);
                 }
-                LOG.info("request handled by websocketHandler");
+                LOG.info("request (" + websocket.path() + ", " + websocket.binaryHandlerID() + ") handled by websocketHandler");
             });
-            httpServer.requestHandler(request -> {
+            httpServer.requestHandler((HttpServerRequest request) -> {
+                HttpServerResponse response = request.response();
                 if (request.path().equals("/about")) {
-                    request.response().
+                    response.
                             putHeader("Content-type", "text/json").
                             end(aboutBuffer);
+                } else {
+                    response.putHeader("Content-type", "text/plain");
+                    response.end("hello vertex.");
                 }
                 LOG.info("request handled by requestHandler");
             });

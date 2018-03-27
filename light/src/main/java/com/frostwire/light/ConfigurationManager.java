@@ -25,6 +25,8 @@ import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 
@@ -74,11 +76,14 @@ public final class ConfigurationManager {
     public static ConfigurationManager instance() {
         if (state.get() == State.CREATING) {
             try {
-                creationLatch.await();
+                creationLatch.await(1, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
                 if (instance == null) {
-                    throw new RuntimeException("ConfigurationManager not created, creationLatch thread interrupted");
+                    throw new RuntimeException("ConfigurationManager not created, forgot to call ConfigurationManager.create()? creationLatch thread interrupted.");
                 }
+            }
+            if (instance == null) {
+                throw new RuntimeException("ConfigurationManager not created, forgot to call ConfigurationManager.create()? creationLatch thread interrupted.");
             }
         }
         if (State.CREATED == state.get() && instance == null) {

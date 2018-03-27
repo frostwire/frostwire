@@ -21,6 +21,7 @@ repositories {
 dependencies {
     compile 'com.frostwire:jlibtorrent:1.2.0.16'
     compile 'io.vertx:vertx-core:3.5.0'
+    compile 'io.vertx:vertx-web:3.5.1'
 
 }
 
