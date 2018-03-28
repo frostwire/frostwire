@@ -51,8 +51,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The Librarian is in charge of:
@@ -66,38 +64,24 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class Librarian {
 
     private static final String TAG = "FW.Librarian";
+
+    private static final Object lock = new Object();
     private static Librarian instance;
-    private static AtomicReference state = new AtomicReference(State.CREATING);
-    private final static CountDownLatch creationLatch = new CountDownLatch(1);
-
-    private enum State {
-        CREATING,
-        CREATED
-    }
-
-    public synchronized static void create() {
-        if (State.CREATED == state.get()  && instance != null) {
-            return;
-        }
-        instance = new Librarian();
-        state.set(Librarian.State.CREATED);
-        creationLatch.countDown();
-    }
 
     public static Librarian instance() {
-        if (state.get() == Librarian.State.CREATING) {
-            try {
-                creationLatch.await();
-            } catch (InterruptedException e) {
-                if (instance == null) {
-                    throw new RuntimeException("Librarian not created, creationLatch interrupted");
-                }
+        if (instance != null) { // quick check to avoid lock
+            return instance;
+        }
+
+        synchronized (lock) {
+            if (instance == null) {
+                instance = new Librarian();
             }
+            return instance;
         }
-        if (Librarian.State.CREATED == state.get() && instance == null) {
-            throw new RuntimeException("Librarian not created");
-        }
-        return instance;
+    }
+
+    private Librarian() {
     }
 
     public List<FileDescriptor> getFiles(final Context context, byte fileType, int offset, int pageSize) {
