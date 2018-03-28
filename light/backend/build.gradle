@@ -2,7 +2,7 @@ group 'com.frostwire'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
-apply from: '../common/dependencies.gradle'
+apply from: '../../common/dependencies.gradle'
 
 sourceCompatibility = 1.8
 
@@ -28,12 +28,12 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDir '../common/src/main/java'
-            srcDir 'backend/main/java'
+            srcDir '../../common/src/main/java'
+            srcDir 'src/main/java'
         }
 
         resources {
-            srcDir 'backend/src/resources'
+            srcDir 'resources'
             include '**/*.properties'
             include '**/*.png'
             include '**/*.gif'
@@ -42,6 +42,12 @@ sourceSets {
             include '**/*.js'
             include '**/*.json'
             exclude '**/*.DS_Store'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'src/test/java'
         }
     }
 }

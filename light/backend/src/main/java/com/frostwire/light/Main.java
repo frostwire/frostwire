@@ -46,7 +46,7 @@ import static com.frostwire.light.Main.ExecutorID.GENERAL;
 // IntelliJ Run configuration:
 // Main Class: com.frostwire.light.Main
 // VM Options: -Djava.library.path=lib
-// Use classpath of module: light_main
+// Use classpath of module: backend_main
 
 public final class Main {
     private static Logger LOG = Logger.getLogger(Main.class);
