@@ -103,6 +103,7 @@ public class MainApplication extends Application {
     private void ignoreHardwareMenu() {
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
+            @SuppressWarnings("JavaReflectionMemberAccess")
             Field f = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
             if (f != null) {
                 f.setAccessible(true);
