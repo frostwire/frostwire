@@ -29,11 +29,11 @@ sourceSets {
     main {
         java {
             srcDir '../common/src/main/java'
-            srcDir 'src/main/java'
+            srcDir 'backend/main/java'
         }
 
         resources {
-            srcDir 'src/resources'
+            srcDir 'backend/src/resources'
             include '**/*.properties'
             include '**/*.png'
             include '**/*.gif'
