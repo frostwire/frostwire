@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.light;
 
 import com.frostwire.util.JsonUtils;
@@ -24,10 +23,9 @@ import com.frostwire.util.Logger;
 import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.prefs.Preferences;
 
 public final class ConfigurationManager {
@@ -35,29 +33,26 @@ public final class ConfigurationManager {
     private ConfigurationDefaults defaults;
     private Preferences preferences;
     private LinkedHashSet<String> initializedKeys;
-    private static ConfigurationManager instance;
-    private static AtomicReference state = new AtomicReference(State.CREATING);
-    private final static CountDownLatch creationLatch = new CountDownLatch(1);
+    private static Future<ConfigurationManager> instance;
 
-    private enum State {
-        CREATING,
-        CREATED
-    }
 
     /** There should only be one call to this method in the entire app.
      * Ideally all calls to ConfigurationManager.instance() should be done in background threads since initialization
      * could in theory take time.
      */
     public static void create() {
-        if (State.CREATED == state.get()  && instance != null) {
-            return;
+        if (instance != null) {
+            throw new RuntimeException("ConfigurationManager.create() should only be called once, instance was already created.");
         }
-        instance = new ConfigurationManager();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        instance = executorService.submit(() -> {
+            ConfigurationManager r = new ConfigurationManager();
+            r.initialize();
+            return r;
+        });
+        executorService.shutdown();
     }
 
-    private ConfigurationManager() {
-        new Thread(this::initialize, "ConfigurationManager-initialize").start();
-    }
 
     private void initialize() {
         try {
@@ -67,29 +62,18 @@ public final class ConfigurationManager {
             initPreferences();
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
-        } finally {
-            state.set(State.CREATED);
-            creationLatch.countDown();
         }
     }
 
     public static ConfigurationManager instance() {
-        if (state.get() == State.CREATING) {
-            try {
-                creationLatch.await(1, TimeUnit.MINUTES);
-            } catch (InterruptedException e) {
-                if (instance == null) {
-                    throw new RuntimeException("ConfigurationManager not created, forgot to call ConfigurationManager.create()? creationLatch thread interrupted.");
-                }
-            }
-            if (instance == null) {
-                throw new RuntimeException("ConfigurationManager not created, forgot to call ConfigurationManager.create()? creationLatch thread interrupted.");
-            }
-        }
-        if (State.CREATED == state.get() && instance == null) {
+        if (instance == null) {
             throw new RuntimeException("ConfigurationManager not created");
         }
-        return instance;
+        try {
+            return instance.get();
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     private void removePreference(String key) {
