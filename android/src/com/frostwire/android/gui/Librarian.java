@@ -93,21 +93,20 @@ public final class Librarian {
     }
 
     /**
-     * @param fileType
-     * @return int
+     * @param fileType the file type
+     * @return the number of files registered in the providers
      */
-    public int getNumFiles(final Context context, byte fileType) {
+    public int getNumFiles(Context context, byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
         Cursor c = null;
 
-        int result;
         int numFiles = 0;
 
         try {
             ContentResolver cr = context.getContentResolver();
             c = cr.query(fetcher.getContentUri(), new String[]{BaseColumns._ID}, fetcher.where(), fetcher.whereArgs(), null);
             numFiles = c != null ? c.getCount() : 0;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             Log.e(TAG, "Failed to get num of files", e);
         } finally {
             if (c != null) {
@@ -115,9 +114,7 @@ public final class Librarian {
             }
         }
 
-        result = numFiles;
-
-        return result;
+        return numFiles;
     }
 
     public FileDescriptor getFileDescriptor(final Context context, byte fileType, int fileId) {
@@ -154,6 +151,7 @@ public final class Librarian {
      * Deletes files.
      * If the fileType is audio it'll use MusicUtils.deleteTracks and
      * tell apollo to clean everything there, playslists, recents, etc.
+     *
      * @param context
      * @param fileType
      * @param fds
@@ -172,7 +170,7 @@ public final class Librarian {
             }
             // wish I could do just trackIdsToDelete.toArray(new long[0]) ...
             long[] songsArray = new long[trackIdsToDelete.size()];
-            int i=0;
+            int i = 0;
             for (Long l : trackIdsToDelete) {
                 songsArray[i++] = l;
             }
