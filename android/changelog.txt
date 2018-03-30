@@ -1,3 +1,7 @@
+FrostWire 2.0.3 build 516 - MAR/30/2018
+ - Fixes a title refresh issue on My Files when switching file types
+ - Library updates
+
 FrostWire 2.0.2 build 515 - MAR/26/2018
  - Application startup is faster
  - Faster YT downloads
