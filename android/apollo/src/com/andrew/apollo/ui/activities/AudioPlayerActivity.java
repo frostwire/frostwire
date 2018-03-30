@@ -187,6 +187,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     // 'advertisement' label
     private TextView mAdvertisementText;
 
+    private TextView removeAdsTextView;
+
     // Button to dismiss album art
     private ImageButton mDismissAlbumArtAdButton;
 
@@ -292,6 +294,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mFallbackAd = findView(R.id.audio_player_fallback_imageview);
         mDismissAlbumArtAdButton = findView(R.id.audio_player_dismiss_mopubview_button);
         mAdvertisementText = findView(R.id.audio_player_advertisement_text);
+        removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
         initAlbumArtBanner();
         initRemoveAds();
 
@@ -300,14 +303,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         PlayerGestureListener gestureListener = new PlayerGestureListener();
         gestureDetector = new GestureDetector(this, gestureListener);
         gestureDetector.setOnDoubleTapListener(gestureListener);
-        findView(R.id.audio_player_album_art).setOnTouchListener(gestureListener);
+        mAlbumArt.setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
     }
 
     private void initRemoveAds() {
-        TextView removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
-
         if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)) {
             removeAdsTextView.setVisibility(View.GONE);
             removeAdsTextView.setOnClickListener(null);
@@ -706,7 +707,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
             loadFallbackBanner();
 
-            //mMopubAd.setTesting(true);
+            mMopubAd.setTesting(false);
             mMopubAd.setAutorefreshEnabled(true);
             mMopubAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
             mMopubAd.setKeywords(keywords.toString());
@@ -736,7 +737,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             bannerView.setVisibility(adVisibility);
             mDismissAlbumArtAdButton.setVisibility(adVisibility);
             mAdvertisementText.setVisibility(adVisibility);
-            TextView removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
+
             if (removeAdsTextView != null) {
                 removeAdsTextView.setVisibility(Offers.removeAdsOffersEnabled() && visible ?
                         View.VISIBLE : View.GONE);
