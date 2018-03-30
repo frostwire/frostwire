@@ -144,6 +144,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         @Override
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded()");
+            mAlbumArt.setVisibility(View.GONE);
             setBannerViewVisibility(mFallbackAd, false);
             setBannerViewVisibility(mMopubAd, true);
             PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(AudioPlayerActivity.this, banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
@@ -170,6 +171,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public void onBannerCollapsed(MoPubView banner) {
             LOG.info("onBannerCollapsed");
             setBannerViewVisibility(mMopubAd, false);
+            mAlbumArt.setVisibility(View.VISIBLE);
         }
     };
 
@@ -178,6 +180,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public void onClick(View view) {
             setBannerViewVisibility(mMopubAd, false);
             setBannerViewVisibility(mFallbackAd, false);
+            mAlbumArt.setVisibility(View.VISIBLE);
         }
     };
 
@@ -722,6 +725,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private void loadFallbackBanner() {
         LOG.info("loadFallbackBanner");
         InHouseBannerFactory.loadAd(mFallbackAd, InHouseBannerFactory.AdFormat.BIG_300x250);
+        mAlbumArt.setVisibility(View.GONE);
         setBannerViewVisibility(mMopubAd, false);
         setBannerViewVisibility(mFallbackAd, true);
     }
@@ -729,15 +733,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private void setBannerViewVisibility(View bannerView, boolean visible) {
         if (bannerView != null && mDismissAlbumArtAdButton != null) {
             int adVisibility = visible ? View.VISIBLE : View.GONE;
-            int albumArtVisibility = visible ? View.GONE : View.VISIBLE;
             bannerView.setVisibility(adVisibility);
-            if (adVisibility == View.VISIBLE) {
-                bannerView.requestLayout();
-            }
             mDismissAlbumArtAdButton.setVisibility(adVisibility);
             mAdvertisementText.setVisibility(adVisibility);
-            mAlbumArt.setVisibility(albumArtVisibility);
-
             TextView removeAdsTextView = findView(R.id.audio_player_remove_ads_text_link);
             if (removeAdsTextView != null) {
                 removeAdsTextView.setVisibility(Offers.removeAdsOffersEnabled() && visible ?

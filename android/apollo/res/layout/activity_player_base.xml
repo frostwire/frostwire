@@ -164,7 +164,6 @@
                                 android:id="@+id/audio_player_dismiss_mopubview_button"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignRight="@+id/audio_player_advertisement_text"
                                 android:layout_gravity="center_vertical|right"
                                 android:layout_marginRight="10dp"
                                 android:background="@null"
@@ -172,11 +171,12 @@
                                 android:visibility="gone" />
                         </LinearLayout>
 
+                        <!-- mopub banner -->
                         <com.mopub.mobileads.MoPubView
                             android:id="@+id/audio_player_mopubview"
                             android:layout_width="match_parent"
                             android:layout_height="250dp"
-                            android:visibility="gone" />
+                            android:visibility="gone"/>
 
                         <ImageView
                             android:id="@+id/audio_player_fallback_imageview"

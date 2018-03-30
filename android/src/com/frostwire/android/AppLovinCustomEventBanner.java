@@ -82,20 +82,7 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
         if (adSize != null) {
             final AppLovinSdk sdk = retrieveSdk(serverExtras, context);
             sdk.setPluginVersion("MoPub-2.1.3");
-            final AppLovinAdView adView = createAdView(adSize, context, customEventBannerListener);
-            adView.setAdLoadListener(new AppLovinAdLoadListener() {
-                @Override
-                public void adReceived(final AppLovinAd ad) {
-                    LOG.debug("Successfully loaded banner ad");
-                    customEventBannerListener.onBannerLoaded(adView);
-                }
-
-                @Override
-                public void failedToReceiveAd(final int errorCode) {
-                    LOG.error("Failed to load banner ad with code: " + errorCode);
-                    customEventBannerListener.onBannerFailed(toMoPubErrorCode(errorCode));
-                }
-            });
+            final AppLovinAdView adView = new AppLovinAdView(sdk, adSize, context);
             adView.setAdDisplayListener(new AppLovinAdDisplayListener() {
                 @Override
                 public void adDisplayed(final AppLovinAd ad) {
@@ -135,6 +122,8 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                     });
                 }
             };
+            adView.setAdLoadListener(adLoadListener);
+
             // Zones support is available on AppLovin SDK 7.5.0 and higher
             final String zoneId;
             if (AppLovinSdk.VERSION_CODE >= 750 && serverExtras != null && serverExtras.containsKey("zone_id")) {
@@ -143,8 +132,9 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 zoneId = null;
             }
             if (zoneId != null && zoneId.length() > 0) {
-                loadNextAd(sdk, zoneId, adLoadListener, customEventBannerListener);
+                sdk.getAdService().loadNextAdForZoneId(zoneId, adLoadListener);
             } else {
+                //adView.loadNextAd(); //the old way, it works, it sets a regular size
                 sdk.getAdService().loadNextAd(adSize, adLoadListener);
             }
         } else {
@@ -195,33 +185,6 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
     //
     // Utility Methods
     //
-
-    private AppLovinAdView createAdView(final AppLovinAdSize size, final Context parentContext, final CustomEventBannerListener customEventBannerListener) {
-        AppLovinAdView adView = null;
-        try {
-            // AppLovin SDK < 7.1.0 uses an Activity, as opposed to Context in >= 7.1.0
-            final Class<?> contextClass = (AppLovinSdk.VERSION_CODE < 710) ? Activity.class : Context.class;
-            final Constructor<?> constructor = AppLovinAdView.class.getConstructor(AppLovinAdSize.class, contextClass);
-            adView = (AppLovinAdView) constructor.newInstance(size, parentContext);
-        } catch (Throwable th) {
-            LOG.error("Unable to get create AppLovinAdView.", th);
-            customEventBannerListener.onBannerFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
-        }
-        return adView;
-    }
-
-    private void loadNextAd(final AppLovinSdk sdk, final String zoneId, final AppLovinAdLoadListener adLoadListener, final CustomEventBannerListener customEventBannerListener) {
-        // Dynamically load an ad for a given zone without breaking backwards compatibility for publishers on older SDKs
-        try {
-            final Method method = sdk.getAdService().getClass().getMethod("loadNextAdForZoneId", String.class, AppLovinAdLoadListener.class);
-            method.invoke(sdk.getAdService(), zoneId, adLoadListener);
-        } catch (Throwable th) {
-            LOG.error("Unable to load ad for zone: " + zoneId + "...");
-            customEventBannerListener.onBannerFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
-        }
-    }
-
-
     private static MoPubErrorCode toMoPubErrorCode(final int applovinErrorCode) {
         if (applovinErrorCode == AppLovinErrorCodes.NO_FILL) {
             return MoPubErrorCode.NETWORK_NO_FILL;
