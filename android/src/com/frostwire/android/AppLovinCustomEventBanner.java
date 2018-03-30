@@ -54,12 +54,13 @@ import java.util.Map;
  */
 
 
+@SuppressWarnings("unused")
 public class AppLovinCustomEventBanner extends CustomEventBanner {
     private static final Logger LOG = Logger.getLogger(AppLovinCustomEventBanner.class);
 
-    private static final int BANNER_STANDARD_HEIGHT         = 50;
+    private static final int BANNER_STANDARD_HEIGHT = 50;
     private static final int BANNER_HEIGHT_OFFSET_TOLERANCE = 10;
-    private static final int LEADER_STANDARD_HEIGHT         = 90;
+    private static final int LEADER_STANDARD_HEIGHT = 90;
     private static final int LEADER_HEIGHT_OFFSET_TOLERANCE = 16;
 
     private static final String AD_WIDTH_KEY = "com_mopub_ad_width";
@@ -172,8 +173,8 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
             if (width > 0 && height > 0) {
                 LOG.debug("Valid width (" + width + ") and height (" + height + ") provided");
                 // Assume fluid width, and check for height with offset tolerance
-                final int bannerOffset = Math.abs( BANNER_STANDARD_HEIGHT - height );
-                final int leaderOffset = Math.abs( LEADER_STANDARD_HEIGHT - height );
+                final int bannerOffset = Math.abs(BANNER_STANDARD_HEIGHT - height);
+                final int leaderOffset = Math.abs(LEADER_STANDARD_HEIGHT - height);
                 if (bannerOffset <= BANNER_HEIGHT_OFFSET_TOLERANCE) {
                     return AppLovinAdSize.BANNER;
                 } else if (leaderOffset <= LEADER_HEIGHT_OFFSET_TOLERANCE) {
@@ -252,6 +253,7 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
             this.customEventBannerListener = customEventBannerListener;
         }
 
+        @SuppressWarnings("RedundantThrows")
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
             final String methodName = method.getName();
             if ("adOpenedFullscreen".equals(methodName)) {
