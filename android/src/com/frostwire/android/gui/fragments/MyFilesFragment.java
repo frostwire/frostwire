@@ -52,6 +52,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
@@ -79,6 +80,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -467,6 +470,12 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             headerTitle.setText(fileTypeStr);
             headerTotal.setText("");
         }
+
+        async(this, (f, ft) -> Librarian.instance().getNumFiles(f.getActivity(), ft),
+                fileType,
+                MyFilesFragment::updateHeaderPostTask);
+
+        /*
         peer.finger(getActivity(),
                 // the finger task will only call this callback if it still has a weak reference to the context
                 (context, finger) -> {
@@ -510,6 +519,19 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                         });
                     }
                 });
+                */
+    }
+
+    private void updateHeaderPostTask(byte fileType, int numFiles) {
+        if (header != null && fileType == lastFileType) {
+            headerTotal.setText("(" + String.valueOf(numFiles) + ")");
+        }
+        if (adapter == null) {
+            clickFileTypeTab(lastFileType);
+        }
+        refreshCheckBoxMenuItemVisibility();
+        MusicUtils.stopSimplePlayer();
+        restoreListViewScrollPosition();
     }
 
     private void clickFileTypeTab(byte lastFileType) {
