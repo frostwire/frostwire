@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -474,52 +474,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         async(this, (f, ft) -> Librarian.instance().getNumFiles(f.getActivity(), ft),
                 fileType,
                 MyFilesFragment::updateHeaderPostTask);
-
-        /*
-        peer.finger(getActivity(),
-                // the finger task will only call this callback if it still has a weak reference to the context
-                (context, finger) -> {
-                    if (isAdded() && isVisible()) {
-                        getActivity().runOnUiThread(() -> {
-                            if (header != null) {
-                                byte fileType2 = adapter != null ? adapter.getFileType() : Constants.FILE_TYPE_AUDIO;
-                                int numTotal = 0;
-                                switch (fileType2) {
-                                    case Constants.FILE_TYPE_TORRENTS:
-                                        numTotal = finger.numTotalTorrentFiles;
-                                        break;
-                                    case Constants.FILE_TYPE_AUDIO:
-                                        numTotal = finger.numTotalAudioFiles;
-                                        break;
-                                    case Constants.FILE_TYPE_DOCUMENTS:
-                                        numTotal = finger.numTotalDocumentFiles;
-                                        break;
-                                    case Constants.FILE_TYPE_PICTURES:
-                                        numTotal = finger.numTotalPictureFiles;
-                                        break;
-                                    case Constants.FILE_TYPE_RINGTONES:
-                                        numTotal = finger.numTotalRingtoneFiles;
-                                        break;
-                                    case Constants.FILE_TYPE_VIDEOS:
-                                        numTotal = finger.numTotalVideoFiles;
-                                        break;
-                                }
-                                if (fileType != fileType2) {
-                                    String fileTypeStr = getString(R.string.my_filetype, UIUtils.getFileTypeAsString(MyFilesFragment.this.getResources(), fileType2));
-                                    headerTitle.setText(fileTypeStr);
-                                }
-                                headerTotal.setText("(" + String.valueOf(numTotal) + ")");
-                            }
-                            if (adapter == null) {
-                                clickFileTypeTab(lastFileType);
-                            }
-                            refreshCheckBoxMenuItemVisibility();
-                            MusicUtils.stopSimplePlayer();
-                            restoreListViewScrollPosition();
-                        });
-                    }
-                });
-                */
     }
 
     private void updateHeaderPostTask(byte fileType, int numFiles) {

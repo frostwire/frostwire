@@ -221,15 +221,6 @@ public final class Librarian {
         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
-    public Finger finger(final Context context) {
-        return new Finger(getNumFiles(context, Constants.FILE_TYPE_AUDIO),
-                getNumFiles(context, Constants.FILE_TYPE_VIDEOS),
-                getNumFiles(context, Constants.FILE_TYPE_PICTURES),
-                getNumFiles(context, Constants.FILE_TYPE_DOCUMENTS),
-                getNumFiles(context, Constants.FILE_TYPE_TORRENTS),
-                getNumFiles(context, Constants.FILE_TYPE_RINGTONES));
-    }
-
     public void syncMediaStore(final WeakReference<Context> contextRef) {
         if (!SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
