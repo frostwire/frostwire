@@ -185,13 +185,21 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     @Override
-    public void onLoadFinished(Loader<Object> loader, Object data) {
-        if (data == null) {
+    public void onLoadFinished(Loader<Object> loader, Object dataObj) {
+        Object[] data = (Object[]) dataObj;
+        if (data == null || data.length < 2 || data[1] == null) {
             LOG.warn("Something wrong, data is null");
             return;
         }
+
+        byte fileType = (Byte) data[0];
+        if (fileType != lastFileType) {
+            // user already pressed another tab
+            return;
+        }
+
         if (loader.getId() == LOADER_FILES_ID) {
-            updateFiles((Object[]) data);
+            updateFiles(data);
         }
         updateHeader();
         if (swipeRefresh != null) {
