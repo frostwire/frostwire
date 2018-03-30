@@ -16,9 +16,6 @@
  */
 
 package com.frostwire.android;
-// I wanted this to be in com.frostwire.android.offers.AppLovinCustomEventBanner but it wasn't working.
-// instructions were very specific to have this be <PACKAGE_NAME>.AppLovinCustomEventBanner
-// therefore the file was renamed and moved here to be com.frostwire.android.AppLovinCustomEventBanner
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,19 +30,19 @@ import com.applovin.sdk.AppLovinErrorCodes;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
 import com.applovin.sdk.AppLovinSdkUtils;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.CustomEventBanner;
 import com.mopub.mobileads.MoPubErrorCode;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 
 /**
- * This is the MoPub Custom Banner adapter for AppLovin.
- * We have the interstitial adapter for MoPub on the standard location com.mopub.mobileads.AppLovinInterstitialAdapter
+ * This is the MoPub Custom Banner adapter for AppLovin. In this package due to AppLovin's docs.
+ * Note: We have the interstitial adapter for MoPub on the standard location com.mopub.mobileads.AppLovinInterstitialAdapter
  *
  * @author aldenml
  * @author gubatron
@@ -123,7 +120,6 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 }
             };
             adView.setAdLoadListener(adLoadListener);
-
             // Zones support is available on AppLovin SDK 7.5.0 and higher
             final String zoneId;
             if (AppLovinSdk.VERSION_CODE >= 750 && serverExtras != null && serverExtras.containsKey("zone_id")) {
@@ -132,9 +128,13 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 zoneId = null;
             }
             if (zoneId != null && zoneId.length() > 0) {
-                sdk.getAdService().loadNextAdForZoneId(zoneId, adLoadListener);
+                // temporary solution, uses zones only for search banners
+                if (context instanceof MainActivity) {
+                    sdk.getAdService().loadNextAdForZoneId(zoneId, adLoadListener);
+                } else {
+                    sdk.getAdService().loadNextAd(adSize, adLoadListener);
+                }
             } else {
-                //adView.loadNextAd(); //the old way, it works, it sets a regular size
                 sdk.getAdService().loadNextAd(adSize, adLoadListener);
             }
         } else {
@@ -182,6 +182,7 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
         }
         return null;
     }
+
     //
     // Utility Methods
     //
@@ -229,6 +230,7 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 // We will fire onLeaveApplication() in the adClicked() callback
                 LOG.debug("Banner left application");
             } else if ("adFailedToDisplay".equals(methodName)) {
+                LOG.debug("Banner failed to display");
             }
             return null;
         }
@@ -247,5 +249,4 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
         }
         return sdk;
     }
-
 }
