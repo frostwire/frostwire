@@ -26,7 +26,7 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-import com.google.gson.GsonBuilder;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
@@ -34,6 +34,10 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -62,7 +66,8 @@ public final class Main {
         ConfigurationManager configurationManager = ConfigurationManager.instance();
         final Map<ExecutorID, ExecutorService> EXECUTORS = initExecutorServices(configurationManager);
         setupBTEngineAsync(configurationManager, EXECUTORS);
-        initRoutesAsync(configurationManager, EXECUTORS);
+        RuntimeEnvironment runtimeEnvironment = RuntimeEnvironment.init();
+        initRoutesAsync(runtimeEnvironment, configurationManager, EXECUTORS);
     }
 
     private Map<ExecutorID, ExecutorService> initExecutorServices(final ConfigurationManager configurationManager) {
@@ -96,7 +101,9 @@ public final class Main {
         });
     }
 
-    private static void initRoutesAsync(final ConfigurationManager configurationManager, final Map<ExecutorID, ExecutorService> EXECUTORS) {
+    private static void initRoutesAsync(final RuntimeEnvironment runtimeEnvironment,
+                                        final ConfigurationManager configurationManager,
+                                        final Map<ExecutorID, ExecutorService> EXECUTORS) {
         EXECUTORS.get(GENERAL).execute(() -> {
             // All this to be moved to com.frostwire.light.api.RouteManager once we understand Vertx better
             final HashMap<String, String> aboutMap = new HashMap<>();
@@ -109,32 +116,30 @@ public final class Main {
             aboutBuffer.appendString(JsonUtils.toJson(aboutMap));
 
             Vertx VERTX = Vertx.vertx(new VertxOptions().setWorkerPoolSize(4));
+            Router router = Router.router(VERTX);
+
+            SockJSHandlerOptions options = new SockJSHandlerOptions().setHeartbeatInterval(2000);
+            SockJSHandler sockJSHandler = SockJSHandler.create(VERTX, options);
+            sockJSHandler.socketHandler(sockJSSocket -> sockJSSocket.write(sockJSSocket.uri()));
+
+            router.route("/api/*").handler(sockJSHandler);
+
+            StaticHandler staticHandler = StaticHandler.create();
+            staticHandler.setAlwaysAsyncFS(true);
+            staticHandler.setWebRoot("file:///Users/gubatron/workspace.frostwire/frostwire/light/frontend/src/");
+
+
+            router.route("/libs/*").handler(staticHandler);
 
             HttpServerOptions httpServerOptions = new HttpServerOptions();
             //httpServerOptions.setSsl(true);
             int randomPort = 9191; //new Random(System.currentTimeMillis()).nextInt(1001) + 6969;
             httpServerOptions.setPort(randomPort);
             HttpServer httpServer = VERTX.createHttpServer(httpServerOptions);
-            httpServer.websocketHandler(websocket -> {
-                if (websocket.path().equals("/wsabout")) {
-                    websocket.end(aboutBuffer);
-                }
-                LOG.info("request (" + websocket.path() + ", " + websocket.binaryHandlerID() + ") handled by websocketHandler");
-            });
-            httpServer.requestHandler((HttpServerRequest request) -> {
-                HttpServerResponse response = request.response();
-                if (request.path().equals("/about")) {
-                    response.
-                            putHeader("Content-type", "text/json").
-                            end(aboutBuffer);
-                } else {
-                    response.putHeader("Content-type", "text/plain");
-                    response.end("hello vertex.");
-                }
-                LOG.info("request handled by requestHandler");
-            });
-            httpServer.listen(randomPort);
-            LOG.info("FrostWire Light Server Listening on port (randomPort="+randomPort+")" + httpServer.actualPort());
+
+            httpServer.requestHandler(router::accept).listen();
+
+            LOG.info("FrostWire Light Server started at http://localhost:" + httpServer.actualPort());
         });
     }
 
