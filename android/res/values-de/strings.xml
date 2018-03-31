@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Offenlegung:</b> Obwohl für Ihre Downloads empfohlen, insbesondere beim Herunterladen oder Austausch sensibler Informationen (z. B. Bankgeschäfte) und bei der Nutzung öffentlicher Wi-Fi- oder mobiler Daten, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Hinweis:</b> Berühren angewendet Tags]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ihre Privatsphäre ist ein Grundrecht</b>. Eine ungeschützte Verbindung bedeutet, dass alles, was Sie online tun, einschließlich <b>Downloads, Suchen, Nachrichten</b>, von jedem in Ihrem Netzwerk überwacht und abgefangen werden kann, z. Internet Service Provider, Hacker, Regierungen.<br><br><b>Wir empfehlen DRINGLICH, einen VPN-Dienst zu verwenden</b>. <br> Hier sind einige Optionen, die einen zuverlässigen Service bieten und gut mit FrostWire funktionieren:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sie sind über ein VPN mit dem Internet verbunden. <br> <br> Wenn Sie es nicht bereits sind, empfehlen wir Ihnen, einen der folgenden Dienste zu verwenden, um Ihre Verbindung zu verschlüsseln und <b>Ihre Privatsphäre zu schützen</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Einstellungen</string>
     <string name="activity_chat_name">Chat</string>
