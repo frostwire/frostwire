@@ -110,7 +110,7 @@
                 android:layout_centerHorizontal="true"
                 android:padding="16dp"
                 android:scaleType="fitXY"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
 
 
             <FrameLayout
