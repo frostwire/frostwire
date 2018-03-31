@@ -22,6 +22,9 @@ import com.frostwire.util.Logger;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Map;
 
 public class SystemUtils {
 
@@ -414,6 +417,22 @@ public class SystemUtils {
         }
 
         return ("".equals(extention)) ? "" : getDefaultExtentionHandler(extention);
+    }
+
+    public static void printClasspath() {
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+
+        for(URL url: urls){
+            System.out.println(url.getFile());
+        }
+    }
+
+    public static void printEnvironmentVariables() {
+        Map<String, String> getenv = System.getenv();
+        for (String k : getenv.keySet()) {
+            System.out.println(k + " = " + getenv.get(k));
+        }
     }
 
     /*

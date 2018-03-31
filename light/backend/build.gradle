@@ -33,15 +33,11 @@ sourceSets {
         }
 
         resources {
-            srcDir 'resources'
-            include '**/*.properties'
-            include '**/*.png'
-            include '**/*.gif'
-            include '**/*.jpg'
-            include '**/*.html'
-            include '**/*.js'
-            include '**/*.json'
-            exclude '**/*.DS_Store'
+            srcDir '../frontend'
+            include 'webroot/index.html'
+            include 'webroot/**'
+            exclude 'webroot/*.DS_Store'
+            exclude 'webroot/**/*.DS_Store'
         }
     }
 

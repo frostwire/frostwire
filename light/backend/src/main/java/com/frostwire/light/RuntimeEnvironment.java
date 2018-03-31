@@ -58,11 +58,6 @@ public final class RuntimeEnvironment {
         this.osVersion = OSUtils.getOSVersion();
         this.osArchitecture = OSUtils.getArchitecture();
         this.fullOSString = OSUtils.getFullOS();
-
-        Map<String, String> getenv = System.getenv();
-        for (String k : getenv.keySet()) {
-            System.out.println(k + " = " + getenv.get(k));
-        }
     }
 
     public static RuntimeEnvironment init() {

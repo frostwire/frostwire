@@ -21,6 +21,7 @@ import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.light.platform.LightPlatform;
+import com.frostwire.light.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.JsonUtils;
@@ -35,6 +36,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
@@ -126,10 +128,7 @@ public final class Main {
 
             StaticHandler staticHandler = StaticHandler.create();
             staticHandler.setAlwaysAsyncFS(true);
-            staticHandler.setWebRoot("file:///Users/gubatron/workspace.frostwire/frostwire/light/frontend/src/");
-
-
-            router.route("/libs/*").handler(staticHandler);
+            router.route("/*").handler(staticHandler::handle);
 
             HttpServerOptions httpServerOptions = new HttpServerOptions();
             //httpServerOptions.setSsl(true);
@@ -138,6 +137,8 @@ public final class Main {
             HttpServer httpServer = VERTX.createHttpServer(httpServerOptions);
 
             httpServer.requestHandler(router::accept).listen();
+
+            SystemUtils.printClasspath();
 
             LOG.info("FrostWire Light Server started at http://localhost:" + httpServer.actualPort());
         });
