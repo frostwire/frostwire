@@ -47,13 +47,24 @@ public final class DeleteFileMenuAction extends MenuAction {
     private final FileListAdapter adapter;
     private final List<FileDescriptor> files;
     private final AbstractDialog.OnDialogClickListener onDialogClickListener;
+    private final byte fileType;
+
+    public DeleteFileMenuAction(Context context, byte fileType, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
+        this(context, fileType,null, files, clickListener);
+
+    }
 
     public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
-        this(context, adapter, files, null);
+        this(context, (byte) -1, adapter, files, null);
     }
 
     public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
+        this(context, (byte) -1, adapter, files, clickListener);
+    }
+
+    public DeleteFileMenuAction(Context context, byte fileType, FileListAdapter adapter, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
         super(context, R.drawable.contextmenu_icon_trash, files.size() > 1 ? R.string.delete_file_menu_action_count : R.string.delete_file_menu_action, files.size());
+        this.fileType = fileType;
         this.adapter = adapter;
         this.files = files;
         this.onDialogClickListener = clickListener;
@@ -76,6 +87,8 @@ public final class DeleteFileMenuAction extends MenuAction {
         if (adapter != null) {
             async(adapter, DeleteFileMenuAction::deleteFilesTask, files,
                     DeleteFileMenuAction::deleteFilesTaskPost);
+        } else if (getContext() != null && fileType != (byte) -1) {
+            async(getContext(), Librarian.instance()::deleteFiles, fileType, files);
         }
     }
 

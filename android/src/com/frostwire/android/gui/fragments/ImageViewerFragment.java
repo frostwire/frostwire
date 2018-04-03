@@ -326,7 +326,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                 case R.id.fragment_my_files_action_mode_menu_delete:
                     ArrayList<FileDescriptor> fdList = new ArrayList<>(1);
                     fdList.add(fd);
-                    new DeleteFileMenuAction(context, null, fdList, (tag, which) -> {
+                    new DeleteFileMenuAction(context, Constants.FILE_TYPE_PICTURES, fdList, (tag, which) -> {
                         if (which == 1) {
                             getActivity().finish();
                         }
