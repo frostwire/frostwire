@@ -30,6 +30,7 @@ import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.ThreadPool;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * @author gubatron
@@ -72,6 +74,7 @@ public final class LocalSearchEngine {
     }
 
     private LocalSearchEngine() {
+        SearchManager.create(new ThreadPool("SearchManager", 6, 6, 1L, new PriorityBlockingQueue<>(), true));
         this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override

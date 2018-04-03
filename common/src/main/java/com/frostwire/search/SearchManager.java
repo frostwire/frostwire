@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -44,18 +46,29 @@ public final class SearchManager {
 
     private SearchListener listener;
 
-    private SearchManager(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<>(), true);
+    private static final Object instanceLock = new Object();
+    private static Future<SearchManager> INSTANCE;
+    
+    public static void create(ExecutorService executorService) {
+        ExecutorService ephemeralExecutor = Executors.newFixedThreadPool(1);
+        synchronized (instanceLock) {
+            INSTANCE = ephemeralExecutor.submit(() -> new SearchManager(executorService));
+        }
+        ephemeralExecutor.shutdown();
+    }
+
+    private SearchManager(ExecutorService executorService) {
+        this.executor = executorService;
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
         this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
     }
 
-    private static class Loader {
-        static final SearchManager INSTANCE = new SearchManager(6);
-    }
-
     public static SearchManager getInstance() {
-        return Loader.INSTANCE;
+        try {
+            return INSTANCE.get();
+        } catch (Throwable t) {
+            throw new RuntimeException("SearchManager.INSTANCE not created yet");
+        }
     }
 
     public void perform(final SearchPerformer performer) {

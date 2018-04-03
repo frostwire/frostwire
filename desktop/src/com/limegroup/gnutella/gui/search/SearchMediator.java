@@ -26,6 +26,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.ThreadPool;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -37,6 +38,7 @@ import org.limewire.util.StringUtils;
 import javax.swing.*;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * This class acts as a mediator between the various search components --
@@ -149,6 +151,7 @@ public final class SearchMediator {
 
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
 
+        SearchManager.create(new ThreadPool("SearchManager", 6, 6, 1L, new PriorityBlockingQueue<>(), true));
         this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override
