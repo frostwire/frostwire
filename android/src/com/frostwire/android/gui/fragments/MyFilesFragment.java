@@ -53,7 +53,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
@@ -105,7 +104,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private TabLayout tabLayout;
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxListener;
     private boolean selectAllModeOn;
-    private final Peer peer;
     private View header;
     private TextView headerTitle;
     private TextView headerTotal;
@@ -155,7 +153,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         super(R.layout.fragment_my_files);
         broadcastReceiver = new LocalBroadcastReceiver();
         setHasOptionsMenu(true);
-        this.peer = new Peer();
         checkedItemsMap = new SparseArray<>();
         selectionModeCallback = new MyFilesActionModeCallback();
     }
@@ -420,7 +417,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     private Loader<Object> createLoaderFiles(final byte fileType) {
-        CreateLoaderFilesAsyncTaskLoader loader = new CreateLoaderFilesAsyncTaskLoader(getActivity(), fileType, peer);
+        CreateLoaderFilesAsyncTaskLoader loader = new CreateLoaderFilesAsyncTaskLoader(getActivity(), fileType);
         try {
             loader.forceLoad();
         } catch (Throwable t) {
@@ -432,13 +429,11 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private final static class CreateLoaderFilesAsyncTaskLoader extends AsyncTaskLoader<Object> {
 
         private final byte fileType;
-        private final Peer peer;
         private final WeakReference<Activity> activityRef;
 
-        public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType, Peer peer) {
+        public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType) {
             super(activity);
             this.fileType = fileType;
-            this.peer = peer;
             activityRef = Ref.weak(activity);
         }
 
@@ -446,7 +441,8 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         public Object loadInBackground() {
             if (Ref.alive(activityRef)) {
                 try {
-                    return new Object[]{fileType, peer.browse(activityRef.get(), fileType)};
+                    List<FileDescriptor> files = Librarian.instance().getFiles(activityRef.get(), fileType, 0, Integer.MAX_VALUE);
+                    return new Object[]{fileType, files};
                 } catch (Throwable e) {
                     LOG.error("Error performing finger", e);
                 }
@@ -464,10 +460,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     private void updateHeader() {
-        if (peer == null) {
-            LOG.warn("Something wrong. peer is null");
-            return;
-        }
         if (!isVisible()) {
             return;
         }
