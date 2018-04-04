@@ -27,17 +27,18 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.bridge.BridgeEventType;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.sockjs.BridgeEvent;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 
@@ -47,7 +48,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
-import static com.frostwire.light.Main.ExecutorID.GENERAL;
+import static com.frostwire.light.Main.ExecutorID.*;
 
 // IntelliJ Run configuration:
 // Main Class: com.frostwire.light.Main
@@ -60,6 +61,7 @@ public final class Main {
     enum ExecutorID {
         GENERAL,
         CLOUD_SEARCH,
+        TORRENT_INDEX_SEARCH,
         P2P_SEARCH
     }
 
@@ -68,14 +70,28 @@ public final class Main {
         ConfigurationManager configurationManager = ConfigurationManager.instance();
         final Map<ExecutorID, ExecutorService> EXECUTORS = initExecutorServices(configurationManager);
         setupBTEngineAsync(configurationManager, EXECUTORS);
-        RuntimeEnvironment runtimeEnvironment = RuntimeEnvironment.init();
-        initRoutesAsync(runtimeEnvironment, configurationManager, EXECUTORS);
+        RuntimeEnvironment runtimeEnvironment = RuntimeEnvironment.create();
+        initSearchEngines(runtimeEnvironment, configurationManager, EXECUTORS);
+        initRoutesAsync(runtimeEnvironment, configurationManager, EXECUTORS.get(GENERAL));
     }
 
     private Map<ExecutorID, ExecutorService> initExecutorServices(final ConfigurationManager configurationManager) {
         final Map<ExecutorID, ExecutorService> executorsMap = new HashMap<>();
-        executorsMap.put(GENERAL, ThreadPool.newThreadPool(GENERAL.name(), 8, false));
+        executorsMap.put(GENERAL, ThreadPool.newThreadPool(GENERAL.name(), 4, false));
+        executorsMap.put(TORRENT_INDEX_SEARCH, ThreadPool.newThreadPool(TORRENT_INDEX_SEARCH.name(), 4, false));
+        executorsMap.put(CLOUD_SEARCH, ThreadPool.newThreadPool(CLOUD_SEARCH.name(), 4, false));
+        executorsMap.put(P2P_SEARCH, ThreadPool.newThreadPool(P2P_SEARCH.name(), 1, false));
         return executorsMap;
+    }
+
+    private static void initSearchEngines(final RuntimeEnvironment runtimeEnvironment,
+                                          final ConfigurationManager configurationManager,
+                                          final Map<ExecutorID, ExecutorService> EXECUTORS) {
+        LocalSearchEngine.create(
+                runtimeEnvironment.userAgent,
+                EXECUTORS.get(CLOUD_SEARCH),
+                EXECUTORS.get(TORRENT_INDEX_SEARCH),
+                EXECUTORS.get(P2P_SEARCH));
     }
 
     private static void setupBTEngineAsync(final ConfigurationManager configurationManager, final Map<ExecutorID, ExecutorService> EXECUTORS) {
@@ -105,11 +121,11 @@ public final class Main {
 
     private static void initRoutesAsync(final RuntimeEnvironment runtimeEnvironment,
                                         final ConfigurationManager configurationManager,
-                                        final Map<ExecutorID, ExecutorService> EXECUTORS) {
-        EXECUTORS.get(GENERAL).execute(() -> {
+                                        ExecutorService executorService) {
+        executorService.execute(() -> {
             // All this to be moved to com.frostwire.light.api.RouteManager once we understand Vertx better
             final HashMap<String, String> aboutMap = new HashMap<>();
-            aboutMap.put("serverVersion", Constants.FROSTWIRE_VERSION_STRING + "b" + Constants.FROSTWIRE_BUILD);
+            aboutMap.put("serverVersion", runtimeEnvironment.frostWireVersion + "b" + runtimeEnvironment.frostWireBuild);
             aboutMap.put("java", Constants.JAVA_VERSION);
             aboutMap.put("jlibtorrent", LibTorrent.jlibtorrentVersion());
             aboutMap.put("boost", LibTorrent.boostVersion());
@@ -122,9 +138,26 @@ public final class Main {
 
             SockJSHandlerOptions options = new SockJSHandlerOptions().setHeartbeatInterval(2000);
             SockJSHandler sockJSHandler = SockJSHandler.create(VERTX, options);
-            sockJSHandler.socketHandler(sockJSSocket -> sockJSSocket.write(sockJSSocket.uri()));
+            BridgeOptions bridgeOptions = new BridgeOptions();
+            PermittedOptions permittedOptions = new PermittedOptions();
+            permittedOptions.setAddress("search");
 
-            router.route("/api/*").handler(sockJSHandler);
+            bridgeOptions.addInboundPermitted(permittedOptions);
+            bridgeOptions.addOutboundPermitted(permittedOptions);
+
+            sockJSHandler.bridge(bridgeOptions, (BridgeEvent be) -> {
+                if (be != null && be.type() == BridgeEventType.SOCKET_CLOSED) {
+                    LOG.info("Handler<BridgeEvent> socket closed from " + be.socket().remoteAddress());
+                }
+                JsonObject rawMessage = be.getRawMessage();
+                // SEND: From Client to Server
+                if (be != null && rawMessage != null && be.type() == BridgeEventType.SEND) {
+                    LOG.info("Handler<BridgeEvent> message:\n" + rawMessage.encodePrettily() + "\n");
+                }
+                be.complete(true);
+            });
+
+            router.route("/bus/*").handler(sockJSHandler);
 
             StaticHandler staticHandler = StaticHandler.create();
             staticHandler.setAlwaysAsyncFS(true);
@@ -138,13 +171,12 @@ public final class Main {
 
             httpServer.requestHandler(router::accept).listen();
 
-            SystemUtils.printClasspath();
-
             LOG.info("FrostWire Light Server started at http://localhost:" + httpServer.actualPort());
         });
     }
 
     public static void main(String[] args) {
+        SystemUtils.printClasspath();
         new Main();
     }
 }
