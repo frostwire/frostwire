@@ -18,6 +18,7 @@
 package com.frostwire.android.gui;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -37,8 +38,6 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.util.Logger;
 
-import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID;
-import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_STATUS_NOTIFICATION;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -48,7 +47,6 @@ import static com.frostwire.android.util.Asyncs.async;
 public final class NotificationUpdateDemon implements TimerObserver {
 
     private static final Logger LOG = Logger.getLogger(NotificationUpdateDemon.class);
-
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
     private final Context mParentContext;
@@ -77,7 +75,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
             try {
-                manager.cancel(FROSTWIRE_STATUS_NOTIFICATION);
+                manager.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
             } catch (SecurityException t) {
                 // possible java.lang.SecurityException
             }
@@ -110,7 +108,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
                     try {
-                        manager.cancel(FROSTWIRE_STATUS_NOTIFICATION);
+                        manager.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
                     } catch (SecurityException ignored) {
                         // possible java.lang.SecurityException
                     }
@@ -126,9 +124,15 @@ public final class NotificationUpdateDemon implements TimerObserver {
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 try {
-                    notificationManager.notify(FROSTWIRE_STATUS_NOTIFICATION, notificationObject);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
+                        channel.setSound(null, null);
+                        notificationManager.createNotificationChannel(channel);
+                    }
+                    notificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
                 } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
+                    ignored.printStackTrace();
                 } catch (Throwable ignored2) {
                     // possible android.os.TransactionTooLargeException
                     ignored2.printStackTrace();
@@ -150,7 +154,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_shutdown, shutdownIntent);
         remoteViews.setOnClickPendingIntent(R.id.view_permanent_status_text_title, showFrostWireIntent);
-        Notification notification = new NotificationCompat.Builder(mParentContext, FROSTWIRE_NOTIFICATION_CHANNEL_ID).
+        Notification notification = new NotificationCompat.Builder(mParentContext, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).
                 setSmallIcon(R.drawable.frostwire_notification_flat).
                 setContentIntent(showFrostWireIntent).
                 setContent(remoteViews).

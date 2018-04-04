@@ -18,6 +18,7 @@
 package com.frostwire.android.gui.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -62,9 +63,6 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author aldenml
  */
 public class EngineService extends Service implements IEngineService {
-
-    public final static int FROSTWIRE_STATUS_NOTIFICATION = 0x4ac4642a; // just a random number
-    public final static String FROSTWIRE_NOTIFICATION_CHANNEL_ID = String.valueOf(FROSTWIRE_STATUS_NOTIFICATION);
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
@@ -249,7 +247,7 @@ public class EngineService extends Service implements IEngineService {
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
             PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            Notification notification = new NotificationCompat.Builder(context, EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+            Notification notification = new NotificationCompat.Builder(context, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setWhen(System.currentTimeMillis())
                     .setContentText(getString(R.string.download_finished))
                     .setContentTitle(getString(R.string.download_finished))
@@ -260,6 +258,11 @@ public class EngineService extends Service implements IEngineService {
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             if (manager != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
+                    channel.setSound(null, null);
+                    manager.createNotificationChannel(channel);
+                }
                 manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
             }
         } catch (Throwable e) {

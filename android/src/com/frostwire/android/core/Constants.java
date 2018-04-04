@@ -151,8 +151,6 @@ public final class Constants {
 
     public static final String ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS = "frostwire.prefs.gui.asked_for_access_coarse_location_permissions";
 
-    public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 1001;
-
     // generic file types
     public static final byte FILE_TYPE_AUDIO = 0x00;
     public static final byte FILE_TYPE_PICTURES = 0x01;
@@ -202,6 +200,12 @@ public final class Constants {
     public static final String PIA_VPN_URL = "https://www.privateinternetaccess.com/pages/android-vpn-app/FROSTWIRE";
     public static final String EXPRESSVPN_URL = "https://www.linkev.com/internet-security/private-vpn/buy?a_aid=frostwire";
     public static final String NORDVPN_URL = "https://go.nordvpn.net/SH14c";
+
+    public static final int NOTIFICATION_FROSTWIRE_STATUS = 1000;
+    public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 1001;
+    public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 1002;
+
+    public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
 
     private Constants() {
     }

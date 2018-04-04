@@ -432,7 +432,7 @@ public class MusicPlaybackService extends Service {
     /**
      * Used to track whether any of Apollo's activities is in the foreground
      */
-    private boolean mAnyActivityInForeground = false;
+    private boolean musicPlaybackActivityInForeground = false;
 
     /**
      * Lock screen controls
@@ -786,7 +786,7 @@ public class MusicPlaybackService extends Service {
             final String action = intent.getAction();
 
             if (intent.hasExtra(NOW_IN_FOREGROUND)) {
-                mAnyActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
+                musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
                 updateNotification();
             }
 
@@ -895,10 +895,9 @@ public class MusicPlaybackService extends Service {
         if (mNotificationHelper == null) {
             return;
         }
-
-        if (!mAnyActivityInForeground && isPlaying()) {
+        if (!musicPlaybackActivityInForeground && isPlaying()) {
             async(this, MusicPlaybackService::updateNotificationTask);
-        } else if (mAnyActivityInForeground) {
+        } else if (musicPlaybackActivityInForeground) {
             mNotificationHelper.killNotification();
             if (!isPlaying()) {
                 updateRemoteControlClient(PLAYSTATE_STOPPED);
@@ -1592,7 +1591,7 @@ public class MusicPlaybackService extends Service {
         } else {
             musicPlaybackService.saveQueue(false);
         }
-        if (PLAYSTATE_CHANGED.equals(change)) {
+        if (PLAYSTATE_CHANGED.equals(change) || META_CHANGED.equals(change)) {
             musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
         }
     }
@@ -2457,7 +2456,7 @@ public class MusicPlaybackService extends Service {
                 mPlayer.pause();
                 scheduleDelayedShutdown();
                 mIsSupposedToBePlaying = false;
-                if (mAnyActivityInForeground) {
+                if (musicPlaybackActivityInForeground) {
                     updateRemoteControlClient(PLAYSTATE_STOPPED);
                 } else {
                     notifyChange(PLAYSTATE_CHANGED);

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
@@ -61,7 +60,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                     NotificationManager notificationService = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
                     if (notificationService != null) {
                         try {
-                            notificationService.cancel(EngineService.FROSTWIRE_STATUS_NOTIFICATION);
+                            notificationService.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
                         } catch (Throwable t) {
                             // possible java.lang.SecurityException
                         }

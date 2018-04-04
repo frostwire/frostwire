@@ -1,6 +1,6 @@
-FrostWire 2.0.3 build 516 - MAR/30/2018
+FrostWire 2.0.3 build 517 - APR/04/2018
  - Fixes a title refresh issue on My Files when switching file types
- - Library updates
+ - Library updates: applovin 7.8.6, gms 12.0.1
 
 FrostWire 2.0.2 build 515 - MAR/26/2018
  - Application startup is faster

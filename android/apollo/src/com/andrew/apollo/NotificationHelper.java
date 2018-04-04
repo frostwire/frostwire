@@ -12,6 +12,7 @@
 package com.andrew.apollo;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -22,8 +23,7 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.frostwire.android.R;
-
-import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_NOTIFICATION_CHANNEL_ID;
+import com.frostwire.android.core.Constants;
 
 /**
  * Builds the notification for Apollo's service. Jelly Bean and higher uses the
@@ -32,13 +32,7 @@ import static com.frostwire.android.gui.services.EngineService.FROSTWIRE_NOTIFIC
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class NotificationHelper {
-
     private static final String INTENT_AUDIO_PLAYER = "com.frostwire.android.AUDIO_PLAYER";
-
-    /**
-     * Notification ID
-     */
-    private static final int APOLLO_MUSIC_SERVICE = 1;
 
     /**
      * Used to allow player controls on lock screen notification on API 21+ phones
@@ -99,10 +93,9 @@ public class NotificationHelper {
         PendingIntent pendingintent = getPendingIntent();
 
         // Notification Builder
-        Notification aNotification = new NotificationCompat.Builder(mService, FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+        Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
-                .setPriority(Notification.PRIORITY_DEFAULT)
                 .setVisibility(VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
                 .build();
@@ -123,8 +116,9 @@ public class NotificationHelper {
 
         mNotification = aNotification;
         try {
-            mService.startForeground(APOLLO_MUSIC_SERVICE, mNotification);
+            mService.startForeground(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
         } catch (Throwable ignored) {
+            ignored.printStackTrace();
         }
         // TODO: research RuntimeException in Android 7
         // we are getting this error at Bitmap.nativeWriteToParcel(Native Method:0)
@@ -164,7 +158,12 @@ public class NotificationHelper {
         }
         try {
             if (mNotification != null) {
-                mNotificationManager.notify(APOLLO_MUSIC_SERVICE, mNotification);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+                    channel.setSound(null, null);
+                    mNotificationManager.createNotificationChannel(channel);
+                }
+                mNotificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
             }
         } catch (SecurityException t) {
             // java.lang.SecurityException
