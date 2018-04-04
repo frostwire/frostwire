@@ -18,9 +18,9 @@
 package com.frostwire.light;
 
 import com.frostwire.light.util.OSUtils;
+import com.frostwire.search.frostclick.UserAgent;
 
 import java.io.File;
-import java.util.Map;
 
 public final class RuntimeEnvironment {
     final RuntimeMode mode;
@@ -33,6 +33,9 @@ public final class RuntimeEnvironment {
     final String osVersion;
     final String osArchitecture;
     final String fullOSString;
+    final String frostWireVersion;
+    final int frostWireBuild;
+    final UserAgent userAgent;
 
     enum RuntimeMode {
         DEVELOPMENT,
@@ -58,9 +61,13 @@ public final class RuntimeEnvironment {
         this.osVersion = OSUtils.getOSVersion();
         this.osArchitecture = OSUtils.getArchitecture();
         this.fullOSString = OSUtils.getFullOS();
+
+        this.frostWireVersion = Constants.FROSTWIRE_VERSION_STRING;
+        this.frostWireBuild = Constants.FROSTWIRE_BUILD;
+        this.userAgent = new UserAgent(fullOSString, Constants.FROSTWIRE_VERSION_STRING, String.valueOf(Constants.FROSTWIRE_BUILD));
     }
 
-    public static RuntimeEnvironment init() {
+    public static RuntimeEnvironment create() {
         File pwd = new File(".");
         String[] list = pwd.list();
 
