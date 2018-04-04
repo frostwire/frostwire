@@ -197,13 +197,12 @@ public final class Librarian {
         } catch (Throwable e) {
             Log.e(TAG, "Failed to delete files from media store", e);
         }
-        if (fileType == Constants.FILE_TYPE_TORRENTS) {
-            FileSystem fs = Platforms.fileSystem();
-            for (FileDescriptor fd : fds) {
-                try {
-                    fs.delete(new File(fd.filePath));
-                } catch (Throwable ignored) {
-                }
+
+        FileSystem fs = Platforms.fileSystem();
+        for (FileDescriptor fd : fds) {
+            try {
+                fs.delete(new File(fd.filePath));
+            } catch (Throwable ignored) {
             }
         }
 
