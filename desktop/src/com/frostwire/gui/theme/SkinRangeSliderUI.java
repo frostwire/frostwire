@@ -373,6 +373,20 @@ public class SkinRangeSliderUI extends SynthSliderUI {
                         slider.setValueIsAdjusting(true);
                         adjustingThumbRect = rect;
                         adjustingThumbIndex = i;
+
+                        // since the slider have a bias towards the first thumb
+                        // it is necessary to correct the actual selection once
+                        // the second is behind the first one and both to the
+                        // left
+                        if (slider.getOrientation() == JSlider.HORIZONTAL &&
+                                adjustingThumbIndex == 0 &&
+                                thumbRects[1].equals(rect)) {
+                            int halfThumbWidth = rect.width / 2;
+                            int thumbLeft = ui.xPositionForValue(mSlider.getValueAt(1) - 1) - halfThumbWidth;
+                            if (thumbLeft <= 1) {
+                                adjustingThumbIndex = 1;
+                            }
+                        }
                         return;
                     }
                 }
