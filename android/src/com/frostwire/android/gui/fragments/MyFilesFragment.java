@@ -429,23 +429,19 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private final static class CreateLoaderFilesAsyncTaskLoader extends AsyncTaskLoader<Object> {
 
         private final byte fileType;
-        private final WeakReference<Activity> activityRef;
 
-        public CreateLoaderFilesAsyncTaskLoader(Activity activity, byte fileType) {
-            super(activity);
+        CreateLoaderFilesAsyncTaskLoader(Context context, byte fileType) {
+            super(context);
             this.fileType = fileType;
-            activityRef = Ref.weak(activity);
         }
 
         @Override
         public Object loadInBackground() {
-            if (Ref.alive(activityRef)) {
-                try {
-                    List<FileDescriptor> files = Librarian.instance().getFiles(activityRef.get(), fileType, 0, Integer.MAX_VALUE);
-                    return new Object[]{fileType, files};
-                } catch (Throwable e) {
-                    LOG.error("Error performing finger", e);
-                }
+            try {
+                List<FileDescriptor> files = Librarian.instance().getFiles(getContext(), fileType, 0, Integer.MAX_VALUE);
+                return new Object[]{fileType, files};
+            } catch (Throwable e) {
+                LOG.error("Error performing finger", e);
             }
             return null;
         }
