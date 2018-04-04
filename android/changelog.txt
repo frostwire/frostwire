@@ -1,4 +1,5 @@
 FrostWire 2.0.3 build 517 - APR/04/2018
+ - Issues with Android 8.0 notifications fixed
  - Fixes a title refresh issue on My Files when switching file types
  - Library updates: applovin 7.8.6, gms 12.0.1
 
