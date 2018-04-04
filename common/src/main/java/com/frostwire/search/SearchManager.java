@@ -57,7 +57,7 @@ public final class SearchManager {
         ephemeralExecutor.shutdown();
     }
 
-    private SearchManager(ExecutorService executorService) {
+    public SearchManager(ExecutorService executorService) {
         this.executor = executorService;
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
         this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
@@ -72,9 +72,6 @@ public final class SearchManager {
     }
 
     public void perform(final SearchPerformer performer) {
-//        if (performer == null) {
-//            throw new IllegalArgumentException("Search performer argument can't be null");
-//        }
         if (performer != null) {
             if (performer.getToken() < 0) {
                 throw new IllegalArgumentException("Search token id must be >= 0");
