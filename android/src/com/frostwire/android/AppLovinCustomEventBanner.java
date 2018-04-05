@@ -128,7 +128,7 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 zoneId = null;
             }
             if (zoneId != null && zoneId.length() > 0) {
-                // temporary solution, uses zones only for search banners
+                // FIXME: temporary solution, uses zones only for search banners, mrects not working
                 if (context instanceof MainActivity) {
                     sdk.getAdService().loadNextAdForZoneId(zoneId, adLoadListener);
                 } else {

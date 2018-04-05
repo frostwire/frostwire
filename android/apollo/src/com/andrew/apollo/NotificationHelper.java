@@ -167,6 +167,9 @@ public class NotificationHelper {
             }
         } catch (SecurityException t) {
             // java.lang.SecurityException
+        } catch (NullPointerException t2) {
+            // possible java.lang.NullPointerException: Attempt to read from field 'android.os.Bundle android.app.Notification.extras' on a null object reference
+            // when closing the player notification with the 'X' icon.
         }
     }
 
@@ -235,37 +238,29 @@ public class NotificationHelper {
      */
     private PendingIntent retrievePlaybackActions(final int which) {
         Intent action;
-        PendingIntent pendingIntent;
         final ComponentName serviceName = new ComponentName(mService, MusicPlaybackService.class);
         switch (which) {
             case 1:
                 // Play and pause
                 action = new Intent(MusicPlaybackService.TOGGLEPAUSE_ACTION);
-                action.setComponent(serviceName);
-                pendingIntent = PendingIntent.getService(mService, 1, action, 0);
-                return pendingIntent;
+                break;
             case 2:
                 // Skip tracks
                 action = new Intent(MusicPlaybackService.NEXT_ACTION);
-                action.setComponent(serviceName);
-                pendingIntent = PendingIntent.getService(mService, 2, action, 0);
-                return pendingIntent;
+                break;
             case 3:
                 // Previous tracks
                 action = new Intent(MusicPlaybackService.PREVIOUS_ACTION);
-                action.setComponent(serviceName);
-                pendingIntent = PendingIntent.getService(mService, 3, action, 0);
-                return pendingIntent;
+                break;
             case 4:
                 // Stop and collapse the notification
                 action = new Intent(MusicPlaybackService.STOP_ACTION);
-                action.setComponent(serviceName);
-                pendingIntent = PendingIntent.getService(mService, 4, action, 0);
-                return pendingIntent;
-            default:
                 break;
+            default:
+                return null;
         }
-        return null;
+        action.setComponent(serviceName);
+        return PendingIntent.getService(mService, which, action, 0);
     }
 
     /**
