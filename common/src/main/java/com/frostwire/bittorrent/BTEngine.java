@@ -231,8 +231,7 @@ public final class BTEngine extends SessionManager {
 
     private SessionParams defaultParams() {
         SettingsPack sp = defaultSettings();
-        SessionParams params = new SessionParams(sp);
-        return params;
+        return new SessionParams(sp);
     }
 
     @Override
@@ -306,11 +305,9 @@ public final class BTEngine extends SessionManager {
 
             boolean changed = false;
             for (int i = 0; i < selection.length; i++) {
-                if (selection[i]) {
-                    if (priorities[i] == Priority.IGNORE) {
-                        priorities[i] = Priority.NORMAL;
-                        changed = true;
-                    }
+                if (selection[i] && priorities[i] == Priority.IGNORE) {
+                    priorities[i] = Priority.NORMAL;
+                    changed = true;
                 }
             }
 
@@ -361,11 +358,9 @@ public final class BTEngine extends SessionManager {
         if (priorities != null) {
             boolean changed = false;
             for (int i = 0; i < selection.length; i++) {
-                if (selection[i] && i < priorities.length) {
-                    if (priorities[i] == Priority.IGNORE) {
-                        priorities[i] = Priority.NORMAL;
-                        changed = true;
-                    }
+                if (selection[i] && i < priorities.length && priorities[i] == Priority.IGNORE) {
+                    priorities[i] = Priority.NORMAL;
+                    changed = true;
                 }
             }
 
