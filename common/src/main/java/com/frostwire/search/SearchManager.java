@@ -50,12 +50,6 @@ public final class SearchManager {
         }
     }
 
-    /**
-     * This constructor has been made public for usages on which a SearchEngine might want to manage multiple
-     * SearchManager instances, like on frostwire light's LocalSearchEngine Implementation, which has
-     * 3 different SearchManagers for different groups of SearchPerformers
-     * <insert skeptical black kid meme here>
-     */
     public static SearchManager getInstance() {
         try {
             return INSTANCE;
@@ -64,6 +58,12 @@ public final class SearchManager {
         }
     }
 
+    /**
+     * This constructor has been made public for usages on which a SearchEngine might want to manage multiple
+     * SearchManager instances, like on frostwire light's LocalSearchEngine Implementation, which has
+     * 3 different SearchManagers for different groups of SearchPerformers
+     * <insert skeptical black kid meme here>
+     */
     public SearchManager(ExecutorService executorService) {
         this.executor = executorService;
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
