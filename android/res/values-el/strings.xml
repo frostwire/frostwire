@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Αποκάλυψη:</b> Αν και συνιστάται για τις λήψεις σας, ιδίως όταν κάνετε λήψη ή ανταλλάσσετε ευαίσθητες πληροφορίες (π.χ. τραπεζικά) και ενώ χρησιμοποιείτε δημόσια δεδομένα Wi-Fi ή κινητά, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Η ιδιωτική σας ζωή είναι ένα θεμελιώδες ανθρώπινο δικαίωμα</b>. Μια μη προστατευμένη σύνδεση σημαίνει ότι ό, τι κάνετε online, συμπεριλαμβανομένων των <b>λήψεων, αναζητήσεων, μηνυμάτων</b>, μπορεί να παρακολουθείται και να παρεμποδίζεται από οποιονδήποτε στο δίκτυό σας, π.χ. Πάροχοι υπηρεσιών διαδικτύου, χάκερ, κυβερνήσεις.<br><br><b>We STRONGLY recommend using a VPN service</b>. <br> Εδώ είναι μερικές επιλογές που παρέχουν αξιόπιστες υπηρεσίες και λειτουργούν καλά με το FrostWire:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Συνδέεστε στο Internet χρησιμοποιώντας ένα VPN. <br><br> Αν δεν το έχετε ήδη, συνιστούμε να χρησιμοποιήσετε μία από τις παρακάτω υπηρεσίες για να κρυπτογραφήσετε τη σύνδεσή σας και <b>να διαφυλάξετε τα προσωπικά σας δεδομένα</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="activity_chat_name">Chat</string>
@@ -672,4 +674,51 @@
     <string name="invalid_tracker_url">Μη έγκυρη διεύθυνση URL παρακολούθησης</string>
     <string name="frostwire_start_engine_service_security_exception">Το FrostWire δεν μπορούσε να ξεκινήσει σωστά λόγω έλλειψης αδειών. Παραχωρήστε τα απαιτούμενα δικαιώματα και κάντε επανεκκίνηση της εφαρμογής</string>
     <string name="vpn_find_out_more">Βρες περισσότερα</string>
+
+
+    <string name="uploaded">Μεταφορτώθηκε</string>
+    <string name="trackers">Trackers</string>
+    <string name="source_type">Πηγή: %1$s</string>
+    <string name="transfer_detail_storage_header">Διαδρομή αποθήκευσης:</string>
+    <string name="seeding_time">Χρόνος σποράς</string>
+    <string name="working">Εργαζόμενος</string>
+    <string name="rtt_ms">RTT %1$d ms</string>
+    <string name="pieces">Τεμάχια</string>
+    <string name="upload_limit">Όριο μεταφόρτωσης</string>
+    <string name="enter_valid_tracker_url_here">Εισαγάγετε την έγκυρη url παρακολούθησης εδώ</string>
+    <string name="add_trackers">Προσθέστε ιχνηλάτες</string>
+    <string name="edit">Επεξεργασία</string>
+    <string name="active_time">Ενεργός χρόνος</string>
+    <string name="status">Κατάσταση</string>
+    <string name="speed_limits">Ορια ταχύτητας</string>
+    <string name="created_on">Δημιουργήθηκε στο</string>
+    <string name="number_of_files">Αριθμός αρχείων</string>
+    <string name="pieces_header">Τεμάχια:</string>
+    <string name="share_ratio">Αναλογία μετοχών</string>
+    <string name="download_limit">Λήψη ορίου</string>
+    <string name="seeding_on">Ενεργοποίηση σποράς</string>
+    <string name="edit_tracker">Επεξεργασία tracker</string>
+    <string name="down_speed">Λήψη ταχύτητας</string>
+    <string name="completed">Ολοκληρώθηκε το</string>
+    <string name="downloaded">Λήψη</string>
+    <string name="n_peers">%1$d PEERS</string>
+    <string name="sequential_download">Διαδοχική λήψη</string>
+    <string name="downloaded_n">Λήψη %1$s / </string>
+    <string name="transfer_detail_title_header">Ονομα:</string>
+    <string name="m_of_n_strings">%1$s/%2$s</string>
+    <string name="time_elapsed">Time elapsed</string>
+    <string name="remove_tracker">Κατάργηση tracker</string>
+    <string name="comment">Σχόλιο</string>
+    <string name="up_speed">Ταχύτητα μεταφόρτωσης</string>
+    <string name="add">Προσθέτω</string>
+    <string name="time_left">Υπολειπόμενος χρόνος</string>
+    <string name="n_files">%1$d ΑΡΧΕΙΑ</string>
+    <string name="total_size">Συνολικό μέγεθος</string>
+    <string name="show_torrent_details">Εμφάνιση λεπτομερειών Torrent</string>
+    <string name="uploaded_n">Μεταφορτώθηκε %1$s</string>
+    <string name="m_of_n_decimals">%1$d από %2$d</string>
+    <string name="details">Λεπτομέριες</string>
+    <string name="title_activity_transfer_detail">Λεπτομέρειες μεταφοράς</string>
+    <string name="piece_size_header">Μέγεθος τεμαχίου:</string>
+    <string name="add_tracker">Προσθήκη tracker</string>
 </resources>
