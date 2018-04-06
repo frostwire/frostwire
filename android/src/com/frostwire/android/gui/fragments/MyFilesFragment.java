@@ -56,7 +56,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.Peer;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
-import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
@@ -730,7 +730,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             final FileDescriptor fd = fileDescriptorItem.fd;
             switch (item.getItemId()) {
                 case R.id.fragment_my_files_action_mode_menu_delete:
-                    new DeleteFileMenuAction(context, adapter, fileDescriptors).onClick();
+                    new DeleteAdapterFilesMenuAction(context, adapter, fileDescriptors, null).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_seed:
                     new SeedAction(context, fd, null).onClick();
