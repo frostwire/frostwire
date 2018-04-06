@@ -39,7 +39,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.adapters.menu.DeleteFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.DeleteSingleFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
@@ -324,9 +324,7 @@ public final class ImageViewerFragment extends AbstractFragment {
             Activity context = getActivity();
             switch (item.getItemId()) {
                 case R.id.fragment_my_files_action_mode_menu_delete:
-                    ArrayList<FileDescriptor> fdList = new ArrayList<>(1);
-                    fdList.add(fd);
-                    new DeleteFileMenuAction(context, Constants.FILE_TYPE_PICTURES, fdList, (tag, which) -> {
+                    new DeleteSingleFileMenuAction(context, Constants.FILE_TYPE_PICTURES, fd, (tag, which) -> {
                         if (which == 1) {
                             getActivity().finish();
                         }

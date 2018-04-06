@@ -32,8 +32,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -42,31 +41,16 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author aldenml
  * @author marcelinkaaa
  */
-public final class DeleteFileMenuAction extends MenuAction {
+public final class DeleteSingleFileMenuAction extends MenuAction {
 
-    private final FileListAdapter adapter;
-    private final List<FileDescriptor> files;
+    private final FileDescriptor fileDescriptor;
     private final AbstractDialog.OnDialogClickListener onDialogClickListener;
     private final byte fileType;
 
-    public DeleteFileMenuAction(Context context, byte fileType, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
-        this(context, fileType,null, files, clickListener);
-
-    }
-
-    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files) {
-        this(context, (byte) -1, adapter, files, null);
-    }
-
-    public DeleteFileMenuAction(Context context, FileListAdapter adapter, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
-        this(context, (byte) -1, adapter, files, clickListener);
-    }
-
-    public DeleteFileMenuAction(Context context, byte fileType, FileListAdapter adapter, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
-        super(context, R.drawable.contextmenu_icon_trash, files.size() > 1 ? R.string.delete_file_menu_action_count : R.string.delete_file_menu_action, files.size());
+    public DeleteSingleFileMenuAction(Context context, byte fileType, FileDescriptor file, AbstractDialog.OnDialogClickListener clickListener) {
+        super(context, R.drawable.contextmenu_icon_trash, R.string.delete_file_menu_action);
         this.fileType = fileType;
-        this.adapter = adapter;
-        this.files = files;
+        this.fileDescriptor = file;
         this.onDialogClickListener = clickListener;
     }
 
@@ -83,37 +67,17 @@ public final class DeleteFileMenuAction extends MenuAction {
         DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener).show(((Activity) getContext()).getFragmentManager());
     }
 
-    private void deleteFiles() {
-        if (adapter != null) {
-            async(adapter, DeleteFileMenuAction::deleteFilesTask, files,
-                    DeleteFileMenuAction::deleteFilesTaskPost);
-        } else if (getContext() != null && fileType != (byte) -1) {
-            async(getContext(), Librarian.instance()::deleteFiles, fileType, files);
+    private void deleteFile() {
+        if (getContext() != null && fileType != (byte) -1) {
+            async(getContext(), Librarian.instance()::deleteFiles, fileType, Arrays.asList(fileDescriptor));
         }
-    }
-
-    private static void deleteFilesTask(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
-        byte fileType = fileListAdapter.getFileType();
-        Librarian.instance().deleteFiles(fileListAdapter.getContext(), fileType, new ArrayList<>(files));
-
-        int size = files.size();
-        for (int i = 0; i < size; i++) {
-            try {
-                FileDescriptor fd = files.get(i);
-                fileListAdapter.deleteItem(fd); // only notifies if in main thread
-            } catch (Throwable ignored) {}
-        }
-    }
-
-    private static void deleteFilesTaskPost(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
-        fileListAdapter.notifyDataSetChanged();
     }
 
     @SuppressWarnings("WeakerAccess")
     public static class DeleteFileMenuActionDialog extends AbstractDialog {
-        private static DeleteFileMenuAction action;
+        private static DeleteSingleFileMenuAction action;
 
-        public static DeleteFileMenuActionDialog newInstance(DeleteFileMenuAction action, AbstractDialog.OnDialogClickListener onDialogClickListener) {
+        public static DeleteFileMenuActionDialog newInstance(DeleteSingleFileMenuAction action, OnDialogClickListener onDialogClickListener) {
             DeleteFileMenuActionDialog.action = action;
             DeleteFileMenuActionDialog deleteFileMenuActionDialog = new DeleteFileMenuActionDialog();
             if (onDialogClickListener != null) {
@@ -157,7 +121,7 @@ public final class DeleteFileMenuAction extends MenuAction {
         @Override
         public void onClick(View view) {
             if (delete) {
-                DeleteFileMenuActionDialog.action.deleteFiles();
+                DeleteFileMenuActionDialog.action.deleteFile();
             }
             newDeleteFilesDialog.dismiss();
             if (DeleteFileMenuActionDialog.action.getOnDialogClickListener() != null) {
