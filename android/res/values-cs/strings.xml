@@ -21,6 +21,8 @@
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Klepněte na aplikované značky na]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Zveřejnění:</b> Ačkoli doporučen pro vaše stahování, zejména při každém stahování nebo výměně citlivých informací (např. bankovnictví) a při používání veřejných Wi-Fi nebo mobilních dat, <b>nepotřebujete VPN použít FrostWire. </b>]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Vaše soukromí je základním lidským právem</b>. Nechránené připojení znamená, že vše, co děláte online, včetně <b>stažení, vyhledávání a zasílání zpráv</b>, může být sledováno a zachyceno kýmkoli ve vaší síti, např. Poskytovatelé internetových služeb, hackeři, vlády.<br><br><b>Důrazně doporučujeme používat službu VPN</b>. <br> Zde jsou některé možnosti, které poskytují spolehlivý servis a fungují dobře s aplikací FrostWire:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Připojíte se k síti Internet pomocí VPN. <br><br> Pokud nejste již, doporučujeme použít jednu z níže uvedených služeb pro šifrování vašeho připojení a <b>zabezpečení vašeho soukromí</b>. ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Nastavení</string>
     <string name="activity_chat_name">Chat</string>
