@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.frostwire.search;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.ThreadPool;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -28,9 +27,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * @author gubatron
@@ -45,30 +41,33 @@ public final class SearchManager {
     private final List<WeakReference<SearchTable>> tables;
 
     private SearchListener listener;
+    private static SearchManager INSTANCE;
 
-    private static final Object instanceLock = new Object();
-    private static Future<SearchManager> INSTANCE;
-    
+    /** Use create() when you only need a single SearchManager accessed via SearchManager.getInstance()*/
     public static void create(ExecutorService executorService) {
-        ExecutorService ephemeralExecutor = Executors.newFixedThreadPool(1);
-        synchronized (instanceLock) {
-            INSTANCE = ephemeralExecutor.submit(() -> new SearchManager(executorService));
+        if (INSTANCE == null) {
+            INSTANCE = new SearchManager(executorService);
         }
-        ephemeralExecutor.shutdown();
+    }
+
+    /**
+     * This constructor has been made public for usages on which a SearchEngine might want to manage multiple
+     * SearchManager instances, like on frostwire light's LocalSearchEngine Implementation, which has
+     * 3 different SearchManagers for different groups of SearchPerformers
+     * <insert skeptical black kid meme here>
+     */
+    public static SearchManager getInstance() {
+        try {
+            return INSTANCE;
+        } catch (Throwable t) {
+            throw new RuntimeException("SearchManager.INSTANCE not created yet");
+        }
     }
 
     public SearchManager(ExecutorService executorService) {
         this.executor = executorService;
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
         this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
-    }
-
-    public static SearchManager getInstance() {
-        try {
-            return INSTANCE.get();
-        } catch (Throwable t) {
-            throw new RuntimeException("SearchManager.INSTANCE not created yet");
-        }
     }
 
     public void perform(final SearchPerformer performer) {
