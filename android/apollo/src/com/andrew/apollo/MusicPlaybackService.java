@@ -41,7 +41,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -1591,7 +1590,7 @@ public class MusicPlaybackService extends Service {
         } else {
             musicPlaybackService.saveQueue(false);
         }
-        if (PLAYSTATE_CHANGED.equals(change) || META_CHANGED.equals(change)) {
+        if (PLAYSTATE_CHANGED.equals(change)) {//) || META_CHANGED.equals(change)) {
             musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
         }
     }
@@ -1645,6 +1644,10 @@ public class MusicPlaybackService extends Service {
 
         if (what == null) {
             return;
+        }
+
+        if (PLAYSTATE_STOPPED.equals(what) && mNotificationHelper != null) {
+            mNotificationHelper.killNotification();
         }
 
         switch (what) {
@@ -3326,7 +3329,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void openFile(final String path) throws RemoteException {
+        public void openFile(final String path) {
             if (Ref.alive(mService)) {
                 mService.get().openFile(path, result -> {
                     // do nothing
@@ -3338,7 +3341,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void open(final long[] list, final int position) throws RemoteException {
+        public void open(final long[] list, final int position) {
             if (list != null && Ref.alive(mService)) {
                 mService.get().open(list, position);
             }
@@ -3348,7 +3351,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void stop() throws RemoteException {
+        public void stop() {
             if (Ref.alive(mService)) {
                 mService.get().stop();
             }
@@ -3358,7 +3361,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void pause() throws RemoteException {
+        public void pause() {
             if (Ref.alive(mService)) {
                 mService.get().pause();
             }
@@ -3368,21 +3371,21 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void play() throws RemoteException {
+        public void play() {
             if (Ref.alive(mService)) {
                 mService.get().play();
             }
         }
 
         @Override
-        public void playSimple(String path) throws RemoteException {
+        public void playSimple(String path) {
             if (Ref.alive(mService)) {
                 mService.get().playSimple(path);
             }
         }
 
         @Override
-        public void stopSimplePlayer() throws RemoteException {
+        public void stopSimplePlayer() {
             if (Ref.alive(mService)) {
                 mService.get().stopSimplePlayer();
             }
@@ -3393,7 +3396,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void prev() throws RemoteException {
+        public void prev() {
             if (Ref.alive(mService)) {
                 mService.get().prev();
             }
@@ -3403,7 +3406,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void next() throws RemoteException {
+        public void next() {
             if (Ref.alive(mService)) {
                 mService.get().gotoNext(true);
             }
@@ -3413,7 +3416,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void enqueue(final long[] list, final int action) throws RemoteException {
+        public void enqueue(final long[] list, final int action) {
             if (list != null && Ref.alive(mService)) {
                 mService.get().enqueue(list, action);
             }
@@ -3423,7 +3426,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void setQueuePosition(final int index) throws RemoteException {
+        public void setQueuePosition(final int index) {
             if (Ref.alive(mService)) {
                 mService.get().setQueuePosition(index);
             }
@@ -3433,7 +3436,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void setShuffleMode(final int shufflemode) throws RemoteException {
+        public void setShuffleMode(final int shufflemode) {
             if (Ref.alive(mService)) {
                 mService.get().setShuffleMode(shufflemode);
             }
@@ -3443,7 +3446,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void setRepeatMode(final int repeatmode) throws RemoteException {
+        public void setRepeatMode(final int repeatmode) {
             if (Ref.alive(mService)) {
                 mService.get().setRepeatMode(repeatmode);
             }
@@ -3453,7 +3456,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void moveQueueItem(final int from, final int to) throws RemoteException {
+        public void moveQueueItem(final int from, final int to) {
             if (Ref.alive(mService)) {
                 mService.get().moveQueueItem(from, to);
             }
@@ -3463,7 +3466,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void toggleFavorite() throws RemoteException {
+        public void toggleFavorite() {
             if (Ref.alive(mService)) {
                 mService.get().toggleFavorite();
             }
@@ -3473,7 +3476,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void refresh() throws RemoteException {
+        public void refresh() {
             if (Ref.alive(mService)) {
                 mService.get().refresh();
             }
@@ -3483,7 +3486,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public boolean isFavorite() throws RemoteException {
+        public boolean isFavorite() {
             return Ref.alive(mService) && mService.get().isFavorite();
         }
 
@@ -3491,12 +3494,12 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public boolean isPlaying() throws RemoteException {
+        public boolean isPlaying() {
             return Ref.alive(mService) && mService.get().isPlaying();
         }
 
         @Override
-        public boolean isStopped() throws RemoteException {
+        public boolean isStopped() {
             return !Ref.alive(mService) || mService.get().isStopped();
         }
 
@@ -3504,7 +3507,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long[] getQueue() throws RemoteException {
+        public long[] getQueue() {
             if (Ref.alive(mService)) {
                 return mService.get().getQueue();
             }
@@ -3515,7 +3518,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long duration() throws RemoteException {
+        public long duration() {
             if (Ref.alive(mService)) {
                 return mService.get().duration();
             }
@@ -3526,7 +3529,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long position() throws RemoteException {
+        public long position() {
             if (Ref.alive(mService)) {
                 return mService.get().position();
             }
@@ -3537,7 +3540,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long seek(final long position) throws RemoteException {
+        public long seek(final long position) {
             if (Ref.alive(mService)) {
                 return mService.get().seek(position);
             }
@@ -3548,7 +3551,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long getAudioId() throws RemoteException {
+        public long getAudioId() {
             if (Ref.alive(mService)) {
                 return mService.get().getAudioId();
             }
@@ -3556,7 +3559,7 @@ public class MusicPlaybackService extends Service {
         }
 
         @Override
-        public long getCurrentSimplePlayerAudioId() throws RemoteException {
+        public long getCurrentSimplePlayerAudioId() {
             return mService.get().getCurrentSimplePlayerAudioId();
         }
 
@@ -3564,7 +3567,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long getArtistId() throws RemoteException {
+        public long getArtistId() {
             if (Ref.alive(mService)) {
                 return mService.get().getArtistId();
             }
@@ -3575,7 +3578,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public long getAlbumId() throws RemoteException {
+        public long getAlbumId() {
             if (Ref.alive(mService)) {
                 return mService.get().getAlbumId();
             }
@@ -3586,7 +3589,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public String getArtistName() throws RemoteException {
+        public String getArtistName() {
             if (Ref.alive(mService)) {
                 return mService.get().getArtistName();
             }
@@ -3597,7 +3600,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public String getTrackName() throws RemoteException {
+        public String getTrackName() {
             if (Ref.alive(mService)) {
                 return mService.get().getTrackName();
             }
@@ -3608,7 +3611,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public String getAlbumName() throws RemoteException {
+        public String getAlbumName() {
             if (Ref.alive(mService)) {
                 return mService.get().getAlbumName();
             }
@@ -3619,7 +3622,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public String getPath() throws RemoteException {
+        public String getPath() {
             if (Ref.alive(mService)) {
                 return mService.get().getPath();
             }
@@ -3630,7 +3633,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getQueuePosition() throws RemoteException {
+        public int getQueuePosition() {
             if (Ref.alive(mService)) {
                 return mService.get().getQueuePosition();
             }
@@ -3641,7 +3644,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getShuffleMode() throws RemoteException {
+        public int getShuffleMode() {
             if (Ref.alive(mService)) {
                 return mService.get().getShuffleMode();
             }
@@ -3652,7 +3655,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getRepeatMode() throws RemoteException {
+        public int getRepeatMode() {
             if (Ref.alive(mService)) {
                 return mService.get().getRepeatMode();
             }
@@ -3663,7 +3666,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int removeTracks(final int first, final int last) throws RemoteException {
+        public int removeTracks(final int first, final int last) {
             if (Ref.alive(mService)) {
                 return mService.get().removeTracks(first, last);
             }
@@ -3674,7 +3677,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int removeTrack(final long id) throws RemoteException {
+        public int removeTrack(final long id) {
             if (Ref.alive(mService)) {
                 return mService.get().removeTrack(id);
             }
@@ -3685,7 +3688,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getMediaMountedCount() throws RemoteException {
+        public int getMediaMountedCount() {
             if (Ref.alive(mService)) {
                 return mService.get().getMediaMountedCount();
             }
@@ -3696,7 +3699,7 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getAudioSessionId() throws RemoteException {
+        public int getAudioSessionId() {
             if (Ref.alive(mService)) {
                 return mService.get().getAudioSessionId();
             }
@@ -3704,7 +3707,7 @@ public class MusicPlaybackService extends Service {
         }
 
         @Override
-        public void shutdown() throws RemoteException {
+        public void shutdown() {
             if (Ref.alive(mService)) {
                 mService.get().shutdown();
             }
