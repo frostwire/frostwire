@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2017-06-19 21:20-0400\n"
+"PO-Revision-Date: 2018-04-08 13:15-0400\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ko\n"
@@ -1688,18 +1688,16 @@ msgid "Export this playlist into a .m3u file"
 msgstr "재생목록에 .m3u 파일 보내기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:869
-#, fuzzy
 msgid "Export Playlist to iTunes"
-msgstr "재생목록 .m3u 보내기"
+msgstr "재생 목록을 iTunes로 내보내기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:870
-#, fuzzy
 msgid "Export this playlist into an iTunes playlist"
-msgstr "재생목록에 .m3u 파일 보내기"
+msgstr "이 재생 목록을 iTunes 재생 목록으로 내보내기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:39
 msgid "Index"
-msgstr ""
+msgstr "색인"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:55
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:267
@@ -1797,9 +1795,8 @@ msgid "Refreshing"
 msgstr "갱신"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/MediaTypeSavedFilesDirectoryHolder.java:66
-#, fuzzy
 msgid "Holds the Results for"
-msgstr "라이브러리 폴더"
+msgstr "에 대한 결과 보유"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/RecursiveLibraryDirectoryPanel.java:141
 msgid "Library Folders"
@@ -2044,24 +2041,25 @@ msgid ""
 "Browse, Search and Play files in your computer. Wi-Fi sharing, Internet "
 "Radio and more."
 msgstr ""
+"컴퓨터에서 파일 찾아보기, 검색 및 재생. 와이파이 공유, 인터넷 라디오와 더 많"
+"은."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTab.java:29
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTransfersTab.java:43
-#, fuzzy
 msgid "Search and Download Files from the Internet."
-msgstr "검색해 파일을 다운로드"
+msgstr "인터넷에서 파일 검색 및 다운로드."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:40
 msgid "filter transfers here"
-msgstr ""
+msgstr "여기에 필터 전송"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:50
 msgid "Transfers tab description goes here."
-msgstr ""
+msgstr "전송 탭 설명은 여기에 표시됩니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:112
 msgid "All"
-msgstr ""
+msgstr "모두"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/theme/BaseFileChooserUI.java:499
 msgid "FileChooser.lookInLabelText"
@@ -2177,9 +2175,8 @@ msgid "Update"
 msgstr "업데이트"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/PortableUpdater.java:69
-#, fuzzy
 msgid "Uncompressing files"
-msgstr "미완성 파일을 보관 유지하는 날짜："
+msgstr "파일 압축 해제"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/ProgressMonitor.java:131
 msgid "OptionPane.cancelButtonText"
@@ -2413,48 +2410,40 @@ msgid "No"
 msgstr "아니오"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:45
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin donation"
-msgstr "Bitcoin 기부 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Bitcoin에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:46
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Cash donation"
-msgstr "Bitcoin 기부 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Bitcoin Cash에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:47
-#, fuzzy
 msgid "Support FrostWire development with an Ether donation"
-msgstr "Bitcoin 기부 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Ether에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:48
-#, fuzzy
 msgid "Support FrostWire development with a Dash donation"
-msgstr "USD $1 기부금으로 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Dash에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:49
-#, fuzzy
 msgid "Support FrostWire development with a Litecoin donation"
-msgstr "Bitcoin 기부 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Litecoin에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Paypal 기부로 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. ZCash에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "Bitcoin 기부 FrostWire 개발 지원"
+msgstr "FrostWire 개발을 지원하십시오. Bitcoin Gold에서 기부하기."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
 msgstr "Paypal 기부로 FrostWire 개발 지원"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:57
-#, fuzzy
 msgid "Donate"
-msgstr "다운로드됨"
+msgstr "기부"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/FileChooserHandler.java:878
 msgid "All Folders"
@@ -2821,7 +2810,7 @@ msgstr "@frostwire 팔로우"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:196
 msgid "Follow FrostWire on Instagram"
-msgstr ""
+msgstr "Instagram의 FrostWire 따라 가기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:202
 msgid ""
@@ -2833,7 +2822,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:208
 msgid "Circle FrostWire on G+"
-msgstr ""
+msgstr "G +의 FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 #, fuzzy
@@ -2849,9 +2838,8 @@ msgstr ""
 "<b>배포하지 않음</b>.<p>토렌트 다운로드 중에만 파일을<p>공유할 수 있습니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:468
-#, fuzzy
 msgid "Not Seeding"
-msgstr "검색"
+msgstr "비 시드"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:487
 msgid "FrostWire has not detected a firewall"
@@ -2879,7 +2867,7 @@ msgstr "네트워크에의 접속이 최적화되었습니다"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:580
 msgid "nodes"
-msgstr ""
+msgstr "노드들"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:684
 msgid "Show Connection Quality"
@@ -3338,11 +3326,11 @@ msgstr "VPN 자동 보호 사용 안 함"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:92
 msgid "VPN-Drop protection disabled. Restarting BitTorrent engine."
-msgstr ""
+msgstr "VPN 자동 보호가 비활성화되었습니다. BitTorrent 엔진을 다시 시작합니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:59
 msgid "VPN Off: BitTorrent disabled"
-msgstr ""
+msgstr "VPN 끄기 : BitTorrent가 비활성화 됨"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:60
 msgid ""
@@ -3648,18 +3636,14 @@ msgid "Find out more..."
 msgstr "더 알아보기..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentPanel.java:63
-#, fuzzy, java-format
+#, java-format
 msgid "I <b>will not</b> use FrostWire {0} for copyright infringement."
-msgstr ""
-"<div display=\"block\" color=\"#515151\" size=\"13\"><b></b> FrostWire {0}를 "
-"저작권을 위반하는 행위를 하지 않습니다.</div>"
+msgstr "나는 저작권 침해에 FrostWire {0}을 사용하지 않을 것입니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentPanel.java:71
-#, fuzzy, java-format
+#, java-format
 msgid "I <b>might use</b> FrostWire {0} for copyright infringement."
-msgstr ""
-"<div display=\"block\" color=\"#515151\" size=\"13\"> <b></b> FrostWire {0}"
-"의 저작권을 위반하는 행위를 할 수 도 있습니다.</div>"
+msgstr "<b>저작권 침해에 대해</b> FrostWire {0}을 (를) 사용할 수 있습니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentWindow.java:40
 msgid "State Your Intent"
@@ -3822,13 +3806,12 @@ msgid ""
 msgstr "인터넷 연결 및 온라인 개인 정보를 보호하는 방법에 대해 알아보십시오."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:55
-#, fuzzy
 msgid "Support FrostWire"
-msgstr "FrostWire 정보"
+msgstr "지원 FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:57
 msgid "Support with CryptoCurrencies"
-msgstr ""
+msgstr "CryptoCurrencies 지원"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Bitcoin"
@@ -3863,27 +3846,24 @@ msgid "Free Legal Downloads"
 msgstr "무료 합법 다운로드"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
-#, fuzzy
 msgid "Follow us on Facebook"
-msgstr "FrostWire 페이스북"
+msgstr "페이스 북으로 우릴 팔로우 해"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
 msgid "Come and say hi to the community on Facebook"
 msgstr "페이스북 커뮤니티에 인사글을 남기세요"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:74
-#, fuzzy
 msgid "Follow us on G+"
-msgstr "트위터에서 저희를 팔로우하세요"
+msgstr "G+에서 팔로우하기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:76
-#, fuzzy
 msgid "Follow us on Instagram"
-msgstr "트위터에서 저희를 팔로우하세요"
+msgstr "Instagram에서 팔로우하기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:78
 msgid "Follow us on Twitter"
-msgstr "트위터에서 저희를 팔로우하세요"
+msgstr "트위터에 우리를 따르라."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:80
 msgid "Foru&m"
@@ -4572,9 +4552,8 @@ msgid "Configure username and password to be used for the proxy."
 msgstr "프록시에 사용하는 유저명과 비밀번호를 설정"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:48
-#, fuzzy
 msgid "Enable Authentication:"
-msgstr "내용 필터링"
+msgstr "인증 사용:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ProxyLoginPaneItem.java:55
 msgid "Username:"
@@ -4715,6 +4694,9 @@ msgid ""
 "{0} torrents that FrostWire has learned to speed up your search results.\n"
 "Do you wish to continue?"
 msgstr ""
+"계속하면 다음과 관련된 모든 정보가 지워집니다.\n"
+"{0} 급류는 FrostWire가 검색 결과를 빠르게하는 것을 배웠습니다. \n"
+"계속 하시겠습니까?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StartupPaneItem.java:22
 msgid ""
@@ -5020,7 +5002,7 @@ msgstr "검색이 너무 길므로, 검색을 소규모로 해 재시행"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:136
 msgid "Name|Source|Ext."
-msgstr ""
+msgstr "이름 | 출처 | 내선"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:194
 msgid ""
@@ -5036,9 +5018,8 @@ msgid "Select content to download from this torrent."
 msgstr "보낼 내용 선택"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultDisplayer.java:556
-#, fuzzy
 msgid "results"
-msgstr "결과"
+msgstr "결과들"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:332
 msgid "Copy Hash"
