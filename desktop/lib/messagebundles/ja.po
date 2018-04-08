@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-17 19:03-0700\n"
-"PO-Revision-Date: 2017-06-20 20:29-0400\n"
+"PO-Revision-Date: 2018-04-08 13:08-0400\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ja\n"
@@ -995,9 +995,8 @@ msgstr "操作に失敗しました。"
 
 #. check just the first file on all mirrors.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:715
-#, fuzzy
 msgid "Checking Web seed mirror URLs..."
-msgstr "最新版の有無を確認しています"
+msgstr "WebシードミラーURL"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:724
 msgid "Web seed not reachable."
@@ -1039,9 +1038,8 @@ msgid "Select/Unselect all files"
 msgstr "全ファイルを選択/非選択する"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PartialFilesDialog.java:504
-#, fuzzy
 msgid "Unknown"
-msgstr "不明として"
+msgstr "不明"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:43
 #, fuzzy
@@ -1709,14 +1707,12 @@ msgid "Export this playlist into a .m3u file"
 msgstr "この再生リストを.m3uファイルにエクスポート"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:869
-#, fuzzy
 msgid "Export Playlist to iTunes"
-msgstr ".m3uへ再生リストをエクスポート"
+msgstr "プレイリストをiTunesにエクスポート"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:870
-#, fuzzy
 msgid "Export this playlist into an iTunes playlist"
-msgstr "この再生リストを.m3uファイルにエクスポート"
+msgstr "このプレイリストをiTunesプレイリストにエクスポートする"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:39
 #, fuzzy
@@ -1931,9 +1927,8 @@ msgid "Open Archive.org source page"
 msgstr "Archive.org ソース ページを開く"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:1027
-#, fuzzy
 msgid "playlist"
-msgstr "新規再生リスト"
+msgstr "プレイリスト"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:1088
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/dnd/SendFileTransferHandler.java:82
@@ -1983,6 +1978,10 @@ msgid ""
 "in your computer.<br><br>If you want to use FrostWire as a media player "
 "<b>Please install mplayer and restart FrostWire.</b>"
 msgstr ""
+"<b>FrostWireでは、Mplayerでメディアを再生する必要</b>がありますが、コンピュー"
+"タで見つけることができませんでした。 <br><br> FrostWireをメディアプレーヤーと"
+"して使用する場合は、 <b>mplayerをインストールしてFrostWireを再起動してくださ"
+"い。</b>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/searchfield/GoogleSearchField.java:54
 msgid "Hints by Google"
@@ -2441,46 +2440,39 @@ msgstr "いいえ"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:45
 msgid "Support FrostWire development with a Bitcoin donation"
-msgstr "FrostWire 開発 Bitcoin の寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Bitcoinで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:46
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Cash donation"
-msgstr "FrostWire 開発 Bitcoin の寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Bitcoin Cashで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:47
-#, fuzzy
 msgid "Support FrostWire development with an Ether donation"
-msgstr "FrostWire 開発 Bitcoin の寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Etherで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:48
-#, fuzzy
 msgid "Support FrostWire development with a Dash donation"
-msgstr "FrostWire 開発米ドル 1 ドルの寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Dashで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:49
-#, fuzzy
 msgid "Support FrostWire development with a Litecoin donation"
-msgstr "FrostWire 開発 Bitcoin の寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Litecoinで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Paypalの寄付によるFrostWire開発のサポート"
+msgstr "FrostWireの開発をサポートしてください。 ZCashで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "FrostWire 開発 Bitcoin の寄付とサポートします。"
+msgstr "FrostWireの開発をサポートしてください。 Bitcoin Goldで寄付をする。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
 msgstr "Paypalの寄付によるFrostWire開発のサポート"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:57
-#, fuzzy
 msgid "Donate"
-msgstr "ダウンロード"
+msgstr "寄付する"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/FileChooserHandler.java:878
 msgid "All Folders"
@@ -3898,7 +3890,7 @@ msgstr "FrostWire について"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:57
 msgid "Support with CryptoCurrencies"
-msgstr ""
+msgstr "CryptoCurrenciesで寄付する"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
 msgid "Bitcoin"
@@ -3933,23 +3925,20 @@ msgid "Free Legal Downloads"
 msgstr "合法的ダウンロード"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
-#, fuzzy
 msgid "Follow us on Facebook"
-msgstr "FrostWireをFacebookで"
+msgstr "フェースブックでフォローして"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:72
 msgid "Come and say hi to the community on Facebook"
 msgstr "Facebookのコミュニティへ挨拶しにきましょう"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:74
-#, fuzzy
 msgid "Follow us on G+"
-msgstr "Twitterでフォロしてください"
+msgstr "G +でフォローしましょう"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:76
-#, fuzzy
 msgid "Follow us on Instagram"
-msgstr "Twitterでフォロしてください"
+msgstr "Instagramで私たちに従ってください"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:78
 msgid "Follow us on Twitter"
@@ -5089,7 +5078,7 @@ msgstr "検索が長すぎるので、検索を小規模にして再試行"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:136
 msgid "Name|Source|Ext."
-msgstr ""
+msgstr "名前|ソース|内線"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchOptionsPanel.java:194
 msgid ""
