@@ -164,7 +164,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
         try {
             super.unregisterReceiver(receiver);
         } catch (Throwable e) {
-            if (Debug.isEnable()) {
+            if (Debug.isEnabled()) {
                 // rethrow to actually see it and fix it
                 throw e;
             }

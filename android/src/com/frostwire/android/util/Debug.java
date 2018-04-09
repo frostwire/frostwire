@@ -55,10 +55,10 @@ public final class Debug {
      * The current implementation delegates the check to the native
      * android {@code BuildConfig} but that's not necessary the only way.
      *
-     * @return {@code true} if running under debug
+     * @return {@code true} if running as a debug build but disconnected from the debugger
      */
-    public static boolean isEnable() {
-        return BuildConfig.DEBUG;
+    public static boolean isEnabled() {
+        return BuildConfig.DEBUG && !android.os.Debug.isDebuggerConnected();
     }
 
     /**
@@ -72,7 +72,7 @@ public final class Debug {
      * @param enable {@code true} activate the most strict policy
      */
     public static void setStrictPolicy(boolean enable) {
-        if (!isEnable()) {
+        if (!isEnabled()) {
             return; // no debug mode, do nothing
         }
 
@@ -134,7 +134,7 @@ public final class Debug {
     }
 
     private static boolean hasContext(Object obj, int level, Set<Integer> refs) {
-        if (!isEnable()) {
+        if (!isEnabled()) {
             return false;
         }
 

@@ -71,7 +71,7 @@ final class EngineThreadPool extends ThreadPool {
         }
 
         // if debug/development, allow only 20 tasks in the queue
-        if (Debug.isEnable() && getQueue().size() > 20) {
+        if (Debug.isEnabled() && getQueue().size() > 20) {
             throw new RuntimeException("Too many tasks in the queue");
         }
     }

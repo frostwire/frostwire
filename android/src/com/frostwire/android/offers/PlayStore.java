@@ -150,7 +150,7 @@ public final class PlayStore extends StoreBase {
         }
 
         helper = new IabHelper(context, base64EncodedPublicKey);
-        helper.enableDebugLogging(Debug.isEnable(), LOG.getName()); // toggle this value for development
+        helper.enableDebugLogging(Debug.isEnabled(), LOG.getName()); // toggle this value for development
 
         helper.startSetup(result -> {
             if (!result.isSuccess()) {
