@@ -20,7 +20,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frostwire.android"
     android:installLocation="auto"
-    android:versionCode="519"
+    android:versionCode="520"
     android:versionName="2.0.3">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
@@ -320,45 +320,5 @@
         <activity
             android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
-        <!-- OGURY/PRESAGE LIBRARY -->
-        <meta-data
-            android:name="presage_key"
-            android:value="269485" />
-        <service
-            android:name="io.presage.PresageService"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":remote">
-            <intent-filter>
-                <action android:name="io.presage.PresageService.PIVOT" />
-            </intent-filter>
-        </service>
-        <activity
-            android:name="io.presage.activities.PresageActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:hardwareAccelerated="true"
-            android:label="@string/application_label"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-            <intent-filter>
-                <action android:name="io.presage.intent.action.LAUNCH_WEBVIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <receiver android:name="io.presage.receiver.NetworkChangeReceiver2">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-                <action android:name="io.presage.receiver.NetworkChangeReceiver.ONDESTROY" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="io.presage.receiver.AlarmReceiver" />
-
-        <provider
-            android:name="io.presage.provider.PresageProvider"
-            android:authorities="${applicationId}.PresageProvider"
-            android:enabled="true"
-            android:exported="true" />
     </application>
 </manifest>

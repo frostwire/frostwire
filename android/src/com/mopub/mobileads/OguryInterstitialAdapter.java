@@ -17,6 +17,7 @@
 
 package com.mopub.mobileads;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.frostwire.android.core.ConfigurationManager;
@@ -28,7 +29,9 @@ import com.frostwire.util.Logger;
 import java.util.Map;
 
 import io.presage.Presage;
-import io.presage.ads.PresageInterstitial;
+import io.presage.common.AdConfig;
+import io.presage.interstitial.PresageInterstitial;
+import io.presage.interstitial.PresageInterstitialCallback;
 
 /**
  * @author aldenml
@@ -88,20 +91,30 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             Object firstKey = serverExtras.keySet().toArray()[0];
             Object valueFirstKey = serverExtras.get(firstKey);
             String adUnit = "" + valueFirstKey;
+            AdConfig adConfig = new AdConfig(adUnit);
 
-            if (adUnit != null && adUnit != "") {
+            if (!adUnit.equals("")) {
                 try {
-                    placement = new PresageInterstitial(context, adUnit);
+                    if (context instanceof Activity) {
+                        placement = new PresageInterstitial((Activity) context, adConfig);
+                    }
                 } catch (IllegalArgumentException invalidAdUnitException) {
                     placement = null;
                 }
             }
         } else {
-            placement = new PresageInterstitial(context);
+            if (context instanceof Activity) {
+                try {
+                    placement = new PresageInterstitial((Activity) context);
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                    placement = null;
+                }
+            }
         }
 
         if (placement != null) {
-            placement.setPresageInterstitialCallback(new OguryPresageInterstitialCallback(interstitialListener));
+            placement.setInterstitialCallback(new OguryPresageInterstitialCallback(interstitialListener));
             placement.load();
         }
     }
@@ -119,7 +132,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             return;
         }
 
-        if (placement != null && placement.canShow()) {
+        if (placement != null && placement.isLoaded()) {
             try {
                 LOG.info("showInterstitial() Showing Ogury-Mopub interstitial");
                 placement.show();
@@ -138,19 +151,17 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         placement = null;
     }
 
-    private static Presage presage() {
-        return Presage.getInstance();
-    }
-
     private static void startOgury(Context context) {
         if (!OGURY_ENABLED || OGURY_STARTED) {
+            if (OGURY_STARTED) {
+                LOG.info("startOgury(): Ogury already started, all good");
+            }
             return;
         }
         try {
             OGURY_STARTED = true;
             // presage internally picks the application context
-            presage().setContext(context);
-            presage().start();
+            Presage.getInstance().start("269485", context);
             LOG.info("startOgury: Ogury started from Mopub-Ogury adapter");
         } catch (Throwable e) {
             OGURY_STARTED = false;
@@ -158,7 +169,7 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
         }
     }
 
-    private static final class OguryPresageInterstitialCallback implements PresageInterstitial.PresageInterstitialCallback {
+    private static final class OguryPresageInterstitialCallback implements PresageInterstitialCallback {
 
         private final CustomEventInterstitialListener mopubListener;
 
@@ -182,6 +193,10 @@ public final class OguryInterstitialAdapter extends CustomEventInterstitial {
             if (mopubListener != null) {
                 mopubListener.onInterstitialLoaded();
             }
+        }
+
+        @Override
+        public void onAdNotLoaded() {
         }
 
         @Override
