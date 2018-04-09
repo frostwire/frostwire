@@ -7,7 +7,6 @@
 -keep class for.** {*;}
 -keep class if.** {*;}
 -keep class int.** {*;}
--keep class io.presage.** {*;}
 
 # applovin seems to have passed by proguard already
 -keep class com.applovin.** {*;}
