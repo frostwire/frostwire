@@ -58,7 +58,7 @@ public final class Debug {
      * @return {@code true} if running as a debug build but disconnected from the debugger
      */
     public static boolean isEnabled() {
-        return BuildConfig.DEBUG && !android.os.Debug.isDebuggerConnected();
+        return BuildConfig.DEBUG;
     }
 
     /**

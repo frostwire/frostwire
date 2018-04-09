@@ -66,6 +66,9 @@ final class EngineThreadPool extends ThreadPool {
     }
 
     private void verifyTask(Object task) {
+        if (android.os.Debug.isDebuggerConnected()) {
+            return;
+        }
         if (Debug.hasContext(task)) {
             throw new RuntimeException("Runnable/task contains context, possible context leak");
         }
