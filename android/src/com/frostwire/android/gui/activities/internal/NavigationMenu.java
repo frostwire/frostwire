@@ -72,7 +72,7 @@ public final class NavigationMenu {
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
         menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
-        async(this, NavigationMenu::refreshMenuRemoveAdsItem);
+        refreshMenuRemoveAdsItem();
     }
 
     public boolean isOpen() {
@@ -196,6 +196,8 @@ public final class NavigationMenu {
                 View.VISIBLE :
                 View.GONE;
         Handler handler = new Handler(Looper.getMainLooper());
+        // TODO: review why calling this directly was causing ANR
+        // there is some lifecycle issue here
         handler.post(() -> menuRemoveAdsItem.setVisibility(visibility) );
     }
 
@@ -239,7 +241,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            async(NavigationMenu.this, NavigationMenu::refreshMenuRemoveAdsItem);
+            refreshMenuRemoveAdsItem();
             controller.syncNavigationMenu();
         }
     }
