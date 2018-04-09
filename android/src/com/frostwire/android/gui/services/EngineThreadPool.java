@@ -66,15 +66,18 @@ final class EngineThreadPool extends ThreadPool {
     }
 
     private void verifyTask(Object task) {
-        if (android.os.Debug.isDebuggerConnected()) {
-            return;
-        }
         if (Debug.hasContext(task)) {
             throw new RuntimeException("Runnable/task contains context, possible context leak");
         }
 
         // if debug/development, allow only 20 tasks in the queue
         if (Debug.isEnabled() && getQueue().size() > 20) {
+            // TODO: review this condition, since debugging session is not the same
+            // as "paused at a breakpoint"
+            if (android.os.Debug.isDebuggerConnected()) {
+                return;
+            }
+
             throw new RuntimeException("Too many tasks in the queue");
         }
     }
