@@ -103,7 +103,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                         sr.getDetailsUrl() + "\n\n");
 
                         // comment this when in production
-                        LOG.info("================================================================\n\n"+html);
+                        //LOG.info("================================================================\n\n"+html);
                     }
                 } catch (Throwable e) {
                     throw new Exception("URL:" + sr.getDetailsUrl() + " (" + e.getMessage() + ")", e);
