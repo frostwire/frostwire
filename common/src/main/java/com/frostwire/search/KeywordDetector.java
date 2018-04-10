@@ -64,7 +64,7 @@ public final class KeywordDetector {
         }
     }
 
-    private static Logger LOG = Logger.getLogger(KeywordDetector.class);
+    private static final Logger LOG = Logger.getLogger(KeywordDetector.class);
     private static final Set<String> stopWords = new HashSet<>();
     private final Map<Feature, HistoHashMap<String>> histoHashMaps;
     private KeywordDetectorListener keywordDetectorListener;
