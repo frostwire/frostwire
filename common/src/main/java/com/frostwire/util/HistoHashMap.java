@@ -32,12 +32,7 @@ public final class HistoHashMap<K> {
 
     // creates the comparator as a field to avoid GC pressure every
     // time histogram is called, but still not static (no need)
-    private final Comparator<Entry<K, Integer>> cmp = new Comparator<Entry<K, Integer>>() {
-        @Override
-        public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
-            return o2.getValue().compareTo(o1.getValue());
-        }
-    };
+    private final Comparator<Entry<K, Integer>> cmp = (o1, o2) -> o2.getValue().compareTo(o1.getValue());
 
     /**
      * (Cheap operation)
@@ -66,7 +61,7 @@ public final class HistoHashMap<K> {
         return r;
     }
 
-    public Integer get(K key) {
+    public int get(K key) {
         return map.get(key);
     }
 
