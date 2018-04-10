@@ -47,8 +47,20 @@ public final class HistoHashMap<K> {
      */
     public int update(K key) {
         int r = 1;
+        // This is a problematic operation in light of the heavy concurrency to which
+        // an instance of this class is subject to. The problem is that when the reset()
+        // is called, the following operations are not atomic and can yield a NPE.
+        // Still, there is no need of synchronization, since a simple call to map.getOrDefault
+        // could do the trick, but that method is not in android API 19.
         if (map.containsKey(key)) {
-            r = 1 + map.get(key);
+            Integer n = map.get(key);
+            if (n == null) {
+                // a reset was called in the middle, this key can't be considered
+                // since this update was called before the reset
+                r = 0;
+            } else {
+                r = 1 + n;
+            }
         }
         map.put(key, r);
         return r;
@@ -72,7 +84,7 @@ public final class HistoHashMap<K> {
         } catch (ConcurrentModificationException e) {
             // working with no synchronized structures, even with the copies
             // it's possible that this exception can happens, but the cost
-            // of synchronization bigger than the lack of accuracy
+            // of synchronization is bigger than the lack of accuracy
             // ignore
             return Collections.emptyList();
         }
