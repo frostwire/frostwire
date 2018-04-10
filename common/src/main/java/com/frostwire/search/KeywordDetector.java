@@ -116,17 +116,18 @@ public final class KeywordDetector {
         for (SearchResult sr : copiedResults) {
             addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
             if (sr instanceof FileSearchResult) {
-                String fileName = ((FileSearchResult) sr).getFilename().toLowerCase();
-                String ext = FilenameUtils.getExtension(fileName);
-                if (fileName != null && !fileName.isEmpty()) {
-                    addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
+                String fileName = ((FileSearchResult) sr).getFilename();
+                if (fileName == null || fileName.isEmpty()) {
+                    continue;
                 }
+
+                addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName.toLowerCase());
 
                 // Check file extensions for YouTubeSearch results.
                 // If we find files with extensions other than ".youtube", we make their mt = null and don't include them
                 // in the keyword detector. IDEA: Make FileSearchResults have a .getMediaType() method and put this logic there.
                 KeywordMediaType mt;
-                String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
+                String extension = FilenameUtils.getExtension(fileName);
                 mt = KeywordMediaType.getMediaTypeForExtension(extension);
                 if ("youtube".equals(extension)) {
                     mt = KeywordMediaType.getVideoMediaType();
@@ -135,8 +136,8 @@ public final class KeywordDetector {
                     mt = null;
                 }
 
-                if (ext != null && !ext.isEmpty() && mt != null) {
-                    addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, ext);
+                if (extension != null && !extension.isEmpty() && mt != null) {
+                    addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, extension);
                 }
             }
         }
