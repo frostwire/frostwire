@@ -939,6 +939,13 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
+            // TODO: review this, this is a workaround to a not clear framework logic problem
+            long td = System.currentTimeMillis() - filterButton.lastUIUpdate;
+            if (td <= 300) {
+                // don't bother to enqueue the task
+                return;
+            }
+
             async(filterButton,
                     SearchFragment::possiblyWaitInBackgroundToUpdateUI,
                     keywordFilterDrawerView, filteredHistograms,
