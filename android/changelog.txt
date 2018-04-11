@@ -1,9 +1,10 @@
-FrostWire 2.0.3 build 517 - APR/08/2018
+FrostWire 2.0.3 build 519 - APR/11/2018
  - Issues with Android 8.0 notifications fixed
  - Fixes a title refresh issue on My Files when switching file types
  - Fixes a bug deleting a picture from the picture viewer screen
  - Library updates: applovin 7.8.6, gms 12.0.1
  - Translations updated: Czech, Greek, Danish
+ - Performance upgrades
 
 FrostWire 2.0.2 build 515 - MAR/26/2018
  - Application startup is faster
