@@ -38,8 +38,7 @@ public final class TransferStateStrings {
     private static TransferStateStrings INSTANCE;
 
     private TransferStateStrings(Context ctx) {
-        TRANSFER_STATE_STRING_MAP = new HashMap<>();
-        initTransferStateStringMap(ctx);
+        TRANSFER_STATE_STRING_MAP = initTransferStateStringMap(ctx);
     }
 
     public static TransferStateStrings getInstance(Context context) {
@@ -55,36 +54,38 @@ public final class TransferStateStrings {
         return TRANSFER_STATE_STRING_MAP.get(stateEnum);
     }
 
-    private void initTransferStateStringMap(Context c) {
-        TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHING, c.getString(R.string.finishing));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_TORRENT, c.getString(R.string.torrent_fetcher_download_status_downloading_torrent));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING, c.getString(R.string.azureus_manager_item_downloading));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHED, c.getString(R.string.azureus_peer_manager_status_finished));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.SEEDING, c.getString(R.string.azureus_manager_item_seeding));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ALLOCATING, c.getString(R.string.azureus_manager_item_allocating));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSED, c.getString(R.string.azureus_manager_item_paused));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR, c.getString(R.string.azureus_manager_item_error));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_MOVING_INCOMPLETE, c.getString(R.string.error_moving_incomplete));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_HASH_MD5, c.getString(R.string.error_wrong_md5_hash));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_SIGNATURE, c.getString(R.string.error_wrong_signature));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NOT_ENOUGH_PEERS, c.getString(R.string.error_not_enough_peers));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_NO_INTERNET, c.getString(R.string.error_no_internet_connection));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_SAVE_DIR, c.getString(R.string.http_download_status_save_dir_error));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_TEMP_DIR, c.getString(R.string.http_download_status_temp_dir_error));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.STOPPED, c.getString(R.string.azureus_manager_item_stopped));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSING, c.getString(R.string.pausing));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.CANCELING, c.getString(R.string.canceling));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.CANCELED, c.getString(R.string.torrent_fetcher_download_status_canceled));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.WAITING, c.getString(R.string.waiting));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.COMPLETE, c.getString(R.string.peer_http_download_status_complete));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.UPLOADING, c.getString(R.string.peer_http_upload_status_uploading));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.UNCOMPRESSING, c.getString(R.string.http_download_status_uncompressing));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.DEMUXING, c.getString(R.string.transfer_status_demuxing));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_DISK_FULL, c.getString(R.string.error_no_space_left_on_device));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.SCANNING, c.getString(R.string.scanning));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_CONNECTION_TIMED_OUT, c.getString(R.string.error_connection_timed_out));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.UNKNOWN, "");
+    private Map<TransferState, String> initTransferStateStringMap(Context c) {
+        Map<TransferState, String> map = new HashMap<>();
+        map.put(TransferState.FINISHING, c.getString(R.string.finishing));
+        map.put(TransferState.CHECKING, c.getString(R.string.checking_ellipsis));
+        map.put(TransferState.DOWNLOADING_METADATA, c.getString(R.string.downloading_metadata));
+        map.put(TransferState.DOWNLOADING_TORRENT, c.getString(R.string.torrent_fetcher_download_status_downloading_torrent));
+        map.put(TransferState.DOWNLOADING, c.getString(R.string.azureus_manager_item_downloading));
+        map.put(TransferState.FINISHED, c.getString(R.string.azureus_peer_manager_status_finished));
+        map.put(TransferState.SEEDING, c.getString(R.string.azureus_manager_item_seeding));
+        map.put(TransferState.ALLOCATING, c.getString(R.string.azureus_manager_item_allocating));
+        map.put(TransferState.PAUSED, c.getString(R.string.azureus_manager_item_paused));
+        map.put(TransferState.ERROR, c.getString(R.string.azureus_manager_item_error));
+        map.put(TransferState.ERROR_MOVING_INCOMPLETE, c.getString(R.string.error_moving_incomplete));
+        map.put(TransferState.ERROR_HASH_MD5, c.getString(R.string.error_wrong_md5_hash));
+        map.put(TransferState.ERROR_SIGNATURE, c.getString(R.string.error_wrong_signature));
+        map.put(TransferState.ERROR_NOT_ENOUGH_PEERS, c.getString(R.string.error_not_enough_peers));
+        map.put(TransferState.ERROR_NO_INTERNET, c.getString(R.string.error_no_internet_connection));
+        map.put(TransferState.ERROR_SAVE_DIR, c.getString(R.string.http_download_status_save_dir_error));
+        map.put(TransferState.ERROR_TEMP_DIR, c.getString(R.string.http_download_status_temp_dir_error));
+        map.put(TransferState.STOPPED, c.getString(R.string.azureus_manager_item_stopped));
+        map.put(TransferState.PAUSING, c.getString(R.string.pausing));
+        map.put(TransferState.CANCELING, c.getString(R.string.canceling));
+        map.put(TransferState.CANCELED, c.getString(R.string.torrent_fetcher_download_status_canceled));
+        map.put(TransferState.WAITING, c.getString(R.string.waiting));
+        map.put(TransferState.COMPLETE, c.getString(R.string.peer_http_download_status_complete));
+        map.put(TransferState.UPLOADING, c.getString(R.string.peer_http_upload_status_uploading));
+        map.put(TransferState.UNCOMPRESSING, c.getString(R.string.http_download_status_uncompressing));
+        map.put(TransferState.DEMUXING, c.getString(R.string.transfer_status_demuxing));
+        map.put(TransferState.ERROR_DISK_FULL, c.getString(R.string.error_no_space_left_on_device));
+        map.put(TransferState.SCANNING, c.getString(R.string.scanning));
+        map.put(TransferState.ERROR_CONNECTION_TIMED_OUT, c.getString(R.string.error_connection_timed_out));
+        map.put(TransferState.UNKNOWN, "");
+        return map;
     }
 }
