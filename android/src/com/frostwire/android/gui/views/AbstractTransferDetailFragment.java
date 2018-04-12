@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,19 +37,18 @@ import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
 
-import java.text.DecimalFormatSymbols;
-
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 10/10/17.
+ * Created on 10/10/17.
  */
-
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-    private static String INFINITY = null;
+
+    private String infinity;
+
     protected TransferStateStrings transferStateStrings;
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
@@ -90,6 +89,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     protected void initComponents(View rootView, Bundle savedInstanceState) {
         super.initComponents(rootView, savedInstanceState);
+
+        infinity = rootView.getContext().getString(R.string.infinity);
+
         if (uiBittorrentDownload == null && savedInstanceState != null) {
             String infoHash = savedInstanceState.getString("infohash");
             async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
@@ -207,12 +209,9 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
      * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
      * "m:ss" where m=minutes<60, ss=seconds
      */
-    public static String seconds2time(long seconds) {
+    protected final String seconds2time(long seconds) {
         if (seconds == -1) {
-            if (INFINITY == null) {
-                INFINITY = DecimalFormatSymbols.getInstance().getInfinity();
-            }
-            return INFINITY;
+            return infinity;
         }
         long minutes = seconds / 60;
         seconds = seconds - minutes * 60;
