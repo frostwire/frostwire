@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.util;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.frostwire.android.R;
 import com.frostwire.transfers.TransferState;
@@ -34,6 +35,7 @@ import java.util.Map;
 public final class TransferStateStrings {
 
     private final Map<TransferState, String> stringsMap;
+
     private static final Object singletonLock = new Object();
     private static TransferStateStrings INSTANCE;
 
@@ -41,13 +43,13 @@ public final class TransferStateStrings {
         stringsMap = initTransferStateStringMap(ctx);
     }
 
-    public static TransferStateStrings getInstance(Context context) {
+    public static TransferStateStrings getInstance(@NonNull Context context) {
         synchronized (singletonLock) {
-            if (INSTANCE == null && context != null) {
+            if (INSTANCE == null) {
                 INSTANCE = new TransferStateStrings(context);
             }
+            return INSTANCE;
         }
-        return INSTANCE;
     }
 
     public String get(TransferState stateEnum) {
