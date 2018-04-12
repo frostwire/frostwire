@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +30,9 @@ import java.util.Map;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 10/16/17.
  */
-
-
 public final class TransferStateStrings {
-    //private static Logger LOG = Logger.getLogger(TransferStateStrings.class);
+
     private final Map<TransferState, String> TRANSFER_STATE_STRING_MAP;
     private static final Object singletonLock = new Object();
     private static TransferStateStrings INSTANCE;
