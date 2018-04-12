@@ -48,8 +48,8 @@ import static com.frostwire.android.util.Asyncs.async;
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     private String infinity;
+    private TransferStateStrings transferStateStrings;
 
-    protected TransferStateStrings transferStateStrings;
     private String tabTitle;
     protected UIBittorrentDownload uiBittorrentDownload;
     protected TorrentHandle torrentHandle;
@@ -62,8 +62,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     public AbstractTransferDetailFragment(int layoutId) {
         super(layoutId);
         setHasOptionsMenu(true);
-        // we can pass null below since this map has already been initialized by TransferListAdapter
-        transferStateStrings = TransferStateStrings.getInstance(null);
     }
 
     protected abstract int getTabTitleStringId();
@@ -145,7 +143,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (detailProgressProgressBar != null) {
             detailProgressProgressBar.setProgress(uiBittorrentDownload.getProgress());
         }
-        if (detailProgressStatusTextView != null && transferStateStrings != null) {
+        if (detailProgressStatusTextView != null) {
+            if (transferStateStrings == null) {
+                transferStateStrings = TransferStateStrings.getInstance(detailProgressStatusTextView.getContext());
+            }
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
         if (detailProgressDownSpeedTextView != null) {
@@ -168,10 +169,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         detailProgressStatusTextView = findView(rootView, R.id.view_transfer_detail_progress_status);
         detailProgressDownSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_down_speed);
         detailProgressUpSpeedTextView = findView(rootView, R.id.view_transfer_detail_progress_up_speed);
-        if (transferStateStrings == null) {
-            // this could be initialized to null in the constructor due to possible synchronization conditions
-            transferStateStrings = TransferStateStrings.getInstance(getActivity());
-        }
     }
 
     private void recoverUIBittorrentDownload(String infoHash) {
