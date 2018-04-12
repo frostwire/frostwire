@@ -33,12 +33,12 @@ import java.util.Map;
  */
 public final class TransferStateStrings {
 
-    private final Map<TransferState, String> TRANSFER_STATE_STRING_MAP;
+    private final Map<TransferState, String> stringsMap;
     private static final Object singletonLock = new Object();
     private static TransferStateStrings INSTANCE;
 
     private TransferStateStrings(Context ctx) {
-        TRANSFER_STATE_STRING_MAP = initTransferStateStringMap(ctx);
+        stringsMap = initTransferStateStringMap(ctx);
     }
 
     public static TransferStateStrings getInstance(Context context) {
@@ -51,7 +51,7 @@ public final class TransferStateStrings {
     }
 
     public String get(TransferState stateEnum) {
-        return TRANSFER_STATE_STRING_MAP.get(stateEnum);
+        return stringsMap.get(stateEnum);
     }
 
     private Map<TransferState, String> initTransferStateStringMap(Context c) {
