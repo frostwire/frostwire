@@ -1,7 +1,8 @@
 frostwire (6.6.5) stable; urgency=high
+  * Search: Yify fixed
   * Japanese, Korean translations updated
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 09 Apr 2018 08:25:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 12 Apr 2018 12:31:00 -0600
 
 frostwire (6.6.4) stable; urgency=high
   * Fixes Out of memory error trying to clear the search cache database

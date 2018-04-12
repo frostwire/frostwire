@@ -1,4 +1,5 @@
-FrostWire 2.0.3 build 519 - APR/11/2018
+FrostWire 2.0.3 build 521 - APR/12/2018
+ - Search: Yify fixed
  - Issues with Android 8.0 notifications fixed
  - Fixes a title refresh issue on My Files when switching file types
  - Fixes a bug deleting a picture from the picture viewer screen
