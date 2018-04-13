@@ -5,7 +5,9 @@
   "dependencies": {
     "react": "^16.3.1",
     "react-dom": "^16.3.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "sockjs-client": "1.1.4",
+    "vertx3-eventbus-client": "3.5.1"
   },
   "scripts": {
     "start": "react-scripts start",

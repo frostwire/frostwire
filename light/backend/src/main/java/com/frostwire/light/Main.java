@@ -152,7 +152,12 @@ public final class Main {
                 JsonObject rawMessage = be.getRawMessage();
                 // SEND: From Client to Server
                 if (be != null && rawMessage != null && be.type() == BridgeEventType.SEND) {
-                    LOG.info("Handler<BridgeEvent> message:\n" + rawMessage.encodePrettily() + "\n");
+                    LOG.info("Handler<BridgeEvent:SEND> message:\n" + rawMessage.encodePrettily() + "\n");
+                }
+                // RECEIVE: From Server to Client
+                if (be != null && be.type() == BridgeEventType.RECEIVE) {
+                    LOG.info("Handler<BridgeEvent:RECEIVE>");
+                    LOG.info(be.getRawMessage().encodePrettily());
                 }
                 be.complete(true);
             });
