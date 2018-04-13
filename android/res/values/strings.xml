@@ -777,7 +777,7 @@
     <string name="trackers">Trackers</string>
     <string name="pieces">Pieces</string>
     <string name="m_of_n_decimals">%1$d of %2$d</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
+    <string name="m_of_n_strings" translatable="false">%1$s/%2$s</string>
     <string name="n_files">%1$d FILES</string>
     <string name="n_peers">%1$d PEERS</string>
     <string name="source_type">Source: %1$s</string>
