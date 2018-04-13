@@ -160,6 +160,7 @@ public final class Main {
             router.route("/bus/*").handler(sockJSHandler);
 
             StaticHandler staticHandler = StaticHandler.create();
+            staticHandler.setWebRoot("build");
             staticHandler.setAlwaysAsyncFS(true);
             router.route("/*").handler(staticHandler::handle);
 
@@ -168,7 +169,6 @@ public final class Main {
             int randomPort = 9191; //new Random(System.currentTimeMillis()).nextInt(1001) + 6969;
             httpServerOptions.setPort(randomPort);
             HttpServer httpServer = VERTX.createHttpServer(httpServerOptions);
-
             httpServer.requestHandler(router::accept).listen();
 
             LOG.info("FrostWire Light Server started at http://localhost:" + httpServer.actualPort());

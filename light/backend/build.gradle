@@ -34,10 +34,9 @@ sourceSets {
 
         resources {
             srcDir '../frontend'
-            include 'webroot/index.html'
-            include 'webroot/**'
-            exclude 'webroot/*.DS_Store'
-            exclude 'webroot/**/*.DS_Store'
+            include 'build/**'
+            include 'build/static/**'
+            exclude 'build/.DS_Store'
         }
     }
 
