@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public final class AboutFragment extends AbstractFragment {
         buildNumber.setText(getText(R.string.build) + " " + BuildConfig.VERSION_CODE + ", sdk level " + Build.VERSION.SDK_INT);
 
         TextView jlibtorrentVersion = findView(rootView, R.id.fragment_about_jlibtorrent_version);
-        jlibtorrentVersion.setText("jlibtorrent v" + LibTorrent.jlibtorrentVersion());
+        jlibtorrentVersion.setText(jlibtorrentVersion());
 
         TextView changelog = findView(rootView, R.id.fragment_about_changelog);
         setupClickUrl(changelog, Constants.CHANGELOG_URL);
@@ -110,5 +110,16 @@ public final class AboutFragment extends AbstractFragment {
 
     private static void setupClickUrl(View v, final String url) {
         v.setOnClickListener(view -> UIUtils.openURL(view.getContext(), url));
+    }
+
+    private static String jlibtorrentVersion() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("jlibtorrent v").append(LibTorrent.jlibtorrentVersion());
+
+        if (LibTorrent.hasNeonArmSupport()) {
+            sb.append("(arm neon)");
+        }
+
+        return sb.toString();
     }
 }
