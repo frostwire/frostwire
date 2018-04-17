@@ -139,7 +139,7 @@ public class HexHiveView<T> extends View {
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
             async(this,
                     HexHiveView::asyncDraw,
-                    new HexHiveRenderer(canvasWidth, canvasHeight, DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint),
+                    new HexHiveRenderer(canvasWidth, canvasHeight, hexDataAdapter),
                     (v, r) -> v.invalidate());
         }
     }
@@ -312,31 +312,18 @@ public class HexHiveView<T> extends View {
     private static final class HexHiveRenderer {
         private final int canvasWidth;
         private final int canvasHeight;
-        private final DrawingProperties DP;
         private final HexDataAdapter adapter;
-        private final Paint hexagonBorderPaint;
-        private final CubePaint fullHexPaint;
-        private final CubePaint emptyHexPaint;
 
         public HexHiveRenderer(final int canvasWidth,
                                final int canvasHeight,
-                               final DrawingProperties DP,
-                               final HexDataAdapter adapter,
-                               final Paint hexagonBorderPaint,
-                               final CubePaint fullHexPaint,
-                               final CubePaint emptyHexPaint) {
+                               final HexDataAdapter adapter) {
             this.canvasWidth = canvasWidth;
             this.canvasHeight = canvasHeight;
-            this.DP = DP;
             this.adapter = adapter;
-            this.hexagonBorderPaint = hexagonBorderPaint;
-            this.fullHexPaint = fullHexPaint;
-            this.emptyHexPaint = emptyHexPaint;
         }
     }
 
-    private static void asyncDraw(HexHiveView view, HexHiveRenderer renderer) {
-        final DrawingProperties DP = renderer.DP;
+    private void asyncDraw(HexHiveRenderer renderer) {
         // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
         DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
         boolean evenRow = true;
@@ -352,17 +339,17 @@ public class HexHiveView<T> extends View {
         Bitmap bitmap = Bitmap.createBitmap(renderer.canvasWidth, renderer.canvasHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         while (pieceIndex < DP.numHexs) {
-            drawHexagon(DP, canvas, renderer.hexagonBorderPaint, (renderer.adapter.isFull(pieceIndex) ? renderer.fullHexPaint : renderer.emptyHexPaint), drawCubes);
+            drawHexagon(DP, canvas, hexagonBorderPaint, (renderer.adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            DP.hexCenterBuffer.x += DP.hexWidth + (renderer.hexagonBorderPaint.getStrokeWidth() * 4);
-            float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (renderer.hexagonBorderPaint.getStrokeWidth() * 3);
+            DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
+            float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
             if (rightSide >= DP.end.x) {
                 evenRow = !evenRow;
                 DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
                 DP.hexCenterBuffer.y += threeQuarters;
             }
         }
-        view.compressedBitmap = bitmap;
+        compressedBitmap = bitmap;
     }
 
     // Drawing/Geometry functions
