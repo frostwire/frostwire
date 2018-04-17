@@ -140,7 +140,7 @@ public class HexHiveView<T> extends View {
             async(this,
                     HexHiveView::asyncDraw,
                     new HexHiveRenderer(canvasWidth, canvasHeight, DP, hexDataAdapter, hexagonBorderPaint, fullHexPaint, emptyHexPaint),
-                    HexHiveView::invalidatePostTask);
+                    (v, r) -> v.invalidate());
         }
     }
 
@@ -365,11 +365,6 @@ public class HexHiveView<T> extends View {
         view.compressedBitmap = bitmap;
     }
 
-    // to be executed in main thread
-    private static void invalidatePostTask(HexHiveView view,
-                                           @SuppressWarnings("unused") HexHiveRenderer unusedPassedByAsyncCall) {
-        view.invalidate();
-    }
     // Drawing/Geometry functions
 
     /**
