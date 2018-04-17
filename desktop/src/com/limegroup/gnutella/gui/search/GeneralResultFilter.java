@@ -65,7 +65,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         boolean seedsNeedUpdate = false;
         int seeds = node.getSeeds();
         if (seeds < _minResultsSeeds) {
-            _minResultsSeeds = seeds;
+            _minResultsSeeds = seeds >= 0 ? seeds : 0;
             seedsNeedUpdate = true;
         }
         if (seeds > _maxResultsSeeds) {
@@ -75,7 +75,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         boolean sizeNeedUpdate = false;
         long size = node.getSize();
         if (size < _minResultsSize) {
-            _minResultsSize = size;
+            _minResultsSize = size >= 0 ? size : 0;
             sizeNeedUpdate = true;
         }
         if (size > _maxResultsSize) {
