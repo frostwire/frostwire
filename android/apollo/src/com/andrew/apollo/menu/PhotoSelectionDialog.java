@@ -86,26 +86,22 @@ public class PhotoSelectionDialog extends DialogFragment {
         }
         // Dialog item Adapter
         final ProfileActivity activity = (ProfileActivity) getActivity();
-        final ListAdapter adapter = new ArrayAdapter<String>(activity,
+        final ListAdapter adapter = new ArrayAdapter<>(activity,
                 R.layout.dialog_select_item, mChoices);
         return new AlertDialog.Builder(activity)//.setTitle(title)
-                .setAdapter(adapter, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int which) {
-                        switch (which) {
-                            case NEW_PHOTO:
-                                activity.selectNewPhoto();
-                                break;
-                            case OLD_PHOTO:
-                                activity.selectOldPhoto();
-                                break;
-                            case GOOGLE_SEARCH:
-                                activity.googleSearch();
-                                break;
-                            default:
-                                break;
-                        }
+                .setAdapter(adapter, (dialog, which) -> {
+                    switch (which) {
+                        case NEW_PHOTO:
+                            activity.selectNewPhoto();
+                            break;
+                        case OLD_PHOTO:
+                            activity.selectOldPhoto();
+                            break;
+                        case GOOGLE_SEARCH:
+                            activity.googleSearch();
+                            break;
+                        default:
+                            break;
                     }
                 }).create();
     }
