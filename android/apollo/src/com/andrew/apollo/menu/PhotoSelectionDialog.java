@@ -13,7 +13,6 @@ package com.andrew.apollo.menu;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.ArrayAdapter;
@@ -37,8 +36,6 @@ public class PhotoSelectionDialog extends DialogFragment {
     private static final int NEW_PHOTO = 0;
 
     private static final int OLD_PHOTO = 1;
-
-    private static final int GOOGLE_SEARCH = 2;
 
     private final ArrayList<String> mChoices = new ArrayList<>();
 
@@ -96,11 +93,6 @@ public class PhotoSelectionDialog extends DialogFragment {
                             break;
                         case OLD_PHOTO:
                             activity.selectOldPhoto();
-                            break;
-                        case GOOGLE_SEARCH:
-                            activity.googleSearch();
-                            break;
-                        default:
                             break;
                     }
                 }).create();

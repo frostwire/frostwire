@@ -20,7 +20,6 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -574,21 +573,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         } else {
             mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
         }
-    }
-
-    /**
-     * Searches Google for the artist or album
-     */
-    public void googleSearch() {
-        String query = mProfileName;
-        if (isArtist()) {
-            query = mArtistName;
-        } else if (isAlbum()) {
-            query = mProfileName + " " + mArtistName;
-        }
-        final Intent googleSearch = new Intent(Intent.ACTION_WEB_SEARCH);
-        googleSearch.putExtra(SearchManager.QUERY, query);
-        startActivity(googleSearch);
     }
 
     /**
