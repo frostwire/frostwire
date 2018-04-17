@@ -139,8 +139,8 @@ public class HexHiveView<T> extends View {
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
             async(this,
                     HexHiveView::asyncDraw,
-                    new HexHiveRenderer(canvasWidth, canvasHeight, hexDataAdapter),
-                    (v, r) -> v.invalidate());
+                    canvasWidth, canvasHeight, hexDataAdapter,
+                    (v, w, h, a) -> v.invalidate());
         }
     }
 
@@ -309,21 +309,7 @@ public class HexHiveView<T> extends View {
         }
     }
 
-    private static final class HexHiveRenderer {
-        private final int canvasWidth;
-        private final int canvasHeight;
-        private final HexDataAdapter adapter;
-
-        public HexHiveRenderer(final int canvasWidth,
-                               final int canvasHeight,
-                               final HexDataAdapter adapter) {
-            this.canvasWidth = canvasWidth;
-            this.canvasHeight = canvasHeight;
-            this.adapter = adapter;
-        }
-    }
-
-    private void asyncDraw(HexHiveRenderer renderer) {
+    private void asyncDraw(int canvasWidth, int canvasHeight, HexDataAdapter adapter) {
         // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
         DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
         boolean evenRow = true;
@@ -336,10 +322,10 @@ public class HexHiveView<T> extends View {
             DP.hexCenterBuffer.y = DP.center.y;
         }
         boolean drawCubes = DP.numHexs <= 600;
-        Bitmap bitmap = Bitmap.createBitmap(renderer.canvasWidth, renderer.canvasHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         while (pieceIndex < DP.numHexs) {
-            drawHexagon(DP, canvas, hexagonBorderPaint, (renderer.adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
+            drawHexagon(DP, canvas, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
             DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
             float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
