@@ -154,22 +154,6 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     }
 
     /**
-     * Used to fetch for the album art via Last.fm.
-     *
-     * @param context The {@link Context} to use.
-     * @param album The name of the album in the profile the user is viewing.
-     * @param artist The name of the album artist in the profile the user is viewing
-     */
-    public void fetchAlbumPhoto(final Activity context, final String album, final String artist) {
-        if (!TextUtils.isEmpty(album)) {
-            mFetcher.removeFromCache(ImageFetcher.generateAlbumCacheKey(album, artist));
-            mFetcher.loadAlbumImage(artist, album, -1, mAlbumArt);
-        } else {
-            setDefault(context);
-        }
-    }
-
-    /**
      * Used to set the album art in the artist profile.
      *
      * @param context The {@link Context} to use.

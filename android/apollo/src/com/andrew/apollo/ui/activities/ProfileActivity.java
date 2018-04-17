@@ -577,18 +577,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     }
 
     /**
-     * When the user chooses {@code #selectOldPhoto()} while viewing an album
-     * profile, the image is, most likely, reverted back to the locally found
-     * artwork. This is specifically for fetching the image from Last.fm.
-     */
-    public void fetchAlbumArt() {
-        // First remove the old image
-        removeFromCache();
-        // Fetch for the artwork
-        mTabCarousel.fetchAlbumPhoto(this, mProfileName, mArtistName);
-    }
-
-    /**
      * Searches Google for the artist or album
      */
     public void googleSearch() {

@@ -476,18 +476,6 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
         mEnableSwipe = false;
     }
 
-    /**
-     * Used to fetch for the album art via Last.fm.
-     * 
-     * @param context The {@link Context} to use.
-     * @param albumName The name of the album in the profile the user is viewing.
-     * @param artistName The name of the album artist in the profile the user is viewing.
-     */
-    public void fetchAlbumPhoto(final Activity context, final String albumName,
-            final String artistName) {
-        mFirstTab.fetchAlbumPhoto(context, albumName, artistName);
-    }
-
     /** When clicked, selects the corresponding tab. */
     private final class TabClickListener implements OnClickListener {
         private final int mTab;

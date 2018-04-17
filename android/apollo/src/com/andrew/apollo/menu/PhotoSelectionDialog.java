@@ -40,8 +40,6 @@ public class PhotoSelectionDialog extends DialogFragment {
 
     private static final int GOOGLE_SEARCH = 2;
 
-    private static final int FETCH_IMAGE = 3;
-
     private final ArrayList<String> mChoices = new ArrayList<>();
 
     private static ProfileType mProfileType;
@@ -101,9 +99,6 @@ public class PhotoSelectionDialog extends DialogFragment {
                                 break;
                             case OLD_PHOTO:
                                 activity.selectOldPhoto();
-                                break;
-                            case FETCH_IMAGE:
-                                activity.fetchAlbumArt();
                                 break;
                             case GOOGLE_SEARCH:
                                 activity.googleSearch();
