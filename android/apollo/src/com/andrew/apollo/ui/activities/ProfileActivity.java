@@ -40,8 +40,6 @@ import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.FragmentMenuItems;
-import com.andrew.apollo.menu.PhotoSelectionDialog;
-import com.andrew.apollo.menu.PhotoSelectionDialog.ProfileType;
 import com.andrew.apollo.ui.fragments.TabFragmentOrder;
 import com.andrew.apollo.ui.fragments.profile.AlbumSongFragment;
 import com.andrew.apollo.ui.fragments.profile.ArtistAlbumFragment;
@@ -142,25 +140,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // Initialize the carousel
         mTabCarousel = findViewById(R.id.activity_profile_base_tab_carousel);
         mTabCarousel.reset();
-        mTabCarousel.getPhoto().setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-                ProfileType profileType;
-                if (isArtist()) {
-                    profileType = ProfileType.ARTIST;
-                } else if (isAlbum()) {
-                    profileType = ProfileType.ALBUM;
-                } else {
-                    profileType = ProfileType.OTHER;
-                }
-                try {
-                    PhotoSelectionDialog.newInstance(isArtist() ? mArtistName : mProfileName,
-                            profileType).show(getSupportFragmentManager(), "PhotoSelectionDialog");
-                } catch (Throwable ignored) {
-                }
-            }
-        });
         // Set up the action bar
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
