@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.AnimationUtils;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import com.andrew.apollo.ui.activities.ProfileActivity;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.frostwire.android.R;
@@ -147,9 +146,9 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mFirstTab = (CarouselTab)findViewById(R.id.profile_tab_carousel_tab_one);
+        mFirstTab = findViewById(R.id.profile_tab_carousel_tab_one);
         mFirstTab.setOverlayOnClickListener(mTabOneTouchInterceptListener);
-        mSecondTab = (CarouselTab)findViewById(R.id.profile_tab_carousel_tab_two);
+        mSecondTab = findViewById(R.id.profile_tab_carousel_tab_two);
         mSecondTab.setOverlayOnClickListener(mTabTwoTouchInterceptListener);
     }
 
@@ -343,20 +342,6 @@ public class ProfileTabCarousel extends HorizontalScrollView implements OnTouchL
         alpha = AlphaTouchInterceptorOverlay.clamp(alpha, 0.0f, 1.0f);
         mFirstTab.setAlphaLayerValue(alpha);
         mSecondTab.setAlphaLayerValue(MAX_ALPHA - alpha);
-    }
-
-    /**
-     * @return The {@link ImageView} in the first index.
-     */
-    public ImageView getPhoto() {
-        return mFirstTab.getPhoto();
-    }
-
-    /**
-     * @return The {@link ImageView} used to set the album art.
-     */
-    public ImageView getAlbumArt() {
-        return mFirstTab.getAlbumArt();
     }
 
     /**

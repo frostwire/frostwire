@@ -223,19 +223,4 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     public void showDeselectedState() {
         mLabelView.setSelected(false);
     }
-
-    /**
-     * @return The {@link ImageView} used to set the header photo.
-     */
-    public ImageView getPhoto() {
-        return mPhoto;
-    }
-
-    /**
-     * @return The {@link ImageView} used to set the album art .
-     */
-    public ImageView getAlbumArt() {
-        return mAlbumArt;
-    }
-
 }
