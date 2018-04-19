@@ -734,7 +734,6 @@
     <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
     <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
     <string name="infinity" translatable="false">&#8734;</string>
-
     <string name="transfer_detail_title_header">Name:</string>
     <string name="transfer_detail_storage_header">Storage Path:</string>
     <string name="add_trackers">Add trackers</string>
@@ -771,7 +770,6 @@
     <string name="lsd" translatable="false">LSD</string>
     <string name="pieces_header">Pieces:</string>
     <string name="piece_size_header">Piece Size:</string>
-
     <string name="details">Details</string>
     <string name="status">Status</string>
     <string name="trackers">Trackers</string>
