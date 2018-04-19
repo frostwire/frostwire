@@ -20,12 +20,7 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -65,8 +60,6 @@ import com.frostwire.util.Ref;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class ProfileActivity extends BaseActivity implements OnPageChangeListener, Listener {
-
-    private static final int NEW_PHOTO = 1;
 
     /**
      * The Bundle to pass into the Fragments
@@ -467,106 +460,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     @Override
     public void onTabSelected(final int position) {
         mViewPager.setCurrentItem(position);
-    }
-
-    @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == NEW_PHOTO) {
-            if (resultCode == RESULT_OK) {
-                Uri selectedImage = data.getData();
-
-                if (selectedImage == null) {
-                    selectOldPhoto();
-                    return;
-                }
-
-                if (selectedImage.toString().startsWith("content://com.android.providers.media.documents/document/image%3A")) {
-                    selectedImage = Uri.parse(selectedImage.toString().replace("com.android.providers.media.documents/document/image%3A", "media/external/images/media/"));
-                }
-
-                final String[] filePathColumn = {
-                        MediaStore.Images.Media.DATA
-                };
-
-                try {
-                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null,
-                            null, null);
-
-                    if (cursor != null && cursor.moveToFirst()) {
-                        final int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        final String picturePath = cursor.getString(columnIndex);
-
-                        cursor.close();
-
-                        String key = mProfileName;
-                        if (isArtist()) {
-                            key = mArtistName;
-                        } else if (isAlbum()) {
-                            key = ImageFetcher.generateAlbumCacheKey(mProfileName, mArtistName);
-                        }
-
-                        final Bitmap bitmap = ImageFetcher.decodeSampledBitmapFromFile(picturePath);
-                        mImageFetcher.addBitmapToCache(key, bitmap);
-                        if (isAlbum()) {
-                            mTabCarousel.getAlbumArt().setImageBitmap(bitmap);
-                        } else {
-                            mTabCarousel.getPhoto().setImageBitmap(bitmap);
-                        }
-                    }
-                } catch (Throwable t) {
-                    // it seems to be complaining about not having the '_data' column.
-                    // #fragmentation?
-                    t.printStackTrace();
-                }
-            } else {
-                selectOldPhoto();
-            }
-        }
-    }
-
-    /**
-     * Starts an activity for result that returns an image from the Gallery.
-     */
-    public void selectNewPhoto() {
-        removeFromCache();
-        final Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("image/*");
-        startActivityForResult(intent, NEW_PHOTO);
-    }
-
-    /**
-     * Fetches for the artist or album art, other wise sets the default header
-     * image.
-     */
-    public void selectOldPhoto() {
-        // First remove the old image
-        removeFromCache();
-        // Apply the old photo
-        if (isArtist()) {
-            mTabCarousel.setArtistProfileHeader(this, mArtistName);
-        } else if (isAlbum()) {
-            mTabCarousel.setAlbumProfileHeader(this, mProfileName, mArtistName);
-        } else {
-            mTabCarousel.setPlaylistOrGenreProfileHeader(this, mProfileName);
-        }
-    }
-
-    /**
-     * Removes the header image from the cache.
-     */
-    private void removeFromCache() {
-        String key = mProfileName;
-        if (isArtist()) {
-            key = mArtistName;
-        } else if (isAlbum()) {
-            key = ImageFetcher.generateAlbumCacheKey(mProfileName, mArtistName);
-        }
-        mImageFetcher.removeFromCache(key);
-        // Give the disk cache a little time before requesting a new image.
-        SystemClock.sleep(80);
     }
 
     /**
