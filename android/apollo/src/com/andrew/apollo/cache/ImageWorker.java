@@ -96,18 +96,6 @@ public abstract class ImageWorker {
     }
 
     /**
-     * Adds a new image to the memory and disk caches
-     *
-     * @param key The key used to store the image
-     * @param bitmap The {@link Bitmap} to cache
-     */
-    public void addBitmapToCache(final String key, final Bitmap bitmap) {
-        if (mImageCache != null) {
-            mImageCache.addBitmapToCache(key, bitmap);
-        }
-    }
-
-    /**
      * @return The default artwork
      */
     public Bitmap getDefaultArtwork() {

@@ -20,7 +20,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,7 +38,6 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,19 +65,9 @@ public final class ImageCache {
     private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10;
 
     /**
-     * Compression settings when writing images to disk cache
-     */
-    private static final CompressFormat COMPRESS_FORMAT = CompressFormat.JPEG;
-
-    /**
      * Disk cache index to read from
      */
     private static final int DISK_CACHE_INDEX = 0;
-
-    /**
-     * Image compression quality
-     */
-    private static final int COMPRESS_QUALITY = 98;
 
     /**
      * LRU cache
@@ -277,50 +265,6 @@ public final class ImageCache {
     }
 
     /**
-     * Adds a new image to the memory and disk caches
-     *
-     * @param data   The key used to store the image
-     * @param bitmap The {@link Bitmap} to cache
-     */
-    void addBitmapToCache(final String data, final Bitmap bitmap) {
-        if (data == null || bitmap == null) {
-            return;
-        }
-        // Add to memory cache
-        addBitmapToMemCache(data, bitmap);
-        // Add to disk cache
-        if (mDiskCache != null) {
-            final String key = hashKeyForDisk(data);
-            OutputStream out = null;
-            try {
-                final DiskLruCache.Snapshot snapshot = mDiskCache.get(key);
-                if (snapshot == null) {
-                    final DiskLruCache.Editor editor = mDiskCache.edit(key);
-                    if (editor != null) {
-                        out = editor.newOutputStream(DISK_CACHE_INDEX);
-                        bitmap.compress(COMPRESS_FORMAT, COMPRESS_QUALITY, out);
-                        editor.commit();
-                        out.close();
-                        flush();
-                    }
-                } else {
-                    snapshot.getInputStream(DISK_CACHE_INDEX).close();
-                }
-            } catch (final IOException e) {
-                Log.e(TAG, "addBitmapToCache - " + e);
-            } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (final Throwable e) {
-                    Log.e(TAG, "addBitmapToCache - " + e);
-                }
-            }
-        }
-    }
-
-    /**
      * Called to add a new image to the memory cache
      *
      * @param data   The key identifier
@@ -413,30 +357,6 @@ public final class ImageCache {
         Bitmap cachedImage = getBitmapFromMemCache(data);
         if (cachedImage == null) {
             cachedImage = getBitmapFromDiskCache(data);
-        }
-        if (cachedImage != null) {
-            addBitmapToMemCache(data, cachedImage);
-            return cachedImage;
-        }
-        return null;
-    }
-
-    /**
-     * Tries to return the album art from memory cache and disk cache, before
-     * calling {@code #getArtworkFromFile(Context, String)} again
-     *
-     * @param context The {@link Context} to use
-     * @param data    The name of the album art
-     * @param id      The ID of the album to find artwork for
-     * @return The artwork for an album
-     */
-    final Bitmap getCachedArtwork(final Context context, final String data, final long id) {
-        if (context == null || data == null) {
-            return null;
-        }
-        Bitmap cachedImage = getCachedBitmap(data);
-        if (cachedImage == null && id >= 0) {
-            cachedImage = getArtworkFromFile(context, id);
         }
         if (cachedImage != null) {
             addBitmapToMemCache(data, cachedImage);
