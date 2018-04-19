@@ -59,9 +59,9 @@ public class CarouselTab extends FrameLayoutWithOverlay {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mPhoto = (ImageView)findViewById(R.id.profile_tab_photo);
-        mAlbumArt = (ImageView)findViewById(R.id.profile_tab_album_art);
-        mLabelView = (TextView)findViewById(R.id.profile_tab_label);
+        mPhoto = findViewById(R.id.profile_tab_photo);
+        mAlbumArt = findViewById(R.id.profile_tab_album_art);
+        mLabelView = findViewById(R.id.profile_tab_label);
         mAlphaLayer = findViewById(R.id.profile_tab_alpha_overlay);
         mColorstrip = findViewById(R.id.profile_tab_colorstrip);
         // Set the alpha layer
@@ -166,14 +166,10 @@ public class CarouselTab extends FrameLayoutWithOverlay {
             mFetcher.loadAlbumImage(artist, lastAlbum,
                     MusicUtils.getIdForAlbum(context, lastAlbum, artist), mPhoto);
             // Play the album
-            mPhoto.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(final View v) {
-                    final long[] albumList = MusicUtils.getSongListForAlbum(getContext(),
-                            MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                    MusicUtils.playAll(albumList, 0, false);
-                }
+            mPhoto.setOnClickListener(v -> {
+                final long[] albumList = MusicUtils.getSongListForAlbum(getContext(),
+                        MusicUtils.getIdForAlbum(context, lastAlbum, artist));
+                MusicUtils.playAll(albumList, 0, false);
             });
         } else {
             setDefault(context);
