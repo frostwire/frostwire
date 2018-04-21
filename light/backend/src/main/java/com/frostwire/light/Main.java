@@ -146,16 +146,20 @@ public final class Main {
             bridgeOptions.addOutboundPermitted(permittedOptions);
 
             sockJSHandler.bridge(bridgeOptions, (BridgeEvent be) -> {
-                if (be != null && be.type() == BridgeEventType.SOCKET_CLOSED) {
+                if (be == null) {
+                    LOG.info("Handler<BridgeEvent> aborted, bridgeEvent object is null");
+                    return;
+                }
+                if (be.type() == BridgeEventType.SOCKET_CLOSED) {
                     LOG.info("Handler<BridgeEvent> socket closed from " + be.socket().remoteAddress());
                 }
                 JsonObject rawMessage = be.getRawMessage();
                 // SEND: From Client to Server
-                if (be != null && rawMessage != null && be.type() == BridgeEventType.SEND) {
+                if (rawMessage != null && be.type() == BridgeEventType.SEND) {
                     LOG.info("Handler<BridgeEvent:SEND> message:\n" + rawMessage.encodePrettily() + "\n");
                 }
                 // RECEIVE: From Server to Client
-                if (be != null && be.type() == BridgeEventType.RECEIVE) {
+                if (be.type() == BridgeEventType.RECEIVE) {
                     LOG.info("Handler<BridgeEvent:RECEIVE>");
                     LOG.info(be.getRawMessage().encodePrettily());
                 }
