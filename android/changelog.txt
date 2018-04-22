@@ -1,4 +1,4 @@
-FrostWire 2.0.4 build 522 - APR/19/2018
+FrostWire 2.0.4 build 523 - APR/21/2018
  - New jlibtorrent 1.2.0.18-RC2
  - Library updates: gms 15.0.0, re2j 1.2
  - Translations updated, Hungarian
