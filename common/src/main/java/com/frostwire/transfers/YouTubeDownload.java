@@ -157,6 +157,10 @@ public class YouTubeDownload extends BaseHttpDownload {
         return 0;
     }
 
+    protected boolean isDemuxDownload() {
+        return downloadType == DownloadType.DEMUX;
+    }
+
     private static Info convert(YouTubeCrawledSearchResult sr) {
         return new Info(sr.getDownloadUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize());
     }

@@ -229,18 +229,15 @@ public abstract class BaseHttpDownload implements Transfer {
         }
 
         state = TransferState.FINISHING;
-        THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (complete) {
-                        return;
-                    }
-
-                    onFinishing();
-                } catch (Throwable e) {
-                    error(e);
+        THREAD_POOL.execute(() -> {
+            try {
+                if (complete) {
+                    return;
                 }
+
+                onFinishing();
+            } catch (Throwable e) {
+                error(e);
             }
         });
     }

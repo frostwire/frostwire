@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.transfers.YouTubeDownload;
 
 /**
@@ -29,6 +30,7 @@ import com.frostwire.transfers.YouTubeDownload;
 public final class UIYouTubeDownload extends YouTubeDownload {
 
     private final TransferManager manager;
+    private long demuxedDownloadSize = -1;
 
     UIYouTubeDownload(TransferManager manager, YouTubeCrawledSearchResult sr) {
         super(sr);
@@ -43,17 +45,30 @@ public final class UIYouTubeDownload extends YouTubeDownload {
     }
 
     @Override
-    protected void onComplete() throws Throwable {
+    protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof UIYouTubeDownload)) {
-            return false;
-        }
+        return obj instanceof UIYouTubeDownload && getName().equals(((UIYouTubeDownload) obj).getName());
+    }
 
-        return getName().equals(((UIYouTubeDownload) obj).getName());
+    @Override
+    public long getSize() {
+        if (isDemuxDownload()) {
+            TransferState state = getState();
+            if (state == TransferState.SCANNING ||
+                state == TransferState.COMPLETE) {
+                if (demuxedDownloadSize == -1) {
+                    demuxedDownloadSize = savePath.length();
+                }
+                return demuxedDownloadSize;
+            } else {
+                return super.getSize();
+            }
+        }
+        return super.getSize();
     }
 }
