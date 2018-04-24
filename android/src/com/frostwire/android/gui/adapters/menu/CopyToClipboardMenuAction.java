@@ -25,7 +25,6 @@ import android.content.Context;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
-import com.frostwire.transfers.HttpDownload;
 
 /**
  * @author gubatron
