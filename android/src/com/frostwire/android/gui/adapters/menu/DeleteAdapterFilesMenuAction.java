@@ -23,6 +23,7 @@ import android.content.Context;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.views.AbstractDialog;
 
 import java.util.ArrayList;

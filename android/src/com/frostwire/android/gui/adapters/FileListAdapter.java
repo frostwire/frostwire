@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.frostwire.android.gui.adapters.menu;
+package com.frostwire.android.gui.adapters;
 
 import android.app.Activity;
 import android.content.ContentUris;
@@ -45,7 +45,17 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.adapters.menu.FileListAdapter.FileDescriptorItem;
+import com.frostwire.android.gui.adapters.FileListAdapter.FileDescriptorItem;
+import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
+import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
+import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
+import com.frostwire.android.gui.adapters.menu.FileInformationAction;
+import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
+import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.SeedAction;
+import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
+import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
+import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;

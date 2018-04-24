@@ -57,7 +57,7 @@ import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
-import com.frostwire.android.gui.adapters.menu.FileListAdapter;
+import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;

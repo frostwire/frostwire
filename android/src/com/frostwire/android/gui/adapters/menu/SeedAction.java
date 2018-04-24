@@ -86,7 +86,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
      * Seeds a file that's not a torrent yet.
      * Reminder: Currently disabled when using SD Card.
      */
-    SeedAction(Context context, FileDescriptor fd) {
+    public SeedAction(Context context, FileDescriptor fd) {
         this(context, fd, null, null);
     }
 
