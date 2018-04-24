@@ -1681,7 +1681,13 @@ public class MusicPlaybackService extends Service {
         if (config == null) {
             config = Bitmap.Config.ARGB_8888;
         }
-        final Bitmap albumArtCopy = albumArt.copy(config, false);
+        Bitmap bmpCopy = null;
+        try {
+            bmpCopy = albumArt.copy(config, false);
+        } catch (OutOfMemoryError e) {
+            // ignore, can't do anything meaningful here
+        }
+        final Bitmap albumArtCopy = bmpCopy;
         final String artistName = musicPlaybackService.getArtistName();
         final String albumName = musicPlaybackService.getAlbumName();
         final String trackName = musicPlaybackService.getTrackName();
@@ -1697,15 +1703,19 @@ public class MusicPlaybackService extends Service {
             }
             MusicPlaybackService musicPlaybackService1 = musicPlaybackServiceRef.get();
             try {
-                musicPlaybackService1.mRemoteControlClient
+                RemoteControlClient.MetadataEditor editor = musicPlaybackService1.mRemoteControlClient
                         .editMetadata(true)
                         .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
                         .putString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, albumArtistName)
                         .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, albumName)
                         .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, trackName)
-                        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration)
-                        .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy)
-                        .apply();
+                        .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration);
+
+                if (albumArtCopy != null) {
+                    editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArtCopy);
+                }
+
+                editor.apply();
             } catch (Throwable t) {
                 // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
             }
