@@ -175,6 +175,8 @@ android {
 
 dependencies {
     implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:animated-vector-drawable:27.1.1'
+    implementation 'com.android.support:customtabs:27.1.1'
     implementation 'com.android.support:exifinterface:27.1.1'
     implementation 'com.android.support:preference-v7:27.1.1'
     implementation 'com.google.android.gms:play-services-ads:15.0.0'
