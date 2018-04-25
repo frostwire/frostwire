@@ -31,6 +31,7 @@ import com.mopub.mobileads.MoPubView;
 import org.prebid.mobile.core.AdUnit;
 import org.prebid.mobile.core.BannerAdUnit;
 import org.prebid.mobile.core.Prebid;
+import org.prebid.mobile.core.TargetingParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,6 +179,8 @@ public final class PrebidManager {
             // It's ok to do this in the main thread.
             // The expensive server operation is done in a background executor inside Prebid
             String ACCOUNT_ID = "01e786a8-b070-4fb3-a21f-a76866f15c80";
+            TargetingParams.setLocationDecimalDigits(2);
+            TargetingParams.setLocationEnabled(true);
             Prebid.init(applicationContext, adUnits, ACCOUNT_ID, Prebid.AdServer.MOPUB, Prebid.Host.APPNEXUS);
             initialized = true;
             enabled = true;
