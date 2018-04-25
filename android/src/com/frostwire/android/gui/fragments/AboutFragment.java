@@ -116,10 +116,9 @@ public final class AboutFragment extends AbstractFragment {
         StringBuilder sb = new StringBuilder();
         sb.append("jlibtorrent v").append(LibTorrent.jlibtorrentVersion());
 
-        // TODO: uncomment when using 1.2.0.18
-        //if (LibTorrent.hasNeonArmSupport()) {
+        if (LibTorrent.hasArmNeonSupport()) {
             sb.append("(arm neon)");
-        //}
+        }
 
         return sb.toString();
     }
