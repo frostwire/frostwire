@@ -184,8 +184,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-interstitial:4.20.0@aar') { transitive = true }
     implementation 'com.applovin:applovin-sdk:7.8.6'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC3'
-    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC3'
+    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC4'
+    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC4'
     implementation 'com.google.android:flexbox:0.3.2'
     implementation(name: 'presage-3.0.13-3.0.8', ext: 'aar')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
