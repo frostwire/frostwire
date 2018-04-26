@@ -23,7 +23,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -148,8 +147,45 @@ public final class SearchFragment extends AbstractFragment implements
         if (slides != null) {
             promotions.setSlides(slides);
         } else {
-            new LoadSlidesTask(this).execute();
+            //new LoadSlidesTask(this).execute();
+            async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
         }
+    }
+
+    private List<Slide> loadSlidesInBackground() {
+        try {
+            HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+            String url = String.format("%s?from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
+            String json = http.get(url);
+            SlideList slides = JsonUtils.toObject(json, SlideList.class);
+            // HACK: Gets rid of the old "see more search results" slide.
+            // TODO: Remove this when unnecessary after several updates
+            if (slides != null && slides.slides != null) {
+                Iterator<Slide> it = slides.slides.iterator();
+                while (it.hasNext()) {
+                    Slide slide = it.next();
+                    if (slide.imageSrc.equals("http://static.frostwire.com/images/overlays/fw-results-overlay-2.jpg")) {
+                        it.remove();
+                    }
+                }
+            }
+            // yes, these requests are done only once per session.
+            //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
+            return slides != null ? slides.slides : null;
+        } catch (Throwable e) {
+            LOG.error("Error loading slides from url", e);
+        }
+        return null;
+    }
+
+    private void onSlidesLoaded(List<Slide> result) {
+        if (result != null && !result.isEmpty()) {
+            slides = result;
+        } else {
+            slides = new ArrayList<>(0);
+        }
+        promotions.setSlides(slides);
+        promotions.invalidate();
     }
 
     @Override
@@ -397,7 +433,6 @@ public final class SearchFragment extends AbstractFragment implements
             fragment1.keywordDetector.requestHistogramsUpdateAsync(null);
         });
     }
-
 
     private static final class ScrollDirectionListener implements DirectionDetectorScrollListener.ScrollDirectionListener {
         private final WeakReference<SearchFragment> searchFragmentWeakReference;
@@ -802,56 +837,6 @@ public final class SearchFragment extends AbstractFragment implements
             }
             SearchFragment fragment = fragmentRef.get();
             fragment.cancelSearch();
-        }
-    }
-
-    private static class LoadSlidesTask extends AsyncTask<Void, Void, List<Slide>> {
-        private final WeakReference<SearchFragment> fragmentRef;
-
-        LoadSlidesTask(SearchFragment fragment) {
-            this.fragmentRef = new WeakReference<>(fragment);
-        }
-
-        @Override
-        protected List<Slide> doInBackground(Void... params) {
-            try {
-                HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                String url = String.format("%s?from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
-                String json = http.get(url);
-                SlideList slides = JsonUtils.toObject(json, SlideList.class);
-                // HACK: Gets rid of the old "see more search results" slide.
-                // TODO: Remove this when unnecessary after several updates
-                if (slides != null && slides.slides != null) {
-                    Iterator<Slide> it = slides.slides.iterator();
-                    while (it.hasNext()) {
-                        Slide slide = it.next();
-                        if (slide.imageSrc.equals("http://static.frostwire.com/images/overlays/fw-results-overlay-2.jpg")) {
-                            it.remove();
-                        }
-                    }
-                }
-                // yes, these requests are done only once per session.
-                //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
-                return slides != null ? slides.slides : null;
-            } catch (Throwable e) {
-                LOG.error("Error loading slides from url", e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Slide> result) {
-            if (!Ref.alive(fragmentRef)) {
-                return;
-            }
-            SearchFragment f = fragmentRef.get();
-            if (result != null && !result.isEmpty()) {
-                f.slides = result;
-            } else {
-                f.slides = new ArrayList<>(0);
-            }
-            f.promotions.setSlides(f.slides);
-            f.promotions.invalidate();
         }
     }
 
