@@ -126,12 +126,12 @@ public final class KeywordDetector {
                 // Check file extensions for YouTubeSearch results.
                 // If we find files with extensions other than ".youtube", we make their mt = null and don't include them
                 // in the keyword detector. IDEA: Make FileSearchResults have a .getMediaType() method and put this logic there.
-                KeywordMediaType mt;
                 String extension = FilenameUtils.getExtension(fileName);
-                mt = KeywordMediaType.getMediaTypeForExtension(extension);
                 if ("youtube".equals(extension)) {
-                    mt = KeywordMediaType.getVideoMediaType();
-                } else if (mt != null && mt.equals(KeywordMediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
+                    continue;
+                }
+                KeywordMediaType mt = KeywordMediaType.getMediaTypeForExtension(extension);
+                if (mt != null && mt.equals(KeywordMediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
                     // NOTE: this excludes all non .youtube youtube search results (e.g. 3gp, webm) from appearing on results
                     mt = null;
                 }
