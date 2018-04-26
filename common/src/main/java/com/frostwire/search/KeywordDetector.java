@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 package com.frostwire.search;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
@@ -66,6 +67,9 @@ public final class KeywordDetector {
 
     private static final Logger LOG = Logger.getLogger(KeywordDetector.class);
     private static final Set<String> stopWords = new HashSet<>();
+
+    private static final Pattern REPLACE_ALL_PATTERN = Pattern.compile("[^\\p{L}0-9 .]|\\.{2,}");
+
     private final Map<Feature, HistoHashMap<String>> histoHashMaps;
     private KeywordDetectorListener keywordDetectorListener;
     private final HistogramUpdateRequestDispatcher histogramUpdateRequestsDispatcher;
@@ -99,7 +103,7 @@ public final class KeywordDetector {
 
     public void addSearchTerms(Feature feature, String terms) {
         // tokenize
-        String[] pre_tokens = terms.replaceAll("[^\\p{L}0-9 .]|\\.{2}+", "").toLowerCase().split("\\s");
+        String[] pre_tokens = REPLACE_ALL_PATTERN.matcher(terms).replaceAll("").toLowerCase().split("\\s");
         if (pre_tokens.length == 0) {
             return;
         }
