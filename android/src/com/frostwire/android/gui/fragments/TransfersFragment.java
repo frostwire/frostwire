@@ -56,7 +56,7 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
+import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -716,7 +716,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void startCloudTransfer(String text) {
         if (text.contains("soundcloud.com/")) {
-            new DownloadSoundcloudFromUrlTask(getActivity(), text.trim()).execute();
+            new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim()).execute();
         } else if (text.contains("youtube.com/")) {
             startYouTubeSearchFromUrl(text.trim());
         } else {

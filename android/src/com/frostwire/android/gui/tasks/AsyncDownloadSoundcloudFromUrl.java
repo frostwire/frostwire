@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.ConfirmSoundcloudDownloadDialog;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.views.ContextTask;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -38,46 +38,15 @@ import java.util.List;
  * @author aldenml
  * @author gubatron
  */
-public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<SoundcloudSearchResult>> {
+public final class AsyncDownloadSoundcloudFromUrl {
     @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger(DownloadSoundcloudFromUrlTask.class);
-    private final String soundcloudUrl;
+    private static final Logger LOG = Logger.getLogger(AsyncDownloadSoundcloudFromUrl.class);
 
-    public DownloadSoundcloudFromUrlTask(Context ctx, String soundcloudUrl) {
-        super(ctx);
-        this.soundcloudUrl = soundcloudUrl;
+    public AsyncDownloadSoundcloudFromUrl(Context ctx, String soundcloudUrl) {
+        Asyncs.async(ctx, AsyncDownloadSoundcloudFromUrl::doInBackground, soundcloudUrl, AsyncDownloadSoundcloudFromUrl::onPostExecute);
     }
 
-    private ConfirmSoundcloudDownloadDialog createConfirmListDialog(Context ctx, List<SoundcloudSearchResult> results) {
-        String title = ctx.getString(R.string.confirm_download);
-        String whatToDownload = ctx.getString((results.size() > 1) ? R.string.playlist : R.string.track);
-        String totalSize = UIUtils.getBytesInHuman(getTotalSize(results));
-        String text = ctx.getString(R.string.are_you_sure_you_want_to_download_the_following, whatToDownload, totalSize);
-
-        //AbstractConfirmListDialog
-        ConfirmSoundcloudDownloadDialog dlg = ConfirmSoundcloudDownloadDialog.newInstance(ctx, title, text, results);
-        return dlg;
-    }
-
-    private long getTotalSize(List<SoundcloudSearchResult> results) {
-        long totalSizeInBytes = 0;
-        for (SoundcloudSearchResult sr : results) {
-            totalSizeInBytes += sr.getSize();
-        }
-        return totalSizeInBytes;
-    }
-
-    @Override
-    protected void onPostExecute(Context ctx, List<SoundcloudSearchResult> results) {
-        if (ctx != null && !results.isEmpty()) {
-            MainActivity activity = (MainActivity) ctx;
-            ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
-            dlg.show(activity.getFragmentManager());
-        }
-    }
-
-    @Override
-    protected List<SoundcloudSearchResult> doInBackground() {
+    private static List<SoundcloudSearchResult> doInBackground(final Context context, final String soundcloudUrl) {
         List<SoundcloudSearchResult> results = new ArrayList<>();
         try {
             String url = soundcloudUrl;
@@ -92,5 +61,31 @@ public final class DownloadSoundcloudFromUrlTask extends ContextTask<List<Soundc
             e.printStackTrace();
         }
         return results;
+    }
+
+    private static void onPostExecute(Context ctx, final String soundcloudUrl, List<SoundcloudSearchResult> results) {
+        if (ctx != null && !results.isEmpty()) {
+            MainActivity activity = (MainActivity) ctx;
+            ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
+            dlg.show(activity.getFragmentManager());
+        }
+    }
+
+    private static ConfirmSoundcloudDownloadDialog createConfirmListDialog(Context ctx, List<SoundcloudSearchResult> results) {
+        String title = ctx.getString(R.string.confirm_download);
+        String whatToDownload = ctx.getString((results.size() > 1) ? R.string.playlist : R.string.track);
+        String totalSize = UIUtils.getBytesInHuman(getTotalSize(results));
+        String text = ctx.getString(R.string.are_you_sure_you_want_to_download_the_following, whatToDownload, totalSize);
+
+        //AbstractConfirmListDialog
+        return ConfirmSoundcloudDownloadDialog.newInstance(ctx, title, text, results);
+    }
+
+    private static long getTotalSize(List<SoundcloudSearchResult> results) {
+        long totalSizeInBytes = 0;
+        for (SoundcloudSearchResult sr : results) {
+            totalSizeInBytes += sr.getSize();
+        }
+        return totalSizeInBytes;
     }
 }
