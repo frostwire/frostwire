@@ -49,9 +49,8 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearch
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.tasks.DownloadSoundcloudFromUrlTask;
-import com.frostwire.android.gui.tasks.StartDownloadTask;
-import com.frostwire.android.gui.tasks.Tasks;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
@@ -626,8 +625,7 @@ public final class SearchFragment extends AbstractFragment implements
         if (sr instanceof AbstractTorrentSearchResult) {
             UIUtils.showShortMessage(ctx, R.string.fetching_torrent_ellipsis);
         }
-        StartDownloadTask task = new StartDownloadTask(ctx, sr, message);
-        Tasks.executeParallel(task);
+        new AsyncStartDownload(ctx, sr, message);
     }
 
     private void showRatingsReminder(View v) {

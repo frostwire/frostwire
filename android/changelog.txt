@@ -1,9 +1,11 @@
-FrostWire 2.0.4 build 524 - APR/25/2018
+FrostWire 2.0.4 build 525 - APR/26/2018
  - New jlibtorrent 1.2.0.18-RC4
  - Library updates: gms 15.0.0, re2j 1.2
  - Translations updated, Hungarian
  - Music player clean up and optimizations
  - Advanced Transfer Piece viewer rendering optimizations
+ - Search Filtering optimizations
+ - Bug where Creative Commons features would dissapear on Plus fixed
 
 FrostWire 2.0.3 build 521 - APR/12/2018
  - Search: Yify fixed

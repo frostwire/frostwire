@@ -22,8 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.tasks.StartDownloadTask;
-import com.frostwire.android.gui.tasks.Tasks;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -56,8 +55,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
     private static void startDownloads(Context ctx, List<? extends SearchResult> srs) {
         if (srs != null && !srs.isEmpty()) {
             for (SearchResult sr : srs) {
-                StartDownloadTask task = new StartDownloadTask(ctx, sr);
-                Tasks.executeParallel(task);
+                new AsyncStartDownload(ctx, sr);
             }
             UIUtils.showTransfersOnDownloadStart(ctx);
         }
