@@ -162,7 +162,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         // "ALL FREE DOWNLOADS" button shown last
         if (position == getCount() - 1) {
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
                 return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
             } else {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
