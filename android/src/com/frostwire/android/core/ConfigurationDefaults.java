@@ -73,9 +73,9 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 5);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, 15);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 0 : 100);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 0 : 100);
-        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 100 : 50);
+        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, 0);
+        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, 0);
+        defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, 100);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES, 15);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
