@@ -199,7 +199,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         }
         // "FROSTWIRE FEATURES" title view
         if (position == offsetFeaturesTitleHeader) {
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
             } else {
                 return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
