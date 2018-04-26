@@ -114,14 +114,14 @@ public final class KeywordDetector {
 
     public void feedSearchResults(final List<? extends SearchResult> copiedResults) {
         for (SearchResult sr : copiedResults) {
-            addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource().toLowerCase());
+            addSearchTerms(KeywordDetector.Feature.SEARCH_SOURCE, sr.getSource());
             if (sr instanceof FileSearchResult) {
                 String fileName = ((FileSearchResult) sr).getFilename();
                 if (fileName == null || fileName.isEmpty()) {
                     continue;
                 }
 
-                addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName.toLowerCase());
+                addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
 
                 // Check file extensions for YouTubeSearch results.
                 // If we find files with extensions other than ".youtube", we make their mt = null and don't include them
