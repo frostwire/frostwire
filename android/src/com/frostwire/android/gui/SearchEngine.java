@@ -98,7 +98,7 @@ public abstract class SearchEngine {
         }
         if (!oneEnabled) {
             SearchEngine engineToEnable;
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
                 engineToEnable = EZTV;
             } else {
                 engineToEnable = YOUTUBE;

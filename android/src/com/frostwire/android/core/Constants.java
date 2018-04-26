@@ -27,6 +27,7 @@ import com.frostwire.android.BuildConfig;
  */
 public final class Constants {
 
+    /** isDevelopment */
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
     public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
