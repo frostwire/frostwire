@@ -49,8 +49,8 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearch
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.HttpSlideSearchResult;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
@@ -804,7 +804,7 @@ public final class SearchFragment extends AbstractFragment implements
             fragment.searchInput.selectTabByMediaType((byte) mediaTypeId);
             if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
                 fragment.cancelSearch();
-                new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query).execute();
+                new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query);
                 fragment.searchInput.setText("");
             } else if (query.contains("youtube.com/")) {
                 fragment.performYTSearch(query);

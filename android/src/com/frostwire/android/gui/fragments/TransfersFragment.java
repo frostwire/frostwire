@@ -716,7 +716,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private void startCloudTransfer(String text) {
         if (text.contains("soundcloud.com/")) {
-            new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim()).execute();
+            new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim());
         } else if (text.contains("youtube.com/")) {
             startYouTubeSearchFromUrl(text.trim());
         } else {
