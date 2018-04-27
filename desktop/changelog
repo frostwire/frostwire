@@ -1,3 +1,19 @@
+frostwire (6.6.6) stable; urgency=high
+  * re2j update to 1.2, search results parsing optimizations
+  * search filter fixes
+  * New jlibtorrent 1.2.0.18-RC4
+  * jlibtorrent: updated to boost 1.67.0
+  * jlibtorrent: updated to OpenSSL 1.1.0h
+  * jlibtorrent: fix storage initialization
+  * jlibtorrent: don't perform DNS lookups for the DHT bootstrap unless DHT is enabled
+  * jlibtorrent: stat files in the disk thread
+  * jlibtorrent: source code cleanup, performance and stability
+  * jlibtorrent: issue query block size from torrent before metadata has been received
+  * jlibtorrent: source code cleanup, performance and stability
+  * jlibtorrent: honor torrent abort even on file check error
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 26 Apr 2018 19:56:00 -0600
+
 frostwire (6.6.5) stable; urgency=high
   * Search: Yify fixed
   * Japanese, Korean translations updated
