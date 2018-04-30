@@ -21,7 +21,9 @@ import android.os.StrictMode;
 
 import com.frostwire.android.gui.services.Engine;
 
-public interface RunStrict {
+public interface RunStrict<R> {
+
+    R run();
 
     /**
      * Enable the most strict form of {@link StrictMode} possible,
@@ -69,6 +71,22 @@ public interface RunStrict {
         try {
             setStrictPolicy(true);
             r.run();
+        } finally {
+            setStrictPolicy(false);
+        }
+    }
+
+    /**
+     * Runs the lambda code under strict policy.
+     *
+     * @param r   the lambda to run
+     * @param <R> the type of return
+     * @return the return value
+     */
+    static <R> R runStrict(RunStrict<R> r) {
+        try {
+            setStrictPolicy(true);
+            return r.run();
         } finally {
             setStrictPolicy(false);
         }
