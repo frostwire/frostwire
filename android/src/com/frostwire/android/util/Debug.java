@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,57 +59,6 @@ public final class Debug {
      */
     public static boolean isEnabled() {
         return BuildConfig.DEBUG;
-    }
-
-    /**
-     * Enable the most strict form of {@link StrictMode} possible,
-     * with log and death as penalty. When {@code enable} is {@code false}, the
-     * default more relaxed (LAX) policy is used.
-     * <p>
-     * This method only perform an actual action if the application is
-     * in debug mode.
-     *
-     * @param enable {@code true} activate the most strict policy
-     */
-    public static void setStrictPolicy(boolean enable) {
-        if (!isEnabled()) {
-            return; // no debug mode, do nothing
-        }
-
-        // by default, the LAX policy
-        StrictMode.ThreadPolicy threadPolicy = StrictMode.ThreadPolicy.LAX;
-        StrictMode.VmPolicy vmPolicy = StrictMode.VmPolicy.LAX;
-
-        if (enable) {
-            threadPolicy = new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .penaltyDeath()
-                    .build();
-            vmPolicy = new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .penaltyDeath()
-                    .setClassInstanceLimit(Engine.class, 1)
-                    .build();
-        }
-
-        StrictMode.setThreadPolicy(threadPolicy);
-        StrictMode.setVmPolicy(vmPolicy);
-    }
-
-    /**
-     * Runs the runnable code under strict policy.
-     *
-     * @param r the runnable to execute r.run()
-     */
-    public static void runStrict(Runnable r) {
-        try {
-            setStrictPolicy(true);
-            r.run();
-        } finally {
-            setStrictPolicy(false);
-        }
     }
 
     /**

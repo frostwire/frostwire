@@ -47,7 +47,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.Debug.runStrict;
+import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * @author gubatron
