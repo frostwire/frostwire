@@ -1,4 +1,4 @@
-FrostWire 2.0.4 build 525 - APR/26/2018
+FrostWire 2.0.4 build 526 - APR/30/2018
  - New jlibtorrent 1.2.0.18-RC4
  - jlibtorrent: updated to boost 1.67.0
  - jlibtorrent: updated to OpenSSL 1.1.0h
@@ -10,7 +10,7 @@ FrostWire 2.0.4 build 525 - APR/26/2018
  - jlibtorrent: source code cleanup, performance and stability
  - jlibtorrent: honor torrent abort even on file check error
  - Library updates: gms 15.0.0, re2j 1.2
- - Translations updated, Hungarian
+ - Translations updated, Hungarian, Hindi
  - Music player clean up and optimizations
  - Advanced Transfer Piece viewer rendering optimizations
  - Search Filtering optimizations
