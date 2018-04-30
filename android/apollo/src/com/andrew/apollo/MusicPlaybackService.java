@@ -66,6 +66,7 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -553,8 +554,11 @@ public class MusicPlaybackService extends Service {
         if (D) LOG.info("Creating service");
         super.onCreate();
 
-        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        boolean permissionGranted = runStrict(() ->
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                        PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
+
+        if (permissionGranted) {
 
             try {
                 // "This initService() call may result in ANRs, when some of the ContentResovler queries (like getCardId())
