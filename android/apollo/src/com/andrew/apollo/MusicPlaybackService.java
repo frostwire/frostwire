@@ -2165,11 +2165,16 @@ public class MusicPlaybackService extends Service {
      * @return The current song artist name
      */
     private String getAlbumArtistName() {
-        synchronized (this) {
-            if (mAlbumCursor == null || mAlbumCursor.isClosed()) {
-                return null;
+        try {
+            synchronized (this) {
+                if (mAlbumCursor == null || mAlbumCursor.isClosed()) {
+                    return null;
+                }
+                return mAlbumCursor.getString(mAlbumCursor.getColumnIndexOrThrow(AlbumColumns.ARTIST));
             }
-            return mAlbumCursor.getString(mAlbumCursor.getColumnIndexOrThrow(AlbumColumns.ARTIST));
+        } catch (Throwable e) {
+            // avoid crash due to IllegalStateException, or any other exception
+            return "";
         }
     }
 
