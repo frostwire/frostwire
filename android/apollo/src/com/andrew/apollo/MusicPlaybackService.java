@@ -1971,7 +1971,7 @@ public class MusicPlaybackService extends Service {
                     LOG.error("Error while opening file for play", e);
                     callback.openFileResult(false);
                     return;
-                } catch (StaleDataException e) {
+                } catch (StaleDataException | IllegalStateException e) {
                     LOG.error("Error with database cursor while opening file for play", e);
                     callback.openFileResult(false);
                     return;
