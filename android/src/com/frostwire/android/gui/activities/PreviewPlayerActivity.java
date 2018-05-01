@@ -383,9 +383,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         // these ones only exist on landscape mode.
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
 
+        // TODO: review this logic, how is that toggleFullScreen can be called before initMopubView?
         // these might not even be there
         if (advertisementHeaderLayout == null) {
             advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
+        }
+        if (fallbackImageView == null) {
+            fallbackImageView = findView(R.id.activity_preview_fallback_imageview);
         }
         if (mopubView == null) {
             mopubView = findView(R.id.activity_preview_player_mopubview);
