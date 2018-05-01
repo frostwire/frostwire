@@ -702,7 +702,6 @@
     <string name="sequential_download">シーケンシャルダウンロード</string>
     <string name="downloaded_n">ダウンロード済み %1$s / </string>
     <string name="transfer_detail_title_header">名：</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="time_elapsed">時間が経過した</string>
     <string name="remove_tracker">トラッカーを削除</string>
     <string name="comment">コメント</string>

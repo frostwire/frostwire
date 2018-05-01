@@ -700,7 +700,6 @@
     <string name="sequential_download">Sekvenční stahování</string>
     <string name="downloaded_n">Stažený %1$s / </string>
     <string name="transfer_detail_title_header">Název:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d souborů bylo sdíleno s FrostWire zařízeními ve stejné síti Wi-Fi.</string>
     <string name="time_elapsed">Uplynulý čas</string>
     <string name="remove_tracker">Odstraňte tracker</string>

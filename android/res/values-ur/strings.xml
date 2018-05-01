@@ -697,7 +697,6 @@
     <string name="sequential_download">منظوری ڈاؤن لوڈ</string>
     <string name="downloaded_n">%1$s ڈاؤن لوڈ کردہ / </string>
     <string name="transfer_detail_title_header">نام:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d فائلوں کو اسی وائی فائی نیٹ ورک پر FrostWire آلات میں اشتراک کیا گیا ہے.</string>
     <string name="time_elapsed">وقت گزر گیا</string>
     <string name="remove_tracker">ٹریکر کو ہٹا دیں</string>

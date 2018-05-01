@@ -700,7 +700,6 @@
     <string name="sequential_download">순차 다운로드</string>
     <string name="downloaded_n">다운로드 됨 %1$s / </string>
     <string name="transfer_detail_title_header">이름:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d 개의 파일이 동일한 Wi-Fi 네트워크의 FrostWire 장치에 공유되었습니다.</string>
     <string name="time_elapsed">경과 시간</string>
     <string name="remove_tracker">추적기 제거</string>

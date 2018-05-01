@@ -701,7 +701,6 @@
     <string name="sequential_download">Последовательная загрузка</string>
     <string name="downloaded_n">загруженный %1$s / </string>
     <string name="transfer_detail_title_header">Имя:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d файлы были разделены на устройства FrostWire в той же сети Wi-Fi.</string>
     <string name="time_elapsed">Истекшее время</string>
     <string name="remove_tracker">Удалить трекер</string>

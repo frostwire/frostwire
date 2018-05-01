@@ -705,7 +705,6 @@
     <string name="sequential_download">Διαδοχική λήψη</string>
     <string name="downloaded_n">Λήψη %1$s / </string>
     <string name="transfer_detail_title_header">Ονομα:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="time_elapsed">Time elapsed</string>
     <string name="remove_tracker">Κατάργηση tracker</string>
     <string name="comment">Σχόλιο</string>

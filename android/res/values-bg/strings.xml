@@ -696,7 +696,6 @@
     <string name="sequential_download">Последователно изтегляне</string>
     <string name="downloaded_n">Изтеглили %1$s / </string>
     <string name="transfer_detail_title_header">Име:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d файла бяха споделени на FrostWire устройства в същата Wi-Fi мрежа.</string>
     <string name="time_elapsed">Изминало време</string>
     <string name="remove_tracker">Премахнете тракера</string>

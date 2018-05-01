@@ -696,7 +696,6 @@
     <string name="sequential_download">Download sequencial</string>
     <string name="downloaded_n">Baixado %1$s / </string>
     <string name="transfer_detail_title_header">Nome:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d arquivos foram compartilhados com dispositivos FrostWire na mesma rede Wi-Fi.</string>
     <string name="time_elapsed">Tempo decorrido</string>
     <string name="remove_tracker">Remover rastreador</string>

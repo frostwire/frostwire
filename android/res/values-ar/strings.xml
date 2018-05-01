@@ -697,7 +697,6 @@
     <string name="sequential_download">تحميل متتابعة</string>
     <string name="downloaded_n"> %1$s / تحميلها</string>
     <string name="transfer_detail_title_header">اسم:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="time_elapsed">الوقت المنقضي</string>
     <string name="remove_tracker">إزالة تعقب</string>
     <string name="comment">تعليق</string>

@@ -701,7 +701,6 @@
     <string name="sequential_download">Sekventiell nedladdning</string>
     <string name="downloaded_n">Nedladdat %1$s / </string>
     <string name="transfer_detail_title_header">Namn:</string>
-    <string name="m_of_n_strings">%1$s/%2$s</string>
     <string name="n_files_shared">%d filer har delats till FrostWire-enheter på samma Wi-Fi-nätverk.</string>
     <string name="time_elapsed">Tiden som gått</string>
     <string name="remove_tracker">Ta bort tracker</string>

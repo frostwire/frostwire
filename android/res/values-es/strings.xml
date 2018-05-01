@@ -671,7 +671,6 @@
     <string name="nothing_is_currently_seeding">Nada se está compartiendo actualmente</string>
     <string name="seeding_keeps_the_network_healthy">Compartir ayuda a mantener la red sana</string>
     <string name="seeding_is_currently_disabled">Compartir está actualmente inactivo</string>
-    <string name="m_of_n_decimals">%1$d de %2$d</string>
     <string name="m_of_n_strings">%1$s de %2$s</string>
     <string name="uploaded">Subido</string>
     <string name="trackers">Trackers</string>
