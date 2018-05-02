@@ -1690,7 +1690,9 @@ public class MusicPlaybackService extends Service {
         }
         Bitmap bmpCopy = null;
         try {
-            bmpCopy = albumArt.copy(config, false);
+            if (albumArt != null) {
+                bmpCopy = albumArt.copy(config, false);
+            }
         } catch (OutOfMemoryError e) {
             // ignore, can't do anything meaningful here
         }
