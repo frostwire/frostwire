@@ -1683,7 +1683,7 @@ public class MusicPlaybackService extends Service {
         // to make sure not to hand out our cache copy
         Bitmap.Config config = null;
         if (albumArt != null) {
-            albumArt.getConfig();
+            config = albumArt.getConfig();
         }
         if (config == null) {
             config = Bitmap.Config.ARGB_8888;
