@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import SockJS from 'sockjs-client';
 import EventBus from 'vertx3-eventbus-client';
 import './App.css';
 
@@ -9,7 +8,8 @@ class App extends Component {
 
         this.state = {
             query: '',
-            searchId: 0
+            searchId: 0,
+	    searchResults : []
         }
 
         const busOptions = {
@@ -25,6 +25,10 @@ class App extends Component {
 
     }
 
+    newSearchId() {
+        return this.state.searchId + 1;
+    }
+
     onEventBusOpen() {
         console.log('onEventBusOpen');
         this.eb.registerHandler('search', this.onSearchResponse.bind(this));
@@ -32,17 +36,20 @@ class App extends Component {
 
     onSearchResponse(error, message) {
         console.log('onSearchResponse(error, message=' + JSON.stringify(message) + ')');
-        this.state.message = message;
+        const searchResult = {
+            title : message.body.query
+	} 
+        this.setState({'searchResults' : this.state.searchResults.concat([searchResult]) });
     }
 
     onQueryChanged(event) {
-        this.state.query = event.target.value;
+        this.setState({'query' : event.target.value });
     }
 
     onSearchButton() {
         console.log('onSearchButton - sending:' + this.state.query);
         this.eb.send('search', { query: this.state.query, 'searchId': this.state.searchId});
-        this.state.searchId++;
+        this.setState({'searchId' : this.newSearchId()});
     }
 
     render() {
@@ -51,13 +58,26 @@ class App extends Component {
                 <h1>FrostWire Light</h1>
                 <hr/>
 
-                <input onChange={(e) => this.onQueryChanged(e)} type="text" value="love" placeholder="What are you looking for?" id="message"/>
+                <input onChange={(e) => this.onQueryChanged(e)} type="text" defaultValue="" placeholder="What are you looking for?" id="message"/>
                 <input type="button" value="Search" onClick={this.onSearchButton.bind(this)}/>
                 <br/>
+
+                <SearchResultList searchResults={this.state.searchResults} />	        
 
                 Status: {this.state.message}
             </div>
         );
+    }
+}
+
+class SearchResultList extends Component {
+    render() {
+        return (
+        <ul>
+	{this.props.searchResults.map(function (searchResult, i) {
+	       return <li key={i}>{searchResult.title}</li>
+	})}
+        </ul>);
     }
 }
 
