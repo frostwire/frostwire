@@ -1,20 +1,19 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.adapters.menu;
@@ -40,12 +39,12 @@ import java.util.Calendar;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 5/12/17.
+ * Created on 5/12/17.
  */
-
-
 public final class FileInformationAction extends MenuAction {
-    final FileDescriptor fd;
+
+    private final FileDescriptor fd;
+
     public FileInformationAction(Context context, FileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_file, R.string.file_information);
         this.fd = fd;
@@ -103,12 +102,13 @@ public final class FileInformationAction extends MenuAction {
             fileNameTextView.setText(FilenameUtils.getName(fd.filePath));
             fileSizeTextView.setText(UIUtils.getBytesInHuman(fd.fileSize));
             Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(fd.dateAdded*1000);
+            cal.setTimeInMillis(fd.dateAdded * 1000);
             int numMonth = cal.get(Calendar.MONTH) + 1;
             int numDay = cal.get(Calendar.DAY_OF_MONTH) + 1;
             String month = numMonth >= 10 ? String.valueOf(numMonth) : "0" + numMonth;
             String day = numDay >= 10 ? String.valueOf(numDay) : "0" + numDay;
-            fileDateTextView.setText(cal.get(Calendar.YEAR) + "-" + month + "-" + day);
+            String date = cal.get(Calendar.YEAR) + "-" + month + "-" + day;
+            fileDateTextView.setText(date);
             fileStoragePathTextView.setText(fd.filePath);
             fileStoragePathTextView.setClickable(true);
         }
