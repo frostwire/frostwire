@@ -1681,7 +1681,10 @@ public class MusicPlaybackService extends Service {
         Bitmap albumArt = musicPlaybackService.getAlbumArt();
         // RemoteControlClient wants to recycle the bitmaps thrown at it, so we need
         // to make sure not to hand out our cache copy
-        Bitmap.Config config = albumArt.getConfig();
+        Bitmap.Config config = null;
+        if (albumArt != null) {
+            albumArt.getConfig();
+        }
         if (config == null) {
             config = Bitmap.Config.ARGB_8888;
         }
