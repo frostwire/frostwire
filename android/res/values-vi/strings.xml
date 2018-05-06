@@ -673,7 +673,6 @@
     <string name="transfer_detail_storage_header">Đường dẫn lưu trữ:</string>
     <string name="seeding_time">Thời gian gieo hạt</string>
     <string name="working">Đang làm việc</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Một tệp đã được chia sẻ với các thiết bị FrostWire trên cùng một mạng Wi-Fi.</string>
     <string name="pieces">Miếng</string>
     <string name="upload_limit">Giới hạn tải lên</string>

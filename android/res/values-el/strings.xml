@@ -674,15 +674,12 @@
     <string name="invalid_tracker_url">Μη έγκυρη διεύθυνση URL παρακολούθησης</string>
     <string name="frostwire_start_engine_service_security_exception">Το FrostWire δεν μπορούσε να ξεκινήσει σωστά λόγω έλλειψης αδειών. Παραχωρήστε τα απαιτούμενα δικαιώματα και κάντε επανεκκίνηση της εφαρμογής</string>
     <string name="vpn_find_out_more">Βρες περισσότερα</string>
-
-
     <string name="uploaded">Μεταφορτώθηκε</string>
     <string name="trackers">Trackers</string>
     <string name="source_type">Πηγή: %1$s</string>
     <string name="transfer_detail_storage_header">Διαδρομή αποθήκευσης:</string>
     <string name="seeding_time">Χρόνος σποράς</string>
     <string name="working">Εργαζόμενος</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="pieces">Τεμάχια</string>
     <string name="upload_limit">Όριο μεταφόρτωσης</string>
     <string name="enter_valid_tracker_url_here">Εισαγάγετε την έγκυρη url παρακολούθησης εδώ</string>

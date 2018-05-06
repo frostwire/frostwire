@@ -677,7 +677,6 @@
     <string name="transfer_detail_storage_header">Путь хранения:</string>
     <string name="seeding_time">Время высева</string>
     <string name="working">Работает</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Один файл был разделен на устройства FrostWire в той же сети Wi-Fi.</string>
     <string name="pieces">Куски</string>
     <string name="upload_limit">Предел загрузки</string>

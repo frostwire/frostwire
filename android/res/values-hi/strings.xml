@@ -677,7 +677,6 @@
     <string name="transfer_detail_storage_header">संग्रहण पथ:</string>
     <string name="seeding_time">बीजिंग समय</string>
     <string name="working">काम कर रहे</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">एक फ़ाइल को उसी वाई-फाई नेटवर्क पर फ्रॉस्टवायर डिवाइस पर साझा किया गया है।</string>
     <string name="pieces">टुकड़े</string>
     <string name="upload_limit">अपलोड सीमा</string>

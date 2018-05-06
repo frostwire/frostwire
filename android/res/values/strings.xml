@@ -782,7 +782,7 @@
     <string name="remove_tracker">Remove tracker</string>
     <string name="downloaded_n">Downloaded %1$s / </string>
     <string name="uploaded_n">Uploaded %1$s</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
+    <string name="rtt_ms" translatable="false">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
     <string name="vpn_suggestion_pia" translatable="false">PIA</string>
     <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
