@@ -678,7 +678,6 @@
     <string name="transfer_detail_storage_header">Opbevaring sti:</string>
     <string name="seeding_time">Tidspunkt for såning</string>
     <string name="working">Arbejder</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Én fil er blevet delt til FrostWire-enheder på samme Wi-Fi-netværk.</string>
     <string name="pieces">Stykker</string>
     <string name="upload_limit">Upload grænse</string>

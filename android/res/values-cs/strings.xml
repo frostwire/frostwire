@@ -676,7 +676,6 @@
     <string name="transfer_detail_storage_header">Skladovací cesta:</string>
     <string name="seeding_time">Čas sečení</string>
     <string name="working">Pracovní</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Jeden soubor byl sdílen na zařízeních FrostWire ve stejné síti Wi-Fi.</string>
     <string name="pieces">Kousky</string>
     <string name="upload_limit">Limit nahrávání</string>

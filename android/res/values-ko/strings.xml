@@ -676,7 +676,6 @@
     <string name="transfer_detail_storage_header">저장 경로 :</string>
     <string name="seeding_time">심는 시간</string>
     <string name="working">일</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">하나의 파일이 동일한 Wi-Fi 네트워크의 FrostWire 장치에 공유되었습니다.</string>
     <string name="pieces">조각들</string>
     <string name="upload_limit">업로드 한도</string>

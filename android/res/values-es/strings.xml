@@ -678,7 +678,6 @@
     <string name="transfer_detail_storage_header">Ruta de almacenamiento:</string>
     <string name="seeding_time">Tiempo compartiendo</string>
     <string name="working">Funcionando</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Se ha compartido un archivo en dispositivos FrostWire en la misma red Wi-Fi.</string>
     <string name="pieces">Piezas</string>
     <string name="upload_limit">Límite de subida</string>

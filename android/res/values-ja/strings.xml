@@ -679,7 +679,6 @@
     <string name="transfer_detail_storage_header">ストレージパス：</string>
     <string name="seeding_time">シード時間</string>
     <string name="working">ワーキング</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="pieces">ピース</string>
     <string name="upload_limit">アップロード制限</string>
     <string name="enter_valid_tracker_url_here">有効なトラッカーURLをここに入力してください</string>

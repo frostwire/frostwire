@@ -674,7 +674,6 @@
     <string name="transfer_detail_storage_header">Percorso di archiviazione:</string>
     <string name="seeding_time">Tempo di semina</string>
     <string name="working">Funzionando</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Un file è stato condiviso con i dispositivi FrostWire sulla stessa rete Wi-Fi.</string>
     <string name="pieces">Pezzi</string>
     <string name="upload_limit">Carica limite</string>

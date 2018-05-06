@@ -676,7 +676,6 @@
     <string name="transfer_detail_storage_header">Tárolási útvonal:</string>
     <string name="seeding_time">Vetési idő</string>
     <string name="working">Dolgozó</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Az egyik fájl megosztott a FrostWire eszközökön ugyanazon a Wi-Fi hálózaton.</string>
     <string name="pieces">Darabok</string>
     <string name="upload_limit">Feltöltési limit</string>

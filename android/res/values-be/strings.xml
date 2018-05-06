@@ -673,7 +673,6 @@
     <string name="transfer_detail_storage_header">Шлях захоўвання:</string>
     <string name="seeding_time">пасеў час</string>
     <string name="working">Рабочая</string>
-    <string name="rtt_ms">RTT %1$d ms</string>
     <string name="one_file_shared">Адзін файл быў агульным для Frostwire прылад на адной і той жа сеткі Wi-Fi.</string>
     <string name="pieces">Шт</string>
     <string name="upload_limit">мяжа загрузкі</string>
