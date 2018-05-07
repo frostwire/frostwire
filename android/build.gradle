@@ -183,6 +183,7 @@ dependencies {
     implementation('com.mopub:mopub-sdk-banner:4.20.0@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:4.20.0@aar') { transitive = true }
     implementation 'com.applovin:applovin-sdk:8.0.1'
+    implementation 'org.prebid:prebid-mobile-sdk:0.3'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC4'
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC4'
