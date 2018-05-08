@@ -74,8 +74,10 @@ public final class AddToPlaylistMenuAction extends MenuAction {
     private List<MenuAction> getMenuActions() {
         List<MenuAction> actions = new ArrayList<>();
 
+        // Create new Playlist
         actions.add(new CreateNewPlaylistMenuAction(getContext(), fds));
 
+        // Add to Playlist[s] available
         List<Playlist> playlists = MusicUtils.getPlaylists(getContext());
         for (int i = 0; i < playlists.size(); i++) {
             final Playlist playlist = playlists.get(i);

@@ -39,6 +39,9 @@ import com.frostwire.android.util.ImageLoader;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
+ * See also Apollo's BaseActivity and StopAndHideBottomActionBarListener if you're trying
+ * to update the mini player in My Music.
+ *
  * @author gubatron
  * @author aldenml
  * @author marcelinkaaa

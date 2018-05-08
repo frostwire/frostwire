@@ -330,7 +330,13 @@ public abstract class BaseActivity extends AbstractActivity
      * Sets the track name, album name, and album art.
      */
     private void updateBottomActionBarInfo() {
-        if (!MusicUtils.isStopped() && mTrackName != null && mArtistName != null) {
+        if (!MusicUtils.isStopped()) {
+            if (mTrackName == null && mArtistName == null) {
+                initBottomActionBar();
+            }
+            if (mTrackName == null || mArtistName == null) {
+                return;
+            }
             // Set the track name
             mTrackName.setText(MusicUtils.getTrackName());
             // Set the artist name

@@ -2705,8 +2705,11 @@ public class MusicPlaybackService extends Service {
             }
             if (mPlayPos < 0) {
                 mPlayPos = 0;
+            }
+            if (!isPlaying()) {
                 openCurrentAndNext(() -> {
                     play();
+                    pause();
                     notifyChange(META_CHANGED);
                 });
             }
