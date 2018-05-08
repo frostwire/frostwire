@@ -90,6 +90,8 @@ final class HelpMenu extends AbstractMenu {
             addSeparator();
             addMenuItem(new ShowAboutDialogAction());
         }
+
+        addMenuItem(new ShowSendFeedbackAction());
     }
 
     /**
@@ -129,6 +131,19 @@ final class HelpMenu extends AbstractMenu {
 
         public void actionPerformed(ActionEvent e) {
             GUIMediator.showAboutWindow();
+        }
+    }
+
+    private static class ShowSendFeedbackAction extends AbstractAction {
+
+        ShowSendFeedbackAction(){
+            super(I18n.tr("Send Feedback"));
+            putValue(LONG_DESCRIPTION, I18n.tr("Show Send Feedback Window"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GUIMediator.showSendFeedbackDialog();
         }
     }
 }
