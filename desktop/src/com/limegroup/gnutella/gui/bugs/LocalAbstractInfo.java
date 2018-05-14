@@ -308,11 +308,8 @@ abstract class LocalAbstractInfo {
     public void addUserComments(String comments) {
         _userComments = comments;
     }
-    
-    /**
-     * Returns this bug as a bug report.
-     */
-    public String toBugReport() {
+
+    public Object[] getBasicSystemInfo() {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("FrostWire version " + _limewireVersion + " build " + FrostWireUtils.getBuildNumber());
@@ -320,7 +317,17 @@ abstract class LocalAbstractInfo {
         pw.println(_os + " v. " + _osVersion + " on " + _architecture);
         pw.println("Free/total memory: " + _freeMemory + "/" + _totalMemory);
         pw.println();
-        
+        return new Object[] { sw, pw};
+    }
+    
+    /**
+     * Returns this bug as a bug report.
+     */
+    public String toBugReport() {
+        Object[] writers = getBasicSystemInfo();
+        StringWriter sw = (StringWriter) writers[0];
+        PrintWriter pw = (PrintWriter) writers[1];
+
         if(isFatalError()) {
             pw.println("FATAL ERROR!");
             pw.println();
