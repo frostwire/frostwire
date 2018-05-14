@@ -5,6 +5,8 @@ import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.bugs.LocalClientInfo;
 import net.miginfocom.swing.MigLayout;
+import org.limewire.concurrent.ExecutorsHelper;
+import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,7 @@ public class SendFeedbackDialog {
     private final JButton cancelButton;
     private JTextArea messageTextArea;
     final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better? (Please make sure your firewall or antivirus is not blocking FrostWire)");
+    final String SYSTEM_INFO = getSytemInformation();
 
     SendFeedbackDialog() {
         DIALOG = new JDialog(GUIMediator.getAppFrame());
@@ -67,7 +70,7 @@ public class SendFeedbackDialog {
         feedbackPanel.add(emailPanel, "spanx 2, growx, wrap");
 
         // System Information
-        JLabel systemInformationTextArea = new JLabel(getSytemInformation());
+        JLabel systemInformationTextArea = new JLabel(SYSTEM_INFO);
         systemInformationTextArea.setEnabled(false);
         systemInformationTextArea.setAutoscrolls(true);
 
@@ -102,7 +105,7 @@ public class SendFeedbackDialog {
         sendFeedbackDialog.showDialog();
     }
 
-    private String getSytemInformation(){
+    private static String getSytemInformation(){
         LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
         String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
         String basicSystemInfoHtml = "<html>" + basicSystemInfo.replace("\n","<br/>") + "</html>";
@@ -116,12 +119,18 @@ public class SendFeedbackDialog {
         sendButton.setText(I18n.tr("Sending..."));
         sendButton.setEnabled(false);
         cancelButton.setVisible(false);
+        ThreadExecutor.startThread(() -> submitFeedbackAsync(messageTextArea.getText(), emailTextField.getText(), SYSTEM_INFO), "submitFeedbackAsync");
+        DIALOG.dispose();
     }
 
-    private static void submitFeedbackAsync() {
+    private void submitFeedbackAsync(String feedback, String email, String systemInfo) {
         HashMap<String, String> feedbackData = new HashMap<>();
+        feedbackData.put("feedback", feedback);
+        feedbackData.put("email", email);
+        feedbackData.put("systemInfo", systemInfo);
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         try {
+            //TODO: Create a constant with endpoint information.
             httpClient.post("http://www1.frostwire.com/desktop-feedback",10000, UserAgentGenerator.getUserAgent(), feedbackData);
         } catch (IOException e1) {
             e1.printStackTrace();
