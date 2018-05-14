@@ -131,11 +131,9 @@ public class SendFeedbackDialog {
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         try {
             //TODO: Create a constant with endpoint information.
-            httpClient.post("http://www1.frostwire.com/desktop-feedback",10000, UserAgentGenerator.getUserAgent(), feedbackData);
+            httpClient.post("http://installer.frostwire.com/feedback.php",10000, UserAgentGenerator.getUserAgent(), feedbackData);
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
     }
-
 }
