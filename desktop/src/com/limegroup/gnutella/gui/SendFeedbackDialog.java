@@ -1,5 +1,7 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
@@ -9,9 +11,7 @@ import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -25,6 +25,8 @@ public class SendFeedbackDialog {
     private JTextArea messageTextArea;
     private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "<br><br>( " + I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
     private final String SYSTEM_INFO = getSystemInformation();
+    private Pattern VALID_EMAIL_ADDRESS_REGEX = null;
+
 
     SendFeedbackDialog() {
         DIALOG = new JDialog(GUIMediator.getAppFrame());
@@ -58,6 +60,12 @@ public class SendFeedbackDialog {
                 onMessageTextAreaFirstClick();
             }
         });
+        messageTextArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                onMessageTextAreaTyped();
+            }
+        });
         feedbackPanel.add(messageTextArea, "spanx 2, growx, wrap");
 
         // Optional email
@@ -66,6 +74,12 @@ public class SendFeedbackDialog {
         emailLabel.setEnabled(false);
         emailPanel.add(emailLabel, "shrink, align left");
         emailTextField = new JTextField();
+        emailTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                onEmailTextFieldKeyTyped();
+            }
+        });
         emailPanel.add(emailTextField, "align left, pushx 1.0, growx");
 
         // Optional name
@@ -88,13 +102,26 @@ public class SendFeedbackDialog {
         // Buttons
         sendButton = new JButton(I18n.tr("Send"));
         sendButton.addActionListener(this::onSendClicked);
+        sendButton.setEnabled(false);
         feedbackPanel.add(sendButton, "pushx 1.0, alignx right");
 
         cancelButton = new JButton(I18n.tr("Cancel"));
         cancelButton.addActionListener(GUIUtils.getDisposeAction());
         feedbackPanel.add(cancelButton, "alignx right");
-
         baseContentPane.add(feedbackPanel, "grow, wrap");
+    }
+
+    private void onMessageTextAreaTyped() {
+        boolean feedbackMessageIsLongEnough = feedbackMessageIsLongEnough(messageTextArea.getText());
+        sendButton.setEnabled(feedbackMessageIsLongEnough);
+    }
+
+    private void onEmailTextFieldKeyTyped() {
+        if (emailTextField.getText().equals("")) {
+            return;
+        }
+        boolean emailIsValid = validateEmail(emailTextField.getText());
+        sendButton.setEnabled(emailIsValid);
     }
 
     private void onMessageTextAreaFirstClick() {
@@ -104,6 +131,7 @@ public class SendFeedbackDialog {
     }
 
     void showDialog() {
+
         GUIUtils.centerOnScreen(DIALOG);
         DIALOG.setVisible(true);
     }
@@ -138,9 +166,25 @@ public class SendFeedbackDialog {
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         try {
             //TODO: Create a constant with endpoint information.
-            httpClient.post("http://installer.frostwire.com/feedback.php",10000, UserAgentGenerator.getUserAgent(), feedbackData);
+            httpClient.post("http://installer.frostwire.com/feedback.php", 10000, UserAgentGenerator.getUserAgent(), feedbackData);
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    private boolean validateEmail(String emailString) {
+        if (VALID_EMAIL_ADDRESS_REGEX == null) {
+            VALID_EMAIL_ADDRESS_REGEX = Pattern.compile(
+                    "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$",
+                    java.util.regex.Pattern.CASE_INSENSITIVE
+            );
+        }
+
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailString);
+        return matcher.matches();
+    }
+
+    private boolean feedbackMessageIsLongEnough(String feedbackMessage) {
+        return feedbackMessage.length() >= 16;
     }
 }
