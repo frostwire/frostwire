@@ -21,6 +21,7 @@ public class SendFeedbackDialog {
     private final JTextField emailTextField;
     private final JButton sendButton;
     private final JButton cancelButton;
+    private final JTextField nameTextField;
     private JTextArea messageTextArea;
     private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "<br><br>( " + I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
     private final String SYSTEM_INFO = getSystemInformation();
@@ -65,7 +66,15 @@ public class SendFeedbackDialog {
         emailLabel.setEnabled(false);
         emailPanel.add(emailLabel, "shrink, align left");
         emailTextField = new JTextField();
-        emailPanel.add(emailTextField, "align left, pushx 1.0, growx, wrap");
+        emailPanel.add(emailTextField, "align left, pushx 1.0, growx");
+
+        // Optional name
+        JLabel nameLabel = new JLabel(I18n.tr("Your Name (Optional)"));
+        nameLabel.setEnabled(false);
+        emailPanel.add(nameLabel, "shrink, align left");
+        nameTextField = new JTextField();
+        emailPanel.add(nameTextField, "align left, pushx 2.0, growx");
+
         feedbackPanel.add(emailPanel, "spanx 2, growx, wrap");
 
         // System Information
