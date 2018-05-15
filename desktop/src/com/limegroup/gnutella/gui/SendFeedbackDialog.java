@@ -5,7 +5,6 @@ import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.bugs.LocalClientInfo;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
@@ -23,8 +22,8 @@ public class SendFeedbackDialog {
     private final JButton sendButton;
     private final JButton cancelButton;
     private JTextArea messageTextArea;
-    final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better? (Please make sure your firewall or antivirus is not blocking FrostWire)");
-    final String SYSTEM_INFO = getSytemInformation();
+    private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "<br><br>( " + I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
+    private final String SYSTEM_INFO = getSystemInformation();
 
     SendFeedbackDialog() {
         DIALOG = new JDialog(GUIMediator.getAppFrame());
@@ -105,11 +104,10 @@ public class SendFeedbackDialog {
         sendFeedbackDialog.showDialog();
     }
 
-    private static String getSytemInformation(){
+    private static String getSystemInformation(){
         LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
         String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
-        String basicSystemInfoHtml = "<html>" + basicSystemInfo.replace("\n","<br/>") + "</html>";
-        return basicSystemInfoHtml;
+        return "<html>" + basicSystemInfo.replace("\n","<br/>") + "</html>";
     }
 
     @SuppressWarnings("unused")
