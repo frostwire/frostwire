@@ -24,8 +24,6 @@ import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 
 /**
