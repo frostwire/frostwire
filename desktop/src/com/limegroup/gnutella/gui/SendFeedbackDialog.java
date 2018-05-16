@@ -183,7 +183,6 @@ public class SendFeedbackDialog {
         feedbackData.put("name", name);
         feedbackData.put("systemInfo", systemInfo);
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-        UISettings.LAST_FEEDBACK_SENT_TIMESTAMP.setValue(System.currentTimeMillis());
         try {
             httpClient.post("http://installer.frostwire.com/feedback.php", 10000,
                     UserAgentGenerator.getUserAgent(), feedbackData);
