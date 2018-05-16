@@ -29,7 +29,6 @@ public class SendFeedbackDialog {
     private JTextArea feedbackTextArea;
     private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "\n(" +
             I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
-    private final String SYSTEM_INFO = getSystemInformation();
     private static Pattern VALID_EMAIL_ADDRESS_REGEX = null;
 
     SendFeedbackDialog() {
@@ -106,7 +105,7 @@ public class SendFeedbackDialog {
         feedbackPanel.add(contactInfoPanel, "spanx 2, growx, wrap");
 
         // System Information
-        JLabel systemInformationTextArea = new JLabel(SYSTEM_INFO);
+        JLabel systemInformationTextArea = new JLabel(getSystemInformation(true));
         systemInformationTextArea.setEnabled(false);
         systemInformationTextArea.setAutoscrolls(true);
         feedbackPanel.add(systemInformationTextArea, "spanx 2, grow, wrap");
@@ -159,10 +158,12 @@ public class SendFeedbackDialog {
         sendFeedbackDialog.showDialog();
     }
 
-    private static String getSystemInformation() {
+    private static String getSystemInformation(boolean useHTML) {
         LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
         String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
-        return "<html>" + basicSystemInfo.replace("\n", "<br/>") + "</html>";
+        return (useHTML) ?
+                "<html>" + basicSystemInfo.replace("\n", "<br/>") + "</html>" :
+                basicSystemInfo;
     }
 
     private void onSendClicked() {
@@ -171,7 +172,7 @@ public class SendFeedbackDialog {
         sendButton.setText(I18n.tr("Sending..."));
         sendButton.setEnabled(false);
         cancelButton.setVisible(false);
-        ThreadExecutor.startThread(() -> submitFeedbackAsync(feedbackTextArea.getText(), emailTextField.getText(), userNameTextField.getText(), SYSTEM_INFO), "submitFeedbackAsync");
+        ThreadExecutor.startThread(() -> submitFeedbackAsync(feedbackTextArea.getText(), emailTextField.getText(), userNameTextField.getText(), getSystemInformation(false)), "submitFeedbackAsync");
         DIALOG.dispose();
     }
 
