@@ -12,10 +12,7 @@ import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -168,11 +165,15 @@ public class SendFeedbackDialog {
     private void onSendClicked() {
         feedbackTextArea.setEnabled(false);
         emailTextField.setEnabled(false);
-        sendButton.setText(I18n.tr("Sending..."));
+        userNameTextField.setEnabled(false);
+        sendButton.setText(I18n.tr("Sending") + "...");
         sendButton.setEnabled(false);
         cancelButton.setVisible(false);
         ThreadExecutor.startThread(() -> submitFeedbackAsync(feedbackTextArea.getText(), emailTextField.getText(), userNameTextField.getText(), getSystemInformation(false)), "submitFeedbackAsync");
-        DIALOG.dispose();
+        new Timer(800, e -> {
+            sendButton.setText(I18n.tr("Thank you") + "!");
+            new Timer(500, e1 -> DIALOG.dispose()).start();
+        }).start();
     }
 
     private void submitFeedbackAsync(String feedback, String email, String name, String systemInfo) {
@@ -182,7 +183,7 @@ public class SendFeedbackDialog {
         feedbackData.put("name", name);
         feedbackData.put("systemInfo", systemInfo);
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-
+        UISettings.LAST_FEEDBACK_SENT_TIMESTAMP.setValue(System.currentTimeMillis());
         try {
             httpClient.post("http://installer.frostwire.com/feedback.php", 10000,
                     UserAgentGenerator.getUserAgent(), feedbackData);
