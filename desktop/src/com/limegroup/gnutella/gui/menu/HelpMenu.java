@@ -147,7 +147,7 @@ final class HelpMenu extends AbstractMenu {
 
     private static class ShowSendFeedbackDialogAction extends AbstractAction {
 
-        private int FIVE_MINUTES_IN_MILLISECONDS = 80000;//300000; // 5 minutes
+        private int FIVE_MINUTES_IN_MILLISECONDS = 5*60*1000;
         private final String SEND_FEEDBACK_STRING = I18n.tr("Send Feedback");
 
 
@@ -163,20 +163,20 @@ final class HelpMenu extends AbstractMenu {
 
         public void refresh() {
             long lastFeedbackSentTimestamp = UISettings.LAST_FEEDBACK_SENT_TIMESTAMP.getValue();
-
             if (lastFeedbackSentTimestamp == 0) {
                 return;
             }
             long elapsedTime = System.currentTimeMillis() - lastFeedbackSentTimestamp;
             setEnabled(elapsedTime > FIVE_MINUTES_IN_MILLISECONDS);
+
             if (!isEnabled()) {
                 String timeToWait;
-                long ee = FIVE_MINUTES_IN_MILLISECONDS - elapsedTime;
-                if (ee < 60000) {
-                    int seconds = (int) ee / 1000;
+                long timeLeft = FIVE_MINUTES_IN_MILLISECONDS - elapsedTime;
+                if (timeLeft < 60000) {
+                    int seconds = (int) timeLeft / 1000;
                     timeToWait = seconds + " " + ((seconds > 1) ? I18n.tr("seconds") : I18n.tr("second"));
                 } else {
-                    int minutes = (int) ee / 60000;
+                    int minutes = (int) timeLeft / 60000;
                     timeToWait = minutes + " " + ((minutes > 1) ? I18n.tr("minutes") : I18n.tr("minute"));
                 }
                 putValue(NAME, SEND_FEEDBACK_STRING + " (" + I18n.tr("Please wait") + " " + timeToWait + ")");

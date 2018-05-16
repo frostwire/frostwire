@@ -53,7 +53,9 @@ public class SendFeedbackDialog {
         feedbackTextArea = new JTextArea(FEEDBACK_HINT);
         feedbackTextArea.selectAll();
         feedbackTextArea.setRows(7);
-        feedbackTextArea.setSize(new Dimension(380, 400));
+        Dimension feedbackTextAreaDimensions = new Dimension(690, 130);
+        feedbackTextArea.setMinimumSize(feedbackTextAreaDimensions);
+        feedbackTextArea.setMaximumSize(feedbackTextAreaDimensions);
         feedbackTextArea.setLineWrap(true);
         feedbackTextArea.setWrapStyleWord(true);
         feedbackTextArea.addMouseListener(new MouseAdapter() {
@@ -69,7 +71,10 @@ public class SendFeedbackDialog {
                 sendButtonRefresh();
             }
         });
-        feedbackPanel.add(feedbackTextArea, "spanx 2, growx, wrap");
+        GUIUtils.fixInputMap(feedbackTextArea);
+        JScrollPane feedbackTextAreaScrollPane = new JScrollPane(feedbackTextArea);
+        feedbackTextAreaScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        feedbackPanel.add(feedbackTextAreaScrollPane, "spanx 2, growx, wrap");
 
         // Optional email
         JPanel contactInfoPanel = new JPanel(new MigLayout("fill, insets 0 0"));
