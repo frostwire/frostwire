@@ -68,259 +68,276 @@ abstract class LocalAbstractInfo {
     /**
      * Constant for the current thread name.
      */
-    protected static final String CURRENT_THREAD = "9";
-    protected String _currentThread;
+    static final String CURRENT_THREAD = "9";
+    String _currentThread;
     
     /**
      * Constant for the Properties object.
      */
-    protected static final String PROPS = "10";
-    protected String _props;
+    static final String PROPS = "10";
+    String _props;
     
     /**
      * Constant for the uptime.
      */
-    protected static final String UPTIME = "11";
-    protected String _upTime;
+    static final String UPTIME = "11";
+    String _upTime;
     
     /**
      * Constant for the connection status.
      */
-    protected static final String CONNECTED = "12";
-    protected String _connected;
+    static final String CONNECTED = "12";
+    String _connected;
     
     /**
      * Constant for the number of ultrapeer -> ultrapeer connections.
      */
-    protected static final String UP_TO_UP = "13";
-    protected String _upToUp;
+    static final String UP_TO_UP = "13";
+    String _upToUp;
     
     /**
      * Constant for the number of up -> leaf connections.
      */
-    protected static final String UP_TO_LEAF = "14";
-    protected String _upToLeaf;
+    static final String UP_TO_LEAF = "14";
+    String _upToLeaf;
     
     /**
      * Constant for the number of leaf -> up connections.
      */
-    protected static final String LEAF_TO_UP = "15";
-    protected String _leafToUp;
+    static final String LEAF_TO_UP = "15";
+    String _leafToUp;
     
     /**
      * Constant for the number of old connections.
      */
-    protected static final String OLD_CONNECTIONS = "16";
-    protected String _oldConnections;
+    static final String OLD_CONNECTIONS = "16";
+    String _oldConnections;
     
     /**
      * Constant for ultrapeer status.
      */
-    protected static final String ULTRAPEER = "17";
-    protected String _ultrapeer;
+    static final String ULTRAPEER = "17";
+    String _ultrapeer;
     
     /**
      * Constant for leaf status.
      */
-    protected static final String LEAF = "18";
-    protected String _leaf;
+    static final String LEAF = "18";
+    String _leaf;
     
     /**
      * Constant for the number of active uploads.
      */
-    protected static final String ACTIVE_UPLOADS = "19";
-    protected String _activeUploads;
+    static final String ACTIVE_UPLOADS = "19";
+    String _activeUploads;
     
     /**
      * Constant for the number of queued uploads.
      */
-    protected static final String QUEUED_UPLOADS = "20";
-    protected String _queuedUploads;
+    static final String QUEUED_UPLOADS = "20";
+    String _queuedUploads;
     
     /**
      * Constant for the number of active downloads.
      */
-    protected static final String ACTIVE_DOWNLOADS = "21";
-    protected String _activeDownloads;
+    static final String ACTIVE_DOWNLOADS = "21";
+    String _activeDownloads;
     
     /**
      * Constant for the number of http downloaders.
      */
-    protected static final String HTTP_DOWNLOADERS = "22";
-    protected String _httpDownloaders;
+    static final String HTTP_DOWNLOADERS = "22";
+    String _httpDownloaders;
     
     /**
      * Constant for the number of waiting downloaders.
      */
-    protected static final String WAITING_DOWNLOADERS = "23";
-    protected String _waitingDownloaders;
+    static final String WAITING_DOWNLOADERS = "23";
+    String _waitingDownloaders;
     
     /**
      * Constant for whether or not incoming has been accepted.
      */
-    protected static final String ACCEPTED_INCOMING = "24";
-    protected String _acceptedIncoming;
+    static final String ACCEPTED_INCOMING = "24";
+    String _acceptedIncoming;
     
     /**
      * Constant for the number of shared files.
      */
-    protected static final String SHARED_FILES = "25";
-    protected String _sharedFiles;
+    static final String SHARED_FILES = "25";
+    String _sharedFiles;
     
     /**
      * Constant for the other active threads.
      */
-    protected static final String OTHER_THREADS = "26";
-    protected String _otherThreads;
+    static final String OTHER_THREADS = "26";
+    String _otherThreads;
     
     /**
      * Constant for the detail message.
      */
-    protected static final String DETAIL = "27";
-    protected String _detail;
+    static final String DETAIL = "27";
+    String _detail;
     
     /**
      * Constant for an underlying bug, if any.
      */
-    protected static final String OTHER_BUG = "28";
-    protected String _otherBug;
+    static final String OTHER_BUG = "28";
+    String _otherBug;
     
     /**
      * Constant for the java vendor.
      */
-    protected static final String JAVA_VENDOR = "29";
-    protected String _javaVendor;
+    static final String JAVA_VENDOR = "29";
+    String _javaVendor;
     
     /**
      * Constant for the total amount of active threads.
      */
-    protected static final String THREAD_COUNT = "30";
-    protected String _threadCount;
+    static final String THREAD_COUNT = "30";
+    String _threadCount;
     
     /**
      * Constant for the exception's name.
      */
-    protected static final String BUG_NAME = "31";
-    protected String _bugName;
+    static final String BUG_NAME = "31";
+    String _bugName;
     
     /**
      * Constant for guess capability.
      */
-    protected static final String GUESS_CAPABLE = "32";
-    protected String _guessCapable;
+    static final String GUESS_CAPABLE = "32";
+    String _guessCapable;
     
-    protected static final String SOLICITED_CAPABLE = "33";
-    protected String _solicitedCapable;
+    static final String SOLICITED_CAPABLE = "33";
+    String _solicitedCapable;
     
-    protected static final String LATEST_SIMPP = "34";
-    protected String _latestSIMPP;
+    static final String LATEST_SIMPP = "34";
+    String _latestSIMPP;
     
-//    protected static final String IP_STABLE = "35";
-//    protected String _ipStable;
+//    static final String IP_STABLE = "35";
+//    String _ipStable;
     
-    protected static final String PORT_STABLE = "36";
-    protected String _portStable;
+    static final String PORT_STABLE = "36";
+    String _portStable;
     
-    protected static final String CAN_DO_FWT = "37";
-    protected String _canDoFWT;
+    static final String CAN_DO_FWT = "37";
+    String _canDoFWT;
     
-    protected static final String LAST_REPORTED_PORT = "38";
-    protected String _lastReportedPort;
+    static final String LAST_REPORTED_PORT = "38";
+    String _lastReportedPort;
     
-    protected static final String EXTERNAL_PORT = "39";
-    protected String _externalPort;
+    static final String EXTERNAL_PORT = "39";
+    String _externalPort;
     
-    protected static final String RECEIVED_IP_PONG = "40";
-    protected String _receivedIpPong;
+    static final String RECEIVED_IP_PONG = "40";
+    String _receivedIpPong;
     
-    protected static final String FATAL_ERROR = "41";
-    protected String _fatalError;
+    static final String FATAL_ERROR = "41";
+    String _fatalError;
     
-    protected static final String RESPONSE_SIZE = "42";
-    protected String _responseSize;
+    static final String RESPONSE_SIZE = "42";
+    String _responseSize;
     
-    protected static final String CT_SIZE = "43";
-    protected String _creationCacheSize;
+    static final String CT_SIZE = "43";
+    String _creationCacheSize;
     
-    protected static final String VF_VERIFY_SIZE = "44";
-    protected String _vfVerifyingSize;
+    static final String VF_VERIFY_SIZE = "44";
+    String _vfVerifyingSize;
     
-    protected static final String VF_BYTE_SIZE = "45";
-    protected String _vfByteSize;
+    static final String VF_BYTE_SIZE = "45";
+    String _vfByteSize;
     
-    protected static final String BB_BYTE_SIZE = "46";
-    protected String _bbSize;
+    static final String BB_BYTE_SIZE = "46";
+    String _bbSize;
     
-    protected static final String VF_QUEUE_SIZE = "47";
-    protected String _vfQueueSize;
+    static final String VF_QUEUE_SIZE = "47";
+    String _vfQueueSize;
     
-    protected static final String WAITING_SOCKETS = "48";
-    protected String _waitingSockets;
+    static final String WAITING_SOCKETS = "48";
+    String _waitingSockets;
     
-    protected static final String PENDING_TIMEOUTS = "49";
-    protected String _pendingTimeouts;
+    static final String PENDING_TIMEOUTS = "49";
+    String _pendingTimeouts;
     
-    protected static final String PEAK_THREADS = "50";
-    protected String _peakThreads;
+    static final String PEAK_THREADS = "50";
+    String _peakThreads;
     
-    protected static final String SP2_WORKAROUNDS = "51";
-    protected String _sp2Workarounds;
+    static final String SP2_WORKAROUNDS = "51";
+    String _sp2Workarounds;
     
-    protected static final String LOAD_AVERAGE = "52";
-    protected String _loadAverage;
+    static final String LOAD_AVERAGE = "52";
+    String _loadAverage;
     
-    protected static final String PENDING_GCOBJ = "53";
-    protected String _pendingObjects;
+    static final String PENDING_GCOBJ = "53";
+    String _pendingObjects;
     
-    protected static final String SETTINGS_FREE_SPACE = "54";
-    protected String _settingsFreeSpace;
+    static final String SETTINGS_FREE_SPACE = "54";
+    String _settingsFreeSpace;
     
-    protected static final String INCOMPLETES_FREE_SPACE = "55";
-    protected String _incompleteFreeSpace;
+    static final String INCOMPLETES_FREE_SPACE = "55";
+    String _incompleteFreeSpace;
     
-    protected static final String DOWNLOAD_FREE_SPACE = "56";
-    protected String _downloadFreeSpace;
+    static final String DOWNLOAD_FREE_SPACE = "56";
+    String _downloadFreeSpace;
     
-    protected static final String HEAP_USAGE = "57";
-    protected String _heapUsage;
+    static final String HEAP_USAGE = "57";
+    String _heapUsage;
     
-    protected static final String NON_HEAP_USAGE = "58";
-    protected String _nonHeapUsage;
+    static final String NON_HEAP_USAGE = "58";
+    String _nonHeapUsage;
     
-    protected static final String SLOT_MANAGER = "59";
-    protected String _slotManager;
+    static final String SLOT_MANAGER = "59";
+    String _slotManager;
     
-    protected static final String NUM_SELECTS = "60";
-    protected String _numSelects;
+    static final String NUM_SELECTS = "60";
+    String _numSelects;
     
-    protected static final String NUM_IMMEDIATE_SELECTS = "61";
-    protected String _numImmediateSelects;
+    static final String NUM_IMMEDIATE_SELECTS = "61";
+    String _numImmediateSelects;
     
-    protected static final String AVG_SELECT_TIME = "62";
-    protected String _avgSelectTime;
+    static final String AVG_SELECT_TIME = "62";
+    String _avgSelectTime;
     
-    protected static final String USER_COMMENTS = "63";
-    protected String _userComments;
+    static final String USER_COMMENTS = "63";
+    String _userComments;
     /**
      * sets the variable _userComments value to the comments user entered
      * @param comments is the comment user entered
-     */    
-    public void addUserComments(String comments) {
+     */
+    void addUserComments(String comments) {
         _userComments = comments;
+    }
+
+    public final class SystemInfoWriters {
+        public final StringWriter sw;
+        public final PrintWriter pw;
+        SystemInfoWriters(StringWriter sWriter, PrintWriter pWriter) {
+            sw = sWriter;
+            pw = pWriter;
+        }
+    }
+
+    public SystemInfoWriters getBasicSystemInfo() {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        SystemInfoWriters result = new SystemInfoWriters(sw, pw);
+        result.pw.println("FrostWire version " + _limewireVersion + " build " + FrostWireUtils.getBuildNumber());
+        result.pw.println("Java version " + _javaVersion + " from " + _javaVendor);
+        result.pw.println(_os + " v. " + _osVersion + " on " + _architecture);
+        result.pw.println("Free/total memory: " + _freeMemory + "/" + _totalMemory);
+        result.pw.println();
+        return result;
     }
     
     /**
      * Returns this bug as a bug report.
      */
     public String toBugReport() {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        pw.println("FrostWire version " + _limewireVersion + " build " + FrostWireUtils.getBuildNumber());
-        pw.println("Java version " + _javaVersion + " from " + _javaVendor);
-        pw.println(_os + " v. " + _osVersion + " on " + _architecture);
-        pw.println("Free/total memory: " + _freeMemory + "/" + _totalMemory);
-        pw.println();
-        
+        SystemInfoWriters siw = getBasicSystemInfo();
+        StringWriter sw = siw.sw;
+        PrintWriter pw = siw.pw;
+
         if(isFatalError()) {
             pw.println("FATAL ERROR!");
             pw.println();
@@ -335,6 +352,7 @@ abstract class LocalAbstractInfo {
 		}
 
         pw.println("-- class path --");
+        //noinspection RegExpRedundantEscape
         pw.println(System.getProperty("java.class.path").replaceAll("\\;|\\:","\n"));
 
         pw.println("-- listing session information --");
@@ -409,34 +427,8 @@ abstract class LocalAbstractInfo {
             pw.println(k + ": " + v);
         }
     }
-    
+
     /**
-     * Returns the parsed version of the stack trace, without the message
-     * between the exception and the stack trace.
-     */
-    final String getParsedBug() {
-        int colon = _bug.indexOf(':');
-        // If no ':', just use the bug as we read it.
-        if(colon == -1)
-            return _bug;
-            
-        // If we did find a colon, ensure that it isn't within
-        // the file:line part.  If so, return the normal bug.
-        if( colon - 4 >= 0 && _bug.substring(colon - 4, colon).equals("java"))
-            return _bug;
-            
-        int ntat = _bug.indexOf("\n\tat", colon);
-        // If no \n\tat, just use the bug as we read it.
-        if(ntat == -1)
-            return _bug;
-            
-        //Now that we know where the message begins and where the message ends
-        //put the bug back together without the message.
-        return _bug.substring(0, colon) +
-                                 _bug.substring(ntat);
-    }   
-        
-	/**
 	 * Prints the bug's name. This is used primarily in generating the
 	 * servlet log.
      *

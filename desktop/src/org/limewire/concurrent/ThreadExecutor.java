@@ -42,20 +42,18 @@ public class ThreadExecutor {
      * Adds and runs the given named Runnable on a ThreadPool
      */
     public static void startThread(final Runnable runner, final String name) {
-        THREAD_POOL.execute(new Runnable() {
-            public void run() {
-                try {
-                    Thread.currentThread().setName(name);
-                    runner.run();
-                } catch(Throwable t) {
-                    // Forward throwables to the handler,
-                    // and reset the name back to idle.
-                    Thread.currentThread().
-                      getUncaughtExceptionHandler().
-                        uncaughtException(Thread.currentThread(), t);
-                } finally {
-                    Thread.currentThread().setName("IdleThread");
-                }
+        THREAD_POOL.execute(() -> {
+            try {
+                Thread.currentThread().setName(name);
+                runner.run();
+            } catch(Throwable t) {
+                // Forward throwables to the handler,
+                // and reset the name back to idle.
+                Thread.currentThread().
+                  getUncaughtExceptionHandler().
+                    uncaughtException(Thread.currentThread(), t);
+            } finally {
+                Thread.currentThread().setName("IdleThread");
             }
         });
     }

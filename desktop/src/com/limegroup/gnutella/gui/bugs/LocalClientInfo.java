@@ -46,7 +46,7 @@ public final class LocalClientInfo extends LocalAbstractInfo {
     /**
      * Creates information about this bug from the bug, thread, and detail.
      */
-    public LocalClientInfo(Throwable bug, String threadName, String detail, boolean fatal, SessionInfo sessionInfo) {
+    public LocalClientInfo(Throwable bug, String threadName, String detail, boolean fatal) {
         //Store the basic information ...
         _limewireVersion = FrostWireUtils.getFrostWireVersion();
         _javaVersion = VersionUtils.getJavaVersion();

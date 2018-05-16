@@ -21,7 +21,7 @@ public class LocalClientInfoFactoryImpl implements LocalClientInfoFactory {
      * @see com.limegroup.gnutella.gui.LocalClientInfoFactory#createLocalClientInfo(java.lang.Throwable, java.lang.String, java.lang.String, boolean)
      */
     public LocalClientInfo createLocalClientInfo(Throwable bug, String threadName, String detail, boolean fatal) {
-        return new LocalClientInfo(bug, threadName, detail, fatal, null);
+        return new LocalClientInfo(bug, threadName, detail, fatal);
     }
 
 }

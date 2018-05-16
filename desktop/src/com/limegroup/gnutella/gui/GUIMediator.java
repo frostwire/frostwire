@@ -863,6 +863,10 @@ public final class GUIMediator {
         new AboutWindow().showDialog();
     }
 
+    public static void showSendFeedbackDialog() {
+        new SendFeedbackDialog().showDialog();
+    }
+
     /**
      * Shows the user notification area. The user notification icon and tooltip
      * created by the NotifyUser object are not modified.
