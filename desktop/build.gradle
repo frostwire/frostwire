@@ -16,6 +16,7 @@ apply plugin: 'java'
 apply from: '../common/dependencies.gradle'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 compileJava {
     options.encoding = '8859_1'

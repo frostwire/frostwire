@@ -138,7 +138,10 @@ public class MacEventHandler {
             if (versionStr.startsWith("9")) {
                 return 9;
             }
-            return -1; // invalid value
+            if (versionStr.startsWith("10")) {
+                return 10;
+            }
+            throw new RuntimeException("Java version " + versionStr + " not supported");
         }
 
         private static Class<?> applicationClass() {
