@@ -20,9 +20,12 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.TipOfTheDayMediator;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.OpenLinkAction;
+import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 
 /**
@@ -31,6 +34,8 @@ import java.awt.event.ActionEvent;
  * web site as well as links to the forum, faq, "tell a friend", etc.
  */
 final class HelpMenu extends AbstractMenu {
+
+    private final ShowSendFeedbackDialogAction showSendFeedbackDialogAction;
 
     /**
      * Creates a new <tt>HelpMenu</tt>, using the <tt>key</tt>
@@ -91,7 +96,13 @@ final class HelpMenu extends AbstractMenu {
             addMenuItem(new ShowAboutDialogAction());
         }
 
-        addMenuItem(new ShowSendFeedbackAction());
+        showSendFeedbackDialogAction = new ShowSendFeedbackDialogAction();
+        addMenuItem(showSendFeedbackDialogAction);
+    }
+
+    @Override
+    protected void refresh() {
+        showSendFeedbackDialogAction.refresh();
     }
 
     /**
@@ -134,9 +145,13 @@ final class HelpMenu extends AbstractMenu {
         }
     }
 
-    private static class ShowSendFeedbackAction extends AbstractAction {
+    private static class ShowSendFeedbackDialogAction extends AbstractAction {
 
-        ShowSendFeedbackAction(){
+        private int FIVE_MINUTES_IN_MILLISECONDS = 80000;//300000; // 5 minutes
+        private final String SEND_FEEDBACK_STRING = I18n.tr("Send Feedback");
+
+
+        ShowSendFeedbackDialogAction(){
             super(I18n.tr("Send Feedback"));
             putValue(LONG_DESCRIPTION, I18n.tr("Show Send Feedback Window"));
         }
@@ -144,6 +159,30 @@ final class HelpMenu extends AbstractMenu {
         @Override
         public void actionPerformed(ActionEvent e) {
             GUIMediator.showSendFeedbackDialog();
+        }
+
+        public void refresh() {
+            long lastFeedbackSentTimestamp = UISettings.LAST_FEEDBACK_SENT_TIMESTAMP.getValue();
+
+            if (lastFeedbackSentTimestamp == 0) {
+                return;
+            }
+            long elapsedTime = System.currentTimeMillis() - lastFeedbackSentTimestamp;
+            setEnabled(elapsedTime > FIVE_MINUTES_IN_MILLISECONDS);
+            if (!isEnabled()) {
+                String timeToWait;
+                long ee = FIVE_MINUTES_IN_MILLISECONDS - elapsedTime;
+                if (ee < 60000) {
+                    int seconds = (int) ee / 1000;
+                    timeToWait = seconds + " " + ((seconds > 1) ? I18n.tr("seconds") : I18n.tr("second"));
+                } else {
+                    int minutes = (int) ee / 60000;
+                    timeToWait = minutes + " " + ((minutes > 1) ? I18n.tr("minutes") : I18n.tr("minute"));
+                }
+                putValue(NAME, SEND_FEEDBACK_STRING + " (" + I18n.tr("Please wait") + " " + timeToWait + ")");
+            } else {
+                putValue(NAME, SEND_FEEDBACK_STRING);
+            }
         }
     }
 }
