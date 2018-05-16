@@ -112,7 +112,6 @@ public class SendFeedbackDialog {
         // System Information
         JLabel systemInformationTextArea = new JLabel(getSystemInformation(true));
         systemInformationTextArea.setEnabled(false);
-        systemInformationTextArea.setAutoscrolls(true);
         feedbackPanel.add(systemInformationTextArea, "spanx 2, grow, wrap");
 
         // Buttons
@@ -158,11 +157,6 @@ public class SendFeedbackDialog {
         DIALOG.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        SendFeedbackDialog sendFeedbackDialog = new SendFeedbackDialog();
-        sendFeedbackDialog.showDialog();
-    }
-
     private static String getSystemInformation(boolean useHTML) {
         LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
         String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
@@ -196,5 +190,10 @@ public class SendFeedbackDialog {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        SendFeedbackDialog sendFeedbackDialog = new SendFeedbackDialog();
+        sendFeedbackDialog.showDialog();
     }
 }
