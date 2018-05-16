@@ -12,7 +12,10 @@ import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -22,11 +25,11 @@ public class SendFeedbackDialog {
     private final JTextField emailTextField;
     private final JButton sendButton;
     private final JButton cancelButton;
-    private final JTextField nameTextField;
-    private JTextArea messageTextArea;
-    final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "\n(" +
+    private final JTextField userNameTextField;
+    private JTextArea feedbackTextArea;
+    private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "\n(" +
             I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
-    final String SYSTEM_INFO = getSystemInformation();
+    private final String SYSTEM_INFO = getSystemInformation();
     private static Pattern VALID_EMAIL_ADDRESS_REGEX = null;
 
     SendFeedbackDialog() {
@@ -48,73 +51,70 @@ public class SendFeedbackDialog {
         JPanel feedbackPanel = new JPanel(new MigLayout("fill, insets 10 10"));
 
         // Message
-        messageTextArea = new JTextArea(FEEDBACK_HINT);
-        messageTextArea.selectAll();
-        messageTextArea.setRows(7);
-        messageTextArea.setSize(new Dimension(380, 400));
-        messageTextArea.setLineWrap(true);
-        messageTextArea.setWrapStyleWord(true);
-        messageTextArea.addMouseListener(new MouseAdapter() {
+        feedbackTextArea = new JTextArea(FEEDBACK_HINT);
+        feedbackTextArea.selectAll();
+        feedbackTextArea.setRows(7);
+        feedbackTextArea.setSize(new Dimension(380, 400));
+        feedbackTextArea.setLineWrap(true);
+        feedbackTextArea.setWrapStyleWord(true);
+        feedbackTextArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 onMessageTextAreaFirstClick();
             }
         });
 
-        messageTextArea.addKeyListener(new KeyAdapter() {
+        feedbackTextArea.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                onMessageTextAreaTyped();
+            public void keyReleased(KeyEvent e) {
+                sendButtonRefresh();
             }
         });
-        feedbackPanel.add(messageTextArea, "spanx 2, growx, wrap");
+        feedbackPanel.add(feedbackTextArea, "spanx 2, growx, wrap");
 
         // Optional email
-        JPanel emailPanel = new JPanel(new MigLayout("fill, insets 0 0"));
+        JPanel contactInfoPanel = new JPanel(new MigLayout("fill, insets 0 0"));
         JLabel emailLabel = new JLabel(I18n.tr("Email (Optional)"));
         emailLabel.setEnabled(false);
-        emailPanel.add(emailLabel, "shrink, align left");
+        contactInfoPanel.add(emailLabel, "shrink, align left");
         emailTextField = new JTextField();
         emailTextField.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                if (messageTextArea.getText().equals(FEEDBACK_HINT)) {
-                    messageTextArea.setText("");
+            public void keyReleased(KeyEvent e) {
+                if (feedbackTextArea.getText().equals(FEEDBACK_HINT)) {
+                    feedbackTextArea.setText("");
                 }
-                onEmailTextFieldKeyTyped();
+                sendButtonRefresh();
             }
         });
-        emailPanel.add(emailTextField, "align left, pushx 1.0, growx");
+        contactInfoPanel.add(emailTextField, "align left, pushx 1.0, growx");
 
         // Optional name
         JLabel nameLabel = new JLabel(I18n.tr("Your Name (Optional)"));
         nameLabel.setEnabled(false);
-        emailPanel.add(nameLabel, "shrink, align left");
-        nameTextField = new JTextField();
-        nameTextField.addKeyListener(new KeyAdapter() {
+        contactInfoPanel.add(nameLabel, "shrink, align left");
+        userNameTextField = new JTextField();
+        userNameTextField.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                if (messageTextArea.getText().equals(FEEDBACK_HINT)) {
-                    messageTextArea.setText("");
+            public void keyPressed(KeyEvent e) {
+                if (feedbackTextArea.getText().equals(FEEDBACK_HINT)) {
+                    feedbackTextArea.setText("");
                 }
             }
         });
-        emailPanel.add(nameTextField, "align left, pushx 2.0, growx");
-
-        feedbackPanel.add(emailPanel, "spanx 2, growx, wrap");
+        contactInfoPanel.add(userNameTextField, "align left, pushx 2.0, growx");
+        feedbackPanel.add(contactInfoPanel, "spanx 2, growx, wrap");
 
         // System Information
         JLabel systemInformationTextArea = new JLabel(SYSTEM_INFO);
         systemInformationTextArea.setEnabled(false);
         systemInformationTextArea.setAutoscrolls(true);
-
         feedbackPanel.add(systemInformationTextArea, "spanx 2, grow, wrap");
 
         // Buttons
         sendButton = new JButton(I18n.tr("Send"));
-        sendButton.addActionListener(this::onSendClicked);
+        sendButton.addActionListener(e -> onSendClicked());
         sendButton.setEnabled(false);
-
         feedbackPanel.add(sendButton, "pushx 1.0, alignx right");
 
         cancelButton = new JButton(I18n.tr("Cancel"));
@@ -124,21 +124,11 @@ public class SendFeedbackDialog {
         baseContentPane.add(feedbackPanel, "grow, wrap");
     }
 
-    private void onMessageTextAreaTyped() {
-        boolean feedbackMessageIsLongEnough = feedbackMessageIsLongEnough(messageTextArea.getText());
-        sendButton.setEnabled(feedbackMessageIsLongEnough);
-    }
-
-    private boolean feedbackMessageIsLongEnough(String feedbackMessage) {
-        return feedbackMessage.length() >= 16;
-    }
-
-    private void onEmailTextFieldKeyTyped() {
-        if (emailTextField.getText().equals("")) {
-            return;
-        }
-        boolean emailIsValid = validateEmail(emailTextField.getText());
-        sendButton.setEnabled(emailIsValid && feedbackMessageIsLongEnough(messageTextArea.getText()));
+    private void sendButtonRefresh() {
+        boolean messageLongEnough = feedbackTextArea.getText().length() >= 15;
+        String emailValue = emailTextField.getText().trim();
+        boolean validEmailField = emailValue.length() == 0 || validateEmail(emailValue);
+        sendButton.setEnabled(messageLongEnough && validEmailField);
     }
 
     private boolean validateEmail(String emailString) {
@@ -154,12 +144,12 @@ public class SendFeedbackDialog {
     }
 
     private void onMessageTextAreaFirstClick() {
-        if (messageTextArea.getText().equals(FEEDBACK_HINT)) {
-            messageTextArea.setText("");
+        if (feedbackTextArea.getText().equals(FEEDBACK_HINT)) {
+            feedbackTextArea.setText("");
         }
     }
 
-    public void showDialog() {
+    void showDialog() {
         GUIUtils.centerOnScreen(DIALOG);
         DIALOG.setVisible(true);
     }
@@ -175,20 +165,21 @@ public class SendFeedbackDialog {
         return "<html>" + basicSystemInfo.replace("\n", "<br/>") + "</html>";
     }
 
-    private void onSendClicked(ActionEvent e) {
-        messageTextArea.setEnabled(false);
+    private void onSendClicked() {
+        feedbackTextArea.setEnabled(false);
         emailTextField.setEnabled(false);
         sendButton.setText(I18n.tr("Sending..."));
         sendButton.setEnabled(false);
         cancelButton.setVisible(false);
-        ThreadExecutor.startThread(() -> submitFeedbackAsync(messageTextArea.getText(), emailTextField.getText(), SYSTEM_INFO), "submitFeedbackAsync");
+        ThreadExecutor.startThread(() -> submitFeedbackAsync(feedbackTextArea.getText(), emailTextField.getText(), userNameTextField.getText(), SYSTEM_INFO), "submitFeedbackAsync");
         DIALOG.dispose();
     }
 
-    private void submitFeedbackAsync(String feedback, String email, String systemInfo) {
+    private void submitFeedbackAsync(String feedback, String email, String name, String systemInfo) {
         HashMap<String, String> feedbackData = new HashMap<>();
         feedbackData.put("feedback", feedback);
         feedbackData.put("email", email);
+        feedbackData.put("name", name);
         feedbackData.put("systemInfo", systemInfo);
         HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
 
