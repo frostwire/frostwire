@@ -41,7 +41,15 @@ public class SystemUtils {
     static {
         boolean canLoad = false;
         try {
-            if ((OSUtils.isWindows() && OSUtils.isGoodWindows()) || OSUtils.isMacOSX()) {
+            if ((OSUtils.isWindows() && OSUtils.isGoodWindows())) {
+                if (OSUtils.isMachineX64()) {
+                    System.loadLibrary("SystemUtilities");
+                } else {
+                    System.loadLibrary("SystemUtilitiesX86");
+                }
+                canLoad = true;
+            }
+            if (OSUtils.isMacOSX()) {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
@@ -51,6 +59,7 @@ public class SystemUtils {
                 } else {
                     System.loadLibrary("SystemUtilitiesX86");
                 }
+                canLoad = true;
             }
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
