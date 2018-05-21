@@ -317,8 +317,12 @@
         <activity
             android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity android:name="com.mopub.common.privacy.ConsentDialogActivity"
+                  android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <!--
         <activity
             android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        -->
     </application>
 </manifest>

@@ -84,6 +84,7 @@ import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.InHouseBannerFactory;
+import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.PrebidManager;
@@ -709,7 +710,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
             mMopubAd.setTesting(false);
             mMopubAd.setAutorefreshEnabled(true);
-            mMopubAd.setAdUnitId("c737d8a55b2e41189aa1532ae0520ad1");
+            mMopubAd.setAdUnitId(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
             mMopubAd.setKeywords(keywords.toString());
             mMopubAd.setBannerAdListener(moPubBannerListener);
 

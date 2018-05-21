@@ -71,6 +71,9 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import static com.frostwire.android.offers.MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL;
+import static com.frostwire.android.offers.MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -225,7 +228,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         mopubView.setTesting(false);
         mopubView.setAutorefreshEnabled(true);
         isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        mopubView.setAdUnitId(isVertical ? "a8be0cad4ad0419dbb19601aef3a18d2" : "2fd0fafe3d3c4d668385a620caaa694e");
+        mopubView.setAdUnitId(isVertical ? UNIT_ID_PREVIEW_PLAYER_VERTICAL : UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
         mopubView.setKeywords("music,audio,ringtone,video,music video");
         mopubView.setBannerAdListener(new MoPubView.BannerAdListener() {
             @Override

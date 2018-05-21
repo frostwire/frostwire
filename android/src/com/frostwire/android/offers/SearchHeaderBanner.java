@@ -36,6 +36,7 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.mopub.common.MoPub;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
@@ -150,7 +151,7 @@ public class SearchHeaderBanner extends LinearLayout {
         loadFallbackBanner();
         moPubView.setTesting(false);
         moPubView.setAutorefreshEnabled(true);
-        moPubView.setAdUnitId("be0b959f15994fd5b56c997f63530bd0");
+        moPubView.setAdUnitId(MoPubAdNetwork.UNIT_ID_SEARCH_HEADER);
         String currentQuery = getCurrentQuery();
         if (currentQuery != null) {
             moPubView.setKeywords(currentQuery);

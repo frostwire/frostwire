@@ -23,6 +23,8 @@ import android.content.Context;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
 import com.mopub.mobileads.MoPubInterstitial;
 
 import java.util.HashMap;
@@ -42,12 +44,23 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     private Map<String,String> placements;
     private Map<String, MoPubInterstitial> interstitials;
 
+    public static final String UNIT_ID_AUDIO_PLAYER = "c737d8a55b2e41189aa1532ae0520ad1";
+    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
+    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
+    public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
+
     @Override
     public void initialize(Activity activity) {
         if (abortInitialize(activity)) {
             return;
         }
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
+
+        // unsure how this works for many ads, and multiple networks.
+        // for now just adding the main search banner seems to work for other
+        // banner units
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
+        MoPub.initializeSdk(activity, sdkConfiguration, null);
         start();
         loadNewInterstitial(activity);
     }
