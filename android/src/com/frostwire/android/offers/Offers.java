@@ -45,7 +45,7 @@ public final class Offers {
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
     private static Map<String,AdNetwork> AD_NETWORKS;
-    private final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
+    public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();

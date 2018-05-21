@@ -52,6 +52,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     @Override
     public void initialize(Activity activity) {
         if (abortInitialize(activity)) {
+            LOG.info("initialize() aborted");
             return;
         }
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));

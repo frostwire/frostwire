@@ -708,6 +708,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
             loadFallbackBanner();
 
+            if (!Offers.MOPUB.started()) {
+                return;
+            }
+
             mMopubAd.setTesting(false);
             mMopubAd.setAutorefreshEnabled(true);
             mMopubAd.setAdUnitId(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);

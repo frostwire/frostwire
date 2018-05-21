@@ -149,6 +149,10 @@ public class SearchHeaderBanner extends LinearLayout {
         }
         setBannerViewVisibility(BannerType.MOPUB, false);
         loadFallbackBanner();
+
+        if (!Offers.MOPUB.started()) {
+            return;
+        }
         moPubView.setTesting(false);
         moPubView.setAutorefreshEnabled(true);
         moPubView.setAdUnitId(MoPubAdNetwork.UNIT_ID_SEARCH_HEADER);

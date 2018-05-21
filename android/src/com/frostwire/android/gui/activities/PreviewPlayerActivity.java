@@ -225,6 +225,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             fallbackImageView.setVisibility(View.GONE);
         });
 
+        if (!Offers.MOPUB.started()) {
+            return;
+        }
         mopubView.setTesting(false);
         mopubView.setAutorefreshEnabled(true);
         isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
