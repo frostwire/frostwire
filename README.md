@@ -94,7 +94,7 @@ If you are on Mac, `gettext` installation is very simple with brew:
 
 If you are on Ubuntu, `gettext` installation can be done with 
 
-`sudo apt-get install gettext`.
+`sudo apt install gettext`.
 
 
 ***Windows developers***

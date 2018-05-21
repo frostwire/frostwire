@@ -1,6 +1,7 @@
-FrostWire 2.0.5 build 528 - MAY/14/2018
+FrostWire 2.0.5 build 529 - MAY/20/2018
  - New jlibtorrent 1.2.0.18-RC5
  - New: Telugu translation available for 75 million speakers
+ - New: Marathi translation available for 73 million speakers
  - Library updates: applovin 8.0.1, prebid 0.3
  - Music Player: Add song to playlist shows mini-player in My Music
 
