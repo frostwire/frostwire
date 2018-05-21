@@ -57,11 +57,15 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         }
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
 
-        // unsure how this works for many ads, and multiple networks.
+        // Note 1: Not performing this .initializeSdk(...) call for now.
+        // It's only needed for personalized ads and rewarded videos which we don't have.
+        // It was causing the FrostWire process to be relaunched after a shutdown.
+
+        // Note 2: unsure how this works for many ads, and multiple networks.
         // for now just adding the main search banner seems to work for other
         // banner units
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
-        MoPub.initializeSdk(activity, sdkConfiguration, null);
+        //SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
+        //MoPub.initializeSdk(activity, sdkConfiguration, null);
         start();
         loadNewInterstitial(activity);
     }
