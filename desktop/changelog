@@ -1,7 +1,8 @@
 frostwire (6.6.7) stable; urgency=high
+  * New Help > Feedback dialog
   * New jlibtorrent 1.2.0.18-RC5
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 14 May 2018 21:35:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 22 May 2018 08:30:00 -0600
 
 frostwire (6.6.6) stable; urgency=high
   * re2j update to 1.2, search results parsing optimizations
