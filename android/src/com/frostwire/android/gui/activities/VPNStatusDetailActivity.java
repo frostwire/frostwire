@@ -56,7 +56,11 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
 
         final TextView learnVPNText = findView(R.id.view_vpn_status_learn_more_textview);
-        final Button PiaVPN = findView(R.id.view_vpn_status_pia);
+
+        /*
+        issue-709
+            final Button PiaVPN = findView(R.id.view_vpn_status_pia);
+         */
         final Button ExpressVPN = findView(R.id.view_vpn_status_expressvpn);
         final Button NordVPN = findView(R.id.view_vpn_status_nordvpn);
 
@@ -85,7 +89,10 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
         learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
 
-        PiaVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
+        /*
+        issue-709
+            PiaVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
+        */
 
         ExpressVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_URL));
 
