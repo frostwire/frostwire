@@ -82,6 +82,7 @@
                 android:layout_gravity="center"
                 android:orientation="horizontal">
 
+                <!-- issue-709.  PIA VPN deactivated
                 <Button
                     android:id="@+id/view_vpn_status_pia"
                     style="?android:attr/borderlessButtonStyle"
@@ -94,7 +95,7 @@
                     android:drawableTop="@drawable/pia"
                     android:padding="3dp"
                     android:text="@string/vpn_suggestion_pia"/>
-
+                -->
 
                 <Button
                     android:id="@+id/view_vpn_status_expressvpn"
