@@ -36,7 +36,6 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.common.MoPub;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
@@ -46,18 +45,17 @@ import java.lang.ref.WeakReference;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 8/25/17.
  */
+public final class SearchHeaderBanner extends LinearLayout {
 
+    private static final Logger LOG = Logger.getLogger(SearchHeaderBanner.class);
 
-public class SearchHeaderBanner extends LinearLayout {
     public enum BannerType {
         MOPUB,
         FALLBACK,
         ALL
     }
 
-    private static final Logger LOG = Logger.getLogger(SearchHeaderBanner.class);
     private WeakReference<SearchFragment> searchFragmentWeakReference;
     private LinearLayout bannerHeaderLayout;
     private ImageButton dismissBannerButton;
