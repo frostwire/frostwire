@@ -59,10 +59,10 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
         /*
         issue-709
-            final Button PiaVPN = findView(R.id.view_vpn_status_pia);
+            final Button piaVPNButton = findView(R.id.view_vpn_status_pia);
          */
-        final Button ExpressVPN = findView(R.id.view_vpn_status_expressvpn);
-        final Button NordVPN = findView(R.id.view_vpn_status_nordvpn);
+        final Button expressVPNButton = findView(R.id.view_vpn_status_expressvpn);
+        final Button nordVPNButton = findView(R.id.view_vpn_status_nordvpn);
 
         boolean isProtectedConnection = isProtectedConnection();
         // By default the layout has icon and title set to unprotected.
@@ -91,12 +91,12 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
         /*
         issue-709
-            PiaVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
+            piaVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.PIA_VPN_URL));
         */
 
-        ExpressVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_URL));
+        expressVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.EXPRESSVPN_URL));
 
-        NordVPN.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.NORDVPN_URL));
+        nordVPNButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.NORDVPN_URL));
 
         headerIcon.setOnClickListener(new LearnVPNLink());
         headerStatus.setOnClickListener(new LearnVPNLink());
