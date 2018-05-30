@@ -718,4 +718,5 @@
     <string name="invalid_tracker_url">URL de suivi non valide</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire n\'a pas pu démarrer correctement en raison du manque d\'autorisations. Veuillez accorder les autorisations requises et redémarrer l\'application</string>
     <string name="vpn_find_out_more">En savoir plus</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Essai gratuit de 7 jours</string>
 </resources>

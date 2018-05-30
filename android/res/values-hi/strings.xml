@@ -717,4 +717,5 @@
     <string name="title_activity_transfer_detail">स्थानांतरण विवरण</string>
     <string name="piece_size_header">टुकड़ा आकार:</string>
     <string name="add_tracker">ट्रैकर जोड़ें</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n नि: शुल्क 7-दिन का परीक्षण</string>
 </resources>

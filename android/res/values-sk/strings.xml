@@ -669,4 +669,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Nepodarilo sa otvoriť podrobnosti o prevode, neplatné InfoHash</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire sa nemohol správne spustiť kvôli nedostatku povolení. Zadajte požadované povolenia a reštartujte aplikáciu</string>
     <string name="vpn_find_out_more">Dozvedieť sa viac</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Voľná 7-dňová skúška</string>
 </resources>

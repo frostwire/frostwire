@@ -717,4 +717,5 @@
     <string name="add_tracker">추적기 추가</string>
     <string name="frostwire_start_engine_service_security_exception">권한이 없기 때문에 FrostWire를 제대로 시작할 수 없습니다. 필요한 권한을 부여하고 애플리케이션을 다시 시작하십시오.</string>
     <string name="vpn_find_out_more">더 찾아 봐</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n 무료 7 일 평가판</string>
 </resources>

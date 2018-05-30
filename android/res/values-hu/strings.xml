@@ -717,4 +717,5 @@
     <string name="title_activity_transfer_detail">Az átruházás részletei</string>
     <string name="piece_size_header">Darab mérete:</string>
     <string name="add_tracker">Tracker hozzáadása</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Ingyenes 7 napos próba</string>
 </resources>
