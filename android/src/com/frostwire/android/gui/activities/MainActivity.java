@@ -582,6 +582,14 @@ public class MainActivity extends AbstractActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
+        if (search != null) {
+            // this is necessary because the Fragment#onDestroy is not
+            // necessary called right in the Activity#onDestroy call, making
+            // the internal mopub view possible to outlive the activity
+            // destruction, creating a context leak
+            search.destroyHeaderBanner();
+        }
+
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
         }

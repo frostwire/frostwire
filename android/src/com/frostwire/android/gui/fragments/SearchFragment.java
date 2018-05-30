@@ -266,11 +266,15 @@ public final class SearchFragment extends AbstractFragment implements
     public void onDestroy() {
         LocalSearchEngine.instance().setListener(null);
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
+        destroyHeaderBanner();
+        super.onDestroy();
+    }
+
+    public void destroyHeaderBanner() {
         if (searchHeaderBanner != null) {
             searchHeaderBanner.setSearchFragmentReference(this);
             searchHeaderBanner.onDestroy();
         }
-        super.onDestroy();
     }
 
     @Override
