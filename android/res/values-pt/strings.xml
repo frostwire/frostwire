@@ -715,4 +715,5 @@
     <string name="invalid_tracker_url">URL do rastreador inválido</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire não pôde iniciar corretamente devido à falta de permissões. Por favor, conceda as permissões necessárias e reinicie o aplicativo</string>
     <string name="vpn_find_out_more">Descubra mais</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Julgamento gratuito de 7 dias</string>
 </resources>

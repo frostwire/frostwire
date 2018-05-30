@@ -669,4 +669,5 @@
     <string name="could_not_open_transfer_detail_invalid_infohash">Kunne ikke åpne Overføringsdetaljer, ugyldig InfoHash</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire kunne ikke starte riktig på grunn av manglende tillatelser. Vennligst gi de nødvendige tillatelsene og start programmet på nytt</string>
     <string name="vpn_find_out_more">Finne ut mer</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dagers prøveversjon</string>
 </resources>

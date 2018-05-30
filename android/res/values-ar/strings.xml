@@ -715,4 +715,5 @@
     <string name="invalid_tracker_url">عنوان ورل المقتفي غير صالح</string>
     <string name="frostwire_start_engine_service_security_exception">فروستوير لا يمكن أن تبدأ بشكل صحيح بسبب عدم وجود أذونات. يرجى منح الأذونات المطلوبة وإعادة تشغيل التطبيق</string>
     <string name="vpn_find_out_more">اكتشف المزيد</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n نسخة تجريبية مجانية لمدة 7 أيام</string>
 </resources>

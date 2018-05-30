@@ -717,4 +717,5 @@
     <string name="title_activity_transfer_detail">Λεπτομέρειες μεταφοράς</string>
     <string name="piece_size_header">Μέγεθος τεμαχίου:</string>
     <string name="add_tracker">Προσθήκη tracker</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Δωρεάν δοκιμή 7 ημερών</string>
 </resources>

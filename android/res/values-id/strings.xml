@@ -667,4 +667,5 @@
     <string name="seeding_keeps_the_network_healthy">Berbagi membantu menjaga jaringan tetap sehat</string>
     <string name="seeding_is_currently_disabled">Berbagi saat ini dinonaktifkan</string>
     <string name="vpn_find_out_more">Temukan lebih banyak lagi</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
 </resources>

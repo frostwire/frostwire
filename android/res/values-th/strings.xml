@@ -670,4 +670,5 @@
     <string name="invalid_tracker_url">URL ของเครื่องมือติดตามไม่ถูกต้อง</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire ไม่สามารถเริ่มต้นได้อย่างถูกต้องเนื่องจากไม่มีสิทธิ์ โปรดให้สิทธิ์ที่จำเป็นและรีสตาร์ทแอ็พพลิเคชัน</string>
     <string name="vpn_find_out_more">หาข้อมูลเพิ่มเติม</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n การทดลองใช้ฟรี 7 วัน</string>
 </resources>

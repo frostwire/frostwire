@@ -670,4 +670,5 @@
     <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire kan niet goed starten vanwege een gebrek aan rechten. Geef de vereiste machtigingen en start de toepassing opnieuw</string>
     <string name="vpn_find_out_more">Meer te weten komen</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis proefperiode van 7 dagen</string>
 </resources>

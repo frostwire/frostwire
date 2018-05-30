@@ -714,4 +714,5 @@
     <string name="add_tracker">Добави тракер</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire не можа да започне правилно поради липса на разрешения. Моля, дайте необходимите разрешения и рестартирайте приложението</string>
     <string name="vpn_find_out_more">Открийте повече</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Безплатен 7-дневен пробен период</string>
 </resources>

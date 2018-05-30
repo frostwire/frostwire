@@ -674,4 +674,5 @@
     <string name="invalid_tracker_url">Неважећа УРЛ адреса Трацкер</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire није могао да ради правилно због недостатка дозвола. Молимо да дате потребне дозволе и поново покрените апликацију</string>
     <string name="vpn_find_out_more">Откриј више</string>
+    <string name="vpn_suggestion_nordvpn">NORDVPN \n Слободно седмодневно суђење</string>
 </resources>
