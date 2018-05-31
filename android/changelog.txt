@@ -4,6 +4,7 @@ FrostWire 2.0.5 build 529 - MAY/30/2018
  - New: Marathi translation available for 73 million speakers
  - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
  - Music Player: Add song to playlist shows mini-player in My Music
+ - Memory leak fixed on SearchHeaderBanner
 
 FrostWire 2.0.4 build 526 - MAY/01/2018
  - New jlibtorrent 1.2.0.18-RC4
