@@ -457,7 +457,7 @@ public class MusicPlaybackService extends Service {
 
     private int mShuffleMode = SHUFFLE_NONE;
 
-    private int mRepeatMode = REPEAT_NONE;
+    private int mRepeatMode = REPEAT_ALL;
 
     private int mServiceStartId = -1;
 
