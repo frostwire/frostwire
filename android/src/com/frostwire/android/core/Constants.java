@@ -207,7 +207,7 @@ public final class Constants {
     public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 1002;
 
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
-
+    public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";
     private Constants() {
     }
 }

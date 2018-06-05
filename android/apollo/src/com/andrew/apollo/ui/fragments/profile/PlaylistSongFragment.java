@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -43,6 +44,8 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 
 import java.util.List;
 
@@ -158,5 +161,13 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
     @Override
     protected String getLayoutTypeName() {
         return PreferenceUtils.SIMPLE_LAYOUT;
+    }
+
+    @Override
+    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+        mDefaultFragmentEmptyString = R.string.empty_playlist;
+        super.onLoadFinished(loader, data);
+        final TextView empty = mRootView.findViewById(R.id.empty);
+        empty.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST));
     }
 }

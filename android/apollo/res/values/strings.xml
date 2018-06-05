@@ -165,5 +165,6 @@
     <string name="empty_search">No search results found</string>
     <string name="empty_favorite">Songs you mark as favorites will be shown here.</string>
     <string name="empty_recent">Songs you have listened to will show up here. Try playing some music.</string>
+    <string name="empty_playlist">This playlist is empty.\nTry adding some of your favorite songs.\n(Click here to learn how) </string>
     <string name="frostwire_player">FrostWire Player</string>
 </resources>
