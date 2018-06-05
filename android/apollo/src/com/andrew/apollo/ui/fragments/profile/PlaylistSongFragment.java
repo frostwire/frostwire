@@ -18,7 +18,6 @@
 
 package com.andrew.apollo.ui.fragments.profile;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.net.Uri;
@@ -31,7 +30,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;

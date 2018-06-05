@@ -149,16 +149,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         }
     }
 
-    protected ApolloFragment(int groupId, int loaderId) {
-        this.GROUP_ID = groupId;
-        this.LOADER_ID = loaderId;
-        this.mDefaultFragmentEmptyString = R.string.empty_music;
-    }
-
     protected ApolloFragment(int groupId, int loaderId, int defaultEmptyString) {
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
         this.mDefaultFragmentEmptyString = defaultEmptyString;
+    }
+
+    protected ApolloFragment(int groupId, int loaderId) {
+        this(groupId, loaderId, R.string.empty_music);
     }
 
     @Override
