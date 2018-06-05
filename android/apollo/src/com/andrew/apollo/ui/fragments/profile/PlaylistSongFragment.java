@@ -43,6 +43,8 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.Fragments;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 
 import java.util.List;
 
@@ -52,11 +54,14 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
+ * @author Jose Molina (@votaguz)
  */
 public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
 
     public PlaylistSongFragment() {
-        super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID);
+        super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID,
+                Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID,
+                R.string.empty_playlist);
     }
 
     @Override
@@ -91,7 +96,7 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
         //fix scrollbar todo figure out why was it disabled in ApolloFragment
         dsListView.setVerticalScrollBarEnabled(true);
         dsListView.setFastScrollEnabled(true);
-
+        mEmptyTextView.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL));
         return mRootView;
     }
 

@@ -22,8 +22,9 @@ import com.frostwire.android.BuildConfig;
 /**
  * Static class containing all constants in one place.
  *
- * @author gubatron
- * @author aldenml
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
+ * @author Jose Molina (@votaguz)
  */
 public final class Constants {
 
@@ -207,7 +208,7 @@ public final class Constants {
     public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 1002;
 
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
-
+    public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";
     private Constants() {
     }
 }
