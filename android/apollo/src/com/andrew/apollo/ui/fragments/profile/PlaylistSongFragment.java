@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.ui.fragments.profile;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Loader;
 import android.net.Uri;
@@ -55,11 +56,14 @@ import java.util.List;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
+ * @author Jose Molina (@votaguz)
  */
 public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapter, Song> implements DropListener, RemoveListener, DragScrollProfile {
 
     public PlaylistSongFragment() {
-        super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID);
+        super(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID,
+                Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_LOADER_ID,
+                R.string.empty_playlist);
     }
 
     @Override
@@ -94,7 +98,7 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
         //fix scrollbar todo figure out why was it disabled in ApolloFragment
         dsListView.setVerticalScrollBarEnabled(true);
         dsListView.setFastScrollEnabled(true);
-
+        mEmptyTextView.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL));
         return mRootView;
     }
 
@@ -161,13 +165,5 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
     @Override
     protected String getLayoutTypeName() {
         return PreferenceUtils.SIMPLE_LAYOUT;
-    }
-
-    @Override
-    public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
-        mDefaultFragmentEmptyString = R.string.empty_playlist;
-        super.onLoadFinished(loader, data);
-        final TextView empty = mRootView.findViewById(R.id.empty);
-        empty.setOnClickListener(v -> UIUtils.openURL(v.getContext(), Constants.FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST));
     }
 }

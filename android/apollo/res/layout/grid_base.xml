@@ -29,7 +29,8 @@
         android:textSize="@dimen/text_size_large"
         android:textStyle="bold"
         android:visibility="gone"
-        android:layout_margin="40dp"/>
+        android:layout_margin="40dp"
+        android:textAlignment="center"/>
 
     <GridView
         android:id="@+id/grid_base"

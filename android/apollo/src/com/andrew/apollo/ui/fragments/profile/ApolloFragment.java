@@ -69,8 +69,9 @@ import static com.frostwire.android.util.Asyncs.async;
 /**
  * Created on 1/26/16 in a plane.
  *
- * @author gubatron
- * @author aldenml
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (@aldenml)
+ * @author Jose Molina (@votaguz)
  */
 public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         extends Fragment implements
@@ -87,6 +88,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
      * The list view
      */
     protected ListView mListView;
+
+    protected TextView mEmptyTextView;
 
     /**
      * The grid view
@@ -129,7 +132,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected ViewGroup mRootView;
 
-    protected int mDefaultFragmentEmptyString = R.string.empty_music;
+    protected int mDefaultFragmentEmptyString;
 
     private volatile long lastRestartLoader;
 
@@ -149,6 +152,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     protected ApolloFragment(int groupId, int loaderId) {
         this.GROUP_ID = groupId;
         this.LOADER_ID = loaderId;
+        this.mDefaultFragmentEmptyString = R.string.empty_music;
+    }
+
+    protected ApolloFragment(int groupId, int loaderId, int defaultEmptyString) {
+        this.GROUP_ID = groupId;
+        this.LOADER_ID = loaderId;
+        this.mDefaultFragmentEmptyString = defaultEmptyString;
     }
 
     @Override
@@ -172,6 +182,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             // this inflate here is crashing.
             mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null, false);
             initGridView();
+        }
+        if (mEmptyTextView == null ){
+            mEmptyTextView = mRootView.findViewById(R.id.empty);
         }
         return mRootView;
     }
@@ -425,13 +438,12 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mAdapter.unload();
             mAdapter.notifyDataSetChanged();
             // Set the empty text
-            final TextView empty = mRootView.findViewById(R.id.empty);
-            if (empty != null) {
-                empty.setText(mDefaultFragmentEmptyString);
+            if (mEmptyTextView != null) {
+                mEmptyTextView.setText(mDefaultFragmentEmptyString);
                 if (isSimpleLayout()) {
-                    mListView.setEmptyView(empty);
+                    mListView.setEmptyView(mEmptyTextView);
                 } else {
-                    mGridView.setEmptyView(empty);
+                    mGridView.setEmptyView(mEmptyTextView);
                 }
             }
             return;

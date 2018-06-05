@@ -160,11 +160,11 @@
 
     <!-- Empty list / error messages -->
     <string name="no_effects_for_you">The equalizer could not be opened.</string>
-    <string name="empty_music">To copy music from your computer to your device, use a USB cable.</string>
+    <string name="empty_music">No songs available yet. Try downloading some content</string>
     <string name="empty_last_added">Songs you have added over the last month will be shown here.</string>
     <string name="empty_search">No search results found</string>
     <string name="empty_favorite">Songs you mark as favorites will be shown here.</string>
     <string name="empty_recent">Songs you have listened to will show up here. Try playing some music.</string>
-    <string name="empty_playlist">This playlist is empty.\nTry adding some of your favorite songs.\n(Click here to learn how) </string>
+    <string name="empty_playlist">This playlist is empty.\n\nClick here to learn how to add songs.</string>
     <string name="frostwire_player">FrostWire Player</string>
 </resources>
