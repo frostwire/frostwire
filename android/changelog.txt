@@ -7,7 +7,7 @@ FrostWire 2.0.5 build 531 - JUN/05/2018
  - Music Player: Repeat All is the default playback mode for playlists
  - Music Playre: Empty playlist message makes sense now
  - Memory leak fixed on SearchHeaderBanner
- - Translations updated: Romanian, Turkish, Finnish, Serbian
+ - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian
  - Library updates: (dev) gradle 4.8
 
 FrostWire 2.0.4 build 526 - MAY/01/2018
