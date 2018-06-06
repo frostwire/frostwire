@@ -1101,6 +1101,9 @@ public final class MusicUtils {
             return;
         }
 
+        long[] currentQueue = getQueue();
+        long[] playlist = getSongListForPlaylist(context, playlistid);
+        boolean updateQueue = isPlaylistInQueue(playlist, currentQueue);
         final int size = ids.length;
         final ContentResolver resolver = context.getContentResolver();
         final String[] projection = new String[]{
@@ -1118,9 +1121,13 @@ public final class MusicUtils {
             final int base = cursor.getInt(0);
             cursor.close();
             int numinserted = 0;
+            //TODO: Check this portion of code, seems is doing extra work.
             for (int offSet = 0; offSet < size; offSet += 1000) {
                 makeInsertItems(ids, offSet, 1000, base);
                 numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+            }
+            if (updateQueue) {
+                addToQueue(context, ids);
             }
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
@@ -1129,6 +1136,25 @@ public final class MusicUtils {
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
         }
+    }
+
+    private static boolean isPlaylistInQueue(long[] currentQueue, long[] playlist) {
+        if (playlist.length == 0 || currentQueue.length == 0 || playlist.length > currentQueue.length) {
+            return false;
+        }
+        for (long p : playlist) {
+            boolean foundP = false;
+            for (long q : currentQueue) {
+                if (p == q) {
+                    foundP = true;
+                    break;
+                }
+            }
+            if (!foundP) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
