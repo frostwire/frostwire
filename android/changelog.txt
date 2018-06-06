@@ -1,5 +1,5 @@
 FrostWire 2.0.5 build 531 - JUN/05/2018
- - New jlibtorrent 1.2.0.18-RC5
+ - New jlibtorrent 1.2.0.18-RC6
  - New: Telugu translation available for 75 million speakers
  - New: Marathi translation available for 73 million speakers
  - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
@@ -8,7 +8,7 @@ FrostWire 2.0.5 build 531 - JUN/05/2018
  - Music Playre: Empty playlist message makes sense now
  - Memory leak fixed on SearchHeaderBanner
  - Translations updated: Romanian, Turkish, Finnish, Serbian
- - Library updates: (dev) gradle 4.8, 1.2.0.18-RC6
+ - Library updates: (dev) gradle 4.8
 
 FrostWire 2.0.4 build 526 - MAY/01/2018
  - New jlibtorrent 1.2.0.18-RC4
