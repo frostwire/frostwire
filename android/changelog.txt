@@ -5,7 +5,7 @@ FrostWire 2.0.5 build 531 - JUN/05/2018
  - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
  - Music Player: Add song to playlist shows mini-player in My Music
  - Music Player: Repeat All is the default playback mode for playlists
- - Music Playre: Empty playlist message makes sense now
+ - Music Player: Empty playlist message makes sense now
  - Memory leak fixed on SearchHeaderBanner
  - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian
  - Library updates: (dev) gradle 4.8
