@@ -15,7 +15,7 @@ interface IApolloService
     void next();
     void enqueue(in long [] list, int action);
     void setQueuePosition(int index);
-    void setShuffleMode(int shufflemode);
+    void setShuffleMode(boolean on);
     void setRepeatMode(int repeatmode);
     void moveQueueItem(int from, int to);
     void toggleFavorite();
@@ -36,7 +36,7 @@ interface IApolloService
     String getAlbumName();
     String getPath();
     int getQueuePosition();
-    int getShuffleMode();
+    boolean getShuffleMode();
     int removeTracks(int first, int last);
     int removeTrack(long id); 
     int getRepeatMode();

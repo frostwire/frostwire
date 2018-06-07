@@ -59,11 +59,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Random;
-import java.util.TreeSet;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;
@@ -215,21 +211,6 @@ public class MusicPlaybackService extends Service {
      * Moves a list to the last position in the queue
      */
     public static final int LAST = 3;
-
-    /**
-     * Shuffles no songs, turns shuffling off
-     */
-    public static final int SHUFFLE_NONE = 0;
-
-    /**
-     * Shuffles all songs
-     */
-    public static final int SHUFFLE_NORMAL = 1;
-
-    /**
-     * Party shuffle
-     */
-    public static final int SHUFFLE_AUTO = 2;
 
     /**
      * Turns repeat off
@@ -450,7 +431,7 @@ public class MusicPlaybackService extends Service {
 
     private int mMediaMountedCount = 0;
 
-    private int mShuffleMode = SHUFFLE_NONE;
+    private boolean mShuffleMode = false;
 
     private int mRepeatMode = REPEAT_ALL;
 
@@ -879,8 +860,6 @@ public class MusicPlaybackService extends Service {
             releaseServiceUiAndStop(false);
         } else if (REPEAT_ACTION.equals(action)) {
             cycleRepeat();
-        } else if (SHUFFLE_ACTION.equals(action)) {
-            cycleShuffle();
         }
     }
 
@@ -1123,7 +1102,7 @@ public class MusicPlaybackService extends Service {
                     mPlayPos = -1;
                     closeCursor();
                 } else {
-                    if (mShuffleMode != SHUFFLE_NONE) {
+                    if (mShuffleMode) {
                         mPlayPos = getNextPosition(true);
                     } else if (mPlayPos >= mPlayListLen) {
                         mPlayPos = 0;
@@ -1630,7 +1609,7 @@ public class MusicPlaybackService extends Service {
             }
         }
         editor.putInt("repeatmode", mRepeatMode);
-        editor.putInt("shufflemode", mShuffleMode);
+        editor.putBoolean("shufflemode", mShuffleMode);
         editor.apply();
     }
 
@@ -1825,7 +1804,7 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current shuffle mode (all, party, none)
      */
-    private int getShuffleMode() {
+    private boolean getShuffleMode() {
         return mShuffleMode;
     }
 
@@ -2413,10 +2392,10 @@ public class MusicPlaybackService extends Service {
     /**
      * Sets the shuffle mode
      *
-     * @param shufflemode The shuffle mode to use
+     * @param on The shuffle mode to use
      */
-    public void setShuffleMode(final int shufflemode) {
-        mShuffleMode = shufflemode;
+    public void setShuffleMode(boolean on) {
+        mShuffleMode = on;
         notifyChange(SHUFFLEMODE_CHANGED);
     }
 
@@ -2482,21 +2461,6 @@ public class MusicPlaybackService extends Service {
             setRepeatMode(REPEAT_CURRENT);
         } else {
             setRepeatMode(REPEAT_NONE);
-        }
-    }
-
-    /**
-     * Cycles through the different shuffle modes
-     */
-    private void cycleShuffle() {
-        // TODO: remove one of the active states of shuffle. AUTO or NORMAL
-        if (mShuffleMode == SHUFFLE_NONE) {
-            setShuffleMode(SHUFFLE_NORMAL);
-            if (mRepeatMode == REPEAT_CURRENT) {
-                setRepeatMode(REPEAT_ALL);
-            }
-        } else if (mShuffleMode == SHUFFLE_NORMAL || mShuffleMode == SHUFFLE_AUTO) {
-            setShuffleMode(SHUFFLE_NONE);
         }
     }
 
@@ -3166,8 +3130,7 @@ public class MusicPlaybackService extends Service {
         /**
          * {@inheritDoc}
          */
-        @Override
-        public void setShuffleMode(final int shufflemode) {
+        public void setShuffleMode(boolean shufflemode) {
             if (Ref.alive(mService)) {
                 mService.get().setShuffleMode(shufflemode);
             }
@@ -3375,11 +3338,11 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public int getShuffleMode() {
+        public boolean getShuffleMode() {
             if (Ref.alive(mService)) {
                 return mService.get().getShuffleMode();
             }
-            return 0; // SHUFFLE_NONE
+            return false;
         }
 
         /**

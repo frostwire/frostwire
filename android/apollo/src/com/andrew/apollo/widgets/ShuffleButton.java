@@ -19,15 +19,12 @@
 package com.andrew.apollo.widgets;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 
-import com.andrew.apollo.MusicPlaybackService;
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -60,35 +57,25 @@ public final class ShuffleButton extends ImageButton
     public boolean onLongClick(final View view) {
         return false;
 
-
-// TODO:[votaguz]  Working on Shuffle stuff
-//        if (TextUtils.isEmpty(view.getContentDescription())) {
-//            return false;
-//        } else {
-//            ApolloUtils.showCheatSheet(view);
-//            return true;
-//        }
+        // TODO: Ask @gubatron what to do here?
+        //        if (TextUtils.isEmpty(view.getContentDescription())) {
+        //            return false;
+        //        } else {
+        //            ApolloUtils.showCheatSheet(view);
+        //            return true;
+        //        }
     }
 
     /**
      * Sets the correct drawable for the shuffle state.
      */
     public void updateShuffleState() {
-        switch (MusicUtils.getShuffleMode()) {
-            case MusicPlaybackService.SHUFFLE_NORMAL:
-                setContentDescription(getResources().getString(R.string.accessibility_shuffle_all));
-                setImageResource(R.drawable.btn_playback_shuffle_all);
-                break;
-            case MusicPlaybackService.SHUFFLE_AUTO:
-                setContentDescription(getResources().getString(R.string.accessibility_shuffle_all));
-                setImageResource(R.drawable.btn_playback_shuffle_all);
-                break;
-            case MusicPlaybackService.SHUFFLE_NONE:
-                setContentDescription(getResources().getString(R.string.accessibility_shuffle));
-                setImageResource(R.drawable.btn_playback_shuffle);
-                break;
-            default:
-                break;
+        if (MusicUtils.getShuffleMode()) {
+            setContentDescription(getResources().getString(R.string.accessibility_shuffle_all));
+            setImageResource(R.drawable.btn_playback_shuffle_all);
+        } else {
+            setContentDescription(getResources().getString(R.string.accessibility_shuffle));
+            setImageResource(R.drawable.btn_playback_shuffle);
         }
     }
 }
