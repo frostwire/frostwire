@@ -58,12 +58,16 @@ public final class ShuffleButton extends ImageButton
 
     @Override
     public boolean onLongClick(final View view) {
-        if (TextUtils.isEmpty(view.getContentDescription())) {
-            return false;
-        } else {
-            ApolloUtils.showCheatSheet(view);
-            return true;
-        }
+        return false;
+
+
+// TODO:[votaguz]  Working on Shuffle stuff
+//        if (TextUtils.isEmpty(view.getContentDescription())) {
+//            return false;
+//        } else {
+//            ApolloUtils.showCheatSheet(view);
+//            return true;
+//        }
     }
 
     /**
