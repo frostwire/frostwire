@@ -23,8 +23,6 @@ import android.content.Context;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
-import com.mopub.common.MoPub;
-import com.mopub.common.SdkConfiguration;
 import com.mopub.mobileads.MoPubInterstitial;
 
 import java.util.HashMap;
@@ -72,11 +70,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
 
     private void initPlacementMappings(boolean isTablet) {
         placements = new HashMap<>();
-
         if (!isTablet) {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "399a20d69bdc449a8e0ca171f82179c8");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "399a20d69bdc449a8e0ca171f82179c8");
         } else {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_EXIT, "cebdbc56b37c4d31ba79e861d1cb0de4");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "cebdbc56b37c4d31ba79e861d1cb0de4");
         }
     }
 

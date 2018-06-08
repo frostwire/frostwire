@@ -583,7 +583,7 @@ public final class SearchFragment extends AbstractFragment implements
                     clickCount++;
                     LOG.info("header.onClick() - clickCount => " + clickCount);
                     if (clickCount % 5 == 0) {
-                        Offers.showInterstitial(getActivity(), Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                        Offers.showInterstitial(getActivity(), Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
                     }
                 }
             };

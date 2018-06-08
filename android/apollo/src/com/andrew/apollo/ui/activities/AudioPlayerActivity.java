@@ -19,6 +19,7 @@
 package com.andrew.apollo.ui.activities;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
@@ -268,6 +269,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         super(R.layout.activity_player_base);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -528,7 +530,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         try {
             super.onBackPressed();
         } catch (Throwable ignored) {}
-        finish();
+
+        Offers.showInterstitialOfferIfNecessary(
+                this,
+                Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                false,
+                false,
+                true);
     }
 
     @Override
@@ -1314,6 +1322,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private final class PlayerGestureListener extends SwipeLayout.SwipeGestureAdapter
             implements View.OnTouchListener {
 
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             gestureDetector.onTouchEvent(event);

@@ -158,6 +158,7 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     public void onBackPressed() {
+        boolean lastBackDialogShown = false;
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
@@ -169,13 +170,24 @@ public class MainActivity extends AbstractActivity implements
             } catch (Throwable e) {
                 // don't break the app
                 showLastBackDialog();
+                lastBackDialogShown = true;
             }
         } else {
             showLastBackDialog();
+            lastBackDialogShown = true;
         }
 
         syncNavigationMenu();
         updateHeader(getCurrentFragment());
+
+        if (!lastBackDialogShown) {
+            Offers.showInterstitialOfferIfNecessary(
+                    this,
+                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                    false,
+                    true,
+                    true);
+        }
     }
 
     public void shutdown() {
@@ -514,7 +526,7 @@ public class MainActivity extends AbstractActivity implements
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePicker.handle(this, requestCode, resultCode, data);
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
-            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
         }
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -578,19 +590,11 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void onLastDialogButtonPositive() {
-        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD)) {
-            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
-        } else {
-            finish();
-        }
+        finish();
     }
 
     private void onShutdownDialogButtonPositive() {
-        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD)) {
-            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
-        } else {
-            shutdown();
-        }
+        shutdown();
     }
 
     public void syncNavigationMenu() {
