@@ -41,12 +41,11 @@ import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.activities.AboutActivity;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
+import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -150,14 +149,21 @@ public final class NavigationMenu {
         controller.syncNavigationMenu();
         menuItem.setChecked(true);
         controller.setTitle(menuItem.getTitle());
+        int menuActionId = menuItem.getItemId();
 
         Fragment fragment = controller.getFragmentByNavMenuId(menuItem.getItemId());
         if (fragment != null) {
             controller.switchContent(fragment);
         } else {
-            switch (menuItem.getItemId()) {
+            switch (menuActionId) {
                 case R.id.menu_main_my_music:
                     controller.launchMyMusic();
+                    break;
+                case R.id.menu_main_library:
+                    controller.showMyFiles();
+                    break;
+                case R.id.menu_main_transfers:
+                    controller.showTransfers(TransfersFragment.TransferStatus.ALL);
                     break;
                 case R.id.menu_main_support:
                     UIUtils.openURL(controller.getActivity(), Constants.SUPPORT_URL);
@@ -172,7 +178,20 @@ public final class NavigationMenu {
                     break;
             }
         }
+
         hide();
+
+        if ((menuActionId == R.id.menu_main_my_music ||
+            menuActionId == R.id.menu_main_search ||
+            menuActionId == R.id.menu_main_library) &&
+            controller.getActivity() != null) {
+            Offers.showInterstitialOfferIfNecessary(
+                    controller.getActivity(),
+                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                    false,
+                    false,
+                    true);
+        }
     }
 
     private void onUpdateButtonClicked(MainActivity mainActivity) {

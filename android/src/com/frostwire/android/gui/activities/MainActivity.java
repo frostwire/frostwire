@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
