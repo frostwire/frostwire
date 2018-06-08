@@ -70,7 +70,7 @@ public final class ShuffleButton extends ImageButton
      * Sets the correct drawable for the shuffle state.
      */
     public void updateShuffleState() {
-        if (MusicUtils.getShuffleMode()) {
+        if (MusicUtils.isShuffleEnabled()) {
             setContentDescription(getResources().getString(R.string.accessibility_shuffle_all));
             setImageResource(R.drawable.btn_playback_shuffle_all);
         } else {

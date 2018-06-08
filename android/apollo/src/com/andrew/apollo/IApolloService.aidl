@@ -36,7 +36,7 @@ interface IApolloService
     String getAlbumName();
     String getPath();
     int getQueuePosition();
-    boolean getShuffleMode();
+    boolean isShuffleEnabled();
     int removeTracks(int first, int last);
     int removeTrack(long id); 
     int getRepeatMode();
@@ -45,4 +45,3 @@ interface IApolloService
 
     void shutdown();
 }
-

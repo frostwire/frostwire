@@ -350,7 +350,7 @@ public final class MusicUtils {
      */
     public static void cycleShuffle() {
         if (musicPlaybackService != null) {
-            boolean on = getShuffleMode();
+            boolean on = isShuffleEnabled();
             try {
                 musicPlaybackService.setShuffleMode(!on);
             } catch (RemoteException ignored) {}
@@ -383,10 +383,10 @@ public final class MusicUtils {
     /**
      * @return The current shuffle mode.
      */
-    public static boolean getShuffleMode() {
+    public static boolean isShuffleEnabled() {
         if (musicPlaybackService != null) {
             try {
-                return musicPlaybackService.getShuffleMode();
+                return musicPlaybackService.isShuffleEnabled();
             } catch (final RemoteException ignored) { }
         }
         return false;

@@ -59,8 +59,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.Stack;
 
@@ -275,7 +273,7 @@ public class MusicPlaybackService extends Service {
      * track instead of skipping to the previous track when getting the PREVIOUS
      * command
      */
-    private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 10000;
+    private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
 
     /**
      * The max size allowed for the track history
@@ -434,7 +432,7 @@ public class MusicPlaybackService extends Service {
 
     private int mMediaMountedCount = 0;
 
-    private boolean mShuffleMode = false;
+    private boolean mShuffleEnabled = false;
 
     private int mRepeatMode = REPEAT_ALL;
 
@@ -1107,8 +1105,8 @@ public class MusicPlaybackService extends Service {
                     mPlayPos = -1;
                     closeCursor();
                 } else {
-                    if (mShuffleMode) {
-                        mPlayPos = getNextPosition(true, getShuffleMode());
+                    if (mShuffleEnabled) {
+                        mPlayPos = getNextPosition(true, isShuffleEnabled());
                     } else if (mPlayPos >= mPlayListLen) {
                         mPlayPos = 0;
                     }
@@ -1281,7 +1279,7 @@ public class MusicPlaybackService extends Service {
                         // we're either going to create a new one next, or stop trying
                         closeCursor();
                         if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
-                            final int pos = getNextPosition(false, getShuffleMode());
+                            final int pos = getNextPosition(false, isShuffleEnabled());
                             if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
                             mPlayPos = pos;
                             stop(false);
@@ -1323,13 +1321,13 @@ public class MusicPlaybackService extends Service {
      *              otherwise.
      * @return The next position to play.
      */
-    private int getNextPosition(final boolean force, final boolean shuffleMode) {
+    private int getNextPosition(final boolean force, final boolean shuffleEnabled) {
         if (!force && mRepeatMode == REPEAT_CURRENT) {
             if (mPlayPos < 0) {
                 return 0;
             }
             return mPlayPos;
-        } else if (shuffleMode) {
+        } else if (shuffleEnabled) {
             return r.nextInt(mPlayListLen);
         } else {
             if (mPlayPos >= mPlayListLen - 1) {
@@ -1349,7 +1347,7 @@ public class MusicPlaybackService extends Service {
      * Sets the track track to be played
      */
     private void setNextTrack() {
-        mNextPlayPos = getNextPosition(false, getShuffleMode());
+        mNextPlayPos = getNextPosition(false, isShuffleEnabled());
         if (D) LOG.info("setNextTrack: next play position = " + mNextPlayPos);
 
         if (mPlayer != null) {
@@ -1615,7 +1613,7 @@ public class MusicPlaybackService extends Service {
             }
         }
         editor.putInt("repeatmode", mRepeatMode);
-        editor.putBoolean("shufflemode", mShuffleMode);
+        editor.putBoolean("shufflemode", mShuffleEnabled);
         editor.apply();
     }
 
@@ -1810,8 +1808,8 @@ public class MusicPlaybackService extends Service {
      *
      * @return The current shuffle mode (all, party, none)
      */
-    private boolean getShuffleMode() {
-        return mShuffleMode;
+    private boolean isShuffleEnabled() {
+        return mShuffleEnabled;
     }
 
     /**
@@ -2220,7 +2218,7 @@ public class MusicPlaybackService extends Service {
         if (mPlayer != null && mPlayer.isInitialized()) {
             setNextTrack();
 
-            if (mShuffleMode && (mHistory.empty() || mHistory.peek() != mPlayPos)) {
+            if (mShuffleEnabled && (mHistory.empty() || mHistory.peek() != mPlayPos)) {
                 mHistory.push(mPlayPos);
             }
 
@@ -2279,7 +2277,7 @@ public class MusicPlaybackService extends Service {
                 scheduleDelayedShutdown();
                 return;
             }
-            final int pos = getNextPosition(force, getShuffleMode());
+            final int pos = getNextPosition(force, isShuffleEnabled());
             if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
             mPlayPos = pos;
             stop(false);
@@ -2310,7 +2308,7 @@ public class MusicPlaybackService extends Service {
         if (D) LOG.info("Going to previous track");
 
         synchronized (this) {
-            if (!mShuffleMode) {
+            if (!mShuffleEnabled) {
                 if (mPlayPos > 0) {
                     mPlayPos--;
                 } else {
@@ -2415,7 +2413,7 @@ public class MusicPlaybackService extends Service {
      * @param on The shuffle mode to use
      */
     public void setShuffleMode(boolean on) {
-        mShuffleMode = on;
+        mShuffleEnabled = on;
         notifyChange(SHUFFLEMODE_CHANGED);
     }
 
@@ -3358,9 +3356,9 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public boolean getShuffleMode() {
+        public boolean isShuffleEnabled() {
             if (Ref.alive(mService)) {
-                return mService.get().getShuffleMode();
+                return mService.get().isShuffleEnabled();
             }
             return false;
         }
