@@ -1,14 +1,16 @@
-FrostWire 2.0.5 build 531 - JUN/05/2018
+FrostWire 2.0.5 build 532 - JUN/07/2018
+ - No more intrusive interstitial ads when resuming app
  - New jlibtorrent 1.2.0.18-RC6
- - New: Telugu translation available for 75 million speakers
- - New: Marathi translation available for 73 million speakers
- - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
+ - Music Player: Shuffle mode now remembers songs played, back works as expected
  - Music Player: Add song to playlist shows mini-player in My Music
  - Music Player: Repeat All is the default playback mode for playlists
  - Music Player: Empty playlist message makes sense now
- - Memory leak fixed on SearchHeaderBanner
+ - New: Telugu translation available for 75 million speakers
+ - New: Marathi translation available for 73 million speakers
  - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian
+ - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
  - Library updates: (dev) gradle 4.8
+ - Memory leak fixed on SearchHeaderBanner
 
 FrostWire 2.0.4 build 526 - MAY/01/2018
  - New jlibtorrent 1.2.0.18-RC4
