@@ -278,20 +278,6 @@ public final class MusicUtils {
         }
     }
 
-    /**
-     * Changes to the previous track.
-     *
-     * @NOTE The AIDL isn't used here in order to properly use the previous
-     * action. When the user is shuffling, because {@link
-     * MusicPlaybackService#openCurrentAndNext()} is used, the user won't
-     * be able to travel to the previously skipped track. To remedy this,
-     * {@link MusicPlaybackService#openCurrent()} is called in {@link
-     * MusicPlaybackService#prev()}. {@code #startService(Intent intent)}
-     * is called here to specifically invoke the onStartCommand used by
-     * {@link MusicPlaybackService}, which states if the current position
-     * less than 2000 ms, start the track over, otherwise move to the
-     * previously listened track.
-     */
     public static void previous(final Context context) {
         final Intent previous = new Intent(context, MusicPlaybackService.class);
         previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
@@ -349,9 +335,6 @@ public final class MusicUtils {
                         break;
                     case MusicPlaybackService.REPEAT_ALL:
                         musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_CURRENT);
-                        if (musicPlaybackService.getShuffleMode() != MusicPlaybackService.SHUFFLE_NONE) {
-                            musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NONE);
-                        }
                         break;
                     default:
                         musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_NONE);
@@ -366,26 +349,11 @@ public final class MusicUtils {
      * Cycles through the shuffle options.
      */
     public static void cycleShuffle() {
-        try {
-            if (musicPlaybackService != null) {
-                switch (musicPlaybackService.getShuffleMode()) {
-                    case MusicPlaybackService.SHUFFLE_NONE:
-                        musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NORMAL);
-                        if (musicPlaybackService.getRepeatMode() == MusicPlaybackService.REPEAT_CURRENT) {
-                            musicPlaybackService.setRepeatMode(MusicPlaybackService.REPEAT_ALL);
-                        }
-                        break;
-                    case MusicPlaybackService.SHUFFLE_NORMAL:
-                        musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NONE);
-                        break;
-                    case MusicPlaybackService.SHUFFLE_AUTO:
-                        musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NONE);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (final RemoteException ignored) {
+        if (musicPlaybackService != null) {
+            boolean on = isShuffleEnabled();
+            try {
+                musicPlaybackService.setShuffleMode(!on);
+            } catch (RemoteException ignored) {}
         }
     }
 
@@ -415,14 +383,13 @@ public final class MusicUtils {
     /**
      * @return The current shuffle mode.
      */
-    public static int getShuffleMode() {
+    public static boolean isShuffleEnabled() {
         if (musicPlaybackService != null) {
             try {
-                return musicPlaybackService.getShuffleMode();
-            } catch (final RemoteException ignored) {
-            }
+                return musicPlaybackService.isShuffleEnabled();
+            } catch (final RemoteException ignored) { }
         }
-        return 0;
+        return false;
     }
 
     /**
@@ -819,11 +786,7 @@ public final class MusicUtils {
         }
 
         try {
-            if (forceShuffle) {
-                musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NORMAL);
-            } else {
-                musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NONE);
-            }
+            musicPlaybackService.setShuffleMode(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
             final int currentQueuePosition = getQueuePosition();
             if (continuedPlayingCurrentQueue(list, position, currentId, currentQueuePosition)) {
@@ -880,7 +843,6 @@ public final class MusicUtils {
      */
     public static void shuffleAll(final Context context) {
         // TODO: Check for PHONE_STATE Permissions here.
-
         Cursor cursor = new SongLoader(context).makeCursor(context);
         final long[] mTrackList = getSongListForCursor(cursor);
         final int position = 0;
@@ -888,7 +850,7 @@ public final class MusicUtils {
             return;
         }
         try {
-            musicPlaybackService.setShuffleMode(MusicPlaybackService.SHUFFLE_NORMAL);
+            musicPlaybackService.setShuffleMode(true);
             final long mCurrentId = musicPlaybackService.getAudioId();
             final int mCurrentQueuePosition = getQueuePosition();
 
