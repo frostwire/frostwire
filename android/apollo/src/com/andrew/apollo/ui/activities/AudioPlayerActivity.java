@@ -537,12 +537,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 false,
                 false,
                 true);
+
+        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Set the playback drawables
+        initPlaybackControls();
         updatePlaybackControls();
         // Current info
         updateNowPlayingInfo();
@@ -646,6 +649,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mShuffleButton = findView(R.id.action_button_shuffle);
         // Repeat button
         mRepeatButton = findView(R.id.action_button_repeat);
+
+        mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
+        mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
+
+        mShuffleButton.updateShuffleState();
+
         // Previous button
         RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button
@@ -864,12 +873,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Sets the correct drawable states for the playback controls.
      */
     private void updatePlaybackControls() {
+        // Set the repeat image
+        mRepeatButton.updateRepeatState();
         // Set the play and pause image
         mPlayPauseButton.updateState();
         // Set the shuffle image
         mShuffleButton.updateShuffleState();
-        // Set the repeat image
-        mRepeatButton.updateRepeatState();
     }
 
     private void updateQueueFragmentCurrentSong() {

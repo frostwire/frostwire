@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -30,9 +29,12 @@ import com.frostwire.android.R;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon
  */
 public final class ShuffleButton extends ImageButton
-        implements OnClickListener, OnLongClickListener {
+        implements OnClickListener {
+
+    private Runnable onClickedCallback;
 
     /**
      * @param context The {@link Context} to use
@@ -43,39 +45,31 @@ public final class ShuffleButton extends ImageButton
         setBackgroundResource(R.drawable.holo_background_selector);
         // Control playback (cycle shuffle)
         setOnClickListener(this);
-        // Show the cheat sheet
-        setOnLongClickListener(this);
+    }
+
+    public void setOnClickedCallback(Runnable runnable) {
+        onClickedCallback = runnable;
     }
 
     @Override
     public void onClick(final View v) {
         MusicUtils.cycleShuffle();
         updateShuffleState();
-    }
-
-    @Override
-    public boolean onLongClick(final View view) {
-        return false;
-
-        // TODO: Ask @gubatron what to do here?
-        //        if (TextUtils.isEmpty(view.getContentDescription())) {
-        //            return false;
-        //        } else {
-        //            ApolloUtils.showCheatSheet(view);
-        //            return true;
-        //        }
+        if (onClickedCallback != null) {
+            try {
+                onClickedCallback.run();
+            } catch (Throwable t) {
+            }
+        }
     }
 
     /**
      * Sets the correct drawable for the shuffle state.
      */
     public void updateShuffleState() {
-        if (MusicUtils.isShuffleEnabled()) {
-            setContentDescription(getResources().getString(R.string.accessibility_shuffle_all));
-            setImageResource(R.drawable.btn_playback_shuffle_all);
-        } else {
-            setContentDescription(getResources().getString(R.string.accessibility_shuffle));
-            setImageResource(R.drawable.btn_playback_shuffle);
-        }
+        boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
+        System.out.println("ShuffleButton::updateShuffleState(): shuffleEnabled=" + shuffleEnabled);
+        setContentDescription(getResources().getString(MusicUtils.isShuffleEnabled() ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
+        setImageResource(shuffleEnabled ? R.drawable.btn_playback_shuffle_all : R.drawable.btn_playback_shuffle);
     }
 }

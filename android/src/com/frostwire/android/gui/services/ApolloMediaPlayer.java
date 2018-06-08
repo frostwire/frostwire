@@ -39,7 +39,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
             }
         }
 
-        MusicUtils.playAll(list, position, false);
+        MusicUtils.playAll(list, position, MusicUtils.isShuffleEnabled());
     }
 
     @Override

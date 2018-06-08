@@ -15,7 +15,7 @@ interface IApolloService
     void next();
     void enqueue(in long [] list, int action);
     void setQueuePosition(int index);
-    void setShuffleMode(boolean on);
+    void enableShuffle(boolean on);
     void setRepeatMode(int repeatmode);
     void moveQueueItem(int from, int to);
     void toggleFavorite();

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,58 +123,35 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
                 @Override
                 public void run() {
                     final String requestedMimeType = mIntent.getExtras().getString(MIME_TYPE);
-
+                    // Shuffle the artist track list
+                    mShouldShuffle = MusicUtils.isShuffleEnabled();
                     // First, check the artist MIME type
                     if (MediaStore.Audio.Artists.CONTENT_TYPE.equals(requestedMimeType)) {
-
-                        // Shuffle the artist track list
-                        mShouldShuffle = true;
-
                         // Get the artist song list
                         mList = MusicUtils.getSongListForArtist(ShortcutActivity.this, getId());
                     } else
                         // Second, check the album MIME type
                         if (MediaStore.Audio.Albums.CONTENT_TYPE.equals(requestedMimeType)) {
-
-                            // Shuffle the album track list
-                            mShouldShuffle = true;
-
                             // Get the album song list
                             mList = MusicUtils.getSongListForAlbum(ShortcutActivity.this, getId());
                         } else
                             // Third, check the genre MIME type
                             if (MediaStore.Audio.Genres.CONTENT_TYPE.equals(requestedMimeType)) {
-
-                                // Shuffle the genre track list
-                                mShouldShuffle = true;
-
                                 // Get the genre song list
                                 mList = MusicUtils.getSongListForGenre(ShortcutActivity.this, getId());
                             } else
                                 // Fourth, check the playlist MIME type
                                 if (MediaStore.Audio.Playlists.CONTENT_TYPE.equals(requestedMimeType)) {
-
-                                    // Don't shuffle the playlist track list
-                                    mShouldShuffle = false;
-
                                     // Get the playlist song list
                                     mList = MusicUtils.getSongListForPlaylist(ShortcutActivity.this, getId());
                                 } else
                                     // Check the Favorites playlist
                                     if (getString(R.string.playlist_favorites).equals(requestedMimeType)) {
-
-                                        // Don't shuffle the Favorites track list
-                                        mShouldShuffle = false;
-
                                         // Get the Favorites song list
                                         mList = MusicUtils.getSongListForFavorites(ShortcutActivity.this);
                                     } else
                                         // Check for the Last added playlist
                                         if (getString(R.string.playlist_last_added).equals(requestedMimeType)) {
-
-                                            // Don't shuffle the last added track list
-                                            mShouldShuffle = false;
-
                                             // Get the Last added song list
                                             Cursor cursor = LastAddedLoader.makeLastAddedCursor(ShortcutActivity.this);
                                             if (cursor != null) {

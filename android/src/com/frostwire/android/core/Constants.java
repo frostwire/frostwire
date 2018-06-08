@@ -107,6 +107,9 @@ public final class Constants {
     public static final String PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY = "frostwire.prefs.gui.interstitial_on_resume_last_display";
     public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP = "frostwire.prefs.gui.installation_timestamp";
 
+    public static final String PREF_KEY_GUI_PLAYER_REPEAT_MODE = "com.frostwire.android.player.REPEAT_MODE";
+    public static final String PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED = "com.frostwire.android.player.SHUFFLE_ENABLED";
+
     public static final String PREF_KEY_GUI_OFFERS_WATERFALL = "frostwire.prefs.gui.offers_waterfall";
     public static final String PREF_KEY_GUI_HAPTIC_FEEDBACK_ON = "frostwire.prefs.gui.haptic_feedback_on";
     public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH = "frostwire.prefs.gui.distraction_free_search";

@@ -350,9 +350,8 @@ public final class MusicUtils {
      */
     public static void cycleShuffle() {
         if (musicPlaybackService != null) {
-            boolean on = isShuffleEnabled();
             try {
-                musicPlaybackService.setShuffleMode(!on);
+                musicPlaybackService.enableShuffle(!isShuffleEnabled());
             } catch (RemoteException ignored) {}
         }
     }
@@ -717,7 +716,7 @@ public final class MusicUtils {
     public static void playArtist(final Context context, final long artistId, int position) {
         final long[] artistList = getSongListForArtist(context, artistId);
         if (artistList != null) {
-            playAll(artistList, position, false);
+            playAll(artistList, position, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -786,7 +785,7 @@ public final class MusicUtils {
         }
 
         try {
-            musicPlaybackService.setShuffleMode(forceShuffle);
+            musicPlaybackService.enableShuffle(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
             final int currentQueuePosition = getQueuePosition();
             if (continuedPlayingCurrentQueue(list, position, currentId, currentQueuePosition)) {
@@ -796,7 +795,7 @@ public final class MusicUtils {
                 position = 0;
             }
 
-            musicPlaybackService.open(list, forceShuffle ? -1 : position);
+            musicPlaybackService.open(list, position);
             musicPlaybackService.play();
 
         } catch (final RemoteException ignored) {
@@ -850,18 +849,15 @@ public final class MusicUtils {
             return;
         }
         try {
-            musicPlaybackService.setShuffleMode(true);
+            musicPlaybackService.enableShuffle(true);
             final long mCurrentId = musicPlaybackService.getAudioId();
             final int mCurrentQueuePosition = getQueuePosition();
 
             if (continuedPlayingCurrentQueue(mTrackList, position, mCurrentId, mCurrentQueuePosition)) {
                 return;
             }
-
-            if (mTrackList.length > 0) {
-                musicPlaybackService.open(mTrackList, -1);
-                musicPlaybackService.play();
-            }
+            musicPlaybackService.open(mTrackList, -1);
+            musicPlaybackService.play();
             cursor.close();
         } catch (final RemoteException ignored) {
         }
@@ -949,7 +945,7 @@ public final class MusicUtils {
     public static void playAlbum(final Context context, final long albumId, int position) {
         final long[] albumList = getSongListForAlbum(context, albumId);
         if (albumList != null) {
-            playAll(albumList, position, false);
+            playAll(albumList, position, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -1381,7 +1377,7 @@ public final class MusicUtils {
     public static void playPlaylist(final Context context, final long playlistId) {
         final long[] playlistList = getSongListForPlaylist(context, playlistId);
         if (playlistList != null) {
-            playAll(playlistList, -1, false);
+            playAll(playlistList, -1, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -1430,7 +1426,7 @@ public final class MusicUtils {
      * @param context The {@link Context} to use
      */
     public static void playFavorites(final Context context) {
-        playAll(getSongListForFavorites(context), 0, false);
+        playAll(getSongListForFavorites(context), 0, MusicUtils.isShuffleEnabled());
     }
 
     /**
@@ -1457,7 +1453,7 @@ public final class MusicUtils {
      * @param context The {@link Context} to use
      */
     public static void playLastAdded(final Context context) {
-        playAll(getSongListForLastAdded(context), 0, false);
+        playAll(getSongListForLastAdded(context), 0, MusicUtils.isShuffleEnabled());
     }
 
     /**
@@ -1718,7 +1714,7 @@ public final class MusicUtils {
         if (list.length == 0) {
             pos = 0;
         }
-        MusicUtils.playAll(list, pos, false);
+        MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
     }
 
     public static void removeSongFromAllPlaylists(final Context context, final long songId) {

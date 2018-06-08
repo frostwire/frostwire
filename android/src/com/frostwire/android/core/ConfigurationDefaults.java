@@ -19,6 +19,7 @@ package com.frostwire.android.core;
 
 import android.os.Environment;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.util.Hex;
 
 import java.util.Collections;
@@ -128,6 +129,9 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 
         defaultValues.put(Constants.PREF_KEY_UXSTATS_ENABLED, true);
+
+        defaultValues.put(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE, MusicPlaybackService.REPEAT_ALL);
+        defaultValues.put(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED, false);
 
         resetValue(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN);
         resetValue(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN);

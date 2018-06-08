@@ -55,6 +55,9 @@ import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -601,6 +604,13 @@ public class MusicPlaybackService extends Service {
         // Initialize the media player
         mPlayer = new MultiPlayer(this);
         mPlayer.setHandler(mPlayerHandler);
+
+        ConfigurationManager CM = ConfigurationManager.instance();
+        // Load Repeat Mode
+        setRepeatMode(CM.getInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE));
+        // Load Shuffle Mode On/Off
+        enableShuffle(CM.getBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED));
+        MusicUtils.isShuffleEnabled();
 
         // Initialize the intent filter and each action
         final IntentFilter filter = new IntentFilter();
@@ -2168,6 +2178,9 @@ public class MusicPlaybackService extends Service {
                 addToPlayList(list, -1);
                 notifyChange(QUEUE_CHANGED);
             }
+            if (position == -1) {
+                mPlayPos = 0;
+            }
             if (position >= 0) {
                 mPlayPos = position;
             }
@@ -2396,15 +2409,21 @@ public class MusicPlaybackService extends Service {
     /**
      * Sets the repeat mode
      *
-     * @param repeatmode The repeat mode to use
+     * @param repeatMode The repeat mode to use
      */
-    public void setRepeatMode(final int repeatmode) {
+    public void setRepeatMode(final int repeatMode) {
         synchronized (this) {
-            mRepeatMode = repeatmode;
+            mRepeatMode = repeatMode;
             setNextTrack();
             saveQueue(false);
             notifyChange(REPEATMODE_CHANGED);
         }
+        Asyncs.async(MusicPlaybackService::saveLastRepeatStateAsync, repeatMode);
+    }
+
+    private static void saveLastRepeatStateAsync(int repeatMode) {
+        ConfigurationManager CM = ConfigurationManager.instance();
+        CM.setInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE, repeatMode);
     }
 
     /**
@@ -2412,11 +2431,16 @@ public class MusicPlaybackService extends Service {
      *
      * @param on The shuffle mode to use
      */
-    public void setShuffleMode(boolean on) {
+    public void enableShuffle(boolean on) {
         mShuffleEnabled = on;
+        Asyncs.async(MusicPlaybackService::saveLastShuffleStateAsync, on);
         notifyChange(SHUFFLEMODE_CHANGED);
     }
 
+    private static void saveLastShuffleStateAsync(boolean shuffleEnabled) {
+        ConfigurationManager CM = ConfigurationManager.instance();
+        CM.setBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED, shuffleEnabled);
+    }
     /**
      * Sets the position of a track in the queue
      *
@@ -3148,9 +3172,9 @@ public class MusicPlaybackService extends Service {
         /**
          * {@inheritDoc}
          */
-        public void setShuffleMode(boolean shufflemode) {
+        public void enableShuffle(boolean on) {
             if (Ref.alive(mService)) {
-                mService.get().setShuffleMode(shufflemode);
+                mService.get().enableShuffle(on);
             }
         }
 
@@ -3158,9 +3182,9 @@ public class MusicPlaybackService extends Service {
          * {@inheritDoc}
          */
         @Override
-        public void setRepeatMode(final int repeatmode) {
+        public void setRepeatMode(final int repeatMode) {
             if (Ref.alive(mService)) {
-                mService.get().setRepeatMode(repeatmode);
+                mService.get().setRepeatMode(repeatMode);
             }
         }
 

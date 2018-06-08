@@ -315,7 +315,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
             final long[] list = new long[]{
                     id
             };
-            MusicUtils.playAll(list, 0, false);
+            MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
         }
 
         // Close it up

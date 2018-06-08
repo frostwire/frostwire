@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,12 @@
 package com.andrew.apollo.widgets;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 
 import com.andrew.apollo.MusicPlaybackService;
-import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 
@@ -37,7 +34,9 @@ import com.frostwire.android.R;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class RepeatButton extends ImageButton
-        implements OnClickListener, OnLongClickListener {
+        implements OnClickListener {
+
+    private Runnable onClickedCallback;
 
     /**
      * @param context The {@link Context} to use
@@ -48,23 +47,21 @@ public final class RepeatButton extends ImageButton
         setBackgroundResource(R.drawable.holo_background_selector);
         // Control playback (cycle repeat modes)
         setOnClickListener(this);
-        // Show the cheat sheet
-        setOnLongClickListener(this);
+    }
+
+    public void setOnClickedCallback(Runnable runnable) {
+        onClickedCallback = runnable;
     }
 
     @Override
     public void onClick(final View v) {
         MusicUtils.cycleRepeat();
         updateRepeatState();
-    }
-
-    @Override
-    public boolean onLongClick(final View view) {
-        if (TextUtils.isEmpty(view.getContentDescription())) {
-            return false;
-        } else {
-            ApolloUtils.showCheatSheet(view);
-            return true;
+        if (onClickedCallback != null) {
+            try {
+                onClickedCallback.run();
+            } catch (Throwable t) {
+            }
         }
     }
 
@@ -72,7 +69,14 @@ public final class RepeatButton extends ImageButton
      * Sets the correct drawable for the repeat state.
      */
     public void updateRepeatState() {
-        switch (MusicUtils.getRepeatMode()) {
+        boolean isShuffleEnabled = MusicUtils.isShuffleEnabled();
+        setVisibility(isShuffleEnabled ? View.INVISIBLE : View.VISIBLE);
+        if (isShuffleEnabled) {
+            // nothing to update, button is invisible
+            return;
+        }
+        int repeatMode = MusicUtils.getRepeatMode();
+        switch (repeatMode) {
             case MusicPlaybackService.REPEAT_ALL:
                 setContentDescription(getResources().getString(R.string.accessibility_repeat_all));
                 setImageResource(R.drawable.btn_playback_repeat_all);

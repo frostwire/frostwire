@@ -480,7 +480,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 false,
                 false,
                 true);
-            finish();
+        finish();
     }
 
     /**
