@@ -353,10 +353,7 @@ public final class MusicUtils {
             boolean on = getShuffleMode();
             try {
                 musicPlaybackService.setShuffleMode(!on);
-            } catch (RemoteException e) {
-                //TODO: Ask @gubatron what to do here?
-                e.printStackTrace();
-            }
+            } catch (RemoteException ignored) {}
         }
     }
 
@@ -789,11 +786,7 @@ public final class MusicUtils {
         }
 
         try {
-            if (forceShuffle) {
-                musicPlaybackService.setShuffleMode(true);
-            } else {
-                musicPlaybackService.setShuffleMode(false);
-            }
+            musicPlaybackService.setShuffleMode(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
             final int currentQueuePosition = getQueuePosition();
             if (continuedPlayingCurrentQueue(list, position, currentId, currentQueuePosition)) {
@@ -850,7 +843,6 @@ public final class MusicUtils {
      */
     public static void shuffleAll(final Context context) {
         // TODO: Check for PHONE_STATE Permissions here.
-
         Cursor cursor = new SongLoader(context).makeCursor(context);
         final long[] mTrackList = getSongListForCursor(cursor);
         final int position = 0;
