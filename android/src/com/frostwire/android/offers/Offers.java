@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 
@@ -43,7 +44,7 @@ public final class Offers {
 
     static final boolean DEBUG_MODE = false;
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
-    public static final String PLACEMENT_INTERSTITIAL_EXIT = "interstitial_exit";
+    public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String,AdNetwork> AD_NETWORKS;
     public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
@@ -154,31 +155,58 @@ public final class Offers {
         showInterstitialOfferIfNecessary(ctx, placement, shutdownAfterwards, dismissAfterwards, false);
     }
 
-    public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
+    private static class InterstitialLogicParams {
+        final String placement;
+        final boolean shutdownAfterwards;
+        final boolean dismissAfterwards;
+        final boolean ignoreStartedTransfers;
+        InterstitialLogicParams(String p, boolean s, boolean d, boolean i) {
+            placement = p;
+            shutdownAfterwards = s;
+            dismissAfterwards = d;
+            ignoreStartedTransfers = i;
+        }
+    }
+
+    public static void showInterstitialOfferIfNecessary(Activity activity, String placement,
                                                         final boolean shutdownAfterwards,
                                                         final boolean dismissAfterwards,
                                                         final boolean ignoreStartedTransfers) {
+        InterstitialLogicParams params = new InterstitialLogicParams(placement, shutdownAfterwards, dismissAfterwards, ignoreStartedTransfers);
+        Asyncs.async(
+                Offers::readyForAnotherInterstitialAsync, activity, params, // returns true if ready
+                Offers::onReadyForAnotherInterstitialAsyncCallback); // shows offers on main thread if ready received
+    }
+
+    private static boolean readyForAnotherInterstitialAsync(Activity activity, InterstitialLogicParams params) {
+        if (Offers.disabledAds()) {
+            return false;
+        }
+        final String placement = params.placement;
+        final boolean shutdownAfterwards = params.shutdownAfterwards;
+        final boolean dismissAfterwards = params.dismissAfterwards;
+        final boolean ignoreStartedTransfers = params.ignoreStartedTransfers;
         TransferManager TM = TransferManager.instance();
-        int startedTransfers = TM.incrementStartedTransfers();
         ConfigurationManager CM = ConfigurationManager.instance();
         final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = DEBUG_MODE ? 1 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
         final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
         final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
-
+        final int INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = DEBUG_MODE ? 0 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
+        final long INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
         long lastInterstitialShownTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
         long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
-        boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
-        boolean startedEnoughTransfers = startedTransfers >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
+        boolean appStartedLongEnoughAgo = (System.currentTimeMillis() - Offers.STARTUP_TIME) > INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS;
+        boolean itsBeenLongEnough = appStartedLongEnoughAgo && timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
+        boolean startedEnoughTransfers = ignoreStartedTransfers || TM.startedTransfers() >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
+        boolean shouldDisplayFirstOne = (appStartedLongEnoughAgo && lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
+        boolean readyForInterstitial = shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers);
+        if (readyForInterstitial && !ignoreStartedTransfers) { TM.resetStartedTransfers(); }
+        return readyForInterstitial;
+    }
 
-        if (ignoreStartedTransfers) {
-            startedEnoughTransfers = true;
-        }
-
-        boolean shouldDisplayFirstOne = (lastInterstitialShownTimestamp == -1 && startedEnoughTransfers);
-
-        if (shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers)) {
-            Offers.showInterstitial(ctx, placement, shutdownAfterwards, dismissAfterwards);
-            TM.resetStartedTransfers();
+    private static void onReadyForAnotherInterstitialAsyncCallback(Activity activity, InterstitialLogicParams params, boolean readyForInterstitial) {
+        if (readyForInterstitial) {
+            Offers.showInterstitial(activity, params.placement, params.shutdownAfterwards, params.dismissAfterwards);
         }
     }
 
@@ -213,7 +241,7 @@ public final class Offers {
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {
-        if (REMOVE_ADS == null || !REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
+        if (!REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
 

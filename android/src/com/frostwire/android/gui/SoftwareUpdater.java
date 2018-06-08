@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,6 @@ public final class SoftwareUpdater {
                     result = "0" + result;
                 }
             }
-
             return result;
         } catch (Exception e) {
             return null;
@@ -296,11 +295,7 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES, update.config.interstitialOnResumeFirstDisplayDelayInMinutes);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES, update.config.interstitialOnResumeTimeoutInMinutes);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD, update.config.onExitThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD, update.config.onBackThreshold);
-        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD, update.config.onResumeThreshold);
+        CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, update.config.interstitialFirstDisplayDelayInMinutes);
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
@@ -368,13 +363,9 @@ public final class SoftwareUpdater {
         int mopubPreviewBannerThreshold = 40;
         int oguryThreshold = 101;
         int prebidThreshold = 101;
-        int interstitialOffersTransferStarts = 5;
-        int interstitialTransferOffersTimeoutInMinutes = 15;
-        int interstitialOnResumeFirstDisplayDelayInMinutes = 30;
-        int interstitialOnResumeTimeoutInMinutes = 15;
-        int onExitThreshold = 0;
-        int onBackThreshold = 0;
-        int onResumeThreshold = 100;
+        int interstitialOffersTransferStarts = 3;
+        int interstitialTransferOffersTimeoutInMinutes = 10;
+        int interstitialFirstDisplayDelayInMinutes = 3;
 
         // ux stats
         boolean uxEnabled = false;

@@ -25,6 +25,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.WizardActivity;
+import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.util.Ref;
@@ -44,6 +45,9 @@ public final class MainController {
     }
 
     public MainActivity getActivity() {
+        if (!Ref.alive(activityRef)) {
+            return null;
+        }
         return activityRef.get();
     }
 
@@ -91,6 +95,19 @@ public final class MainController {
         }
     }
 
+    public void showMyFiles() {
+        if (!Ref.alive(activityRef)) {
+            return;
+        }
+        MainActivity activity = activityRef.get();
+        if (!(activity.getCurrentFragment() instanceof MyFilesFragment)) {
+            activity.runOnUiThread(() -> {
+                MyFilesFragment fragment = (MyFilesFragment) activity.getFragmentByNavMenuId(R.id.menu_main_library);
+                switchFragment(R.id.menu_main_library);
+            });
+        }
+    }
+
     public void startWizardActivity() {
         if (!Ref.alive(activityRef)) {
             return;
@@ -131,7 +148,7 @@ public final class MainController {
             return null;
         }
         MainActivity activity = activityRef.get();
-       return activity.getFragmentByNavMenuId(itemId);
+        return activity.getFragmentByNavMenuId(itemId);
     }
 
     public void switchContent(Fragment fragment) {

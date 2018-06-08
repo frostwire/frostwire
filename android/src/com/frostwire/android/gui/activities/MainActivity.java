@@ -19,7 +19,6 @@
 package com.frostwire.android.gui.activities;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -95,7 +94,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Stack;
-import java.util.concurrent.TimeUnit;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
@@ -130,7 +128,6 @@ public class MainActivity extends AbstractActivity implements
     private BroadcastReceiver mainBroadcastReceiver;
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private TimerSubscription playerSubscription;
-    private DelayedOnResumeInterstitialRunnable delayedOnResumeInterstitialRunnable;
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -160,6 +157,7 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     public void onBackPressed() {
+        boolean lastBackDialogShown = false;
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
@@ -171,13 +169,24 @@ public class MainActivity extends AbstractActivity implements
             } catch (Throwable e) {
                 // don't break the app
                 showLastBackDialog();
+                lastBackDialogShown = true;
             }
         } else {
             showLastBackDialog();
+            lastBackDialogShown = true;
         }
 
         syncNavigationMenu();
         updateHeader(getCurrentFragment());
+
+        if (!lastBackDialogShown) {
+            Offers.showInterstitialOfferIfNecessary(
+                    this,
+                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                    false,
+                    true,
+                    true);
+        }
     }
 
     public void shutdown() {
@@ -362,7 +371,6 @@ public class MainActivity extends AbstractActivity implements
             checkExternalStoragePermissionsOrBindMusicService();
         }
 
-        tryOnResumeInterstitial();
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
     }
 
@@ -378,125 +386,6 @@ public class MainActivity extends AbstractActivity implements
             } catch (Throwable ignored) {
                 //oh well (the api doesn't provide a way to know if it's been registered before,
                 //seems like overkill keeping track of these ourselves.)
-            }
-        }
-
-        if (delayedOnResumeInterstitialRunnable != null) {
-            LOG.info("onPause() cancelling delayedOnResumeInterstitialRunnable");
-            delayedOnResumeInterstitialRunnable.cancel();
-        }
-    }
-
-    private void tryOnResumeInterstitial() {
-        if (Offers.disabledAds()) {
-            LOG.info("tryOnResumeInterstitial() aborted - ads disabled");
-            delayedOnResumeInterstitialRunnable = null;
-            return;
-        }
-        ConfigurationManager CM = ConfigurationManager.instance();
-
-        // TEST. Uncomment below
-        // CM.setLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, (long) (System.currentTimeMillis() - 8.64e+7));
-
-        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
-        if (installationTimestamp == -1) {
-            LOG.info("tryOnResumeInterstitial() aborted - wizard not finished");
-            delayedOnResumeInterstitialRunnable = null;
-            return;
-        }
-        if (!UIUtils.diceRollPassesThreshold(CM, Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD)) {
-            LOG.info("tryOnResumeInterstitial() aborted - threshold not met");
-            delayedOnResumeInterstitialRunnable = null;
-            return;
-        }
-        long now = System.currentTimeMillis();
-        long lastDisplayTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
-
-        // TEST. Uncomment below
-        // lastDisplayTimestamp = (long) (System.currentTimeMillis() - 8.64e+7);
-
-        // if it's never been displayed, we check against the first display delayInMs setting
-        if (lastDisplayTimestamp == -1) {
-            int minutesSinceInstallation = (int) TimeUnit.MILLISECONDS.toMinutes(now - installationTimestamp);
-            int firstDisplayDelayInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES);
-            if (minutesSinceInstallation < firstDisplayDelayInMinutes || firstDisplayDelayInMinutes == 0) {
-                LOG.info("tryOnResumeInterstitial() aborted - not ready for first display yet (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
-                delayedOnResumeInterstitialRunnable = null;
-                return;
-            }
-            //LOG.info("tryOnResumeInterstitial() might be ready for first display (initialDelay=" + firstDisplayDelayInMinutes + ", minutesSinceInstallation=" + minutesSinceInstallation + ")");
-        } else {
-            int minutesSinceSessionStarted = (int) TimeUnit.MILLISECONDS.toMinutes(now - CM.getLong(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP));
-            int minutesSinceLastDisplay = (int) TimeUnit.MILLISECONDS.toMinutes(now - lastDisplayTimestamp);
-            int onResumeOfferTimeoutInMinutes = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES);
-            if (minutesSinceSessionStarted < onResumeOfferTimeoutInMinutes || minutesSinceLastDisplay < onResumeOfferTimeoutInMinutes) {
-                LOG.info("tryOnResumeInterstitial() aborted - too soon for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
-                delayedOnResumeInterstitialRunnable = null;
-                return;
-            }
-            LOG.info("tryOnResumeInterstitial() ready for next display (timeoutInMinutes=" + onResumeOfferTimeoutInMinutes + ", minutesSinceLastDisplay=" + minutesSinceLastDisplay + ", minutesSinceSessionStarted=" + minutesSinceSessionStarted + ")");
-        }
-
-        LOG.info("tryOnResumeInterstitial() - creating new delayedOnResumeInterstitialRunnable attempt");
-        delayedOnResumeInterstitialRunnable = new DelayedOnResumeInterstitialRunnable(2000, this);
-        Engine.instance().getThreadPool().execute(delayedOnResumeInterstitialRunnable);
-    }
-
-    private static class DelayedOnResumeInterstitialRunnable implements Runnable {
-        private final WeakReference<MainActivity> activityRef;
-        private final long delayInMs;
-        private boolean cancelled;
-
-        DelayedOnResumeInterstitialRunnable(long delayInMs, MainActivity activity) {
-            activityRef = Ref.weak(activity);
-            this.delayInMs = delayInMs;
-            cancelled = false;
-        }
-
-        @Override
-        public void run() {
-            if (!Ref.alive(activityRef)) {
-                return;
-            }
-            try {
-                if (cancelled) {
-                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 1).");
-                    activityRef.get().delayedOnResumeInterstitialRunnable = null;
-                    return;
-                }
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") sleeping " + delayInMs + "ms");
-                Thread.sleep(delayInMs);
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") done sleeping");
-            } catch (Throwable ignored) {
-                return;
-            }
-            if (!Ref.alive(activityRef)) {
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") lost MainActivity reference");
-                return;
-            }
-            if (cancelled) {
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 2).");
-                activityRef.get().delayedOnResumeInterstitialRunnable = null;
-                return;
-            }
-            final Activity activity = activityRef.get();
-            activity.runOnUiThread(() -> {
-                if (cancelled) {
-                    //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") cancelled (stage 3).");
-                    activityRef.get().delayedOnResumeInterstitialRunnable = null;
-                    return;
-                }
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ") showing interstitial");
-                Offers.showInterstitialOfferIfNecessary(activity, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false, true);
-            });
-        }
-
-        public void cancel() {
-            LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel()");
-            cancelled = true;
-            if (Ref.alive(activityRef)) {
-                //LOG.info("DelayedOnResumeInterstitialRunnable(tid=" + Thread.currentThread().getId() + ").cancel() clearing runnable reference from MainActivity");
-                activityRef.get().delayedOnResumeInterstitialRunnable = null;
             }
         }
     }
@@ -636,7 +525,7 @@ public class MainActivity extends AbstractActivity implements
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePicker.handle(this, requestCode, resultCode, data);
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
-            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
         }
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -700,19 +589,11 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void onLastDialogButtonPositive() {
-        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD)) {
-            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, true);
-        } else {
-            finish();
-        }
+        finish();
     }
 
     private void onShutdownDialogButtonPositive() {
-        if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD)) {
-            Offers.showInterstitial(this, Offers.PLACEMENT_INTERSTITIAL_EXIT, true, false);
-        } else {
-            shutdown();
-        }
+        shutdown();
     }
 
     public void syncNavigationMenu() {

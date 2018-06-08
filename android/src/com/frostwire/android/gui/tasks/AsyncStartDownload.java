@@ -87,7 +87,7 @@ public class AsyncStartDownload {
     private static void onPostExecute(final Context ctx, final SearchResult sr, final String message, final Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
-                Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
             }
 
             if (!(transfer instanceof InvalidTransfer)) {

@@ -313,7 +313,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                     startTorrentPartialDownload(checked);
 
                     if (ctxRef.get() instanceof Activity) {
-                        Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_EXIT, false, false);
+                        Offers.showInterstitialOfferIfNecessary((Activity) ctxRef.get(), Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
                     }
                 }
             }
@@ -356,6 +356,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 } catch (Throwable ignored) {
                 }
             });
+
+            TransferManager.instance().incrementStartedTransfers();
         }
 
         private static List<TcpEndpoint> parsePeers(String magnet) {

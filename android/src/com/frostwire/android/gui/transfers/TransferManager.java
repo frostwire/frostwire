@@ -155,6 +155,8 @@ public final class TransferManager {
 
         if (alreadyDownloading(sr.getDetailsUrl())) {
             transfer = new ExistingDownload();
+        } else {
+            incrementStartedTransfers();
         }
 
         if (sr instanceof TorrentSearchResult) {
@@ -320,11 +322,13 @@ public final class TransferManager {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
                     bittorrentDownloadsList.add(download);
                     bittorrentDownloadsMap.put(download.getInfoHash(), download);
+                    incrementStartedTransfers();
                     return download;
                 }
                 return null;
             }
 
+            incrementStartedTransfers();
             return download;
         } catch (Throwable e) {
             LOG.warn("Error creating download from uri: " + url, e);
@@ -523,6 +527,10 @@ public final class TransferManager {
 
     public void resetStartedTransfers() {
         startedTransfers = 0;
+    }
+
+    public int startedTransfers() {
+        return startedTransfers;
     }
 
     static long getCurrentMountAvailableBytes() {

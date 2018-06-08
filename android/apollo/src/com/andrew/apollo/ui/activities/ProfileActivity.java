@@ -51,6 +51,7 @@ import com.andrew.apollo.utils.SortOrder;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Ref;
 
 /**
@@ -472,7 +473,14 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
             NavUtils.openArtistProfile(this, mArtistName, tracks);
         }
-        finish();
+
+        Offers.showInterstitialOfferIfNecessary(
+                this,
+                Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                false,
+                false,
+                true);
+            finish();
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,11 +103,7 @@ public final class Constants {
 
     public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
     public static final String PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_transfer_offers_timeout_in_minutes";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_EXIT_THRESHOLD = "frostwire.prefs.gui.interstitial_on_exit_threshold";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_BACK_THRESHOLD = "frostwire.prefs.gui.interstitial_on_back_threshold";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_THRESHOLD = "frostwire.prefs.gui.interstitial_on_resume_threshold";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_FIRST_DISPLAY_DELAY_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_first_display_delay_in_minutes";
-    public static final String PREF_KEY_GUI_INTERSTITIAL_ON_RESUME_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_timeout_in_minutes";
+    public static final String PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = "frostwire.prefs.gui.interstitial_on_resume_first_display_delay_in_minutes";
     public static final String PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY = "frostwire.prefs.gui.interstitial_on_resume_last_display";
     public static final String PREF_KEY_GUI_INSTALLATION_TIMESTAMP = "frostwire.prefs.gui.installation_timestamp";
 
