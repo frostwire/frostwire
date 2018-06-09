@@ -68,7 +68,6 @@ public final class ShuffleButton extends ImageButton
      */
     public void updateShuffleState() {
         boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
-        System.out.println("ShuffleButton::updateShuffleState(): shuffleEnabled=" + shuffleEnabled);
         setContentDescription(getResources().getString(MusicUtils.isShuffleEnabled() ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
         setImageResource(shuffleEnabled ? R.drawable.btn_playback_shuffle_all : R.drawable.btn_playback_shuffle);
     }

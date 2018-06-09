@@ -111,6 +111,23 @@ public final class Offers {
         LOG.info("Ad networks stopped");
     }
 
+    /** DO NOT CALL THIS DIRECTLY, DO SO ONLY FOR TESTING OR IF YOU REALLY
+     * KNOW WHAT YOU ARE DOING. This method runs on the UI Thread entirely.
+     *
+     * You should be calling instead Offers.showInterstitialOfferIfNecessary
+     * it will perform all the logic checks necessary in the background and then invoke
+     * showInterstitial() if the time is right.
+     *
+     * Why is it `public` then?
+     * This method has been kept public since we use it as an easter egg
+     * when touching the SearchFragment title 5 times to trigger an interstitial
+     * on demand, no questions asked
+     *
+     * @param activity
+     * @param placement
+     * @param shutdownAfterwards
+     * @param dismissAfterwards
+     */
     public static void showInterstitial(final Activity activity,
                                         String placement,
                                         final boolean shutdownAfterwards,
