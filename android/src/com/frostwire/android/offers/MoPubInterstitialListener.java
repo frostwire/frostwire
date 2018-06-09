@@ -57,7 +57,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public boolean show(Activity activity, String placement) {
-        LOG.info("MoPubInterstitialListener.show(): wasPlayingMusic=" + wasPlayingMusic);
+//        LOG.info("MoPubInterstitialListener.show(): wasPlayingMusic=" + wasPlayingMusic);
         return isAdReadyToDisplay() && interstitial.show();
     }
 
@@ -86,13 +86,13 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
         // ad failed to load, excellent place to load more ads.
         this.interstitial = null;
-        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
+//        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
         mopubAdNetwork.loadMoPubInterstitial(interstitial.getActivity(), placement);
     }
 
     @Override
     public void onInterstitialShown(MoPubInterstitial interstitial) {
-        LOG.info("MoPub onInterstitialShown - " + interstitial.toString());
+//        LOG.info("MoPub onInterstitialShown - " + interstitial.toString());
         if (wasPlayingMusic && !shutDownAfter && !MusicUtils.isPlaying()) {
             MusicUtils.play();
         }
@@ -105,7 +105,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public void onInterstitialDismissed(MoPubInterstitial interstitial) {
-        LOG.info("onInterstitialDismissed");
+//        LOG.info("onInterstitialDismissed");
         Activity activity = interstitial.getActivity();
 
         if (interstitial != null) {

@@ -76,7 +76,7 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                     @Override
                     public void videoPlaybackBegan(AppLovinAd appLovinAd) {
                         if (wasPlayingMusic && !MusicUtils.isPlaying()) {
-                            LOG.info("videoPlaybackBegan(): wasPlayingMusic, ensuring music playback continues");
+//                            LOG.info("videoPlaybackBegan(): wasPlayingMusic, ensuring music playback continues");
                             MusicUtils.play();
                         }
                     }
@@ -84,7 +84,7 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                     @Override
                     public void videoPlaybackEnded(AppLovinAd appLovinAd, double v, boolean b) {
                         if (wasPlayingMusic && !MusicUtils.isPlaying()) {
-                            LOG.info("videoPlaybackBegan(): wasPlayingMusic, ensuring music playback continues");
+//                            LOG.info("videoPlaybackBegan(): wasPlayingMusic, ensuring music playback continues");
                             MusicUtils.play();
                         }
                     }
@@ -92,9 +92,9 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                 inter.setAdDisplayListener(new AppLovinAdDisplayListener() {
                     @Override
                     public void adDisplayed(AppLovinAd appLovinAd) {
-                        LOG.info("adDisplayed(): wasPlayingMusic=" + wasPlayingMusic);
+//                        LOG.info("adDisplayed(): wasPlayingMusic=" + wasPlayingMusic);
                         if (wasPlayingMusic && !MusicUtils.isPlaying()) {
-                            LOG.info("adDisplayed(): wasPlayingMusic, ensuring music playback continues");
+//                            LOG.info("adDisplayed(): wasPlayingMusic, ensuring music playback continues");
                             MusicUtils.play();
                         }
                         mInterstitialListener.onInterstitialShown();
@@ -103,7 +103,7 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
                     @Override
                     public void adHidden(AppLovinAd appLovinAd) {
                         if (wasPlayingMusic && !MusicUtils.isPlaying()) {
-                            LOG.info("adHidden(): wasPlayingMusic, ensuring music playback continues");
+//                            LOG.info("adHidden(): wasPlayingMusic, ensuring music playback continues");
                             MusicUtils.play();
                         }
                         mInterstitialListener.onInterstitialDismissed();

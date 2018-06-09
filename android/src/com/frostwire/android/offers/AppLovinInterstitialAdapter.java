@@ -115,7 +115,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     @Override
     public void adDisplayed(AppLovinAd appLovinAd) {
         if (wasPlayingMusic && !shutdownAfter && !MusicUtils.isPlaying()) {
-            LOG.info("adDisplayed(): wasPlaying and not shutting down, resuming player playback");
+//            LOG.info("adDisplayed(): wasPlaying and not shutting down, resuming player playback");
             MusicUtils.play();
         }
     }

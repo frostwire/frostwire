@@ -9,8 +9,9 @@ FrostWire 2.0.5 build 532 - JUN/08/2018
  - New: Telugu translation available for 75 million speakers
  - New: Marathi translation available for 73 million speakers
  - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian
- - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.0.0, flexbox 1.0.0
+ - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.1.0, flexbox 1.0.0
  - Library updates: (dev) gradle 4.8
+ - Fixes bug on which music playback was stopped when a video interstitial ad was shown
  - Memory leak fixed on SearchHeaderBanner
 
 FrostWire 2.0.4 build 526 - MAY/01/2018
