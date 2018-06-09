@@ -25,4 +25,5 @@ interface InterstitialListener {
     boolean show(Activity activity, String placement);
     void shutdownAppAfter(boolean shutdown);
     void dismissActivityAfterwards(boolean dismiss);
+    void wasPlayingMusic(boolean wasPlayingMusic);
 }

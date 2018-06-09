@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
@@ -46,6 +47,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
+    private boolean wasPlayingMusic;
 
     @Override
     public void initialize(Activity activity) {
@@ -87,6 +89,8 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         if (listener != null) {
             listener.shutdownAppAfter(shutdownActivityAfterwards);
             listener.dismissActivityAfterwards(dismissActivityAfterward);
+            wasPlayingMusic = MusicUtils.isPlaying();
+            listener.wasPlayingMusic(wasPlayingMusic);
         }
         return listener != null && interstitial.isReady() && interstitial.show();
     }

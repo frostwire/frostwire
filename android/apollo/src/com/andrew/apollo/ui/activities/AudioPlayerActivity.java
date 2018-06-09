@@ -545,7 +545,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
         // Set the playback drawables
-        initPlaybackControls();
         updatePlaybackControls();
         // Current info
         updateNowPlayingInfo();
@@ -649,12 +648,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mShuffleButton = findView(R.id.action_button_shuffle);
         // Repeat button
         mRepeatButton = findView(R.id.action_button_repeat);
-
         mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
         mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
-
-        mShuffleButton.updateShuffleState();
-
         // Previous button
         RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button

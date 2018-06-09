@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
@@ -92,6 +93,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
+                interstitialAdapter.wasPlayingMusic(MusicUtils.isPlaying());
                 result = interstitialAdapter.isAdReadyToDisplay() &&
                         // do not show applovin interstitials on exit
                         (!shutdownAfterwards || !interstitialAdapter.isVideoAd()) &&

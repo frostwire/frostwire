@@ -19,6 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
@@ -36,6 +37,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     private MoPubInterstitial interstitial;
     private boolean shutDownAfter = false;
     private boolean finishAfterDismiss = false;
+    private boolean wasPlayingMusic;
 
     public MoPubInterstitialListener(AdNetwork adNetwork, String placement) {
         mopubAdNetwork = (MoPubAdNetwork) adNetwork;
@@ -55,6 +57,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public boolean show(Activity activity, String placement) {
+        LOG.info("MoPubInterstitialListener.show(): wasPlayingMusic=" + wasPlayingMusic);
         return isAdReadyToDisplay() && interstitial.show();
     }
 
@@ -68,6 +71,10 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
         finishAfterDismiss = dismiss;
     }
 
+    @Override
+    public void wasPlayingMusic(boolean wasPlayingMusic) {
+        this.wasPlayingMusic = wasPlayingMusic;
+    }
     // MoPubInterstitial.InterstitialAdListener methods.
 
     @Override
@@ -79,13 +86,16 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
         // ad failed to load, excellent place to load more ads.
         this.interstitial = null;
-        LOG.warn("MoPub Interstitial load Failed, " + errorCode.toString());
+        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
         mopubAdNetwork.loadMoPubInterstitial(interstitial.getActivity(), placement);
     }
 
     @Override
     public void onInterstitialShown(MoPubInterstitial interstitial) {
-        //LOG.info("onInterstitialShown - " + interstitial.toString());
+        LOG.info("MoPub onInterstitialShown - " + interstitial.toString());
+        if (wasPlayingMusic && !shutDownAfter && !MusicUtils.isPlaying()) {
+            MusicUtils.play();
+        }
     }
 
     @Override

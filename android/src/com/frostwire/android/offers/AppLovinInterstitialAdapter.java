@@ -89,7 +89,6 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                     adDialog.dismiss();
                     return false;
                 }
-                wasPlayingMusic = MusicUtils.isPlaying();
                 adDialog.setAdDisplayListener(this);
                 adDialog.showAndRender(ad, placement);
                 result = true;
@@ -109,8 +108,13 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
     }
 
     @Override
+    public void wasPlayingMusic(boolean wasPlayingMusic) {
+        this.wasPlayingMusic = wasPlayingMusic;
+    }
+
+    @Override
     public void adDisplayed(AppLovinAd appLovinAd) {
-        if (wasPlayingMusic && !shutdownAfter) {
+        if (wasPlayingMusic && !shutdownAfter && !MusicUtils.isPlaying()) {
             LOG.info("adDisplayed(): wasPlaying and not shutting down, resuming player playback");
             MusicUtils.play();
         }
