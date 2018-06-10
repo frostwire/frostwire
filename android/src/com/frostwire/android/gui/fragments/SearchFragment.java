@@ -329,6 +329,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private static String extractYTId(String ytUrl) {
         String vId = null;
+        //noinspection RegExpRedundantEscape
         Pattern pattern = Pattern.compile(".*(?:youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=)([^#\\&\\?]*).*");
         Matcher matcher = pattern.matcher(ytUrl);
         if (matcher.matches()) {
