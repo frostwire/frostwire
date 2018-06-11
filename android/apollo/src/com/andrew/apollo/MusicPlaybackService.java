@@ -2368,37 +2368,37 @@ public class MusicPlaybackService extends Service {
     /**
      * Moves an item in the queue from one position to another
      *
-     * @param index1 The position the item is currently at
-     * @param index2 The position the item is being moved to
+     * @param from The position the item is currently at
+     * @param to The position the item is being moved to
      */
-    public void moveQueueItem(int index1, int index2) {
+    public void moveQueueItem(int from, int to) {
         synchronized (this) {
-            if (index1 >= mPlayListLen) {
-                index1 = mPlayListLen - 1;
+            if (from >= mPlayListLen) {
+                from = mPlayListLen - 1;
             }
-            if (index2 >= mPlayListLen) {
-                index2 = mPlayListLen - 1;
+            if (to >= mPlayListLen) {
+                to = mPlayListLen - 1;
             }
-            if (index1 < index2) {
-                final long tmp = mPlayList[index1];
-                for (int i = index1; i < index2; i++) {
+            if (from < to) {
+                final long tmp = mPlayList[from];
+                for (int i = from; i < to; i++) {
                     mPlayList[i] = mPlayList[i + 1];
                 }
-                mPlayList[index2] = tmp;
-                if (mPlayPos == index1) {
-                    mPlayPos = index2;
-                } else if (mPlayPos >= index1 && mPlayPos <= index2) {
+                mPlayList[to] = tmp;
+                if (mPlayPos == from) {
+                    mPlayPos = to;
+                } else if (mPlayPos >= from && mPlayPos <= to) {
                     mPlayPos--;
                 }
-            } else if (index2 < index1) {
-                final long tmp = mPlayList[index1];
-                for (int i = index1; i > index2; i--) {
+            } else if (to < from) {
+                final long tmp = mPlayList[from];
+                for (int i = from; i > to; i--) {
                     mPlayList[i] = mPlayList[i - 1];
                 }
-                mPlayList[index2] = tmp;
-                if (mPlayPos == index1) {
-                    mPlayPos = index2;
-                } else if (mPlayPos >= index2 && mPlayPos <= index1) {
+                mPlayList[to] = tmp;
+                if (mPlayPos == from) {
+                    mPlayPos = to;
+                } else if (mPlayPos >= to && mPlayPos <= from) {
                     mPlayPos++;
                 }
             }
