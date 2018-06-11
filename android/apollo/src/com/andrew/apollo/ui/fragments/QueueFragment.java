@@ -41,6 +41,7 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.util.Logger;
 
 import java.util.List;
 
@@ -149,10 +150,15 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     }
 
     public void drop(final int from, final int to) {
+        if (from == to) {
+            mAdapter.notifyDataSetChanged();
+            return;
+        }
+
         try {
             mItem = mAdapter.getItem(from);
-            mAdapter.remove(mItem);
             int count = mAdapter.getCount();
+            mAdapter.remove(mItem);
             int adjustedTo = (to >= count) ? count-1 : to;
             mAdapter.insert(mItem, adjustedTo);
             mAdapter.notifyDataSetChanged();

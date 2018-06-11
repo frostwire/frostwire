@@ -51,8 +51,17 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
      */
     private static final int VIEW_TYPE_COUNT = 1;
 
+    private final Object mDataListLock = new Object();
+
+    private final int itemsOffset;
+
     public SongAdapter(Context context, int mLayoutId) {
+        this(context, mLayoutId, 0);
+    }
+
+    public SongAdapter(Context context, int mLayoutId, int itemsOffset) {
         super(context, mLayoutId, 0);
+        this.itemsOffset = itemsOffset;
     }
 
     /**
@@ -169,8 +178,19 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     }
 
     @Override
-    public int getOffset() {
-        return 0;
+    public void insert(Song object, int index) {
+        synchronized (mDataListLock) {
+            super.insert(object, index);
+            mDataList.add(index, object);
+        }
+    }
+
+    @Override
+    public void remove(Song object) {
+        synchronized (mDataListLock) {
+            super.remove(object);
+            mDataList.remove(object);
+        }
     }
 
     public void setDataList(final List<Song> data) {
@@ -182,5 +202,10 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
                 }
             }
         }
+    }
+
+    @Override
+    public int getOffset() {
+        return itemsOffset;
     }
 }
