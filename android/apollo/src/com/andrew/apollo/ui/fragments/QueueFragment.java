@@ -55,8 +55,6 @@ import java.util.List;
 public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
         implements DropListener, RemoveListener, DragScrollProfile {
 
-    private static Logger LOG = Logger.getLogger(QueueFragment.class);
-
     public QueueFragment() {
         super(Fragments.QUEUE_FRAGMENT_GROUP_ID, Fragments.QUEUE_FRAGMENT_LOADER_ID);
     }
@@ -152,7 +150,6 @@ public final class QueueFragment extends ApolloFragment<SongAdapter, Song>
     }
 
     public void drop(final int from, final int to) {
-        LOG.info("QueueFragment.drop(from=" + from + ", to=" + to + ")");
         if (from == to) {
             mAdapter.notifyDataSetChanged();
             return;
