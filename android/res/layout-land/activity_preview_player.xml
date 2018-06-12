@@ -112,52 +112,12 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/activity_preview_advertisement_header_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:layout_gravity="top"
-                android:orientation="horizontal"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/activity_preview_player_advertisement_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1.0"
-                    android:gravity="center"
-                    android:text="@string/advertisement"
-                    android:textColor="@color/app_text_disabled"
-                    android:visibility="visible" />
-
-                <ImageButton
-                    android:id="@+id/audio_player_dismiss_mopubview_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|right"
-                    android:layout_marginRight="10dp"
-                    android:background="@null"
-                    android:src="@drawable/ad_cancel"
-                    android:visibility="visible" />
-            </LinearLayout>
-
-            <com.mopub.mobileads.MoPubView
-                android:id="@+id/activity_preview_player_mopubview"
+            <com.frostwire.android.offers.MopubSquaredBanner
+                android:id="@+id/activity_preview_player_mopub_squared_banner"
                 android:layout_width="300dp"
                 android:layout_height="250dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_gravity="center_horizontal|center_vertical"/>
-
-            <ImageView
-                android:id="@+id/activity_preview_fallback_imageview"
-                android:layout_width="300dp"
-                android:layout_height="250dp"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:visibility="gone"/>
 
         </LinearLayout>
     </LinearLayout>
