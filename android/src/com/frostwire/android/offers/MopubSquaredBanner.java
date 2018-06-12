@@ -45,14 +45,27 @@ import com.mopub.mobileads.MoPubView;
  */
 
 public class MopubSquaredBanner extends LinearLayout {
+    public enum Visibility {
+        MOPUB,
+        FALLBACK,
+        ALL
+    }
+
+    public interface OnBannerDismissedListener {
+        void dispatch();
+    }
+
     private static Logger LOG = Logger.getLogger(MopubSquaredBanner.class);
     private ImageButton dismissBannerButton;
     private MoPubView moPubView;
     private ImageView fallbackBannerView;
     private TextView mAdvertisementText;
     private TextView removeAdsTextView;
+    private OnBannerDismissedListener onBannerDismissedListener;
     private long lastInitAlbumArtBanner;
     private boolean isHidden;
+    private boolean isLoaded;
+
 
     public MopubSquaredBanner(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -67,12 +80,16 @@ public class MopubSquaredBanner extends LinearLayout {
                 t.printStackTrace();
             }
         }
-
         if (attrs == null) {
             LinearLayout.LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             layoutParams.setLayoutDirection(LinearLayout.VERTICAL);
             setLayoutParams(layoutParams);
         }
+        onBannerDismissedListener = null;
+    }
+
+    public void setOnBannerDismissedListener(OnBannerDismissedListener onBannerDismissedListener) {
+        this.onBannerDismissedListener = onBannerDismissedListener;
     }
 
     @Override
@@ -94,11 +111,16 @@ public class MopubSquaredBanner extends LinearLayout {
     private void loadFallbackBanner() {
         LOG.info("loadFallbackBanner");
         InHouseBannerFactory.loadAd(fallbackBannerView, InHouseBannerFactory.AdFormat.BIG_300x250);
-        setBannerViewVisibility(moPubView, false);
-        setBannerViewVisibility(fallbackBannerView, true);
+        setVisible(Visibility.FALLBACK, true);
     }
 
-    private void loadMoPubBanner() {
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
+    // TODO: Pass ad Unit ID
+    public void loadMoPubBanner() {
+        isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
 
         if (timeSinceLastBannerInit < 5000) {
@@ -110,11 +132,11 @@ public class MopubSquaredBanner extends LinearLayout {
             return;
         }
 
-        if ((moPubView != null && moPubView.getVisibility() == View.VISIBLE) ||
-                (fallbackBannerView != null && fallbackBannerView.getVisibility() == View.VISIBLE)) {
-            // ad is already visible, leave as is
-            return;
-        }
+//        if ((moPubView != null && moPubView.getVisibility() == View.VISIBLE) ||
+//                (fallbackBannerView != null && fallbackBannerView.getVisibility() == View.VISIBLE)) {
+//            // ad is already visible, leave as is
+//            return;
+//        }
 
         lastInitAlbumArtBanner = System.currentTimeMillis();
 
@@ -140,9 +162,37 @@ public class MopubSquaredBanner extends LinearLayout {
         }
     }
 
+    public void setVisible(Visibility visibility, boolean visible) {
+        isHidden = false;
+        if (visibility == Visibility.ALL) {
+            setBannerViewVisibility(moPubView, visible);
+            setBannerViewVisibility(fallbackBannerView, visible);
+            isHidden = !visible;
+        } else if (visibility == Visibility.MOPUB) {
+            setBannerViewVisibility(moPubView, visible);
+            setBannerViewVisibility(fallbackBannerView, !visible);
+        } else if (visibility == Visibility.FALLBACK) {
+            setBannerViewVisibility(moPubView, !visible);
+            setBannerViewVisibility(fallbackBannerView, visible);
+        }
+    }
+
+    public void destroy() {
+        try {
+            if (moPubView != null) {
+                moPubView.destroy();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
     private void setBannerViewVisibility(View bannerView, boolean visible) {
         if (bannerView != null && dismissBannerButton != null) {
-            isHidden = !visible;
             int adVisibility = visible ? View.VISIBLE : View.GONE;
             bannerView.setVisibility(adVisibility);
             dismissBannerButton.setVisibility(adVisibility);
@@ -154,18 +204,13 @@ public class MopubSquaredBanner extends LinearLayout {
         }
     }
 
-    public boolean isHidden() {
-        return isHidden;
-    }
-
     private final MoPubView.BannerAdListener moPubBannerListener = new MoPubView.BannerAdListener() {
         @Override
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded()");
-            setBannerViewVisibility(fallbackBannerView, false);
-            setBannerViewVisibility(moPubView, true);
+            setVisible(Visibility.MOPUB, true);
             PrebidManager.getInstance(getContext().getApplicationContext()).onBannerLoaded(getContext(), banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
-            isHidden = false;
+            isLoaded = true;
         }
 
         @Override
@@ -174,6 +219,7 @@ public class MopubSquaredBanner extends LinearLayout {
             loadFallbackBanner();
             PrebidManager.getInstance(getContext().getApplicationContext()).onBannerFailed(getContext(), banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250, errorCode);
             banner.destroy();
+            isLoaded = false;
         }
 
         @Override
@@ -188,31 +234,30 @@ public class MopubSquaredBanner extends LinearLayout {
         @Override
         public void onBannerCollapsed(MoPubView banner) {
             LOG.info("onBannerCollapsed");
-            setBannerViewVisibility(moPubView, false);
+            setVisible(Visibility.ALL, false);
+            isLoaded = false;
         }
     };
 
-    private final OnClickListener onDismissBannerOnClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            setBannerViewVisibility(moPubView, false);
-            setBannerViewVisibility(fallbackBannerView, false);
-            isHidden = true;
-        }
-    };
-
-    private final OnClickListener removeAdsTextViewOnClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            setBannerViewVisibility(moPubView, false);
-            setBannerViewVisibility(fallbackBannerView, false);
-            PlayStore.getInstance().endAsync();
-            Intent i = new Intent(getContext(), BuyActivity.class);
-            if (getContext() instanceof Activity) {
-                ((Activity) getContext()).startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
-            } else {
-                throw new RuntimeException("MopubSquaredBanner.onClick(): Context is not an activity, what's up with that?");
+    private final OnClickListener onDismissBannerOnClickListener = view -> {
+        setVisible(Visibility.ALL, false);
+        if (onBannerDismissedListener != null) {
+            try {
+                onBannerDismissedListener.dispatch();
+            } catch (Throwable t) {
+                t.printStackTrace();
             }
+        }
+    };
+
+    private final OnClickListener removeAdsTextViewOnClickListener = view -> {
+        setVisible(Visibility.ALL, false);
+        PlayStore.getInstance().endAsync();
+        Intent i = new Intent(getContext(), BuyActivity.class);
+        if (getContext() instanceof Activity) {
+            ((Activity) getContext()).startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+        } else {
+            throw new RuntimeException("MopubSquaredBanner.onClick(): Context is not an activity, what's up with that?");
         }
     };
 }
