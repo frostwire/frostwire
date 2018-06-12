@@ -69,12 +69,6 @@ public final class RepeatButton extends ImageButton
      * Sets the correct drawable for the repeat state.
      */
     public void updateRepeatState() {
-        boolean isShuffleEnabled = MusicUtils.isShuffleEnabled();
-        setVisibility(isShuffleEnabled ? View.INVISIBLE : View.VISIBLE);
-        if (isShuffleEnabled) {
-            // nothing to update, button is invisible
-            return;
-        }
         int repeatMode = MusicUtils.getRepeatMode();
         switch (repeatMode) {
             case MusicPlaybackService.REPEAT_ALL:

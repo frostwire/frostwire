@@ -2288,9 +2288,16 @@ public class MusicPlaybackService extends Service {
 
     /**
      * Changes from the current track to the next track
+     *
+     * @param force -> set to true when gotoNext is invoked by an user action
      */
     public void gotoNext(final boolean force) {
         if (D) LOG.info("Going to next track");
+
+        if (force && mRepeatMode == REPEAT_CURRENT) {
+            mRepeatMode = REPEAT_ALL;
+        }
+
         synchronized (this) {
             if (mPlayListLen <= 0) {
                 if (D) LOG.info("No play queue");
@@ -2326,6 +2333,10 @@ public class MusicPlaybackService extends Service {
      */
     public void prev() {
         if (D) LOG.info("Going to previous track");
+
+        if (mRepeatMode == REPEAT_CURRENT) {
+            mRepeatMode = REPEAT_ALL;
+        }
 
         synchronized (this) {
             if (!mShuffleEnabled) {
