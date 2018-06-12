@@ -77,10 +77,11 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
     public void onCreateContextMenu(final ContextMenu menu, final View v,
                                     final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-
+        
         // Remove the song from playlist
         menu.add(Fragments.PLAYLIST_SONG_PROFILE_FRAGMENT_GROUP_ID, FragmentMenuItems.REMOVE_FROM_PLAYLIST, Menu.NONE,
-                getString(R.string.context_menu_remove_from_playlist));
+                getString(R.string.context_menu_remove_from_playlist))
+                .setIcon(R.drawable.contextmenu_icon_remove_transfer);
     }
 
     @Override
