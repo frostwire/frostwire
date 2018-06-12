@@ -2295,7 +2295,7 @@ public class MusicPlaybackService extends Service {
         if (D) LOG.info("Going to next track");
 
         if (force && mRepeatMode == REPEAT_CURRENT) {
-            mRepeatMode = REPEAT_ALL;
+            setRepeatMode(REPEAT_ALL);
         }
 
         synchronized (this) {
@@ -2335,7 +2335,7 @@ public class MusicPlaybackService extends Service {
         if (D) LOG.info("Going to previous track");
 
         if (mRepeatMode == REPEAT_CURRENT) {
-            mRepeatMode = REPEAT_ALL;
+            setRepeatMode(REPEAT_ALL);
         }
 
         synchronized (this) {

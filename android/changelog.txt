@@ -1,8 +1,9 @@
-FrostWire 2.0.5 build 533 - JUN/11/2018
+FrostWire 2.0.5 build 534 - JUN/12/2018
  - No more intrusive interstitial ads when resuming app
  - New jlibtorrent 1.2.0.18-RC6
  - Music Player: Shuffle mode now remembers songs played, back works as expected
  - Music Player: Shuffle and Repeat mode preferences are remembered across sessions
+ - Music Player: Shuffle mode respects Repeat mode
  - Music Player: Add song to playlist shows mini-player in My Music
  - Music Player: Repeat All is the default playback mode for playlists
  - Music Player: Empty playlist message makes sense now
