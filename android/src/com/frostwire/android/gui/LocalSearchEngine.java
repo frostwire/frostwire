@@ -51,21 +51,22 @@ public final class LocalSearchEngine {
     private final SearchManager manager;
     private SearchListener listener;
 
+    private static final Object instanceLock = new Object();
     private static LocalSearchEngine instance;
     private final HashSet<Integer> opened = new HashSet<>();
     private long currentSearchToken;
     private List<String> currentSearchTokens;
     private boolean searchFinished;
 
-    public synchronized static void create() {
-        if (instance != null) {
-            return;
-        }
-        instance = new LocalSearchEngine();
-    }
-
     public static LocalSearchEngine instance() {
-        return instance;
+        if (instance != null) {
+            return instance;
+        } else {
+            synchronized (instanceLock) {
+                instance = new LocalSearchEngine();
+            }
+            return instance;
+        }
     }
 
     private LocalSearchEngine() {

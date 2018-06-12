@@ -73,7 +73,7 @@ public class MainApplication extends Application {
 
         async(this, this::initializeCrawlPagedWebSearchPerformer);
 
-        LocalSearchEngine.create();
+        async(LocalSearchEngine::instance);
 
         async(MainApplication::cleanTemp);
     }
