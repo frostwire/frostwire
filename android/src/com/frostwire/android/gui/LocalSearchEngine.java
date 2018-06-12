@@ -63,7 +63,9 @@ public final class LocalSearchEngine {
             return instance;
         } else {
             synchronized (instanceLock) {
-                instance = new LocalSearchEngine();
+                if (instance == null) {
+                    instance = new LocalSearchEngine();
+                }
             }
             return instance;
         }

@@ -1109,6 +1109,10 @@ public class MusicPlaybackService extends Service {
             }
             mPlayListLen -= last - first + 1;
 
+            if (mPlayListLen < 0) {
+                mPlayListLen = 0;
+            }
+
             if (gotonext) {
                 if (mPlayListLen == 0) {
                     stop(true);
@@ -1338,6 +1342,9 @@ public class MusicPlaybackService extends Service {
             }
             return mPlayPos;
         } else if (shuffleEnabled) {
+            if (mPlayListLen <= 0) {
+                return -1;
+            }
             return r.nextInt(mPlayListLen);
         } else {
             if (mPlayPos >= mPlayListLen - 1) {
