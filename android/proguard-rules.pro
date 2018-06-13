@@ -23,5 +23,9 @@
 
 # to keep all the names and avoid code mangling
 -keepnames class ** {*;}
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
 -dontobfuscate
 -optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!code/allocation/variable
