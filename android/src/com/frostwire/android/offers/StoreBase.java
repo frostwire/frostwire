@@ -17,8 +17,6 @@
 
 package com.frostwire.android.offers;
 
-import com.frostwire.android.core.Constants;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,10 +27,12 @@ import java.util.Map;
  * <p>
  * If an abstract class is meant to be extended, then it's named *Abstract.
  *
+ * NOTE: this class is public only for use in subpackages.
+ *
  * @author gubatron
  * @author aldenml
  */
-abstract class StoreBase implements Store {
+public abstract class StoreBase implements Store {
 
     protected Map<String, Product> products;
 

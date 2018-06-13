@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
-import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.PlayStore2;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
@@ -239,7 +239,8 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             PreferenceCategory category = findPreference("frostwire.prefs.other_settings");
             category.removePreference(p);
         } else if (p != null) {
-            PlayStore playStore = PlayStore.getInstance();
+            //PlayStore playStore = PlayStore.getInstance();
+            PlayStore2 playStore = PlayStore2.getInstance(getActivity());
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
@@ -252,7 +253,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             } else {
                 p.setSummary(R.string.remove_ads_description);
                 p.setOnPreferenceClickListener(preference -> {
-                    PlayStore.getInstance().endAsync();
+                    //PlayStore.getInstance().endAsync();
                     Intent intent = new Intent(getActivity(), BuyActivity.class);
                     startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                     return true;
@@ -308,7 +309,8 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                                 if (p.subscription()) {
                                     continue;
                                 }
-                                PlayStore.getInstance().consume(p);
+                                //PlayStore.getInstance().consume(p);
+                                PlayStore2.getInstance(activityRef.get()).consume(p);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",

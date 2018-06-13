@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
@@ -251,7 +250,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public void onSpecialOfferClick() {
         if (specialOfferLayout == R.layout.view_remove_ads_notification) {
             // take to buy remove ads screen
-            PlayStore.getInstance().endAsync();
+            //PlayStore.getInstance().endAsync();
             MainActivity mainActivity = (MainActivity) getContext();
             Intent i = new Intent(getContext(), BuyActivity.class);
             mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);

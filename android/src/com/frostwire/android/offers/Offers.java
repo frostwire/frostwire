@@ -228,7 +228,17 @@ public final class Offers {
     }
 
     public static boolean disabledAds() {
-        return FORCED_DISABLED || Products.disabledAds(PlayStore.getInstance());
+        //PlayStore
+        //return FORCED_DISABLED || Products.disabledAds(PlayStore.getInstance());
+        PlayStore2 store;
+        try {
+            // try with a null context
+            //noinspection ConstantConditions
+            store = PlayStore2.getInstance(null);
+        } catch (Throwable e) {
+            store = null;
+        }
+        return FORCED_DISABLED || (store != null && Products.disabledAds(store));
     }
 
     public static void forceDisabledAds(Context context) {
@@ -270,7 +280,9 @@ public final class Offers {
     private static boolean stopAdNetworksIfPurchasedRemoveAds(Context context) {
         //final ConfigurationManager CM = ConfigurationManager.instance();
         boolean stopped = false;
-        final PlayStore playStore = PlayStore.getInstance();
+        //PlayStore
+        //final PlayStore playStore = PlayStore.getInstance();
+        PlayStore2 playStore = PlayStore2.getInstance(context);
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
         if (purchasedProducts != null && purchasedProducts.size() > 0) {
             //CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.PlayStore2;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
@@ -71,7 +71,10 @@ public final class BuyActivity extends AbstractActivity {
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            PlayStore.getInstance().purchase(BuyActivity.this, p);
+            //PlayStore.getInstance().purchase(BuyActivity.this, p);
+            PlayStore2.getInstance(this).setGlobalPurchasesUpdatedListener(
+                    (responseCode, purchases) -> onPurchasesUpdated(responseCode));
+            PlayStore2.getInstance(this).purchase(this, p);
         }
     }
 
@@ -177,7 +180,9 @@ public final class BuyActivity extends AbstractActivity {
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
 
-        final PlayStore store = PlayStore.getInstance();
+        //PlayStore
+        //final PlayStore store = PlayStore.getInstance();
+        PlayStore2 store = PlayStore2.getInstance(this);
         initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
         initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
         initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
@@ -226,7 +231,7 @@ public final class BuyActivity extends AbstractActivity {
         }
     }
 
-    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
+    private void initProductCard(ProductCardView card, PlayStore2 store, String subsSKU, String inappSKU) {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }
@@ -358,7 +363,8 @@ public final class BuyActivity extends AbstractActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        PlayStore store = PlayStore.getInstance();
+        //PlayStore uncomment the following block if reverting to old PlayStore
+        /*PlayStore store = PlayStore.getInstance();
         if (store.handleActivityResult(requestCode, resultCode, data)) {
             store.refresh();
 
@@ -386,12 +392,29 @@ public final class BuyActivity extends AbstractActivity {
             result.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
             setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
             finish();
-        }
+        }*/
     }
 
     private boolean isInterstitial() {
         Intent intent = getIntent();
         return intent != null && intent.getBooleanExtra(INTERSTITIAL_MODE, false);
+    }
+
+    private void onPurchasesUpdated(int responseCode) {
+        // RESPONSE_CODE = 0 -> Payment Successful
+        // user clicked outside of the PlayStore purchase dialog
+        if (responseCode != 0) {
+            paymentOptionsView.stopProgressBar();
+
+            LOG.info("BuyActivity local receiver -> purchase cancelled");
+            return;
+        }
+
+        // make sure ads won't show on this session any more if we got a positive response.
+        Offers.stopAdNetworks(this);
+
+        LOG.info("BuyActivity local receiver -> purchase finished");
+        finish();
     }
 
     private class InterstitialActionBarDismissButtonClickListener implements View.OnClickListener {

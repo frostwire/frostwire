@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.PlayStore2;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -94,7 +94,8 @@ public class MainApplication extends Application {
 
         ConfigurationManager.create(this);
 
-        PlayStore.getInstance().initialize(this);
+        //PlayStore.getInstance().initialize(this);
+        PlayStore2.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);

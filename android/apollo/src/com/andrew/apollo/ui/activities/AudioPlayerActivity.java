@@ -87,7 +87,6 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.InHouseBannerFactory;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.PrebidManager;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -253,7 +252,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public void onClick(View view) {
             setBannerViewVisibility(mMopubAd, false);
             setBannerViewVisibility(mFallbackAd, false);
-            PlayStore.getInstance().endAsync();
+            //PlayStore.getInstance().endAsync();
             Intent i = new Intent(AudioPlayerActivity.this, BuyActivity.class);
             startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
         }

@@ -112,7 +112,10 @@ public final class Products {
         //return skuId + ".test";
     }
 
-    static class ProductBase implements Product {
+    /**
+     * NOTE: public only to sub packages.
+     */
+    public static class ProductBase implements Product {
 
         private final String sku;
         private final boolean subscription;

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.offers.PlayStore2;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -74,7 +74,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 // heavy lifting happens in Thread()
                 Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                async(this, EngineBroadcastReceiver::handleConnectivityChange, intent);
+                async(this, EngineBroadcastReceiver::handleConnectivityChange, context, intent);
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
@@ -87,12 +87,12 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         LOG.info(msg);
     }
 
-    private void handleConnectivityChange(Intent intent) {
+    private void handleConnectivityChange(Context context, Intent intent) {
         NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
         DetailedState detailedState = networkInfo.getDetailedState();
         switch (detailedState) {
             case CONNECTED:
-                handleConnectedNetwork(networkInfo);
+                handleConnectedNetwork(context, networkInfo);
                 handleNetworkStatusChange();
                 reopenNetworkSockets();
                 break;
@@ -126,8 +126,9 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         Engine.instance().getThreadPool().execute(() -> Engine.instance().stopServices(true));
     }
 
-    private void handleConnectedNetwork(NetworkInfo networkInfo) {
-        PlayStore.getInstance().refresh();
+    private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
+        //PlayStore.getInstance().refresh();
+        PlayStore2.getInstance(context).refresh();
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isDataUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();
