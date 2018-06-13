@@ -111,8 +111,8 @@ public final class Logger {
         Thread currentThread = Thread.currentThread();
         StackTraceElement[] stackTrace = currentThread.getStackTrace();
         String caller = " - <Thread not scheduled yet>";
-        if (stackTrace.length >= 4) {
-            StackTraceElement stackElement = stackTrace[4];
+        if (stackTrace.length >= 5) {
+            StackTraceElement stackElement = stackTrace[5];
             caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:"+currentThread.getName()+"(tid="+currentThread.getId()+")>";
         }
         return caller;
