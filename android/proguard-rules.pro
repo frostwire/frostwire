@@ -1,6 +1,9 @@
 # okhttp3
 -keep class okhttp3.Headers { *; }
 
+# MoPub
+-keep class com.mopub.mobileads.WebViewCacheService { *; }
+
 # presage seems to have passed by proguard already
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
