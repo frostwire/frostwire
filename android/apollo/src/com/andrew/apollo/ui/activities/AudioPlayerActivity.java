@@ -20,6 +20,7 @@ package com.andrew.apollo.ui.activities;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
@@ -88,6 +89,7 @@ import com.frostwire.android.offers.InHouseBannerFactory;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PrebidManager;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
@@ -530,14 +532,25 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             super.onBackPressed();
         } catch (Throwable ignored) {}
 
-        Offers.showInterstitialOfferIfNecessary(
-                this,
-                Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                false,
-                false,
-                true);
+        Asyncs.async(this,
+                AudioPlayerActivity::isMusicPlayingAsync,
+                AudioPlayerActivity::tryShowingInterstitialAndFinish);
+    }
 
-        finish();
+    private static boolean isMusicPlayingAsync(Activity activity) {
+        return MusicUtils.isPlaying();
+    }
+
+    private static void tryShowingInterstitialAndFinish(Activity activity, boolean isMusicPlaying) {
+        if (!isMusicPlaying) {
+            Offers.showInterstitialOfferIfNecessary(
+                    activity,
+                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                    false,
+                    false,
+                    true);
+        }
+        activity.finish();
     }
 
     @Override
