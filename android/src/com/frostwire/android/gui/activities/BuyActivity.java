@@ -248,6 +248,11 @@ public final class BuyActivity extends AbstractActivity {
         Product prodSubs = store.product(subsSKU);
         Product prodInApp = store.product(inappSKU);
 
+        if (prodSubs == null || prodInApp == null) {
+            UIUtils.showLongMessage(this, R.string.play_store_out_of_sync);
+            finish();
+        }
+
         card.setTag(R.id.subs_product_tag_id, prodSubs);
         card.setTag(R.id.inapp_product_tag_id, prodInApp);
 

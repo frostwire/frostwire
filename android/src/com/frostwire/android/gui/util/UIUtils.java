@@ -30,6 +30,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
@@ -161,7 +162,7 @@ public final class UIUtils {
         showShortMessage(context, context.getString(resId));
     }
 
-    public static void showLongMessage(Context context, int resId) {
+    public static void showLongMessage(Context context, @StringRes int resId) {
         showLongMessage(context, context.getString(resId));
     }
 
