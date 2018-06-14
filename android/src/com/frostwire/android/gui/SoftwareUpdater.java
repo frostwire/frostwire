@@ -359,8 +359,8 @@ public final class SoftwareUpdater {
         Map<String, Boolean> activeSearchEngines;
         String[] waterfall;
         int removeAdsB2bThreshold = 50;
-        int mopubAlbumArtBannerThreshold = 40;
-        int mopubPreviewBannerThreshold = 40;
+        int mopubAlbumArtBannerThreshold = 50;
+        int mopubPreviewBannerThreshold = 101;
         int oguryThreshold = 101;
         int prebidThreshold = 101;
         int interstitialOffersTransferStarts = 3;
