@@ -29,9 +29,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Future;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -47,25 +47,36 @@ public final class ConfigurationManager {
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
 
-    private static final Object lock = new Object();
-    private static Future<ConfigurationManager> instance;
+    private static final Object creationLock = new Object();
+    private static ConfigurationManager instance;
 
     public static void create(@NonNull Context context) {
-        synchronized (lock) {
-            if (instance == null) {
-                instance = Engine.instance().getThreadPool().submit(() ->
-                        new ConfigurationManager(context.getApplicationContext())
-                );
-            }
+        if (instance != null) {
+            throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
+        Engine.instance().getThreadPool().execute(() -> {
+            instance = new ConfigurationManager(context.getApplicationContext());
+            synchronized (creationLock) {
+                creationLock.notifyAll();
+            }
+        });
     }
 
     public static ConfigurationManager instance() {
-        try {
-            return instance.get();
-        } catch (Throwable e) {
-            throw new RuntimeException("ConfigurationManager not created", e);
+        if (instance == null) {
+            try {
+                synchronized (creationLock) {
+                    creationLock.wait(20000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        if (instance == null) {
+            throw new RuntimeException("The ConfigurationManager instance() creation timed out, try reinstalling the app or notify FrostWire developers");
+        }
+        return instance;
     }
 
     private ConfigurationManager(Context context) {
@@ -179,7 +190,7 @@ public final class ConfigurationManager {
         try {
             setStringArray(preferences.edit(), key, values).apply();
         } catch (Throwable ignore) {
-            LOG.warn("setStringArray(key=" + key + ", value=" + values + ") failed", ignore);
+            LOG.warn("setStringArray(key=" + key + ", value=" + Arrays.toString(values) + ") failed", ignore);
         }
     }
 

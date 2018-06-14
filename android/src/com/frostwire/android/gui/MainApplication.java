@@ -86,13 +86,13 @@ public class MainApplication extends Application {
     }
 
     private void onCreateSafe() {
+        ConfigurationManager.create(this);
+
         // some phones still can configure an external button as the
         // permanent menu key
         ignoreHardwareMenu();
 
         AbstractActivity.setMenuIconsVisible(true);
-
-        ConfigurationManager.create(this);
 
         //PlayStore.getInstance().initialize(this);
         PlayStore2.getInstance(this); // triggers initial query
