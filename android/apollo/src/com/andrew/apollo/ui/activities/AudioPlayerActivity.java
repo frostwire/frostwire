@@ -20,7 +20,6 @@ package com.andrew.apollo.ui.activities;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
@@ -537,11 +536,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 AudioPlayerActivity::tryShowingInterstitialAndFinish);
     }
 
-    private static boolean isMusicPlayingAsync(Activity activity) {
+    private static boolean isMusicPlayingAsync(AudioPlayerActivity activity) {
         return MusicUtils.isPlaying();
     }
 
-    private static void tryShowingInterstitialAndFinish(Activity activity, boolean isMusicPlaying) {
+    private static void tryShowingInterstitialAndFinish(AudioPlayerActivity activity, boolean isMusicPlaying) {
         if (!isMusicPlaying) {
             Offers.showInterstitialOfferIfNecessary(
                     activity,
