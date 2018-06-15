@@ -2693,7 +2693,9 @@ public class MusicPlaybackService extends Service {
     }
 
     private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer, MediaPlayerAction action) {
-        async(mediaPlayer, MusicPlaybackService::mediaPlayerAction, action);
+        if (mediaPlayer != null) {
+            async(mediaPlayer, MusicPlaybackService::mediaPlayerAction, action);
+        }
     }
 
     enum MediaPlayerAction {
@@ -2858,29 +2860,26 @@ public class MusicPlaybackService extends Service {
         }
 
         private void releaseCurrentMediaPlayer() {
-            if (mCurrentMediaPlayer == null) {
-                return;
-            }
-
-            try {
-                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
-            } catch (Throwable e) {
-                LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
-            } finally {
-                mCurrentMediaPlayer = null;
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
+                } catch (Throwable e) {
+                    LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
+                } finally {
+                    mCurrentMediaPlayer = null;
+                }
             }
         }
 
         private void releaseNextMediaPlayer() {
-            if (mNextMediaPlayer == null) {
-                return;
-            }
-            try {
-                mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RELEASE);
-            } catch (Throwable e) {
-                LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
-            } finally {
-                mNextMediaPlayer = null;
+            if (mNextMediaPlayer != null) {
+                try {
+                    mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RELEASE);
+                } catch (Throwable e) {
+                    LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
+                } finally {
+                    mNextMediaPlayer = null;
+                }
             }
         }
 
@@ -2904,21 +2903,25 @@ public class MusicPlaybackService extends Service {
          * Starts or resumes playback.
          */
         public void start() {
-            mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.START);
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.START);
+                } catch (Throwable ignored) {
+                }
+            }
         }
 
         /**
          * Resets the MediaPlayer to its uninitialized state.
          */
         public void stop() {
-            try {
+            if (mCurrentMediaPlayer != null) {
                 try {
                     mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RESET);
-                } catch (Throwable ignored) {
+                    mIsInitialized = false;
+                } catch (Throwable t) {
+                    // recover from possible IllegalStateException caused by native _reset() method.
                 }
-                mIsInitialized = false;
-            } catch (Throwable t) {
-                // recover from possible IllegalStateException caused by native _reset() method.
             }
         }
 
@@ -2928,9 +2931,11 @@ public class MusicPlaybackService extends Service {
          */
         public void release() {
             stop();
-            try {
-                mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
-            } catch (Throwable ignored) {
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
+                } catch (Throwable ignored) {
+                }
             }
         }
 
@@ -2938,10 +2943,11 @@ public class MusicPlaybackService extends Service {
          * Pauses playback. Call start() to resume.
          */
         public void pause() {
-            try {
-                mCurrentMediaPlayer.pause();
-            } catch (Throwable ignored) {
-
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mCurrentMediaPlayer.pause();
+                } catch (Throwable ignored) {
+                }
             }
         }
 
@@ -2952,11 +2958,14 @@ public class MusicPlaybackService extends Service {
          * @return The duration in milliseconds
          */
         public long duration() {
-            try {
-                return mCurrentMediaPlayer.getDuration();
-            } catch (Throwable t) {
-                return -1;
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    return mCurrentMediaPlayer.getDuration();
+                } catch (Throwable t) {
+                    return -1;
+                }
             }
+            return -1;
         }
 
         /**
@@ -2966,9 +2975,11 @@ public class MusicPlaybackService extends Service {
          */
         public long position() {
             long result = 0;
-            try {
-                result = mCurrentMediaPlayer.getCurrentPosition();
-            } catch (Throwable ignored) {
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    result = mCurrentMediaPlayer.getCurrentPosition();
+                } catch (Throwable ignored) {
+                }
             }
             return result;
         }
@@ -2980,10 +2991,11 @@ public class MusicPlaybackService extends Service {
          * @return The offset in milliseconds from the start to seek to
          */
         public long seek(final long whereto) {
-            try {
-                mCurrentMediaPlayer.seekTo((int) whereto);
-            } catch (Throwable ignored) {
-
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mCurrentMediaPlayer.seekTo((int) whereto);
+                } catch (Throwable ignored) {
+                }
             }
             return whereto;
         }
@@ -2994,10 +3006,12 @@ public class MusicPlaybackService extends Service {
          * @param vol Left and right volume scalar
          */
         public void setVolume(final float vol) {
-            try {
-                mCurrentMediaPlayer.setVolume(vol, vol);
-            } catch (Throwable t) {
-                // possible native IllegalStateException.
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mCurrentMediaPlayer.setVolume(vol, vol);
+                } catch (Throwable t) {
+                    // possible native IllegalStateException.
+                }
             }
         }
 
@@ -3007,9 +3021,11 @@ public class MusicPlaybackService extends Service {
          * @param sessionId The audio session ID
          */
         public void setAudioSessionId(final int sessionId) {
-            try {
-                mCurrentMediaPlayer.setAudioSessionId(sessionId);
-            } catch (Throwable ignored) {
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    mCurrentMediaPlayer.setAudioSessionId(sessionId);
+                } catch (Throwable ignored) {
+                }
             }
         }
 
@@ -3020,9 +3036,11 @@ public class MusicPlaybackService extends Service {
          */
         public int getAudioSessionId() {
             int result = 0;
-            try {
-                result = mCurrentMediaPlayer.getAudioSessionId();
-            } catch (Throwable ignored) {
+            if (mCurrentMediaPlayer != null) {
+                try {
+                    result = mCurrentMediaPlayer.getAudioSessionId();
+                } catch (Throwable ignored) {
+                }
             }
             return result;
         }

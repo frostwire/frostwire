@@ -114,8 +114,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem fullscreen = menu.findItem(R.id.activity_preview_player_menu_fullscreen);
-        fullscreen.setVisible(!audio);  //userRegistered is boolean, pointing if the user has registered or not.
+        MenuItem fullscreenMenu = menu.findItem(R.id.activity_preview_player_menu_fullscreen);
+        if (fullscreenMenu != null) {
+            fullscreenMenu.setVisible(!audio);  //userRegistered is boolean, pointing if the user has registered or not.
+        }
         return true;
     }
 
@@ -208,8 +210,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (mopubBannerView == null) {
             mopubBannerView = findViewById(R.id.activity_preview_player_mopub_squared_banner);
         }
-        mopubBannerView.setOnBannerDismissedListener(this::hideAd);
-        mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
+        if (mopubBannerView != null) {
+            mopubBannerView.setOnBannerDismissedListener(this::hideAd);
+            mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
+        }
     }
 
     @Override
@@ -629,7 +633,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void hideAd() {
-        mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+        if (mopubBannerView != null) {
+            mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+        }
         if (!isPortrait()) {
             LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
             horizontalAdContainer.setVisibility(View.GONE);
