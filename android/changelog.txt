@@ -1,4 +1,4 @@
-FrostWire 2.0.5 build 537 - JUN/14/2018
+FrostWire 2.0.5 build 538 - JUN/15/2018
  - No more intrusive interstitial ads when resuming app
  - New jlibtorrent 1.2.0.18-RC6
  - Android billing client 1.1 update

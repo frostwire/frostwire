@@ -20,7 +20,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.frostwire.android"
     android:installLocation="auto"
-    android:versionCode="537"
+    android:versionCode="538"
     android:versionName="2.0.5">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
