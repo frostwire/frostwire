@@ -41,7 +41,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,24 +56,18 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
-import com.frostwire.android.offers.InHouseBannerFactory;
-import com.frostwire.android.offers.MopubSquaredBanner;
+import com.frostwire.android.offers.MoPubAdNetwork;
+import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PrebidManager;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.mobileads.MoPubErrorCode;
-import com.mopub.mobileads.MoPubView;
 
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static com.frostwire.android.offers.MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL;
-import static com.frostwire.android.offers.MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL;
 
 /**
  * @author gubatron
@@ -104,10 +97,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private boolean isFullScreen = false;
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
-    private LinearLayout advertisementHeaderLayout;
-    private MopubSquaredBanner mopubSquaredBanner;
-    private MoPubView mopubView;
-    private ImageView fallbackImageView;
+    private MopubBannerView mopubBannerView;
     private boolean mopubLoaded = false;
     private boolean isVertical;
 
@@ -208,105 +198,19 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void initMopubView() {
         if (Offers.disabledAds()) {
-            hideAdContainer();
+            hideAd();
             return;
         }
-
         if (!UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD)) {
-            hideAdContainer();
+            hideAd();
             return;
         }
-
-        if (isPortrait()) {
-            initSmallMopubBanner();
-        } else {
-            if (mopubSquaredBanner == null) {
-                mopubSquaredBanner = findViewById(R.id.activity_preview_player_mopub_squared_banner);
-            }
-            mopubSquaredBanner.setOnBannerDismissedListener(this::hideAdContainer);
-            mopubSquaredBanner.loadMoPubBanner();
+        if (mopubBannerView == null) {
+            mopubBannerView = findViewById(R.id.activity_preview_player_mopub_squared_banner);
         }
+        mopubBannerView.setOnBannerDismissedListener(this::hideAd);
+        mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
     }
-
-    private void initSmallMopubBanner() {
-        mopubView = findViewById(R.id.activity_preview_player_mopubview);
-        advertisementHeaderLayout = findViewById(R.id.activity_preview_advertisement_header_layout);
-        fallbackImageView = findView(R.id.activity_preview_fallback_imageview);
-        final ImageButton dismissButton = findViewById(R.id.audio_player_dismiss_mopubview_button);
-        if (mopubView == null || advertisementHeaderLayout == null || dismissButton == null) {
-            return;
-        }
-        fallbackImageView.setVisibility(View.GONE);
-        dismissButton.setOnClickListener(view -> {
-            destroyMopubView();
-            fallbackImageView.setVisibility(View.GONE);
-        });
-
-        if (!Offers.MOPUB.started()) {
-            return;
-        }
-        mopubView.setTesting(false);
-        mopubView.setAutorefreshEnabled(true);
-        isVertical = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        mopubView.setAdUnitId(isVertical ? UNIT_ID_PREVIEW_PLAYER_VERTICAL : UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
-        mopubView.setKeywords("music,audio,ringtone,video,music video");
-        mopubView.setBannerAdListener(new MoPubView.BannerAdListener() {
-            @Override
-            public void onBannerLoaded(MoPubView banner) {
-                mopubLoaded = true;
-                if (!isFullScreen) {
-                    if (isPortrait()) {
-                        setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, mopubView);
-                        fallbackImageView.setVisibility(View.GONE);
-                    } else {
-                        if (mopubSquaredBanner != null && mopubSquaredBanner.isLoaded()) {
-                            mopubSquaredBanner.setVisible(MopubSquaredBanner.Visibility.MOPUB, true);
-                        }
-                    }
-                    PrebidManager.getInstance(getApplicationContext()).onBannerLoaded(PreviewPlayerActivity.this, banner, isVertical ? PrebidManager.Placement.PREVIEW_BANNER_PORTRAIT_320_50 : PrebidManager.Placement.PREVIEW_BANNER_LANDSCAPE_300_250);
-                }
-            }
-
-            @Override
-            public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
-                PrebidManager.getInstance(getApplicationContext()).onBannerFailed(PreviewPlayerActivity.this, banner, isVertical ? PrebidManager.Placement.PREVIEW_BANNER_PORTRAIT_320_50 : PrebidManager.Placement.PREVIEW_BANNER_LANDSCAPE_300_250, errorCode);
-                destroyMopubView(); // mopubLoaded = false, also hides the ad-header view ("advertisement")
-
-                if (!Offers.disabledAds()) {
-                    loadSmallFallbackBanner();
-                } else {
-                    hideAdContainer();
-                }
-            }
-
-            @Override
-            public void onBannerClicked(MoPubView banner) {
-            }
-
-            @Override
-            public void onBannerExpanded(MoPubView banner) {
-            }
-
-            @Override
-            public void onBannerCollapsed(MoPubView banner) {
-            }
-        });
-        try {
-            mopubView.loadAd();
-        } catch (Throwable e) {
-            LOG.warn("AudioPlayer Mopub banner could not be loaded", e);
-            mopubLoaded = false;
-            loadSmallFallbackBanner();
-        }
-    }
-
-    private void loadSmallFallbackBanner() {
-        advertisementHeaderLayout.setVisibility(View.VISIBLE);
-        InHouseBannerFactory.AdFormat adFormat = isPortrait() ?
-                InHouseBannerFactory.AdFormat.SMALL_320x50 : InHouseBannerFactory.AdFormat.BIG_300x250;
-        InHouseBannerFactory.loadAd(fallbackImageView, adFormat);
-    }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -412,22 +316,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         // these ones only exist on landscape mode.
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
 
-        if (isPortrait) {
-            // TODO: review this logic, how is that toggleFullScreen can be called before initMopubView?
-            // these might not even be there
-            if (advertisementHeaderLayout == null) {
-                advertisementHeaderLayout = findView(R.id.activity_preview_advertisement_header_layout);
-            }
-            if (fallbackImageView == null) {
-                fallbackImageView = findView(R.id.activity_preview_fallback_imageview);
-            }
-            if (mopubView == null) {
-                mopubView = findView(R.id.activity_preview_player_mopubview);
-            }
-        } else {
-            if (mopubSquaredBanner == null) {
-                mopubSquaredBanner = findView(R.id.activity_preview_player_mopub_squared_banner);
-            }
+        if (mopubBannerView == null) {
+            mopubBannerView = findView(R.id.activity_preview_player_mopub_squared_banner);
         }
 
         // Let's Go into full screen mode.
@@ -438,11 +328,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
 
-            if (isPortrait) {
-                setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView, fallbackImageView);
-            } else {
-                mopubSquaredBanner.setVisible(MopubSquaredBanner.Visibility.ALL,false);
-            }
+            mopubBannerView.setVisible(MopubBannerView.Visibility.ALL,false);
 
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
@@ -466,28 +352,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             findToolbar().setVisibility(View.VISIBLE);
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (Offers.disabledAds()) {
-                hideAdContainer();
-                if (isPortrait) {
-                    setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView, fallbackImageView);
-                } else {
-                    mopubSquaredBanner.setVisible(MopubSquaredBanner.Visibility.ALL, false);
-                }
+                hideAd();
+                mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
             } else {
                 if (mopubLoaded) {
-                    if (isPortrait) {
-                        setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, mopubView);
-                        setViewsVisibility(View.GONE, fallbackImageView);
-                    } else {
-                        mopubSquaredBanner.setVisible(MopubSquaredBanner.Visibility.MOPUB, true);
-                    }
+                    mopubBannerView.setVisible(MopubBannerView.Visibility.MOPUB, true);
                 } else {
-                    if (isPortrait) {
-                        loadSmallFallbackBanner();
-                        setViewsVisibility(View.VISIBLE, advertisementHeaderLayout, fallbackImageView);
-                        setViewsVisibility(View.GONE, mopubView);
-                    } else {
-                        mopubSquaredBanner.setVisible(MopubSquaredBanner.Visibility.FALLBACK, true);
-                    }
+                    mopubBannerView.setVisible(MopubBannerView.Visibility.FALLBACK, true);
                 }
             }
             v.setRotation(0);
@@ -746,12 +617,9 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void destroyMopubView() {
         try {
-            hideAdContainer();
-            if (mopubView != null) {
-                mopubView.destroy(); // -> mopubView.unregisterScreenStateBroadcastReceiver() private method call
-            }
-            if (mopubSquaredBanner != null) {
-                mopubSquaredBanner.destroy();
+            hideAd();
+            if (mopubBannerView != null) {
+                mopubBannerView.destroy();
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
@@ -760,13 +628,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private void hideAdContainer() {
+    private void hideAd() {
+        mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
         if (!isPortrait()) {
             LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
             horizontalAdContainer.setVisibility(View.GONE);
-        } else {
-            LinearLayout adHeader = findView(R.id.activity_preview_advertisement_header_layout);
-            setViewsVisibility(View.GONE, advertisementHeaderLayout, mopubView, fallbackImageView);
         }
     }
 
