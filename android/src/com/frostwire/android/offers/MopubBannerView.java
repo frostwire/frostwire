@@ -55,17 +55,22 @@ public class MopubBannerView extends LinearLayout {
         void dispatch();
     }
 
+    public interface OnBannerLoadedListener {
+        void dispatch();
+    }
+
     private static Logger LOG = Logger.getLogger(MopubBannerView.class);
     private ImageButton dismissBannerButton;
     private MoPubView moPubView;
     private ImageView fallbackBannerView;
     private TextView mAdvertisementText;
     private TextView removeAdsTextView;
+    private OnBannerLoadedListener onBannerLoadedListener;
     private OnBannerDismissedListener onBannerDismissedListener;
     private long lastInitAlbumArtBanner;
     private boolean isHidden;
     private boolean isLoaded;
-
+    private boolean showFallbackBannerOnDismiss;
 
     public MopubBannerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -86,6 +91,16 @@ public class MopubBannerView extends LinearLayout {
             setLayoutParams(layoutParams);
         }
         onBannerDismissedListener = null;
+        onBannerLoadedListener = null;
+        showFallbackBannerOnDismiss = true;
+    }
+
+    public void setShowFallbackBannerOnDismiss(boolean showFallbackOnDismiss) {
+        showFallbackBannerOnDismiss = showFallbackOnDismiss;
+    }
+
+    public void setOnBannerLoadedListener(OnBannerLoadedListener onBannerLoadedListener) {
+        this.onBannerLoadedListener = onBannerLoadedListener;
     }
 
     public void setOnBannerDismissedListener(OnBannerDismissedListener onBannerDismissedListener) {
@@ -114,7 +129,6 @@ public class MopubBannerView extends LinearLayout {
         return isLoaded;
     }
 
-    // TODO: Pass ad Unit ID
     public void loadMoPubBanner(final String adUnitId) {
         isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
@@ -132,6 +146,14 @@ public class MopubBannerView extends LinearLayout {
 
         if (moPubView != null && dismissBannerButton != null) {
             loadFallbackBanner(adUnitId);
+
+            if (onBannerLoadedListener != null) {
+                try {
+                    onBannerLoadedListener.dispatch();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
 
             if (!Offers.MOPUB.started()) {
                 LOG.warn("MopubSquaredBanner.loadMoPubBanner() abort moPubView loading, MOPUB not started");
@@ -229,6 +251,13 @@ public class MopubBannerView extends LinearLayout {
             setVisible(Visibility.MOPUB, true);
             PrebidManager.getInstance(getContext().getApplicationContext()).onBannerLoaded(getContext(), banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
             isLoaded = true;
+            if (onBannerLoadedListener != null) {
+                try {
+                    onBannerLoadedListener.dispatch();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
         }
 
         @Override
@@ -258,9 +287,9 @@ public class MopubBannerView extends LinearLayout {
     };
 
     private final OnClickListener onDismissBannerOnClickListener = view -> {
-        if (moPubView.getVisibility() == View.VISIBLE) {
+        if (moPubView.getVisibility() == View.VISIBLE && showFallbackBannerOnDismiss) {
             setVisible(Visibility.FALLBACK, true);
-        } else if (fallbackBannerView.getVisibility() == View.VISIBLE) {
+        } else {
             setVisible(Visibility.ALL, false);
             if (onBannerDismissedListener != null) {
                 try {
