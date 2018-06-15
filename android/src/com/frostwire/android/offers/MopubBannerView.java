@@ -283,6 +283,13 @@ public class MopubBannerView extends LinearLayout {
             LOG.info("onBannerCollapsed");
             setVisible(Visibility.ALL, false);
             isLoaded = false;
+            if (onBannerDismissedListener != null) {
+                try {
+                    onBannerDismissedListener.dispatch();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            }
         }
     };
 

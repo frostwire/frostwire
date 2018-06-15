@@ -622,12 +622,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
         mMopubBannerView.setShowFallbackBannerOnDismiss(false);
         mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
-        if (!Offers.removeAdsOffersEnabled() || (removeAdsPurchaseTime > 0)) {
-            mMopubBannerView.setOnBannerDismissedListener(null);
-        } else {
-            mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
-        }
-
+        mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
         mMopubBannerView.setOnBannerLoadedListener(() -> mAlbumArt.setVisibility(View.GONE));
 
         Asyncs.async(
