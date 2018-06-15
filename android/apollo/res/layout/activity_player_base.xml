@@ -123,84 +123,11 @@
                     android:layout_alignTop="@+id/audio_player_album_art"
                     android:background="@drawable/divider_line" />
 
-                <RelativeLayout
+                <com.frostwire.android.offers.MopubBannerView
+                    android:id="@+id/audio_player_mopub_banner_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignRight="@+id/audio_player_advertisement_text"
-                                android:layout_gravity="center_horizontal|right"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginTop="10dp"
-                                android:background="@null"
-                                android:src="@drawable/ad_cancel"
-                                android:visibility="invisible" />
-
-                            <TextView
-                                android:id="@+id/audio_player_advertisement_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_weight="1.0"
-                                android:gravity="center"
-                                android:text="@string/advertisement"
-                                android:textColor="@color/app_text_disabled"
-                                android:visibility="gone" />
-
-                            <ImageButton
-                                android:id="@+id/audio_player_dismiss_mopubview_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical|right"
-                                android:layout_marginRight="10dp"
-                                android:background="@null"
-                                android:src="@drawable/ad_cancel"
-                                android:visibility="gone" />
-                        </LinearLayout>
-
-                        <!-- mopub banner -->
-                        <com.mopub.mobileads.MoPubView
-                            android:id="@+id/audio_player_mopubview"
-                            android:layout_width="match_parent"
-                            android:layout_height="250dp"
-                            android:visibility="gone"/>
-
-                        <ImageView
-                            android:id="@+id/audio_player_fallback_imageview"
-                            android:layout_width="match_parent"
-                            android:layout_height="250dp"
-                            android:visibility="gone"/>
-
-                        <TextView
-                            android:id="@+id/audio_player_remove_ads_text_link"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:gravity="center"
-                            android:paddingTop="20dp"
-                            android:text="@string/remove_ads"
-                            android:textColor="@color/basic_blue_highlight_dark"
-                            android:textSize="@dimen/text_medium"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
-
-                    </LinearLayout>
-
-                </RelativeLayout>
+                    android:layout_gravity="center_horizontal"/>
             </FrameLayout>
 
 
