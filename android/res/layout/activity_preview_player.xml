@@ -57,53 +57,12 @@
             android:text="@string/dummy_author" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/activity_preview_advertisement_header_layout"
+    <com.frostwire.android.offers.MopubBannerView
+        android:id="@+id/activity_preview_player_mopub_squared_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/activity_preview_player_advertisement_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1.0"
-            android:gravity="center"
-            android:text="@string/advertisement"
-            android:textColor="@color/app_text_disabled"
-            android:visibility="visible" />
-
-        <ImageButton
-            android:id="@+id/audio_player_dismiss_mopubview_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|right"
-            android:layout_marginRight="10dp"
-            android:background="@null"
-            android:src="@drawable/ad_cancel"
-            android:visibility="visible" />
-    </LinearLayout>
-
-    <com.mopub.mobileads.MoPubView
-        android:id="@+id/activity_preview_player_mopubview"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible" />
-
-    <ImageView
-        android:id="@+id/activity_preview_fallback_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal|center_vertical"/>
 
     <FrameLayout
         android:id="@+id/activity_preview_player_framelayout"

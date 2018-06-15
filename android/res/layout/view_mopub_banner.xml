@@ -41,7 +41,7 @@
 
         <TextView
             android:gravity="center"
-            android:id="@+id/mopub_squared_banner_advertisement_text"
+            android:id="@+id/mopub_banner_advertisement_text"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
@@ -52,7 +52,7 @@
 
         <ImageButton
             android:background="@null"
-            android:id="@+id/mopub_squared_banner_dismiss_mopubview_button"
+            android:id="@+id/mopub_banner_dismiss_mopubview_button"
             android:layout_gravity="center_vertical|right"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
@@ -63,20 +63,22 @@
 
     <!-- mopub banner -->
     <com.mopub.mobileads.MoPubView
-        android:id="@+id/mopub_squared_banner_mopubview"
-        android:layout_height="250dp"
-        android:layout_width="match_parent"
+        android:id="@+id/mopub_banner_mopubview"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:visibility="gone"/>
 
     <ImageView
-        android:id="@+id/mopub_squared_banner_fallback_imageview"
-        android:layout_height="250dp"
-        android:layout_width="match_parent"
-        android:visibility="gone"/>
+        android:id="@+id/mopub_banner_fallback_imageview"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible"/>
 
     <TextView
         android:gravity="center"
-        android:id="@+id/mopub_squared_banner_remove_ads_text_link"
+        android:id="@+id/mopub_banner_remove_ads_text_link"
         android:layout_gravity="center"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"

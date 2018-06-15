@@ -112,10 +112,10 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <com.frostwire.android.offers.MopubSquaredBanner
+            <com.frostwire.android.offers.MopubBannerView
                 android:id="@+id/activity_preview_player_mopub_squared_banner"
-                android:layout_width="300dp"
-                android:layout_height="250dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="gone"
                 android:layout_gravity="center_horizontal|center_vertical"/>
 
