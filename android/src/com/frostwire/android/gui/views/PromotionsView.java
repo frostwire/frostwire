@@ -131,6 +131,11 @@ public class PromotionsView extends LinearLayout {
         //
         // Additionally, I'm recycling the picasso drawables for older devices. 
         unbindPromotionDrawables();
+
+        PromotionsAdapter promotionsAdapter = (PromotionsAdapter) gridview.getAdapter();
+        if (promotionsAdapter != null) {
+            promotionsAdapter.onDestroyView();
+        }
     }
 
     private void unbindPromotionDrawables() {

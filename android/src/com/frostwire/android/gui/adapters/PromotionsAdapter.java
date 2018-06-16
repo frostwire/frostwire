@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -36,12 +37,15 @@ import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
+import com.frostwire.android.offers.MoPubAdNetwork;
+import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
@@ -57,6 +61,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
     private final ImageLoader imageLoader;
+    private MopubBannerView mopubBannerView;
     private int specialOfferLayout;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
@@ -181,18 +186,29 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
             int specialOfferLayout = pickSpecialOfferLayout();
 
-            if (position == 0 && specialOfferLayout != NO_SPECIAL_OFFER) {
-                if (specialOfferLayout == R.layout.view_remove_ads_notification) {
-                    View removeAdsOfferView = setupRemoveAdsOfferView();
-                    if (removeAdsOfferView != null) {
-                        return removeAdsOfferView;
-                    }
-                }
-                return View.inflate(getContext(), specialOfferLayout, null);
-            } else if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
+            // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
+            if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-            }
-            else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
+            } else if (position == 0) {
+                int r = 1 + new Random(System.currentTimeMillis()).nextInt(100);
+                if (r % 2 == 0) {
+                    if (specialOfferLayout == R.layout.view_remove_ads_notification) {
+                        View removeAdsOfferView = setupRemoveAdsOfferView();
+                        if (removeAdsOfferView != null) {
+                            return removeAdsOfferView;
+                        }
+                    }
+                } else {
+                    if (mopubBannerView == null) {
+                        mopubBannerView = new MopubBannerView(getContext(), null, true, false);
+                        mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
+                        mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
+                    }
+                    return mopubBannerView;
+                }
+                //this line below should be impossible, but we could have some other special offer layout
+                //return View.inflate(getContext(), specialOfferLayout, null);
+            } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
                 return super.getView(position - 2, null, parent);
             }
         }
@@ -254,6 +270,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             MainActivity mainActivity = (MainActivity) getContext();
             Intent i = new Intent(getContext(), BuyActivity.class);
             mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+        }
+    }
+
+    public void onDestroyView() {
+        if (mopubBannerView != null) {
+            mopubBannerView.destroy();
         }
     }
 }
