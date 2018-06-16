@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -190,8 +191,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
             } else if (position == 0) {
+                // mopubBannerView does not work well in Android 4.4 (KitKat)
+                // java.lang.ClassCastException:
+                //  at android.widget.GridView.onMeasure (GridView.java:1046)
                 int r = 1 + new Random(System.currentTimeMillis()).nextInt(100);
-                if (r % 2 == 0) {
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || r % 2 == 0) {
                     if (specialOfferLayout == R.layout.view_remove_ads_notification) {
                         View removeAdsOfferView = setupRemoveAdsOfferView();
                         if (removeAdsOfferView != null) {
