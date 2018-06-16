@@ -71,9 +71,18 @@ public class MopubBannerView extends LinearLayout {
     private boolean isHidden;
     private boolean isLoaded;
     private boolean showFallbackBannerOnDismiss;
+    private boolean showDismissButton;
 
     public MopubBannerView(Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, true, true);
+    }
+
+    public MopubBannerView(Context context, @Nullable AttributeSet attrs, boolean showFallbackBannerOnDismiss, boolean showDismissButton) {
         super(context, attrs);
+        onBannerDismissedListener = null;
+        onBannerLoadedListener = null;
+        this.showFallbackBannerOnDismiss = showFallbackBannerOnDismiss;
+        this.showDismissButton = showDismissButton;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (inflater != null) {
@@ -90,13 +99,17 @@ public class MopubBannerView extends LinearLayout {
             layoutParams.setLayoutDirection(LinearLayout.VERTICAL);
             setLayoutParams(layoutParams);
         }
-        onBannerDismissedListener = null;
-        onBannerLoadedListener = null;
-        showFallbackBannerOnDismiss = true;
     }
 
     public void setShowFallbackBannerOnDismiss(boolean showFallbackOnDismiss) {
         showFallbackBannerOnDismiss = showFallbackOnDismiss;
+    }
+
+    public void setShowDismissButton(boolean showDismissButton) {
+        this.showDismissButton = showDismissButton;
+        if (dismissBannerButton != null) {
+            dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
     public void setOnBannerLoadedListener(OnBannerLoadedListener onBannerLoadedListener) {
@@ -112,6 +125,7 @@ public class MopubBannerView extends LinearLayout {
         dismissBannerButton = findViewById(R.id.mopub_banner_dismiss_mopubview_button);
         dismissBannerButton.setOnClickListener(onDismissBannerOnClickListener);
         dismissBannerButton.setClickable(true);
+        dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
         fallbackBannerView = findViewById(R.id.mopub_banner_fallback_imageview);
         fallbackBannerView.setClickable(true);
         mAdvertisementText = findViewById(R.id.mopub_banner_advertisement_text);
@@ -272,6 +286,7 @@ public class MopubBannerView extends LinearLayout {
         @Override
         public void onBannerClicked(MoPubView banner) {
             LOG.info("onBannerClicked: " + banner);
+            loadFallbackBanner(banner.getAdUnitId());
         }
 
         @Override
