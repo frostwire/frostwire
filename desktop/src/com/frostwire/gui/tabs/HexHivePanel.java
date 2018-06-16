@@ -112,7 +112,7 @@ public class HexHivePanel extends JPanel {
 
     private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor) {
         Color borderColor = new Color(numBorderColor, true);
-        hexagonBorderPaint = new ColoredStroke(1, borderColor);
+        hexagonBorderPaint = new ColoredStroke(2.0f, borderColor);
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
         fullHexPaint = new CubePaint(numFullColor, 20);
     }
@@ -130,6 +130,7 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.x = drawingProperties.center.x;
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
+
         boolean drawCubes = drawingProperties.numHexs <= 600;
 
         BufferedImage bitmap = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
@@ -137,12 +138,12 @@ public class HexHivePanel extends JPanel {
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, bitmap, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth + (hexagonBorderPaint.getLineWidth() * 4);
-            float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2) + (hexagonBorderPaint.getLineWidth() * 3);
+            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth;
+            float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2) + hexagonBorderPaint.getLineWidth();
             if (rightSide >= drawingProperties.end.x) {
                 evenRow = !evenRow;
                 drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
-                drawingProperties.hexCenterBuffer.y += threeQuarters;
+                drawingProperties.hexCenterBuffer.y += threeQuarters + 4 * hexagonBorderPaint.getLineWidth();
             }
         }
         return bitmap;
@@ -205,8 +206,7 @@ public class HexHivePanel extends JPanel {
         graphics.fill(drawingProperties.fillPathBuffer);
         graphics.setPaint(borderStroke.getColor());
         graphics.setStroke(borderStroke);
-        graphics.fill(drawingProperties.fillPathBuffer);
-
+        graphics.draw(drawingProperties.fillPathBuffer);
         drawingProperties.fillPathBuffer.reset();
         if (drawCube) {
             // LEFT FACE
@@ -253,8 +253,8 @@ public class HexHivePanel extends JPanel {
     private static final class ColoredStroke extends BasicStroke {
         private final Color color;
 
-        ColoredStroke(int width, Color color) {
-            super(width);
+        ColoredStroke(float width, Color color) {
+            super(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
             this.color = color;
         }
 
@@ -482,7 +482,9 @@ public class HexHivePanel extends JPanel {
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(0xff264053, 0xfff2f2f2, 0xff33b5e5, 10, 10, 10, 10);
+//        final HexHivePanel hexPanel = new HexHivePanel(0xff264053, 0xfff2f2f2, 0xff33b5e5, 10, 10, 10, 10);
+        final HexHivePanel hexPanel = new HexHivePanel(0xffff0000, 0xff00ff00, 0xff0000ff,
+                0, 0, 0, 0);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
@@ -491,12 +493,12 @@ public class HexHivePanel extends JPanel {
 
             @Override
             public int getTotalHexagonsCount() {
-                return 3000;
+                return 10;
             }
 
             @Override
             public int getFullHexagonsCount() {
-                return 6;
+                return 5;
             }
 
             @Override
@@ -504,12 +506,13 @@ public class HexHivePanel extends JPanel {
                 return hexOffset % 2 == 0;
             }
         };
+
         JFrame frame = new JFrame("Hive Testing Area");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
         frame.add(hexPanel);
-        frame.setSize(800, 800);
+        frame.setSize(640, 480);
 
         frame.addComponentListener(new ComponentAdapter() {
             @Override
