@@ -229,7 +229,7 @@ public class MainActivity extends AbstractActivity implements
         if (intent == null) {
             intent = getIntent();
         }
-        boolean result = intent != null && intent.getBooleanExtra("shutdown-" + ConfigurationManager.instance().getUUIDString(), false);
+        boolean result = intent != null && intent.getBooleanExtra("shutdown-frostwire", false);
         if (result) {
             shutdown();
         }
@@ -240,7 +240,7 @@ public class MainActivity extends AbstractActivity implements
         if (intent == null) {
             intent = getIntent();
         }
-        return intent != null && intent.getBooleanExtra("gohome-" + ConfigurationManager.instance().getUUIDString(), false);
+        return intent != null && intent.getBooleanExtra("gohome-frostwire", false);
     }
 
     @Override
