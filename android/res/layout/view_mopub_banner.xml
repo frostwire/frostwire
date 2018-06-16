@@ -83,6 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:paddingTop="20dp"
+        android:paddingBottom="5dp"
         android:text="@string/remove_ads"
         android:textColor="@color/basic_blue_highlight_dark"
         android:textSize="@dimen/text_medium"
