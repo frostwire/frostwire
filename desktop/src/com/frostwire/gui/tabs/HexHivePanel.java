@@ -63,7 +63,6 @@ public class HexHivePanel extends JPanel {
         final int canvasHeight = getHeight();
         LOG.info("udpateData(): width=" + canvasWidth + ", height=" + canvasHeight, true);
 
-
         if (drawingProperties == null && canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
             drawingProperties = new DrawingProperties(hexDataAdapter,
                     hexagonBorderPaint.getLineWidth(),
@@ -111,10 +110,10 @@ public class HexHivePanel extends JPanel {
     }
 
     private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor) {
-        Color borderColor = new Color(numBorderColor, true);
-        hexagonBorderPaint = new ColoredStroke(2.0f, borderColor);
+        Color borderColor = new Color(numBorderColor, false);
+        hexagonBorderPaint = new ColoredStroke(1.0f, borderColor);
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
-        fullHexPaint = new CubePaint(numFullColor, 20);
+        fullHexPaint = new CubePaint(numFullColor, 30);
     }
 
     private BufferedImage asyncDraw(int canvasWidth, int canvasHeight, HexDataAdapter adapter) {
@@ -133,10 +132,15 @@ public class HexHivePanel extends JPanel {
 
         boolean drawCubes = drawingProperties.numHexs <= 600;
 
-        BufferedImage bitmap = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{10.0f}, 0.0f));
+        graphics.drawRect(drawingProperties.origin.x, drawingProperties.origin.y, drawingProperties.end.x, drawingProperties.end.y);
+
+
         while (pieceIndex < drawingProperties.numHexs) {
-            drawHexagon(drawingProperties, graphics, bitmap, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
+            drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
             drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth;
             float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2) + hexagonBorderPaint.getLineWidth();
@@ -189,9 +193,11 @@ public class HexHivePanel extends JPanel {
         outCorner.setLocation((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
     }
 
-    private static void drawHexagon(final DrawingProperties drawingProperties, final Graphics2D graphics, final BufferedImage bufferedImage, final ColoredStroke borderStroke,
+    private static void drawHexagon(final DrawingProperties drawingProperties, final Graphics2D graphics,
+                                    final ColoredStroke borderStroke,
                                     final CubePaint fillPaint, final boolean drawCube) {
-        LOG.info("drawHexagon()");
+
+        // Create outer shape for Hexagon
         drawingProperties.fillPathBuffer.reset();
         for (int i = 0; i < 7; i++) {
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, i, drawingProperties.hexSideLength);
@@ -202,33 +208,38 @@ public class HexHivePanel extends JPanel {
             }
         }
 
-        graphics.setPaint(fillPaint);
+        // Fill hexagon with base color
+        graphics.setPaint(fillPaint.getBaseColor());
         graphics.fill(drawingProperties.fillPathBuffer);
+
+        // Paint outer border
         graphics.setPaint(borderStroke.getColor());
         graphics.setStroke(borderStroke);
-        graphics.draw(drawingProperties.fillPathBuffer);
+        //graphics.draw(drawingProperties.fillPathBuffer);
+
         drawingProperties.fillPathBuffer.reset();
         if (drawCube) {
-            // LEFT FACE
+            // LEFT FACE (DARK)
             // bottom corner - 90 degrees (with zero at horizon on the right side)
-            // angles move clockwise
+            // angles move clockwise - corner 1 is at the bottom (90 degrees down from the right)
+
+            // Create shape for left face
             drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 2, drawingProperties.hexSideLength);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            // top left corner - 210 degrees
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-            fillPaint.useDarkColor();
-            // fill and paint border of face
-            graphics.setPaint(fillPaint); // might be setColor in case this doesn't work
-            graphics.draw(drawingProperties.fillPathBuffer);
-            graphics.setPaint(borderStroke.getColor());
-            graphics.setStroke(borderStroke);
-            graphics.draw(drawingProperties.fillPathBuffer);
-            // TOP FACE
+
+            // Fill left face
+            graphics.setPaint(fillPaint.getDarkColor()); // might be setColor in case this doesn't work
+            graphics.fill(drawingProperties.fillPathBuffer);
+
+            // TOP FACE (LIGHT)
+
+            // Create shape for top face
             drawingProperties.fillPathBuffer.reset();
             drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
@@ -238,14 +249,24 @@ public class HexHivePanel extends JPanel {
             getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
             drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-            fillPaint.useLightColor();
-            graphics.setPaint(fillPaint);
-            graphics.draw(drawingProperties.fillPathBuffer);
+
+            // Fill top face
+            graphics.setPaint(fillPaint.getLightColor());
+            graphics.fill(drawingProperties.fillPathBuffer);
+
+
+            // Now paint inner faces border, 3 line.
+            // From center to 1, center to 3 and center to 5
             graphics.setPaint(borderStroke.getColor());
             graphics.setStroke(borderStroke);
-            graphics.draw(drawingProperties.fillPathBuffer);
-            drawingProperties.fillPathBuffer.reset();
-            fillPaint.useBaseColor();
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
+            //graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
+            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
+            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+
+            graphics.setPaint(fillPaint.getBaseColor());
         }
         drawingProperties.cornerBuffer.setLocation(-1, -1);
     }
@@ -263,24 +284,14 @@ public class HexHivePanel extends JPanel {
         }
     }
 
-    private static final class CubePaint extends Color {
-        private final int shades;
+    private static final class CubePaint {
+        private final Color baseColor;
+        private final Color darkColor;
+        private final Color lightColor;
 
-        private Color baseColor;
-        private Color darkColor;
-        private Color lightColor;
-        private Color currentColor;
-
-        CubePaint(int color, int shades) {
-            super(color, true);
-            this.shades = shades;
-            initColors(color);
-        }
-
-        private void initColors(int numBaseColor) {
+        CubePaint(int numBaseColor, int shades) {
             int numDarkColor;
             int numLightColor;
-            int A = (numBaseColor >> 24) & 0xff;
             int R = (numBaseColor >> 16) & 0xff;
             int G = (numBaseColor >> 8) & 0xff;
             int B = (numBaseColor) & 0xff;
@@ -290,97 +301,30 @@ public class HexHivePanel extends JPanel {
             int lightR = Math.min(R + shades, 0xff);
             int lightG = Math.min(G + shades, 0xff);
             int lightB = Math.min(B + shades, 0xff);
-            numDarkColor = (A & 0xff) << 24 | (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
-            numLightColor = (A & 0xff) << 24 | (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
-            baseColor = new Color(numBaseColor, true);
-            darkColor = new Color(numDarkColor, true);
-            lightColor = new Color(numLightColor, true);
-            currentColor = baseColor;
+            numDarkColor =  (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
+            numLightColor = (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
+            baseColor = new Color(numBaseColor, false);
+            darkColor = new Color(numDarkColor, false);
+            lightColor = new Color(numLightColor, false);
+
+            LOG.info("================================================================================");
+            LOG.info("Shades = " + shades);
+            LOG.info(String.format("BASE COLOR (R=%d,G=%d,B=%d)", R, G, B));
+            LOG.info(String.format("DARK COLOR (R=%d,G=%d,B=%d)", darkR, darkG, darkB));
+            LOG.info(String.format("LGHT COLOR (R=%d,G=%d,B=%d)", lightR, lightG, lightB));
+            LOG.info("================================================================================");
         }
 
-        public void useBaseColor() {
-            currentColor = baseColor;
+        Color getBaseColor() {
+            return baseColor;
         }
 
-        public void useDarkColor() {
-            currentColor = darkColor;
+        Color getDarkColor() {
+            return darkColor;
         }
 
-        public void useLightColor() {
-            currentColor = lightColor;
-        }
-
-        public int getRed() {
-            return currentColor.getRed();
-        }
-
-        public int getGreen() {
-            return currentColor.getGreen();
-        }
-
-        public int getBlue() {
-            return currentColor.getBlue();
-        }
-
-        public int getAlpha() {
-            return currentColor.getAlpha();
-        }
-
-        public int getRGB() {
-            return currentColor.getRGB();
-        }
-
-        public Color brighter() {
-            return currentColor.brighter();
-        }
-
-        public Color darker() {
-            return currentColor.darker();
-        }
-
-        public int hashCode() {
-            return currentColor.hashCode();
-        }
-
-        public boolean equals(Object obj) {
-            return currentColor.equals(obj);
-        }
-
-        public String toString() {
-            return currentColor.toString();
-        }
-
-        public float[] getRGBComponents(float[] compArray) {
-            return currentColor.getRGBComponents(compArray);
-        }
-
-        public float[] getRGBColorComponents(float[] compArray) {
-            return currentColor.getRGBColorComponents(compArray);
-        }
-
-        public float[] getComponents(float[] compArray) {
-            return currentColor.getComponents(compArray);
-        }
-
-        public float[] getColorComponents(float[] compArray) {
-            return currentColor.getColorComponents(compArray);
-        }
-
-        public float[] getComponents(ColorSpace cspace, float[] compArray) {
-            return currentColor.getColorComponents(cspace, compArray);
-        }
-
-        public ColorSpace getColorSpace() {
-            return currentColor.getColorSpace();
-        }
-
-        public synchronized PaintContext createContext(ColorModel cm, Rectangle r, Rectangle2D r2d, AffineTransform xform,
-                                                       RenderingHints hints) {
-            return currentColor.createContext(cm, r, r2d, xform, hints);
-        }
-
-        public int getTransparency() {
-            return currentColor.getTransparency();
+        Color getLightColor() {
+            return lightColor;
         }
     }
 
@@ -483,8 +427,8 @@ public class HexHivePanel extends JPanel {
 
     public static void main(String[] args) {
 //        final HexHivePanel hexPanel = new HexHivePanel(0xff264053, 0xfff2f2f2, 0xff33b5e5, 10, 10, 10, 10);
-        final HexHivePanel hexPanel = new HexHivePanel(0xffff0000, 0xff00ff00, 0xff0000ff,
-                0, 0, 0, 0);
+        //final HexHivePanel hexPanel = new HexHivePanel(0x264053, 0x00ff00, 0x0000ff,
+        final HexHivePanel hexPanel = new HexHivePanel(0xff264053, 0xfff2f2f2, 0xff33b5e5,0, 0, 0, 0);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
@@ -493,7 +437,7 @@ public class HexHivePanel extends JPanel {
 
             @Override
             public int getTotalHexagonsCount() {
-                return 10;
+                return 100;
             }
 
             @Override
@@ -506,8 +450,7 @@ public class HexHivePanel extends JPanel {
                 return hexOffset % 2 == 0;
             }
         };
-
-        JFrame frame = new JFrame("Hive Testing Area");
+        JFrame frame = new JFrame("HexHive Testing Area");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
