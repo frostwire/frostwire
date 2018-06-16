@@ -74,6 +74,7 @@ import static com.frostwire.android.util.Asyncs.async;
 /**
  * @author gubatron
  * @author aldenml
+ * @author votaguz
  */
 public final class UIUtils {
 
@@ -90,6 +91,8 @@ public final class UIUtils {
 
     // put "support" pitches at the beginning and play with the offset
     private static final int[] PITCHES = {
+            R.string.support_frostwire,
+            R.string.support_free_software,
             R.string.support_frostwire,
             R.string.support_free_software,
             R.string.save_bandwidth,
@@ -473,9 +476,8 @@ public final class UIUtils {
     }
 
     public static int randomPitchResId(boolean avoidSupportPitches) {
-        int offset1 = 0;
-        int offset2 = 2;
-        int offset = !avoidSupportPitches ? offset1 : offset2;
+        int offsetRemoveAds = 4;
+        int offset = !avoidSupportPitches ? 0 : offsetRemoveAds;
         return PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
     }
 
