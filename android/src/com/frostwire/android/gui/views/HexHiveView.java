@@ -370,22 +370,24 @@ public class HexHiveView<T> extends View {
         DP.fillPathBuffer.reset();
         if (drawCube) {
             // LEFT FACE
-            // bottom corner - 90 degrees (with zero at horizon on the right side)
-            // angles move clockwise
+            // bottom corner - 90 degrees points straight below (zero at horizon on the right side)
+            // angles move clockwise. 0 is below right horizon, 1 right below the center...
+
+            // make left face path
             DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
             DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 2, DP.hexSideLength);
             DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
-            // top left corner - 210 degrees
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
             DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
             fillPaint.useDarkColor();
-            // fill and paint border of face
+            // fill left face path
             canvas.drawPath(DP.fillPathBuffer, fillPaint);
-            canvas.drawPath(DP.fillPathBuffer, borderPaint);
+
             // TOP FACE
+            // make top face path
             DP.fillPathBuffer.reset();
             DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
             getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
@@ -397,7 +399,20 @@ public class HexHiveView<T> extends View {
             DP.fillPathBuffer.lineTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
             fillPaint.useLightColor();
             canvas.drawPath(DP.fillPathBuffer, fillPaint);
+
+            // Now draw 3 lines from the center to corners 1,3 and 5
+            DP.fillPathBuffer.reset();
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 1, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 3, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
+            DP.fillPathBuffer.moveTo(DP.hexCenterBuffer.x, DP.hexCenterBuffer.y);
+            getHexCorner(DP.cornerBuffer, DP.hexCenterBuffer, 5, DP.hexSideLength);
+            DP.fillPathBuffer.lineTo(DP.cornerBuffer.x, DP.cornerBuffer.y);
             canvas.drawPath(DP.fillPathBuffer, borderPaint);
+
             DP.fillPathBuffer.reset();
             fillPaint.useBaseColor();
         }
