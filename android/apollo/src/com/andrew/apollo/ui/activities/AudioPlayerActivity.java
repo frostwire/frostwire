@@ -362,7 +362,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // hide ads in case of a share call
         if (!Offers.disabledAds() && mAlbumArt.getVisibility() == View.GONE) {
             mAlbumArt.setVisibility(View.VISIBLE);
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            if (mMopubBannerView != null) {
+                mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            }
         }
         return super.onMenuOpened(featureId, menu);
     }
@@ -1003,7 +1005,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * /** Used to shared what the user is currently listening to
      */
     private void shareCurrentTrack() {
-        mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+        if (mMopubBannerView != null) {
+            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+        }
         mAlbumArt.setVisibility(View.VISIBLE);
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
     }
