@@ -1,25 +1,26 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.tabs;
 
-import com.frostwire.gui.bittorrent.BTDownloadMediator;
+import com.frostwire.gui.bittorrent.*;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -32,6 +33,7 @@ import java.awt.event.*;
  * @author aldenml
  */
 public final class TransfersTab extends AbstractTab {
+    private static final Logger LOG = Logger.getLogger(TransfersTab.class);
     private final BTDownloadMediator downloadMediator;
 
     // it will be a reference to the download mediator above who is the one interested.
@@ -45,10 +47,13 @@ public final class TransfersTab extends AbstractTab {
     private JPanel mainComponent;
     private JTextArea filterText;
 
+    private final boolean dedicatedTransfersTabAvailable;
+
     public TransfersTab(BTDownloadMediator downloadMediator) {
         super(I18n.tr("Transfers"),
               I18n.tr("Transfers tab description goes here."),
               "transfers_tab");
+        dedicatedTransfersTabAvailable = !UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
         this.downloadMediator = downloadMediator;
         initComponents();
     }
@@ -77,12 +82,48 @@ public final class TransfersTab extends AbstractTab {
         void onFilterUpdate(String searchKeywords);
     }
 
+    private class TransferTableSelectionListener implements BTDownloadMediator.BTDownloadSelectionListener {
+        /**
+         * @param selected null if nothing has been selected, a BTDownload otherwise
+         */
+        @Override
+        public void onTransferSelected(BTDownload selected) {
+            if (!dedicatedTransfersTabAvailable) {
+                LOG.info("Transfer Details not available in this search/transfers split screen mode");
+                hideTransferDetailsComponent();
+                return;
+            }
+            if (selected == null ||
+                selected instanceof YouTubeDownload ||
+                selected instanceof SoundcloudDownload ||
+                selected instanceof HttpDownload) {
+                hideTransferDetailsComponent();
+            } else {
+                showTransferDetailsComponent(selected);
+            }
+        }
+    }
+
+    private void hideTransferDetailsComponent() {
+        LOG.info("TODO: Hide transfer details component");
+    }
+
+    private void showTransferDetailsComponent(BTDownload selected) {
+        LOG.info("TODO: Show transfer details component (only if TransfersTab is a component on its own)");
+        if (!(selected instanceof BittorrentDownload) &&
+            !(selected instanceof TorrentFetcherDownload)) {
+            LOG.warn("Check your logic. TransfersTab.showTransferDetailsComponent() invoked on non-torrent transfer");
+            return;
+        }
+    }
+
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0","[][grow]","[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
         mainComponent.add(createFilterToggleButtons(),"w 500!, h 30!, pad 2 0 0 0, right, wrap");
         mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
         setTransfersFilterModeListener(downloadMediator);
+        downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
     }
 
     private void setTransfersFilterModeListener(TransfersFilterModeListener transfersFilterModeListener) {
