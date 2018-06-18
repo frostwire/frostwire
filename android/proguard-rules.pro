@@ -9,13 +9,13 @@
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
 -dontwarn org.conscrypt.Conscrypt
 -dontwarn org.conscrypt.OpenSSLProvider
--keep class do.** {*;}
--keep class for.** {*;}
--keep class if.** {*;}
--keep class int.** {*;}
+#-keep class do.** {*;}
+#-keep class for.** {*;}
+#-keep class if.** {*;}
+#-keep class int.** {*;}
 
 # applovin seems to have passed by proguard already
--keep class com.applovin.** {*;}
+#-keep class com.applovin.** {*;}
 
 -keep class com.frostwire.jlibtorrent.swig.libtorrent_jni {*;}
 
