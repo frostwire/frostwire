@@ -671,4 +671,5 @@
     <string name="connection_header_title">VPN连接状态：</string>
     <string name="vpn_find_out_more">了解更多</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 免费试用7天</string>
+    <string name="play_store_out_of_sync">Google Play商店需要同步，请等待几分钟</string>
 </resources>

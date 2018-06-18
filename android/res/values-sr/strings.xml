@@ -22,6 +22,8 @@
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Обелодањивање:</b> Иако се препоручује за своје преузимања, нарочито када преузмете или размјените осјетљиве информације (нпр. банкарство) и док користите јавне Ви-Фи или мобилне податке, <b>не треба ВПН за коришћење FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Инфо:</b> Тоуцх примењене ознаке на]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Повезани сте на Интернет помоћу ВПН-а. <br><br> Ако нисте већ, препоручујемо вам да користите једну од услуга испод да бисте шифровали везу и <b>заштитили своју приватност </b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ваша приватност је основно људско право</b>. Незаштићена веза значи све што радите на мрежи, укључујући <b>преузимање, претраживање, размену порука</b>, може се пратити и пресретнути од стране било кога на вашој мрежи, нпр. Интернет провајдери, хакери, владе.<br><br><b>Стално препоручујемо коришћење ВПН сервиса</b>. <br> Ево неких опција које пружају поуздан сервис и добро функционишу са ФростВире:]]></string>
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Подешавања</string>
@@ -698,7 +700,6 @@
     <string name="edit_tracker">Измени трацкер</string>
     <string name="down_speed">Брзина преузимања</string>
     <string name="completed">Завршено</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ваша приватност је основно људско право</b>. Незаштићена веза значи све што радите на мрежи, укључујући <b>преузимање, претраживање, размену порука</b>, може се пратити и пресретнути од стране било кога на вашој мрежи, нпр. Интернет провајдери, хакери, владе.<br><br><b>Стално препоручујемо коришћење ВПН сервиса</b>. <br> Ево неких опција које пружају поуздан сервис и добро функционишу са ФростВире:]]></string>
     <string name="downloaded">Преузето</string>
     <string name="n_peers">%1$d ПЕЕРС</string>
     <string name="sequential_download">Секвенцијални довнлоад</string>
@@ -716,8 +717,8 @@
     <string name="uploaded_n">Уплоадед %1$s</string>
     <string name="m_of_n_decimals">%1$d од %2$d</string>
     <string name="details">Детаљи</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Повезани сте на Интернет помоћу ВПН-а. <br><br> Ако нисте већ, препоручујемо вам да користите једну од услуга испод да бисте шифровали везу и <b>заштитили своју приватност </b>. ]]></string>
     <string name="title_activity_transfer_detail">Детаљи преноса</string>
     <string name="piece_size_header">Величина комада:</string>
     <string name="add_tracker">Додај траку</string>
+    <string name="play_store_out_of_sync">Гоогле Плаи продавница мора да се синхронизује, сачекајте неколико минута</string>
 </resources>

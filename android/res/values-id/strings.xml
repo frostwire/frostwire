@@ -668,4 +668,5 @@
     <string name="seeding_is_currently_disabled">Berbagi saat ini dinonaktifkan</string>
     <string name="vpn_find_out_more">Temukan lebih banyak lagi</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
+    <string name="play_store_out_of_sync">Play Store perlu melakukan sinkronisasi, tunggu beberapa menit</string>
 </resources>
