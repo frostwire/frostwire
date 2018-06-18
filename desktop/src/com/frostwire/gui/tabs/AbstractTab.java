@@ -37,18 +37,14 @@ public abstract class AbstractTab implements Tab {
 	/** <tt>Icon</tt> instance to use for this tab. */
 	private Icon icon;
 
-	/** Constant for the unique key for the specific tab instance. */
-	private String iconFile;
-	
 	/** PropertyChangeSupport. */
 	private final PropertyChangeSupport propertyChangeSupport;
 
 	/** Constructs the elements of the tab. */
-	public AbstractTab(String title, String tooltip, String icon) {
+	AbstractTab(String title, String tooltip, String icon) {
 		this.title     = title;
 		this.toolTip  = tooltip;
-		this.iconFile = icon;
-		this.icon     = GUIMediator.getThemeImage(iconFile);
+		this.icon     = GUIMediator.getThemeImage(icon);
 		this.propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 	
