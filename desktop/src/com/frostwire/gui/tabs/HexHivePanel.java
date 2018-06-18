@@ -5,14 +5,10 @@ import com.limegroup.gnutella.gui.GUIMediator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.util.concurrent.ExecutorService;
 
 
@@ -116,7 +112,7 @@ public class HexHivePanel extends JPanel {
         fullHexPaint = new CubePaint(numFullColor, 30);
     }
 
-    private BufferedImage asyncDraw(int canvasWidth, int canvasHeight, HexDataAdapter adapter) {
+    private BufferedImage asyncDraw(HexDataAdapter adapter) {
         LOG.info("asyncDraw()", true);
         // with drawingProperties we don't need to think about padding offsets. We just use drawingProperties numbers for our calculations
         drawingProperties.hexCenterBuffer.setLocation(drawingProperties.evenRowOrigin.x, drawingProperties.evenRowOrigin.y);
@@ -315,15 +311,15 @@ public class HexHivePanel extends JPanel {
             LOG.info("================================================================================");
         }
 
-        Color getBaseColor() {
+        public Color getBaseColor() {
             return baseColor;
         }
 
-        Color getDarkColor() {
+        public Color getDarkColor() {
             return darkColor;
         }
 
-        Color getLightColor() {
+        public Color getLightColor() {
             return lightColor;
         }
     }
@@ -349,16 +345,16 @@ public class HexHivePanel extends JPanel {
         /**
          * Drawing area top-left
          */
-        Point origin;
+        private Point origin;
         // Hexagon Geometry Helpers
         /**
          * Drawing area center
          */
-        Point center;
+        private Point center;
         /**
          * Drawing are bottom-right cornerBuffer
          */
-        Point end;
+        private Point end;
         /**
          * Drawing area width
          */
@@ -404,7 +400,7 @@ public class HexHivePanel extends JPanel {
             update(left, top, right, bottom);
         }
 
-        void update(int left, int top, int right, int bottom) {
+        public void update(int left, int top, int right, int bottom) {
             origin.x = left;
             origin.y = top;
             center.x = (left + right) >> 1;
