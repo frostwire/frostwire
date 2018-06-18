@@ -718,4 +718,5 @@
     <string name="title_activity_transfer_detail">Detaliul transferului</string>
     <string name="piece_size_header">Dimensiune piesă:</string>
     <string name="add_tracker">Adaugă tracker</string>
+    <string name="play_store_out_of_sync">Magazinul Google Play trebuie sincronizat, așteptați câteva minute</string>
 </resources>

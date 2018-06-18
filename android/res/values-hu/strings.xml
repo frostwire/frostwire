@@ -718,4 +718,5 @@
     <string name="piece_size_header">Darab mérete:</string>
     <string name="add_tracker">Tracker hozzáadása</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Ingyenes 7 napos próba</string>
+    <string name="play_store_out_of_sync">Szinkronizálnia kell a Google Play Áruházat, várjon néhány percet</string>
 </resources>

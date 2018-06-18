@@ -719,4 +719,5 @@
     <string name="your_connection_has_dropped_stopping_services">आपले Wi-Fi कनेक्शन सोडले आहे सेवा थांबविणे</string>
     <string name="use_tpb_summary">टीपीबी चुंबक आधारित आहे, केवळ वाय-फाय वर कार्य करते</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n विनामूल्य 7-दिवसांची चाचणी</string>
+    <string name="play_store_out_of_sync">Google Play Store समक्रमित करण्याची आवश्यकता आहे, काही मिनिटे प्रतीक्षा करा</string>
 </resources>

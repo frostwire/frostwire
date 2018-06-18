@@ -718,4 +718,5 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire konnte aufgrund fehlender Berechtigungen nicht ordnungsgemäß gestartet werden. Bitte gewähren Sie die erforderlichen Berechtigungen und starten Sie die Anwendung neu</string>
     <string name="vpn_find_out_more">Finde mehr heraus</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Kostenlose 7-Tage-Testversion</string>
+    <string name="play_store_out_of_sync">Play Store muss synchronisiert werden, warten Sie ein paar Minuten</string>
 </resources>

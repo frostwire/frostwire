@@ -718,4 +718,5 @@
     <string name="piece_size_header">Styckstorlek:</string>
     <string name="add_tracker">Lägg till tracker</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dagars prov</string>
+    <string name="play_store_out_of_sync">Google Play Butik behöver synkronisera, vänta några minuter</string>
 </resources>

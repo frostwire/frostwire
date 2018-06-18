@@ -718,4 +718,5 @@
     <string name="title_activity_transfer_detail">Transfer Detayı</string>
     <string name="piece_size_header">Parça boyutu:</string>
     <string name="add_tracker">İzleyici ekle</string>
+    <string name="play_store_out_of_sync">Google Play Store\'un senkronize edilmesi, birkaç dakika beklemesi gerekiyor</string>
 </resources>
