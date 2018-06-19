@@ -33,7 +33,7 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.offers.PlayStore2;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -127,7 +127,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
-        PlayStore2.getInstance(context).refresh();
+        PlayStore.getInstance(context).refresh();
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isDataUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();

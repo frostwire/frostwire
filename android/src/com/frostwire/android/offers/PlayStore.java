@@ -66,9 +66,9 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author gubatron
  * @author aldenml
  */
-public final class PlayStore2 extends StoreBase {
+public final class PlayStore extends StoreBase {
 
-    private static final Logger LOG = Logger.getLogger(PlayStore2.class);
+    private static final Logger LOG = Logger.getLogger(PlayStore.class);
 
     // Taken from: Google Play Developer Console -> Services & APIs
     // Base64-encoded RSA public key to include in your binary.
@@ -90,19 +90,19 @@ public final class PlayStore2 extends StoreBase {
     private WeakReference<PurchasesUpdatedListener> globalPurchasesUpdatedListener;
 
     private static final Object lock = new Object();
-    private static PlayStore2 instance;
+    private static PlayStore instance;
 
     @NonNull
-    public static PlayStore2 getInstance(@NonNull Context context) {
+    public static PlayStore getInstance(@NonNull Context context) {
         synchronized (lock) {
             if (instance == null) {
-                instance = new PlayStore2(context.getApplicationContext());
+                instance = new PlayStore(context.getApplicationContext());
             }
             return instance;
         }
     }
 
-    private PlayStore2(Context context) {
+    private PlayStore(Context context) {
         inventory = new Inventory();
         billingClient = BillingClient
                 .newBuilder(context)
@@ -233,7 +233,7 @@ public final class PlayStore2 extends StoreBase {
             return;
         }
 
-        async(this, PlayStore2::queryPurchases);
+        async(this, PlayStore::queryPurchases);
         querySkuDetails();
     }
 

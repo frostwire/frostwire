@@ -27,7 +27,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.offers.PlayStore2;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -94,7 +94,7 @@ public class MainApplication extends Application {
 
         AbstractActivity.setMenuIconsVisible(true);
 
-        PlayStore2.getInstance(this); // triggers initial query
+        PlayStore.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);

@@ -41,7 +41,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
-import com.frostwire.android.offers.PlayStore2;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
@@ -239,7 +239,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             PreferenceCategory category = findPreference("frostwire.prefs.other_settings");
             category.removePreference(p);
         } else if (p != null) {
-            PlayStore2 playStore = PlayStore2.getInstance(getActivity());
+            PlayStore playStore = PlayStore.getInstance(getActivity());
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
@@ -307,7 +307,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                                 if (p.subscription()) {
                                     continue;
                                 }
-                                PlayStore2.getInstance(activityRef.get()).consume(p);
+                                PlayStore.getInstance(activityRef.get()).consume(p);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),
                                         "Product " + p.sku() + " forced-consumed.",

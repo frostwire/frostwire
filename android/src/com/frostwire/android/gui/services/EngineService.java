@@ -40,7 +40,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.offers.PlayStore2;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -139,7 +139,7 @@ public class EngineService extends Service implements IEngineService {
         }
 
         ImageLoader.getInstance(this).shutdown();
-        PlayStore2.getInstance(this).dispose();
+        PlayStore.getInstance(this).dispose();
         stopOkHttp();
 
         stopForeground(true);

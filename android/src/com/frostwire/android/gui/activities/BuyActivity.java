@@ -36,7 +36,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore2;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
@@ -71,9 +71,9 @@ public final class BuyActivity extends AbstractActivity {
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            PlayStore2.getInstance(this).setGlobalPurchasesUpdatedListener(
+            PlayStore.getInstance(this).setGlobalPurchasesUpdatedListener(
                     (responseCode, purchases) -> onPurchasesUpdated(responseCode));
-            PlayStore2.getInstance(this).purchase(this, p);
+            PlayStore.getInstance(this).purchase(this, p);
         }
     }
 
@@ -179,7 +179,7 @@ public final class BuyActivity extends AbstractActivity {
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
 
-        PlayStore2 store = PlayStore2.getInstance(this);
+        PlayStore store = PlayStore.getInstance(this);
         initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
         initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
         initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
@@ -228,7 +228,7 @@ public final class BuyActivity extends AbstractActivity {
         }
     }
 
-    private void initProductCard(ProductCardView card, PlayStore2 store, String subsSKU, String inappSKU) {
+    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }
