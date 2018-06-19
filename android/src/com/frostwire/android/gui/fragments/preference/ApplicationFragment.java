@@ -239,7 +239,6 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             PreferenceCategory category = findPreference("frostwire.prefs.other_settings");
             category.removePreference(p);
         } else if (p != null) {
-            //PlayStore playStore = PlayStore.getInstance();
             PlayStore2 playStore = PlayStore2.getInstance(getActivity());
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
@@ -253,7 +252,6 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             } else {
                 p.setSummary(R.string.remove_ads_description);
                 p.setOnPreferenceClickListener(preference -> {
-                    //PlayStore.getInstance().endAsync();
                     Intent intent = new Intent(getActivity(), BuyActivity.class);
                     startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                     return true;
@@ -309,7 +307,6 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                                 if (p.subscription()) {
                                     continue;
                                 }
-                                //PlayStore.getInstance().consume(p);
                                 PlayStore2.getInstance(activityRef.get()).consume(p);
                                 LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
                                 UIUtils.showToastMessage(preference.getContext(),

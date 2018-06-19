@@ -94,7 +94,6 @@ public class MainApplication extends Application {
 
         AbstractActivity.setMenuIconsVisible(true);
 
-        //PlayStore.getInstance().initialize(this);
         PlayStore2.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);

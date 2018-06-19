@@ -139,7 +139,6 @@ public class EngineService extends Service implements IEngineService {
         }
 
         ImageLoader.getInstance(this).shutdown();
-        //PlayStore.getInstance().dispose();
         PlayStore2.getInstance(this).dispose();
         stopOkHttp();
 

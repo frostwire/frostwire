@@ -71,7 +71,6 @@ public final class BuyActivity extends AbstractActivity {
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            //PlayStore.getInstance().purchase(BuyActivity.this, p);
             PlayStore2.getInstance(this).setGlobalPurchasesUpdatedListener(
                     (responseCode, purchases) -> onPurchasesUpdated(responseCode));
             PlayStore2.getInstance(this).purchase(this, p);
@@ -180,8 +179,6 @@ public final class BuyActivity extends AbstractActivity {
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
 
-        //PlayStore
-        //final PlayStore store = PlayStore.getInstance();
         PlayStore2 store = PlayStore2.getInstance(this);
         initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
         initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
@@ -364,40 +361,6 @@ public final class BuyActivity extends AbstractActivity {
                 scrollToSelectedCard();
             }
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //PlayStore uncomment the following block if reverting to old PlayStore
-        /*PlayStore store = PlayStore.getInstance();
-        if (store.handleActivityResult(requestCode, resultCode, data)) {
-            store.refresh();
-
-            // RESPONSE_CODE = 0 -> Payment Successful
-            // user clicked outside of the PlayStore purchase dialog
-            if (data != null && data.hasExtra("RESPONSE_CODE") && data.getIntExtra("RESPONSE_CODE", 0) != 0) {
-                paymentOptionsView.stopProgressBar();
-
-                LOG.info("onActivityResult -> purchase cancelled");
-                // UNCOMMENT BELOW IF YOU WANT TO SIMULATE A SUCCESSFUL PURCHASE TEMPORARILY
-                //Intent deleteMe = new Intent();
-                //deleteMe.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
-                //setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, deleteMe);
-                //finish();
-                return;
-            }
-
-            // make sure ads won't show on this session any more if we got a positive response.
-            Offers.stopAdNetworks(this);
-
-            // now we prepare a result for SettingsActivity since it won't know right away
-            // given the purchase process is asynchronous
-            LOG.info("onActivityResult -> purchase finished");
-            Intent result = new Intent();
-            result.putExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, System.currentTimeMillis());
-            setResult(BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE, result);
-            finish();
-        }*/
     }
 
     private boolean isInterstitial() {

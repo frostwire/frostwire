@@ -127,7 +127,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
-        //PlayStore.getInstance().refresh();
         PlayStore2.getInstance(context).refresh();
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isDataUp()) {

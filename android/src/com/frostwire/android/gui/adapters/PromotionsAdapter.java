@@ -270,7 +270,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     public void onSpecialOfferClick() {
         if (specialOfferLayout == R.layout.view_remove_ads_notification) {
             // take to buy remove ads screen
-            //PlayStore.getInstance().endAsync();
             MainActivity mainActivity = (MainActivity) getContext();
             Intent i = new Intent(getContext(), BuyActivity.class);
             mainActivity.startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);

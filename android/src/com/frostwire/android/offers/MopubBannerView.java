@@ -325,7 +325,6 @@ public class MopubBannerView extends LinearLayout {
 
     private final OnClickListener removeAdsTextViewOnClickListener = view -> {
         setVisible(Visibility.ALL, false);
-        PlayStore.getInstance().endAsync();
         Intent i = new Intent(getContext(), BuyActivity.class);
         if (getContext() instanceof Activity) {
             ((Activity) getContext()).startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
