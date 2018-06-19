@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BTDownload;
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;

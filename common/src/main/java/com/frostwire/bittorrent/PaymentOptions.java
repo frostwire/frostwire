@@ -52,7 +52,7 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
     /** Simply a valid email address for creating a paypal payment form */
     public final String paypalUrl;
     
-    public String itemName;
+    private String itemName;
 
     public PaymentOptions() {
         bitcoin = null;
