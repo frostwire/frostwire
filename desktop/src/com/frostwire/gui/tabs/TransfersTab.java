@@ -18,6 +18,7 @@
 package com.frostwire.gui.tabs;
 
 import com.frostwire.gui.bittorrent.*;
+import com.frostwire.gui.components.transfers.TransferDetailComponent;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
@@ -34,7 +35,13 @@ import java.awt.event.*;
  */
 public final class TransfersTab extends AbstractTab {
     private static final Logger LOG = Logger.getLogger(TransfersTab.class);
-    private final BTDownloadMediator downloadMediator;
+    private final BTDownloadMediator downloadMediator; // holds the JTable
+
+    /**
+     * Visible only on non search/transfer split mode and
+     * upon a Torrent Download selection.
+     */
+    private TransferDetailComponent transferDetailComponent;
 
     // it will be a reference to the download mediator above who is the one interested.
     private TransfersFilterModeListener transfersFilterModeListener;
@@ -51,8 +58,8 @@ public final class TransfersTab extends AbstractTab {
 
     public TransfersTab(BTDownloadMediator downloadMediator) {
         super(I18n.tr("Transfers"),
-              I18n.tr("Transfers tab description goes here."),
-              "transfers_tab");
+                I18n.tr("Transfers tab description goes here."),
+                "transfers_tab");
         dedicatedTransfersTabAvailable = !UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
         this.downloadMediator = downloadMediator;
         initComponents();
@@ -79,6 +86,7 @@ public final class TransfersTab extends AbstractTab {
 
     public interface TransfersFilterModeListener {
         void onFilterUpdate(FilterMode mode, String searchKeywords);
+
         void onFilterUpdate(String searchKeywords);
     }
 
@@ -94,9 +102,9 @@ public final class TransfersTab extends AbstractTab {
                 return;
             }
             if (selected == null ||
-                selected instanceof YouTubeDownload ||
-                selected instanceof SoundcloudDownload ||
-                selected instanceof HttpDownload) {
+                    selected instanceof YouTubeDownload ||
+                    selected instanceof SoundcloudDownload ||
+                    selected instanceof HttpDownload) {
                 hideTransferDetailsComponent();
             } else {
                 showTransferDetailsComponent(selected);
@@ -105,23 +113,38 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private void hideTransferDetailsComponent() {
-        LOG.info("TODO: Hide transfer details component");
+        if (transferDetailComponent != null) {
+            transferDetailComponent.setVisible(false);
+            mainComponent.remove(transferDetailComponent);
+            mainComponent.validate();
+        }
     }
 
     private void showTransferDetailsComponent(BTDownload selected) {
-        LOG.info("TODO: Show transfer details component (only if TransfersTab is a component on its own)");
         if (!(selected instanceof BittorrentDownload) &&
-            !(selected instanceof TorrentFetcherDownload)) {
+                !(selected instanceof TorrentFetcherDownload)) {
             LOG.warn("Check your logic. TransfersTab.showTransferDetailsComponent() invoked on non-torrent transfer");
-            return;
+        } else {
+            if (transferDetailComponent != null) {
+                mainComponent.add(transferDetailComponent, "span 2, growx");
+                transferDetailComponent.setVisible(true);
+                transferDetailComponent.updateData(selected);
+                transferDetailComponent.validate();
+                mainComponent.validate();
+            }
         }
     }
 
     private void initComponents() {
-        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0","[][grow]","[][grow]"));
+        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][grow]", "[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
-        mainComponent.add(createFilterToggleButtons(),"w 500!, h 30!, pad 2 0 0 0, right, wrap");
-        mainComponent.add(downloadMediator.getComponent(),"cell 0 1 2 1,grow"); // "cell <column> <row> <width> <height>"
+        mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
+        mainComponent.add(downloadMediator.getComponent(), "cell 0 1 2 1, grow, wrap"); // "cell <column> <row> <width> <height>"
+
+        if (dedicatedTransfersTabAvailable) {
+            transferDetailComponent = new TransferDetailComponent();
+        }
+
         setTransfersFilterModeListener(downloadMediator);
         downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
     }
@@ -134,7 +157,7 @@ public final class TransfersTab extends AbstractTab {
         filterText = new JTextArea();
         filterText.setEditable(true);
         filterText.setText(FILTER_TEXT_HINT);
-        filterText.setFont(new Font("Helvetica",Font.PLAIN, 12));
+        filterText.setFont(new Font("Helvetica", Font.PLAIN, 12));
         filterText.setForeground(Color.GRAY);
         filterText.addMouseListener(new TextFilterMouseAdapter());
         filterText.addKeyListener(new TextFilterKeyAdapter());
@@ -150,22 +173,18 @@ public final class TransfersTab extends AbstractTab {
     private JPanel createFilterToggleButtons() {
         JPanel filterButtonsContainer = new JPanel(new MigLayout("align right, ins 0 0 0 8"));
         ButtonGroup filterGroup = new ButtonGroup();
-        filterAllButton = new JToggleButton(I18n.tr("All"),true);
-        filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"),false);
-        filterSeedingButton = new JToggleButton(I18n.tr("Seeding"),false);
-        filterFinishedButton = new JToggleButton(I18n.tr("Finished"),false);
+        filterAllButton = new JToggleButton(I18n.tr("All"), true);
+        filterDownloadingButton = new JToggleButton(I18n.tr("Downloading"), false);
+        filterSeedingButton = new JToggleButton(I18n.tr("Seeding"), false);
+        filterFinishedButton = new JToggleButton(I18n.tr("Finished"), false);
         filterAllButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.ALL));
         filterDownloadingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.DOWNLOADING));
         filterSeedingButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.SEEDING));
         filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
         final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
-        final Dimension buttonDimension = new Dimension(115,28);
+        final Dimension buttonDimension = new Dimension(115, 28);
         applyFontAndDimensionToFilterToggleButtons(smallHelvetica, buttonDimension,
-                filterAllButton, filterDownloadingButton,filterSeedingButton,filterFinishedButton);
-
-        filterAllButton.setPreferredSize(buttonDimension);
-        filterAllButton.setMinimumSize(buttonDimension);
-        filterAllButton.setMaximumSize(buttonDimension);
+                filterAllButton, filterDownloadingButton, filterSeedingButton, filterFinishedButton);
         filterGroup.add(filterAllButton);
         filterGroup.add(filterDownloadingButton);
         filterGroup.add(filterSeedingButton);
@@ -177,7 +196,7 @@ public final class TransfersTab extends AbstractTab {
         return filterButtonsContainer;
     }
 
-    private void applyFontAndDimensionToFilterToggleButtons(Font font, Dimension dimension, JToggleButton ... buttons) {
+    private void applyFontAndDimensionToFilterToggleButtons(Font font, Dimension dimension, JToggleButton... buttons) {
         for (JToggleButton button : buttons) {
             button.setFont(font);
             button.setMinimumSize(dimension);
@@ -254,7 +273,8 @@ public final class TransfersTab extends AbstractTab {
 
     private class OnFilterButtonToggledListener implements ActionListener {
         final private FilterMode filterMode;
-         OnFilterButtonToggledListener(FilterMode filterMode) {
+
+        OnFilterButtonToggledListener(FilterMode filterMode) {
             this.filterMode = filterMode;
         }
 

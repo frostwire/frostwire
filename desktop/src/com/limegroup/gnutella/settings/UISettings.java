@@ -18,6 +18,7 @@ package com.limegroup.gnutella.settings;
 import org.limewire.setting.BooleanSetting;
 import org.limewire.setting.IntSetting;
 import org.limewire.setting.LongSetting;
+import org.limewire.setting.StringSetting;
 
 import java.awt.*;
 
@@ -136,6 +137,9 @@ public final class UISettings extends LimeProps {
     public static final BooleanSetting BETA_FEATURES_ENABLED = FACTORY.createBooleanSetting("BETA_FEATURES_ENABLED", true);
 
     public static final LongSetting LAST_FEEDBACK_SENT_TIMESTAMP = FACTORY.createLongSetting("LAST_FEEDBACK_SENT_TIMESTAMP", 0);
+
+    /** FILES -> "F" by default */
+    public static final StringSetting LAST_SELECTED_TRANSFER_DETAIL_JPANEL = FACTORY.createStringSetting("LAST_SELECTED_TRANSFER_DETAIL_JPANEL", "F");
 
     private UISettings() {}
 }
