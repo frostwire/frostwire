@@ -1,3 +1,6 @@
+FrostWire 2.0.6 build 542 - JUN/20/2018
+ - New jlibtorrent 1.2.0.18-RC7
+
 FrostWire 2.0.5 build 541 - JUN/17/2018
  - No more intrusive interstitial ads when resuming app
  - New jlibtorrent 1.2.0.18-RC6
