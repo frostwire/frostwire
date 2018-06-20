@@ -67,18 +67,18 @@ public final class TransferDetailComponent extends JPanel {
 
     private JPanel createDetailComponentHolder() {
         detailComponentHolder = new JPanel(new CardLayout());
-        TransferDetailJFiles filesComponent;
-        detailComponentHolder.add(filesComponent = new TransferDetailJFiles(), FILES_CARD);
-        TransferDetailJPieces piecesComponent;
-        detailComponentHolder.add(piecesComponent = new TransferDetailJPieces(), PIECES_CARD);
-        TransferDetailJStatus statusComponent;
-        detailComponentHolder.add(statusComponent = new TransferDetailJStatus(), STATUS_CARD);
-        TransferDetailJDetails detailsComponent;
-        detailComponentHolder.add(detailsComponent = new TransferDetailJDetails(), DETAILS_CARD);
-        TransferDetailJTrackers trackersComponent;
-        detailComponentHolder.add(trackersComponent = new TransferDetailJTrackers(), TRACKERS_CARD);
-        TransferDetailJPeers peersComponent;
-        detailComponentHolder.add(peersComponent = new TransferDetailJPeers(), PEERS_CARD);
+        TransferDetailFiles filesComponent;
+        detailComponentHolder.add(filesComponent = new TransferDetailFiles(), FILES_CARD);
+        TransferDetailPieces piecesComponent;
+        detailComponentHolder.add(piecesComponent = new TransferDetailPieces(), PIECES_CARD);
+        TransferDetailStatus statusComponent;
+        detailComponentHolder.add(statusComponent = new TransferDetailStatus(), STATUS_CARD);
+        TransferDetailDetails detailsComponent;
+        detailComponentHolder.add(detailsComponent = new TransferDetailDetails(), DETAILS_CARD);
+        TransferDetailTrackers trackersComponent;
+        detailComponentHolder.add(trackersComponent = new TransferDetailTrackers(), TRACKERS_CARD);
+        TransferDetailPeers peersComponent;
+        detailComponentHolder.add(peersComponent = new TransferDetailPeers(), PEERS_CARD);
 
         cardPanelMap = new HashMap<>();
         cardPanelMap.put(FILES_CARD, filesComponent);
