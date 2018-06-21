@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ import android.widget.ImageView;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.OKHTTPClient;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
@@ -50,7 +49,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
-import java.util.concurrent.ExecutorService;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -64,9 +62,6 @@ import static com.frostwire.android.util.Asyncs.async;
 public final class ImageLoader {
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
-
-    // for the ImageCache
-    //private static final int MAX_DISK_CACHE_SIZE = 64 * 1024 * 1024; // 64MB
 
     private static final String SCHEME_IMAGE = "image";
 
@@ -156,14 +151,9 @@ public final class ImageLoader {
     }
 
     private ImageLoader(Context context) {
-        File directory = SystemUtils.getCacheDir(context, "picasso");
-        //this.cache = new ImageCache(context, directory, MAX_DISK_CACHE_SIZE);
-        //ExecutorService threadPool = ThreadPool.newThreadPool("Picasso", 4, true);
         Builder picassoBuilder = new Builder(context).
                 addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
-                //memoryCache(cache).
                 downloader(new ImageLoaderDownloader(createHttpClient(context.getApplicationContext())));
-                //executor(threadPool);
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
@@ -462,7 +452,7 @@ public final class ImageLoader {
         }
 
         @Override
-        public Result load(Request data, int networkPolicy) throws IOException {
+        public Result load(Request data, int networkPolicy) {
             String authority = data.uri.getAuthority();
             if (APPLICATION_AUTHORITY.equals(authority)) {
                 return loadApplication(data.uri);
@@ -476,7 +466,7 @@ public final class ImageLoader {
             return null;
         }
 
-        private Result loadApplication(Uri uri) throws IOException {
+        private Result loadApplication(Uri uri) {
             Result result;
             String packageName = uri.getLastPathSegment();
             PackageManager pm = context.getPackageManager();
@@ -490,7 +480,7 @@ public final class ImageLoader {
             return result;
         }
 
-        private Result loadAlbum(Uri uri) throws IOException {
+        private Result loadAlbum(Uri uri) {
             String albumId = uri.getLastPathSegment();
             if (albumId == null || albumId.equals("-1")) {
                 return null;
@@ -499,7 +489,7 @@ public final class ImageLoader {
             return (bitmap != null) ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
         }
 
-        private Result loadFirstArtistAlbum(Uri uri) throws IOException {
+        private Result loadFirstArtistAlbum(Uri uri) {
             String artistName = uri.getLastPathSegment();
             long albumId = getFirstAlbumIdForArtist(context, artistName);
             if (albumId == -1) {
@@ -538,7 +528,7 @@ public final class ImageLoader {
             return id;
         }
 
-        private Result extractMetadata(Uri uri) throws IOException {
+        private Result extractMetadata(Uri uri) {
             String seg = Uri.decode(uri.getLastPathSegment());
             if (failed.contains(seg)) {
                 return null;
