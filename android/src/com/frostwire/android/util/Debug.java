@@ -22,11 +22,9 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.StrictMode;
 import android.view.View;
 
 import com.frostwire.android.BuildConfig;
-import com.frostwire.android.gui.services.Engine;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -39,7 +37,7 @@ import java.util.TreeSet;
 /**
  * Utility class for runtime debugging.
  * <p>
- * None of the methods perform any operation is debug is not enabled.
+ * None of the methods perform any operation if debug is not enabled.
  *
  * @author gubatron
  * @author aldenml
