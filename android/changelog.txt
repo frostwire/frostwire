@@ -13,7 +13,7 @@ FrostWire 2.0.5 build 541 - JUN/17/2018
  - Music Player: Empty playlist message makes sense now
  - New: Telugu translation available for 75 million speakers
  - New: Marathi translation available for 73 million speakers
- - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian, Ukranian
+ - Translations updated: Romanian, Turkish, Finnish, Serbian, Norwegian, Ukranian, Malay
  - Library updates: (GDPR) applovin 8.0.1, prebid 0.3, mopub 5.1.0, flexbox 1.0.0, presage 3.0.17/3.0.11
  - Library updates: (dev) gradle 4.8
  - Fixes bug on which music playback was stopped when a video interstitial ad was shown
