@@ -1,3 +1,8 @@
+frostwire (6.6.8) stable; urgency=high
+  * New jlibtorrent 1.2.0.18-RC7
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 22 Jun 2018 15:51:00 -0600
+
 frostwire (6.6.7) stable; urgency=high
   * New Help > Feedback dialog
   * New jlibtorrent 1.2.0.18-RC5
