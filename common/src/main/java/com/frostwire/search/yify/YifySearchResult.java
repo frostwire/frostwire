@@ -24,7 +24,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +64,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.infoHash = matcher.group("infohash");
         this.size = buildSize(matcher.group("size"));
         this.creationTime = buildCreationTime(matcher.group("creationDate"));
-        this.seeds = Integer.parseInt(Objects.requireNonNull(matcher.group("seeds")));
+        this.seeds = parseSeeds(matcher.group("seeds"));
         this.magnetUrl = matcher.group("magnet");
         this.filename = buildFileName(detailsUrl);
     }
@@ -151,5 +150,13 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
             }
         }
         return result;
+    }
+
+    private static int parseSeeds(String group) {
+        try {
+            return Integer.parseInt(group);
+        } catch (Throwable e) {
+            return 0;
+        }
     }
 }
