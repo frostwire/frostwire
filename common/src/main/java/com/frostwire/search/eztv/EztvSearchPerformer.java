@@ -116,8 +116,8 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         HttpClient httpClient = HttpClientFactory.newInstance();
         String fileStr = httpClient.get("https://eztv.ag/search/" + TEST_SEARCH_TERM);
 
-        Pattern searchResultsDetailURLPattern = Pattern.compile(REGEX);
-        Pattern detailPagePattern = Pattern.compile(HTML_REGEX);
+        Pattern searchResultsDetailURLPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
+        Pattern detailPagePattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
 
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
 
@@ -151,7 +151,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                 EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
                 System.out.println(sr);
             } else {
-                System.out.println("Detail page search matcher failed, check HTML_REGEX");
+                System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
             }
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");

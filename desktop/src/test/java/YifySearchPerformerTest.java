@@ -9,14 +9,14 @@ import com.frostwire.search.yify.YifySearchPerformer;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class YifiSearchPerformerTest {
+public class YifySearchPerformerTest {
     public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "foo bar";
+        String TEST_SEARCH_TERM = "one";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = httpClient.get("https://www.yify-torrent.org/search/" + TEST_SEARCH_TERM);
 
-        Pattern searchResultsDetailURLPattern = Pattern.compile(YifySearchPerformer.REGEX);
-        Pattern detailPagePattern = Pattern.compile(YifySearchPerformer.HTML_REGEX);
+        Pattern searchResultsDetailURLPattern = Pattern.compile(YifySearchPerformer.SEARCH_RESULTS_REGEX);
+        Pattern detailPagePattern = Pattern.compile(YifySearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
 
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
 
@@ -26,7 +26,7 @@ public class YifiSearchPerformerTest {
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
 
-            String detailUrl = "https://www.yify-torrent.org/movie/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
+            String detailUrl = "https://www.yify-torrent.org/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
 
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
@@ -40,18 +40,17 @@ public class YifiSearchPerformerTest {
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
 
             if (sm.find()) {
-                System.out.println("magneturl: [" + sm.group("magneturl") + "]");
-                System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");
-                System.out.println("displayname: [" + sm.group("displayname") + "]");
-                System.out.println("displayname2: [" + sm.group("displayname2") + "]");
-                System.out.println("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
+                System.out.println("displayname: [" + sm.group("displayName") + "]");
                 System.out.println("infohash: [" + sm.group("infohash") + "]");
-                System.out.println("filesize: [" + sm.group("filesize") + "]");
-                System.out.println("creationtime: [" + sm.group("creationtime") + "]");
+                System.out.println("size: [" + sm.group("size") + "]");
+                System.out.println("creationDate: [" + sm.group("creationDate") + "]");
+                System.out.println("seeds: [" + sm.group("seeds") + "]");
+                System.out.println("magnet: [" + sm.group("magnet") + "]");
+
                 YifySearchResult sr = new YifySearchResult(detailUrl, sm);
                 System.out.println(sr);
             } else {
-                System.out.println("Detail page search matcher failed, check HTML_REGEX");
+                System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
             }
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");

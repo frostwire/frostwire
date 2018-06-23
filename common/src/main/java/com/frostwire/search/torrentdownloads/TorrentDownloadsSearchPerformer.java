@@ -76,10 +76,10 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
 /**
  public static void main(String[] args) throws Exception {
- //REGEX TEST CODE
+ //SEARCH_RESULTS_REGEX TEST CODE
 
  //         String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/torrentdownloads-results.html"));
- //         final Pattern resultsPattern = Pattern.compile(REGEX);
+ //         final Pattern resultsPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
  //
  //         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
  //         while (matcher.find()) {
@@ -88,7 +88,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
 
  String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
- final Pattern detailPattern = Pattern.compile(HTML_REGEX);
+ final Pattern detailPattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
  final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
 
  if (detailMatcher.find()) {

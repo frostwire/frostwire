@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,20 +117,20 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     }
 
     /**
-     * Sometimes the HTML_REGEX has to work on too big of an HTML file.
+     * Sometimes the TORRENT_DETAILS_PAGE_REGEX has to work on too big of an HTML file.
      * In order to minimize the chance for long backtracking times we can
      * override this methods to specify what offsets of the HTML file our
-     * REGEX should be focusing on.
+     * SEARCH_RESULTS_REGEX should be focusing on.
      */
     protected int htmlPrefixOffset(String html) {
         return 0;
     }
 
     /**
-     * Sometimes the HTML_REGEX has to work on too big of an HTML file.
+     * Sometimes the TORRENT_DETAILS_PAGE_REGEX has to work on too big of an HTML file.
      * In order to minimize the chance for long backtracking times we can
      * override this methods to specify what offsets of the HTML file our
-     * REGEX should be focusing on.
+     * SEARCH_RESULTS_REGEX should be focusing on.
      */
     protected int htmlSuffixOffset(String html) {
         return html.length();

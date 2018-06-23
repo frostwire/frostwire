@@ -81,17 +81,17 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
      HttpClient httpClient = HttpClientFactory.newInstance();
      String resultsHTML = httpClient.get(URL_PREFIX + "/all/torrents/" + TEST_SEARCH_TERM + ".html", 10000);
      System.out.println("Downloaded " + resultsHTML.length() + " bytes from search result page");
-     final Pattern resultsPattern = Pattern.compile(REGEX);
+     final Pattern resultsPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
      final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
      while (matcher.find()) {
          String detailsUrl = URL_PREFIX + "/torrent/" + matcher.group(1);
          System.out.println("detailsUrl: [" + detailsUrl + "]");
          System.out.println("Fetching " + detailsUrl + " ...");
          String detailPageHTML = httpClient.get(detailsUrl);
-         Pattern detailPattern = Pattern.compile(HTML_REGEX);
+         Pattern detailPattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
          SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(detailPageHTML));
          if (!detailMatcher.find()) {
-             System.out.println("HTML_REGEX failed with " + detailsUrl);
+             System.out.println("TORRENT_DETAILS_PAGE_REGEX failed with " + detailsUrl);
              return;
          } else {
              System.out.println("TorrentID: " + detailMatcher.group("torrentid"));

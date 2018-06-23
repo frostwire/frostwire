@@ -19,11 +19,7 @@ package com.frostwire.search.yify;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author gubatron
@@ -32,11 +28,18 @@ import java.util.List;
 public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
 
     private static final int MAX_RESULTS = 21;
-    private static final String HTML_REGEX = "(?is)<h1 itemprop=\"name\">(?<displayName>.*?)</h1>.*?<img itemprop=\"image\" src=\"(?<cover>.*?)\".*?<dt>Size:</dt><dd>(?<size>.*?)</dd>.*?<dt>Language:</dt><dd>(?<language>.*?)</dd>.*?<dt>Seeds:</dt><dd>(?<seeds>\\d*?)</dd><dt>Peers:</dt><dd>(?<peers>\\d*?)</dd>.*?<span><a href=\"(?<magnet>.*?)\" id=\"dm\"";
-    private static final String REGEX = "(?is)<figure> <a href=\"/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">";
+
+    public static final String SEARCH_RESULTS_REGEX = "(?is)<figcaption><h3><a class=\"movielink\" href=\"/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">";
+
+    public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<section id=\"torrent\"><h1>(?<displayName>.*?)</h1>.*?" +
+            "<div class=\"torrent_info\"><dl><dt>Torrent Hash:</dt> <dd>(?<infohash>[0-9A-F]{40}) <dd>.*?" +
+            "<dt>Size:</dt> <dd>(?<size>[\\d.]+[BKMGTP]) <dd>.*?" +
+            "<dt>Creation Date:</dt> <dd>(?<creationDate>[0-9\\/]+) <dd>.*?" +
+            "<dt>Seeders:</dt> <dd>(?<seeds>[0-9]+) <dd>.*?" +
+            "<a href=\"(?<magnet>.*?)\" id=\"dm\" class=\"button button-default\".*?>Download Magnet</a>.*?";
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
     }
 
     @Override
@@ -58,32 +61,21 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
     }
 
     @Override
-    protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
-        try {
-            return super.crawlResult(sr, data);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("in bencoded string")) {
-                return fallbackToMagnet(sr);
-            }
-
-            throw e;
-        }
-    }
-
-    private List<SearchResult> fallbackToMagnet(CrawlableSearchResult sr) {
-        ArrayList<SearchResult> r = new ArrayList<>(1);
-        if (sr instanceof YifySearchResult) {
-            YifySearchResult yify = (YifySearchResult) sr;
-            if (!yify.getTorrentUrl().startsWith("magnet")) {
-                ((YifySearchResult) sr).switchToMagnet();
-                r.add(sr);
-            }
-        }
-        return r;
-    }
-
-    @Override
     protected boolean isValidHtml(String html) {
         return html != null && !html.contains("Cloudfare");
     }
+
+    @Override
+    protected int htmlPrefixOffset(String html) {
+        int offset = html.indexOf("<div id=\"content\"");
+        return offset > 0 ? offset : 0;
+    }
+
+    @Override
+    protected int htmlSuffixOffset(String html) {
+        int offset = html.indexOf("<section id=\"movie_bottom\">");
+        return offset > 0 ? offset : html.length();
+    }
+
+    // Tests? See YifiSearchPerformerTest in tests folder for non-ui search test
 }

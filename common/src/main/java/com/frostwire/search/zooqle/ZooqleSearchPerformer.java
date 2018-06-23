@@ -119,7 +119,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 //            String htmlDetailsString = FileUtils.readFileToString(new File("/Users/foo/Desktop/zooqle.html"));
 //
 //            Pattern htmlDetailPattern = Pattern.compile(HTML_DETAIL_REGEX);
-//            System.out.println("REGEX: " + htmlDetailPattern.toString());
+//            System.out.println("SEARCH_RESULTS_REGEX: " + htmlDetailPattern.toString());
 //            SearchMatcher detailMatcher = SearchMatcher.from(htmlDetailPattern.matcher(htmlDetailsString));
 //
 //            if (detailMatcher.find()) {

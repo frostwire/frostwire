@@ -241,8 +241,8 @@ public final class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouT
         }
         String fileStr = new String(readAllBytes,"utf-8");
 
-        Pattern pattern = Pattern.compile(REGEX);
-        //Pattern pattern = Pattern.compile(HTML_REGEX);
+        Pattern pattern = Pattern.compile(SEARCH_RESULTS_REGEX);
+        //Pattern pattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
 
         Matcher matcher = pattern.matcher(fileStr);
 

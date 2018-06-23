@@ -17,7 +17,6 @@
 
 package com.frostwire.search.yify;
 
-import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
@@ -25,6 +24,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +49,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         SIZE_PATTERN = Pattern.compile("([\\d.]+)([BKMGTP])");
     }
 
-    private final String thumbnailUrl;
+    //private final String thumbnailUrl;
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -57,26 +57,17 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     private final long size;
     private final long creationTime;
     private final int seeds;
-
     private final String magnetUrl;
-    private String torrentUrl;
 
-    YifySearchResult(String detailsUrl, SearchMatcher matcher) {
+    public YifySearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-
-        // this url carries the date information
-        this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
-
-        this.filename = buildFileName(detailsUrl);
-        this.size = buildSize(matcher.group("size"));
-        this.creationTime = buildCreationTime(thumbnailUrl);
-        this.seeds = Integer.parseInt(matcher.group("seeds"));
         this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
-
+        this.infoHash = matcher.group("infohash");
+        this.size = buildSize(matcher.group("size"));
+        this.creationTime = buildCreationTime(matcher.group("creationDate"));
+        this.seeds = Integer.parseInt(Objects.requireNonNull(matcher.group("seeds")));
         this.magnetUrl = matcher.group("magnet");
-        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
-
-        this.torrentUrl = buildTorrentUrl(thumbnailUrl, infoHash);
+        this.filename = buildFileName(detailsUrl);
     }
 
     @Override
@@ -87,6 +78,11 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     @Override
     public long getCreationTime() {
         return creationTime;
+    }
+
+    @Override
+    public String getTorrentUrl() {
+        return magnetUrl;
     }
 
     @Override
@@ -119,23 +115,6 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         return filename;
     }
 
-    @Override
-    public String getTorrentUrl() {
-        return torrentUrl;
-    }
-
-    @Override
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
-    }
-
-    void switchToMagnet() {
-        this.torrentUrl = magnetUrl;
-    }
-
-    private static String buildThumbnailUrl(String str) {
-        return str.startsWith("//") ? "https:" + str : str;
-    }
 
     private static long buildCreationTime(String url) {
         try {
@@ -172,10 +151,5 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
             }
         }
         return result;
-    }
-
-    private String buildTorrentUrl(String thumbnailUrl, String infoHash) {
-        String prefix = FilenameUtils.getPath(thumbnailUrl);
-        return prefix + infoHash + ".torrent";
     }
 }
