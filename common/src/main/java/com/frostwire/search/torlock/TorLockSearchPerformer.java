@@ -71,7 +71,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && html.indexOf("Cloudflare") == -1;
+        return html != null && !html.contains("Cloudflare");
     }
 
  /*
