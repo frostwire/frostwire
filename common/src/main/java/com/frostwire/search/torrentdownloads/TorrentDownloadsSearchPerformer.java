@@ -70,7 +70,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && html.indexOf("Cloudfare") == -1;
+        return html != null && html.indexOf("Cloudflare") == -1;
     }
 
 

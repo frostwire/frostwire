@@ -62,7 +62,7 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudfare");
+        return html != null && !html.contains("Cloudflare");
     }
 
     @Override

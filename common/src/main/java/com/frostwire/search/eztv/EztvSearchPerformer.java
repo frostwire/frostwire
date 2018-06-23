@@ -89,7 +89,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     // EZTV is very simplistic in the search engine
     // just a simple keyword check allows to discard the page
     protected boolean isValidHtml(String html) {
-        if (html == null || html.indexOf("Cloudfare") != -1) {
+        if (html == null || html.indexOf("Cloudflare") != -1) {
             return false;
         }
         String[] keywords = getKeywords().split(" ");
