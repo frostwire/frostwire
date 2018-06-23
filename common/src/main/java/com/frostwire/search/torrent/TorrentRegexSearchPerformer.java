@@ -82,7 +82,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
         } else {
             String unreducedHtml = new String(data, "UTF-8");
             if (!isValidHtml(unreducedHtml)) {
-                LOG.warn("invalid html from " + sr.getClass().getSimpleName() + ".\n" + unreducedHtml);
+                LOG.warn("invalid html from " + sr.getClass().getSimpleName());
                 return list;
             }
             String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));
