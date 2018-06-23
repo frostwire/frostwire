@@ -73,9 +73,6 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     @Override
     protected int htmlPrefixOffset(String html) {
-        if (!isValidHtml(html)) {
-            return -1;
-        }
         int offset = html.indexOf("<h4 id=\"torname\">");
         if (offset == -1) {
             return super.htmlPrefixOffset(html);
@@ -85,9 +82,6 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
 
     @Override
     protected int htmlSuffixOffset(String html) {
-        if (!isValidHtml(html)) {
-            return -1;
-        }
         int offset = html.indexOf("Language:");
         if (offset == -1) {
             return super.htmlSuffixOffset(html);

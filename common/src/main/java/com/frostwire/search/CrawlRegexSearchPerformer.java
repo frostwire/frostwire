@@ -17,6 +17,7 @@
 
 package com.frostwire.search;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +35,9 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
 
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
+        if (!isValidHtml(page)) {
+            return Collections.emptyList();
+        }
         int prefixOffset = preliminaryHtmlPrefixOffset(page);
         int suffixOffset = preliminaryHtmlSuffixOffset(page);
         String reducedPage = PerformersHelper.reduceHtml(page, prefixOffset, suffixOffset);
@@ -52,16 +56,10 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
     abstract protected boolean isValidHtml(String html);
 
     protected int preliminaryHtmlSuffixOffset(String page) {
-        if (!isValidHtml(page)) {
-            return -1;
-        }
         return page.length();
     }
 
     protected int preliminaryHtmlPrefixOffset(String page) {
-        if (!isValidHtml(page)) {
-            return -1;
-        }
         return 0;
     }
 }
