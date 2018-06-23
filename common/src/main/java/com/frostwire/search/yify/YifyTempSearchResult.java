@@ -29,7 +29,7 @@ final class YifyTempSearchResult extends AbstractSearchResult implements Crawlab
     private final String detailsUrl;
 
     YifyTempSearchResult(String domainName, String itemId, String htmlFilename) {
-        this.detailsUrl = "https://" + domainName + "/torrent`/" + itemId + "/" + htmlFilename;
+        this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + "/" + htmlFilename;
     }
 
     @Override
