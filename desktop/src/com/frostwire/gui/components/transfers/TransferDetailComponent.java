@@ -51,10 +51,10 @@ public final class TransferDetailComponent extends JPanel {
     private final String TRACKERS_CARD = "T";
     private final String PEERS_CARD = "p";
 
-    private HashMap<String, TransferDetailJPanel> cardPanelMap;
-    private TransferDetailJPanel currentComponent;
+    private HashMap<String, TransferDetailPanel> cardPanelMap;
+    private TransferDetailPanel currentComponent;
 
-    interface TransferDetailJPanel {
+    interface TransferDetailPanel {
         void updateData(BTDownload btDownload);
     }
 
