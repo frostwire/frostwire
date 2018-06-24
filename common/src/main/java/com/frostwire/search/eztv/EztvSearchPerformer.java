@@ -43,6 +43,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?" +
                     //"(<a href=\"(?<magneturl>magnet:\\?.*?)\" title=\"Magnet Link\".*?)?"+
                     ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" class=\"download_.\".*?" +
+                    "Seeds: <span.*?>(?<seeds>.*?)</span><br.*?" +
                     "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?" +
                     "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?" +
                     "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +

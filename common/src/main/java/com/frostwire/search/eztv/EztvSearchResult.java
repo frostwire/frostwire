@@ -60,7 +60,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
         this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
         this.infoHash = parseInfoHash(matcher, torrentUrl);
 
-        this.seeds = -1;
+        this.seeds = parseSeeds(matcher.group("seeds"));
         this.creationTime = parseCreationTime(matcher.group("creationtime"));
         this.size = parseSize(matcher.group("filesize"));
     }
@@ -153,5 +153,13 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
             url = matcher.group("magneturl");
         }
         return url;
+    }
+
+    private static int parseSeeds(String group) {
+        try {
+            return Integer.parseInt(group);
+        } catch (Throwable e) {
+            return 0;
+        }
     }
 }
