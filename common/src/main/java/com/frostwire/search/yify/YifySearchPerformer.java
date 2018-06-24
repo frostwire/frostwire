@@ -31,11 +31,13 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
 
     public static final String SEARCH_RESULTS_REGEX = "(?is)<figcaption><h3><a class=\"movielink\" href=\"/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">";
 
-    public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<section id=\"torrent\"><h1>(?<displayName>.*?)</h1>.*?" +
-            "<div class=\"torrent_info\"><dl><dt>Torrent Hash:</dt> <dd>(?<infohash>[0-9A-F]{40}) <dd>.*?" +
-            "<dt>Size:</dt> <dd>(?<size>[\\d.]+[BKMGTP]) <dd>.*?" +
-            "<dt>Creation Date:</dt> <dd>(?<creationDate>[0-9\\/]+) <dd>.*?" +
-            "<dt>Seeders:</dt> <dd>(?<seeds>[0-9]+) <dd>.*?" +
+    public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<section id=\"movie\".*?" +
+            "<h1 itemprop=\"name\">(?<displayName>.*?)</h1>.*?" +
+            "<img itemprop=\"image\" src=\"(?<cover>.*?)\".*?" +
+            "<dt>Size:</dt> <dd>(?<size>.*?)</dd>.*?" +
+            "<dt>Language:</dt> <dd>(?<language>.*?)</dd>.*?" +
+            "<dt>Add Date:</dt> <dd><span.*?>(?<creationDate>.*?)</span></dd>.*?" +
+            "<dt>Seeds:</dt> <dd>(?<seeds>[0-9]+)</dd>.*?" +
             "<a href=\"(?<magnet>.*?)\" id=\"dm\" class=\"button button-default\".*?>Download Magnet</a>.*?";
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {

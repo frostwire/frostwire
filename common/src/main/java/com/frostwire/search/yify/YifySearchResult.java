@@ -17,6 +17,7 @@
 
 package com.frostwire.search.yify;
 
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
@@ -48,7 +49,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         SIZE_PATTERN = Pattern.compile("([\\d.]+)([BKMGTP])");
     }
 
-    //private final String thumbnailUrl;
+    private final String thumbnailUrl;
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -60,13 +61,15 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
 
     public YifySearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.displayName = matcher.group("displayName") + " (" + matcher.group("language") + ")";
-        this.infoHash = matcher.group("infohash");
+
+        this.displayName = buildDisplayName(matcher);
+        this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
         this.size = buildSize(matcher.group("size"));
         this.creationTime = buildCreationTime(matcher.group("creationDate"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.magnetUrl = matcher.group("magnet");
+        this.magnetUrl = matcher.group("magnet").replaceAll("&amp;", "&");
         this.filename = buildFileName(detailsUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
     }
 
     @Override
@@ -114,12 +117,30 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         return filename;
     }
 
+    @Override
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
 
-    private static long buildCreationTime(String url) {
+    private static String buildDisplayName(SearchMatcher matcher) {
+        String displayName = matcher.group("displayName");
+        String lang = matcher.group("language");
+        if (lang != null) {
+            displayName += " (" + lang + ")";
+        }
+        return displayName;
+    }
+
+    private static String buildThumbnailUrl(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.startsWith("//") ? "https:" + str : "https://www.yify-torrent.org" + str;
+    }
+
+    private static long buildCreationTime(String str) {
         try {
-            int idx = url.indexOf("/", 9) + 1;
-            String str = url.substring(idx, idx + 8);
-            return new SimpleDateFormat("YYYYMMdd").parse(str).getTime();
+            return new SimpleDateFormat("M/d/y").parse(str).getTime();
         } catch (Throwable e) {
             // not that important
             return System.currentTimeMillis();
