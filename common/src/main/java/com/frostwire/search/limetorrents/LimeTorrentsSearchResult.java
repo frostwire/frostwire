@@ -48,7 +48,7 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
         this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "http://itorrents.org/torrent/" + matcher.group("torrentid") + ".torrent";
+        this.torrentUrl = "magnet:" + matcher.group("magnet_part");
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
@@ -98,7 +98,7 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
     }
 
     private String parseFileName(String decodedFileName) {
-        return HtmlManipulator.replaceHtmlEntities(decodedFileName) + ".torrent";
+        return HtmlManipulator.replaceHtmlEntities(decodedFileName.trim()) + ".torrent";
     }
 
     private int parseSeeds(String group) {
