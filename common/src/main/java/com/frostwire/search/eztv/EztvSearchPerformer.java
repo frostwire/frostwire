@@ -34,10 +34,10 @@ import java.util.Map;
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
 
     private static final int MAX_RESULTS = 20;
-    private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
+    public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"(/ep/.*?)\"";
 
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
-    private static final String HTML_REGEX =
+    public static final String TORRENT_DETAILS_PAGE_REGEX =
             "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
                     "Download Links.*?" +
                     ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?" +
@@ -51,7 +51,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
     }
 
     @Override
@@ -110,54 +110,4 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
         return count > 9;
     }
-
-    /**
-    public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "foobar";
-        HttpClient httpClient = HttpClientFactory.newInstance();
-        String fileStr = httpClient.get("https://eztv.ag/search/" + TEST_SEARCH_TERM);
-
-        Pattern searchResultsDetailURLPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
-        Pattern detailPagePattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
-
-        Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
-
-        int found = 0;
-        while (searchResultsMatcher.find()) {
-            found++;
-            System.out.println("\nfound " + found);
-            System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
-
-            String detailUrl = "https://eztv.ag" + searchResultsMatcher.group(1);
-            System.out.println("Fetching details from " + detailUrl + " ....");
-            long start = System.currentTimeMillis();
-            String detailPage = httpClient.get(detailUrl, 5000);
-            if (detailPage == null) {
-                System.out.println("Error fetching from " + detailUrl);
-                continue;
-            }
-            long downloadTime = System.currentTimeMillis() - start;
-            System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
-            SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
-
-            if (sm.find()) {
-                System.out.println("magneturl: [" + sm.group("magneturl") + "]");
-                System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");
-                System.out.println("displayname: [" + sm.group("displayname") + "]");
-                System.out.println("displayname2: [" + sm.group("displayname2") + "]");
-                System.out.println("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
-                System.out.println("infohash: [" + sm.group("infohash") + "]");
-                System.out.println("filesize: [" + sm.group("filesize") + "]");
-                System.out.println("creationtime: [" + sm.group("creationtime") + "]");
-                EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
-                System.out.println(sr);
-            } else {
-                System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
-            }
-            System.out.println("===");
-            System.out.println("Sleeping 5 seconds...");
-            Thread.sleep(5000);
-        }
-        System.out.println("-done-");
-    } */
 }

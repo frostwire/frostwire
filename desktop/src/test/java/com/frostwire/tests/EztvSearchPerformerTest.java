@@ -20,22 +20,28 @@ package com.frostwire.tests;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.yify.YifySearchResult;
-import com.frostwire.util.ThreadPool;
+import com.frostwire.search.eztv.EztvSearchResult;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.OKHTTPClient;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import static com.frostwire.search.eztv.EztvSearchPerformer.SEARCH_RESULTS_REGEX;
+import static com.frostwire.search.eztv.EztvSearchPerformer.TORRENT_DETAILS_PAGE_REGEX;
 
-public final class YifySearchPerformerTest {
+public final class EztvSearchPerformerTest {
     public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "one";
-        HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
-        String fileStr = httpClient.get("https://www.yify-torrent.org/search/" + TEST_SEARCH_TERM);
+        String TEST_SEARCH_TERM = "foo";
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        String fileStr;
+        try {
+            fileStr = httpClient.get("https://eztv.ag/search/" + TEST_SEARCH_TERM);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.out.println("Aborting test.");
+            return;
+        }
 
-        Pattern searchResultsDetailURLPattern = Pattern.compile(YifySearchPerformer.SEARCH_RESULTS_REGEX);
-        Pattern detailPagePattern = Pattern.compile(YifySearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
+        Pattern searchResultsDetailURLPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
+        Pattern detailPagePattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
 
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
 
@@ -45,11 +51,15 @@ public final class YifySearchPerformerTest {
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
 
-            String detailUrl = "https://www.yify-torrent.org/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
-
+            String detailUrl = "https://eztv.ag" + searchResultsMatcher.group(1);
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
-            String detailPage = httpClient.get(detailUrl, 5000);
+            String detailPage;
+            try {
+                detailPage = httpClient.get(detailUrl, 5000);
+            } catch (Throwable t) {
+                detailPage = null;
+            }
             if (detailPage == null) {
                 System.out.println("Error fetching from " + detailUrl);
                 continue;
@@ -59,14 +69,16 @@ public final class YifySearchPerformerTest {
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
 
             if (sm.find()) {
-                System.out.println("displayname: [" + sm.group("displayName") + "]");
-                System.out.println("infohash: [" + sm.group("infohash") + "]");
-                System.out.println("size: [" + sm.group("size") + "]");
-                System.out.println("creationDate: [" + sm.group("creationDate") + "]");
+                System.out.println("magneturl: [" + sm.group("magneturl") + "]");
+                System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");
                 System.out.println("seeds: [" + sm.group("seeds") + "]");
-                System.out.println("magnet: [" + sm.group("magnet") + "]");
-
-                YifySearchResult sr = new YifySearchResult(detailUrl, sm);
+                System.out.println("displayname: [" + sm.group("displayname") + "]");
+                System.out.println("displayname2: [" + sm.group("displayname2") + "]");
+                System.out.println("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
+                System.out.println("infohash: [" + sm.group("infohash") + "]");
+                System.out.println("filesize: [" + sm.group("filesize") + "]");
+                System.out.println("creationtime: [" + sm.group("creationtime") + "]");
+                EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
                 System.out.println(sr);
             } else {
                 System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
@@ -76,9 +88,5 @@ public final class YifySearchPerformerTest {
             Thread.sleep(5000);
         }
         System.out.println("-done-");
-
-        if (found == 0) {
-            System.out.println(fileStr);
-        }
     }
 }

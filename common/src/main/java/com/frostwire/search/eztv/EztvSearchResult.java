@@ -33,7 +33,7 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-final class EztvSearchResult extends AbstractTorrentSearchResult {
+public final class EztvSearchResult extends AbstractTorrentSearchResult {
 
     private final String filename;
     private final String displayName;
@@ -44,7 +44,7 @@ final class EztvSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
+    public EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         String dispName = null;
         if (matcher.group("displayname") != null) {
