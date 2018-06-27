@@ -32,6 +32,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
     private static final String HTML_REGEX = "(?is).*?<li><a rel=\"nofollow\" href=\"http://itorrents.org/torrent/(?<torrentid>.*?).torrent?(.*?)\">.*?"  +
             "<span>Name:.?</span>(?<filename>.*?)(<a.*>)?</a></p></div>.*?"   +
             "<span>Total Size:.?</span>(?<filesize>.*?)&nbsp;(?<unit>[A-Z]+)</p></div>.*?"  +
+            "<span>Magnet:.*?</span>.*?<a href=\"(?<magnet>.*?)\".*?"  +
             "<span>Seeds:.?</span>.?(?<seeds>\\d*?)</p></div>.*?" +
             "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
 

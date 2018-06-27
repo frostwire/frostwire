@@ -50,7 +50,7 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
         this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "http://itorrents.org/torrent/" + matcher.group("torrentid") + ".torrent";
+        this.torrentUrl = matcher.group("magnet");
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
