@@ -187,7 +187,6 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC7'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation(name: 'presage-moat-3.0.17-3.0.11', ext: 'aar')
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
 
 class DeployRelease extends DefaultTask {
