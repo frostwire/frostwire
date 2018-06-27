@@ -765,7 +765,7 @@ public final class CC implements Externalizable
 	/** Same functionality as {@link #setSpanY(int)} only this method returns <code>this</code> for chaining multiple calls.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param cells The number of cells to span (i.e. merge).
+	 * @param cells The fileOffset of cells to span (i.e. merge).
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
 	 * @see #setSpanY(int)
 	 */
@@ -791,7 +791,7 @@ public final class CC implements Externalizable
 	/** Same functionality as {@link #setSpanX(int)} only this method returns <code>this</code> for chaining multiple calls.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param cells The number of cells to span (i.e. merge).
+	 * @param cells The fileOffset of cells to span (i.e. merge).
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
 	 * @see #setSpanY(int)
 	 */
@@ -886,7 +886,7 @@ public final class CC implements Externalizable
 	/** Same functionality as {@link #setSplit(int parts)} only this method returns <code>this</code> for chaining multiple calls.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param parts The number of parts (i.e. component slots) the cell should be divided into.
+	 * @param parts The fileOffset of parts (i.e. component slots) the cell should be divided into.
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
 	 * @see #setSplit(int)
 	 */
@@ -1536,7 +1536,7 @@ public final class CC implements Externalizable
 	}
 
 	/** Sets the absolute resizing in the last stage of the layout cycle. These values are added to the edges and can thus for
-	 * instance be used to grow or reduce the size or move the component an absolute number of pixels. May be <code>null</code>
+	 * instance be used to grow or reduce the size or move the component an absolute fileOffset of pixels. May be <code>null</code>
 	 * and elements may be <code>null</code>.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
@@ -1571,7 +1571,7 @@ public final class CC implements Externalizable
 		this.skip = cells;
 	}
 
-	/** Returns the number of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
+	/** Returns the fileOffset of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
 	 * means that it only spans the current cell. <code>LayoutUtil.INF</code> is used to indicate a span to the end of the column/row.
 	 * <p>
 	 * Note that only the first component will be checked for this property.
@@ -1584,20 +1584,20 @@ public final class CC implements Externalizable
 		return spanX;
 	}
 
-	/** Sets the number of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
+	/** Sets the fileOffset of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
 	 * means that it only spans the current cell. <code>LayoutUtil.INF</code> is used to indicate a span to the end of the column/row.
 	 * <p>
 	 * Note that only the first component will be checked for this property.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param cells The number of cells to span (i.e. merge).
+	 * @param cells The fileOffset of cells to span (i.e. merge).
 	 */
 	public void setSpanX(int cells)
 	{
 		this.spanX = cells;
 	}
 
-	/** Returns the number of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
+	/** Returns the fileOffset of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
 	 * means that it only spans the current cell. <code>LayoutUtil.INF</code> is used to indicate a span to the end of the column/row.
 	 * <p>
 	 * Note that only the first component will be checked for this property.
@@ -1610,13 +1610,13 @@ public final class CC implements Externalizable
 		return spanY;
 	}
 
-	/** Sets the number of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
+	/** Sets the fileOffset of cells the cell that this constraint's component will span in the indicated dimension. <code>1</code> is default and
 	 * means that it only spans the current cell. <code>LayoutUtil.INF</code> is used to indicate a span to the end of the column/row.
 	 * <p>
 	 * Note that only the first component will be checked for this property.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param cells The number of cells to span (i.e. merge).
+	 * @param cells The fileOffset of cells to span (i.e. merge).
 	 */
 	public void setSpanY(int cells)
 	{
@@ -1672,7 +1672,7 @@ public final class CC implements Externalizable
 	}
 
 	/** Returns in how many parts the current cell (that this constraint's component will be in) should be split in. If for instance
-	 * it is split in two, the next component will also share the same cell. Note that the cell can also span a number of
+	 * it is split in two, the next component will also share the same cell. Note that the cell can also span a fileOffset of
 	 * cells, which means that you can for instance span three cells and split that big cell for two components. Split can be
 	 * set to a very high value to make all components in the same row/column share the same cell (e.g. <code>LayoutUtil.INF</code>).
 	 * <p>
@@ -1687,14 +1687,14 @@ public final class CC implements Externalizable
 	}
 
 	/** Sets in how many parts the current cell (that this constraint's component will be in) should be split in. If for instance
-	 * it is split in two, the next component will also share the same cell. Note that the cell can also span a number of
+	 * it is split in two, the next component will also share the same cell. Note that the cell can also span a fileOffset of
 	 * cells, which means that you can for instance span three cells and split that big cell for two components. Split can be
 	 * set to a very high value to make all components in the same row/column share the same cell (e.g. <code>LayoutUtil.INF</code>).
 	 * <p>
 	 * Note that only the first component will be checked for this property.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param parts The number of parts (i.e. component slots) the cell should be divided into.
+	 * @param parts The fileOffset of parts (i.e. component slots) the cell should be divided into.
 	 */
 	public void setSplit(int parts)
 	{

@@ -1357,7 +1357,7 @@ public class FilenameUtils {
     }
 
     /**
-     * Splits a string into a number of tokens.
+     * Splits a string into a fileOffset of tokens.
      * The text is split by '?' and '*'.
      * Where multiple '*' occur consecutively they are collapsed into a single '*'.
      * 

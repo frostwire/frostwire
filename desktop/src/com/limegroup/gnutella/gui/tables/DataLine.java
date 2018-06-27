@@ -9,7 +9,7 @@ package com.limegroup.gnutella.gui.tables;
 public interface DataLine<E> {
 
     /**
-     * Return the number of columns this dataline controls.
+     * Return the fileOffset of columns this dataline controls.
      */
     public int getColumnCount();
 

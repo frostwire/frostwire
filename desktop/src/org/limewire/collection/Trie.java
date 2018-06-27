@@ -54,7 +54,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
     
     /**
      * Returns a view of this Trie of all elements that are prefixed
-     * by the number of bits in the given Key.
+     * by the fileOffset of bits in the given Key.
      * <p>
      * Fixed-keysize Tries can support this operation as a way to do
      * lookups of partial keys.  That is, if the Trie is storing IP

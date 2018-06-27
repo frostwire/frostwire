@@ -120,7 +120,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
          * less than value of <code>timeFactor</code>. Subsequent same key
          * presses move the keyboard focus to the next object that starts with
          * the same letter until another key is pressed, then it is treated
-         * as the prefix with appropriate number of the same letters followed
+         * as the prefix with appropriate fileOffset of the same letters followed
          * by first typed another letter.
          */
         public void keyTyped(KeyEvent e) {

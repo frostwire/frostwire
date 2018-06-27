@@ -21,7 +21,7 @@ package com.frostwire.gui.library;
 public class PlaylistItemTrackProperty extends PlaylistItemIntProperty {
     
     public PlaylistItemTrackProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean playing, boolean exists) {
-        // using Integer.MAX_VALUE to put entries with no track number at the bottom of the list
+        // using Integer.MAX_VALUE to put entries with no track fileOffset at the bottom of the list
         super(line, stringValue, stringValue.toLowerCase().trim().replaceFirst("^0+(?!$)", "").length() > 0 ?
                            Integer.valueOf(stringValue.toLowerCase().trim().replaceFirst("^0+(?!$)", "")) :
                            Integer.MAX_VALUE, playing, exists);

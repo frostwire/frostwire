@@ -472,7 +472,7 @@ public class WinRegistryWrapper {
      * Enumerates all the sub keys under the specified registry key.
      * @param hKey specified windows registry folder constant
      * @param subKey given sub key (not null)
-     * @param maxKeyLength max number of sub keys
+     * @param maxKeyLength max fileOffset of sub keys
      * @return a array containing name of the sub keys
      */  
     public static String[] WinRegGetSubKeys(int hKey, String subKey, int maxKeyLength) {
@@ -512,7 +512,7 @@ public class WinRegistryWrapper {
      * Enumerates all the values under the specified registry key.
      * @param hKey specified windows registry folder constant
      * @param subKey given sub key (not null)
-     * @param maxValueLength max number of values
+     * @param maxValueLength max fileOffset of values
      * @return a string array containing the name of each value
      */  
     public static String[] WinRegGetValues(int hKey, String subKey, int maxValueLength) {

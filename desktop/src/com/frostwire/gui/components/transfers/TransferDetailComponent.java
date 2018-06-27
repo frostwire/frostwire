@@ -18,8 +18,10 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.gui.bittorrent.BTDownload;
+import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.RefreshListener;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
 
@@ -31,7 +33,7 @@ import java.util.HashMap;
  * The component that holds the different panels to present
  * all the different torrent transfer details.
  */
-public final class TransferDetailComponent extends JPanel {
+public final class TransferDetailComponent extends JPanel implements RefreshListener {
     //private static final Logger LOG = Logger.getLogger(TransferDetailComponent.class);
 
     private JToggleButton filesButton;
@@ -53,9 +55,10 @@ public final class TransferDetailComponent extends JPanel {
 
     private HashMap<String, TransferDetailPanel> cardPanelMap;
     private TransferDetailPanel currentComponent;
+    private BittorrentDownload selectedBittorrentDownload;
 
     interface TransferDetailPanel {
-        void updateData(BTDownload btDownload);
+        void updateData(BittorrentDownload btDownload);
     }
 
     public TransferDetailComponent() {
@@ -63,6 +66,7 @@ public final class TransferDetailComponent extends JPanel {
         add(new JLabel(I18n.tr("Transfer Detail")), "left, gapleft 5px, growx");
         add(createDetailSwitcherButtons(), "right, wrap");
         add(createDetailComponentHolder(), "span 2, grow");
+        GUIMediator.addRefreshListener(this);
     }
 
     private JPanel createDetailComponentHolder() {
@@ -171,7 +175,17 @@ public final class TransferDetailComponent extends JPanel {
         }
     }
 
-    public void updateData(BTDownload btDownload) {
+    @Override
+    public void refresh() {
+        // we're a Refresh listener of the GUIMediator, this gets invoked every 1 second
+        if (isVisible() && currentComponent != null && selectedBittorrentDownload != null) {
+            currentComponent.updateData(selectedBittorrentDownload);
+        }
+    }
+
+    // gets invoked when a transfer is selected and called back by our RefreshListener implementation
+    public void updateData(BittorrentDownload btDownload) {
+        selectedBittorrentDownload = btDownload;
         if (currentComponent != null && isVisible()) {
             currentComponent.updateData(btDownload);
         }

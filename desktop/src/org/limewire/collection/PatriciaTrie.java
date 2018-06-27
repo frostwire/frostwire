@@ -12,9 +12,9 @@ import java.util.*;
  * edges of the Trie (and having empty internal nodes), PATRICIA stores data
  * in every node. This allows for very efficient traversal, insert, delete,
  * predecessor, successor, prefix, range, and 'select' operations. All operations
- * are performed at worst in O(K) time, where K is the number of bits in the
+ * are performed at worst in O(K) time, where K is the fileOffset of bits in the
  * largest item in the tree. In practice, operations actually take O(A(K))
- * time, where A(K) is the average number of bits of all items in the tree.
+ * time, where A(K) is the average fileOffset of bits of all items in the tree.
  * <p>
  * Most importantly, PATRICIA requires very few comparisons to keys while
  * doing any operation. While performing a lookup, each comparison
@@ -73,10 +73,10 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     /** The root element of the Trie. */
     private final TrieEntry<K, V> root = new TrieEntry<>(null, null, -1);
     
-    /** The current size (total number of elements) of the Trie. */
+    /** The current size (total fileOffset of elements) of the Trie. */
     private int size = 0;
     
-    /** The number of times this has been modified (to fail-fast the iterators). */
+    /** The fileOffset of times this has been modified (to fail-fast the iterators). */
     private transient int modCount = 0;
     
     /** The keyAnalyzer used to analyze bit values of keys. */
@@ -118,7 +118,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         return size == 0;
     }
     
-    /** Returns the number items in the Trie */
+    /** Returns the fileOffset items in the Trie */
     public int size() {
         return size;
     }
@@ -497,7 +497,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
 
     /**
      * Returns a view of this Trie of all elements that are prefixed
-     * by the number of bits in the given Key.
+     * by the fileOffset of bits in the given Key.
      * 
      * Fixed-keysize Tries can support this operation as a way to do
      * lookups of partial keys.  That is, if the Trie is storing IP
@@ -1213,7 +1213,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
                      K found, int foundStart, int foundLength);
         
         /**
-         * Returns the number of bits per element in the key.
+         * Returns the fileOffset of bits per element in the key.
          * This is only useful for variable-length keys, such as Strings.
          */
         int bitsPerElement();

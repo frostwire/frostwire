@@ -33,12 +33,12 @@ public final class GUIConstants {
     static final File FROSTWIRE_EXE_FILE = new File("FrostWire.exe").getAbsoluteFile();
 
     /**
-     * The number of pixels in the margin of a padded panel.
+     * The fileOffset of pixels in the margin of a padded panel.
      */
     static final int OUTER_MARGIN = 6;
 
     /**
-     * Standard number of pixels that should separate many
+     * Standard fileOffset of pixels that should separate many
      * different types of gui components.
      */
     public static final int SEPARATOR = 6;

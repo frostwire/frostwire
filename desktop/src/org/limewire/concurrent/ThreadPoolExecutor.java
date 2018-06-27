@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * and they provide a means of bounding and managing the resources,
  * including threads, consumed when executing a collection of tasks.
  * Each <tt>ThreadPoolExecutor</tt> also maintains some basic
- * statistics, such as the number of completed tasks.
+ * statistics, such as the fileOffset of completed tasks.
  *
  * <p>To be useful across a wide range of contexts, this class
  * provides many adjustable parameters and extensibility
@@ -64,7 +64,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * corePoolSize and maximumPoolSize the same, you create a fixed-size
  * thread pool. By setting maximumPoolSize to an essentially unbounded
  * value such as <tt>Integer.MAX_VALUE</tt>, you allow the pool to
- * accommodate an arbitrary number of concurrent tasks. Most typically,
+ * accommodate an arbitrary fileOffset of concurrent tasks. Most typically,
  * core and maximum pool sizes are set only upon construction, but they
  * may also be changed dynamically using {@link
  * ThreadPoolExecutor#setCorePoolSize} and {@link
@@ -308,7 +308,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     /**
      * The main pool control state, ctl, is an atomic integer packing
      * two conceptual fields
-     *   workerCount, indicating the effective number of threads
+     *   workerCount, indicating the effective fileOffset of threads
      *   runState,    indicating whether running, shutting down etc
      *
      * In order to pack them into one int, we limit workerCount to
@@ -318,9 +318,9 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * and the shift/mask constants below adjusted. But until the need
      * arises, this code is a bit faster and simpler using an int.
      *
-     * The workerCount is the number of workers that have been
+     * The workerCount is the fileOffset of workers that have been
      * permitted to start and not permitted to stop.  The value may be
-     * transiently different from the actual number of live threads,
+     * transiently different from the actual fileOffset of live threads,
      * for example when a ThreadFactory fails to create a thread when
      * asked, and when exiting threads are still performing
      * bookkeeping before terminating. The user-visible pool size is
@@ -431,7 +431,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Factory for new threads. All threads are created using this
      * factory (via method addWorker).  All callers must be prepared
      * for addWorker to fail, which may reflect a system or user's
-     * policy limiting the number of threads.  Even though it is not
+     * policy limiting the fileOffset of threads.  Even though it is not
      * treated as an error, failure to create threads may result in
      * new tasks being rejected or existing ones remaining stuck in
      * the queue. On the other hand, no special precautions exist to
@@ -462,7 +462,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     private volatile boolean allowCoreThreadTimeOut;
 
     /**
-     * Core pool size is the minimum number of workers to keep alive
+     * Core pool size is the minimum fileOffset of workers to keep alive
      * (and not allow to time out etc) unless allowCoreThreadTimeOut
      * is set, in which case the minimum is zero.
      */
@@ -939,7 +939,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     /**
      * Main worker run loop.  Repeatedly gets tasks from queue and
-     * executes them, while coping with a number of issues:
+     * executes them, while coping with a fileOffset of issues:
      *
      * 1. We may start out with an initial task, in which case we
      * don't need to get the first one. Otherwise, as long as pool is
@@ -1022,11 +1022,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * It may be more convenient to use one of the {@link Executors} factory
      * methods instead of this general purpose constructor.
      *
-     * @param corePoolSize the number of threads to keep in the
+     * @param corePoolSize the fileOffset of threads to keep in the
      * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
+     * @param maximumPoolSize the maximum fileOffset of threads to allow in the
      * pool.
-     * @param keepAliveTime when the number of threads is greater than
+     * @param keepAliveTime when the fileOffset of threads is greater than
      * the core, this is the maximum time that excess idle threads
      * will wait for new tasks before terminating.
      * @param unit the time unit for the keepAliveTime
@@ -1052,11 +1052,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
      * parameters and default rejected execution handler.
      *
-     * @param corePoolSize the number of threads to keep in the
+     * @param corePoolSize the fileOffset of threads to keep in the
      * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
+     * @param maximumPoolSize the maximum fileOffset of threads to allow in the
      * pool.
-     * @param keepAliveTime when the number of threads is greater than
+     * @param keepAliveTime when the fileOffset of threads is greater than
      * the core, this is the maximum time that excess idle threads
      * will wait for new tasks before terminating.
      * @param unit the time unit for the keepAliveTime
@@ -1086,11 +1086,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
      * parameters and default thread factory.
      *
-     * @param corePoolSize the number of threads to keep in the
+     * @param corePoolSize the fileOffset of threads to keep in the
      * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
+     * @param maximumPoolSize the maximum fileOffset of threads to allow in the
      * pool.
-     * @param keepAliveTime when the number of threads is greater than
+     * @param keepAliveTime when the fileOffset of threads is greater than
      * the core, this is the maximum time that excess idle threads
      * will wait for new tasks before terminating.
      * @param unit the time unit for the keepAliveTime
@@ -1120,11 +1120,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
      * parameters.
      *
-     * @param corePoolSize the number of threads to keep in the
+     * @param corePoolSize the fileOffset of threads to keep in the
      * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
+     * @param maximumPoolSize the maximum fileOffset of threads to allow in the
      * pool.
-     * @param keepAliveTime when the number of threads is greater than
+     * @param keepAliveTime when the fileOffset of threads is greater than
      * the core, this is the maximum time that excess idle threads
      * will wait for new tasks before terminating.
      * @param unit the time unit for the keepAliveTime
@@ -1378,7 +1378,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Sets the core number of threads.  This overrides any value set
+     * Sets the core fileOffset of threads.  This overrides any value set
      * in the constructor.  If the new value is smaller than the
      * current value, excess existing threads will be terminated when
      * they next become idle. If larger, new threads will, if needed,
@@ -1399,7 +1399,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         else if (delta > 0) {
             // We don't really know how many new threads are "needed".
             // As a heuristic, prestart enough new workers (up to new
-            // core size) to handle the current number of tasks in
+            // core size) to handle the current fileOffset of tasks in
             // queue, but stop if queue becomes empty while doing so.
             int k = Math.min(delta, workQueue.size());
             while (k-- > 0 && addWorker(null, true)) {
@@ -1410,9 +1410,9 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the core number of threads.
+     * Returns the core fileOffset of threads.
      *
-     * @return the core number of threads
+     * @return the core fileOffset of threads
      * @see #setCorePoolSize
      */
     public int getCorePoolSize() {
@@ -1435,7 +1435,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Starts all core threads, causing them to idly wait for work. This
      * overrides the default policy of starting core threads only when
      * new tasks are executed.
-     * @return the number of threads started
+     * @return the fileOffset of threads started
      */
     public int prestartAllCoreThreads() {
         int n = 0;
@@ -1487,7 +1487,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Sets the maximum allowed number of threads. This overrides any
+     * Sets the maximum allowed fileOffset of threads. This overrides any
      * value set in the constructor. If the new value is smaller than
      * the current value, excess existing threads will be
      * terminated when they next become idle.
@@ -1507,9 +1507,9 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the maximum allowed number of threads.
+     * Returns the maximum allowed fileOffset of threads.
      *
-     * @return the maximum allowed number of threads
+     * @return the maximum allowed fileOffset of threads
      * @see #setMaximumPoolSize
      */
     public int getMaximumPoolSize() {
@@ -1518,7 +1518,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     /**
      * Sets the time limit for which threads may remain idle before
-     * being terminated.  If there are more than the core number of
+     * being terminated.  If there are more than the core fileOffset of
      * threads currently in the pool, after waiting this amount of
      * time without processing a task, excess threads will be
      * terminated.  This overrides any value set in the constructor.
@@ -1632,9 +1632,9 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     /* Statistics */
 
     /**
-     * Returns the current number of threads in the pool.
+     * Returns the current fileOffset of threads in the pool.
      *
-     * @return the number of threads
+     * @return the fileOffset of threads
      */
     public int getPoolSize() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1647,10 +1647,10 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the approximate number of threads that are actively
+     * Returns the approximate fileOffset of threads that are actively
      * executing tasks.
      *
-     * @return the number of threads
+     * @return the fileOffset of threads
      */
     public int getActiveCount() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1668,10 +1668,10 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the largest number of threads that have ever
+     * Returns the largest fileOffset of threads that have ever
      * simultaneously been in the pool.
      *
-     * @return the number of threads
+     * @return the fileOffset of threads
      */
     public int getLargestPoolSize() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1684,12 +1684,12 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the approximate total number of tasks that have ever been
+     * Returns the approximate total fileOffset of tasks that have ever been
      * scheduled for execution. Because the states of tasks and
      * threads may change dynamically during computation, the returned
      * value is only an approximation.
      *
-     * @return the number of tasks
+     * @return the fileOffset of tasks
      */
     public long getTaskCount() {
         final ReentrantLock mainLock = this.mainLock;
@@ -1708,13 +1708,13 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Returns the approximate total number of tasks that have
+     * Returns the approximate total fileOffset of tasks that have
      * completed execution. Because the states of tasks and threads
      * may change dynamically during computation, the returned value
      * is only an approximation, but one that does not ever decrease
      * across successive calls.
      *
-     * @return the number of tasks
+     * @return the fileOffset of tasks
      */
     public long getCompletedTaskCount() {
         final ReentrantLock mainLock = this.mainLock;

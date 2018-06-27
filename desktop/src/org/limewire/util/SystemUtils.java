@@ -216,7 +216,7 @@ public class SystemUtils {
      * @param root  The name of the root registry key, like "HKEY_LOCAL_MACHINE"
      * @param path  The path to the registry key with backslashes as separators, like "Software\\Microsoft\\Windows"
      * @param name  The name of the variable within that key, or blank to access the key's default value
-     * @param value The number value to set there
+     * @param value The fileOffset value to set there
      * @return      False on error
      */
     public static boolean registryWriteNumber(String root, String path, String name, int value) {

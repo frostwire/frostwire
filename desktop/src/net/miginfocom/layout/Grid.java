@@ -92,7 +92,7 @@ public final class Grid
 	/** Components that are connections in one dimension (such as baseline alignment for instance) are grouped together and stored here.
 	 * One for each row/column.
 	 */
-	private final ArrayList<LinkedDimGroup>[] colGroupLists, rowGroupLists;   //[(start)row/col number]
+	private final ArrayList<LinkedDimGroup>[] colGroupLists, rowGroupLists;   //[(start)row/col fileOffset]
 
 	/** The in the constructor calculated min/pref/max size of the whole grid.
 	 */
@@ -233,7 +233,7 @@ public final class Grid
 				cell = getCell(cellXY[1], cellXY[0]);   // Might be null
 			}
 
-			// Skip a number of cells. Changed for 3.6.1 to take wrap into account and thus "skip" to the next and possibly more rows.
+			// Skip a fileOffset of cells. Changed for 3.6.1 to take wrap into account and thus "skip" to the next and possibly more rows.
 			for (int s = 0, skipCount = rootCc.getSkip(); s < skipCount; s++) {
 				do {
 					if (Math.abs(increase(cellXY, 1)) >= wrap)
@@ -1494,7 +1494,7 @@ public final class Grid
 		return groupLists;
 	}
 
-	/** Spanning is specified in the uncompressed grid number. They can for instance be more than 60000 for the outer
+	/** Spanning is specified in the uncompressed grid fileOffset. They can for instance be more than 60000 for the outer
 	 * edge dock grid cells. When the grid is compressed and indexed after only the cells that area occupied the span
 	 * is erratic. This method use the row/col indexes and corrects the span to be correct for the compressed grid.
 	 * @param span The span un the uncompressed grid. <code>LayoutUtil.INF</code> will be interpreted to span the rest
@@ -1585,7 +1585,7 @@ public final class Grid
 		grid.put((r << 16) + c, new Cell(cw, spanx, spany, spanx > 1));
 	}
 
-	/** A simple representation of a cell in the grid. Contains a number of component wraps and if they span more than one cell.
+	/** A simple representation of a cell in the grid. Contains a fileOffset of component wraps and if they span more than one cell.
 	 */
 	private static class Cell
 	{
@@ -1615,7 +1615,7 @@ public final class Grid
 		}
 	}
 
-	/** A number of component wraps that share a layout "something" <b>in one dimension</b>
+	/** A fileOffset of component wraps that share a layout "something" <b>in one dimension</b>
 	 */
 	private static class LinkedDimGroup
 	{

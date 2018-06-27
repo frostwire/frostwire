@@ -447,7 +447,7 @@ public class HexHivePanel extends JPanel {
 
             evenRowOrigin.x = (int) (origin.x + (hexWidth / 2));
             evenRowOrigin.y = (int) (origin.y + (hexHeight / 2));
-            // calculate number of hexagons in an even row
+            // calculate fileOffset of hexagons in an even row
             oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2));
             oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight);
         }

@@ -123,11 +123,11 @@ public final class GUIUtils {
     }
     
     /**
-     * This static method converts the passed in number
+     * This static method converts the passed in fileOffset
      * into a localizable representation of an integer, with
      * digit grouping using locale dependant separators.
      *
-     * @param value the number to convert to a numeric String.
+     * @param value the fileOffset to convert to a numeric String.
      *
      * @return a localized String representing the integer value
      */
@@ -136,13 +136,13 @@ public final class GUIUtils {
     }
     
     /**
-     * This static method converts the passed in number of bytes into a
+     * This static method converts the passed in fileOffset of bytes into a
      * kilobyte string grouping digits with locale-dependant thousand separator
      * and with "KB" locale-dependant unit at the end.
      *
-     * @param bytes the number of bytes to convert to a kilobyte String.
+     * @param bytes the fileOffset of bytes to convert to a kilobyte String.
      *
-     * @return a String representing the number of kilobytes that the
+     * @return a String representing the fileOffset of kilobytes that the
      *         <code>bytes</code> argument evaluates to, with "KB" appended
      *         at the end.  If the input value is negative, the string
      *         returned will be "? KB".
@@ -158,13 +158,13 @@ public final class GUIUtils {
     }
     
     /**
-     * Converts the passed in number of bytes into a byte-size string.
+     * Converts the passed in fileOffset of bytes into a byte-size string.
      * Group digits with locale-dependant thousand separator if needed, but
      * with "KB", or "MB" or "GB" or "TB" locale-dependant unit at the end,
      * and a limited precision of 4 significant digits.
      *
-     * @param bytes the number of bytes to convert to a size String.
-     * @return a String representing the number of kilobytes that the
+     * @param bytes the fileOffset of bytes to convert to a size String.
+     * @return a String representing the fileOffset of kilobytes that the
      *         <code>bytes</code> argument evaluates to, with
      *         "KB"/"MB"/"GB"/TB" appended at the end. If the input value is
      *         negative, the string returned will be "? KB".
@@ -458,7 +458,7 @@ public final class GUIUtils {
     /**
      * Converts all spaces in the string to non-breaking spaces.
      *
-     * Adds 'preSpaces' number of non-breaking spaces prior to the string.
+     * Adds 'preSpaces' fileOffset of non-breaking spaces prior to the string.
      */
     public static String convertToNonBreakingSpaces(int preSpaces, String s) {
         StringBuilder b = new StringBuilder(preSpaces + s.length());

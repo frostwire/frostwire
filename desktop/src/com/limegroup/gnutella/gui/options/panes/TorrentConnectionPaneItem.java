@@ -31,9 +31,9 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 
     private final static String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
 
-    private final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum number of connections");
+    private final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum fileOffset of connections");
 
-    private final static String MAX_PEERS = I18n.tr("Maximum number of peers");
+    private final static String MAX_PEERS = I18n.tr("Maximum fileOffset of peers");
 
     private final static String MAX_ACTIVE_SEEDS = I18n.tr("Maximum active seeds");
 

@@ -147,7 +147,7 @@ public final class LayoutUtil
 	}
 
 	/** The size of an empty row or columns in a grid during design time.
-	 * @return The number of pixels. Default is 15.
+	 * @return The fileOffset of pixels. Default is 15.
 	 */
 	public static int getDesignTimeEmptySize()
 	{
@@ -155,7 +155,7 @@ public final class LayoutUtil
 	}
 
 	/** The size of an empty row or columns in a grid during design time.
-	 * @param pixels The number of pixels. Default is 0 (it was 15 prior to v3.7.2, but since that meant different behaviour
+	 * @param pixels The fileOffset of pixels. Default is 0 (it was 15 prior to v3.7.2, but since that meant different behaviour
 	 * under design time by default it was changed to be 0, same as non-design time). IDE vendors can still set it to 15 to
 	 * get the old behaviour.
 	 */
@@ -209,7 +209,7 @@ public final class LayoutUtil
 		throw new IllegalStateException("setStoreConstraintData(true) must be set for strings to be saved.");
 	}
 
-	/** Takes a number on min/preferred/max sizes and resize constraints and returns the calculated sizes which sum should add up to <code>bounds</code>. Whether the sum
+	/** Takes a fileOffset on min/preferred/max sizes and resize constraints and returns the calculated sizes which sum should add up to <code>bounds</code>. Whether the sum
 	 * will actually equal <code>bounds</code> is dependent om the pref/max sizes and resize constraints.
 	 * @param sizes [ix],[MIN][PREF][MAX]. Grid.CompWrap.NOT_SET will be treated as N/A or 0. A "[MIN][PREF][MAX]" array with null elements will be interpreted as very flexible (no bounds)
 	 * but if the array itself is null it will not get any size.
@@ -391,7 +391,7 @@ public final class LayoutUtil
 		return container == null || container.isLeftToRight();
 	}
 
-	/** Round a number of float sizes into int sizes so that the total length match up
+	/** Round a fileOffset of float sizes into int sizes so that the total length match up
 	 * @param sizes The sizes to round
 	 * @return An array of equal length as <code>sizes</code>.
 	 */

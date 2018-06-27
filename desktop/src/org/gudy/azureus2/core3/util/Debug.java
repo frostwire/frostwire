@@ -47,7 +47,7 @@ public class Debug {
   /**
    * Prints out the given debug message to System.out,
    * prefixed by the calling class name, method and
-   * line number.
+   * line fileOffset.
    */
   public static void out(final String _debug_message) {
     out( _debug_message, null );
@@ -56,7 +56,7 @@ public class Debug {
   /**
    * Prints out the given exception stacktrace to System.out,
    * prefixed by the calling class name, method and
-   * line number.
+   * line fileOffset.
    */
   public static void out(final Throwable _exception) {
     out( "", _exception );
@@ -87,7 +87,7 @@ public class Debug {
   /**
    * Prints out the given debug message to System.out,
    * prefixed by the calling class name, method and
-   * line number, appending the stacktrace of the given exception.
+   * line fileOffset, appending the stacktrace of the given exception.
    */
   public static void out(final String _debug_msg, final Throwable _exception) {
   	if ((_exception instanceof ConnectException) && _exception.getMessage().startsWith("No route to host")) {

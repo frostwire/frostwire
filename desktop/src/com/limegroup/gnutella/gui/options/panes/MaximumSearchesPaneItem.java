@@ -11,14 +11,14 @@ import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user
- * to change the maximum number of dowloads to allow at any one time.
+ * to change the maximum fileOffset of dowloads to allow at any one time.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class MaximumSearchesPaneItem extends AbstractPaneItem {
 
     public final static String TITLE = I18n.tr("Maximum Searches");
     
-    public final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");
+    public final static String LABEL = I18n.tr("You can set the maximum fileOffset of simultaneous searches you can perform.");
 
 	/**
 	 * Constant for the key of the locale-specific <code>String</code> for the 

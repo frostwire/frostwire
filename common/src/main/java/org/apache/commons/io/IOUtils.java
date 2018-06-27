@@ -1730,12 +1730,12 @@ public class IOUtils {
      * <p>
      * Large streams (over 2GB) will return a bytes copied value of
      * <code>-1</code> after the copy has completed since the correct
-     * number of bytes cannot be returned as an int. For large streams
+     * fileOffset of bytes cannot be returned as an int. For large streams
      * use the <code>copyLarge(InputStream, OutputStream)</code> method.
      * 
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
-     * @return the number of bytes copied, or -1 if &gt; Integer.MAX_VALUE
+     * @return the fileOffset of bytes copied, or -1 if &gt; Integer.MAX_VALUE
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 1.1
@@ -1759,7 +1759,7 @@ public class IOUtils {
      * 
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
-     * @return the number of bytes copied
+     * @return the fileOffset of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 1.3
@@ -1780,7 +1780,7 @@ public class IOUtils {
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
      * @param buffer the buffer to use for the copy
-     * @return the number of bytes copied
+     * @return the fileOffset of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -1807,10 +1807,10 @@ public class IOUtils {
      * 
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
-     * @param inputOffset : number of bytes to skip from input before copying
+     * @param inputOffset : fileOffset of bytes to skip from input before copying
      *         -ve values are ignored
-     * @param length : number of bytes to copy. -ve means all
-     * @return the number of bytes copied
+     * @param length : fileOffset of bytes to copy. -ve means all
+     * @return the fileOffset of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -1830,12 +1830,12 @@ public class IOUtils {
      * 
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
-     * @param inputOffset : number of bytes to skip from input before copying
+     * @param inputOffset : fileOffset of bytes to skip from input before copying
      *         -ve values are ignored
-     * @param length : number of bytes to copy. -ve means all
+     * @param length : fileOffset of bytes to copy. -ve means all
      * @param buffer the buffer to use for the copy
      *
-     * @return the number of bytes copied
+     * @return the fileOffset of bytes copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -1943,12 +1943,12 @@ public class IOUtils {
      * <p>
      * Large streams (over 2GB) will return a chars copied value of
      * <code>-1</code> after the copy has completed since the correct
-     * number of chars cannot be returned as an int. For large streams
+     * fileOffset of chars cannot be returned as an int. For large streams
      * use the <code>copyLarge(Reader, Writer)</code> method.
      *
      * @param input  the <code>Reader</code> to read from
      * @param output  the <code>Writer</code> to write to
-     * @return the number of characters copied, or -1 if &gt; Integer.MAX_VALUE
+     * @return the fileOffset of characters copied, or -1 if &gt; Integer.MAX_VALUE
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 1.1
@@ -1971,7 +1971,7 @@ public class IOUtils {
      *
      * @param input  the <code>Reader</code> to read from
      * @param output  the <code>Writer</code> to write to
-     * @return the number of characters copied
+     * @return the fileOffset of characters copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 1.3
@@ -1990,7 +1990,7 @@ public class IOUtils {
      * @param input  the <code>Reader</code> to read from
      * @param output  the <code>Writer</code> to write to
      * @param buffer the buffer to be used for the copy
-     * @return the number of characters copied
+     * @return the fileOffset of characters copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -2016,10 +2016,10 @@ public class IOUtils {
      * 
      * @param input  the <code>Reader</code> to read from
      * @param output  the <code>Writer</code> to write to
-     * @param inputOffset : number of chars to skip from input before copying
+     * @param inputOffset : fileOffset of chars to skip from input before copying
      *         -ve values are ignored
-     * @param length : number of chars to copy. -ve means all
-     * @return the number of chars copied
+     * @param length : fileOffset of chars to copy. -ve means all
+     * @return the fileOffset of chars copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -2039,11 +2039,11 @@ public class IOUtils {
      * 
      * @param input  the <code>Reader</code> to read from
      * @param output  the <code>Writer</code> to write to
-     * @param inputOffset : number of chars to skip from input before copying
+     * @param inputOffset : fileOffset of chars to skip from input before copying
      *         -ve values are ignored
-     * @param length : number of chars to copy. -ve means all
+     * @param length : fileOffset of chars to copy. -ve means all
      * @param buffer the buffer to be used for the copy
-     * @return the number of chars copied
+     * @return the fileOffset of chars copied
      * @throws NullPointerException if the input or output is null
      * @throws IOException if an I/O error occurs
      * @since 2.2
@@ -2265,8 +2265,8 @@ public class IOUtils {
      * subclasses of {@link Reader}.
      *   
      * @param input byte stream to skip
-     * @param toSkip number of bytes to skip.
-     * @return number of bytes actually skipped.
+     * @param toSkip fileOffset of bytes to skip.
+     * @return fileOffset of bytes actually skipped.
      * 
      * @see InputStream#skip(long)
      * 
@@ -2304,8 +2304,8 @@ public class IOUtils {
      * subclasses of {@link Reader}.
      *   
      * @param input character stream to skip
-     * @param toSkip number of characters to skip.
-     * @return number of characters actually skipped.
+     * @param toSkip fileOffset of characters to skip.
+     * @return fileOffset of characters actually skipped.
      * 
      * @see Reader#skip(long)
      * 
@@ -2337,18 +2337,18 @@ public class IOUtils {
     }
 
     /**
-     * Skip the requested number of bytes or fail if there are not enough left.
+     * Skip the requested fileOffset of bytes or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link InputStream#skip(long)} may
      * not skip as many bytes as requested (most likely because of reaching EOF).
      * 
      * @param input stream to skip
-     * @param toSkip the number of bytes to skip
+     * @param toSkip the fileOffset of bytes to skip
      * @see InputStream#skip(long)
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if toSkip is negative
-     * @throws EOFException if the number of bytes skipped was incorrect 
+     * @throws EOFException if the fileOffset of bytes skipped was incorrect
      * @since 2.0
      */
     public static void skipFully(InputStream input, long toSkip) throws IOException {
@@ -2362,18 +2362,18 @@ public class IOUtils {
     }
 
     /**
-     * Skip the requested number of characters or fail if there are not enough left.
+     * Skip the requested fileOffset of characters or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link Reader#skip(long)} may
      * not skip as many characters as requested (most likely because of reaching EOF).
      * 
      * @param input stream to skip
-     * @param toSkip the number of characters to skip
+     * @param toSkip the fileOffset of characters to skip
      * @see Reader#skip(long)
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if toSkip is negative
-     * @throws EOFException if the number of characters skipped was incorrect
+     * @throws EOFException if the fileOffset of characters skipped was incorrect
      * @since 2.0
      */
     public static void skipFully(Reader input, long toSkip) throws IOException {
@@ -2477,7 +2477,7 @@ public class IOUtils {
     }
 
     /**
-     * Read the requested number of characters or fail if there are not enough left.
+     * Read the requested fileOffset of characters or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link Reader#read(char[], int, int)} may
      * not read as many characters as requested (most likely because of reaching EOF).
@@ -2489,7 +2489,7 @@ public class IOUtils {
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
-     * @throws EOFException if the number of characters read was incorrect
+     * @throws EOFException if the fileOffset of characters read was incorrect
      * @since 2.2
      */
     public static void readFully(Reader input, char[] buffer, int offset, int length) throws IOException {
@@ -2500,7 +2500,7 @@ public class IOUtils {
     }
 
     /**
-     * Read the requested number of characters or fail if there are not enough left.
+     * Read the requested fileOffset of characters or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link Reader#read(char[], int, int)} may
      * not read as many characters as requested (most likely because of reaching EOF).
@@ -2510,7 +2510,7 @@ public class IOUtils {
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
-     * @throws EOFException if the number of characters read was incorrect
+     * @throws EOFException if the fileOffset of characters read was incorrect
      * @since 2.2
      */
     public static void readFully(Reader input, char[] buffer) throws IOException {
@@ -2518,7 +2518,7 @@ public class IOUtils {
     }
 
     /**
-     * Read the requested number of bytes or fail if there are not enough left.
+     * Read the requested fileOffset of bytes or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
      * not read as many bytes as requested (most likely because of reaching EOF).
@@ -2530,7 +2530,7 @@ public class IOUtils {
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
-     * @throws EOFException if the number of bytes read was incorrect
+     * @throws EOFException if the fileOffset of bytes read was incorrect
      * @since 2.2
      */
     public static void readFully(InputStream input, byte[] buffer, int offset, int length) throws IOException {
@@ -2541,7 +2541,7 @@ public class IOUtils {
     }
 
     /**
-     * Read the requested number of bytes or fail if there are not enough left.
+     * Read the requested fileOffset of bytes or fail if there are not enough left.
      * <p>
      * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
      * not read as many bytes as requested (most likely because of reaching EOF).
@@ -2551,7 +2551,7 @@ public class IOUtils {
      * 
      * @throws IOException if there is a problem reading the file
      * @throws IllegalArgumentException if length is negative
-     * @throws EOFException if the number of bytes read was incorrect
+     * @throws EOFException if the fileOffset of bytes read was incorrect
      * @since 2.2
      */
     public static void readFully(InputStream input, byte[] buffer) throws IOException {

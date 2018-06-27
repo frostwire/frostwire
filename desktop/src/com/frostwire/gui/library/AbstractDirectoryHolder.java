@@ -78,7 +78,7 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
     }
 
     /**
-     * Returns the number of files that this directory holder contains.
+     * Returns the fileOffset of files that this directory holder contains.
      */
     public int size() {
         File[] files = getFiles();

@@ -102,12 +102,14 @@ public final class TransfersTab extends AbstractTab {
                 return;
             }
             if (selected == null ||
-                    selected instanceof YouTubeDownload ||
-                    selected instanceof SoundcloudDownload ||
-                    selected instanceof HttpDownload) {
+                selected instanceof YouTubeDownload ||
+                selected instanceof SoundcloudDownload ||
+                selected instanceof HttpDownload ||
+                selected instanceof TorrentFetcherDownload) {
                 hideTransferDetailsComponent();
-            } else {
-                showTransferDetailsComponent(selected);
+            } else if (selected instanceof BittorrentDownload) {
+                BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
+                showTransferDetailsComponent(bittorrentDownload);
             }
         }
     }
@@ -120,18 +122,13 @@ public final class TransfersTab extends AbstractTab {
         }
     }
 
-    private void showTransferDetailsComponent(BTDownload selected) {
-        if (!(selected instanceof BittorrentDownload) &&
-                !(selected instanceof TorrentFetcherDownload)) {
-            LOG.warn("Check your logic. TransfersTab.showTransferDetailsComponent() invoked on non-torrent transfer");
-        } else {
-            if (transferDetailComponent != null) {
-                mainComponent.add(transferDetailComponent, "span 2, growx");
-                transferDetailComponent.setVisible(true);
-                transferDetailComponent.updateData(selected);
-                transferDetailComponent.validate();
-                mainComponent.validate();
-            }
+    private void showTransferDetailsComponent(BittorrentDownload selected) {
+        if (transferDetailComponent != null && selected != null) {
+            mainComponent.add(transferDetailComponent, "span 2, growx");
+            transferDetailComponent.setVisible(true);
+            transferDetailComponent.updateData(selected);
+            transferDetailComponent.validate();
+            mainComponent.validate();
         }
     }
 

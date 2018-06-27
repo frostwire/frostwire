@@ -2,7 +2,7 @@ package com.limegroup.gnutella.gui;
 
 public class TipOfTheDayMessages {
     
-    private static final String FIRST_MESSAGE = I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher number in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!");
+    private static final String FIRST_MESSAGE = I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher fileOffset in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!");
 
     /**
      * Determines whether or not the current locale language is English. Note
@@ -21,7 +21,7 @@ public class TipOfTheDayMessages {
         return new String[] {
                 I18n.tr(FIRST_MESSAGE),
                 I18n.tr("You can change the look and feel of FrostWire by going to View &gt; Use Small Icons, Show Icon Text and Increase-Decrease the Font Size."),
-                I18n.tr("You can sort your search results by clicking on a column. The most useful column to sort by is the 'Seeds' column if you are looking for a torrent, Seeds represents an approximate number of computers that have the entire file and are online."),
+                I18n.tr("You can sort your search results by clicking on a column. The most useful column to sort by is the 'Seeds' column if you are looking for a torrent, Seeds represents an approximate fileOffset of computers that have the entire file and are online."),
                 I18n.tr("It helps the network if you keep your FrostWire running. Others will connect to the network easier and searches will perform better."),
                 I18n.tr("Passionate about digital rights? Visit the <a href=\"{0}\">Electronic Frontier Foundation</a> and see what you can do to help."),
                 I18n.tr("FrostWire is translated into many different languages including Chinese, French, German, Japanese, Italian, Spanish and many more. Visit FrostWire's <a href=\"{0}\">internationalization page</a> for information on how you can help translation efforts!"),
@@ -53,7 +53,7 @@ public class TipOfTheDayMessages {
                 I18n.tr("You can ban certain words from appearing in your search results by choosing 'Options' from the 'Tools' menu and adding new words to those listed under Filters &gt; Keywords."),
                 I18n.tr("Hate tool tips? Love tool tips? You can turn them on or off in most tables by right-clicking on the column headers and choosing 'More Options'. You can toggle other options here too, like whether or not to sort tables automatically and if you prefer the rows to be striped."),
                 I18n.tr("You can sort uploads, downloads, etc..., by clicking on a column. The table keeps resorting as the information changes. You can turn this automatic-sorting behavior off by right-clicking on a column header, choosing 'More Options' and un-checking 'Sort Automatically'."),
-                I18n.tr("Are you unhappy with the small number of search results you received? Right-click a search result, then choose Search More, then Get More Results."),
+                I18n.tr("Are you unhappy with the small fileOffset of search results you received? Right-click a search result, then choose Search More, then Get More Results."),
         };
     }
 

@@ -262,7 +262,7 @@ public final class SearchSettings extends LimeProps {
         FACTORY.createCharArraySetting("ILLEGAL_CHARS", BAD_CHARS);
 
     /**
-     * Setting for the maximum number of bytes to allow in queries.
+     * Setting for the maximum fileOffset of bytes to allow in queries.
      */
     public static final IntSetting MAX_QUERY_LENGTH =
         FACTORY.createIntSetting("MAX_QUERY_LENGTH", 512);
@@ -276,7 +276,7 @@ public final class SearchSettings extends LimeProps {
     public static final int MAXIMUM_PARALLEL_SEARCH = 10;
     
     /**
-	 * The maximum number of simultaneous searches to allow.
+	 * The maximum fileOffset of simultaneous searches to allow.
 	 */    
     public static final IntSetting PARALLEL_SEARCH =
         FACTORY.createIntSetting("PARALLEL_SEARCH", MAXIMUM_PARALLEL_SEARCH);

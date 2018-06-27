@@ -19,6 +19,7 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BTDownload;
+import com.frostwire.gui.bittorrent.BittorrentDownload;
 
 import javax.swing.*;
 
@@ -29,7 +30,7 @@ public final class TransferDetailStatus extends JPanel implements TransferDetail
     }
 
     @Override
-    public void updateData(BTDownload btDownload) {
+    public void updateData(BittorrentDownload btDownload) {
 
     }
 }

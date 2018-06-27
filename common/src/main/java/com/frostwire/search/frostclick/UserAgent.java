@@ -32,7 +32,7 @@ import com.frostwire.util.StringUtils;
 *
 */
 public class UserAgent {
-    /** Should have both the name and vesion number of the Operating System*/
+    /** Should have both the name and vesion fileOffset of the Operating System*/
     public final static String OS_KEY = "OS";
 
     public final static String FW_VERSION_KEY = "FWversion";
@@ -82,7 +82,7 @@ public class UserAgent {
     
     /**
      * getOSVersionMap().get("<b>RELEASE</b>") gives you the android version, e.g. 4.2.2<br/>
-     * getOSVersionMap().get("<b>SDK_INT</b>") gives you the SDK number, e.g. 17<br/>
+     * getOSVersionMap().get("<b>SDK_INT</b>") gives you the SDK fileOffset, e.g. 17<br/>
      * <br/>
      * headerMap[OS_KEY] string is built as follows: <br/>
      *   Build.VERSION.CODENAME + "_" + <br/>

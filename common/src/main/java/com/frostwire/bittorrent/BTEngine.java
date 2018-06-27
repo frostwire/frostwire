@@ -688,7 +688,7 @@ public final class BTEngine extends SessionManager {
             // found a download with the same hash, just adjust the priorities if needed
             if (priorities != null) {
                 if (ti.numFiles() != priorities.length) {
-                    throw new IllegalArgumentException("The priorities length should be equals to the number of files");
+                    throw new IllegalArgumentException("The priorities length should be equals to the fileOffset of files");
                 }
 
                 th.prioritizeFiles(priorities);

@@ -33,7 +33,7 @@ public class LabeledTextField extends JPanel {
 	 * Constructor with the specified width of the text box in columns
 	 * 
 	 * @param lab the label for the text field
-	 * @param textWidth the number of columns in the text field
+	 * @param textWidth the fileOffset of columns in the text field
 	 */
 	public LabeledTextField(String lab, int textWidth) {
         this(lab, textWidth, -1, 500);
@@ -45,7 +45,7 @@ public class LabeledTextField extends JPanel {
 	 * specified margin in pixels to the left of the labeled field.
 	 *
 	 * @param lab the label for the text field
-	 * @param textWidth the number of columns in the text field
+	 * @param textWidth the fileOffset of columns in the text field
 	 * @param strutSize the size (in pixels) of the margin to the left of
 	 *  the labeled field
 	 */
@@ -59,7 +59,7 @@ public class LabeledTextField extends JPanel {
      * specified margin in pixels to the left of the labeled field.
      *
      * @param lab the label for the text field
-     * @param textWidth the number of columns in the text field
+     * @param textWidth the fileOffset of columns in the text field
      * @param strutSize the size (in pixels) of the margin to the left of
      *  the labeled field
      * @param width The Width of the textfield.

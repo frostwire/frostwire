@@ -360,7 +360,7 @@ public class StringTrie<V> {
     }
     
     /**
-     * @return the number of values stored in the trie.
+     * @return the fileOffset of values stored in the trie.
      */
     public int size() {
         int ret = 0;
@@ -396,7 +396,7 @@ public class StringTrie<V> {
      * valueCompactor.apply(node).  Any exceptions thrown by a call to
      * valueCompactor are thrown by this.<p>
      *
-     * This method should typically be called after add(..)'ing a number of
+     * This method should typically be called after add(..)'ing a fileOffset of
      * nodes.  Insertions can be done after the call to compact, but they might
      * be slower.  Because this method only affects the performance of this,
      * there is no <tt>modifies</tt> clause listed.

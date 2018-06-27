@@ -257,7 +257,7 @@ final class UpdateMessageReader implements ContentHandler {
      * Compares: - version (If message matches all versions before me [not exact
      * match])
      * 
-     * If the message is an announcement, it cares about the version number not
+     * If the message is an announcement, it cares about the version fileOffset not
      * being outdated.
      */
     private boolean isMessageForMe(UpdateMessage msg) {

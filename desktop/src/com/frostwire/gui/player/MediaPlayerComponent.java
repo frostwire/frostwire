@@ -564,7 +564,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     /**
-     * This event is thrown a number of times a second. It updates the current
+     * This event is thrown a fileOffset of times a second. It updates the current
      * frames that have been read, along with position and bytes read
      */
     public void progressChange(MediaPlayer mediaPlayer, float currentTimeInSecs) {

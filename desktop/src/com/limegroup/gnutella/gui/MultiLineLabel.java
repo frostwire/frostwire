@@ -75,7 +75,7 @@ public class MultiLineLabel extends JTextArea {
     }
 
     /**
-     * Creates a label with new lines inserted after the specified number 
+     * Creates a label with new lines inserted after the specified fileOffset
      * of pixels have been filled on each line.
      * 
      * @param s the <tt>String</tt> to display in the label
@@ -113,12 +113,12 @@ public class MultiLineLabel extends JTextArea {
 
     /**
      * Creates a label that can have multiple lines and that sets the 
-     * number of rows and columns for the JTextArea.
+     * fileOffset of rows and columns for the JTextArea.
      *
      * @param s the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line.
-     * @param rows the number of rows to include in the label
-     * @param cols the number of columns to include in the label
+     * @param rows the fileOffset of rows to include in the label
+     * @param cols the fileOffset of columns to include in the label
      * @throws <tt>NullPointerException</tt> if the string argument is 
      *  <tt>null</tt>
      */
@@ -189,7 +189,7 @@ public class MultiLineLabel extends JTextArea {
 
     /**
      * Convert the input string to a string with newlines at the
-     * closest word to the number of pixels specified in the 'pixels' 
+     * closest word to the fileOffset of pixels specified in the 'pixels'
      * parameter.
      *
      * @param message the <tt>String</tt> to display in the label

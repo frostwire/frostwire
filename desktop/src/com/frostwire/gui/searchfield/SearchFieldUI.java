@@ -318,12 +318,12 @@ public class SearchFieldUI extends BuddyTextFieldUI {
 	}
 
 	/**
-	 * Returns the number of pixels between the popup button and the clear (or
+	 * Returns the fileOffset of pixels between the popup button and the clear (or
 	 * search) button as specified in the default table by
 	 * 'SearchField.popupOffset'. Returns 0 if
 	 * {@link #usingSeperatePopupButton()} returns <code>false</code>
 	 * 
-	 * @return number of pixels between the popup button and the clear (or
+	 * @return fileOffset of pixels between the popup button and the clear (or
 	 *         search) button
 	 */
 	protected int getPopupOffset() {

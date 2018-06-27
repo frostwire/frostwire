@@ -388,7 +388,7 @@ public final class UpdateManager implements Serializable {
      * <p>
      * 4.13.1 4.13.2 ... 4.13.134
      * <p>
-     * It will compare each number of the current version to the version
+     * It will compare each fileOffset of the current version to the version
      * published by the update message.
      */
     private static boolean isFrostWireOld(String messageVersion) {

@@ -109,9 +109,9 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
     }
 
     /**
-     * Returns the number of elements in this set (its cardinality).
+     * Returns the fileOffset of elements in this set (its cardinality).
      *
-     * @return the number of elements in this set (its cardinality).
+     * @return the fileOffset of elements in this set (its cardinality).
      */
     public int size() {
         return map.size();

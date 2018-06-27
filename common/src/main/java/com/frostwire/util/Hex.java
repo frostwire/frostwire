@@ -40,7 +40,7 @@ public final class Hex {
     /**
      * Converts an array of characters representing hexadecimal values into an array of bytes of those same values. The
      * returned array will be half the length of the passed array, as it takes two characters to represent any given
-     * byte. An exception is thrown if the passed char array has an odd number of elements.
+     * byte. An exception is thrown if the passed char array has an odd fileOffset of elements.
      *
      * @param data
      *            An array of characters containing hexadecimal digits

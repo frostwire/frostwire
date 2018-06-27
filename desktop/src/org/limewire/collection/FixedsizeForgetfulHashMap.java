@@ -50,13 +50,13 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * 
      */
     private static final long serialVersionUID = -519304540549432803L;
-    /**  Maximum number of elements to be stored in the underlying hashMap */
+    /**  Maximum fileOffset of elements to be stored in the underlying hashMap */
     private final int MAXIMUM_SIZE;
 
     /**
      * Create a new instance that holds only the last "size" entries.
      * 
-     * @param size the number of entries to hold
+     * @param size the fileOffset of entries to hold
      * @exception IllegalArgumentException if size is less < 1.
      */
     public FixedsizeForgetfulHashMap(int size) {
@@ -67,7 +67,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * Create a new instance that holds only the last "size" entries,
      * using the given initialCapacity and a loadFactor of 0.75.
      * 
-     * @param size the number of entries to hold
+     * @param size the fileOffset of entries to hold
      * @exception IllegalArgumentException if size is less < 1.
      */
     public FixedsizeForgetfulHashMap(int size, int initialCapacity) {
@@ -78,7 +78,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * Create a new instance that holds only the last "size" entries, using
      * the given initialCapacity & loadFactor.
      * 
-     * @param size the number of entries to hold
+     * @param size the fileOffset of entries to hold
      * @exception IllegalArgumentException if size is less < 1.
      */
     public FixedsizeForgetfulHashMap(int size, int initialCapacity, float loadFactor) {

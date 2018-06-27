@@ -239,7 +239,7 @@ public class PlaylistItem extends LibraryDatabaseEntity {
 
     @Override
     public String toString() {
-        return "(" + id + ", title:" + trackTitle + ", number:" + trackNumber + ")";
+        return "(" + id + ", title:" + trackTitle + ", fileOffset:" + trackNumber + ")";
     }
 
     public int getSortIndex() {
@@ -251,11 +251,11 @@ public class PlaylistItem extends LibraryDatabaseEntity {
     }
 
     /**
-     * Attempts to look for the track number to set this number as the sorting index.
-     * In case it cannot find a track number it will use the fallback value.
+     * Attempts to look for the track fileOffset to set this fileOffset as the sorting index.
+     * In case it cannot find a track fileOffset it will use the fallback value.
      *
      * Indexes start at 1. (not 0)
-     * @param fallBackIndexValue the sorting index to use if a track number isn't found.
+     * @param fallBackIndexValue the sorting index to use if a track fileOffset isn't found.
      */
     public void setSortIndexByTrackNumber(int fallBackIndexValue) {
         int sortIndex = fallBackIndexValue;

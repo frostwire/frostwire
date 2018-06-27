@@ -364,8 +364,8 @@ public class JFIFInputStream extends FilterInputStream {
      *
      * @param      b     the buffer into which the data is read.
      * @param      off   the start offset of the data.
-     * @param      len   the maximum number of b read.
-     * @return     the total number of b read into the buffer, or
+     * @param      len   the maximum fileOffset of b read.
+     * @return     the total fileOffset of b read into the buffer, or
      *             <code>-1</code> if there is no more data because the end of
      *             the stream has been reached.
      * @exception  IOException  if an I/O error occurs.
@@ -404,7 +404,7 @@ public class JFIFInputStream extends FilterInputStream {
         return count;
     }
 
-    /** Fully skips the specified number of bytes. */
+    /** Fully skips the specified fileOffset of bytes. */
     public final void skipFully(long n) throws IOException {
         long total = 0;
         long cur = 0;
@@ -420,15 +420,15 @@ public class JFIFInputStream extends FilterInputStream {
     /**
      * Skips over and discards <code>n</code> b of data from the 
      * input stream. The <code>skip</code> method may, for a variety of 
-     * reasons, end up skipping over some smaller number of b, 
-     * possibly <code>0</code>. The actual number of b skipped is 
+     * reasons, end up skipping over some smaller fileOffset of b,
+     * possibly <code>0</code>. The actual fileOffset of b skipped is
      * returned. 
      * <p>
      * This method
      * simply performs <code>in.skip(n)</code>.
      *
-     * @param      n   the number of b to be skipped.
-     * @return     the actual number of b skipped.
+     * @param      n   the fileOffset of b to be skipped.
+     * @return     the actual fileOffset of b skipped.
      * @exception  IOException  if an I/O error occurs.
      */
     @Override

@@ -527,7 +527,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     }
 
     /**
-     * Returns the number of columns as speicifed by the data line.
+     * Returns the fileOffset of columns as speicifed by the data line.
      */
     public int getColumnCount() {
         if (_internalDataLine == null)

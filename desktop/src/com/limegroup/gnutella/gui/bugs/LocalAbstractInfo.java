@@ -90,25 +90,25 @@ abstract class LocalAbstractInfo {
     String _connected;
     
     /**
-     * Constant for the number of ultrapeer -> ultrapeer connections.
+     * Constant for the fileOffset of ultrapeer -> ultrapeer connections.
      */
     static final String UP_TO_UP = "13";
     String _upToUp;
     
     /**
-     * Constant for the number of up -> leaf connections.
+     * Constant for the fileOffset of up -> leaf connections.
      */
     static final String UP_TO_LEAF = "14";
     String _upToLeaf;
     
     /**
-     * Constant for the number of leaf -> up connections.
+     * Constant for the fileOffset of leaf -> up connections.
      */
     static final String LEAF_TO_UP = "15";
     String _leafToUp;
     
     /**
-     * Constant for the number of old connections.
+     * Constant for the fileOffset of old connections.
      */
     static final String OLD_CONNECTIONS = "16";
     String _oldConnections;
@@ -126,31 +126,31 @@ abstract class LocalAbstractInfo {
     String _leaf;
     
     /**
-     * Constant for the number of active uploads.
+     * Constant for the fileOffset of active uploads.
      */
     static final String ACTIVE_UPLOADS = "19";
     String _activeUploads;
     
     /**
-     * Constant for the number of queued uploads.
+     * Constant for the fileOffset of queued uploads.
      */
     static final String QUEUED_UPLOADS = "20";
     String _queuedUploads;
     
     /**
-     * Constant for the number of active downloads.
+     * Constant for the fileOffset of active downloads.
      */
     static final String ACTIVE_DOWNLOADS = "21";
     String _activeDownloads;
     
     /**
-     * Constant for the number of http downloaders.
+     * Constant for the fileOffset of http downloaders.
      */
     static final String HTTP_DOWNLOADERS = "22";
     String _httpDownloaders;
     
     /**
-     * Constant for the number of waiting downloaders.
+     * Constant for the fileOffset of waiting downloaders.
      */
     static final String WAITING_DOWNLOADERS = "23";
     String _waitingDownloaders;
@@ -162,7 +162,7 @@ abstract class LocalAbstractInfo {
     String _acceptedIncoming;
     
     /**
-     * Constant for the number of shared files.
+     * Constant for the fileOffset of shared files.
      */
     static final String SHARED_FILES = "25";
     String _sharedFiles;

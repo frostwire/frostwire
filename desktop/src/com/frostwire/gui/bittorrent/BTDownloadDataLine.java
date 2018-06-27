@@ -218,8 +218,6 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         return initializer.getDisplayName();
     }
 
-
-
     /**
      * Returns the <tt>Object</tt> stored at the specified column in this
      * line of data.

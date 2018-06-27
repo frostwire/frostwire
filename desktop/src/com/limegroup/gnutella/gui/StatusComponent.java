@@ -62,7 +62,7 @@ public final class StatusComponent extends JPanel {
         BAR.setIndeterminate(true);
     }
 
-    /** Creates a new StatusComponent with the specified number of steps. */
+    /** Creates a new StatusComponent with the specified fileOffset of steps. */
     public StatusComponent(int steps) {
         STEPPING = true;
         LABEL = new JLabel();

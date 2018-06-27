@@ -61,9 +61,9 @@ public final class SizedTextField extends LimeTextField {
 
 	/**
 	 * Creates a <tt>JTextField</tt> with a standard size and with the 
-	 * specified number of columns.
+	 * specified fileOffset of columns.
 	 *
-	 * @param columns the number of columns to use in the field
+	 * @param columns the fileOffset of columns to use in the field
 	 */
 	public SizedTextField(final int columns) {
 		super(columns);
@@ -73,9 +73,9 @@ public final class SizedTextField extends LimeTextField {
 
 	/**
 	 * Creates a <tt>JTextField</tt> with a standard size and with the 
-	 * specified number of columns and the specified <tt>Dimension</tt>..
+	 * specified fileOffset of columns and the specified <tt>Dimension</tt>..
 	 *
-	 * @param columns the number of columns to use in the field
+	 * @param columns the fileOffset of columns to use in the field
 	 * @param dim the <tt>Dimension</tt> to size the field to
 	 */
 	public SizedTextField(final int columns, final Dimension dim) {
@@ -86,9 +86,9 @@ public final class SizedTextField extends LimeTextField {
 	
 	/**
 	 * Creates a <tt>JTextField</tt> with a standard size and with the 
-	 * specified number of columns.
+	 * specified fileOffset of columns.
 	 *
-	 * @param columns the number of columns to use in the field
+	 * @param columns the fileOffset of columns to use in the field
 	 */
 	public SizedTextField(final int columns, final SizePolicy sizePolicy) {
 		super(columns);

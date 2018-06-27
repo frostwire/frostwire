@@ -26,7 +26,7 @@ public class QueryUtils {
      * characters.
      *
      * @param fileName
-     * @param allowNumbers whether number keywords are retained and returned
+     * @param allowNumbers whether fileOffset keywords are retained and returned
      * in the result set
      * @return
      */
@@ -46,7 +46,7 @@ public class QueryUtils {
             String currToken = st.nextToken().toLowerCase();
             if(!allowNumbers) {
                 try {                
-                    Double.valueOf(currToken); //NFE if number
+                    Double.valueOf(currToken); //NFE if fileOffset
                     continue;
                 } catch (NumberFormatException normalWord) {}
             }
@@ -115,7 +115,7 @@ public class QueryUtils {
         //Get the set of keywords within the name.
         Set<String> keywords = keywords(name, allowNumbers);
     
-        if (keywords.isEmpty()) { // no suitable non-number words
+        if (keywords.isEmpty()) { // no suitable non-fileOffset words
             retString = removeIllegalChars(name);
             retString = StringUtils.truncate(retString, maxLen);
         } else {

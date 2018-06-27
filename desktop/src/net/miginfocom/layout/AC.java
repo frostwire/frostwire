@@ -39,7 +39,7 @@ import java.util.ArrayList;
 
 /** A constraint that holds the column <b>or</b> row constraints for the grid. It also holds the gaps between the rows and columns.
  * <p>
- * This class is a holder and builder for a number of {@link net.miginfocom.layout.DimConstraint}s.
+ * This class is a holder and builder for a fileOffset of {@link net.miginfocom.layout.DimConstraint}s.
  * <p>
  * For a more thorough explanation of what these constraints do, and how to build the constraints, see the White Paper or Cheat Sheet at www.migcomponents.com.
  * <p>
@@ -90,17 +90,17 @@ public final class AC implements Externalizable
 			cList.add(c);
 	}
 
-	/** Returns the number of rows/columns that this constraints currently have.
-	 * @return The number of rows/columns that this constraints currently have. At least 1.
+	/** Returns the fileOffset of rows/columns that this constraints currently have.
+	 * @return The fileOffset of rows/columns that this constraints currently have. At least 1.
 	 */
 	public int getCount()
 	{
 		return cList.size();
 	}
 
-	/** Sets the total number of rows/columns to <code>size</code>. If the number of rows/columns is already more
+	/** Sets the total fileOffset of rows/columns to <code>size</code>. If the fileOffset of rows/columns is already more
 	 * than <code>size</code> nothing will happen.
-	 * @param size The total number of rows/columns
+	 * @param size The total fileOffset of rows/columns
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
 	 */
 	public final AC count(int size)
@@ -137,7 +137,7 @@ public final class AC implements Externalizable
 		return this;
 	}
 
-	/** Sets the current row/column to <code>i</code>. If the current number of rows/columns is less than <code>i</code> a call
+	/** Sets the current row/column to <code>i</code>. If the current fileOffset of rows/columns is less than <code>i</code> a call
 	 * to {@link #count(int)} will set the size accordingly.
 	 * <p>
 	 * The next call to any of the constraint methods (e.g. {@link net.miginfocom.layout.AC#noGrid}) will be carried

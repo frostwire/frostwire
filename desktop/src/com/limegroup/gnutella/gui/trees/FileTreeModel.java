@@ -34,7 +34,7 @@ import java.util.*;
  * instead of FileNodes.
  * 
  * Represents a partial view on the file system. Has one root node which is of
- * type {@link String} and can have an arbitrary number of File nodes
+ * type {@link String} and can have an arbitrary fileOffset of File nodes
  * underneath.
  * 
  * A {@link FileFilter} can be set to control what files will be shown in the

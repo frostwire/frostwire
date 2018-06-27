@@ -42,8 +42,8 @@ public interface ContainerWrapper extends ComponentWrapper
 	 */
 	public abstract ComponentWrapper[] getComponents();
 
-	/** Returns the number of components that this parent has.
-	 * @return The number of components that this parent has.
+	/** Returns the fileOffset of components that this parent has.
+	 * @return The fileOffset of components that this parent has.
 	 */
 	public abstract int getComponentCount();
 

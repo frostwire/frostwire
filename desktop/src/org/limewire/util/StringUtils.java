@@ -241,7 +241,7 @@ public class StringUtils {
     }
 
     /**
-     * Returns a truncated string, up to the maximum number of characters
+     * Returns a truncated string, up to the maximum fileOffset of characters
      */
     public static String truncate(final String string, final int maxLen) {
         return (string.length() <= maxLen) ? string : string.substring(0, maxLen);

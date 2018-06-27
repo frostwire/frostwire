@@ -18,18 +18,72 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.gui.bittorrent.BTDownload;
+import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.transfers.TransferItem;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.List;
 
 public final class TransferDetailFiles extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    public TransferDetailFiles() {
-        super();
-        add(new JLabel("FILES HERE"));
+    private final TransferDetailFilesTableMediator tableMediator;
+    private BittorrentDownload btDownload;
+
+    TransferDetailFiles() {
+        tableMediator = new TransferDetailFilesTableMediator();
+        setLayout(new MigLayout("fill"));
+        add(tableMediator.getComponent(), "growx, growy");
     }
 
     @Override
-    public void updateData(BTDownload btDownload) {
+    public void updateData(BittorrentDownload btDownload) {
+        if (btDownload != null && btDownload.getDl() != null) {
+            try {
+                List<TransferItem> items = btDownload.getDl().getItems();
+                if (items != null && items.size() > 0) {
+                    if (this.btDownload != btDownload) {
+                        this.btDownload = btDownload;
+                        tableMediator.clearTable();
+                        int i = 0;
+                        for (TransferItem item : items) {
+                            tableMediator.add(new TransferItemHolder(i++, item));
+                        }
+                    } else {
+                        int i = 0;
+                        for (TransferItem item : items) {
+                            tableMediator.update(new TransferItemHolder(i++, item));
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
 
+    /**
+     * A Transfer item does not know its own position within the torrent item list,
+     * this class keeps that fileOffset and a reference to the transfer item.
+     * <p>
+     * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
+     */
+    public class TransferItemHolder {
+        public final int fileOffset;
+        final TransferItem transferItem;
+
+        TransferItemHolder(int number, TransferItem transferItem) {
+            this.fileOffset = number;
+            this.transferItem = transferItem;
+        }
+
+        @Override
+        public int hashCode() {
+            return fileOffset;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof TransferItemHolder && ((TransferItemHolder) obj).fileOffset == fileOffset;
+        }
     }
 }

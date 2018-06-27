@@ -18,19 +18,10 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.gui.bittorrent.BTDownload;
-import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
-import javax.swing.*;
-
-public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    public TransferDetailPeers() {
-        super();
-        add(new JLabel("PEERS HERE"));
-    }
-
-    @Override
-    public void updateData(BittorrentDownload btDownload) {
-
+public final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
+    public TransferDetailFilesModel() {
+        super(TransferDetailFilesDataLine.class);
     }
 }

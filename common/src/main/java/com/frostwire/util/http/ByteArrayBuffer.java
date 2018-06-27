@@ -66,7 +66,7 @@ final class ByteArrayBuffer implements Serializable {
      *
      * @param   b        the bytes to be appended.
      * @param   off      the index of the first byte to append.
-     * @param   len      the number of bytes to append.
+     * @param   len      the fileOffset of bytes to append.
      * @throws IndexOutOfBoundsException if <code>off</code> if out of
      * range, <code>len</code> is negative, or
      * <code>off</code> + <code>len</code> is out of range.
@@ -114,7 +114,7 @@ final class ByteArrayBuffer implements Serializable {
      *
      * @param   b        the chars to be appended.
      * @param   off      the index of the first char to append.
-     * @param   len      the number of bytes to append.
+     * @param   len      the fileOffset of bytes to append.
      * @throws IndexOutOfBoundsException if <code>off</code> if out of
      * range, <code>len</code> is negative, or
      * <code>off</code> + <code>len</code> is out of range.
@@ -151,7 +151,7 @@ final class ByteArrayBuffer implements Serializable {
      *
      * @param   b        the chars to be appended.
      * @param   off      the index of the first char to append.
-     * @param   len      the number of bytes to append.
+     * @param   len      the fileOffset of bytes to append.
      * @throws IndexOutOfBoundsException if <code>off</code> if out of
      * range, <code>len</code> is negative, or
      * <code>off</code> + <code>len</code> is out of range.

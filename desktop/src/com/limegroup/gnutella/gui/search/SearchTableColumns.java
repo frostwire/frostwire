@@ -55,7 +55,7 @@ final class SearchTableColumns {
     private final LimeTableColumn EXTENSION_COLUMN = new SearchColumn(EXTENSION_IDX, "RESULT_PANEL_EXTENSION", I18n.tr("Extension"), 55, true, String.class);
 
     /**
-     * The number of default columns.
+     * The fileOffset of default columns.
      */
     static final int COLUMN_COUNT = 8;
 

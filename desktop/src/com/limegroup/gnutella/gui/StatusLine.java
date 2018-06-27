@@ -517,7 +517,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             String sDown = GUIUtils.rate2speed(GUIMediator.instance().getBTDownloadMediator().getDownloadsBandwidth());
             String sUp = GUIUtils.rate2speed(GUIMediator.instance().getBTDownloadMediator().getUploadsBandwidth());
 
-            // number of uploads (seeding) and downloads
+            // fileOffset of uploads (seeding) and downloads
             int downloads = GUIMediator.instance().getCurrentDownloads();
             int uploads = GUIMediator.instance().getCurrentUploads();
 

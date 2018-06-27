@@ -6,7 +6,7 @@ import java.util.Properties;
  * Provides a {@link Number} setting value and 
  * ensures any value you set in the future falls within a range. As a subclass 
  * of <code>Setting</code>, the setting has a key. If the value is set outside 
- * the number range, the value is set to the closer value of either the minimum 
+ * the fileOffset range, the value is set to the closer value of either the minimum
  * or maximum range value. For example, if the range is [0,2] and you set the 
  * value to 8, the value is actually set to 2.
  * <p>

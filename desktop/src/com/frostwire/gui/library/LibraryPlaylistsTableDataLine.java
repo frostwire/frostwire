@@ -115,7 +115,7 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     private static final LimeTableColumn YEAR_COLUMN = new LimeTableColumn(YEAR_IDX, "PLAYLIST_TABLE_YEAR", I18n.tr("Year"), 30, false, PlaylistItemStringProperty.class);
 
     /**
-     * Total number of columns
+     * Total fileOffset of columns
      */
     private static final int NUMBER_OF_COLUMNS = 14;
 
