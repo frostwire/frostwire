@@ -68,22 +68,22 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
      */
     public class TransferItemHolder {
-        public final int number;
+        public final int fileOffset;
         final TransferItem transferItem;
 
-        TransferItemHolder(int number, TransferItem transferItem) {
-            this.number = number;
+        TransferItemHolder(int fileOffset, TransferItem transferItem) {
+            this.fileOffset = fileOffset;
             this.transferItem = transferItem;
         }
 
         @Override
         public int hashCode() {
-            return number;
+            return fileOffset;
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof TransferItemHolder && ((TransferItemHolder) obj).number == number;
+            return obj instanceof TransferItemHolder && ((TransferItemHolder) obj).fileOffset == fileOffset;
         }
     }
 }

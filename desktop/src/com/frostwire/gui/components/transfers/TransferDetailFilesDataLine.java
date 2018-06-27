@@ -76,7 +76,7 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
         final int TYPE = 4;
         switch (col) {
             case NUMBER:
-                return holder.number + 1; // humans...
+                return holder.fileOffset + 1; // humans...
             case NAME:
                 return holder.transferItem.getName();
             case PROGRESS:
