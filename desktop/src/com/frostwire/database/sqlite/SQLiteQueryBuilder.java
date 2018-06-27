@@ -187,7 +187,7 @@ public class SQLiteQueryBuilder
      * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause
      *            (excluding the ORDER BY itself). Passing null will use the
      *            default sort order, which may be unordered.
-     * @param limit Limits the fileOffset of rows returned by the query,
+     * @param limit Limits the number of rows returned by the query,
      *            formatted as LIMIT clause. Passing null denotes no LIMIT clause.
      * @return the SQL query string
      */
@@ -314,7 +314,7 @@ public class SQLiteQueryBuilder
      * @param sortOrder How to order the rows, formatted as an SQL
      *   ORDER BY clause (excluding the ORDER BY itself). Passing null
      *   will use the default sort order, which may be unordered.
-     * @param limit Limits the fileOffset of rows returned by the query,
+     * @param limit Limits the number of rows returned by the query,
      *   formatted as LIMIT clause. Passing null denotes no LIMIT clause.
      * @return a cursor over the result set
      * @see android.content.ContentResolver#query(android.net.Uri, String[],
@@ -389,7 +389,7 @@ public class SQLiteQueryBuilder
      * @param sortOrder How to order the rows, formatted as an SQL
      *   ORDER BY clause (excluding the ORDER BY itself). Passing null
      *   will use the default sort order, which may be unordered.
-     * @param limit Limits the fileOffset of rows returned by the query,
+     * @param limit Limits the number of rows returned by the query,
      *   formatted as LIMIT clause. Passing null denotes no LIMIT clause.
      * @return the resulting SQL SELECT statement
      */

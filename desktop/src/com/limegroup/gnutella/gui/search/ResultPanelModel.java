@@ -171,7 +171,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
 
     /**
-     * Simple clear -- clears the fileOffset of sources & cached SHA1 indexes.
+     * Simple clear -- clears the number of sources & cached SHA1 indexes.
      * Calls super.clear to erase the stored lines.
      */
     protected void simpleClear() {

@@ -49,7 +49,7 @@ public interface DirectoryHolder extends FileFilter {
 	 */
 	File[] getFiles();
 	/**
-	 * Returns the fileOffset of files that this directory holder contains.
+	 * Returns the number of files that this directory holder contains.
 	 */
 	int size();
 	/**

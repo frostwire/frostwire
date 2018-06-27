@@ -185,7 +185,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     }
 
     /**
-     * Returns the fileOffset of columns.
+     * Returns the number of columns.
      */
     public int getColumnCount() {
         return SearchTableColumns.COLUMN_COUNT;

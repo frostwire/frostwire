@@ -5,12 +5,12 @@ public interface SessionInfo {
     public int getNumberOfPendingTimeouts();
 
     /**
-     * Returns the fileOffset of downloads waiting to be started.
+     * Returns the number of downloads waiting to be started.
      */
     public int getNumWaitingDownloads();
 
     /**
-     * Returns the fileOffset of individual downloaders.
+     * Returns the number of individual downloaders.
      */
     public int getNumIndividualDownloaders();
 
@@ -20,22 +20,22 @@ public interface SessionInfo {
     public long getCurrentUptime();
 
     /**
-     * Returns the fileOffset of active ultrapeer -> leaf connections.
+     * Returns the number of active ultrapeer -> leaf connections.
      */
     public int getNumUltrapeerToLeafConnections();
 
     /**
-     * Returns the fileOffset of leaf -> ultrapeer connections.
+     * Returns the number of leaf -> ultrapeer connections.
      */
     public int getNumLeafToUltrapeerConnections();
 
     /**
-     * Returns the fileOffset of ultrapeer -> ultrapeer connections.
+     * Returns the number of ultrapeer -> ultrapeer connections.
      */
     public int getNumUltrapeerToUltrapeerConnections();
 
     /**
-     * Returns the fileOffset of old unrouted connections.
+     * Returns the number of old unrouted connections.
      */
     public int getNumOldConnections();
 

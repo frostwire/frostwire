@@ -63,27 +63,27 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
 
     /**
      * A Transfer item does not know its own position within the torrent item list,
-     * this class keeps that fileOffset and a reference to the transfer item.
+     * this class keeps that number and a reference to the transfer item.
      * <p>
      * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
      */
     public class TransferItemHolder {
-        public final int fileOffset;
+        public final int number;
         final TransferItem transferItem;
 
         TransferItemHolder(int number, TransferItem transferItem) {
-            this.fileOffset = number;
+            this.number = number;
             this.transferItem = transferItem;
         }
 
         @Override
         public int hashCode() {
-            return fileOffset;
+            return number;
         }
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof TransferItemHolder && ((TransferItemHolder) obj).fileOffset == fileOffset;
+            return obj instanceof TransferItemHolder && ((TransferItemHolder) obj).number == number;
         }
     }
 }

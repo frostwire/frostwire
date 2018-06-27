@@ -109,7 +109,7 @@ public class RecentSearches implements ActionListener {
 	 * already exists, the old element will be removed. The modified list will
 	 * automatically be persisted.
 	 * 
-	 * If the fileOffset of elements exceeds the maximum fileOffset of entries, the last
+	 * If the number of elements exceeds the maximum number of entries, the last
 	 * entry will be removed.
 	 * 
 	 * @see #getMaxRecents()
@@ -143,9 +143,9 @@ public class RecentSearches implements ActionListener {
 	}
 
 	/**
-	 * The fileOffset of recent searches.
+	 * The number of recent searches.
 	 * 
-	 * @return fileOffset of recent searches
+	 * @return number of recent searches
 	 */
 	public int getLength() {
 		return recentSearches.size();
@@ -161,21 +161,21 @@ public class RecentSearches implements ActionListener {
 	}
 
 	/**
-	 * Returns the maximum fileOffset of recent searches.
+	 * Returns the maximum number of recent searches.
 	 * 
 	 * @see #put(String)
-	 * @return the maximum fileOffset of recent searches
+	 * @return the maximum number of recent searches
 	 */
 	public int getMaxRecents() {
 		return maxRecents;
 	}
 
 	/**
-	 * Set the maximum fileOffset of recent searches.
+	 * Set the maximum number of recent searches.
 	 * 
 	 * @see #put(String)
 	 * @param maxRecents
-	 *            maximum fileOffset of recent searches
+	 *            maximum number of recent searches
 	 */
 	public void setMaxRecents(int maxRecents) {
 		this.maxRecents = maxRecents;

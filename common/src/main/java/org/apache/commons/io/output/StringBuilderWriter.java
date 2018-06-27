@@ -130,7 +130,7 @@ public class StringBuilderWriter extends Writer implements Serializable {
      *
      * @param value The value to write
      * @param offset The index of the first character
-     * @param length The fileOffset of characters to write
+     * @param length The number of characters to write
      */
     @Override
     public void write(char[] value, int offset, int length) {

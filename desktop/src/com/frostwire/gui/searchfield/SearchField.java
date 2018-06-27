@@ -691,7 +691,7 @@ public class SearchField extends JXSearchField {
         }
 
         /**
-         * Sets the size according to the fileOffset of entries.
+         * Sets the size according to the number of entries.
          */
         public Dimension getPreferredScrollableViewportSize() {
             int width = SearchField.this.getSize().width - 2;

@@ -107,7 +107,7 @@ public class SQLiteDatabase {
      * Execute a single SQL statement that is NOT a SELECT
      * or any other SQL statement that returns data.
      * <p>
-     * It has no means to return any data (such as the fileOffset of affected rows).
+     * It has no means to return any data (such as the number of affected rows).
      * Instead, you're encouraged to use {@link #insert(String, String, ContentValues)},
      * {@link #update(String, ContentValues, String, String[])}, et al, when possible.
      * </p>
@@ -230,7 +230,7 @@ public class SQLiteDatabase {
      * @param table the table to delete from
      * @param whereClause the optional WHERE clause to apply when deleting.
      *            Passing null will delete all rows.
-     * @return the fileOffset of rows affected if a whereClause is passed in, 0
+     * @return the number of rows affected if a whereClause is passed in, 0
      *         otherwise. To remove all rows and get a count pass "1" as the
      *         whereClause.
      */
@@ -249,7 +249,7 @@ public class SQLiteDatabase {
      *            valid value that will be translated to NULL.
      * @param whereClause the optional WHERE clause to apply when updating.
      *            Passing null will update all rows.
-     * @return the fileOffset of rows affected
+     * @return the number of rows affected
      */
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         verifyDbIsOpen();

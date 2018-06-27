@@ -1,7 +1,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 /**
- * Simple comparable holder so that the Transfer table can properly be sorted by the fileOffset of seeds.
+ * Simple comparable holder so that the Transfer table can properly be sorted by the number of seeds.
  * @author gubatron
  *
  */

@@ -107,7 +107,7 @@ public class JXSearchField extends JXTextField {
 		 * In INSTANT search mode, an action event is fired, when the user
 		 * presses enter or changes the search text.
 		 * 
-		 * The action event is delayed about the fileOffset of milliseconds
+		 * The action event is delayed about the number of milliseconds
 		 * specified by {@link JXSearchField#getInstantSearchDelay()}.
 		 * 
 		 * No rollover and pressed icon is used for the find button.

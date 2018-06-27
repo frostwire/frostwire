@@ -122,7 +122,7 @@ public class Cursor {
     /**
      * Returns the numbers of rows in the cursor.
      *
-     * @return the fileOffset of rows in the cursor.
+     * @return the number of rows in the cursor.
      */
     public int getCount() {
         try {

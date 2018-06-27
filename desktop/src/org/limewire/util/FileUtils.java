@@ -359,13 +359,13 @@ public class FileUtils {
     
     /** 
      * Attempts to copy the first 'amount' bytes of file 'src' to 'dst',
-     * returning the fileOffset of bytes actually copied.  If 'dst' already exists,
+     * returning the number of bytes actually copied.  If 'dst' already exists,
      * the copy may or may not succeed.
      * 
      * @param src the source file to copy
      * @param amount the amount of src to copy, in bytes
      * @param dst the place to copy the file
-     * @return the fileOffset of bytes actually copied.  Returns 'amount' if the
+     * @return the number of bytes actually copied.  Returns 'amount' if the
      *  entire requested range was copied.
      */
     public static long copy(File src, long amount, File dst) {

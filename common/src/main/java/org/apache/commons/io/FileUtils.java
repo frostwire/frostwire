@@ -79,24 +79,24 @@ public class FileUtils {
     }
 
     /**
-     * The fileOffset of bytes in a kilobyte.
+     * The number of bytes in a kilobyte.
      */
     public static final long ONE_KB = 1024;
 
     /**
-     * The fileOffset of bytes in a kilobyte.
+     * The number of bytes in a kilobyte.
      * 
      * @since 2.4
      */
     public static final BigInteger ONE_KB_BI = BigInteger.valueOf(ONE_KB);
 
     /**
-     * The fileOffset of bytes in a megabyte.
+     * The number of bytes in a megabyte.
      */
     public static final long ONE_MB = ONE_KB * ONE_KB;
 
     /**
-     * The fileOffset of bytes in a megabyte.
+     * The number of bytes in a megabyte.
      * 
      * @since 2.4
      */
@@ -108,60 +108,60 @@ public class FileUtils {
     private static final long FILE_COPY_BUFFER_SIZE = ONE_MB * 30;
 
     /**
-     * The fileOffset of bytes in a gigabyte.
+     * The number of bytes in a gigabyte.
      */
     public static final long ONE_GB = ONE_KB * ONE_MB;
 
     /**
-     * The fileOffset of bytes in a gigabyte.
+     * The number of bytes in a gigabyte.
      * 
      * @since 2.4
      */
     public static final BigInteger ONE_GB_BI = ONE_KB_BI.multiply(ONE_MB_BI);
 
     /**
-     * The fileOffset of bytes in a terabyte.
+     * The number of bytes in a terabyte.
      */
     public static final long ONE_TB = ONE_KB * ONE_GB;
 
     /**
-     * The fileOffset of bytes in a terabyte.
+     * The number of bytes in a terabyte.
      * 
      * @since 2.4
      */
     public static final BigInteger ONE_TB_BI = ONE_KB_BI.multiply(ONE_GB_BI);
 
     /**
-     * The fileOffset of bytes in a petabyte.
+     * The number of bytes in a petabyte.
      */
     public static final long ONE_PB = ONE_KB * ONE_TB;
 
     /**
-     * The fileOffset of bytes in a petabyte.
+     * The number of bytes in a petabyte.
      * 
      * @since 2.4
      */
     public static final BigInteger ONE_PB_BI = ONE_KB_BI.multiply(ONE_TB_BI);
 
     /**
-     * The fileOffset of bytes in an exabyte.
+     * The number of bytes in an exabyte.
      */
     public static final long ONE_EB = ONE_KB * ONE_PB;
 
     /**
-     * The fileOffset of bytes in an exabyte.
+     * The number of bytes in an exabyte.
      * 
      * @since 2.4
      */
     public static final BigInteger ONE_EB_BI = ONE_KB_BI.multiply(ONE_PB_BI);
 
     /**
-     * The fileOffset of bytes in a zettabyte.
+     * The number of bytes in a zettabyte.
      */
     public static final BigInteger ONE_ZB = BigInteger.valueOf(ONE_KB).multiply(BigInteger.valueOf(ONE_EB));
 
     /**
-     * The fileOffset of bytes in a yottabyte.
+     * The number of bytes in a yottabyte.
      */
     public static final BigInteger ONE_YB = ONE_KB_BI.multiply(ONE_ZB);
 
@@ -365,9 +365,9 @@ public class FileUtils {
 
     //-----------------------------------------------------------------------
     /**
-     * Returns a human-readable version of the file size, where the input represents a specific fileOffset of bytes.
+     * Returns a human-readable version of the file size, where the input represents a specific number of bytes.
      * <p>
-     * If the size is over 1GB, the size is returned as the fileOffset of whole GB, i.e. the size is rounded down to the
+     * If the size is over 1GB, the size is returned as the number of whole GB, i.e. the size is rounded down to the
      * nearest GB boundary.
      * </p>
      * <p>
@@ -375,7 +375,7 @@ public class FileUtils {
      * </p>
      * 
      * @param size
-     *            the fileOffset of bytes
+     *            the number of bytes
      * @return a human-readable display value (includes units - EB, PB, TB, GB, MB, KB or bytes)
      * @see <a href="https://issues.apache.org/jira/browse/IO-226">IO-226 - should the rounding be changed?</a>
      * @since 2.4
@@ -403,9 +403,9 @@ public class FileUtils {
     }
 
     /**
-     * Returns a human-readable version of the file size, where the input represents a specific fileOffset of bytes.
+     * Returns a human-readable version of the file size, where the input represents a specific number of bytes.
      * <p>
-     * If the size is over 1GB, the size is returned as the fileOffset of whole GB, i.e. the size is rounded down to the
+     * If the size is over 1GB, the size is returned as the number of whole GB, i.e. the size is rounded down to the
      * nearest GB boundary.
      * </p>
      * <p>
@@ -413,7 +413,7 @@ public class FileUtils {
      * </p>
      * 
      * @param size
-     *            the fileOffset of bytes
+     *            the number of bytes
      * @return a human-readable display value (includes units - EB, PB, TB, GB, MB, KB or bytes)
      * @see <a href="https://issues.apache.org/jira/browse/IO-226">IO-226 - should the rounding be changed?</a>
      */
@@ -1097,7 +1097,7 @@ public class FileUtils {
      *            the <code>File</code> to read from
      * @param output
      *            the <code>OutputStream</code> to write to
-     * @return the fileOffset of bytes copied
+     * @return the number of bytes copied
      * @throws NullPointerException
      *             if the input or output is null
      * @throws IOException
@@ -1466,9 +1466,9 @@ public class FileUtils {
      * @param source  the <code>URL</code> to copy bytes from, must not be {@code null}
      * @param destination  the non-directory <code>File</code> to write bytes to
      *  (possibly overwriting), must not be {@code null}
-     * @param connectionTimeout the fileOffset of milliseconds until this method
+     * @param connectionTimeout the number of milliseconds until this method
      *  will timeout if no connection could be established to the <code>source</code>
-     * @param readTimeout the fileOffset of milliseconds until this method will
+     * @param readTimeout the number of milliseconds until this method will
      *  timeout if no data could be read from the <code>source</code> 
      * @throws IOException if <code>source</code> URL cannot be opened
      * @throws IOException if <code>destination</code> is a directory
@@ -2455,7 +2455,7 @@ public class FileUtils {
      * 
      * @param directory
      *            directory to inspect, must not be {@code null}
-     * @return size of directory in bytes, 0 if directory is security restricted, a negative fileOffset when the real total
+     * @return size of directory in bytes, 0 if directory is security restricted, a negative number when the real total
      *         is greater than {@link Long#MAX_VALUE}.
      * @throws NullPointerException
      *             if the directory is {@code null}

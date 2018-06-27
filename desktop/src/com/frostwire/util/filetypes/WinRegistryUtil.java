@@ -140,7 +140,7 @@ public class WinRegistryUtil {
   
     /**
      *  Constructs a new class ID name based on the given fileExt name
-     *  by adding a sequence fileOffset at the rear of the given fileExt.
+     *  by adding a sequence number at the rear of the given fileExt.
      *
      *  @param fileExt given file extension (not null)
      *  @param regLevel given regLevel

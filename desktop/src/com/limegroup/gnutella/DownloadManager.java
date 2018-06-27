@@ -17,7 +17,7 @@ package com.limegroup.gnutella;
 
 
 /** 
- * The list of all downloads in progress.  DownloadManager has a fixed fileOffset
+ * The list of all downloads in progress.  DownloadManager has a fixed number
  * of download slots given by the MAX_SIM_DOWNLOADS property.  It is
  * responsible for starting downloads and scheduling and queueing them as 
  * needed.  This class is thread safe.<p>

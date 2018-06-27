@@ -633,18 +633,18 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the total fileOffset of currently active uploads.
+     * Returns the total number of currently active uploads.
      *
-     * @return the total fileOffset of currently active uploads
+     * @return the total number of currently active uploads
      */
     int getCurrentUploads() {
         return getBTDownloadMediator().getActiveUploads();
     }
 
     /**
-     * Returns the total fileOffset of downloads for this session.
+     * Returns the total number of downloads for this session.
      *
-     * @return the total fileOffset of downloads for this session
+     * @return the total number of downloads for this session
      */
     @SuppressWarnings("unused")
     public final int getTotalDownloads() {

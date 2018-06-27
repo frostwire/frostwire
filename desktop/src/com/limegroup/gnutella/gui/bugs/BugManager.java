@@ -85,7 +85,7 @@ public final class BugManager {
 	private volatile long _nextAllowedTime = 0;
 	
 	/**
-	 * The fileOffset of bug dialogs currently showing.
+	 * The number of bug dialogs currently showing.
 	 */
 	private int _dialogsShowing = 0;
 
@@ -161,7 +161,7 @@ public final class BugManager {
         }
 
         /*
-	    The maximum fileOffset of dialogs we're allowed to show.
+	    The maximum number of dialogs we're allowed to show.
 	    */
         int MAX_DIALOGS = 3;
         if (!BugSettings.USE_AUTOMATIC_BUG.getValue() &&  _dialogsShowing < MAX_DIALOGS) {

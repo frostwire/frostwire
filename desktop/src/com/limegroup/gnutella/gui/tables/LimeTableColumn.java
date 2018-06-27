@@ -23,8 +23,8 @@ import javax.swing.table.TableColumn;
  * A personalized TableColumn for storing extended information.
  * This class provides support for storing:
  * <ul>
- * <li> The model fileOffset of the column
- *      (this doubles as the default order fileOffset) </li>
+ * <li> The model number of the column
+ *      (this doubles as the default order number) </li>
  * <li> The messageBundle ID of the column </li>
  * <li> The default width of the column
  *      (as opposed to the current preferredSize) </li>
@@ -197,7 +197,7 @@ public class LimeTableColumn extends TableColumn {
      */
 
     /**
-     * Disallows changing of model fileOffset
+     * Disallows changing of model number
      */
     public void setModelIndex(int idx) {
         if (!initialized)

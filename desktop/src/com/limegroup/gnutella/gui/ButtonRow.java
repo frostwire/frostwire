@@ -27,7 +27,7 @@ public final class ButtonRow extends JPanel {
     private JButton[] _buttons;
 
 	/**
-	 * The fileOffset of pixels separating buttons.
+	 * The number of pixels separating buttons.
 	 */
     public static final int BUTTON_SEP = 6;
 

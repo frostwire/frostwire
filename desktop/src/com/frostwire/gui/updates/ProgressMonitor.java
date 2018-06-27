@@ -724,12 +724,12 @@ class ProgressMonitor implements Accessible
         }
 
         /**
-         * Returns the fileOffset of accessible children of the object.
+         * Returns the number of accessible children of the object.
          *
-         * @return the fileOffset of accessible children of the object.
+         * @return the number of accessible children of the object.
          */
         public int getAccessibleChildrenCount() {
-            // return the fileOffset of children in the JPanel containing
+            // return the number of children in the JPanel containing
             // the message, note label and progress bar
             AccessibleContext ac = getPanelAccessibleContext();
             if (ac != null) {
@@ -912,9 +912,9 @@ class ProgressMonitor implements Accessible
         }
 
         /**
-         * Returns the fileOffset of characters (valid indicies)
+         * Returns the number of characters (valid indicies)
          *
-         * @return the fileOffset of characters
+         * @return the number of characters
          */
         public int getCharCount() {
             AccessibleText at = getNoteLabelAccessibleText();

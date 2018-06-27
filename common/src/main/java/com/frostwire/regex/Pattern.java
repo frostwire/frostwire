@@ -210,7 +210,7 @@ public class Pattern {
      * then the resulting array has just one element, namely the input
      * sequence in string form.</p>
      *
-     * <p>The limit parameter controls the fileOffset of times the pattern is
+     * <p>The limit parameter controls the number of times the pattern is
      * applied and therefore affects the length of the resulting array. If
      * the limit n is greater than zero then the pattern will be applied
      * at most n - 1 times, the array's length will be no greater than n,
@@ -395,7 +395,7 @@ public class Pattern {
      * @param s string to evaluate
      * @param pos ending position of string; characters to the left
      * of this position are evaluated
-     * @return fileOffset of open parentheses
+     * @return number of open parentheses
      */
     static private int countOpenParens(String s, int pos) {
         java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\(");

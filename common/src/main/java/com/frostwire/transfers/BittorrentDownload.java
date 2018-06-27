@@ -66,7 +66,7 @@ public interface BittorrentDownload extends Transfer {
     void remove(boolean deleteTorrent, boolean deleteData);
 
     /**
-     * Adds up the fileOffset of bytes per file extension and returns
+     * Adds up the number of bytes per file extension and returns
      * the winning file extension for the torrent.
      *
      * If the files are not known, then it returns "torrent"

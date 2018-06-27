@@ -188,9 +188,9 @@ public final class ContentValues /*implements Parcelable*/ {
     }
 
     /**
-     * Returns the fileOffset of values.
+     * Returns the number of values.
      *
-     * @return the fileOffset of values
+     * @return the number of values
      */
     public int size() {
         return mValues.size();

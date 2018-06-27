@@ -25,12 +25,12 @@ import java.awt.*;
 public class SizedWholeNumberField extends WholeNumberField {
 	
 	/**
-	 * constant dimension for sizing fileOffset fields.
+	 * constant dimension for sizing number fields.
 	 */
 	private final Dimension STANDARD_DIMENSION = new Dimension(5, 28);
 
 	/**
-	 * Constant for the standard fileOffset of columns in the field.
+	 * Constant for the standard number of columns in the field.
 	 */
 	private static final int STANDARD_COLUMNS = 5;
 
@@ -45,9 +45,9 @@ public class SizedWholeNumberField extends WholeNumberField {
 
 	/**
 	 * Constructs a <code>WholeNumberField</code> with a standard size.
-	 * This constructor allows the fileOffset of columns to be customized.
+	 * This constructor allows the number of columns to be customized.
 	 *
-	 * @param columns the fileOffset of columns to use
+	 * @param columns the number of columns to use
 	 */
 	public SizedWholeNumberField(int columns) {
 		super(columns);
@@ -57,10 +57,10 @@ public class SizedWholeNumberField extends WholeNumberField {
 
 	/**
 	 * Constructs a <code>WholeNumberField</code> with a standard size 
-	 * and the specified initial value and fileOffset of columns.
+	 * and the specified initial value and number of columns.
 	 *
 	 * @param value the initial value of the field
-	 * @param columns the fileOffset of columns to use
+	 * @param columns the number of columns to use
 	 */
 	public SizedWholeNumberField(int value, int columns) {
 		super(value, columns);

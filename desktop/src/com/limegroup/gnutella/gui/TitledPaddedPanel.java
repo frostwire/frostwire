@@ -44,12 +44,12 @@ public class TitledPaddedPanel extends JPanel {
     public static final int Y_AXIS = 21;
 
     /**
-     * The fileOffset of pixels making up the margin of a titled panel.
+     * The number of pixels making up the margin of a titled panel.
      */
     private static final int TITLED_MARGIN = 6;
 
     /**
-     * The fileOffset of pixels in the margin of a padded panel.
+     * The number of pixels in the margin of a padded panel.
      */
     private static final int OUT_MARGIN = 6;
 

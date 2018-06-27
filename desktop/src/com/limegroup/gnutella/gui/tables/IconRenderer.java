@@ -39,7 +39,7 @@ public final class IconRenderer extends DefaultTableBevelledCellRenderer {
 
 	/**
 	 * Returns the <tt>Component</tt> that displays the stars based
-	 * on the fileOffset of stars in the <tt>QualityHolder</tt> object.
+	 * on the number of stars in the <tt>QualityHolder</tt> object.
 	 */
 	public Component getTableCellRendererComponent
 		(JTable table,Object value,boolean isSelected,

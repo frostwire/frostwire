@@ -473,7 +473,7 @@ public final class SearchMediator {
 
     /**
      * called by ResultPanel when the views are changed. Used to set the
-     * tab to indicate the correct fileOffset of TableLines in the current
+     * tab to indicate the correct number of TableLines in the current
      * view.
      */
     static void setTabDisplayCount(SearchResultMediator rp) {

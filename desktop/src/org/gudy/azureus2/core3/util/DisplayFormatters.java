@@ -216,10 +216,10 @@ public class DisplayFormatters {
     //
 
     /**
-     * Format a real fileOffset to the precision specified.  Does not round the fileOffset
+     * Format a real number to the precision specified.  Does not round the number
      * or truncate trailing zeros.
      *
-     * @param value     real fileOffset to format
+     * @param value     real number to format
      * @param precision # of digits after the decimal place
      * @return formatted string
      */
@@ -232,12 +232,12 @@ public class DisplayFormatters {
 
 
     /**
-     * Format a real fileOffset
+     * Format a real number
      *
-     * @param value          real fileOffset to format
+     * @param value          real number to format
      * @param precision      max # of digits after the decimal place
      * @param bTruncateZeros remove any trailing zeros after decimal place
-     * @param bRound         Whether the fileOffset will be rounded to the precision, or
+     * @param bRound         Whether the number will be rounded to the precision, or
      *                       truncated off.
      * @return formatted string
      */

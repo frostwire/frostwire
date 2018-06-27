@@ -5985,7 +5985,7 @@ public class ArrayUtils {
     // package protected for access by unit tests
     static Object removeAll(final Object array, final int... indices) {
         final int length = getLength(array);
-        int diff = 0; // fileOffset of distinct indexes, i.e. fileOffset of entries that will be removed
+        int diff = 0; // number of distinct indexes, i.e. number of entries that will be removed
 
         if (isNotEmpty(indices)) {
             Arrays.sort(indices);
@@ -6007,7 +6007,7 @@ public class ArrayUtils {
         final Object result = Array.newInstance(array.getClass().getComponentType(), length - diff);
         if (diff < length) {
             int end = length; // index just after last copy
-            int dest = length - diff; // fileOffset of entries so far not copied
+            int dest = length - diff; // number of entries so far not copied
             for (int i = indices.length - 1; i >= 0; i--) {
                 final int index = indices[i];
                 if (end - index > 1) { // same as (cp > 0)

@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
  * <p>
  * <code>StringSetSetting</code> class includes methods to add/remove 
  * <code>String</code>s, get <code>String</code> values as an array and return 
- * the fileOffset of <code>String</code>s. Unlike {@link StringArraySetting}, you
+ * the number of <code>String</code>s. Unlike {@link StringArraySetting}, you
  * can add and remove individual <code>String</code>s to the set while 
  * maintaining the existing set.
  * <p>

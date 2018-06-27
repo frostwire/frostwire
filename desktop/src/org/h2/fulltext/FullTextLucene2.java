@@ -208,7 +208,7 @@ public class FullTextLucene2 extends FullText {
      *
      * @param conn the connection
      * @param text the search query
-     * @param limit the maximum fileOffset of rows or 0 for no limit
+     * @param limit the maximum number of rows or 0 for no limit
      * @param offset the offset or 0 for no offset
      * @return the result set
      */
@@ -232,7 +232,7 @@ public class FullTextLucene2 extends FullText {
      *
      * @param conn the connection
      * @param text the search query
-     * @param limit the maximum fileOffset of rows or 0 for no limit
+     * @param limit the maximum number of rows or 0 for no limit
      * @param offset the offset or 0 for no offset
      * @return the result set
      */

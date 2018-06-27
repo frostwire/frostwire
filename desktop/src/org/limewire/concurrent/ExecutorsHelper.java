@@ -70,7 +70,7 @@ public class ExecutorsHelper {
     /**
      * Creates a new ThreadPool.
      * The pool is tuned to begin with zero threads and maintain zero threads,
-     * although an unlimited fileOffset of threads will be created to handle
+     * although an unlimited number of threads will be created to handle
      * the tasks.  Each thread is set to linger for a short period of time,
      * ready to handle new tasks, before the thread terminates.
      * 
@@ -85,7 +85,7 @@ public class ExecutorsHelper {
     }
     
     /**
-     * Creates a new ThreadPool with the maximum fileOffset of available threads.
+     * Creates a new ThreadPool with the maximum number of available threads.
      * Items added while no threads are available to process them will wait
      * until an executing item is finished and then be processed.
      */

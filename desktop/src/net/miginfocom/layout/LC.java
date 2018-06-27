@@ -359,7 +359,7 @@ public final class LC implements Externalizable
 	}
 
 	/** Returns after what cell the grid should always auto wrap.
-	 * @return After what cell the grid should always auto wrap. If <code>0</code> the fileOffset of columns/rows in the
+	 * @return After what cell the grid should always auto wrap. If <code>0</code> the number of columns/rows in the
 	 * {@link net.miginfocom.layout.AC} is used. <code>LayoutUtil.INF</code> is used for no auto wrap.
 	 */
 	public final int getWrapAfter()
@@ -368,7 +368,7 @@ public final class LC implements Externalizable
 	}
 
 	/** Sets after what cell the grid should always auto wrap.
-	 * @param count After what cell the grid should always auto wrap. If <code>0</code> the fileOffset of columns/rows in the
+	 * @param count After what cell the grid should always auto wrap. If <code>0</code> the number of columns/rows in the
 	 * {@link net.miginfocom.layout.AC} is used. <code>LayoutUtil.INF</code> is used for no auto wrap.
 	 */
 	public final void setWrapAfter(int count)
@@ -591,7 +591,7 @@ public final class LC implements Externalizable
 		return this;
 	}
 
-	/** Sets a wrap after the fileOffset of columns/rows that is defined in the {@link net.miginfocom.layout.AC}.
+	/** Sets a wrap after the number of columns/rows that is defined in the {@link net.miginfocom.layout.AC}.
 	 * <p>
 	 * Same functionality as {@link #setWrapAfter(int 0)} only this method returns <code>this</code> for chaining multiple calls.
 	 * <p>
@@ -607,7 +607,7 @@ public final class LC implements Externalizable
 	/** Same functionality as {@link #setWrapAfter(int)} only this method returns <code>this</code> for chaining multiple calls.
 	 * <p>
 	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-	 * @param count After what cell the grid should always auto wrap. If <code>0</code> the fileOffset of columns/rows in the
+	 * @param count After what cell the grid should always auto wrap. If <code>0</code> the number of columns/rows in the
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
 	 */
 	public final LC wrapAfter(int count)

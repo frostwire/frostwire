@@ -390,7 +390,7 @@ public class CheckBoxList<E> extends BoxPanel {
     }
     
     /**
-     * Sets the preferred fileOffset of visible rows.
+     * Sets the preferred number of visible rows.
      * @param rows
      */
     public void setVisibleRowCount(int rows) {

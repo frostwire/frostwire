@@ -125,7 +125,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * Write the bytes to byte array.
      * @param b the bytes to write
      * @param off The start offset
-     * @param len The fileOffset of bytes to write
+     * @param len The number of bytes to write
      */
     @Override
     public void write(byte[] b, int off, int len) {
@@ -176,7 +176,7 @@ public class ByteArrayOutputStream extends OutputStream {
      * internal buffers of this streams.
      *
      * @param in the input stream to read from
-     * @return total fileOffset of bytes read from the input stream
+     * @return total number of bytes read from the input stream
      *         (and written to this stream)
      * @throws IOException if an I/O error occurs while reading the input stream
      * @since 1.4

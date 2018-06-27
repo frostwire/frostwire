@@ -202,7 +202,7 @@ public class CommonUtils {
      * Cleans up the filename from illegal characters and truncates it to the
      * length of bytes specified.
      * @param name the filename to clean up
-     * @param maxBytes the maximumm fileOffset of bytes the cleaned up file name
+     * @param maxBytes the maximumm number of bytes the cleaned up file name
      * can take up
      * @return the cleaned up file name
      */
@@ -229,7 +229,7 @@ public class CommonUtils {
      * on Windows, ( ` ) on unix.
      *
      * @param name the filename to check for illegal characters
-     * @param maxBytes the maximum fileOffset of bytes for the resulting file name,
+     * @param maxBytes the maximum number of bytes for the resulting file name,
      * must be > 0
      * @return String containing the cleaned filename
      * 
@@ -301,7 +301,7 @@ public class CommonUtils {
      * Returns the first <code>maxBytes</code> of <code>string</code> encoded 
      * using the encoder of <code>charSet</code>
      * @param string whose prefix bytes to return
-     * @param maxBytes the maximum fileOffset of bytes to return
+     * @param maxBytes the maximum number of bytes to return
      * @param charSet the char set used for encoding the characters into bytes
      * @return the array of bytes of length <= maxBytes
      * @throws CharacterCodingException if the char set's encoder could not

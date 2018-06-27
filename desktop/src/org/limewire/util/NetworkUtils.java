@@ -39,7 +39,7 @@ public final class NetworkUtils {
      * ports.
      * 
      * @param port
-     *            the port fileOffset to check
+     *            the port number to check
      */
     public static boolean isValidPort(int port) {
         return (port > 0 && port <= 0xFFFF);

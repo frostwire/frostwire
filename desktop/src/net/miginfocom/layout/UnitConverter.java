@@ -53,7 +53,7 @@ public abstract class UnitConverter
 	 * <p>
 	 * May be <code>null</code> in which case a "best guess" value should be returned.
 	 * @param comp The component, if applicable, or <code>null</code> if none.
-	 * @return The fileOffset of pixels if <code>unit</code> is handled by this converter, <code>UnitConverter.UNABLE</code> if not.
+	 * @return The number of pixels if <code>unit</code> is handled by this converter, <code>UnitConverter.UNABLE</code> if not.
 	 */
 	public abstract int convertToPixels(float value, String unit, boolean isHor, float refValue, ContainerWrapper parent, ComponentWrapper comp);
 }

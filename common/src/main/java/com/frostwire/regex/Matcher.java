@@ -183,9 +183,9 @@ public class Matcher {
     }
 
     /**
-     * Returns the fileOffset of capturing groups in this matcher's pattern.
+     * Returns the number of capturing groups in this matcher's pattern.
      *
-     * @return The fileOffset of capturing groups in this matcher's pattern
+     * @return The number of capturing groups in this matcher's pattern
      */
     public int groupCount() {
         return matcher.groupCount();

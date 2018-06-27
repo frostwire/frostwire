@@ -39,7 +39,7 @@ public class Average {
   //the period (in ms)
   private final int period;
 
-  //The fileOffset of elements in the average
+  //The number of elements in the average
   private final int nbElements;
 
   //The time the average was last updated (divided by the refreshRate).
@@ -109,7 +109,7 @@ public class Average {
    */
   private void update(long timeFactor) {
 	    //If we have a really OLD lastUpdate, we could erase the buffer a 
-	    //huge fileOffset of time, so if it's really old, we change it so we'll only
+	    //huge number of time, so if it's really old, we change it so we'll only
 	    //erase the buffer once.
 	  
 	    if (lastUpdate < timeFactor - nbElements)

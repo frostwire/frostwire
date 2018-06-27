@@ -69,7 +69,7 @@ import java.util.regex.Pattern;
  *  <li><b>UpperCase/LowerCase/SwapCase/Capitalize/Uncapitalize</b>
  *      - changes the case of a String</li>
  *  <li><b>CountMatches</b>
- *      - counts the fileOffset of occurrences of one String in another</li>
+ *      - counts the number of occurrences of one String in another</li>
  *  <li><b>IsAlpha/IsNumeric/IsWhitespace/IsAsciiPrintable</b>
  *      - checks the characters in a String</li>
  *  <li><b>DefaultString</b>
@@ -81,7 +81,7 @@ import java.util.regex.Pattern;
  *  <li><b>Difference</b>
  *      - compares Strings and reports on their differences</li>
  *  <li><b>LevenshteinDistance</b>
- *      - the fileOffset of changes needed to change one String into another</li>
+ *      - the number of changes needed to change one String into another</li>
  * </ul>
  *
  * <p>The {@code StringUtils} class defines certain words related to
@@ -2681,7 +2681,7 @@ public class StringUtils {
      * @param str  the String to parse, may be null
      * @param separatorChars  the characters used as the delimiters,
      *  {@code null} splits on whitespace
-     * @param max  the maximum fileOffset of elements to include in the
+     * @param max  the maximum number of elements to include in the
      *  array. A zero or negative value implies no limit
      * @return an array of parsed Strings, {@code null} if null String input
      */
@@ -2739,7 +2739,7 @@ public class StringUtils {
      * @param str  the String to parse, may be null
      * @param separator  String containing the String to be used as a delimiter,
      *  {@code null} splits on whitespace
-     * @param max  the maximum fileOffset of elements to include in the returned
+     * @param max  the maximum number of elements to include in the returned
      *  array. A zero or negative value implies no limit.
      * @return an array of parsed Strings, {@code null} if null String was input
      */
@@ -2800,7 +2800,7 @@ public class StringUtils {
      * @param str  the String to parse, may be null
      * @param separator  String containing the String to be used as a delimiter,
      *  {@code null} splits on whitespace
-     * @param max  the maximum fileOffset of elements to include in the returned
+     * @param max  the maximum number of elements to include in the returned
      *  array. A zero or negative value implies no limit.
      * @return an array of parsed Strings, {@code null} if null String was input
      * @since 2.4
@@ -2815,7 +2815,7 @@ public class StringUtils {
      * @param str  the String to parse, may be {@code null}
      * @param separator  String containing the String to be used as a delimiter,
      *  {@code null} splits on whitespace
-     * @param max  the maximum fileOffset of elements to include in the returned
+     * @param max  the maximum number of elements to include in the returned
      *  array. A zero or negative value implies no limit.
      * @param preserveAllTokens if {@code true}, adjacent separators are
      * treated as empty token separators; if {@code false}, adjacent
@@ -3068,7 +3068,7 @@ public class StringUtils {
      * @param str  the String to parse, may be {@code null}
      * @param separatorChars  the characters used as the delimiters,
      *  {@code null} splits on whitespace
-     * @param max  the maximum fileOffset of elements to include in the
+     * @param max  the maximum number of elements to include in the
      *  array. A zero or negative value implies no limit
      * @return an array of parsed Strings, {@code null} if null String input
      * @since 2.1
@@ -3084,7 +3084,7 @@ public class StringUtils {
      *
      * @param str  the String to parse, may be {@code null}
      * @param separatorChars the separate character
-     * @param max  the maximum fileOffset of elements to include in the
+     * @param max  the maximum number of elements to include in the
      *  array. A zero or negative value implies no limit.
      * @param preserveAllTokens if {@code true}, adjacent separators are
      * treated as empty token separators; if {@code false}, adjacent
@@ -3186,7 +3186,7 @@ public class StringUtils {
      * StringUtils.splitByCharacterType("ab de fg")   = ["ab", " ", "de", " ", "fg"]
      * StringUtils.splitByCharacterType("ab   de fg") = ["ab", "   ", "de", " ", "fg"]
      * StringUtils.splitByCharacterType("ab:cd:ef")   = ["ab", ":", "cd", ":", "ef"]
-     * StringUtils.splitByCharacterType("number5")    = ["fileOffset", "5"]
+     * StringUtils.splitByCharacterType("number5")    = ["number", "5"]
      * StringUtils.splitByCharacterType("fooBar")     = ["foo", "B", "ar"]
      * StringUtils.splitByCharacterType("foo200Bar")  = ["foo", "200", "B", "ar"]
      * StringUtils.splitByCharacterType("ASFRules")   = ["ASFR", "ules"]
@@ -3214,7 +3214,7 @@ public class StringUtils {
      * StringUtils.splitByCharacterTypeCamelCase("ab de fg")   = ["ab", " ", "de", " ", "fg"]
      * StringUtils.splitByCharacterTypeCamelCase("ab   de fg") = ["ab", "   ", "de", " ", "fg"]
      * StringUtils.splitByCharacterTypeCamelCase("ab:cd:ef")   = ["ab", ":", "cd", ":", "ef"]
-     * StringUtils.splitByCharacterTypeCamelCase("number5")    = ["fileOffset", "5"]
+     * StringUtils.splitByCharacterTypeCamelCase("number5")    = ["number", "5"]
      * StringUtils.splitByCharacterTypeCamelCase("fooBar")     = ["foo", "Bar"]
      * StringUtils.splitByCharacterTypeCamelCase("foo200Bar")  = ["foo", "200", "Bar"]
      * StringUtils.splitByCharacterTypeCamelCase("ASFRules")   = ["ASF", "Rules"]
@@ -4002,7 +4002,7 @@ public class StringUtils {
      * @param startIndex the first index to start joining from.
      * @param endIndex the index to stop joining from (exclusive).
      * @return the joined String, {@code null} if null array input; or the empty string
-     * if {@code endIndex - startIndex <= 0}. The fileOffset of joined entries is given by
+     * if {@code endIndex - startIndex <= 0}. The number of joined entries is given by
      * {@code endIndex - startIndex}
      * @throws ArrayIndexOutOfBoundsException ife<br>
      * {@code startIndex < 0} or <br>
@@ -4533,7 +4533,7 @@ public class StringUtils {
      * @param text  text to search and replace in, may be null
      * @param searchString  the String to search for, may be null
      * @param replacement  the String to replace it with, may be null
-     * @param max  maximum fileOffset of values to replace, or {@code -1} if no maximum
+     * @param max  maximum number of values to replace, or {@code -1} if no maximum
      * @return the text with any replacements processed,
      *  {@code null} if null String input
      */
@@ -5136,7 +5136,7 @@ public class StringUtils {
      * </pre>
      *
      * @param str  the String to repeat, may be null
-     * @param repeat  fileOffset of times to repeat str, negative treated as zero
+     * @param repeat  number of times to repeat str, negative treated as zero
      * @return a new String consisting of the original String repeated,
      *  {@code null} if null String input
      */
@@ -5194,7 +5194,7 @@ public class StringUtils {
      *
      * @param str        the String to repeat, may be null
      * @param separator  the String to inject, may be null
-     * @param repeat     fileOffset of times to repeat str, negative treated as zero
+     * @param repeat     number of times to repeat str, negative treated as zero
      * @return a new String consisting of the original String repeated,
      *  {@code null} if null String input
      * @since 2.5
@@ -5226,7 +5226,7 @@ public class StringUtils {
      * </p>
      *
      * @param ch  character to repeat
-     * @param repeat  fileOffset of times to repeat char, negative treated as zero
+     * @param repeat  number of times to repeat char, negative treated as zero
      * @return String with repeated character
      * @see #repeat(String, int)
      */
@@ -5829,7 +5829,7 @@ public class StringUtils {
      *
      * @param str  the CharSequence to check, may be null
      * @param sub  the substring to count, may be null
-     * @return the fileOffset of occurrences, 0 if either CharSequence is {@code null}
+     * @return the number of occurrences, 0 if either CharSequence is {@code null}
      * @since 3.0 Changed signature from countMatches(String, String) to countMatches(CharSequence, CharSequence)
      */
     public static int countMatches(final CharSequence str, final CharSequence sub) {
@@ -5861,7 +5861,7 @@ public class StringUtils {
      *
      * @param str  the CharSequence to check, may be null
      * @param ch  the char to count
-     * @return the fileOffset of occurrences, 0 if the CharSequence is {@code null}
+     * @return the number of occurrences, 0 if the CharSequence is {@code null}
      * @since 3.4
      */
     public static int countMatches(final CharSequence str, final char ch) {
@@ -6391,7 +6391,7 @@ public class StringUtils {
      *
      * <p>Specifically:</p>
      * <ul>
-     *   <li>If the fileOffset of characters in {@code str} is less than or equal to
+     *   <li>If the number of characters in {@code str} is less than or equal to
      *       {@code maxWidth}, return {@code str}.</li>
      *   <li>Else abbreviate it to {@code (substring(str, 0, max-3) + "...")}.</li>
      *   <li>If {@code maxWidth} is less than {@code 4}, throw an
@@ -6770,7 +6770,7 @@ public class StringUtils {
     /**
      * <p>Find the Levenshtein distance between two Strings.</p>
      *
-     * <p>This is the fileOffset of changes needed to change one String into
+     * <p>This is the number of changes needed to change one String into
      * another, where each change is a single character modification (deletion,
      * insertion or substitution).</p>
      *
@@ -6884,7 +6884,7 @@ public class StringUtils {
      * <p>Find the Levenshtein distance between two Strings if it's less than or equal to a given
      * threshold.</p>
      *
-     * <p>This is the fileOffset of changes needed to change one String into
+     * <p>This is the number of changes needed to change one String into
      * another, where each change is a single character modification (deletion,
      * insertion or substitution).</p>
      *
@@ -7126,7 +7126,7 @@ public class StringUtils {
             return 0.0;
         }
 
-        // Calculate the fileOffset of transposition between the two sets
+        // Calculate the number of transposition between the two sets
         // of common characters.
         final int transpositions = transpositions(m1, m2);
 
@@ -7249,10 +7249,10 @@ public class StringUtils {
     }
 
     /**
-     * Calculates the fileOffset of transposition between two strings.
+     * Calculates the number of transposition between two strings.
      * @param first The first string.
      * @param second The second string.
-     * @return The fileOffset of transposition between the two strings.
+     * @return The number of transposition between the two strings.
      */
     private static int transpositions(final CharSequence first, final CharSequence second) {
         int transpositions = 0;
@@ -7265,11 +7265,11 @@ public class StringUtils {
     }
     
     /**
-     * Calculates the fileOffset of characters from the beginning of the strings that match exactly one-to-one,
+     * Calculates the number of characters from the beginning of the strings that match exactly one-to-one,
      * up to a maximum of four (4) characters.
      * @param first The first string.
      * @param second The second string.
-     * @return A fileOffset between 0 and 4.
+     * @return A number between 0 and 4.
      */
     private static int commonPrefixLength(final CharSequence first, final CharSequence second) {
         final int result = getCommonPrefix(first.toString(), second.toString()).length();

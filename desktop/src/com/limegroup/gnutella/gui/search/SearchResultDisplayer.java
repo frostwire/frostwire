@@ -60,8 +60,8 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     /** The contents of tabbedPane. 
      *  INVARIANT: entries.size()==# of tabs in tabbedPane 
-     *  LOCKING: +obtain entries' monitor before adjusting fileOffset of
-     *            outstanding searches, i.e., the fileOffset of tabs
+     *  LOCKING: +obtain entries' monitor before adjusting number of
+     *            outstanding searches, i.e., the number of tabs
      *           +obtain a ResultPanel's monitor before adding or removing 
      *            results + to prevent deadlock, never obtain ResultPanel's
      *            lock if holding entries'.
@@ -480,7 +480,7 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     /**
      * called by ResultPanel when the views are changed. Used to set the
-     * tab to indicate the correct fileOffset of TableLines in the current
+     * tab to indicate the correct number of TableLines in the current
      * view.
      */
     void setTabDisplayCount(SearchResultMediator rp) {
@@ -494,7 +494,7 @@ public final class SearchResultDisplayer implements RefreshListener {
                 break;
             }
         }
-        if (found)//find the fileOffset of lines in model
+        if (found)//find the number of lines in model
             tabbedPane.setTitleAt(i, titleOf(rp));
     }
 

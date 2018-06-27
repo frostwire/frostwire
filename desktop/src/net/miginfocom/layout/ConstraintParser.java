@@ -1135,7 +1135,7 @@ public final class ConstraintParser
 		} else {
 			try {
 				String[] numParts = getNumTextParts(s);
-				float value = numParts[0].length() > 0 ? Float.parseFloat(numParts[0]) : 1;     // e.g. "related" has no fileOffset part..
+				float value = numParts[0].length() > 0 ? Float.parseFloat(numParts[0]) : 1;     // e.g. "related" has no number part..
 
 				return new UnitValue(value, numParts[1], isHor, oper, cs);
 
@@ -1186,7 +1186,7 @@ public final class ConstraintParser
 		return null;
 	}
 
-	/** Splits a text-fileOffset combination such as "hello 10.0" into <code>{"hello", "10.0"}</code>.
+	/** Splits a text-number combination such as "hello 10.0" into <code>{"hello", "10.0"}</code>.
 	 * @param s The string to split. Not <code>null</code>. Needs be be reasonably formatted since the method
 	 * only finds the first 0-9 or . and cuts the string in half there.
 	 * @return Always length 2 and no <code>null</code> elements. Elements are "" if no part found.
@@ -1251,15 +1251,15 @@ public final class ConstraintParser
 		return UnitValue.STATIC;
 	}
 
-	/** Returns if a string shares at least a specified numbers starting characters with a fileOffset of matches.
+	/** Returns if a string shares at least a specified numbers starting characters with a number of matches.
 	 * <p>
 	 * This method just exercise {@link #startsWithLenient(String, String, int, boolean)} with every one of
 	 * <code>matches</code> and <code>minChars</code>.
 	 * @param s The string to check. Not <code>null</code>.
-	 * @param matches A fileOffset of possible starts for <code>s</code>.
-	 * @param minChars The minimum fileOffset of characters to match for every element in <code>matches</code>. Needs
+	 * @param matches A number of possible starts for <code>s</code>.
+	 * @param minChars The minimum number of characters to match for every element in <code>matches</code>. Needs
 	 * to be of same length as <code>matches</code>. Can be <code>null</code>.
-	 * @param acceptTrailing If after the required fileOffset of characters are matched on recognized characters that are not
+	 * @param acceptTrailing If after the required number of characters are matched on recognized characters that are not
 	 * in one of the <code>matches</code> string should be accepted. For instance if "abczz" should be matched with
 	 * "abcdef" and min chars 3.
 	 * @return The index of the first unmatched character if <code>minChars</code> was reached or <code>-1</code> if a match was not
@@ -1279,9 +1279,9 @@ public final class ConstraintParser
 	/** Returns if a string shares at least a specified numbers starting characters with a match.
 	 * @param s The string to check. Not <code>null</code> and must be trimmed.
 	 * @param match The possible start for <code>s</code>. Not <code>null</code> and must be trimmed.
-	 * @param minChars The mimimum fileOffset of characters to match to <code>s</code> for it this to be considered a match. -1 means
+	 * @param minChars The mimimum number of characters to match to <code>s</code> for it this to be considered a match. -1 means
 	 * the full length of <code>match</code>.
-	 * @param acceptTrailing If after the required fileOffset of charecters are matched unrecognized characters that are not
+	 * @param acceptTrailing If after the required number of charecters are matched unrecognized characters that are not
 	 * in one of the <code>matches</code> string should be accepted. For instance if "abczz" should be matched with
 	 * "abcdef" and min chars 3.
 	 * @return The index of the first unmatched character if <code>minChars</code> was reached or <code>-1</code> if a match was not
@@ -1373,7 +1373,7 @@ public final class ConstraintParser
 	}
 
 	/** Parses "AAA[BBB]CCC[DDD]EEE" into {"AAA", "BBB", "CCC", "DDD", "EEE", "FFF"}. Handles empty parts. Will always start and end outside
-	 * a [] block so that the fileOffset of returned elemets will always be uneven and at least of length 3.
+	 * a [] block so that the number of returned elemets will always be uneven and at least of length 3.
 	 * <p>
 	 * "|" is interpreted as "][".
 	 * @param s The string. Might be "" but not null. Should be trimmed.
