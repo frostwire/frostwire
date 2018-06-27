@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -478,9 +478,9 @@ public final class GUIMediator {
      * Refreshes the various gui components that require refreshing.
      */
     final void refreshGUI() {
-        for (RefreshListener aREFRESH_LIST : REFRESH_LIST) {
+        for (RefreshListener listener : REFRESH_LIST) {
             try {
-                aREFRESH_LIST.refresh();
+                listener.refresh();
             } catch (Throwable t) {
                 // Show the error for each RefreshListener individually
                 // so that we continue refreshing the other items.
