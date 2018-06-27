@@ -1,8 +1,9 @@
-FrostWire 2.0.6 build 543 - JUN/25/2018
+FrostWire 2.0.6 build 544 - JUN/26/2018
  - Yify search fixed
  - EZTV search fixed
  - New jlibtorrent 1.2.0.18-RC7
  - Translations updated: Malay, Slovak, Vietnamese
+ - Library updates: prebid 0.4
 
 FrostWire 2.0.5 build 541 - JUN/17/2018
  - No more intrusive interstitial ads when resuming app
