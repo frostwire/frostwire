@@ -18,16 +18,13 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.PeerInfo;
-import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
