@@ -88,8 +88,8 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _rangeSliderSeeds.getMaximumValueLabel().setText(String.valueOf(_maxResultsSeeds));
         }
         if (sizeNeedUpdate) {
-            _rangeSliderSize.getMinimumValueLabel().setText(GUIUtils.toUnitbytes(_minResultsSize));
-            _rangeSliderSize.getMaximumValueLabel().setText(GUIUtils.toUnitbytes(_maxResultsSize));
+            _rangeSliderSize.getMinimumValueLabel().setText(GUIUtils.getBytesInHuman(_minResultsSize));
+            _rangeSliderSize.getMaximumValueLabel().setText(GUIUtils.getBytesInHuman(_maxResultsSize));
         }
 
         boolean inSeedRange = false;

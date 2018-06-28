@@ -168,8 +168,9 @@ public final class GUIUtils {
      *         <code>bytes</code> argument evaluates to, with
      *         "KB"/"MB"/"GB"/TB" appended at the end. If the input value is
      *         negative, the string returned will be "? KB".
+     * @see GUIUtils::rate2speed() if you want to deal with download speeds
      */
-    public static String toUnitbytes(long bytes) {
+    public static String getBytesInHuman(long bytes) {
         if (bytes < 0) {
             return "? " + GENERAL_UNIT_KILOBYTES;
         }
@@ -777,15 +778,5 @@ public final class GUIUtils {
         Border border = BorderFactory.createCompoundBorder(lineBorder, titleBorder);
         panel.setBorder(border);
         panel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
-    }
-
-    public static String getBytesInHuman(long size) {
-        final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
-        int i;
-        float sizeFloat = (float) size;
-        for (i = 0; sizeFloat > 1024; i++) {
-            sizeFloat /= 1024f;
-        }
-        return String.format(Locale.US, "%.2f %s", sizeFloat, BYTE_UNITS[i]);
     }
 }

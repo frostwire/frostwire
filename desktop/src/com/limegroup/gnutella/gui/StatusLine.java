@@ -779,8 +779,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             String sDown = GUIUtils.rate2speed(btDownloadMediator.getDownloadsBandwidth());
             String sUp = GUIUtils.rate2speed(btDownloadMediator.getUploadsBandwidth());
 
-            String totalDown = GUIUtils.toUnitbytes(btDownloadMediator.getTotalBytesDownloaded());
-            String totalUp = GUIUtils.toUnitbytes(btDownloadMediator.getTotalBytesUploaded());
+            String totalDown = GUIUtils.getBytesInHuman(btDownloadMediator.getTotalBytesDownloaded());
+            String totalUp = GUIUtils.getBytesInHuman(btDownloadMediator.getTotalBytesUploaded());
             int downloads = GUIMediator.instance().getCurrentDownloads();
 
             int uploads = GUIMediator.instance().getCurrentUploads();

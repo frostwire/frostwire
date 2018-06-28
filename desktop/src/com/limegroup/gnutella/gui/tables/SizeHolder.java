@@ -41,7 +41,7 @@ public final class SizeHolder implements Comparable<SizeHolder> {
      */
     public SizeHolder(long size, String moreInfo) {
         if (size >= 0) {
-            _string = GUIUtils.toUnitbytes(size) + moreInfo;
+            _string = GUIUtils.getBytesInHuman(size) + moreInfo;
             _size = size;
         } else {
             _string = "--";
