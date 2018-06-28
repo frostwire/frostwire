@@ -123,6 +123,8 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
                 String client = peer.getClient();
                 if (client == null || client.isEmpty()) {
                     client = I18n.tr("Unknown");
+                } else if (client.contains("libtorrent/1.1")) {
+                    client = "FrostWire";
                 }
                 return client;
             case FLAGS_COLUMN_ID:
@@ -132,7 +134,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             case DOWNLOADED_COLUMN_ID:
                 return holder.peerItem.totalDownload();
             case PROGRESS_COLUMN_ID:
-                return peer.getProgress() + "%";
+                return 100*peer.getProgress() + "%";
             case UPLOADED_COLUMN_ID:
                 return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
