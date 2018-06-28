@@ -39,12 +39,14 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
     @Override
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload != null && btDownload.getDl() != null) {
+            if (this.btDownload != btDownload) {
+                tableMediator.clearTable();
+            }
+            this.btDownload = btDownload;
             try {
                 ArrayList<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
                 if (items != null && items.size() > 0) {
-                    if (this.btDownload != btDownload || tableMediator.getSize() == 0) {
-                        this.btDownload = btDownload;
-                        tableMediator.clearTable();
+                    if (tableMediator.getSize() == 0) {
                         int i = 0;
                         for (PeerInfo item : items) {
                             tableMediator.add(new PeerItemHolder(i++, item));
