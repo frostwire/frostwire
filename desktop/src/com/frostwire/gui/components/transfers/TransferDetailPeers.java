@@ -20,17 +20,70 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.jlibtorrent.PeerInfo;
+import com.frostwire.transfers.TransferItem;
+import com.frostwire.util.Logger;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
+    private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
+
+    private final TransferDetailPeersTableMediator tableMediator;
+    private BittorrentDownload btDownload;
+
     public TransferDetailPeers() {
-        super();
-        add(new JLabel("PEERS HERE"));
+        tableMediator = new TransferDetailPeersTableMediator();
+        setLayout(new MigLayout("fill"));
+        add(tableMediator.getComponent(), "growx, growy");
     }
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
+        if (btDownload != null && btDownload.getDl() != null) {
+            try {
+                ArrayList<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
+                if (items != null && items.size() > 0) {
+                    if (this.btDownload != btDownload) {
+                        this.btDownload = btDownload;
+                        tableMediator.clearTable();
+                        int i = 0;
+                        for (PeerInfo item : items) {
+                            tableMediator.add(new PeerItemHolder(i++, item));
+                        }
+                    } else {
+                        int i = 0;
+                        for (PeerInfo item : items) {
+                            tableMediator.update(new PeerItemHolder(i++, item));
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
 
+    public class PeerItemHolder {
+        public final int peerOffset;
+        final PeerInfo peerItem;
+
+        PeerItemHolder(int peerOffset, PeerInfo peerItem) {
+            this.peerOffset = peerOffset;
+            this.peerItem = peerItem;
+        }
+
+        @Override
+        public int hashCode() {
+            return peerOffset;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof PeerItemHolder && ((PeerItemHolder) obj).peerOffset == peerOffset;
+        }
     }
 }
