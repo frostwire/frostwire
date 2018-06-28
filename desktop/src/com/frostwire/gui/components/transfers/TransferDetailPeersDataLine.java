@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.jlibtorrent.swig.error_code;
@@ -5,25 +23,64 @@ import com.frostwire.jlibtorrent.swig.peer_info;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
-import java.util.Locale;
+import com.limegroup.gnutella.gui.tables.SizeHolder;
+import com.limegroup.gnutella.gui.tables.SpeedRenderer;
 
-
-public class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetailPeers.PeerItemHolder> {
+public final class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetailPeers.PeerItemHolder> {
 
     private static final int IP_COLUMN_ID = 0;
     private static final int CLIENT_COLUMN_ID = 1;
     private static final int FLAGS_COLUMN_ID = 2;
-    private static final int PERCENTAGE_COLUMN_ID = 3;
-    private static final int DOWN_SPEED_COLUMN_ID = 4;
-    private static final int UP_SPEED_COLUMN_ID = 5;
+    private static final int SOURCE_COLUMN_ID = 3;
+    private static final int PROGRESS_COLUMN_ID = 4;
+    private static final int DOWNLOADED_COLUMN_ID = 5;
+    private static final int UPLOADED_COLUMN_ID = 6;
+    private static final int DOWN_SPEED_COLUMN_ID = 7;
+    private static final int UP_SPEED_COLUMN_ID = 8;
+
+    // PEER SOURCE FLAGS
+
+    private final byte tracker = 1;
+    private final byte dht = 1 << 1;
+    private final byte pex = 1 << 2;
+    private final byte lsd = 1 << 3;
+    private final byte resume_data = 1 << 4;
+    private final byte incoming = 1 << 5;
+
+    // PEER INFO FLAGS
+
+    private final int interesting = 1;
+    private final int choked = 1 << 1;
+    private final int remote_interested = 1 << 2;
+    private final int remote_choked = 1 << 3;
+    private final int supports_extensions = 1 << 4;
+    private final int local_connection = 1 << 5;
+    private final int handshake = 1 << 6;
+    private final int connecting = 1 << 7;
+    private final int queued = 1 << 8;
+    private final int on_parole = 1 << 9;
+    private final int seed = 1 << 10;
+    private final int optimistic_unchoke = 1 << 11;
+    private final int snubbed = 1 << 12;
+    private final int upload_only = 1 << 13;
+    private final int endgame_mode = 1 << 14;
+    private final int holepunched = 1 << 15;
+    private final int i2p_socket = 1 << 16;
+    private final int utp_socket = 1 << 17;
+    private final int ssl_socket = 1 << 18;
+    private final int rc4_encrypted= 1 << 19;
+    private final int plaintext_encrypted= 1 << 20;
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
-            new LimeTableColumn(IP_COLUMN_ID, "IP", I18n.tr("IP"), 300, true, true, false, String.class),
-            new LimeTableColumn(CLIENT_COLUMN_ID, "CLIENT", I18n.tr("Client"), 300, true, true, false, String.class),
-            new LimeTableColumn(FLAGS_COLUMN_ID, "FLAGS", I18n.tr("Flags"), 60, true, true, false, String.class),
-            new LimeTableColumn(PERCENTAGE_COLUMN_ID, "PERCENTAGE", "%", 60, true, true, false, String.class),
-            new LimeTableColumn(DOWN_SPEED_COLUMN_ID, "DOWN_SPEED", I18n.tr("Down Speed"), 100, true, true, false, String.class),
-            new LimeTableColumn(UP_SPEED_COLUMN_ID, "UP_SPEED", I18n.tr("Up Speed"), 100, true, true, false, String.class),
+            new LimeTableColumn(IP_COLUMN_ID, "IP", I18n.tr("IP"), 180, true, true, true, String.class),
+            new LimeTableColumn(CLIENT_COLUMN_ID, "CLIENT", I18n.tr("Client"), 120, true, true, true, String.class),
+            new LimeTableColumn(FLAGS_COLUMN_ID, "FLAGS", I18n.tr("Flags"), 70, true, true, true, String.class),
+            new LimeTableColumn(SOURCE_COLUMN_ID, "SOURCE", I18n.tr("Source"), 100, true, true, true, String.class),
+            new LimeTableColumn(PROGRESS_COLUMN_ID, "PROGRESS", I18n.tr("Progress"), 100, true, true, false, String.class),
+            new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 80, true, true, false, SizeHolder.class),
+            new LimeTableColumn(UPLOADED_COLUMN_ID, "UPLOADED", I18n.tr("Uploaded"), 80, true, true, false, SizeHolder.class),
+            new LimeTableColumn(DOWN_SPEED_COLUMN_ID, "DOWN_SPEED", I18n.tr("Down Speed"), 130, true, true, false, SpeedRenderer.class),
+            new LimeTableColumn(UP_SPEED_COLUMN_ID, "UP_SPEED", I18n.tr("Up Speed"), 130, true, true, true, SpeedRenderer.class),
     };
 
     public TransferDetailPeersDataLine() {
@@ -52,12 +109,10 @@ public class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetail
     @Override
     public Object getValueAt(int col) {
         final TransferDetailPeers.PeerItemHolder holder = getInitializeObject();
-        peer_info peer = holder.peerItem.swig();
-
         if (holder == null) {
             return null;
         }
-
+        peer_info peer = holder.peerItem.swig();
         switch (col) {
             case IP_COLUMN_ID:
                 String address = peer.getIp().address().to_string(new error_code());
@@ -71,26 +126,171 @@ public class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetail
                 }
                 return client;
             case FLAGS_COLUMN_ID:
-                return peer.get_flags();
-            case PERCENTAGE_COLUMN_ID:
-                return getBytesInHuman(holder.peerItem.totalDownload());
+                return getFlagsAsString(peer.get_flags(), peer.get_source());
+            case SOURCE_COLUMN_ID:
+                return getSourceAsString(peer.get_source());
+            case DOWNLOADED_COLUMN_ID:
+                return holder.peerItem.totalDownload();
+            case PROGRESS_COLUMN_ID:
+                return peer.getProgress() + "%";
+            case UPLOADED_COLUMN_ID:
+                return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
-                return Integer.toString(peer.getDown_speed());
+                return (double) peer.getDown_speed();
             case UP_SPEED_COLUMN_ID:
-                return Integer.toString(peer.getUp_speed());
+                return (double) peer.getUp_speed();
         }
         return null;
     }
 
-    // TODO: put this method on GUIUtils
-    public static String getBytesInHuman(long size) {
-        final String[] BYTE_UNITS = new String[]{"b", "KB", "Mb", "Gb", "Tb"};
-        int i;
-        float sizeFloat = (float) size;
-        for (i = 0; sizeFloat > 1024; i++) {
-            sizeFloat /= 1024f;
+    /**
+     * tracker = 0_bit
+     * dht = 1_bit
+     * pex = 2_bit
+     * lsd = 3_bit
+     * resume_data = 4_bit
+     * incoming = 5_bit
+     */
+    private String getSourceAsString(byte source) {
+        StringBuilder sb = new StringBuilder();
+
+        if ((source & tracker) == tracker) {
+            sb.append("Tracker "); // purposefully not-translatable
         }
-        return String.format(Locale.US, "%.2f %s", sizeFloat, BYTE_UNITS[i]);
+        if ((source & dht) == dht) {
+            sb.append("DHT ");
+        }
+        if ((source & pex) == pex) {
+            sb.append("PEX ");
+        }
+        if ((source & lsd) == lsd) {
+            sb.append("LSD ");
+        }
+        if ((source & resume_data) == resume_data) {
+            sb.append(I18n.tr("Resumed")).append(" ");
+        }
+        if ((source & incoming) == incoming) {
+            sb.append(I18n.tr("Incoming")).append(" ");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * According to uTorrent's FAQ this is what their flag column means
+     * D = Currently downloading (interested and not choked)
+     * d = Your client wants to download, but peer doesn't want to send (interested and choked)
+     * U = Currently uploading (interested and not choked)
+     * u = Peer wants your client to upload, but your client doesn't want to (interested and choked)
+     * O = Optimistic unchoke
+     * S = Peer is snubbed
+     * I = Peer is an incoming connection
+     * K = Peer is unchoking your client, but your client is not interested
+     * ? = Your client unchoked the peer but the peer is not interested
+     * X = Peer was included in peerlists obtained through Peer Exchange (PEX) or an IPv6 peer told you its IPv4 address.
+     * H = Peer was obtained through DHT.
+     * E = Peer is using Protocol Encryption (all traffic)
+     * e = Peer is using Protocol Encryption (handshake)
+     * P = Peer is using uTorrent uTP
+     * L = Peer is local (discovered through network broadcast, or in reserved local IP ranges)
+     * <p>
+     * And these are the flags we have in libtorrent (peer_info.hpp)
+     * https://github.com/arvidn/libtorrent/blob/master/include/libtorrent/peer_info.hpp#L94
+     *
+     * interesting = 0_bit (we are interested)
+     * choked = 1_bit (we choke them)
+     * remote_interested = 2_bit (they are interested)
+     * remote_choked = 3_bit (they choked us)
+     * supports_extensions = 4_bit
+     * local_connection = 5_bit
+     * handshake = 6_bit
+     * connecting = 7_bit
+     * queued = 8_bit
+     * on_parole = 9_bit
+     * seed = 10_bit
+     * optimistic_unchoke = 11_bit
+     * snubbed = 12_bit
+     * upload_only = 13_bit
+     * endgame_mode = 14_bit
+     * holepunched = 15_bit
+     * i2p_socket = 16_bit
+     * utp_socket = 17_bit
+     * ssl_socket = 18_bit
+     * rc4_encrypted = 19_bit
+     * plaintext_encrypted = 20_bit
+     */
+    private String getFlagsAsString(int flags, int sourceFlags) {
+
+        StringBuilder sb = new StringBuilder();
+
+        //D = Currently downloading (interested and not choked)
+        if ( (flags & interesting) == interesting && (flags & remote_choked) == 0) {
+            sb.append("D");
+        }
+        //d = Your client wants to download, but peer doesn't want to send (interested and choked)
+        if ((flags & interesting) == interesting && (flags & remote_choked) == remote_choked) {
+            sb.append("d");
+        }
+        //U = Currently uploading (interested and not choked)
+        if ((flags & remote_interested) == remote_interested && (flags & choked) == 0) {
+            sb.append("U");
+        }
+        //u = Peer wants your client to upload, but your client doesn't want to (interested and choked)
+        if ((flags & remote_interested) == remote_interested && (flags & choked) == choked) {
+            sb.append("u");
+        }
+        //O = Optimistic unchoke
+        if ((flags & optimistic_unchoke) == optimistic_unchoke) {
+            sb.append("O");
+        }
+        //S = Peer is snubbed
+        if ((flags & snubbed) == snubbed) {
+            sb.append("S");
+        }
+        //I = Peer is an incoming connection
+        //local_connection = If this flag is not set, this peer connection was opened by this peer connecting to us.
+        if ((flags & local_connection) == 0) {
+            sb.append("I");
+        }
+        //K = Peer is unchoking your client, but your client is not interested
+        if ((flags & interesting) == 0 && (flags & remote_choked) == 0) {
+            sb.append("K");
+        }
+        //? = Your client unchoked the peer but the peer is not interested
+        if ((flags & remote_interested) == 0 && (flags & choked) == 0) {
+            sb.append("?");
+        }
+        //X = Peer was included in peerlists obtained through Peer Exchange (PEX) or an IPv6 peer told you its IPv4 address.
+        if ((sourceFlags & pex) == pex) {
+            sb.append("X");
+        }
+        //H = Peer was obtained through DHT.
+        if ((sourceFlags & dht) == dht) {
+            sb.append("H");
+        }
+        //E = Peer is using Protocol Encryption (all traffic)
+        if ((flags & plaintext_encrypted)==plaintext_encrypted ||
+            (flags & rc4_encrypted) == rc4_encrypted ||
+            (flags & ssl_socket) == ssl_socket) {
+            sb.append("E");
+        }
+        //e = Peer is using Protocol Encryption (handshake)
+
+        if ((flags & handshake) == handshake &&
+                ((flags & plaintext_encrypted) == plaintext_encrypted ||
+                 (flags & rc4_encrypted) == rc4_encrypted ||
+                 (flags & ssl_socket) == ssl_socket)) {
+            sb.append("e");
+        }
+        //P = Peer is using uTorrent uTP
+        if ((flags & utp_socket) == utp_socket) {
+            sb.append("P");
+        }
+        //L = Peer is local (discovered through network broadcast, or in reserved local IP ranges)
+        // BUGGY FLAG: if ((flags & local_connection) == local_connection) {
+        if ((sourceFlags & lsd) == lsd) {
+            sb.append("L");
+        }
+        return sb.toString();
     }
 
     @Override

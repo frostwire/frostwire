@@ -20,19 +20,17 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.PeerInfo;
-import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.tables.LimeJTable;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
-
     private final TransferDetailPeersTableMediator tableMediator;
     private BittorrentDownload btDownload;
 
-    public TransferDetailPeers() {
+    TransferDetailPeers() {
         tableMediator = new TransferDetailPeersTableMediator();
         setLayout(new MigLayout("fill"));
         add(tableMediator.getComponent(), "growx, growy");
@@ -44,7 +42,7 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
             try {
                 ArrayList<PeerInfo> items = btDownload.getDl().getTorrentHandle().peerInfo();
                 if (items != null && items.size() > 0) {
-                    if (this.btDownload != btDownload) {
+                    if (this.btDownload != btDownload || tableMediator.getSize() == 0) {
                         this.btDownload = btDownload;
                         tableMediator.clearTable();
                         int i = 0;
@@ -54,7 +52,13 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
                     } else {
                         int i = 0;
                         for (PeerInfo item : items) {
-                            tableMediator.update(new PeerItemHolder(i++, item));
+                            try {
+                                tableMediator.update(new PeerItemHolder(i++, item));
+                            } catch (ArrayIndexOutOfBoundsException ignored) {
+                                // peer might not be there anymore, reload table from scratch
+                                tableMediator.clearTable();
+                                updateData(btDownload);
+                            }
                         }
                     }
                 }
@@ -65,7 +69,7 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
     }
 
     public class PeerItemHolder {
-        public final int peerOffset;
+        final int peerOffset;
         final PeerInfo peerItem;
 
         PeerItemHolder(int peerOffset, PeerInfo peerItem) {
