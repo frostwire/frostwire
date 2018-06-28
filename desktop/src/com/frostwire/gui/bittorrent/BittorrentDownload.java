@@ -479,7 +479,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                     dl.getState().equals(TransferState.SEEDING) &&
                     !showShareTorrentDialog) {
                 dl.pause();
-                // sorry Dijkstra.
                 return;
             }
 

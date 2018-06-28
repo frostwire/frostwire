@@ -69,7 +69,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      */
     public class TransferItemHolder {
         public final int fileOffset;
-        final TransferItem transferItem;
+        public final TransferItem transferItem;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {
             this.fileOffset = fileOffset;

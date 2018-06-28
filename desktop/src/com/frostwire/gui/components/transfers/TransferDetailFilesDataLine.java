@@ -31,13 +31,15 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
     // -> The button only shows when the file is complete
     // -> A custom cell renderer for that column that displays a button and it's action listener
 
+    static LimeTableColumn ACTIONS_COLUMN;
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
-            new LimeTableColumn(0, "NUMBER", "#", 30, true, true, false, String.class),
-            new LimeTableColumn(1, "NAME", I18n.tr("Name"), 500, true, String.class),
-            new LimeTableColumn(2, "PROGRESS", I18n.tr("Progress"), 150, true, ProgressBarHolder.class),
-            new LimeTableColumn(3, "SIZE", I18n.tr("Size"), 65, true, true, false, SizeHolder.class),
-            new LimeTableColumn(4, "TYPE", I18n.tr("Type"), 40, true, true, false, String.class)
+            ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 65, true, true, false, TransferDetailFiles.TransferItemHolder.class),
+            new LimeTableColumn(1, "NUMBER", "#", 30, true, true, false, String.class),
+            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 500, true, String.class),
+            new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 150, true, ProgressBarHolder.class),
+            new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 65, true, true, false, SizeHolder.class),
+            new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 40, true, true, false, String.class),
     };
 
     public TransferDetailFilesDataLine() {
@@ -69,11 +71,13 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
         if (holder == null) {
             return null;
         }
-        final int NUMBER = 0;
-        final int NAME = 1;
-        final int PROGRESS = 2;
-        final int SIZE = 3;
-        final int TYPE = 4;
+        final int ACTIONS = 0;
+        final int NUMBER = 1;
+        final int NAME = 2;
+        final int PROGRESS = 3;
+        final int SIZE = 4;
+        final int TYPE = 5;
+
         switch (col) {
             case NUMBER:
                 return holder.fileOffset + 1; // humans...
@@ -85,6 +89,8 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
                 return new SizeHolder(holder.transferItem.getSize());
             case TYPE:
                 return holder.transferItem.getName().substring(holder.transferItem.getName().lastIndexOf(".") + 1);
+            case ACTIONS:
+                return holder;
         }
         return null;
     }

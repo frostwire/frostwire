@@ -19,6 +19,7 @@
 package com.frostwire.gui.components.transfers;
 
 import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 
@@ -40,6 +41,7 @@ public class TransferDetailFilesTableMediator extends AbstractTableMediator<Tran
         DATA_MODEL = new TransferDetailFilesModel();
         TABLE = new LimeJTable(DATA_MODEL);
         TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        DATA_MODEL.sort(1); // by file #
     }
 
     @Override
@@ -60,5 +62,11 @@ public class TransferDetailFilesTableMediator extends AbstractTableMediator<Tran
     @Override
     public void handleNoSelection() {
 
+    }
+
+    @Override
+    protected void setDefaultEditors() {
+        super.setDefaultEditors();
+        TransferDetailFilesDataLine.ACTIONS_COLUMN.setCellEditor(new GenericCellEditor(getTransferDetailFileActionsRenderer()));
     }
 }

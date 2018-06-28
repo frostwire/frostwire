@@ -17,7 +17,9 @@ package com.limegroup.gnutella.gui.tables;
 
 import com.frostwire.gui.bittorrent.PaymentOptionsRenderer;
 import com.frostwire.gui.bittorrent.TransferActionsRenderer;
+import com.frostwire.gui.bittorrent.TransferDetailFilesActionsRenderer;
 import com.frostwire.gui.bittorrent.TransferSeedingRenderer;
+import com.frostwire.gui.components.transfers.TransferDetailFiles;
 import com.limegroup.gnutella.gui.ButtonRow;
 import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.PaddedPanel;
@@ -162,6 +164,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     private static TransferActionsRenderer TRANSFER_ACTIONS_RENDERER;
     private static TransferSeedingRenderer TRANSFER_SEEDING_RENDERER;
     private static PaymentOptionsRenderer PAYMENT_OPTIONS_RENDERER;
+    private static TransferDetailFilesActionsRenderer TRANSFER_DETAIL_FILE_ACTIONS_RENDERER;
 
     /**
      * Resorter -- for doing real-time resorts.
@@ -375,6 +378,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         TABLE.setDefaultRenderer(SpeedRenderer.class, getSpeedRenderer());
         TABLE.setDefaultRenderer(Date.class, getDateRenderer());
         TABLE.setDefaultRenderer(NameHolder.class, getNameHolderRenderer());
+        TABLE.setDefaultRenderer(TransferDetailFiles.TransferItemHolder.class, getTransferDetailFileActionsRenderer());
         
         if (getAbstractActionsRenderer() != null) {
             TABLE.setDefaultRenderer(AbstractActionsHolder.class, getAbstractActionsRenderer());
@@ -1017,5 +1021,12 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             PAYMENT_OPTIONS_RENDERER = new PaymentOptionsRenderer();
         }
         return PAYMENT_OPTIONS_RENDERER;
+    }
+
+    protected TransferDetailFilesActionsRenderer getTransferDetailFileActionsRenderer() {
+        if (TRANSFER_DETAIL_FILE_ACTIONS_RENDERER == null) {
+            TRANSFER_DETAIL_FILE_ACTIONS_RENDERER = new TransferDetailFilesActionsRenderer();
+        }
+        return TRANSFER_DETAIL_FILE_ACTIONS_RENDERER;
     }
 }

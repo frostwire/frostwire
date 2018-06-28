@@ -21,7 +21,12 @@ package com.frostwire.gui.components.transfers;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
 public final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
-    public TransferDetailFilesModel() {
+    TransferDetailFilesModel() {
         super(TransferDetailFilesDataLine.class);
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == TransferDetailFilesDataLine.ACTIONS_COLUMN.getModelIndex();
     }
 }
