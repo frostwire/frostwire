@@ -40,36 +40,36 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
 
     // PEER SOURCE FLAGS
 
-    private final byte tracker = 1;
-    private final byte dht = 1 << 1;
-    private final byte pex = 1 << 2;
-    private final byte lsd = 1 << 3;
-    private final byte resume_data = 1 << 4;
-    private final byte incoming = 1 << 5;
+    private static final byte tracker = 1;
+    private static final byte dht = 1 << 1;
+    private static final byte pex = 1 << 2;
+    private static final byte lsd = 1 << 3;
+    private static final byte resume_data = 1 << 4;
+    private static final byte incoming = 1 << 5;
 
     // PEER INFO FLAGS
 
-    private final int interesting = 1;
-    private final int choked = 1 << 1;
-    private final int remote_interested = 1 << 2;
-    private final int remote_choked = 1 << 3;
-    private final int supports_extensions = 1 << 4;
-    private final int local_connection = 1 << 5;
-    private final int handshake = 1 << 6;
-    private final int connecting = 1 << 7;
-    private final int queued = 1 << 8;
-    private final int on_parole = 1 << 9;
-    private final int seed = 1 << 10;
-    private final int optimistic_unchoke = 1 << 11;
-    private final int snubbed = 1 << 12;
-    private final int upload_only = 1 << 13;
-    private final int endgame_mode = 1 << 14;
-    private final int holepunched = 1 << 15;
-    private final int i2p_socket = 1 << 16;
-    private final int utp_socket = 1 << 17;
-    private final int ssl_socket = 1 << 18;
-    private final int rc4_encrypted= 1 << 19;
-    private final int plaintext_encrypted= 1 << 20;
+    private static final int interesting = 1;
+    private static final int choked = 1 << 1;
+    private static final int remote_interested = 1 << 2;
+    private static final int remote_choked = 1 << 3;
+    //private static final int supports_extensions = 1 << 4;
+    private static final int local_connection = 1 << 5;
+    private static final int handshake = 1 << 6;
+    //private static final int connecting = 1 << 7;
+    //private static final int queued = 1 << 8;
+    //private static final int on_parole = 1 << 9;
+    //private static final int seed = 1 << 10;
+    private static final int optimistic_unchoke = 1 << 11;
+    private static final int snubbed = 1 << 12;
+    //private static final int upload_only = 1 << 13;
+    //private static final int endgame_mode = 1 << 14;
+    //private static final int holepunched = 1 << 15;
+    //private static final int i2p_socket = 1 << 16;
+    private static final int utp_socket = 1 << 17;
+    private static final int ssl_socket = 1 << 18;
+    private static final int rc4_encrypted= 1 << 19;
+    private static final int plaintext_encrypted= 1 << 20;
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
             new LimeTableColumn(IP_COLUMN_ID, "IP", I18n.tr("IP"), 180, true, true, true, String.class),
