@@ -638,7 +638,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
         BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
 
-        notifyTransferTabSelectionListener(dataLine.getInitializeObject());
+        if (GUIMediator.instance().getSelectedTab().equals(GUIMediator.Tabs.TRANSFERS)) {
+            notifyTransferTabSelectionListener(dataLine.getInitializeObject());
+        }
     }
 
 
