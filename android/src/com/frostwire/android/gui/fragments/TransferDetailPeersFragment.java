@@ -159,6 +159,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             rttTextView.setText(r.getString(R.string.rtt_ms, rtt));
 
             String client = new String(peerInfo.client(), Charset.forName("UTF-8"));
+
             if (client.isEmpty()) {
                 client = r.getString(R.string.unknown);
             }
