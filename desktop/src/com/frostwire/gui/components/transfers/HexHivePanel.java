@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 
 import javax.swing.*;
@@ -29,11 +28,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 
-// TODO: Test adding getSize(), getPreferredSize(), etc.
-// TODO: Perform tests with padding values > 0
-
 public class HexHivePanel extends JPanel {
-    private static final Logger LOG = Logger.getLogger(HexHivePanel.class);
     private ColoredStroke hexagonBorderPaint;
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
@@ -63,14 +58,14 @@ public class HexHivePanel extends JPanel {
         boolean isFull(int hexOffset);
     }
 
-    public HexHivePanel(int borderColor,
-                        int emptyColor,
-                        int fullColor,
-                        int backgroundColor,
-                        int topPadding,
-                        int rightPadding,
-                        int bottomPadding,
-                        int leftPadding) {
+    HexHivePanel(int borderColor,
+                 int emptyColor,
+                 int fullColor,
+                 int backgroundColor,
+                 int topPadding,
+                 int rightPadding,
+                 int bottomPadding,
+                 int leftPadding) {
         initPaints(borderColor, emptyColor, fullColor, backgroundColor);
         this.topPadding = topPadding;
         this.rightPadding = rightPadding;
@@ -78,16 +73,10 @@ public class HexHivePanel extends JPanel {
         this.leftPadding = leftPadding;
     }
 
-    public boolean ready() {
-        return drawingProperties != null && bitmap != null;
-    }
-
-    public void updateData(HexDataAdapter hexDataAdapter) {
+    void updateData(HexDataAdapter hexDataAdapter) {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
-        LOG.info("updateData(): width=" + canvasWidth + ", height=" + canvasHeight, true);
-
-        if (drawingProperties == null && canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
+        if (canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
             drawingProperties = new DrawingProperties(hexDataAdapter,
                     hexagonBorderPaint.getLineWidth(),
                     leftPadding,
@@ -95,12 +84,6 @@ public class HexHivePanel extends JPanel {
                     canvasWidth - rightPadding,
                     canvasHeight - bottomPadding);
 
-            lastWidth = canvasWidth;
-            lastHeight = canvasHeight;
-
-        } else if (drawingProperties != null && canvasHeight > 0 && canvasWidth > 0 && (canvasHeight != lastHeight || canvasWidth != lastWidth)) {
-            drawingProperties.numHexs = hexDataAdapter.getFullHexagonsCount();
-            drawingProperties.update(leftPadding, topPadding, canvasWidth - rightPadding, canvasHeight - bottomPadding);
             lastWidth = canvasWidth;
             lastHeight = canvasHeight;
         }
@@ -111,16 +94,13 @@ public class HexHivePanel extends JPanel {
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
             threadPool.execute(() -> {
-                LOG.info("updateData() about to execute asyncDraw on thread");
                 BufferedImage backgroundBitmap = asyncDraw(hexDataAdapter);
                 synchronized (bitmapLock) {
                     bitmap = backgroundBitmap;
                 }
 
                 if (bitmap != null) {
-                    GUIMediator.safeInvokeAndWait(() -> {
-                        repaint();
-                    });
+                    GUIMediator.safeInvokeAndWait(this::repaint);
                 }
             });
         }
@@ -128,9 +108,8 @@ public class HexHivePanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        LOG.info("paintComponent()!", true);
         Graphics2D g2d = (Graphics2D) g;  // Better methods to do stuff in Canvas
-        if (bitmap != null) {
+        if (drawingProperties != null && bitmap != null) {
             g2d.drawImage(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), null);
         }
     }
@@ -143,7 +122,6 @@ public class HexHivePanel extends JPanel {
     }
 
     private BufferedImage asyncDraw(HexDataAdapter adapter) {
-        LOG.info("asyncDraw()", true);
         // with drawingProperties we don't need to think about padding offsets. We just use drawingProperties numbers for our calculations
         drawingProperties.hexCenterBuffer.setLocation(drawingProperties.evenRowOrigin.x, drawingProperties.evenRowOrigin.y);
         boolean evenRow = true;
@@ -162,7 +140,6 @@ public class HexHivePanel extends JPanel {
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
 
-        // might have to revise this
         graphics.fillRect(leftPadding, topPadding, drawingProperties.width - rightPadding, drawingProperties.height - bottomPadding);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -479,7 +456,7 @@ public class HexHivePanel extends JPanel {
             }
         };
         JFrame frame = new JFrame("HexHive Testing Area");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(true);
         frame.setVisible(true);
         frame.add(hexPanel);
