@@ -23,64 +23,103 @@ import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.limegroup.gnutella.gui.GUIUtils;
+import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 
 public final class TransferDetailPieces extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    private HexHivePanel HEXHIVEPANEL;
-    private HexHivePanel.HexDataAdapter hexPanelAdapter;
+    private final JLabel pieceSizeLabel;
+    private final JLabel totalPiecesLabel;
+    private final HexHivePanel hexHivePanel;
+    private HexHiveAdapter hexHivePanelAdapter;
+    private boolean pieceSizeAlreadySet = false;
+    private boolean totalPiecesAlreadySet = false;
+    private BittorrentDownload bittorrentDownload;
 
     TransferDetailPieces() {
         super();
-        HEXHIVEPANEL = new HexHivePanel(0x264053, 0xf2f2f2, 0x33b5e5,0xf2f2f2, 0, 0, 0, 0);
-        setLayout(new MigLayout("fillx, insets 0 0 0 0"));
-        add(HEXHIVEPANEL);
+        setLayout(new MigLayout("fill, insets 0 0 0 0"));
+        hexHivePanel = new HexHivePanel(
+                0x264053,
+                0xf2f2f2,
+                0x33b5e5,
+                0xf2f2f2,
+                0,
+                0,
+                0,
+                0);
+        hexHivePanelAdapter = new HexHiveAdapter();
+
+        pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
+        totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
+        add(totalPiecesLabel, "left");
+        add(pieceSizeLabel, "left, wrap");
+        add(hexHivePanel, "grow, span 2");
     }
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
-        HEXHIVEPANEL.updateData(hexPanelAdapter);
+        pieceSizeAlreadySet = (bittorrentDownload == btDownload);
+        totalPiecesAlreadySet = (bittorrentDownload == btDownload);
+        bittorrentDownload = btDownload;
+
+        hexHivePanelAdapter.updateData(bittorrentDownload);
+
+        updatePieceSizeLabel(hexHivePanelAdapter.getPieceSizeInHuman());
+        updateTotalPiecesLabel(hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount());
+
+        if (hexHivePanelAdapter.getTotalHexagonsCount() >= 0) {
+            hexHivePanel.updateData(hexHivePanelAdapter);
+            hexHivePanel.invalidate();
+        }
     }
 
-    private static class HexHiveAdapter implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
+    private void updatePieceSizeLabel(String pieceSize) {
+        if (!pieceSizeAlreadySet) {
+            pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
+            pieceSizeAlreadySet = true;
+        }
+    }
+
+    private void updateTotalPiecesLabel(String totalPieces) {
+        if (!totalPiecesAlreadySet) {
+            totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
+            totalPiecesAlreadySet = true;
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+
+    private final static class HexHiveAdapter implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
         private BittorrentDownload bittorrentDownload;
+        private int totalPieces;
+        private int numFullPieces;
+        private PieceIndexBitfield pieces;
+        private String pieceSizeInHuman;
+
         @Override
-        public void updateData(BittorrentDownload data) {
-            /*
-            bittorrentDownload = data;
+        public void updateData(BittorrentDownload btDownload) {
+            bittorrentDownload = btDownload;
+            TorrentHandle torrentHandle = bittorrentDownload.getDl().getTorrentHandle();
             TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
             TorrentInfo torrentInfo = torrentHandle.torrentFile();
-
-            if (pieceSizeString == null) {
-                pieceSizeString = UIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
-            }
-
-            if (totalPieces == -1) {
-                totalPieces = torrentInfo.numPieces();
-                piecesNumberTextView.setText(String.valueOf(totalPieces));
-                //progressBar.setVisibility(View.VISIBLE);
-                hexHiveView.setVisibility(View.GONE);
-            }
-
-            PieceIndexBitfield pieces = status.pieces();
-            long piecesCount = pieces.count();
-            if (isAdded()) {
-                // I do this color look-up only once and pass it down to the view holder
-                // otherwise it has to be done thousands of times.
-                pieceSizeTextView.setText(pieceSizeString);
-                hexDataAdapter = new PieceAdapter(totalPieces, pieces);
-                hexHiveView.setVisibility(View.VISIBLE);
-            }
-            if (hexDataAdapter != null) {
-                if (piecesCount >= 0) {
-                    hexDataAdapter.updateData(pieces);
+            pieceSizeInHuman = GUIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
+            totalPieces = torrentInfo.numPieces();
+            pieces = status.pieces();
+            if (pieces.isAllSet()) {
+                numFullPieces = totalPieces;
+            } else if (pieces.isNoneSet() || pieces.isEmpty()) {
+                numFullPieces = 0;
+            } else {
+                numFullPieces = 0;
+                for(int i=0; i < pieces.count(); i++) {
+                    if (pieces.getBit(i)) {
+                        numFullPieces++;
+                    }
                 }
-                //noinspection unchecked
-                hexHiveView.updateData(hexDataAdapter);
-                piecesNumberTextView.setText(piecesCount + "/" + totalPieces);
             }
-            */
         }
 
         @Override
@@ -88,8 +127,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             if (bittorrentDownload == null) {
                 return 0;
             }
-            //bittorrentDownload.getDl().
-            return 0;
+            return totalPieces;
         }
 
         @Override
@@ -97,12 +135,16 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             if (bittorrentDownload == null) {
                 return 0;
             }
-            return 0;
+            return numFullPieces;
         }
 
         @Override
         public boolean isFull(int hexOffset) {
-            return false;
+            return pieces.getBit(hexOffset);
+        }
+
+        String getPieceSizeInHuman() {
+            return pieceSizeInHuman;
         }
     }
 }
