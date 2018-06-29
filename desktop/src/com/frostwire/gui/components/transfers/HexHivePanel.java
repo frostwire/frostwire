@@ -118,7 +118,9 @@ public class HexHivePanel extends JPanel {
                 }
 
                 if (bitmap != null) {
-                    GUIMediator.safeInvokeAndWait(this::invalidate);
+                    GUIMediator.safeInvokeAndWait(() -> {
+                        repaint();
+                    });
                 }
             });
         }
