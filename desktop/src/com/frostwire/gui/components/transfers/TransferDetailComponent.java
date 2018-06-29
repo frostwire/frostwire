@@ -178,7 +178,7 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     @Override
     public void refresh() {
         // we're a Refresh listener of the GUIMediator, this gets invoked every 1 second
-        if (isVisible() && currentComponent != null && selectedBittorrentDownload != null) {
+        if (GUIMediator.instance().getSelectedTab() == GUIMediator.Tabs.TRANSFERS && isVisible() && currentComponent != null && selectedBittorrentDownload != null) {
             currentComponent.updateData(selectedBittorrentDownload);
         }
     }

@@ -23,6 +23,7 @@ import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
@@ -30,6 +31,8 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 
 public final class TransferDetailPieces extends JPanel implements TransferDetailComponent.TransferDetailPanel {
+    private static final Logger LOG = Logger.getLogger(TransferDetailPieces.class);
+
     private final JLabel pieceSizeLabel;
     private final JLabel totalPiecesLabel;
     private final HexHivePanel hexHivePanel;
@@ -40,7 +43,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     TransferDetailPieces() {
         super();
-        setLayout(new MigLayout("fill, insets 0 0 0 0"));
+        setLayout(new MigLayout("fill, insets 0 0 0 0, debug"));
         hexHivePanel = new HexHivePanel(
                 0x264053,
                 0xf2f2f2,
@@ -56,7 +59,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
         add(totalPiecesLabel, "left");
         add(pieceSizeLabel, "left, wrap");
-        add(hexHivePanel, "grow, span 2");
+        add(hexHivePanel, "push, grow, span 2");
     }
 
     @Override
@@ -74,6 +77,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             hexHivePanel.updateData(hexHivePanelAdapter);
             hexHivePanel.invalidate();
         }
+        invalidate();
     }
 
     private void updatePieceSizeLabel(String pieceSize) {
@@ -120,6 +124,9 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                     }
                 }
             }
+            LOG.info("HexHiveAdapter.updateData() totalPieces =" + totalPieces);
+            LOG.info("HexHiveAdapter.updateData() pieces.count() =" + pieces.count());
+            LOG.info("HexHiveAdapter.updateData() numFullPieces =" + numFullPieces);
         }
 
         @Override
