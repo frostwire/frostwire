@@ -41,7 +41,7 @@ public class HexHivePanel extends JPanel {
     private BufferedImage bitmap;
     private final Object bitmapLock = new Object();
 
-    private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
+    private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 2);
 
     private final int topPadding;
     private final int rightPadding;
@@ -85,7 +85,7 @@ public class HexHivePanel extends JPanel {
     public void updateData(HexDataAdapter hexDataAdapter) {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
-        LOG.info("udpateData(): width=" + canvasWidth + ", height=" + canvasHeight, true);
+        LOG.info("updateData(): width=" + canvasWidth + ", height=" + canvasHeight, true);
 
         if (drawingProperties == null && canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
             drawingProperties = new DrawingProperties(hexDataAdapter,
@@ -99,6 +99,7 @@ public class HexHivePanel extends JPanel {
             lastHeight = canvasHeight;
 
         } else if (drawingProperties != null && canvasHeight > 0 && canvasWidth > 0 && (canvasHeight != lastHeight || canvasWidth != lastWidth)) {
+            drawingProperties.numHexs = hexDataAdapter.getFullHexagonsCount();
             drawingProperties.update(leftPadding, topPadding, canvasWidth - rightPadding, canvasHeight - bottomPadding);
             lastWidth = canvasWidth;
             lastHeight = canvasHeight;
