@@ -24,6 +24,7 @@ import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
@@ -35,7 +36,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     private final JLabel pieceSizeLabel;
     private final JLabel totalPiecesLabel;
-    private final HexHivePanel hexHivePanel;
+    private HexHivePanel hexHivePanel;
     private HexHiveAdapter hexHivePanelAdapter;
     private boolean pieceSizeAlreadySet = false;
     private boolean totalPiecesAlreadySet = false;
@@ -43,7 +44,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     TransferDetailPieces() {
         super();
-        setLayout(new MigLayout("fill, insets 0 0 0 0, debug"));
+        setLayout(new MigLayout("fill, insets 0 0 0 0"));
         hexHivePanel = new HexHivePanel(
                 0x264053,
                 0xf2f2f2,
@@ -57,9 +58,10 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
         pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
-        add(totalPiecesLabel, "left");
-        add(pieceSizeLabel, "left, wrap");
-        add(hexHivePanel, "push, grow, span 2");
+        add(totalPiecesLabel, "left, gapleft 5px");
+        add(pieceSizeLabel, "left, gapright 10px, wrap");
+        add(hexHivePanel, "push, grow, gap 5px 5px 5px 5px, span 2");
+        repaint();
     }
 
     @Override
@@ -78,6 +80,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
             hexHivePanel.invalidate();
         }
         invalidate();
+        repaint();
     }
 
     private void updatePieceSizeLabel(String pieceSize) {
