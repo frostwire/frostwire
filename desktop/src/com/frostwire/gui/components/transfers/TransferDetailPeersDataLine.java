@@ -26,6 +26,8 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.tables.SpeedRenderer;
 
+import java.nio.charset.Charset;
+
 public final class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetailPeers.PeerItemHolder> {
 
     private static final int IP_COLUMN_ID = 0;
@@ -120,7 +122,8 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
                 String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
                 return connectionTypes[peer.getConnection_type()] + "://" + address + ":" + port;
             case CLIENT_COLUMN_ID:
-                String client = peer.getClient();
+                String client = new String(holder.peerItem.client(), Charset.forName("UTF-8"));
+
                 if (client == null || client.isEmpty()) {
                     client = I18n.tr("Unknown");
                 } else if (client.contains("libtorrent/1.1")) {
