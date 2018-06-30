@@ -134,7 +134,7 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
 
-        boolean drawCubes = drawingProperties.numHexs <= 600;
+        boolean drawCubes = drawingProperties.numHexs <= 500;
 
         BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
@@ -425,11 +425,11 @@ public class HexHivePanel extends JPanel {
             hexHeight = getHexHeight(hexSideLength) - 2 * hexBorderStrokeWidth;
             hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
 
-            evenRowOrigin.x = (int) (origin.x + (hexWidth / 2));
-            evenRowOrigin.y = (int) (origin.y + (hexHeight / 2));
+            evenRowOrigin.x = (int) (origin.x + (hexWidth / 2) + hexBorderStrokeWidth);
+            evenRowOrigin.y = (int) (origin.y + (hexHeight / 2) + hexBorderStrokeWidth);
             // calculate number of hexagons in an even row
-            oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2));
-            oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight);
+            oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2) + hexBorderStrokeWidth);
+            oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight + hexBorderStrokeWidth);
         }
     }
 

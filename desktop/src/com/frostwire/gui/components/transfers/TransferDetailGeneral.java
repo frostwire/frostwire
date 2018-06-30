@@ -23,10 +23,10 @@ import com.frostwire.gui.bittorrent.BittorrentDownload;
 
 import javax.swing.*;
 
-public final class TransferDetailStatus extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    public TransferDetailStatus() {
+public final class TransferDetailGeneral extends JPanel implements TransferDetailComponent.TransferDetailPanel {
+    public TransferDetailGeneral() {
         super();
-        add(new JLabel("STATUS HERE"));
+        add(new JLabel("GENERAL"));
     }
 
     @Override

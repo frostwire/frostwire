@@ -38,18 +38,16 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
     private JToggleButton filesButton;
     private JToggleButton piecesButton;
-    private JToggleButton statusButton;
-    private JToggleButton detailsButton;
+    private JToggleButton generalButton;
     private JToggleButton trackersButton;
     private JToggleButton peersButton;
 
     private JPanel detailComponentHolder;
 
     // inner use strings, no need to translate, just to switch cards layout
+    private final String GENERAL_CARD = "G";
     private final String FILES_CARD = "F";
     private final String PIECES_CARD = "P";
-    private final String STATUS_CARD = "S";
-    private final String DETAILS_CARD = "D";
     private final String TRACKERS_CARD = "T";
     private final String PEERS_CARD = "p";
 
@@ -71,32 +69,28 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
 
     private JPanel createDetailComponentHolder() {
         detailComponentHolder = new JPanel(new CardLayout());
+        TransferDetailGeneral generalComponent;
+        detailComponentHolder.add(generalComponent = new TransferDetailGeneral(), GENERAL_CARD);
         TransferDetailFiles filesComponent;
         detailComponentHolder.add(filesComponent = new TransferDetailFiles(), FILES_CARD);
         TransferDetailPieces piecesComponent;
         detailComponentHolder.add(piecesComponent = new TransferDetailPieces(), PIECES_CARD);
-        TransferDetailStatus statusComponent;
-        detailComponentHolder.add(statusComponent = new TransferDetailStatus(), STATUS_CARD);
-        TransferDetailDetails detailsComponent;
-        detailComponentHolder.add(detailsComponent = new TransferDetailDetails(), DETAILS_CARD);
         TransferDetailTrackers trackersComponent;
         detailComponentHolder.add(trackersComponent = new TransferDetailTrackers(), TRACKERS_CARD);
         TransferDetailPeers peersComponent;
         detailComponentHolder.add(peersComponent = new TransferDetailPeers(), PEERS_CARD);
 
         cardPanelMap = new HashMap<>();
+        cardPanelMap.put(GENERAL_CARD, generalComponent);
         cardPanelMap.put(FILES_CARD, filesComponent);
         cardPanelMap.put(PIECES_CARD, piecesComponent);
-        cardPanelMap.put(STATUS_CARD, statusComponent);
-        cardPanelMap.put(DETAILS_CARD, detailsComponent);
         cardPanelMap.put(TRACKERS_CARD, trackersComponent);
         cardPanelMap.put(PEERS_CARD, peersComponent);
 
         HashMap<String, JToggleButton> cardButtonMap = new HashMap<>();
+        cardButtonMap.put(GENERAL_CARD, generalButton);
         cardButtonMap.put(FILES_CARD, filesButton);
         cardButtonMap.put(PIECES_CARD, piecesButton);
-        cardButtonMap.put(STATUS_CARD, statusButton);
-        cardButtonMap.put(DETAILS_CARD, detailsButton);
         cardButtonMap.put(TRACKERS_CARD, trackersButton);
         cardButtonMap.put(PEERS_CARD, peersButton);
 
@@ -111,17 +105,15 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     private JPanel createDetailSwitcherButtons() {
         JPanel detailSwitcherButtonsPanel = new JPanel(new MigLayout("align right, ins 0 0 0 8"));
         ButtonGroup switcherButtonsGroup = new ButtonGroup();
+        generalButton = new JToggleButton(I18n.tr("General"), false);
         filesButton = new JToggleButton(I18n.tr("Files"), true);
         piecesButton = new JToggleButton(I18n.tr("Pieces"), false);
-        statusButton = new JToggleButton(I18n.tr("Status"), false);
-        detailsButton = new JToggleButton(I18n.tr("Details"), false);
         trackersButton = new JToggleButton(I18n.tr("Trackers"), false);
         peersButton = new JToggleButton(I18n.tr("Peers"), false);
 
+        generalButton.addActionListener(e -> showDetailComponent(GENERAL_CARD));
         filesButton.addActionListener(e -> showDetailComponent(FILES_CARD));
         piecesButton.addActionListener(e -> showDetailComponent(PIECES_CARD));
-        statusButton.addActionListener(e -> showDetailComponent(STATUS_CARD));
-        detailsButton.addActionListener(e -> showDetailComponent(DETAILS_CARD));
         trackersButton.addActionListener(e -> showDetailComponent(TRACKERS_CARD));
         peersButton.addActionListener(e -> showDetailComponent(PEERS_CARD));
 
@@ -130,24 +122,21 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         applyFontAndDimensionToFilterToggleButtons(
                 smallHelvetica,
                 buttonDimension,
+                generalButton,
                 filesButton,
                 piecesButton,
-                statusButton,
-                detailsButton,
                 trackersButton,
                 peersButton);
 
+        switcherButtonsGroup.add(generalButton);
         switcherButtonsGroup.add(filesButton);
         switcherButtonsGroup.add(piecesButton);
-        switcherButtonsGroup.add(statusButton);
-        switcherButtonsGroup.add(detailsButton);
         switcherButtonsGroup.add(trackersButton);
         switcherButtonsGroup.add(peersButton);
 
+        detailSwitcherButtonsPanel.add(generalButton);
         detailSwitcherButtonsPanel.add(filesButton);
         detailSwitcherButtonsPanel.add(piecesButton);
-        detailSwitcherButtonsPanel.add(statusButton);
-        detailSwitcherButtonsPanel.add(detailsButton);
         detailSwitcherButtonsPanel.add(trackersButton);
         detailSwitcherButtonsPanel.add(peersButton);
 
