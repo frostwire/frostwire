@@ -31,8 +31,8 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
     private BittorrentDownload btDownload;
 
     TransferDetailPeers() {
+        super(new MigLayout("fill"));
         tableMediator = new TransferDetailPeersTableMediator();
-        setLayout(new MigLayout("fill"));
         add(tableMediator.getComponent(), "growx, growy");
     }
 

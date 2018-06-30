@@ -43,8 +43,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     private BittorrentDownload bittorrentDownload;
 
     TransferDetailPieces() {
-        super();
-        setLayout(new MigLayout("fill, insets 0 0 0 0"));
+        super(new MigLayout("fill, insets 0 0 0 0"));
         hexHivePanel = new HexHivePanel(
                 0x264053,
                 0xf2f2f2,
