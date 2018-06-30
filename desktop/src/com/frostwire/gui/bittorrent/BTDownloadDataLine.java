@@ -33,7 +33,7 @@ import java.util.*;
  * displayed data for the download from the contained <tt>Downloader</tt>
  * instance.
  */
-final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
+public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     
     private static final String PARTIAL_DOWNLOAD_TEXT = I18n.tr(" (Handpicked)");
 
@@ -146,7 +146,7 @@ final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         return COLUMN_COUNT;
     }
 
-    private static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
+    public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     static {
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, I18n.tr("Checking..."));

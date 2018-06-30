@@ -18,12 +18,20 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.gui.bittorrent.BTDownloadDataLine;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.TorrentStatus;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public final class TransferDetailGeneral extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private final JProgressBar completionPercentageProgressbar;
@@ -31,7 +39,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private final JLabel torrentNameLabel;
     private final JLabel completionPercentageLabel;
     private final JLabel timeLeftLabel;
-    private final JLabel downSpeedLabel;
+    private final JLabel downloadSpeedLabel;
     private final JLabel downloadedLabel;
     private final JLabel statusLabel;
     private final JLabel downloadSpeedLimitLabel;
@@ -49,10 +57,17 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private final JButton copyMagnetURLButton;
     private final JLabel createdOnLabel;
     private final JLabel commentLabel;
-    private BittorrentDownload bittorrentDownload;
+
+    // TODO: Icons for Copy to clipboard buttons
+    // TODO: Add Pieces
+    // TODO: Don't unselect transfers when pausing/resuming
+    // TODO: Play with font-sizes
+
+    private ActionListener copyInfoHashActionListener;
+    private ActionListener copyMagnetURLActionListener;
 
     TransferDetailGeneral() {
-        super(new MigLayout("insets 0px 0px 0px 0px, fill, debug"));
+        super(new MigLayout("insets 0px 0px 0px 0px, fill"));
         setBackground(Color.WHITE);
         // Upper panel with Name, Percentage labels [future share button]
         // progress bar
@@ -65,7 +80,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         upperPanel.add(new JLabel("|"), "left, gapright 15px");
         upperPanel.add(completionPercentageLabel = new JLabel("<html><b>0%</b></html>"),"left, gapright 5px");
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("complete") + "</b></html>"), "left, pushx, wrap");
-        upperPanel.add(completionPercentageProgressbar = new JProgressBar(),"gapleft 15px, gapright 15px, span 5, growx");
+        upperPanel.add(completionPercentageProgressbar = new JProgressBar(),"span 5, growx");
 
         add(upperPanel, "top, growx, growprioy 0, wrap");
 
@@ -78,7 +93,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(new JLabel(I18n.tr("Time left")), "left");
         midPanel.add(timeLeftLabel = new JLabel(), "left");
         midPanel.add(new JLabel(I18n.tr("Download speed")),"left");
-        midPanel.add(downSpeedLabel = new JLabel(),"left, wrap");
+        midPanel.add(downloadSpeedLabel = new JLabel(),"left, wrap");
 
         // Downloaded, status, download speed limit
         midPanel.add(new JLabel(I18n.tr("Downloaded")), "left");
@@ -115,7 +130,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // Magnet URL
         // Created On
         // Comment
-        JPanel lowerPanel = new JPanel(new MigLayout("insets 15px 15px 0px 15px, fill"));
+        JPanel lowerPanel = new JPanel(new MigLayout("insets 15px 15px 15px 15px, fill"));
         lowerPanel.add(new JLabel(I18n.tr("Save location")), "left");
         lowerPanel.add(saveLocationLabel = new JLabel(), "left, growx, span 2, wrap");
 
@@ -137,7 +152,111 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     }
 
     @Override
-    public void updateData(BittorrentDownload btDownload) {
+    public void updateData(BittorrentDownload guiBtDownload) {
+        if (guiBtDownload == null) {
+            return;
+        }
 
+        BTDownload btDownload = guiBtDownload.getDl();
+        TorrentHandle torrentHandle = btDownload.getTorrentHandle();
+        TorrentStatus status = torrentHandle.status();
+        TorrentInfo torrentInfo = torrentHandle.torrentFile();
+
+        torrentNameLabel.setText(btDownload.getName());
+        //"<html><b>0%</b></html>"
+        int progress = btDownload.getProgress();
+        completionPercentageLabel.setText("<html><b>" + progress + "%</b></html>");
+        completionPercentageProgressbar.setMaximum(100);
+        completionPercentageProgressbar.setValue(progress);
+
+        timeElapsedLabel.setText(seconds2time(status.activeDuration()/1000));
+        timeLeftLabel.setText(seconds2time(guiBtDownload.getETA()));
+        downloadSpeedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getDownloadSpeed()));
+
+        downloadedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getTotalBytesReceived()));
+        statusLabel.setText(BTDownloadDataLine.TRANSFER_STATE_STRING_MAP.get(btDownload.getState()));
+        downloadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(btDownload.getDownloadRateLimit()));
+
+        uploadedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getTotalBytesSent()));
+        seedsLabel.setText(String.format("%d %s %s %d %s",
+                btDownload.getConnectedSeeds(),
+                I18n.tr("connected"),
+                I18n.tr("of"),
+                btDownload.getTotalSeeds(),
+                I18n.tr("total")));
+        uploadSpeedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getUploadSpeed()));
+
+        totalSizeLabel.setText(GUIUtils.getBytesInHuman(btDownload.getSize()));
+        peersLabel.setText(String.format("%d %s %s %d %s",
+                btDownload.getConnectedPeers(),
+                I18n.tr("connected"),
+                I18n.tr("of"),
+                btDownload.getTotalPeers(),
+                I18n.tr("total")));
+        uploadSpeedLimitLabel.setText(GUIUtils.getBytesInHuman(btDownload.getUploadRateLimit()));
+
+        shareRatioLabel.setText(guiBtDownload.getShareRatio());
+
+        saveLocationLabel.setText(guiBtDownload.getSaveLocation().getAbsolutePath());
+
+        infoHashLabel.setText(btDownload.getInfoHash());
+        if (copyInfoHashActionListener != null) {
+            copyInfoHashButton.removeActionListener(copyInfoHashActionListener);
+        }
+        copyInfoHashActionListener = e -> GUIMediator.setClipboardContent(btDownload.getInfoHash());
+        copyInfoHashButton.addActionListener(copyInfoHashActionListener);
+
+        String magnetURI = btDownload.magnetUri();
+        if (magnetURI.length() > 50) {
+            magnetURLLabel.setText(magnetURI.substring(0,49) + "...");
+        } else {
+            magnetURLLabel.setText(magnetURI);
+        }
+        if (copyMagnetURLActionListener != null) {
+            copyMagnetURLButton.removeActionListener(copyMagnetURLActionListener);
+        }
+        copyMagnetURLActionListener = e -> GUIMediator.setClipboardContent(magnetURI);
+        copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
+
+        createdOnLabel.setText(btDownload.getCreated().toString());
+        commentLabel.setText(torrentInfo.comment());
+    }
+
+    /**
+     * Converts a value in seconds to:
+     * "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
+     * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
+     * "m:ss" where m=minutes<60, ss=seconds
+     */
+    private String seconds2time(long seconds) {
+        if (seconds == -1) {
+            return "∞";
+        }
+        long minutes = seconds / 60;
+        seconds = seconds - minutes * 60;
+        long hours = minutes / 60;
+        minutes = minutes - hours * 60;
+        long days = hours / 24;
+        hours = hours - days * 24;
+        // build the numbers into a string
+        StringBuilder time = new StringBuilder();
+        if (days != 0) {
+            time.append(Long.toString(days));
+            time.append(":");
+            if (hours < 10)
+                time.append("0");
+        }
+        if (days != 0 || hours != 0) {
+            time.append(Long.toString(hours));
+            time.append(":");
+            if (minutes < 10)
+                time.append("0");
+        }
+        time.append(Long.toString(minutes));
+        time.append(":");
+        if (seconds < 10)
+            time.append("0");
+        time.append(Long.toString(seconds));
+        return time.toString();
     }
 }
