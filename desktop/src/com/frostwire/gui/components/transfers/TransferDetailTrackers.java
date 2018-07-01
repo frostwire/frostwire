@@ -18,23 +18,20 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.PeerInfo;
-import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.swig.status_flags_t;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private final TransferDetailTrackersTableMediator tableMediator;
     private BittorrentDownload btDownload;
 
 
-    public TransferDetailTrackers() {
+    TransferDetailTrackers() {
         super(new MigLayout("fill"));
         tableMediator = new TransferDetailTrackersTableMediator();
         add(tableMediator.getComponent(), "growx, growy");
@@ -72,7 +69,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         final int trackerOffset;
         final AnnounceEntry announceEntry;
 
-        public TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
+        TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
             this.trackerOffset = trackerOffset;
             this.announceEntry = announceEntry;
         }
