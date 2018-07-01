@@ -20,17 +20,71 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.PeerInfo;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
+    private final TransferDetailTrackersTableMediator tableMediator;
+    private BittorrentDownload btDownload;
+
+
     public TransferDetailTrackers() {
-        super();
-        add(new JLabel("TRACKERS HERE"));
+        super(new MigLayout("fill"));
+        tableMediator = new TransferDetailTrackersTableMediator();
+        add(tableMediator.getComponent(), "growx, growy");
     }
 
     @Override
     public void updateData(BittorrentDownload btDownload) {
+        if (btDownload != null && btDownload.getDl() != null) {
+            if (this.btDownload != btDownload) {
+                tableMediator.clearTable();
+            }
+            this.btDownload = btDownload;
+            try {
+                ArrayList<AnnounceEntry> items = (ArrayList<AnnounceEntry>) btDownload.getDl().getTorrentHandle().trackers();
+                if (items != null && items.size() > 0) {
+                    if (tableMediator.getSize() == 0) {
+                        int i = 0;
+                        for (AnnounceEntry item : items) {
+                            tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
+                        }
+                    } else {
+                        int i = 0;
+                        for (AnnounceEntry item : items) {
+                            tableMediator.update(new TransferDetailTrackers.TrackerItemHolder(i++, item));
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
 
+    public class TrackerItemHolder {
+        final int trackerOffset;
+        final AnnounceEntry announceEntry;
+
+        public TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
+            this.trackerOffset = trackerOffset;
+            this.announceEntry = announceEntry;
+        }
+
+        @Override
+        public int hashCode() {
+            return trackerOffset;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof TrackerItemHolder && ((TrackerItemHolder) obj).trackerOffset == trackerOffset;
+        }
     }
 }
