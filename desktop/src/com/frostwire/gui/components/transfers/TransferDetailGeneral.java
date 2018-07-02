@@ -32,6 +32,8 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public final class TransferDetailGeneral extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private final JProgressBar completionPercentageProgressbar;
@@ -102,6 +104,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(statusLabel = new JLabel(), "left");
         midPanel.add(new JLabel(I18n.tr("Download speed limit")),"left");
         midPanel.add(downloadSpeedLimitLabel = new JLabel(), "left, wrap");
+        // TODO: Add settings_gray button and dialog to adjust download speed limit
 
         // Uploaded, seeds, upload speed
         midPanel.add(new JLabel(I18n.tr("Uploaded")), "left");
@@ -119,6 +122,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(peersLabel = new JLabel(), "left");
         midPanel.add(new JLabel(I18n.tr("Upload speed limit")), "left");
         midPanel.add(uploadSpeedLimitLabel = new JLabel(), "left, wrap");
+        // TODO: Add settings_gray button and dialog to adjust upload speed limit
         midPanel.add(new JLabel(I18n.tr("Share ratio")), "left");
         midPanel.add(shareRatioLabel = new JLabel(), "wrap");
 
@@ -134,19 +138,31 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         lowerPanel.add(new JLabel(I18n.tr("Save location")), "left");
         lowerPanel.add(saveLocationLabel = new JLabel(), "left, growx, span 2, wrap");
 
+        final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
+        final ImageIcon copy_paste = GUIMediator.getThemeImage("copy_paste.png");
+
         lowerPanel.add(new JLabel(I18n.tr("InfoHash")), "left");
         lowerPanel.add(infoHashLabel = new JLabel(), "left");
-        lowerPanel.add(copyInfoHashButton = new JButton(I18n.tr("Copy")),"left, pushx, wrap");
+        lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray),"left, pushx, wrap");
 
         lowerPanel.add(new JLabel(I18n.tr("Magnet URL")), "left");
         lowerPanel.add(magnetURLLabel = new JLabel(), "left");
-        lowerPanel.add(copyMagnetURLButton = new JButton(I18n.tr("Copy")),"left, pushx, wrap");
+        lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray),"left, pushx, wrap");
 
         lowerPanel.add(new JLabel(I18n.tr("Created On")), "left");
         lowerPanel.add(createdOnLabel = new JLabel(), "left, growx, span 2, wrap");
 
         lowerPanel.add(new JLabel(I18n.tr("Comment")), "left");
         lowerPanel.add(commentLabel = new JLabel(), "left, growx, span 2, wrap");
+
+        copyInfoHashButton.setBorder(null);
+        copyInfoHashButton.setBackground(null);
+        copyInfoHashButton.setOpaque(false);
+        copyInfoHashButton.setPressedIcon(copy_paste);
+        copyMagnetURLButton.setBorder(null);
+        copyMagnetURLButton.setBackground(null);
+        copyMagnetURLButton.setOpaque(false);
+        copyMagnetURLButton.setPressedIcon(copy_paste);
 
         add(lowerPanel, "grow");
     }
