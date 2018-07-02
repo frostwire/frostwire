@@ -194,8 +194,15 @@ final class BTDownloadActions {
 
         public void performAction(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
+            BTDownload lastSelectedDownload = null;
+            if (downloaders.length == 1) {
+                lastSelectedDownload = downloaders[0];
+            }
             TorrentUtil.askForPermissionToSeedAndSeedDownloads(downloaders);
             BTDownloadMediator.instance().updateTableFilters();
+            if (lastSelectedDownload != null) {
+                BTDownloadMediator.instance().selectBTDownload(lastSelectedDownload);
+            }
         }
     }
 
@@ -209,11 +216,19 @@ final class BTDownloadActions {
 
         public void performAction(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
+            BTDownload lastSelectedDownload = null;
+            if (downloaders.length == 1) {
+                lastSelectedDownload = downloaders[0];
+            }
             for (int i = 0; i < downloaders.length; i++) {
                 downloaders[i].pause();
             }
             BTDownloadMediator.instance().updateTableFilters();
             UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);
+
+            if (lastSelectedDownload != null) {
+                BTDownloadMediator.instance().selectBTDownload(lastSelectedDownload);
+            }
         }
     }
 

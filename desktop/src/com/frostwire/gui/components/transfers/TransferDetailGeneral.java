@@ -58,9 +58,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private final JLabel createdOnLabel;
     private final JLabel commentLabel;
 
-    // TODO: Add Pieces
-    // TODO: Don't unselect transfers when pausing/resuming
-    // TODO: Play with font-sizes
+    // TODO: Make Pieces fixed size and make HexHiveView scrollable.
 
     private ActionListener copyInfoHashActionListener;
     private ActionListener copyMagnetURLActionListener;
