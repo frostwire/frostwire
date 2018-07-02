@@ -19,6 +19,8 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.swig.announce_endpoint;
+import com.frostwire.jlibtorrent.swig.announce_endpoint_vector;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
@@ -64,21 +66,30 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
     @Override
     public Object getValueAt(int col) {
         final TransferDetailTrackers.TrackerItemHolder holder = getInitializeObject();
+
         if (holder == null) {
             return null;
         }
+
         AnnounceEntry announceEntry = holder.announceEntry;
+
+        announce_endpoint_vector endpoints = announceEntry.swig().getEndpoints();
+        announce_endpoint e = null;
+        if (endpoints.size() > 0) {
+            e = endpoints.get(holder.trackerOffset);
+        }
+
         switch (col) {
             case URL_COLUMN_ID:
                 return announceEntry.url();
             case STATUS_COLUMN_ID:
-                return "Active/Inactive";
+                return "Status Goes Here!!";
             case SEEDS_COLUMN_ID:
-                return "100";
+                return e != null ? Integer.toString(e.getScrape_complete()) : "N/A";
             case PEERS_COLUMN_ID:
-                return "100";
+                return  e != null ? Integer.toString(e.getScrape_incomplete()) : "N/A";
             case DOWNLOADED_COLUMN_ID:
-                return "100";
+                return e != null ? Integer.toString(e.getScrape_downloaded()) : "N/A";
         }
         return null;
     }
