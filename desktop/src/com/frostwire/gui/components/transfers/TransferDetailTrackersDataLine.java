@@ -19,9 +19,12 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.swig.announce_entry;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+
+import java.nio.charset.Charset;
 
 public final class TransferDetailTrackersDataLine extends AbstractDataLine<TransferDetailTrackers.TrackerItemHolder> {
 
@@ -70,7 +73,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         AnnounceEntry announceEntry = holder.announceEntry;
         switch (col) {
             case URL_COLUMN_ID:
-                return announceEntry.url();
+                return new String(announceEntry.url().getBytes(),Charset.forName("UTF-8"));
             case STATUS_COLUMN_ID:
                 return "Active/Inactive";
             case SEEDS_COLUMN_ID:

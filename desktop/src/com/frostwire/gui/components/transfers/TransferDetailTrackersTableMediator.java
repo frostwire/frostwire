@@ -26,7 +26,7 @@ import javax.swing.*;
 
 public class TransferDetailTrackersTableMediator extends
         AbstractTableMediator<TransferDetailTrackersModel, TransferDetailTrackersDataLine, TransferDetailTrackers.TrackerItemHolder> {
-    public TransferDetailTrackersTableMediator() {
+    TransferDetailTrackersTableMediator() {
         super("TRANSFER_DETAIL_TRACKERS_TABLE_MEDIATOR");
     }
 

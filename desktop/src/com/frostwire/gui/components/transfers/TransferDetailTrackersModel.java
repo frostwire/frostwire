@@ -22,7 +22,7 @@ import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
 public class TransferDetailTrackersModel extends
         BasicDataLineModel<TransferDetailTrackersDataLine, TransferDetailTrackers.TrackerItemHolder> {
-    public TransferDetailTrackersModel() {
+    TransferDetailTrackersModel() {
         super(TransferDetailTrackersDataLine.class);
     }
 }
