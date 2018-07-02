@@ -119,6 +119,8 @@ public class HexHivePanel extends JPanel {
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
         fullHexPaint = new CubePaint(numFullColor, 30);
         backgroundColor = new Color(bgColor);
+        setOpaque(true);
+        setBackground(backgroundColor);
     }
 
     private BufferedImage asyncDraw(HexDataAdapter adapter) {
@@ -434,7 +436,7 @@ public class HexHivePanel extends JPanel {
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(0x264053, 0xf2f2f2, 0x33b5e5,0xf2f2f2, 0, 0, 0, 0);
+        final HexHivePanel hexPanel = new HexHivePanel(0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {

@@ -48,7 +48,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 0x264053,
                 0xf2f2f2,
                 0x33b5e5,
-                0xf2f2f2,
+                0xffffff,
                 0,
                 0,
                 0,
