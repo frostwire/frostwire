@@ -672,4 +672,6 @@
     <string name="vpn_find_out_more">หาข้อมูลเพิ่มเติม</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n การทดลองใช้ฟรี 7 วัน</string>
     <string name="play_store_out_of_sync">Google Play สโตร์ต้องซิงโครไนซ์รอสักครู่</string>
+    <string name="one_file_shared">ไฟล์หนึ่งไฟล์ถูกแชร์กับอุปกรณ์ FrostWire บนเครือข่าย Wi-Fi เดียวกัน</string>
+    <string name="n_files_shared">มีการแชร์ไฟล์ %d ไฟล์กับอุปกรณ์ FrostWire บนเครือข่าย Wi-Fi เดียวกัน</string>
 </resources>
