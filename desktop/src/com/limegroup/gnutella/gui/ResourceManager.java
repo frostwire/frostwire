@@ -150,17 +150,6 @@ public final class ResourceManager {
         if (icon != null)
             return icon;
 
-        //File themeDir = ThemeSettings.THEME_DIR.getValue();
-
-        //System.out.println("ResourceManager.getThemeImage("+name+") Getting Theme Image from: \n" + org.limewire.util.CommonUtils.getUserSettingsDir() + "\n");
-        
-        // Next try to get from themes.
-//        icon = getImageFromURL(new File(themeDir, name).getPath(), true);
-//        if (icon != null && icon.getImage() != null) {
-//            THEME_IMAGES.put(name, icon);
-//            return icon;
-//        }
-
         // Then try to get from org/limewire/gui/images resources
         icon = getImageFromURL(IMAGES_PATH + name, false);
         if (icon != null && icon.getImage() != null) {
