@@ -60,14 +60,6 @@ public class HexHivePanel extends JPanel {
     /**
      *
      * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
-     * @param borderColor
-     * @param emptyColor
-     * @param fullColor
-     * @param backgroundColor
-     * @param topPadding
-     * @param rightPadding
-     * @param bottomPadding
-     * @param leftPadding
      */
     HexHivePanel(int hexSideLength,
                  int borderColor,
@@ -181,7 +173,7 @@ public class HexHivePanel extends JPanel {
     }
 
     private static float getHexWidth(float sideLength) {
-        return (float) (2*(Math.cos(Math.toRadians(30)) * sideLength));//(float) (Math.sqrt(3) * sideLength);
+        return (float) (2*(Math.cos(Math.toRadians(30)) * sideLength));
     }
 
     private static float getHexHeight(float sideLength) {
@@ -460,40 +452,36 @@ public class HexHivePanel extends JPanel {
                 // we need to calculate the end.y and the new drawing total height depending
                 // on how many rows we'll have.
                 Point bufferCenter = new Point(evenRowOrigin.x, evenRowOrigin.y);
-                int consideredHexagons = 0;
-                int lastCenterX = 0;
+                int consideredHexagons = 1;
+                int lastCenterX = evenRowOrigin.x;
                 int lastRowCenterY = evenRowOrigin.y;
                 boolean evenRow = true;
                 float heightQuarter = hexHeight / 4;
                 float threeQuarters = heightQuarter * 3;
 
-                while (consideredHexagons < numHexs) {
-                    bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.y;
-                    while ((bufferCenter.x + hexWidth) < right) {
-                        bufferCenter.x += 2 * (hexWidth + hexBorderStrokeWidth);
+                while (consideredHexagons <= numHexs) {
+                    while ((bufferCenter.x + (hexWidth/2) + 2*hexBorderStrokeWidth) <= right) {
                         lastCenterX = bufferCenter.x;
+                        bufferCenter.x += hexWidth + (2*hexBorderStrokeWidth);
                         consideredHexagons++;
-                        if (consideredHexagons > numHexs) {
-                            break;
-                        }
                     }
-                    if (consideredHexagons > numHexs) {
-                        break;
-                    }
+                    // go down one row
+                    bufferCenter.y += threeQuarters + (2 * hexBorderStrokeWidth);
                     lastRowCenterY = bufferCenter.y;
-                    bufferCenter.y += threeQuarters + (hexBorderStrokeWidth);
-                    consideredHexagons++;
+                    // reset x center depending on the row (even or odd)
+                    bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
+                    evenRow = !evenRow;
                 }
-                end.y = (int) (lastRowCenterY + hexSideLength + 2*hexBorderStrokeWidth);
-                height = end.y - top;
                 end.x = (int) (lastCenterX + (hexWidth/2) + hexBorderStrokeWidth);
+                end.y = (int) (lastRowCenterY + hexSideLength + 2 * hexBorderStrokeWidth);
                 width = end.x - left;
+                height = end.y - top;
             }
         }
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(40, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
+        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
@@ -506,7 +494,7 @@ public class HexHivePanel extends JPanel {
 
             @Override
             public int getFullHexagonsCount() {
-                return 5;
+                    return 0;
             }
 
             @Override
