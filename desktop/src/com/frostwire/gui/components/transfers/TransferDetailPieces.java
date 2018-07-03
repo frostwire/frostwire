@@ -23,17 +23,14 @@ import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
-import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.awt.*;
 
 public final class TransferDetailPieces extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-    private static final Logger LOG = Logger.getLogger(TransferDetailPieces.class);
-
     private final JLabel pieceSizeLabel;
     private final JLabel totalPiecesLabel;
     private HexHivePanel hexHivePanel;
@@ -45,7 +42,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     TransferDetailPieces() {
         super(new MigLayout("fill, insets 0 0 0 0"));
         hexHivePanel = new HexHivePanel(
-                10,
+                25,
                 0x264053,
                 0xf2f2f2,
                 0x33b5e5,
@@ -53,14 +50,19 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 0,
                 0,
                 0,
-                0);
+                0,
+                true);
         hexHivePanelAdapter = new HexHiveAdapter();
-
         pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
         add(totalPiecesLabel, "left, gapleft 5px");
-        add(pieceSizeLabel, "left, gapright 10px, wrap");
-        add(hexHivePanel, "push, grow, gap 5px 5px 5px 5px, span 2");
+        add(pieceSizeLabel, "left, growx, gapright 10px, wrap");
+        JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
+        jScrollPane.setOpaque(true);
+        jScrollPane.setBackground(Color.WHITE);
+        jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(jScrollPane, "push, growx, height 240px, gap 0px 0px 5px 5px, span 2");
         repaint();
     }
 
@@ -85,7 +87,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     private void updatePieceSizeLabel(String pieceSize) {
         if (!pieceSizeAlreadySet) {
-            pieceSizeLabel.setText("<html><b>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
+            pieceSizeLabel.setText("<html><b nowrap>" + I18n.tr("Piece Size") + "</b>:" + pieceSize + "</html>");
             pieceSizeAlreadySet = true;
         }
     }
@@ -127,9 +129,6 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                     }
                 }
             }
-            LOG.info("HexHiveAdapter.updateData() totalPieces =" + totalPieces);
-            LOG.info("HexHiveAdapter.updateData() pieces.count() =" + pieces.count());
-            LOG.info("HexHiveAdapter.updateData() numFullPieces =" + numFullPieces);
         }
 
         @Override

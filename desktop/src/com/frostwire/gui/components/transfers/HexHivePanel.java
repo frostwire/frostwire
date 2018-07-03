@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 
 public class HexHivePanel extends JPanel {
+    private final boolean forceCubes;
     private int hexSideLength;
     private ColoredStroke hexagonBorderPaint;
     private CubePaint emptyHexPaint;
@@ -36,6 +37,9 @@ public class HexHivePanel extends JPanel {
     private DrawingProperties drawingProperties;
     private BufferedImage bitmap;
     private final Object bitmapLock = new Object();
+
+    private int lastWidth;
+    private int lastHeight;
 
     private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 2);
 
@@ -69,7 +73,8 @@ public class HexHivePanel extends JPanel {
                  int topPadding,
                  int rightPadding,
                  int bottomPadding,
-                 int leftPadding) {
+                 int leftPadding,
+                 boolean forceCubes) {
         if (hexSideLength != -1 && hexSideLength < 5) {
             throw new IllegalArgumentException("Invalid hexSideLength (" + hexSideLength + "). Valid hexSideLength are: -1 (dynamic) and >= 5");
         }
@@ -79,6 +84,9 @@ public class HexHivePanel extends JPanel {
         this.rightPadding = rightPadding;
         this.bottomPadding = bottomPadding;
         this.leftPadding = leftPadding;
+        this.forceCubes = forceCubes;
+        lastWidth = getWidth();
+        lastHeight = getHeight();
     }
 
     void updateData(HexDataAdapter hexDataAdapter) {
@@ -93,9 +101,8 @@ public class HexHivePanel extends JPanel {
                     topPadding,
                     canvasWidth - rightPadding,
                     canvasHeight - bottomPadding);
-
-            //lastWidth = canvasWidth;
-            //lastHeight = canvasHeight;
+            lastHeight = drawingProperties.height;
+            lastWidth = getWidth();
         }
 
         if (drawingProperties == null) {
@@ -114,6 +121,11 @@ public class HexHivePanel extends JPanel {
                 }
             });
         }
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(lastWidth, lastHeight);
     }
 
     @Override
@@ -146,7 +158,7 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
 
-        boolean drawCubes = drawingProperties.numHexs <= 500;
+        boolean drawCubes = (forceCubes) ? true : drawingProperties.numHexs <= 500;
 
         BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
@@ -481,7 +493,7 @@ public class HexHivePanel extends JPanel {
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
+        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0, true);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
