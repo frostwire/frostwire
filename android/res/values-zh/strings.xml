@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[披露： 虽然建议您下载， <b>您不需要VPN使用FrostWire。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>您的隐私是一项基本人权</b>. 不受保护的连接意味着您在线进行的所有操作（包括<b>下载，搜索，消息传递</b>）都可以被网络上的任何人监控和拦截，例如： 互联网服务提供商，黑客，政府。<br><br><b>我们强烈建议您使用VPN服务</b>. <br> 以下是一些提供可靠服务并与FrostWire配合良好的选项：]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到Internet。 <br><br> 如果您尚未使用，我们建议您使用以下服务之一加密您的连接并<b>保护您的隐私</b>。 ]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
     <string name="activity_chat_name">聊天</string>
@@ -697,7 +699,6 @@
     <string name="edit_tracker">编辑跟踪器</string>
     <string name="down_speed">下载速度</string>
     <string name="completed">已完成</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>您的隐私是一项基本人权</b>. 不受保护的连接意味着您在线进行的所有操作（包括<b>下载，搜索，消息传递</b>）都可以被网络上的任何人监控和拦截，例如： 互联网服务提供商，黑客，政府。<br><br><b>我们强烈建议您使用VPN服务</b>. <br> 以下是一些提供可靠服务并与FrostWire配合良好的选项：]]></string>
     <string name="downloaded">下载</string>
     <string name="n_peers">%1$d 个人</string>
     <string name="sequential_download">顺序下载</string>
@@ -715,7 +716,6 @@
     <string name="uploaded_n">上传的 %1$s</string>
     <string name="m_of_n_decimals">%1$d 的 %2$d</string>
     <string name="details">细节</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到Internet。 <br><br> 如果您尚未使用，我们建议您使用以下服务之一加密您的连接并<b>保护您的隐私</b>。 ]]></string>
     <string name="title_activity_transfer_detail">转移细节</string>
     <string name="piece_size_header">件大小：</string>
     <string name="add_tracker">添加跟踪器</string>
