@@ -45,6 +45,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     TransferDetailPieces() {
         super(new MigLayout("fill, insets 0 0 0 0"));
         hexHivePanel = new HexHivePanel(
+                10,
                 0x264053,
                 0xf2f2f2,
                 0x33b5e5,

@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 
 public class HexHivePanel extends JPanel {
+    private int hexSideLength;
     private ColoredStroke hexagonBorderPaint;
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
@@ -43,8 +44,6 @@ public class HexHivePanel extends JPanel {
     private final int bottomPadding;
     private final int leftPadding;
 
-    private int lastWidth;
-    private int lastHeight;
     private Color backgroundColor;
 
     // Drawing/Geometry functions
@@ -58,7 +57,20 @@ public class HexHivePanel extends JPanel {
         boolean isFull(int hexOffset);
     }
 
-    HexHivePanel(int borderColor,
+    /**
+     *
+     * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
+     * @param borderColor
+     * @param emptyColor
+     * @param fullColor
+     * @param backgroundColor
+     * @param topPadding
+     * @param rightPadding
+     * @param bottomPadding
+     * @param leftPadding
+     */
+    HexHivePanel(int hexSideLength,
+                 int borderColor,
                  int emptyColor,
                  int fullColor,
                  int backgroundColor,
@@ -66,7 +78,11 @@ public class HexHivePanel extends JPanel {
                  int rightPadding,
                  int bottomPadding,
                  int leftPadding) {
+        if (hexSideLength != -1 && hexSideLength < 5) {
+            throw new IllegalArgumentException("Invalid hexSideLength (" + hexSideLength + "). Valid hexSideLength are: -1 (dynamic) and >= 5");
+        }
         initPaints(borderColor, emptyColor, fullColor, backgroundColor);
+        this.hexSideLength = hexSideLength;
         this.topPadding = topPadding;
         this.rightPadding = rightPadding;
         this.bottomPadding = bottomPadding;
@@ -77,15 +93,17 @@ public class HexHivePanel extends JPanel {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
         if (canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
-            drawingProperties = new DrawingProperties(hexDataAdapter,
+            drawingProperties = new DrawingProperties(
+                    hexDataAdapter,
+                    hexSideLength,
                     hexagonBorderPaint.getLineWidth(),
                     leftPadding,
                     topPadding,
                     canvasWidth - rightPadding,
                     canvasHeight - bottomPadding);
 
-            lastWidth = canvasWidth;
-            lastHeight = canvasHeight;
+            //lastWidth = canvasWidth;
+            //lastHeight = canvasHeight;
         }
 
         if (drawingProperties == null) {
@@ -119,8 +137,8 @@ public class HexHivePanel extends JPanel {
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
         fullHexPaint = new CubePaint(numFullColor, 30);
         backgroundColor = new Color(bgColor);
-        setOpaque(true);
-        setBackground(backgroundColor);
+        //setOpaque(true);
+        //setBackground(backgroundColor);
     }
 
     private BufferedImage asyncDraw(HexDataAdapter adapter) {
@@ -145,34 +163,34 @@ public class HexHivePanel extends JPanel {
         graphics.fillRect(leftPadding, topPadding, drawingProperties.width - rightPadding, drawingProperties.height - bottomPadding);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{10.0f}, 0.0f));
+        graphics.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{10.0f}, 0.0f));
         graphics.drawRect(drawingProperties.origin.x, drawingProperties.origin.y, drawingProperties.end.x, drawingProperties.end.y);
 
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth;
-            float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2) + hexagonBorderPaint.getLineWidth() - 4;
+            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - (hexagonBorderPaint.getLineWidth());
+            float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2);
             if (rightSide >= drawingProperties.end.x) {
                 evenRow = !evenRow;
-                drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : drawingProperties.oddRowOrigin.x;
-                drawingProperties.hexCenterBuffer.y += threeQuarters + 2 * hexagonBorderPaint.getLineWidth();
+                drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : (int) (drawingProperties.oddRowOrigin.x - hexagonBorderPaint.getLineWidth());
+                drawingProperties.hexCenterBuffer.y += threeQuarters - 1;// + hexagonBorderPaint.getLineWidth();
             }
         }
         return bitmap;
     }
 
     private static float getHexWidth(float sideLength) {
-        return (float) (Math.sqrt(3) * sideLength);
+        return (float) (2*(Math.cos(Math.toRadians(30)) * sideLength));//(float) (Math.sqrt(3) * sideLength);
     }
 
     private static float getHexHeight(float sideLength) {
-        return (float) (4 * (Math.sin(Math.toRadians(30)) * sideLength));
+        return 2 * sideLength;
     }
 
-    private static float getHexagonSideLength(final int width, final int height, final int numHexagons) {
+    private static float getHexagonSideLength(final int drawingAreaWidth, final int drawingAreaHeight, final int numHexagons) {
         final float THREE_HALVES_SQRT_OF_THREE = 2.59807621135f;
-        final int fullArea = width * height;
+        final int fullArea = drawingAreaWidth * drawingAreaHeight;
         // fullArea             numHexagons                     fullArea
         // --------         =                => s = sqrt(-----------------------)
         // 3/2*sqrt(3)*s^2                               3/2*sqrt(3)*numHexagons
@@ -398,7 +416,7 @@ public class HexHivePanel extends JPanel {
          */
         private float hexBorderStrokeWidth;
 
-        DrawingProperties(HexDataAdapter adapter, float hexBorderWidth, int left, int top, int right, int bottom) {
+        DrawingProperties(HexDataAdapter adapter, int hexSideLen, float hexBorderWidth, int left, int top, int right, int bottom) {
             if (adapter == null) {
                 throw new RuntimeException("check your logic, you need a data adapter before calling initDrawingProperties");
             }
@@ -411,6 +429,7 @@ public class HexHivePanel extends JPanel {
             evenRowOrigin = new Point(0, 0);
             oddRowOrigin = new Point(0, 0);
             numHexs = adapter.getTotalHexagonsCount();
+            hexSideLength = hexSideLen;
             update(left, top, right, bottom);
         }
 
@@ -423,8 +442,12 @@ public class HexHivePanel extends JPanel {
             end.y = bottom;
             width = right - left;
             height = bottom - top;
-            hexSideLength = getHexagonSideLength(width, height, numHexs);
-            hexHeight = getHexHeight(hexSideLength) - 2 * hexBorderStrokeWidth;
+
+            if (hexSideLength == -1) {
+                hexSideLength = getHexagonSideLength(width, height, numHexs);
+            }
+
+            hexHeight = getHexHeight(hexSideLength) + (2 * hexBorderStrokeWidth);
             hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
 
             evenRowOrigin.x = (int) (origin.x + (hexWidth / 2) + hexBorderStrokeWidth);
@@ -432,11 +455,45 @@ public class HexHivePanel extends JPanel {
             // calculate number of hexagons in an even row
             oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2) + hexBorderStrokeWidth);
             oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight + hexBorderStrokeWidth);
+
+            if (hexSideLength != -1) {
+                // we need to calculate the end.y and the new drawing total height depending
+                // on how many rows we'll have.
+                Point bufferCenter = new Point(evenRowOrigin.x, evenRowOrigin.y);
+                int consideredHexagons = 0;
+                int lastCenterX = 0;
+                int lastRowCenterY = evenRowOrigin.y;
+                boolean evenRow = true;
+                float heightQuarter = hexHeight / 4;
+                float threeQuarters = heightQuarter * 3;
+
+                while (consideredHexagons < numHexs) {
+                    bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.y;
+                    while ((bufferCenter.x + hexWidth) < right) {
+                        bufferCenter.x += 2 * (hexWidth + hexBorderStrokeWidth);
+                        lastCenterX = bufferCenter.x;
+                        consideredHexagons++;
+                        if (consideredHexagons > numHexs) {
+                            break;
+                        }
+                    }
+                    if (consideredHexagons > numHexs) {
+                        break;
+                    }
+                    lastRowCenterY = bufferCenter.y;
+                    bufferCenter.y += threeQuarters + (hexBorderStrokeWidth);
+                    consideredHexagons++;
+                }
+                end.y = (int) (lastRowCenterY + hexSideLength + 2*hexBorderStrokeWidth);
+                height = end.y - top;
+                end.x = (int) (lastCenterX + (hexWidth/2) + hexBorderStrokeWidth);
+                width = end.x - left;
+            }
         }
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
+        final HexHivePanel hexPanel = new HexHivePanel(40, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
@@ -444,7 +501,7 @@ public class HexHivePanel extends JPanel {
 
             @Override
             public int getTotalHexagonsCount() {
-                return 100;
+                return 10;
             }
 
             @Override
@@ -457,6 +514,7 @@ public class HexHivePanel extends JPanel {
                 return hexOffset % 2 == 0;
             }
         };
+
         JFrame frame = new JFrame("HexHive Testing Area");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(true);
