@@ -32,6 +32,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
     private static final int SEEDS_COLUMN_ID = 2;
     private static final int PEERS_COLUMN_ID = 3;
     private static final int DOWNLOADED_COLUMN_ID = 4;
+    private static final String NOT_AVAILABLE = "N/A";
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
         new LimeTableColumn(URL_COLUMN_ID, "URL", I18n.tr("URL"), 180, true, true, true, String.class),
@@ -85,11 +86,11 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             case STATUS_COLUMN_ID:
                 return "Status Goes Here!!";
             case SEEDS_COLUMN_ID:
-                return e != null ? Integer.toString(e.getScrape_complete()) : "N/A";
+                return e.getScrape_complete() > 0 ? Integer.toString(e.getScrape_complete()) : NOT_AVAILABLE;
             case PEERS_COLUMN_ID:
-                return  e != null ? Integer.toString(e.getScrape_incomplete()) : "N/A";
+                return e.getScrape_incomplete() > 0 ? Integer.toString(e.getScrape_incomplete()) : NOT_AVAILABLE;
             case DOWNLOADED_COLUMN_ID:
-                return e != null ? Integer.toString(e.getScrape_downloaded()) : "N/A";
+                return e.getScrape_downloaded() > 0 ? Integer.toString(e.getScrape_downloaded()) : NOT_AVAILABLE;
         }
         return null;
     }
