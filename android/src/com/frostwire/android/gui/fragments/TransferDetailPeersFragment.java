@@ -33,6 +33,7 @@ import com.frostwire.jlibtorrent.PeerInfo;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.peer_info;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
@@ -157,8 +158,8 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             int rtt = peer.getRtt();
             rttTextView.setText(r.getString(R.string.rtt_ms, rtt));
 
-            String client = peer.getClient();
-            if (client == null || client.isEmpty()) {
+            String client = new String(peerInfo.client(), Charset.forName("UTF-8"));
+            if (client.isEmpty()) {
                 client = r.getString(R.string.unknown);
             }
             clientTextView.setText(client);
