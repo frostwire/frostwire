@@ -31,7 +31,7 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =
-            "(?is)(<h1>(.*<img.*/> )?)(?<filename>.*?)</h1>.*?" +
+            "(?is)<title>(?<filename>.*?)</title>.*?" +
                     "<span class=\"greenish\">Seeders : (?<seeds>\\d*?)</span>.*?" +
                     "<tr><td align=\"right\"><b>Hash</b> :</td><td>(?<torrentid>.*?)</td></tr>.*?" +
                     "<tr><td align=\"right\"><b>Added</b> :</td><td>(?<time>.*?) in.*?" +
@@ -53,12 +53,6 @@ public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<Lim
         String itemId = matcher.group("itemid");
         String transformedId = itemId.replaceFirst("/", "");
         return new LimeTorrentsTempSearchResult(getDomainName(), transformedId);
-    }
-
-    @Override
-    protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("FREE</a>");
-        return offset > 0 ? offset : 0;
     }
 
     @Override
