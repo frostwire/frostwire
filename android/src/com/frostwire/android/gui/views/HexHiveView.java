@@ -55,7 +55,7 @@ public class HexHiveView<T> extends View {
     }
 
     private static float getHexHeight(float sideLength) {
-        return (float) (4 * (Math.sin(Math.toRadians(30)) * sideLength));
+        return 2 * sideLength;
     }
 
     public static float getHexagonSideLength(final int width, final int height, final int numHexagons) {
@@ -297,7 +297,7 @@ public class HexHiveView<T> extends View {
             height = dimensions.height();
             numHexs = adapter.getTotalHexagonsCount();
             hexSideLength = getHexagonSideLength(width, height, numHexs);
-            hexHeight = getHexHeight(hexSideLength) - 2 * hexBorderStrokeWidth;
+            hexHeight = getHexHeight(hexSideLength) + 2 * hexBorderStrokeWidth;
             hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
             evenRowOrigin = new Point(
                     (int) (origin.x + (hexWidth / 2)),
