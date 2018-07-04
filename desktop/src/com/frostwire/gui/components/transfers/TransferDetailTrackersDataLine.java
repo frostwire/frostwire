@@ -86,11 +86,11 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             case STATUS_COLUMN_ID:
                 return "";
             case SEEDS_COLUMN_ID:
-                return e.getScrape_complete() > 0 ? Integer.toString(e.getScrape_complete()) : NOT_AVAILABLE;
+                return e != null && e.getScrape_complete() > 0 ? Integer.toString(e.getScrape_complete()) : NOT_AVAILABLE;
             case PEERS_COLUMN_ID:
-                return e.getScrape_incomplete() > 0 ? Integer.toString(e.getScrape_incomplete()) : NOT_AVAILABLE;
+                return e != null && e.getScrape_incomplete() > 0 ? Integer.toString(e.getScrape_incomplete()) : NOT_AVAILABLE;
             case DOWNLOADED_COLUMN_ID:
-                return e.getScrape_downloaded() > 0 ? Integer.toString(e.getScrape_downloaded()) : NOT_AVAILABLE;
+                return e != null && e.getScrape_downloaded() > 0 ? Integer.toString(e.getScrape_downloaded()) : NOT_AVAILABLE;
         }
         return null;
     }
