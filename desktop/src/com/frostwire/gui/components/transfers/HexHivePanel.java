@@ -137,7 +137,7 @@ public class HexHivePanel extends JPanel {
     }
 
     private void initPaints(int numBorderColor, int numEmptyColor, int numFullColor, int bgColor) {
-        hexagonBorderPaint = new ColoredStroke(1.0f, new Color(numBorderColor, false));
+        hexagonBorderPaint = new ColoredStroke(0.5f, new Color(numBorderColor, false));
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
         fullHexPaint = new CubePaint(numFullColor, 30);
         backgroundColor = new Color(bgColor);
@@ -167,18 +167,16 @@ public class HexHivePanel extends JPanel {
         graphics.fillRect(leftPadding, topPadding, drawingProperties.width - rightPadding, drawingProperties.height - bottomPadding);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{10.0f}, 0.0f));
-        graphics.drawRect(drawingProperties.origin.x, drawingProperties.origin.y, drawingProperties.end.x, drawingProperties.end.y);
 
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - (hexagonBorderPaint.getLineWidth());
+            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - 1;// + (2*hexagonBorderPaint.getLineWidth());
             float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2);
             if (rightSide >= drawingProperties.end.x) {
                 evenRow = !evenRow;
                 drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : (int) (drawingProperties.oddRowOrigin.x - hexagonBorderPaint.getLineWidth());
-                drawingProperties.hexCenterBuffer.y += threeQuarters - 1;// + hexagonBorderPaint.getLineWidth();
+                drawingProperties.hexCenterBuffer.y += threeQuarters;// + hexagonBorderPaint.getLineWidth();
             }
         }
         return bitmap;
