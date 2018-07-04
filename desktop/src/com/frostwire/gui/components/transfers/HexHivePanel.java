@@ -18,9 +18,8 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.limegroup.gnutella.gui.GUIMediator;
-
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -62,7 +61,6 @@ public class HexHivePanel extends JPanel {
     }
 
     /**
-     *
      * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
      */
     HexHivePanel(int hexSideLength,
@@ -78,6 +76,7 @@ public class HexHivePanel extends JPanel {
         if (hexSideLength != -1 && hexSideLength < 5) {
             throw new IllegalArgumentException("Invalid hexSideLength (" + hexSideLength + "). Valid hexSideLength are: -1 (dynamic) and >= 5");
         }
+        setDoubleBuffered(true);
         initPaints(borderColor, emptyColor, fullColor, backgroundColor);
         this.hexSideLength = hexSideLength;
         this.topPadding = topPadding;
@@ -115,10 +114,10 @@ public class HexHivePanel extends JPanel {
                 synchronized (bitmapLock) {
                     bitmap = backgroundBitmap;
                 }
-
-                if (bitmap != null) {
-                    GUIMediator.safeInvokeAndWait(this::repaint);
-                }
+// Might not need this
+//                if (bitmap != null) {
+//                    GUIMediator.safeInvokeAndWait(this::repaint);
+//                }
             });
         }
     }
@@ -141,8 +140,6 @@ public class HexHivePanel extends JPanel {
         emptyHexPaint = new CubePaint(numEmptyColor, 10);
         fullHexPaint = new CubePaint(numFullColor, 30);
         backgroundColor = new Color(bgColor);
-        //setOpaque(true);
-        //setBackground(backgroundColor);
     }
 
     private BufferedImage asyncDraw(HexDataAdapter adapter) {
@@ -158,7 +155,7 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
 
-        boolean drawCubes = (forceCubes) ? true : drawingProperties.numHexs <= 500;
+        boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
 
         BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
@@ -171,19 +168,19 @@ public class HexHivePanel extends JPanel {
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - 1;// + (2*hexagonBorderPaint.getLineWidth());
+            drawingProperties.hexCenterBuffer.x += drawingProperties.hexWidth - 2;
             float rightSide = drawingProperties.hexCenterBuffer.x + (drawingProperties.hexWidth / 2);
             if (rightSide >= drawingProperties.end.x) {
                 evenRow = !evenRow;
                 drawingProperties.hexCenterBuffer.x = (evenRow) ? drawingProperties.evenRowOrigin.x : (int) (drawingProperties.oddRowOrigin.x - hexagonBorderPaint.getLineWidth());
-                drawingProperties.hexCenterBuffer.y += threeQuarters;// + hexagonBorderPaint.getLineWidth();
+                drawingProperties.hexCenterBuffer.y += threeQuarters;
             }
         }
         return bitmap;
     }
 
     private static float getHexWidth(float sideLength) {
-        return (float) (2*(Math.cos(Math.toRadians(30)) * sideLength));
+        return (float) (2 * (Math.cos(Math.toRadians(30)) * sideLength));
     }
 
     private static float getHexHeight(float sideLength) {
@@ -332,7 +329,7 @@ public class HexHivePanel extends JPanel {
             int lightR = Math.min(R + shades, 0xff);
             int lightG = Math.min(G + shades, 0xff);
             int lightB = Math.min(B + shades, 0xff);
-            numDarkColor =  (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
+            numDarkColor = (darkR & 0xff) << 16 | (darkG & 0xff) << 8 | (darkB & 0xff);
             numLightColor = (lightR & 0xff) << 16 | (lightG & 0xff) << 8 | (lightB & 0xff);
             baseColor = new Color(numBaseColor, false);
             darkColor = new Color(numDarkColor, false);
@@ -470,9 +467,9 @@ public class HexHivePanel extends JPanel {
                 float threeQuarters = heightQuarter * 3;
 
                 while (consideredHexagons <= numHexs) {
-                    while ((bufferCenter.x + (hexWidth/2) + 2*hexBorderStrokeWidth) <= right) {
+                    while ((bufferCenter.x + (hexWidth / 2) + 2 * hexBorderStrokeWidth) <= right) {
                         lastCenterX = bufferCenter.x;
-                        bufferCenter.x += hexWidth + (2*hexBorderStrokeWidth);
+                        bufferCenter.x += hexWidth + (2 * hexBorderStrokeWidth);
                         consideredHexagons++;
                     }
                     // go down one row
@@ -482,7 +479,7 @@ public class HexHivePanel extends JPanel {
                     bufferCenter.x = evenRow ? evenRowOrigin.x : oddRowOrigin.x;
                     evenRow = !evenRow;
                 }
-                end.x = (int) (lastCenterX + (hexWidth/2) + hexBorderStrokeWidth);
+                end.x = (int) (lastCenterX + (hexWidth / 2) + hexBorderStrokeWidth);
                 end.y = (int) (lastRowCenterY + hexSideLength + 2 * hexBorderStrokeWidth);
                 width = end.x - left;
                 height = end.y - top;
@@ -491,7 +488,7 @@ public class HexHivePanel extends JPanel {
     }
 
     public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5,0xffffff, 0, 0, 0, 0, true);
+        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5, 0xffffff, 0, 0, 0, 0, true);
         final HexDataAdapter mockAdapter = new HexDataAdapter() {
             @Override
             public void updateData(Object data) {
@@ -504,7 +501,7 @@ public class HexHivePanel extends JPanel {
 
             @Override
             public int getFullHexagonsCount() {
-                    return 0;
+                return 0;
             }
 
             @Override
