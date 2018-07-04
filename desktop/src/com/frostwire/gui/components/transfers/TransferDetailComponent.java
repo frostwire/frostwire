@@ -117,8 +117,8 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         trackersButton.addActionListener(e -> showDetailComponent(TRACKERS_CARD));
         peersButton.addActionListener(e -> showDetailComponent(PEERS_CARD));
 
-        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 9);
-        final Dimension buttonDimension = new Dimension(70, 22);
+        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 11);
+        final Dimension buttonDimension = new Dimension(75, 24);
         applyFontAndDimensionToFilterToggleButtons(
                 smallHelvetica,
                 buttonDimension,
