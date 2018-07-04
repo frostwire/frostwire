@@ -84,7 +84,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             case URL_COLUMN_ID:
                 return announceEntry.url();
             case STATUS_COLUMN_ID:
-                return "Status Goes Here!!";
+                return "";
             case SEEDS_COLUMN_ID:
                 return e.getScrape_complete() > 0 ? Integer.toString(e.getScrape_complete()) : NOT_AVAILABLE;
             case PEERS_COLUMN_ID:
