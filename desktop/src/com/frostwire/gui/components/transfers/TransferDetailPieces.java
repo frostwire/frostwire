@@ -42,7 +42,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     TransferDetailPieces() {
         super(new MigLayout("fill, insets 0 0 0 0"));
         hexHivePanel = new HexHivePanel(
-                25,
+                16,
                 0x264053,
                 0xf2f2f2,
                 0x33b5e5,
@@ -55,14 +55,14 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         hexHivePanelAdapter = new HexHiveAdapter();
         pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
-        add(totalPiecesLabel, "left, gapleft 5px");
+        add(totalPiecesLabel, "left, gapleft 10px");
         add(pieceSizeLabel, "left, growx, gapright 10px, wrap");
         JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
         jScrollPane.setOpaque(true);
         jScrollPane.setBackground(Color.WHITE);
         jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(jScrollPane, "push, growx, height 240px, gap 0px 0px 5px 5px, span 2");
+        add(jScrollPane, "push, growx, height 240px, gap 10px 10px 5px 5px, span 2");
         repaint();
     }
 
