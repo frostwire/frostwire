@@ -1,3 +1,17 @@
+frostwire (6.7.0) stable; urgency=high
+  * New Torrent Transfer Details components
+  * New Torrent Transfer General viewer
+  * New Torrent Transfer Piece viewer
+  * New Torrent Transfer Files progress viewer
+  * New Torrent Transfer Tracker viewer
+  * New Torrent Transfer Peers viewer
+  * TorrentDownloads search fixed
+  * LimeTorrents search fixed
+  * New jlibtorrent 1.2.0.18-RC8
+  * Crashes and optimizations
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 04 Jul 2018 10:24:00 -0600
+
 frostwire (6.6.8) stable; urgency=high
   * Yify search fixed
   * EZTV search fixed
