@@ -62,7 +62,6 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private ActionListener copyMagnetURLActionListener;
 
     TransferDetailGeneral() {
-
         //MigLayout Notes:
         // insets -> padding for the layout
         // gap -> space/margin _between cells_ in the layout, if you have
@@ -143,7 +142,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         lowerPanel.setBackground(Color.WHITE);
         lowerPanel.setOpaque(true);
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Save location")), "left, gapright 10px, pad 0 10px 0 0, growx");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Save location")), "left, wmin 160px, pad 0 10px 0 0, growx");
         lowerPanel.add(saveLocationLabel = new JLabel(), "left, growx, span 2, wrap");
 
         final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
