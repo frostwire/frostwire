@@ -1,7 +1,8 @@
-FrostWire 2.0.6 build 544 - JUL/03/2018
+FrostWire 2.0.6 build 545 - JUL/04/2018
  - Yify search fixed
  - EZTV search fixed
  - TorrentDownloads search fixed, now magnet based
+ - LimeTorrents search fixed
  - New jlibtorrent 1.2.0.18-RC8
  - Translations updated: Malay, Slovak, Vietnamese, Chinese
  - Library updates: prebid 0.4, (dev) buildtools 28.0.1, (dev) gradle 4.8.1
