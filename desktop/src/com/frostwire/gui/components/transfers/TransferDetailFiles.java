@@ -31,8 +31,8 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
 
     TransferDetailFiles() {
         tableMediator = new TransferDetailFilesTableMediator();
-        setLayout(new MigLayout("fill"));
-        add(tableMediator.getComponent(), "growx, growy");
+        setLayout(new MigLayout("fill, insets 0 0 0 0"));
+        add(tableMediator.getComponent(), "gap 0 0 0 0, growx, growy");
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
      */
     public class TransferItemHolder {
-        public final int fileOffset;
+        final int fileOffset;
         public final TransferItem transferItem;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {

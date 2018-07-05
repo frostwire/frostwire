@@ -20,7 +20,6 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.swig.status_flags_t;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
