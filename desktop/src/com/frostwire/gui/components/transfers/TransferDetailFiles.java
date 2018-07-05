@@ -31,7 +31,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
 
     TransferDetailFiles() {
         tableMediator = new TransferDetailFilesTableMediator();
-        setLayout(new MigLayout("fill, insets 0 0 0 0"));
+        setLayout(new MigLayout("fillx, insets 0 0 0 0"));
         add(tableMediator.getComponent(), "gap 0 0 0 0, growx, growy");
     }
 

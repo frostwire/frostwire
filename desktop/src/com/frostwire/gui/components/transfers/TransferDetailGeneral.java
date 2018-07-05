@@ -76,7 +76,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // (Component) pad <top left bottom right> (like insets, why not just re-use insets, FML)
 
 
-        super(new MigLayout("insets 0 0 0 0, gap 0 0, fill"));
+        super(new MigLayout("insets 0 0 0 0, gap 0 0, fillx"));
         // Upper panel with Name, Percentage labels [future share button]
         // progress bar
         // slightly darker background color (0xf3f5f7)
@@ -172,7 +172,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10,10,10,10),
                 BorderFactory.createLineBorder(new Color(0x9297a1))));
-        add(upperPanel, "top, growx, growprioy 0, gapbottom 5px, wrap");
+        add(upperPanel, "top, growx, gapbottom 5px, wrap");
         add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
         add(lowerPanel, "gap 0 0 0 0, grow");
     }

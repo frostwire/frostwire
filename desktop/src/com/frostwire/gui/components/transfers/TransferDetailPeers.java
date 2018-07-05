@@ -20,7 +20,6 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.PeerInfo;
-import com.limegroup.gnutella.gui.tables.LimeJTable;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -31,7 +30,7 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
     private BittorrentDownload btDownload;
 
     TransferDetailPeers() {
-        super(new MigLayout("fill"));
+        super(new MigLayout("fillx, insets 0 0 0 0, gap 0 0"));
         tableMediator = new TransferDetailPeersTableMediator();
         add(tableMediator.getComponent(), "growx, growy");
     }

@@ -31,7 +31,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
 
     TransferDetailTrackers() {
-        super(new MigLayout("fill"));
+        super(new MigLayout("fillx, gap 0 0, insets 0 0 0 0"));
         tableMediator = new TransferDetailTrackersTableMediator();
         add(tableMediator.getComponent(), "growx, growy");
     }
