@@ -62,12 +62,27 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private ActionListener copyMagnetURLActionListener;
 
     TransferDetailGeneral() {
-        super(new MigLayout("insets 0px 0px 0px 0px, fill"));
+
+        //MigLayout Notes:
+        // insets -> padding for the layout
+        // gap -> space/margin _between cells_ in the layout, if you have
+        //        a different background in inner components than the
+        //        container, the opaque background of the container will leak in between
+        //        cells
+        //
+        // API inconsistencies:
+        // (Layout) insets <top/all left bottom right>
+        // (Layout) gap <x y>
+        // (Component) gap <left right top bottom> (FML)
+        // (Component) pad <top left bottom right> (like insets, why not just re-use insets, FML)
+
+
+        super(new MigLayout("insets 0 0 0 0, gap 0 0, fill"));
         // Upper panel with Name, Percentage labels [future share button]
         // progress bar
         // slightly darker background color (0xf3f5f7)
 
-        JPanel upperPanel = new JPanel(new MigLayout("insets 15px 15px 15px 15px, fillx"));
+        JPanel upperPanel = new JPanel(new MigLayout("insets 5px, gap 0 5px, fill"));
         upperPanel.setBackground(new Color(0xf3f5f7));
         upperPanel.setOpaque(true);
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name") + "</b></html>"), "left, gapleft 15px, gapright 15px");
@@ -78,9 +93,11 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         upperPanel.add(completionPercentageProgressbar = new JProgressBar(),"span 5, growx");
 
         // 2nd Section (TRANSFER)
-        JPanel midPanel = new JPanel(new MigLayout("insets 15px 5px 0px 15px, fillx"));
+        JPanel midPanel = new JPanel(new MigLayout("insets 5px 0 0 0, gap 5px 5px, fill"));
+        midPanel.setBackground(Color.WHITE);
+        midPanel.setOpaque(true);
         // time elapsed, time left, download speed
-        midPanel.add(new JGrayLabel(I18n.tr("Time elapsed")), "left");
+        midPanel.add(new JGrayLabel(I18n.tr("Time elapsed")), "left, pad 0 10px 0 0, growx");
         midPanel.add(timeElapsedLabel = new JLabel(),"left");
         midPanel.add(new JGrayLabel(I18n.tr("Time left")), "left");
         midPanel.add(timeLeftLabel = new JLabel(), "left");
@@ -88,7 +105,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.add(downloadSpeedLabel = new JLabel(),"left, wrap");
 
         // Downloaded, status, download speed limit
-        midPanel.add(new JGrayLabel(I18n.tr("Downloaded")), "left");
+        midPanel.add(new JGrayLabel(I18n.tr("Downloaded")), "left, pad 0 10px 0 0, growx");
         midPanel.add(downloadedLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Status")), "left");
         midPanel.add(statusLabel = new JLabel(), "left");
@@ -97,7 +114,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // TODO: Add settings_gray button and dialog to adjust download speed limit
 
         // Uploaded, seeds, upload speed
-        midPanel.add(new JGrayLabel(I18n.tr("Uploaded")), "left");
+        midPanel.add(new JGrayLabel(I18n.tr("Uploaded")), "left, pad 0 10px 0 0, growx");
         midPanel.add(uploadedLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Seeds")), "left");
         midPanel.add(seedsLabel = new JLabel(), "left");
@@ -106,14 +123,14 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
 
         // Total Size, Peers, Upload speed limit
         // Share Ratio
-        midPanel.add(new JGrayLabel(I18n.tr("Total size")), "left");
+        midPanel.add(new JGrayLabel(I18n.tr("Total size")), "left, pad 0 10px 0 0, growx");
         midPanel.add(totalSizeLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Peers")), "left");
         midPanel.add(peersLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Upload speed limit")), "left");
         midPanel.add(uploadSpeedLimitLabel = new JLabel(), "left, wrap");
         // TODO: Add settings_gray button and dialog to adjust upload speed limit
-        midPanel.add(new JGrayLabel(I18n.tr("Share ratio")), "left");
+        midPanel.add(new JGrayLabel(I18n.tr("Share ratio")), "left, pad 0 10px 0 0, growx");
         midPanel.add(shareRatioLabel = new JLabel(), "wrap");
 
         // 3rd Section, "GENERAL"
@@ -122,25 +139,28 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // Magnet URL
         // Created On
         // Comment
-        JPanel lowerPanel = new JPanel(new MigLayout("insets 5px 5px 15px 15px, fill"));
-        lowerPanel.add(new JGrayLabel(I18n.tr("Save location")), "left, gapright 10px");
+        JPanel lowerPanel = new JPanel(new MigLayout("insets 0 0 0 0, gap 5px 5px, fill"));
+        lowerPanel.setBackground(Color.WHITE);
+        lowerPanel.setOpaque(true);
+
+        lowerPanel.add(new JGrayLabel(I18n.tr("Save location")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(saveLocationLabel = new JLabel(), "left, growx, span 2, wrap");
 
         final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
         final ImageIcon copy_paste = GUIMediator.getThemeImage("copy_paste.png");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash")), "left, gapright 10px");
+        lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(infoHashLabel = new JLabel(), "left");
         lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray),"left, pushx, wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL")), "left, gapright 10px");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(magnetURLLabel = new JLabel(), "left");
         lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray),"left, pushx, wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Created On")), "left, gapright 10px");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Created On")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(createdOnLabel = new JLabel(), "left, growx, span 2, wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Comment")), "left, gapright 10px");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Comment")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(commentLabel = new JLabel(), "left, growx, span 2, wrap");
 
         copyInfoHashButton.setBorder(null);
@@ -150,15 +170,14 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         copyMagnetURLButton.setBackground(null);
         copyMagnetURLButton.setPressedIcon(copy_paste);
 
-        JPanel lowerPanels = new JPanel(new MigLayout("insets 0 0 0 0, fill"));
-        lowerPanels.setOpaque(true);
-        lowerPanels.setBackground(Color.WHITE);
-        lowerPanels.setBorder(BorderFactory.createLineBorder(new Color(0x9297a1)));
-        lowerPanels.add(midPanel, "gap 5px 5px 0 0, growx, growprioy 0, gapbottom 0px, wrap");
-        lowerPanels.add(lowerPanel, "gap 5px 5px 0 0, grow");
-
-        add(upperPanel, "top, growx, growprioy 0, wrap");
-        add(lowerPanels, "gap 10px 10px 0 10px, grow");
+        setOpaque(true);
+        // Empty border for margins, and line border for visual delimiter
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10,10,10,10),
+                BorderFactory.createLineBorder(new Color(0x9297a1))));
+        add(upperPanel, "top, growx, growprioy 0, gapbottom 5px, wrap");
+        add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
+        add(lowerPanel, "gap 0 0 0 0, grow");
     }
 
     @Override
