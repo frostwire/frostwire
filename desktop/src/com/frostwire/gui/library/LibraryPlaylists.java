@@ -43,7 +43,6 @@ import org.limewire.util.FileUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import javax.swing.border.AbstractBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -91,9 +90,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private final byte RENAME_ACTION = 4;
     private final byte IMPORT_TO_PLAYLIST_ACTION = 5;
     private final byte IMPORT_TO_NEW_PLAYLIST_ACTION = 6;
-    private final byte COPY_PLAYLIST_FILES_ACTION = 7;
-    private final byte EXPORT_PLAYLIST_ACTION = 8;
-    private final byte EXPORT_TO_ITUNES_ACTION = 9;
     private final byte CONFIGURE_OPTIONS_ACTION = 0xa;
     private Action[] actions;
 
@@ -202,10 +198,13 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private void addExportActionsToPopupMenu(SkinPopupMenu playlistPopup, boolean playlistEmpty) {
         if (!playlistEmpty) {
             playlistPopup.addSeparator();
+            byte COPY_PLAYLIST_FILES_ACTION = 7;
             playlistPopup.add(new SkinMenuItem(actions[COPY_PLAYLIST_FILES_ACTION]));
+            byte EXPORT_PLAYLIST_ACTION = 8;
             playlistPopup.add(new SkinMenuItem(actions[EXPORT_PLAYLIST_ACTION]));
             playlistPopup.addSeparator();
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
+                byte EXPORT_TO_ITUNES_ACTION = 9;
                 playlistPopup.add(new SkinMenuItem(actions[EXPORT_TO_ITUNES_ACTION]));
             }
         }
@@ -230,19 +229,15 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private void setupList() {
         LibraryPlaylistsMouseObserver _listMouseObserver = new LibraryPlaylistsMouseObserver();
         listSelectionListener = new LibraryPlaylistsSelectionListener();
-        SortedListModel sortedModel = new SortedListModel(model, SortOrder.ASCENDING, new Comparator<LibraryPlaylistsListCell>() {
-
-            @Override
-            public int compare(LibraryPlaylistsListCell o1, LibraryPlaylistsListCell o2) {
-                if (o1 == newPlaylistCell || o1 == starredPlaylistCell) {
-                    return -1;
-                }
-                if (o2 == newPlaylistCell || o2 == starredPlaylistCell) {
-                    return 1;
-                }
-
-                return o1.getText().compareTo(o2.getText());
+        SortedListModel sortedModel = new SortedListModel(model, SortOrder.ASCENDING, (Comparator<LibraryPlaylistsListCell>) (o1, o2) -> {
+            if (o1 == newPlaylistCell || o1 == starredPlaylistCell) {
+                return -1;
             }
+            if (o2 == newPlaylistCell || o2 == starredPlaylistCell) {
+                return 1;
+            }
+
+            return o1.getText().compareTo(o2.getText());
         });
         list = new LibraryIconList(sortedModel);
         list.setFixedCellHeight(TableSettings.DEFAULT_TABLE_ROW_HEIGHT.getValue());
@@ -462,23 +457,17 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
      * @param path - path of file to open
      */
     private void loadM3U(final Playlist playlist, final String path) {
-        BackgroundExecutorService.schedule(new Runnable() {
-            public void run() {
-                try {
-                    final List<File> files = M3UPlaylist.load(path);
-                    if (playlist != null) {
-                        LibraryUtils.asyncAddToPlaylist(playlist, files.toArray(new File[0]));
-                    } else {
-                        LibraryUtils.createNewPlaylist(files.toArray(new File[0]));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            GUIMediator.showError("Unable to load playlist");
-                        }
-                    });
+        BackgroundExecutorService.schedule(() -> {
+            try {
+                final List<File> files = M3UPlaylist.load(path);
+                if (playlist != null) {
+                    LibraryUtils.asyncAddToPlaylist(playlist, files.toArray(new File[0]));
+                } else {
+                    LibraryUtils.createNewPlaylist(files.toArray(new File[0]));
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                GUIMediator.safeInvokeLater(() -> GUIMediator.showError("Unable to load playlist"));
             }
         });
     }
@@ -527,26 +516,20 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
      * @param path - file location to save the list to
      */
     private void saveM3U(final Playlist playlist, final String path) {
-        BackgroundExecutorService.schedule(new Runnable() {
-            public void run() {
-                try {
-                    List<File> files = new ArrayList<>();
-                    List<PlaylistItem> items = playlist.getItems();
-                    for (PlaylistItem item : items) {
-                        File file = new File(item.getFilePath());
-                        if (file.exists()) {
-                            files.add(file);
-                        }
+        BackgroundExecutorService.schedule(() -> {
+            try {
+                List<File> files = new ArrayList<>();
+                List<PlaylistItem> items = playlist.getItems();
+                for (PlaylistItem item : items) {
+                    File file = new File(item.getFilePath());
+                    if (file.exists()) {
+                        files.add(file);
                     }
-                    M3UPlaylist.save(path, files);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            GUIMediator.showError("Unable to save playlist");
-                        }
-                    });
                 }
+                M3UPlaylist.save(path, files);
+            } catch (Exception e) {
+                e.printStackTrace();
+                GUIMediator.safeInvokeLater(() -> GUIMediator.showError("Unable to save playlist"));
             }
         });
     }
@@ -600,7 +583,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     }
 
     private class LibraryPlaylistsCellRenderer extends DefaultListCellRenderer {
-        private final AbstractBorder border = new EmptyBorder(5,5,5,5);
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -611,7 +593,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             Icon icon = cell.getIcon();
             if (icon != null) {
                 setIcon(icon);
-                setBorder(border);
+                setBorder(new EmptyBorder(5,5,5,5));
             }
             this.setFont(list.getFont());
             ThemeMediator.fixLabelFont(this);
