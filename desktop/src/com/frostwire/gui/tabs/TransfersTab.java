@@ -41,6 +41,7 @@ public final class TransfersTab extends AbstractTab {
      * Visible only on non search/transfer split mode and
      * upon a Torrent Download selection.
      */
+    private JSplitPane transferDetailSplitter;
     private TransferDetailComponent transferDetailComponent;
 
     // it will be a reference to the download mediator above who is the one interested.
@@ -55,6 +56,7 @@ public final class TransfersTab extends AbstractTab {
     private JTextArea filterText;
 
     private final boolean dedicatedTransfersTabAvailable;
+    private int lastSplitterLocation = -1;
 
     public TransfersTab(BTDownloadMediator downloadMediator) {
         super(I18n.tr("Transfers"),
@@ -114,36 +116,51 @@ public final class TransfersTab extends AbstractTab {
         }
     }
 
-    private void hideTransferDetailsComponent() {
-        if (transferDetailComponent != null) {
-            transferDetailComponent.setVisible(false);
-            mainComponent.remove(transferDetailComponent);
-            mainComponent.validate();
-        }
-    }
-
-    private void showTransferDetailsComponent(BittorrentDownload selected) {
-        if (transferDetailComponent != null && selected != null) {
-            mainComponent.add(transferDetailComponent, "span 2, growx");
-            transferDetailComponent.setVisible(true);
-            transferDetailComponent.updateData(selected);
-            transferDetailComponent.validate();
-            mainComponent.validate();
-        }
-    }
-
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][grow]", "[][grow]"));
         mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
         mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
-        mainComponent.add(downloadMediator.getComponent(), "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
-
         if (dedicatedTransfersTabAvailable) {
+            transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+            transferDetailSplitter.setDividerLocation(270);
+            transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
+            transferDetailSplitter.add(downloadMediator.getComponent());
             transferDetailComponent = new TransferDetailComponent();
+            int MAX_BOTTOM_COMPONENT_HEIGHT = 337;
+            transferDetailComponent.setMaximumSize(new Dimension(getComponent().getMaximumSize().width, MAX_BOTTOM_COMPONENT_HEIGHT));
+            transferDetailSplitter.add(transferDetailComponent);
+            mainComponent.add(transferDetailSplitter, "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
+
+            transferDetailSplitter.addPropertyChangeListener(evt -> {
+                if (transferDetailComponent.isVisible()) {
+                    lastSplitterLocation = transferDetailSplitter.getLastDividerLocation();
+                }
+            });
+        } else {
+            mainComponent.add(downloadMediator.getComponent(), "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
         }
 
         setTransfersFilterModeListener(downloadMediator);
         downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
+    }
+
+    private void hideTransferDetailsComponent() {
+        if (!dedicatedTransfersTabAvailable) {
+            return;
+        }
+        transferDetailComponent.setVisible(false);
+        mainComponent.validate();
+    }
+
+    private void showTransferDetailsComponent(BittorrentDownload selected) {
+        if (!dedicatedTransfersTabAvailable) {
+            return;
+        }
+        transferDetailComponent.setVisible(true);
+        transferDetailComponent.updateData(selected);
+        transferDetailSplitter.setDividerLocation(lastSplitterLocation == -1 ? 270 : lastSplitterLocation);
+        transferDetailComponent.validate();
+        mainComponent.validate();
     }
 
     private void setTransfersFilterModeListener(TransfersFilterModeListener transfersFilterModeListener) {

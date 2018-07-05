@@ -167,14 +167,19 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         copyMagnetURLButton.setContentAreaFilled(false);
         copyMagnetURLButton.setPressedIcon(copy_paste);
 
-        setOpaque(true);
+        JPanel lowerPortionWhiteBGContainer = new JPanel(new MigLayout("insets 0 0 0 0, gap 0 0, fill"));
+        lowerPortionWhiteBGContainer.setOpaque(true);
+
+
         // Empty border for margins, and line border for visual delimiter
-        setBorder(BorderFactory.createCompoundBorder(
+        lowerPortionWhiteBGContainer.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10,10,10,10),
                 BorderFactory.createLineBorder(new Color(0x9297a1))));
-        add(upperPanel, "top, growx, gapbottom 5px, wrap");
-        add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
-        add(lowerPanel, "gap 0 0 0 0, grow");
+        lowerPortionWhiteBGContainer.add(upperPanel, "top, growx, gapbottom 5px, wrap");
+        lowerPortionWhiteBGContainer.add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
+        lowerPortionWhiteBGContainer.add(lowerPanel, "gap 0 0 0 0, grow");
+
+        add(lowerPortionWhiteBGContainer, "growx");
     }
 
     @Override
