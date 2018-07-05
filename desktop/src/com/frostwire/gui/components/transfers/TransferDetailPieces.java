@@ -40,7 +40,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     private BittorrentDownload bittorrentDownload;
 
     TransferDetailPieces() {
-        super(new MigLayout("fill, insets 0 0 0 0"));
+        super(new MigLayout("fill, insets 0 0 0 0, gap 0 5px"));
         hexHivePanel = new HexHivePanel(
                 16,
                 0x264053,
@@ -56,8 +56,8 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
         pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
-        add(totalPiecesLabel, "left, gapleft 10px");
-        add(pieceSizeLabel, "left, growx, gapright 10px, wrap");
+        add(totalPiecesLabel, "gapleft 10px");
+        add(pieceSizeLabel, "grow, gapright 10px, wmin 130px, hmax 25px, wrap");
         hexHivePanel.setBackground(Color.WHITE);
         hexHivePanel.setOpaque(true);
         JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
@@ -65,8 +65,8 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         jScrollPane.setBackground(Color.WHITE);
         jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0,0,0,0));
         jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        add(jScrollPane, "push, growx, height 240px, gap 10px 10px 5px 5px, span 2");
+        jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
         repaint();
     }
 
