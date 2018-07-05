@@ -47,6 +47,7 @@ import java.util.*;
  *    For use with adding arrows to the tableHeader.
  * 3) Shows special tooltips for each row.
  * @author Sam Berlin
+ * @author gubatron
  */
 public class LimeJTable extends JTable implements JSortTable {
 
@@ -58,12 +59,12 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * The columns that are currently hidden.
      */
-    protected Map<Object, LimeTableColumn> _hiddenColumns = new HashMap<Object, LimeTableColumn>();
+    private Map<Object, LimeTableColumn> _hiddenColumns = new HashMap<>();
 
     /**
      * The index of the column that is currently pressed down.
      */
-    protected int pressedColumnIndex = -1;
+    private int pressedColumnIndex = -1;
 
     /**
      * The array of tooltip data to display next.
@@ -83,12 +84,12 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * The preferences handler for the table columns.
      */
-    protected ColumnPreferenceHandler columnPreferences;
+    private ColumnPreferenceHandler columnPreferences;
 
     /**
      * The settings for this table.
      */
-    protected TableSettings tableSettings;
+    private TableSettings tableSettings;
 
     /**
      * Same as JTable(TableModel)
@@ -98,8 +99,6 @@ public class LimeJTable extends JTable implements JSortTable {
         setToolTipText("");
         GUIUtils.fixInputMap(this);
         addFocusListener(FocusHandler.INSTANCE);
-
-        //setRowHeight(TableSettings.DEFAULT_TABLE_ROW_HEIGHT.getValue());
         setupTableFont();
     }
 
@@ -172,7 +171,7 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Determines if the selected row is visible.
      */
-    public boolean isSelectionVisible() {
+    boolean isSelectionVisible() {
         return isRowVisible(getSelectedRow());
     }
 
@@ -191,28 +190,28 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Access the ColumnPreferenceHandler.
      */
-    public ColumnPreferenceHandler getColumnPreferenceHandler() {
+    ColumnPreferenceHandler getColumnPreferenceHandler() {
         return columnPreferences;
     }
 
     /**
      * Set the ColumnPreferenceHandler
      */
-    public void setColumnPreferenceHandler(ColumnPreferenceHandler handl) {
+    void setColumnPreferenceHandler(ColumnPreferenceHandler handl) {
         columnPreferences = handl;
     }
 
     /**
      * Access the TableSettings.
      */
-    public TableSettings getTableSettings() {
+    TableSettings getTableSettings() {
         return tableSettings;
     }
 
     /**
      * Set the TableSettings.
      */
-    public void setTableSettings(TableSettings settings) {
+    void setTableSettings(TableSettings settings) {
         tableSettings = settings;
     }
 
@@ -220,7 +219,7 @@ public class LimeJTable extends JTable implements JSortTable {
      * set the pressed header column.
      * @param col The MODEL index of the column
      */
-    public void setPressedColumnIndex(int col) {
+    void setPressedColumnIndex(int col) {
         pressedColumnIndex = col;
     }
 
@@ -250,7 +249,7 @@ public class LimeJTable extends JTable implements JSortTable {
      * Simple function that tucks away hidden columns for use later.
      * And it uses them later!
      */
-    public void setColumnVisible(Object columnId, boolean visible) throws LastColumnException {
+    void setColumnVisible(Object columnId, boolean visible) throws LastColumnException {
         if (!visible) {
             TableColumnModel model = getColumnModel();
             // don't allow the last column to be removed.
@@ -270,14 +269,14 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Returns an iterator of the removed columns.
      */
-    public Iterator<LimeTableColumn> getHiddenColumns() {
+    Iterator<LimeTableColumn> getHiddenColumns() {
         return Collections.unmodifiableCollection(_hiddenColumns.values()).iterator();
     }
 
     /**
      * Returns the last removed column.
      */
-    public LimeTableColumn getLastRemovedColumn() {
+    LimeTableColumn getLastRemovedColumn() {
         return _lastRemoved;
     }
 
@@ -291,14 +290,15 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Determines if the given point is a selected row.
      */
+    @SuppressWarnings("unused")
     public boolean isPointSelected(Point p) {
         int row = rowAtPoint(p);
         int col = columnAtPoint(p);
         if (row == -1 || col == -1)
             return false;
         int sel[] = getSelectedRows();
-        for (int i = 0; i < sel.length; i++)
-            if (sel[i] == row)
+        for (int aSel : sel)
+            if (aSel == row)
                 return true;
         return false;
     }
@@ -342,7 +342,7 @@ public class LimeJTable extends JTable implements JSortTable {
             // to do with LimeWire -- but because we insert ourselves
             // into the call-chain here, we must manually ignore the error.
             String msg = aioobe.getMessage();
-            if (msg != null && msg.indexOf("at javax.swing.MenuSelectionManager.processMouseEvent") != -1)
+            if (msg != null && msg.contains("at javax.swing.MenuSelectionManager.processMouseEvent"))
                 return; // ignore;
 
             throw aioobe;
@@ -371,8 +371,8 @@ public class LimeJTable extends JTable implements JSortTable {
         
         int colModel = convertColumnIndexToModel(col);
         DataLineModel<?, ?> dlm = (DataLineModel<?, ?>) dataModel;
-        boolean isClippable = col > -1 && row > -1 ? dlm.isClippable(colModel) : false;
-        boolean forceTooltip = col > -1 && row > -1 ? dlm.isTooltipRequired(row, col) : false;
+        boolean isClippable = (col > -1 && row > -1) && dlm.isClippable(colModel);
+        boolean forceTooltip = (col > -1 && row > -1) && dlm.isTooltipRequired(row, col);
 
         // If the user doesn't want tooltips, only display
         // them if the column is too small (and data is clipped)
@@ -443,7 +443,7 @@ public class LimeJTable extends JTable implements JSortTable {
     }
 
     private String stripHTML(String html) {
-        String clean = html.replaceAll("\\<.*?>", "");
+        @SuppressWarnings("RegExpRedundantEscape") String clean = html.replaceAll("\\<.*?>", "");
         clean = clean.replaceAll("&nbsp;", "");
         clean = clean.replaceAll("&amp;", "&");
         return clean;
@@ -519,14 +519,15 @@ public class LimeJTable extends JTable implements JSortTable {
      *
      * @param prefix the string to test for a match
      * @param startIndex the index for starting the search
-     * @param bias the search direction, either 
+     * @param bias the search direction, either
      * Position.Bias.Forward or Position.Bias.Backward.
      * @return the index of the next list element that
      * starts with the prefix; otherwise -1
      * @exception IllegalArgumentException if prefix is null
      * or startIndex is out of bounds
      */
-    public int getNextMatch(String prefix, int startIndex, Position.Bias bias) {
+    @SuppressWarnings("SameParameterValue")
+    int getNextMatch(String prefix, int startIndex, Position.Bias bias) {
         DataLineModel<?, ?> model = (DataLineModel<?, ?>) dataModel;
         int max = model.getRowCount();
         if (prefix == null)
@@ -594,6 +595,7 @@ public class LimeJTable extends JTable implements JSortTable {
         }
     }
 
+    @SuppressWarnings("unused")
     protected boolean isOverrideRowColor(int row) {
         return false;
     }
