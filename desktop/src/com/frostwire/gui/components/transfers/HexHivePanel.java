@@ -19,7 +19,6 @@
 package com.frostwire.gui.components.transfers;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -34,13 +33,14 @@ public class HexHivePanel extends JPanel {
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
     private DrawingProperties drawingProperties;
+    private final Object drawingPropertiesLock = new Object();
     private BufferedImage bitmap;
     private final Object bitmapLock = new Object();
 
     private int lastWidth;
     private int lastHeight;
 
-    private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 2);
+    private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
 
     private final int topPadding;
     private final int rightPadding;
@@ -92,14 +92,16 @@ public class HexHivePanel extends JPanel {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
         if (canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
-            drawingProperties = new DrawingProperties(
-                    hexDataAdapter,
-                    hexSideLength,
-                    hexagonBorderPaint.getLineWidth(),
-                    leftPadding,
-                    topPadding,
-                    canvasWidth - rightPadding,
-                    canvasHeight - bottomPadding);
+            synchronized(drawingPropertiesLock) {
+                drawingProperties = new DrawingProperties(
+                        hexDataAdapter,
+                        hexSideLength,
+                        hexagonBorderPaint.getLineWidth(),
+                        leftPadding,
+                        topPadding,
+                        canvasWidth - rightPadding,
+                        canvasHeight - bottomPadding);
+            }
             lastHeight = drawingProperties.height;
             lastWidth = getWidth();
         }
@@ -114,10 +116,6 @@ public class HexHivePanel extends JPanel {
                 synchronized (bitmapLock) {
                     bitmap = backgroundBitmap;
                 }
-// Might not need this
-//                if (bitmap != null) {
-//                    GUIMediator.safeInvokeAndWait(this::repaint);
-//                }
             });
         }
     }
