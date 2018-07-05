@@ -30,6 +30,7 @@ import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -162,11 +163,9 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         lowerPanel.add(new JGrayLabel(I18n.tr("Comment")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(commentLabel = new JLabel(), "left, growx, span 2, wrap");
 
-        copyInfoHashButton.setBorder(null);
-        copyInfoHashButton.setBackground(null);
         copyInfoHashButton.setPressedIcon(copy_paste);
-        copyMagnetURLButton.setBorder(null);
-        copyMagnetURLButton.setBackground(null);
+        copyInfoHashButton.setContentAreaFilled(false);
+        copyMagnetURLButton.setContentAreaFilled(false);
         copyMagnetURLButton.setPressedIcon(copy_paste);
 
         setOpaque(true);
