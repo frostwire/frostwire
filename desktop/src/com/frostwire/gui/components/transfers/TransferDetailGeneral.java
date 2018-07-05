@@ -30,7 +30,6 @@ import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
