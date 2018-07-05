@@ -64,7 +64,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         jScrollPane.setOpaque(true);
         jScrollPane.setBackground(Color.WHITE);
         jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-        jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
         repaint();
