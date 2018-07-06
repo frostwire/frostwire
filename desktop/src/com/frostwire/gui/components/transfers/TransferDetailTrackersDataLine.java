@@ -18,12 +18,11 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.swig.announce_endpoint;
-import com.frostwire.jlibtorrent.swig.announce_endpoint_vector;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+
+import java.util.List;
 
 public final class TransferDetailTrackersDataLine extends AbstractDataLine<TransferDetailTrackers.TrackerItemHolder> {
 
@@ -72,10 +71,10 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             return null;
         }
 
-        AnnounceEntry announceEntry = holder.announceEntry;
+        TransferDetailTrackers.AnnounceEntryData announceEntry = holder.announceEntry;
 
-        announce_endpoint_vector endpoints = announceEntry.swig().getEndpoints();
-        announce_endpoint e = null;
+        List<TransferDetailTrackers.AnnounceEndpointData> endpoints = announceEntry.endpoints();
+        TransferDetailTrackers.AnnounceEndpointData e = null;
         if (endpoints.size() > 0) {
             e = endpoints.get(holder.trackerOffset);
         }
@@ -86,11 +85,11 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             case STATUS_COLUMN_ID:
                 return "";
             case SEEDS_COLUMN_ID:
-                return e != null && e.getScrape_complete() > 0 ? Integer.toString(e.getScrape_complete()) : NOT_AVAILABLE;
+                return e != null && e.scrapeComplete() > 0 ? Integer.toString(e.scrapeComplete()) : NOT_AVAILABLE;
             case PEERS_COLUMN_ID:
-                return e != null && e.getScrape_incomplete() > 0 ? Integer.toString(e.getScrape_incomplete()) : NOT_AVAILABLE;
+                return e != null && e.scrapeIncomplete() > 0 ? Integer.toString(e.scrapeIncomplete()) : NOT_AVAILABLE;
             case DOWNLOADED_COLUMN_ID:
-                return e != null && e.getScrape_downloaded() > 0 ? Integer.toString(e.getScrape_downloaded()) : NOT_AVAILABLE;
+                return e != null && e.scrapeDownloaded() > 0 ? Integer.toString(e.scrapeDownloaded()) : NOT_AVAILABLE;
         }
         return null;
     }
