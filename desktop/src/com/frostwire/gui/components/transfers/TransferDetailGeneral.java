@@ -24,6 +24,7 @@ import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
+import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
@@ -170,7 +171,6 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         JPanel lowerPortionWhiteBGContainer = new JPanel(new MigLayout("insets 0 0 0 0, gap 0 0, fill"));
         lowerPortionWhiteBGContainer.setOpaque(true);
 
-
         // Empty border for margins, and line border for visual delimiter
         lowerPortionWhiteBGContainer.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10,10,10,10),
@@ -179,7 +179,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         lowerPortionWhiteBGContainer.add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
         lowerPortionWhiteBGContainer.add(lowerPanel, "gap 0 0 0 0, grow");
 
-        add(lowerPortionWhiteBGContainer, "growx");
+        JScrollPane scrollPane = new JScrollPane(lowerPortionWhiteBGContainer,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        scrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        add(scrollPane, "grow");
     }
 
     @Override
@@ -199,8 +204,12 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         completionPercentageProgressbar.setMaximum(100);
         completionPercentageProgressbar.setValue(progress);
 
-        timeElapsedLabel.setText(seconds2time(status.activeDuration()/1000));
-        timeLeftLabel.setText(seconds2time(guiBtDownload.getETA()));
+        timeElapsedLabel.setText(seconds2time(status.activeDuration() / 1000));
+        if (btDownload.getState().equals(TransferState.DOWNLOADING)) {
+            timeLeftLabel.setText(seconds2time(guiBtDownload.getETA()));
+        } else {
+            timeLeftLabel.setText("");
+        }
         downloadSpeedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getDownloadSpeed()));
 
         downloadedLabel.setText(GUIUtils.getBytesInHuman(btDownload.getTotalBytesReceived()));
