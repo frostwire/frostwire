@@ -18,15 +18,11 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.peer_info;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.tables.SpeedRenderer;
-
-import java.nio.charset.Charset;
 
 public final class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetailPeers.PeerItemHolder> {
 
@@ -114,15 +110,15 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         if (holder == null) {
             return null;
         }
-        peer_info peer = holder.peerItem.swig();
+        TransferDetailPeers.PeerInfoData peer = holder.peerItem;
         switch (col) {
             case IP_COLUMN_ID:
-                String address = peer.getIp().address().to_string(new error_code());
-                int port = peer.getLocal_endpoint().port();
+                String address = peer.ipAddress();
+                int port = peer.localEndpointPort();
                 String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
-                return connectionTypes[peer.getConnection_type()] + "://" + address + ":" + port;
+                return connectionTypes[peer.connectionType()] + "://" + address + ":" + port;
             case CLIENT_COLUMN_ID:
-                String client = new String(holder.peerItem.client(), Charset.forName("UTF-8"));
+                String client = holder.peerItem.client();
 
                 if (client == null || client.isEmpty()) {
                     client = I18n.tr("Unknown");
@@ -131,19 +127,19 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
                 }
                 return client;
             case FLAGS_COLUMN_ID:
-                return getFlagsAsString(peer.get_flags(), peer.get_source());
+                return getFlagsAsString(peer.flags(), peer.source());
             case SOURCE_COLUMN_ID:
-                return getSourceAsString(peer.get_source());
+                return getSourceAsString(peer.source());
             case DOWNLOADED_COLUMN_ID:
                 return holder.peerItem.totalDownload();
             case PROGRESS_COLUMN_ID:
-                return 100*peer.getProgress() + "%";
+                return 100*peer.progress() + "%";
             case UPLOADED_COLUMN_ID:
                 return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
-                return (double) peer.getDown_speed();
+                return (double) peer.downSpeed();
             case UP_SPEED_COLUMN_ID:
-                return (double) peer.getUp_speed();
+                return (double) peer.upSpeed();
         }
         return null;
     }
