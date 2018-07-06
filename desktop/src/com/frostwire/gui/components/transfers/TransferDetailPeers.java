@@ -55,7 +55,7 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
                         for (PeerInfo item : items) {
                             try {
                                 tableMediator.update(new PeerItemHolder(i++, item));
-                            } catch (ArrayIndexOutOfBoundsException ignored) {
+                            } catch (IndexOutOfBoundsException ignored) {
                                 // peer might not be there anymore, reload table from scratch
                                 tableMediator.clearTable();
                                 updateData(btDownload);
