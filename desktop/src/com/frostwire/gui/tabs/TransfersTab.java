@@ -56,7 +56,7 @@ public final class TransfersTab extends AbstractTab {
     private JTextArea filterText;
 
     private final boolean dedicatedTransfersTabAvailable;
-    private int lastSplitterLocation = -1;
+    private int lastSplitterLocationWithDetailsVisible = -1;
 
     public TransfersTab(BTDownloadMediator downloadMediator) {
         super(I18n.tr("Transfers"),
@@ -126,16 +126,8 @@ public final class TransfersTab extends AbstractTab {
             transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
             transferDetailSplitter.add(downloadMediator.getComponent());
             transferDetailComponent = new TransferDetailComponent();
-            int MAX_BOTTOM_COMPONENT_HEIGHT = 337;
-            transferDetailComponent.setMaximumSize(new Dimension(getComponent().getMaximumSize().width, MAX_BOTTOM_COMPONENT_HEIGHT));
             transferDetailSplitter.add(transferDetailComponent);
             mainComponent.add(transferDetailSplitter, "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
-
-            transferDetailSplitter.addPropertyChangeListener(evt -> {
-                if (transferDetailComponent.isVisible()) {
-                    lastSplitterLocation = transferDetailSplitter.getLastDividerLocation();
-                }
-            });
         } else {
             mainComponent.add(downloadMediator.getComponent(), "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
         }
@@ -148,6 +140,7 @@ public final class TransfersTab extends AbstractTab {
         if (!dedicatedTransfersTabAvailable) {
             return;
         }
+        lastSplitterLocationWithDetailsVisible = transferDetailSplitter.getDividerLocation();
         transferDetailComponent.setVisible(false);
         mainComponent.validate();
     }
@@ -156,11 +149,13 @@ public final class TransfersTab extends AbstractTab {
         if (!dedicatedTransfersTabAvailable) {
             return;
         }
-        transferDetailComponent.setVisible(true);
+        boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
         transferDetailComponent.updateData(selected);
-        transferDetailSplitter.setDividerLocation(lastSplitterLocation == -1 ? 270 : lastSplitterLocation);
-        transferDetailComponent.validate();
-        mainComponent.validate();
+
+        if (!transferDetailComponentWasAlreadyVisible) {
+            transferDetailComponent.setVisible(true);
+            transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
+        }
     }
 
     private void setTransfersFilterModeListener(TransfersFilterModeListener transfersFilterModeListener) {
