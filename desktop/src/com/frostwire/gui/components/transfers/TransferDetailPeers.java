@@ -20,12 +20,16 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.PeerInfo;
+import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
+
+    private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
+
     private final TransferDetailPeersTableMediator tableMediator;
     private BittorrentDownload btDownload;
 
@@ -63,8 +67,8 @@ public final class TransferDetailPeers extends JPanel implements TransferDetailC
                         }
                     }
                 }
-            } catch (Throwable t) {
-                t.printStackTrace();
+            } catch (Throwable e) {
+                LOG.error("Error updating data: " + e.getMessage());
             }
         }
     }

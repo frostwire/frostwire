@@ -19,7 +19,6 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
-import com.frostwire.jlibtorrent.AnnounceEndpoint;
 import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.util.Logger;
