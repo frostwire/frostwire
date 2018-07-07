@@ -88,9 +88,9 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name") + "</b></html>"), "left, gapleft 15px, gapright 15px");
         upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 15px");
         upperPanel.add(new JLabel("|"), "left, gapright 15px");
-        upperPanel.add(completionPercentageLabel = new JLabel("<html><b>0%</b></html>"),"left, gapright 5px");
+        upperPanel.add(completionPercentageLabel = new JLabel("<html><b>0%</b></html>"), "left, gapright 5px");
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("complete") + "</b></html>"), "left, pushx, wrap");
-        upperPanel.add(completionPercentageProgressbar = new JProgressBar(),"span 5, growx");
+        upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
 
         // 2nd Section (TRANSFER)
         JPanel midPanel = new JPanel(new MigLayout("insets 5px 0 0 0, gap 5px 5px, fill"));
@@ -98,18 +98,18 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         midPanel.setOpaque(true);
         // time elapsed, time left, download speed
         midPanel.add(new JGrayLabel(I18n.tr("Time elapsed")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(timeElapsedLabel = new JLabel(),"left");
+        midPanel.add(timeElapsedLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Time left")), "left");
         midPanel.add(timeLeftLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Download speed")),"left");
-        midPanel.add(downloadSpeedLabel = new JLabel(),"left, wrap");
+        midPanel.add(new JGrayLabel(I18n.tr("Download speed")), "left");
+        midPanel.add(downloadSpeedLabel = new JLabel(), "left, wrap");
 
         // Downloaded, status, download speed limit
         midPanel.add(new JGrayLabel(I18n.tr("Downloaded")), "left, pad 0 10px 0 0, growx");
         midPanel.add(downloadedLabel = new JLabel(), "left");
         midPanel.add(new JGrayLabel(I18n.tr("Status")), "left");
         midPanel.add(statusLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Download speed limit")),"left");
+        midPanel.add(new JGrayLabel(I18n.tr("Download speed limit")), "left");
         midPanel.add(downloadSpeedLimitLabel = new JLabel(), "left, wrap");
         // TODO: Add settings_gray button and dialog to adjust download speed limit
 
@@ -151,11 +151,11 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
 
         lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(infoHashLabel = new JLabel(), "left");
-        lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray),"left, pushx, wrap");
+        lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray), "left, pushx, wrap");
 
         lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(magnetURLLabel = new JLabel(), "left");
-        lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray),"left, pushx, wrap");
+        lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray), "left, pushx, wrap");
 
         lowerPanel.add(new JGrayLabel(I18n.tr("Created On")), "left, gapright 10px, pad 0 10px 0 0, growx");
         lowerPanel.add(createdOnLabel = new JLabel(), "left, growx, span 2, wrap");
@@ -173,7 +173,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
 
         // Empty border for margins, and line border for visual delimiter
         lowerPortionWhiteBGContainer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10,10,10,10),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
                 BorderFactory.createLineBorder(new Color(0x9297a1))));
         lowerPortionWhiteBGContainer.add(upperPanel, "top, growx, gapbottom 5px, wrap");
         lowerPortionWhiteBGContainer.add(midPanel, "gap 0 0 0 0, growx, growprioy 0, wrap");
@@ -182,9 +182,17 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         JScrollPane scrollPane = new JScrollPane(lowerPortionWhiteBGContainer,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-        scrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        scrollPane.setBackground(new Color(0xf3f5f7));
+        scrollPane.setOpaque(true);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        scrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         add(scrollPane, "grow");
+
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        if (verticalScrollBar != null) {
+            // fixes black background issue when scrolling
+            verticalScrollBar.addAdjustmentListener(e -> scrollPane.repaint());
+        }
     }
 
     @Override
@@ -247,7 +255,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
 
         String magnetURI = btDownload.magnetUri();
         if (magnetURI.length() > 50) {
-            magnetURLLabel.setText(magnetURI.substring(0,49) + "...");
+            magnetURLLabel.setText(magnetURI.substring(0, 49) + "...");
         } else {
             magnetURLLabel.setText(magnetURI);
         }
