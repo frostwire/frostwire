@@ -22,8 +22,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 
-import java.util.List;
-
 public final class TransferDetailTrackersDataLine extends AbstractDataLine<TransferDetailTrackers.TrackerItemHolder> {
 
     private static final int URL_COLUMN_ID = 0;
@@ -71,45 +69,19 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         }
 
         TransferDetailTrackers.AnnounceEntryData announceEntry = holder.announceEntry;
-
-        List<TransferDetailTrackers.AnnounceEndpointData> endpoints = announceEntry.endpoints();
-
-        boolean isActive = false;
-        int seeds = 0;
-        int peers = 0;
-        int downloaded = 0;
-
-        if (endpoints.size() > 0) {
-            for (TransferDetailTrackers.AnnounceEndpointData endpoint : endpoints) {
-                if(endpoint.isActive()) {
-                    isActive = true;
-                }
-
-                if(endpoint.scrapeComplete() > 0) {
-                    seeds += endpoint.scrapeComplete();
-                }
-
-                if(endpoint.scrapeIncomplete() > 0) {
-                    peers += endpoint.scrapeIncomplete();
-                }
-
-                if(endpoint.scrapeDownloaded() > 0) {
-                    downloaded = endpoint.scrapeDownloaded();
-                }
-            }
-        }
+        announceEntry.updateStatus();
 
         switch (col) {
             case URL_COLUMN_ID:
                 return announceEntry.url();
             case STATUS_COLUMN_ID:
-                return isActive ? I18n.tr("Active") : I18n.tr("Inactive");
+                return announceEntry.isActive() ? I18n.tr("Active") : I18n.tr("Inactive");
             case SEEDS_COLUMN_ID:
-                return seeds;
+                return announceEntry.seeds();
             case PEERS_COLUMN_ID:
-                return peers;
+                return announceEntry.peers();
             case DOWNLOADED_COLUMN_ID:
-                return downloaded;
+                return announceEntry.downloaded();
         }
         return null;
     }

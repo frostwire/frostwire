@@ -127,6 +127,11 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         private final String url;
         private final List<AnnounceEndpointData> endpoints;
 
+        private int seeds = 0;
+        private int peers = 0;
+        private int downloaded = 0;
+        private boolean isActive = false;
+
         AnnounceEntryData(announce_entry e) {
             this.url = Vectors.byte_vector2ascii(e.get_url());
             this.endpoints = get_endpoints(e);
@@ -134,6 +139,33 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
         public String url() {
             return url;
+        }
+
+        void updateStatus() {
+            for (AnnounceEndpointData endpoint : endpoints()) {
+                seeds = Math.max(endpoint.scrapeComplete(), seeds);
+                peers = Math.max(endpoint.scrapeIncomplete(), peers);
+                downloaded = Math.max(endpoint.scrapeDownloaded(), downloaded);
+                if(endpoint.isActive()) {
+                    isActive = true;
+                }
+            }
+        }
+
+        public int seeds() {
+            return seeds;
+        }
+
+        public int peers() {
+            return peers;
+        }
+
+        public int downloaded() {
+            return downloaded;
+        }
+
+        public boolean isActive() {
+            return isActive;
         }
 
         List<AnnounceEndpointData> endpoints() {
