@@ -38,7 +38,8 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 180, true, true, true, String.class),
     };
 
-    public TransferDetailTrackersDataLine() { }
+    public TransferDetailTrackersDataLine() {
+    }
 
     @Override
     public int getColumnCount() {
@@ -69,19 +70,18 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         }
 
         TransferDetailTrackers.AnnounceEntryData announceEntry = holder.announceEntry;
-        announceEntry.updateStatus();
 
         switch (col) {
             case URL_COLUMN_ID:
                 return announceEntry.url();
             case STATUS_COLUMN_ID:
-                return announceEntry.isActive() ? I18n.tr("Active") : I18n.tr("Inactive");
+                return holder.isActive ? I18n.tr("Active") : I18n.tr("Inactive");
             case SEEDS_COLUMN_ID:
-                return announceEntry.seeds();
+                return holder.seeds;
             case PEERS_COLUMN_ID:
-                return announceEntry.peers();
+                return holder.peers;
             case DOWNLOADED_COLUMN_ID:
-                return announceEntry.downloaded();
+                return holder.downloaded;
         }
         return null;
     }

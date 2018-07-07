@@ -73,10 +73,33 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
     public class TrackerItemHolder {
         final int trackerOffset;
         final AnnounceEntryData announceEntry;
+        final boolean isActive;
+        public final int seeds;
+        public final int peers;
+        public final int downloaded;
 
         TrackerItemHolder(int trackerOffset, AnnounceEntryData announceEntry) {
             this.trackerOffset = trackerOffset;
             this.announceEntry = announceEntry;
+
+            int s = 0;
+            int p = 0;
+            int d = 0;
+            boolean a = false;
+
+            for (AnnounceEndpointData endPoint : announceEntry.endpoints()) {
+                s = Math.max(endPoint.scrapeComplete(), s);
+                p = Math.max(endPoint.scrapeIncomplete(), p);
+                d = Math.max(endPoint.scrapeDownloaded(), d);
+                if (!a && endPoint.isActive()) {
+                    a = true;
+                }
+            }
+
+            this.seeds = s;
+            this.peers = p;
+            this.downloaded = d;
+            this.isActive = a;
         }
 
         @Override
@@ -127,11 +150,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         private final String url;
         private final List<AnnounceEndpointData> endpoints;
 
-        private int seeds = 0;
-        private int peers = 0;
-        private int downloaded = 0;
-        private boolean isActive = false;
-
         AnnounceEntryData(announce_entry e) {
             this.url = Vectors.byte_vector2ascii(e.get_url());
             this.endpoints = get_endpoints(e);
@@ -139,33 +157,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
         public String url() {
             return url;
-        }
-
-        void updateStatus() {
-            for (AnnounceEndpointData endpoint : endpoints()) {
-                seeds = Math.max(endpoint.scrapeComplete(), seeds);
-                peers = Math.max(endpoint.scrapeIncomplete(), peers);
-                downloaded = Math.max(endpoint.scrapeDownloaded(), downloaded);
-                if(endpoint.isActive()) {
-                    isActive = true;
-                }
-            }
-        }
-
-        public int seeds() {
-            return seeds;
-        }
-
-        public int peers() {
-            return peers;
-        }
-
-        public int downloaded() {
-            return downloaded;
-        }
-
-        public boolean isActive() {
-            return isActive;
         }
 
         List<AnnounceEndpointData> endpoints() {
