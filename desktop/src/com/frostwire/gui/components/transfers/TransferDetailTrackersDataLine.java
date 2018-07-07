@@ -69,11 +69,9 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             return null;
         }
 
-        TransferDetailTrackers.AnnounceEntryData announceEntry = holder.announceEntry;
-
         switch (col) {
             case URL_COLUMN_ID:
-                return announceEntry.url();
+                return holder.url;
             case STATUS_COLUMN_ID:
                 return holder.isActive ? I18n.tr("Active") : I18n.tr("Inactive");
             case SEEDS_COLUMN_ID:

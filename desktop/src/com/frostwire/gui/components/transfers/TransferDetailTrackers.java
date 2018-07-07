@@ -72,21 +72,19 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
     public class TrackerItemHolder {
         final int trackerOffset;
-        final AnnounceEntryData announceEntry;
         final boolean isActive;
         public final int seeds;
         public final int peers;
         public final int downloaded;
+        public String url;
 
         TrackerItemHolder(int trackerOffset, AnnounceEntryData announceEntry) {
             this.trackerOffset = trackerOffset;
-            this.announceEntry = announceEntry;
-
+            this.url = announceEntry.url;
             int s = 0;
             int p = 0;
             int d = 0;
             boolean a = false;
-
             for (AnnounceEndpointData endPoint : announceEntry.endpoints()) {
                 s = Math.max(endPoint.scrapeComplete(), s);
                 p = Math.max(endPoint.scrapeIncomplete(), p);
@@ -95,7 +93,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     a = true;
                 }
             }
-
             this.seeds = s;
             this.peers = p;
             this.downloaded = d;
@@ -122,14 +119,11 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
     // be changed in libtorrent in the next version
     private static List<AnnounceEntryData> trackers(torrent_handle th) {
         announce_entry_vector v = th.trackers();
-
         int size = (int) v.size();
         ArrayList<AnnounceEntryData> l = new ArrayList<>(size);
-
         for (int i = 0; i < size; i++) {
             l.add(new AnnounceEntryData(v.get(i)));
         }
-
         return l;
     }
 
@@ -137,11 +131,9 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         announce_endpoint_vector v = e.getEndpoints();
         int size = (int) v.size();
         ArrayList<AnnounceEndpointData> l = new ArrayList<>(size);
-
         for (int i = 0; i < size; i++) {
             l.add(new AnnounceEndpointData(v.get(i)));
         }
-
         return l;
     }
 
@@ -164,7 +156,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         }
     }
 
-    public static final class AnnounceEndpointData {
+    private static final class AnnounceEndpointData {
 
         private final int scrapeComplete;
         private final int scrapeIncomplete;
