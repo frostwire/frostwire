@@ -97,7 +97,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
     // The other issue is that keeping heap native memory pinned is not particular
     // nice to the GC world, better keep the data in pure java memory, this would
     // be changed in libtorrent in the next version
-    public static List<AnnounceEntryData> trackers(torrent_handle th) {
+    private static List<AnnounceEntryData> trackers(torrent_handle th) {
         announce_entry_vector v = th.trackers();
 
         int size = (int) v.size();
@@ -127,7 +127,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         private final String url;
         private final List<AnnounceEndpointData> endpoints;
 
-        public AnnounceEntryData(announce_entry e) {
+        AnnounceEntryData(announce_entry e) {
             this.url = Vectors.byte_vector2ascii(e.get_url());
             this.endpoints = get_endpoints(e);
         }
@@ -136,7 +136,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
             return url;
         }
 
-        public List<AnnounceEndpointData> endpoints() {
+        List<AnnounceEndpointData> endpoints() {
             return endpoints;
         }
     }
@@ -146,23 +146,29 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         private final int scrapeComplete;
         private final int scrapeIncomplete;
         private final int scrapeDownloaded;
+        private final boolean isActive;
 
-        public AnnounceEndpointData(announce_endpoint e) {
+        AnnounceEndpointData(announce_endpoint e) {
             this.scrapeComplete = e.getScrape_complete();
             this.scrapeIncomplete = e.getScrape_incomplete();
             this.scrapeDownloaded = e.getScrape_downloaded();
+            this.isActive = e.is_working();
         }
 
-        public int scrapeComplete() {
+        int scrapeComplete() {
             return scrapeComplete;
         }
 
-        public int scrapeIncomplete() {
+        int scrapeIncomplete() {
             return scrapeIncomplete;
         }
 
-        public int scrapeDownloaded() {
+        int scrapeDownloaded() {
             return scrapeDownloaded;
+        }
+
+        public boolean isActive() {
+            return isActive;
         }
     }
 }

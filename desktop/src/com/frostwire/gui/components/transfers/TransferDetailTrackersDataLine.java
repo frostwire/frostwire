@@ -31,7 +31,6 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
     private static final int SEEDS_COLUMN_ID = 2;
     private static final int PEERS_COLUMN_ID = 3;
     private static final int DOWNLOADED_COLUMN_ID = 4;
-    private static final String NOT_AVAILABLE = "N/A";
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
         new LimeTableColumn(URL_COLUMN_ID, "URL", I18n.tr("URL"), 180, true, true, true, String.class),
@@ -74,22 +73,43 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         TransferDetailTrackers.AnnounceEntryData announceEntry = holder.announceEntry;
 
         List<TransferDetailTrackers.AnnounceEndpointData> endpoints = announceEntry.endpoints();
-        TransferDetailTrackers.AnnounceEndpointData e = null;
+
+        boolean isActive = false;
+        int seeds = 0;
+        int peers = 0;
+        int downloaded = 0;
+
         if (endpoints.size() > 0) {
-            e = endpoints.get(holder.trackerOffset);
+            for (TransferDetailTrackers.AnnounceEndpointData endpoint : endpoints) {
+                if(endpoint.isActive()) {
+                    isActive = true;
+                }
+
+                if(endpoint.scrapeComplete() > 0) {
+                    seeds += endpoint.scrapeComplete();
+                }
+
+                if(endpoint.scrapeIncomplete() > 0) {
+                    peers += endpoint.scrapeIncomplete();
+                }
+
+                if(endpoint.scrapeDownloaded() > 0) {
+                    downloaded = endpoint.scrapeDownloaded();
+                }
+            }
         }
 
         switch (col) {
             case URL_COLUMN_ID:
                 return announceEntry.url();
             case STATUS_COLUMN_ID:
-                return "";
+                return isActive ? I18n.tr("Active") : I18n.tr("Inactive");
             case SEEDS_COLUMN_ID:
-                return e != null && e.scrapeComplete() > 0 ? Integer.toString(e.scrapeComplete()) : NOT_AVAILABLE;
+                return seeds;
             case PEERS_COLUMN_ID:
-                return e != null && e.scrapeIncomplete() > 0 ? Integer.toString(e.scrapeIncomplete()) : NOT_AVAILABLE;
+                return peers;
             case DOWNLOADED_COLUMN_ID:
-                return e != null && e.scrapeDownloaded() > 0 ? Integer.toString(e.scrapeDownloaded()) : NOT_AVAILABLE;
+                return downloaded;
         }
         return null;
     }
