@@ -203,6 +203,9 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
 
         BTDownload btDownload = guiBtDownload.getDl();
         TorrentHandle torrentHandle = btDownload.getTorrentHandle();
+        if (!torrentHandle.isValid()) {
+            return;
+        }
         TorrentStatus status = torrentHandle.status();
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
 
