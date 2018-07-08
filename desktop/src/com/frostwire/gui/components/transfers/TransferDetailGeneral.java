@@ -82,56 +82,56 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // progress bar
         // slightly darker background color (0xf3f5f7)
 
-        JPanel upperPanel = new JPanel(new MigLayout("insets 5px, gap 0 5px, fill"));
+        JPanel upperPanel = new JPanel(new MigLayout("insets 17px, gap 0 5px, fill"));
         upperPanel.setBackground(new Color(0xf3f5f7));
         upperPanel.setOpaque(true);
-        upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name") + "</b></html>"), "left, gapleft 15px, gapright 15px");
-        upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 15px");
-        upperPanel.add(new JLabel("|"), "left, gapright 15px");
+        upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name:") + "</b></html>"), "left, gapleft 2px, gapright 10px");
+        upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 10px");
+        upperPanel.add(new JLabel("|"), "left, gapright 10px");
         upperPanel.add(completionPercentageLabel = new JLabel("<html><b>0%</b></html>"), "left, gapright 5px");
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("complete") + "</b></html>"), "left, pushx, wrap");
         upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
 
         // 2nd Section (TRANSFER)
-        JPanel midPanel = new JPanel(new MigLayout("insets 5px 0 0 0, gap 5px 5px, fill"));
+        JPanel midPanel = new JPanel(new MigLayout("insets 18px, gap 5px 5px"));
         midPanel.setBackground(Color.WHITE);
         midPanel.setOpaque(true);
-        // time elapsed, time left, download speed
-        midPanel.add(new JGrayLabel(I18n.tr("Time elapsed")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(timeElapsedLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Time left")), "left");
-        midPanel.add(timeLeftLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Download speed")), "left");
-        midPanel.add(downloadSpeedLabel = new JLabel(), "left, wrap");
 
-        // Downloaded, status, download speed limit
-        midPanel.add(new JGrayLabel(I18n.tr("Downloaded")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(downloadedLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Status")), "left");
-        midPanel.add(statusLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Download speed limit")), "left");
-        midPanel.add(downloadSpeedLimitLabel = new JLabel(), "left, wrap");
+        // time elapsed, time left, download speed, status
+        midPanel.add(new JGrayLabel(I18n.tr("Time elapsed:")),"split 2, gapright 10");
+        midPanel.add(timeElapsedLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Time left:")),"split 2, gapright 10");
+        midPanel.add(timeLeftLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Download speed:")),"split 2, gapright 10");
+        midPanel.add(downloadSpeedLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Status:")),"split 2, gapright 10");
+        midPanel.add(statusLabel = new JLabel(),"gapright 50, wrap");
+
+        // Downloaded, seeds, download limit
+        midPanel.add(new JGrayLabel(I18n.tr("Downloaded:")),"split 2, gapright 10");
+        midPanel.add(downloadedLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Seeds:")),"split 2, gapright 10");
+        midPanel.add(seedsLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Download limit:")),"split 2, gapright 10");
+        midPanel.add(downloadSpeedLimitLabel = new JLabel(),"gapright 50, wrap");
         // TODO: Add settings_gray button and dialog to adjust download speed limit
 
-        // Uploaded, seeds, upload speed
-        midPanel.add(new JGrayLabel(I18n.tr("Uploaded")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(uploadedLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Seeds")), "left");
-        midPanel.add(seedsLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Upload speed")), "left");
-        midPanel.add(uploadSpeedLabel = new JLabel(), "gap 10px 10px 0 0, left, wrap");
+        // Uploaded, peers, upload speed
+        midPanel.add(new JGrayLabel(I18n.tr("Uploaded:")),"split 2, gapright 10");
+        midPanel.add(uploadedLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Peers:")),"split 2, gapright 10");
+        midPanel.add(peersLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Upload speed:")),"split 2, gapright 10");
+        midPanel.add(uploadSpeedLabel = new JLabel(),"gapright 50, wrap");
 
-        // Total Size, Peers, Upload speed limit
-        // Share Ratio
-        midPanel.add(new JGrayLabel(I18n.tr("Total size")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(totalSizeLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Peers")), "left");
-        midPanel.add(peersLabel = new JLabel(), "left");
-        midPanel.add(new JGrayLabel(I18n.tr("Upload speed limit")), "left");
-        midPanel.add(uploadSpeedLimitLabel = new JLabel(), "left, wrap");
+        // Total Size, share ratio, upload limit
+        midPanel.add(new JGrayLabel(I18n.tr("Total size:")),"split 2, gapright 10");
+        midPanel.add(totalSizeLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Share ratio")),"split 2, gapright 10");
+        midPanel.add(shareRatioLabel = new JLabel(),"gapright 50");
+        midPanel.add(new JGrayLabel(I18n.tr("Upload limit:")),"split 2, gapright 10");
+        midPanel.add(uploadSpeedLimitLabel = new JLabel(),"gapright 50, wrap");
         // TODO: Add settings_gray button and dialog to adjust upload speed limit
-        midPanel.add(new JGrayLabel(I18n.tr("Share ratio")), "left, pad 0 10px 0 0, growx");
-        midPanel.add(shareRatioLabel = new JLabel(), "wrap");
 
         // 3rd Section, "GENERAL"
         // Save location
@@ -139,29 +139,29 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // Magnet URL
         // Created On
         // Comment
-        JPanel lowerPanel = new JPanel(new MigLayout("insets 0 0 0 0, gap 5px 5px, fill"));
+        JPanel lowerPanel = new JPanel(new MigLayout("insets 5px 18px 18px 18px, gap 5px 5px"));
         lowerPanel.setBackground(Color.WHITE);
         lowerPanel.setOpaque(true);
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Save location")), "left, wmin 160px, pad 0 10px 0 0, growx");
-        lowerPanel.add(saveLocationLabel = new JLabel(), "left, growx, span 2, wrap");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Save location:")),"split 2, gapright 10");
+        lowerPanel.add(saveLocationLabel = new JLabel(),"gapright 60, wrap");
 
         final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
         final ImageIcon copy_paste = GUIMediator.getThemeImage("copy_paste.png");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash")), "left, gapright 10px, pad 0 10px 0 0, growx");
-        lowerPanel.add(infoHashLabel = new JLabel(), "left");
-        lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray), "left, pushx, wrap");
+        lowerPanel.add(new JGrayLabel(I18n.tr("InfoHash:")),"split 3, gapright 10");
+        lowerPanel.add(infoHashLabel = new JLabel(),"gapright 10");
+        lowerPanel.add(copyInfoHashButton = new JButton(copy_paste_gray),"wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL")), "left, gapright 10px, pad 0 10px 0 0, growx");
-        lowerPanel.add(magnetURLLabel = new JLabel(), "left");
-        lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray), "left, pushx, wrap");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Magnet URL:")),"split 3, gapright 10");
+        lowerPanel.add(magnetURLLabel = new JLabel(),"gapright 10");
+        lowerPanel.add(copyMagnetURLButton = new JButton(copy_paste_gray),"wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Created On")), "left, gapright 10px, pad 0 10px 0 0, growx");
-        lowerPanel.add(createdOnLabel = new JLabel(), "left, growx, span 2, wrap");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Created On:")),"split 2, gapright 10");
+        lowerPanel.add(createdOnLabel = new JLabel(),"gapright 60, wrap");
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Comment")), "left, gapright 10px, pad 0 10px 0 0, growx");
-        lowerPanel.add(commentLabel = new JLabel(), "left, growx, span 2, wrap");
+        lowerPanel.add(new JGrayLabel(I18n.tr("Comment:")),"split 2, gapright 10");
+        lowerPanel.add(commentLabel = new JLabel(),"gapright 60, wrap");
 
         copyInfoHashButton.setPressedIcon(copy_paste);
         copyInfoHashButton.setContentAreaFilled(false);
