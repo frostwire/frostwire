@@ -744,7 +744,9 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
     @Override
     public void refresh() {
-        list.repaint();
+        if (list != null) {
+            list.repaint();
+        }
     }
 
     private static class PlaylistListFileFilter extends FileFilter {
