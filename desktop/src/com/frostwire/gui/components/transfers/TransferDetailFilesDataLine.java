@@ -34,12 +34,12 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
     static LimeTableColumn ACTIONS_COLUMN;
 
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
-            ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 70, true, true, false, TransferDetailFiles.TransferItemHolder.class),
-            new LimeTableColumn(1, "NUMBER", "#", 30, true, true, false, String.class),
-            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 500, true, String.class),
+            ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 80, true, true, true, TransferDetailFiles.TransferItemHolder.class),
+            new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
+            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 400, true,true, true, String.class),
             new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 150, true, ProgressBarHolder.class),
-            new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 65, true, true, false, SizeHolder.class),
-            new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 40, true, true, false, String.class),
+            new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 80, true, true, true, SizeHolder.class),
+            new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 80, true, true, true, String.class),
     };
 
     public TransferDetailFilesDataLine() {
