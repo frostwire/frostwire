@@ -790,4 +790,6 @@
     <string name="vpn_find_out_more">Find out more</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="play_store_out_of_sync">Play Store needs to synchronize, wait a few minutes</string>
+    <string name="join_frostwire_chat">Join FrostWire Chat</string>
+    <string name="contact_us">Contact Us</string>
 </resources>

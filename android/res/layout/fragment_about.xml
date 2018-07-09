@@ -53,7 +53,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/dummy_build"
                 android:textColor="@color/app_text_secondary"
-                android:textSize="@dimen/text_medium" />
+                android:textSize="@dimen/text_x_medium" />
 
             <TextView
                 android:id="@+id/fragment_about_jlibtorrent_version"
@@ -62,7 +62,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/dummy_build"
                 android:textColor="@color/app_text_secondary"
-                android:textSize="@dimen/text_medium" />
+                android:textSize="@dimen/text_x_medium" />
 
 
             <Button
@@ -79,6 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="20dp"
                 android:gravity="center_vertical|center_horizontal"
                 android:orientation="horizontal">
@@ -88,44 +89,58 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
-                    android:src="@drawable/about_social_facebook" />
+                    android:src="@drawable/about_social_facebook"
+                    android:contentDescription="@null"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_twitter_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="12dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
                     android:background="@color/transparent"
-                    android:src="@drawable/about_social_twitter" />
+                    android:src="@drawable/about_social_twitter"
+                    android:contentDescription="@null"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_reddit_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="24dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@color/transparent"
-                    android:src="@drawable/about_social_reddit" />
+                    android:src="@drawable/about_social_reddit"
+                    android:contentDescription="@null"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_github_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="20dp"
                     android:background="@color/transparent"
-                    android:src="@drawable/about_social_github" />
+                    android:src="@drawable/about_social_github"
+                    android:contentDescription="@null"/>
+
+                <ImageButton
+                    android:id="@+id/fragment_about_slack_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:src="@drawable/about_social_slack"
+                    android:contentDescription="@null"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/fragment_about_stickers"
+            android:id="@+id/fragment_about_changelog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="18dp"
-            android:text="@string/frostwire_sticker_and_more"
+            android:text="@string/changelog"
             android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold" />
@@ -133,15 +148,16 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/divider_line" />
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null"/>
 
         <TextView
-            android:id="@+id/fragment_about_feedback"
+            android:id="@+id/fragment_about_support_frostwire"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:padding="18dp"
-            android:text="@string/send_feedback"
+            android:text="@string/support_frostwire"
             android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:textStyle="bold" />
@@ -149,7 +165,8 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/divider_line" />
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null"/>
 
         <TextView
             android:id="@+id/fragment_about_content"
@@ -165,24 +182,20 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/divider_line" />
+            android:background="@drawable/divider_line"
+            android:contentDescription="@null"/>
 
         <TextView
-            android:id="@+id/fragment_about_changelog"
+            android:id="@+id/fragment_about_contact_us"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/changelog"
+            android:text="@string/contact_us"
             android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:padding="18dp"
             android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@drawable/divider_line" />
 
         <LinearLayout
             android:layout_width="match_parent"

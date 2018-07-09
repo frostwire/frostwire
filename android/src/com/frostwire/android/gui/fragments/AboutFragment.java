@@ -78,21 +78,23 @@ public final class AboutFragment extends AbstractFragment {
         ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
         ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
         ImageButton githubButton = findView(rootView, R.id.fragment_about_github_button);
+        ImageButton slackButton = findView(rootView, R.id.fragment_about_slack_button);
 
         String referrerParam = "?ref=android_about";
         setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
         setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
         setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
         setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
+        setupClickUrl(slackButton, Constants.SOCIAL_URL_SLACK_PAGE + referrerParam);
 
         //Remaining elements including text content
-        TextView stickersShop = findView(rootView, R.id.fragment_about_stickers);
-        TextView sendFeedback = findView(rootView, R.id.fragment_about_feedback);
+        TextView supportFrostWire = findView(rootView, R.id.fragment_about_support_frostwire);
         TextView translateHelp = findView(rootView, R.id.fragment_about_translate);
+        TextView contactUs = findView(rootView, R.id.fragment_about_contact_us);
 
-        setupClickUrl(stickersShop, Constants.STICKERS_SHOP_URL);
-        setupClickUrl(sendFeedback, Constants.CONTACT_US_URL);
+        setupClickUrl(supportFrostWire, Constants.STICKERS_SHOP_URL);
         setupClickUrl(translateHelp, Constants.TRANSLATE_HELP_URL);
+        setupClickUrl(contactUs, Constants.CONTACT_US_URL);
 
         TextView content = findView(rootView, R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
