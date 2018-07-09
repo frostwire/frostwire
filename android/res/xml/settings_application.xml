@@ -76,5 +76,16 @@
                 android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
                 android:targetPackage="com.frostwire.android" />
         </android.support.v7.preference.Preference>
+        <android.support.v7.preference.Preference android:title="@string/send_feedback">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://support.frostwire.com/hc/en-us/requests/new"/>
+        </android.support.v7.preference.Preference>
+
+        <android.support.v7.preference.Preference android:title="@string/join_frostwire_chat">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.frostwire.com/chat"/>
+        </android.support.v7.preference.Preference>
     </android.support.v7.preference.PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>
