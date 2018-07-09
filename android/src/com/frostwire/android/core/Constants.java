@@ -185,6 +185,7 @@ public final class Constants {
     public static final String SOCIAL_URL_TWITTER_PAGE = "https://twitter.com/frostwire";
     public static final String SOCIAL_URL_REDDIT_PAGE = "https://reddit.com/r/frostwire";
     public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
+    public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
 
     public static final String FROSTWIRE_GIVE_URL = "http://www.frostwire.com/give/?from=";
     public static final String STICKERS_SHOP_URL = "http://www.frostwire.com/stickers";
