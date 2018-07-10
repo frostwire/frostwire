@@ -39,7 +39,6 @@ import java.util.List;
  * @author aldenml
  * @author marcelinkaaa
  */
-
 public class TransferDetailPeersFragment extends AbstractTransferDetailFragment {
 
     private TextView peerNumberTextView;
@@ -147,10 +146,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             Resources r = itemView.getResources();
 
             String address = peer.ip();
-
-            // TODO: fix
-            String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
-            addressTextView.setText(connectionTypes[peer.connectionType().swig()] + "://" + address);
+            addressTextView.setText(connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + address);
 
             //int rtt = peer.getRtt();
             //rttTextView.setText(r.getString(R.string.rtt_ms, rtt));
@@ -175,6 +171,16 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             downloadedTextView.setText(totalDownloadedInHumanBytes);
             String totalUploadedInHumanBytes = r.getString(R.string.uploaded_n, UIUtils.getBytesInHuman(peer.totalUpload()));
             uploadedTextView.setText(totalUploadedInHumanBytes);
+        }
+    }
+
+    private static final int utp_socket = 1 << 17;
+
+    private static String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
+        switch (t) {
+            case WEB_SEED: return "web_seed";
+            case HTTP_SEED: return "http_seed";
+            default: return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
         }
     }
 
