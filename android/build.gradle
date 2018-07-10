@@ -178,8 +178,8 @@ dependencies {
     implementation 'com.android.support:preference-v7:27.1.1'
     implementation 'com.android.billingclient:billing:1.1'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
-    implementation('com.mopub:mopub-sdk-banner:5.1.0@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-interstitial:5.1.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-banner:5.2.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-interstitial:5.2.0@aar') { transitive = true }
     implementation 'com.applovin:applovin-sdk:8.0.1'
     implementation 'org.prebid:prebid-mobile-sdk:0.4'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'

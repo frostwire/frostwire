@@ -65,6 +65,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         // banner units
         //SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
         //MoPub.initializeSdk(activity, sdkConfiguration, null);
+        // TODO: Note 3: the call to initializeSdk is probably a MUST
         start();
         loadNewInterstitial(activity);
     }
