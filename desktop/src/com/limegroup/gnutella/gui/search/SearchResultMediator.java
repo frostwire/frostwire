@@ -242,7 +242,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                     final SearchResultDataLine[] lines = getAllSelectedLines();
                     if (lines.length == 1) {
                         UISearchResult searchResult = lines[0].getSearchResult();
-                        searchResult.showDetails(true);
+                        searchResult.showSearchResultWebPage(true);
                     }
                 }
             }

@@ -57,7 +57,7 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
     public void download(boolean partial) {
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
-        showDetails(false);
+        showSearchResultWebPage(false);
         UXStats.instance().log((sr instanceof TorrentCrawledSearchResult) ? UXAction.DOWNLOAD_PARTIAL_TORRENT_FILE : UXAction.DOWNLOAD_FULL_TORRENT_FILE);
     }
 
@@ -71,7 +71,7 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_PARTIAL_FILES_STRING, resultPanel.DOWNLOAD_PARTIAL_FILES_LISTENER, popupMenu, lines.length == 1, 2);
         PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showDetails(true);
+                showSearchResultWebPage(true);
             }
         }, popupMenu, lines.length == 1, 3);
 

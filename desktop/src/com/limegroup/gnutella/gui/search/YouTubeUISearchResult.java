@@ -52,7 +52,7 @@ public final class YouTubeUISearchResult extends AbstractUISearchResult {
             GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             GUIMediator.instance().openYouTubeItem(sr);
         }
-        showDetails(false);
+        showSearchResultWebPage(false);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 
@@ -65,7 +65,7 @@ public final class YouTubeUISearchResult extends AbstractUISearchResult {
         }, popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.YOUTUBE_DETAILS_STRING, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showDetails(true);
+                showSearchResultWebPage(true);
             }
         }, popupMenu, lines.length == 1, 2);
 

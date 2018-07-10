@@ -84,7 +84,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (sourceHolder != null) {
-                    sourceHolder.getUISearchResult().showDetails(true);
+                    sourceHolder.getUISearchResult().showSearchResultWebPage(true);
                     e.consume();
                     UXStats.instance().log(UXAction.SEARCH_RESULT_SOURCE_VIEW);
                 }

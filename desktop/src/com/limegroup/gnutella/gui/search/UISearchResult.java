@@ -62,7 +62,7 @@ public interface UISearchResult {
     
     SearchResult getSearchResult();
     
-    void showDetails(boolean now);
+    void showSearchResultWebPage(boolean now);
     
     String getDetailsUrl();
     

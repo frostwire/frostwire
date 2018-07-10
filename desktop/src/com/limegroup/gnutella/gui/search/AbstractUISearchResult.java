@@ -95,7 +95,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     }
 
     @Override
-    public void showDetails(boolean now) {
+    public void showSearchResultWebPage(boolean now) {
         if (now) {
             GUIMediator.openURL(getSearchResult().getDetailsUrl());
         } else {

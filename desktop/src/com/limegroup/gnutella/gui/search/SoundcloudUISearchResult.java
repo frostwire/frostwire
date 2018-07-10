@@ -47,7 +47,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
     public void download(boolean partial) {
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr);
-        showDetails(false);
+        showSearchResultWebPage(false);
         UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 
@@ -60,7 +60,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
         }, popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.SOUNDCLOUD_DETAILS_STRING, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showDetails(true);
+                showSearchResultWebPage(true);
             }
         }, popupMenu, lines.length == 1, 2);
 
