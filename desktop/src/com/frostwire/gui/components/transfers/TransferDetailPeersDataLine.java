@@ -115,9 +115,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         switch (col) {
             case IP_COLUMN_ID:
                 String address = peer.ip();
-                // TODO: fix this
-                String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
-                return connectionTypes[peer.connectionType().swig()] + "://" + address;
+                return connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + address;
             case CLIENT_COLUMN_ID:
                 String client = holder.peerItem.client();
 
@@ -293,6 +291,14 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             sb.append("L");
         }
         return sb.toString();
+    }
+
+    private String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
+        switch (t) {
+            case WEB_SEED: return "web_seed";
+            case HTTP_SEED: return "http_seed";
+            default: return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
+        }
     }
 
     @Override
