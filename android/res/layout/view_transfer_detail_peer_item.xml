@@ -41,7 +41,7 @@
             android:paddingBottom="4dp"
             android:text="@string/transfer_detail_peers_address_dummy" />
 
-        <TextView
+        <!--<TextView
             android:id="@+id/view_transfer_detail_peer_item_rtt"
             style="@style/TransfersList.Item"
             android:layout_below="@+id/view_transfer_detail_peer_item_address"
@@ -49,13 +49,14 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:paddingTop="2dp"
-            android:text="@string/rtt_ms" />
+            android:text="@string/rtt_ms" />-->
 
         <TextView
             android:id="@+id/view_transfer_detail_peer_item_client"
             style="@style/TransfersList.Item"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="2dp"
             android:layout_below="@+id/view_transfer_detail_peer_item_address"
             android:text="@string/transfer_detail_peers_address_source_dummy" />
 
@@ -64,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/view_transfer_detail_peer_item_rtt"
+            android:layout_below="@+id/view_transfer_detail_peer_item_client"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 

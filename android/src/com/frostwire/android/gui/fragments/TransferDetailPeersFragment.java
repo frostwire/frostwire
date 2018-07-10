@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.jlibtorrent.PeerInfo;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.peer_info;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -59,7 +57,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             return;
         }
         if (adapter == null && isAdded()) {
-            ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
+            List<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter = new PeersAdapter(peerInfos);
         }
         updateComponents();
@@ -86,7 +84,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             recyclerView.setAdapter(adapter);
         }
         if (adapter != null) {
-            ArrayList<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
+            List<PeerInfo> peerInfos = uiBittorrentDownload.getDl().getTorrentHandle().peerInfo();
             adapter.updatePeers(peerInfos);
             peerNumberTextView.setText(getString(R.string.n_peers, peerInfos.size()));
         }
@@ -96,7 +94,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
         @SuppressWarnings("unused")
         private int offset; // could be used for click listeners on peers, say to remove/throttle, copy ip:port
         private final TextView addressTextView;
-        private final TextView rttTextView;
+        //private final TextView rttTextView;
         private final TextView clientTextView;
         private final TextView downSpeedTextView;
         private final TextView upSpeedTextView;
@@ -133,7 +131,7 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
         public PeerItemViewHolder(View v) {
             super(v);
             addressTextView = v.findViewById(R.id.view_transfer_detail_peer_item_address);
-            rttTextView = v.findViewById(R.id.view_transfer_detail_peer_item_rtt);
+            //rttTextView = v.findViewById(R.id.view_transfer_detail_peer_item_rtt);
             clientTextView = v.findViewById(R.id.view_transfer_detail_peer_item_client);
             downSpeedTextView = v.findViewById(R.id.view_transfer_detail_peer_item_down_speed);
             upSpeedTextView = v.findViewById(R.id.view_transfer_detail_peer_item_up_speed);
@@ -144,39 +142,38 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
             uploadedTextView = v.findViewById(R.id.view_transfer_detail_peer_uploaded);
         }
 
-        public void updateData(PeerInfo peerInfo, int offset) {
-            peer_info peer = peerInfo.swig();
+        public void updateData(PeerInfo peer, int offset) {
             this.offset = offset;
             Resources r = itemView.getResources();
 
-            String address = peer.getIp().address().to_string(new error_code());//peer.getLocal_endpoint().address().to_string(new error_code());
-            int port = peer.getLocal_endpoint().port();
+            String address = peer.ip();
 
+            // TODO: fix
             String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
-            addressTextView.setText(connectionTypes[peer.getConnection_type()] + "://" + address + ":" + port);
+            addressTextView.setText(connectionTypes[peer.connectionType().swig()] + "://" + address);
 
-            int rtt = peer.getRtt();
-            rttTextView.setText(r.getString(R.string.rtt_ms, rtt));
+            //int rtt = peer.getRtt();
+            //rttTextView.setText(r.getString(R.string.rtt_ms, rtt));
 
-            String client = new String(peerInfo.client(), Charset.forName("UTF-8"));
+            String client = peer.client();
 
             if (client.isEmpty()) {
                 client = r.getString(R.string.unknown);
             }
             clientTextView.setText(client);
 
-            downSpeedTextView.setText(UIUtils.getBytesInHuman(peer.getDown_speed()) + "/s");
-            upSpeedTextView.setText(UIUtils.getBytesInHuman(peer.getUp_speed()) + "/s");
+            downSpeedTextView.setText(UIUtils.getBytesInHuman(peer.downSpeed()) + "/s");
+            upSpeedTextView.setText(UIUtils.getBytesInHuman(peer.upSpeed()) + "/s");
 
-            int source = peer.getSource().to_int();
+            int source = peer.source();
             int peerSourceStringId = PeerSourceType.getSourceStringId(source);
             if (peerSourceStringId != -1) {
                 sourceTypeTextView.setText(r.getString(R.string.source_type, r.getString(peerSourceStringId)));
             }
 
-            String totalDownloadedInHumanBytes = r.getString(R.string.downloaded_n, UIUtils.getBytesInHuman(peerInfo.totalDownload()));
+            String totalDownloadedInHumanBytes = r.getString(R.string.downloaded_n, UIUtils.getBytesInHuman(peer.totalDownload()));
             downloadedTextView.setText(totalDownloadedInHumanBytes);
-            String totalUploadedInHumanBytes = r.getString(R.string.uploaded_n, UIUtils.getBytesInHuman(peerInfo.totalUpload()));
+            String totalUploadedInHumanBytes = r.getString(R.string.uploaded_n, UIUtils.getBytesInHuman(peer.totalUpload()));
             uploadedTextView.setText(totalUploadedInHumanBytes);
         }
     }
@@ -185,12 +182,12 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
 
         private final ArrayList<PeerInfo> peers;
 
-        public PeersAdapter(ArrayList<PeerInfo> peerInfos) {
+        public PeersAdapter(List<PeerInfo> peerInfos) {
             this.peers = new ArrayList<>(0);
             updatePeers(peerInfos);
         }
 
-        public void updatePeers(ArrayList<PeerInfo> peerInfos) {
+        public void updatePeers(List<PeerInfo> peerInfos) {
             this.peers.clear();
             if (peerInfos != null) {
                 this.peers.addAll(peerInfos);
