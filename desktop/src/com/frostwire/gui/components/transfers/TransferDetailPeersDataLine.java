@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.jlibtorrent.PeerInfo;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
@@ -110,13 +111,13 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         if (holder == null) {
             return null;
         }
-        TransferDetailPeers.PeerInfoData peer = holder.peerItem;
+        PeerInfo peer = holder.peerItem;
         switch (col) {
             case IP_COLUMN_ID:
-                String address = peer.ipAddress();
-                int port = peer.localEndpointPort();
+                String address = peer.ip();
+                // TODO: fix this
                 String[] connectionTypes = {"bt", "uTP", "web_seed", "http_seed"};
-                return connectionTypes[peer.connectionType()] + "://" + address + ":" + port;
+                return connectionTypes[peer.connectionType().swig()] + "://" + address;
             case CLIENT_COLUMN_ID:
                 String client = holder.peerItem.client();
 
