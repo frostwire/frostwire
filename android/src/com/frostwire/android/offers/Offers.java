@@ -132,15 +132,13 @@ public final class Offers {
                                         String placement,
                                         final boolean shutdownAfterwards,
                                         final boolean dismissAfterwards) {
-        boolean interstitialShown = false;
-
         if (Offers.disabledAds()) {
             LOG.info("Skipping interstitial ads display, PlayStore reports no ads");
         } else {
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
-                if (!interstitialShown && adNetwork != null && adNetwork.started()) {
+                if (adNetwork != null && adNetwork.started()) {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                    interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
+                    boolean interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
                     if (interstitialShown) {
                         ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
@@ -152,18 +150,17 @@ public final class Offers {
             }
         }
 
-        if (!interstitialShown) {
-            if (dismissAfterwards) {
-                activity.finish();
+        if (dismissAfterwards) {
+            activity.finish();
+        }
+        if (shutdownAfterwards) {
+            if (activity instanceof MainActivity) {
+                ((MainActivity) activity).shutdown();
+            } else {
+                UIUtils.sendShutdownIntent(activity);
             }
-            if (shutdownAfterwards) {
-                if (activity instanceof MainActivity) {
-                    ((MainActivity) activity).shutdown();
-                } else {
-                    UIUtils.sendShutdownIntent(activity);
-                }
-            }
-        } // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
+        }
+        // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
     }
 
     public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
