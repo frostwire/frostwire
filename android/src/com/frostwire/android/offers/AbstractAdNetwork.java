@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 package com.frostwire.android.offers;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.frostwire.util.Logger;
@@ -30,12 +29,6 @@ import com.frostwire.util.Logger;
 public abstract class AbstractAdNetwork implements AdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AbstractAdNetwork.class);
-    public abstract void initialize(Activity activity);
-    public abstract boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward);
-    public abstract void loadNewInterstitial(Activity activity);
-    public abstract String getShortCode();
-    public abstract String getInUsePreferenceKey();
-    public abstract boolean isDebugOn();
 
     private long lastStopped = -1;
     private boolean started;
