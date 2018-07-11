@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[ * למרות המומלץ עבור הורדות שלך,אתה לא צריך VPN להשתמש FrostWire ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> גע בתגים שחלים על]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ אתה מחובר לאינטרנט באמצעות VPN. <br> <br>r אם אינך משתמש כבר, מומלץ להשתמש באחד מהשירותים הבאים כדי להצפין את החיבור שלך ו <b/> לשמור על הפרטיות שלך <b>. ]]></string>
+
     <string name="vpn_not_found">לא VPN. לשקול להצפין חיבור.</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="activity_mediaplayer_name">נגן מדיה</string>
@@ -672,4 +674,48 @@
     <string name="play_store_out_of_sync">חנות Google Play צריכה לסנכרן, המתן מספר דקות</string>
     <string name="one_file_shared">קובץ אחד משותף למכשירי FrostWire באותה רשת Wi-Fi.</string>
     <string name="n_files_shared">%d קבצים משותפים למכשירי FrostWire באותה רשת Wi-Fi.</string>
+    <string name="uploaded">הועלה</string>
+    <string name="trackers">עוקבים</string>
+    <string name="source_type">מָקוֹר: %1$s</string>
+    <string name="transfer_detail_storage_header">נתיב אחסון:</string>
+    <string name="seeding_time">זמן זריעה</string>
+    <string name="working">עובד</string>
+    <string name="pieces">חתיכות</string>
+    <string name="upload_limit">מגבלת העלאה</string>
+    <string name="enter_valid_tracker_url_here">הזן כאן כתובת אתר חוקית למעקב</string>
+    <string name="add_trackers">הוסף עוקבים</string>
+    <string name="edit">לַעֲרוֹך</string>
+    <string name="active_time">זמן פעיל</string>
+    <string name="status">סטָטוּס</string>
+    <string name="speed_limits">מגבלת מהירות</string>
+    <string name="created_on">נוצר ב</string>
+    <string name="number_of_files">מספר הקבצים</string>
+    <string name="pieces_header">חתיכות:</string>
+    <string name="share_ratio">יחס המניות</string>
+    <string name="download_limit">גבול הורדה</string>
+    <string name="seeding_on">זריעה על</string>
+    <string name="edit_tracker">ערוך גשש</string>
+    <string name="down_speed">מהירות הורדה</string>
+    <string name="completed">הושלם</string>
+    <string name="downloaded">הורד</string>
+    <string name="n_peers">%1$d פירס</string>
+    <string name="sequential_download">הורדה רציף</string>
+    <string name="downloaded_n">הורד %1$s / </string>
+    <string name="transfer_detail_title_header">שֵׁם:</string>
+    <string name="time_elapsed">זמן שחלף</string>
+    <string name="remove_tracker">הסר גשש</string>
+    <string name="comment">תגובה</string>
+    <string name="up_speed">מהירות העלאה</string>
+    <string name="add">לְהוֹסִיף</string>
+    <string name="time_left">הזמן שנותר</string>
+    <string name="n_files">%1$d קבצים</string>
+    <string name="total_size">גודל כולל</string>
+    <string name="show_torrent_details">הצג פרטי Torrent</string>
+    <string name="uploaded_n">הועלה %1$s</string>
+    <string name="could_not_open_transfer_detail_invalid_infohash">לא ניתן היה לפתוח את פרטי ההעברה, InfoHash לא חוקי</string>
+    <string name="details">פרטים</string>
+    <string name="invalid_tracker_url">כתובת אתר לא חוקית של מעקב</string>
+    <string name="title_activity_transfer_detail">העברת פרטים</string>
+    <string name="piece_size_header">גודל:</string>
+    <string name="add_tracker">הוסף גשש</string>
 </resources>
