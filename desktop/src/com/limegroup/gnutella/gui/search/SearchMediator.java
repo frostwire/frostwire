@@ -15,6 +15,8 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.bittorrent.BTDownload;
+import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.filters.SearchFilter;
 import com.frostwire.gui.filters.SearchFilterFactory;
 import com.frostwire.gui.filters.SearchFilterFactoryImpl;
@@ -44,6 +46,7 @@ import java.util.*;
  * the various search packages and simplifies the responsibilities of the
  * underlying classes.
  */
+@SuppressWarnings("RegExpRedundantEscape")
 public final class SearchMediator {
 
     public static final Logger LOG = Logger.getLogger(SearchMediator.class);
@@ -224,6 +227,7 @@ public final class SearchMediator {
     /**
      * Validates the given search information.
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean validate(SearchInformation info) {
         switch (validateInfo(info)) {
             case QUERY_EMPTY:
@@ -455,6 +459,21 @@ public final class SearchMediator {
         for (SearchResultDataLine line : lines) {
             if (line != null) {
                 downloadLine(line);
+            }
+        }
+
+        if (lines.length == 1) {
+            SearchResultDataLine srdl = lines[0];
+            String hash = srdl.getHash();
+            BTDownloadMediator btDownloadMediator = GUIMediator.instance().getBTDownloadMediator();
+            List<BTDownload> downloads =
+                    btDownloadMediator.getDownloads();
+            for (BTDownload d : downloads) {
+                if (d.getHash().equals(hash)) {
+                    btDownloadMediator.selectBTDownload(d);
+                    btDownloadMediator.ensureDownloadVisible(d);
+                    return;
+                }
             }
         }
     }

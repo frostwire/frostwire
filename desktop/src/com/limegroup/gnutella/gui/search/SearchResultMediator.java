@@ -225,14 +225,12 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     protected void buildListeners() {
         super.buildListeners();
 
-        DOWNLOAD_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e != null && e.getSource() instanceof JButton) {
-                    UXStats.instance().log(UXAction.SEARCH_RESULT_BIG_BUTTON_DOWNLOAD);
-                }
-
-                SearchMediator.doDownload(SearchResultMediator.this);
+        DOWNLOAD_LISTENER = e -> {
+            if (e != null && e.getSource() instanceof JButton) {
+                UXStats.instance().log(UXAction.SEARCH_RESULT_BIG_BUTTON_DOWNLOAD);
             }
+
+            SearchMediator.doDownload(SearchResultMediator.this);
         };
 
         TORRENT_DETAILS_LISTENER = new MouseAdapter() {
@@ -248,59 +246,47 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
         };
 
-        COPY_MAGNET_ACTION_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SearchResultDataLine[] lines = getAllSelectedLines();
-                StringBuilder sb = new StringBuilder();
-                for (SearchResultDataLine line : lines) {
-                    sb.append(TorrentUtil.getMagnet(line.getInitializeObject()));
-                    sb.append("\n");
-                }
-                GUIMediator.setClipboardContent(sb.toString());
+        COPY_MAGNET_ACTION_LISTENER = e -> {
+            SearchResultDataLine[] lines = getAllSelectedLines();
+            StringBuilder sb = new StringBuilder();
+            for (SearchResultDataLine line : lines) {
+                sb.append(TorrentUtil.getMagnet(line.getInitializeObject()));
+                sb.append("\n");
             }
+            GUIMediator.setClipboardContent(sb.toString());
         };
 
-        COPY_HASH_ACTION_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SearchResultDataLine[] lines = getAllSelectedLines();
-                StringBuilder sb = new StringBuilder();
-                for (SearchResultDataLine line : lines) {
-                    sb.append(line.getInitializeObject().getHash());
-                    sb.append("\n");
-                }
-                GUIMediator.setClipboardContent(sb.toString());
+        COPY_HASH_ACTION_LISTENER = e -> {
+            SearchResultDataLine[] lines = getAllSelectedLines();
+            StringBuilder sb = new StringBuilder();
+            for (SearchResultDataLine line : lines) {
+                sb.append(line.getInitializeObject().getHash());
+                sb.append("\n");
             }
+            GUIMediator.setClipboardContent(sb.toString());
         };
 
-        CONFIGURE_SHARING_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.instance().setOptionsVisible(true, tr("Options"));
-            }
-        };
+        CONFIGURE_SHARING_LISTENER = e -> GUIMediator.instance().setOptionsVisible(true, tr("Options"));
 
-        DOWNLOAD_PARTIAL_FILES_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SearchResultDataLine[] lines = getAllSelectedLines();
-                if (lines.length == 1 && lines[0] != null) {
-                    final SearchResult sr = lines[0].getInitializeObject().getSearchResult();
-                    if (sr instanceof TorrentSearchResult) {
-                        // GUIMediator gm = GUIMediator.instance();
-                        //if (sr instanceof ScrapedTorrentFileSearchResult) {
-                        //    gm.openTorrentSearchResult((ScrapedTorrentFileSearchResult) sr);
-                        //} else {
-                        GUIMediator.instance().openTorrentSearchResult((TorrentSearchResult) sr, true);
-                        //}
-                    }
+        DOWNLOAD_PARTIAL_FILES_LISTENER = e -> {
+            SearchResultDataLine[] lines = getAllSelectedLines();
+            if (lines.length == 1 && lines[0] != null) {
+                final SearchResult sr = lines[0].getInitializeObject().getSearchResult();
+                if (sr instanceof TorrentSearchResult) {
+                    // GUIMediator gm = GUIMediator.instance();
+                    //if (sr instanceof ScrapedTorrentFileSearchResult) {
+                    //    gm.openTorrentSearchResult((ScrapedTorrentFileSearchResult) sr);
+                    //} else {
+                    GUIMediator.instance().openTorrentSearchResult((TorrentSearchResult) sr, true);
+                    //}
                 }
             }
         };
 
-        STOP_SEARCH_LISTENER = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                SearchMediator.instance().stopSearch(token);
-                updateSearchIcon(false);
-                setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, false);
-            }
+        STOP_SEARCH_LISTENER = e -> {
+            SearchMediator.instance().stopSearch(token);
+            updateSearchIcon(false);
+            setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, false);
         };
     }
 
@@ -641,18 +627,15 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         //buttonOptions.setMargin(new Insets(0, 0, 0, 0));
         //buttonOptions.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
 
-        buttonOptions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                scrollPaneSearchOptions.setVisible(!scrollPaneSearchOptions.isVisible());
-                buttonOptions.setText(scrollPaneSearchOptions.isVisible() ? strHideOpts : strShowOpts);
-                buttonOptions.setIcon(!scrollPaneSearchOptions.isVisible() ? GUIMediator.getThemeImage("search_tools_left") : GUIMediator.getThemeImage("search_tools_right"));
-                buttonOptions.setHorizontalTextPosition(!scrollPaneSearchOptions.isVisible() ? SwingConstants.RIGHT : SwingConstants.LEFT);
+        buttonOptions.addActionListener(e -> {
+            scrollPaneSearchOptions.setVisible(!scrollPaneSearchOptions.isVisible());
+            buttonOptions.setText(scrollPaneSearchOptions.isVisible() ? strHideOpts : strShowOpts);
+            buttonOptions.setIcon(!scrollPaneSearchOptions.isVisible() ? GUIMediator.getThemeImage("search_tools_left") : GUIMediator.getThemeImage("search_tools_right"));
+            buttonOptions.setHorizontalTextPosition(!scrollPaneSearchOptions.isVisible() ? SwingConstants.RIGHT : SwingConstants.LEFT);
 
-                if (scrollPaneSearchOptions.isVisible()) {
-                    searchOptionsPanel.onOptionsPanelShown();
-                    UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
-                }
+            if (scrollPaneSearchOptions.isVisible()) {
+                searchOptionsPanel.onOptionsPanelShown();
+                UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
             }
         });
 

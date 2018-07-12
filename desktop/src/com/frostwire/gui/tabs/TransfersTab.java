@@ -299,6 +299,7 @@ public final class TransfersTab extends AbstractTab {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (transfersFilterModeListener != null) {
+                filterText.setText("");
                 transfersFilterModeListener.onFilterUpdate(filterMode, filterText.getText());
             }
         }

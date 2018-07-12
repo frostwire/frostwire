@@ -76,7 +76,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      */
     private static BTDownloadMediator INSTANCE;
 
-    void selectBTDownload(BTDownload lastSelectedDownload) {
+    public void selectBTDownload(BTDownload lastSelectedDownload) {
         if (lastSelectedDownload == null) {
             return;
         }
@@ -338,7 +338,20 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         if (TABLE == null || DATA_MODEL == null) {
             return;
         }
+        BTDownload[] selectedDownloaders = getSelectedDownloaders();
         DATA_MODEL.filtersChanged();
+        if (selectedDownloaders.length == 1) {
+            // try to select again as filtersChanged triggers a table rebuild and selection will be lost
+            List<BTDownload> downloads = getDownloads();
+            for (BTDownload d : downloads) {
+                if (selectedDownloaders[0] == d) {
+                    selectBTDownload(d);
+                    ensureDownloadVisible(d);
+                    return;
+                }
+            }
+        }
+
     }
 
     /**
@@ -761,6 +774,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     } else {
                         GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
                     }
+
+
 
                 } catch (Exception e) {
                     e.printStackTrace();

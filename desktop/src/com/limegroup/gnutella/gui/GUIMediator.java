@@ -19,6 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.HideExitDialog;
+import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.library.LibraryMediator;
@@ -26,6 +27,7 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
@@ -656,8 +658,19 @@ public final class GUIMediator {
     }
 
     public final void openTorrentFile(File torrentFile, boolean partialSelection) {
-        Runnable onOpenRunnable = () -> showTransfers(TransfersTab.FilterMode.ALL);
-        getBTDownloadMediator().openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
+        BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
+        List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
+
+        Runnable onOpenRunnable = () -> {
+            showTransfers(TransfersTab.FilterMode.ALL);
+            TorrentInfo ti = new TorrentInfo(torrentFile);
+            for (BTDownload btDownload : downloads) {
+                if (btDownload.getHash().equals(ti.infoHash().toHex())) {
+                    btDownloadMediator.selectBTDownload(btDownload);
+                }
+            }
+        };
+        btDownloadMediator.openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
 
     }
 
