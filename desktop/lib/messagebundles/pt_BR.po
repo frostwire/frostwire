@@ -1226,7 +1226,7 @@ msgstr "Link copiado para a Área de Transferência."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:447
 msgid "Copy Magnet URL to Clipboard"
-msgstr "Copiar URL Magnet para a Área de Transferência"
+msgstr "Copiar URL de Magnet para a Área de Transferência"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:454
 msgid "Magnet copied to clipboard."
@@ -1442,7 +1442,7 @@ msgstr "Infohash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr "URL magnético"
+msgstr "URL de Magnet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
 msgid "Created On"
