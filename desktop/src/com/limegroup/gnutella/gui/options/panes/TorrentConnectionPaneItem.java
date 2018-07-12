@@ -132,7 +132,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         BTEngine btEngine = BTEngine.getInstance();
         applyDHTOptions(btEngine);
         applyVPNDropProtectionOption(btEngine);
@@ -141,7 +141,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         btEngine.maxActiveDownloads(MAX_ACTIVE_DOWNLOADS_FIELD.getValue());
         btEngine.maxActiveSeeds(MAX_ACTIVE_SEEDS_FIELD.getValue());
 
-        return false;
+        return isDirty();
     }
 
     private void applyDHTOptions(BTEngine btEngine) {
