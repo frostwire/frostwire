@@ -206,7 +206,7 @@ msgstr "Effacer inactif (complétés) les transferts de la liste des transferts.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:446
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:331
 msgid "Copy Magnet"
-msgstr "Copier l'Aimant"
+msgstr "Copier Magnet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:351
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadActions.java:352
@@ -1244,11 +1244,11 @@ msgstr "Lien copié dans le presse-papier"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:447
 msgid "Copy Magnet URL to Clipboard"
-msgstr "Copier l'URL Aimant dans le presse-papier"
+msgstr "Copier l'URL de Magnet dans le presse-papier"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:454
 msgid "Magnet copied to clipboard."
-msgstr "Lien Aimant copié dans le presse-papier."
+msgstr "Lien Magnet copié dans le presse-papier."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSaveFolderComponent.java:51
 msgid "Torrent Data Save Folder"
@@ -1458,7 +1458,7 @@ msgstr "InfoHash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr "URL de l'aimant"
+msgstr "URL de l'Magnet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
 msgid "Created On"
@@ -3636,7 +3636,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:44
 msgid "O&pen .Torrent or Magnet"
-msgstr "&Ouvrir un .Torrent ou un Aimant"
+msgstr "&Ouvrir un .Torrent ou un Magnet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:46
 msgid "Opens a magnet link or torrent file"
@@ -3644,7 +3644,7 @@ msgstr "Ouvre un lien “Aimant:” ou un fichier “.torrent”."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:70
 msgid "Download .Torrent or Magnet or YouTube video link"
-msgstr "Téléchargez un .Torrent ou un Aimant ou un lien de vidéo YouTube"
+msgstr "Téléchargez un .Torrent ou un Magnet ou un lien de vidéo YouTube"
 
 #. panel.add(new MultiLineLabel(I18n.tr("Type a magnet link, the file path or web address of a torrent file, or a YouTube Web address and FrostWire will start downloading it for you."),
 #. true), constraints);
