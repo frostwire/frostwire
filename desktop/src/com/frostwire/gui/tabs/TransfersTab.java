@@ -112,6 +112,7 @@ public final class TransfersTab extends AbstractTab {
             } else if (selected instanceof BittorrentDownload) {
                 BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
                 showTransferDetailsComponent(bittorrentDownload);
+                downloadMediator.ensureDownloadVisible(bittorrentDownload);
             }
         }
     }
@@ -154,6 +155,14 @@ public final class TransfersTab extends AbstractTab {
 
         if (!transferDetailComponentWasAlreadyVisible) {
             transferDetailComponent.setVisible(true);
+
+            int totalComponentsHeight = (int) (transferDetailSplitter.getTopComponent().getMinimumSize().getHeight() +
+                                transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight());
+
+            if (lastSplitterLocationWithDetailsVisible >= totalComponentsHeight) {
+                lastSplitterLocationWithDetailsVisible = (int) transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight();
+            }
+
             transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
         }
     }

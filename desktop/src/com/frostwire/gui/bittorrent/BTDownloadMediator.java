@@ -76,10 +76,35 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      */
     private static BTDownloadMediator INSTANCE;
 
-    public void selectBTDownload(BTDownload lastSelectedDownload) {
+    void selectBTDownload(BTDownload lastSelectedDownload) {
+        if (lastSelectedDownload == null) {
+            return;
+        }
         BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(lastSelectedDownload);
+        if (btDownloadDataLine == null) {
+            return;
+        }
         int row = DATA_MODEL.getRow(btDownloadDataLine);
+        if (row == -1) {
+            return;
+        }
         TABLE.setSelectedRow(row);
+        TABLE.ensureRowVisible(row);
+    }
+
+    public void ensureDownloadVisible(BTDownload download) {
+        if (download == null) {
+            return;
+        }
+        BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(download);
+        if (btDownloadDataLine == null) {
+            return;
+        }
+        int row = DATA_MODEL.getRow(btDownloadDataLine);
+        if (row == -1) {
+            return;
+        }
+        TABLE.ensureRowVisible(row);
     }
 
     public interface BTDownloadSelectionListener {
