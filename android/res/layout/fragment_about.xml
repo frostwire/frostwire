@@ -160,9 +160,10 @@
             android:text="@string/support_frostwire"
             android:textColor="@color/basic_blue_highlight_dark"
             android:textSize="@dimen/text_medium"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <ImageView
+            android:id="@+id/fragment_about_support_frostwire_divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
