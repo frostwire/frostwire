@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,11 +47,8 @@ public class PartialFilesDialog extends JDialog {
     private RowFilter<Object, Object> textBasedFilter;
 
     private JPanel panel;
-    private JLabel labelTitle;
     private JTable _table;
-    private JScrollPane _scrollPane;
     private JButton _buttonOK;
-    private JButton _buttonCancel;
 
     private final TorrentInfo _torrent;
     private final String _name;
@@ -61,17 +58,17 @@ public class PartialFilesDialog extends JDialog {
     private JCheckBox _checkBoxToggleAll;
 
     /** Has the table been painted at least once? */
-    protected boolean tablePainted;
+    private boolean tablePainted;
 
-    public PartialFilesDialog(JFrame frame, File torrentFile) {
+    PartialFilesDialog(JFrame frame, File torrentFile) {
         this(frame, new TorrentInfo(torrentFile), torrentFile.getName());
     }
 
-    public PartialFilesDialog(JFrame frame, byte[] bytes, String name) {
+    PartialFilesDialog(JFrame frame, byte[] bytes, String name) {
         this(frame, TorrentInfo.bdecode(bytes), name);
     }
 
-    public PartialFilesDialog(JFrame frame, TorrentInfo torrent, String name) {
+    private PartialFilesDialog(JFrame frame, TorrentInfo torrent, String name) {
         super(frame, I18n.tr("Select files to download"));
 
         this._torrent = torrent;
@@ -128,12 +125,8 @@ public class PartialFilesDialog extends JDialog {
 
     private void setupCancelButton() {
         GridBagConstraints c;
-        _buttonCancel = new JButton(I18n.tr("Cancel"));
-        _buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                buttonCancel_actionPerformed(e);
-            }
-        });
+        JButton _buttonCancel = new JButton(I18n.tr("Cancel"));
+        _buttonCancel.addActionListener(this::buttonCancel_actionPerformed);
         c = new GridBagConstraints();
         c.insets = new Insets(4, 0, 8, 6);
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -146,11 +139,7 @@ public class PartialFilesDialog extends JDialog {
     private void setupOkButton() {
         GridBagConstraints c;
         _buttonOK = new JButton(I18n.tr("Download Selected Files Only"));
-        _buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                buttonOK_actionPerformed(e);
-            }
-        });
+        _buttonOK.addActionListener(this::buttonOK_actionPerformed);
 
         c = new GridBagConstraints();
         c.insets = new Insets(4, 100, 8, 4);
@@ -183,8 +172,7 @@ public class PartialFilesDialog extends JDialog {
                 } catch (Exception e) {
                     tablePainted = false;
                 }
-
-            };
+            }
         };
 
         _table.setPreferredScrollableViewportSize(new Dimension(600, 300));
@@ -204,7 +192,7 @@ public class PartialFilesDialog extends JDialog {
         _table.getColumnModel().getColumn(4).setPreferredWidth(60);
         _table.getColumnModel().getColumn(5).setPreferredWidth(60);
 
-        _scrollPane = new JScrollPane(_table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane _scrollPane = new JScrollPane(_table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         _table.setFillsViewportHeight(true);
         _table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         c = new GridBagConstraints();
@@ -223,12 +211,7 @@ public class PartialFilesDialog extends JDialog {
     private void setupToggleAllSelectionCheckbox() {
         GridBagConstraints c;
         _checkBoxToggleAll = new JCheckBox(I18n.tr("Select/Unselect all files"), true);
-        _checkBoxToggleAll.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                onCheckBoxToggleAll(e);
-            }
-        });
+        _checkBoxToggleAll.addItemListener(e -> onCheckBoxToggleAll());
 
         c = new GridBagConstraints();
         c.gridx = 0;
@@ -259,7 +242,7 @@ public class PartialFilesDialog extends JDialog {
 
                 _checkBoxToggleAll.setSelected(false);
 
-                TableRowSorter<TorrentTableModel> sorter = new TableRowSorter<TorrentTableModel>(_model);
+                TableRowSorter<TorrentTableModel> sorter = new TableRowSorter<>(_model);
                 sorter.setRowFilter(textBasedFilter);
                 _table.setRowSorter(sorter);
             }
@@ -288,7 +271,7 @@ public class PartialFilesDialog extends JDialog {
                 title = _name.replace("_", " ").replace(".torrent", "").replace("&quot;", "\"");
             }
         }
-        labelTitle = new JLabel(title);
+        JLabel labelTitle = new JLabel(title);
         labelTitle.setFont(new Font("Dialog", Font.BOLD, 18));
         labelTitle.setHorizontalAlignment(SwingConstants.LEFT);
         c = new GridBagConstraints();
@@ -303,7 +286,7 @@ public class PartialFilesDialog extends JDialog {
         panel.add(labelTitle, c);
     }
 
-    protected void onCheckBoxToggleAll(ItemEvent e) {
+    private void onCheckBoxToggleAll() {
         _model.setAllSelected(_checkBoxToggleAll.isSelected());
         _buttonOK.setEnabled(_checkBoxToggleAll.isSelected());
     }
@@ -311,9 +294,8 @@ public class PartialFilesDialog extends JDialog {
     /**
      * Change the value of the checkbox but don't trigger any events.
      * (We probably need something generic for this, this pattern keeps appearing all over)
-     * @param allSelected
      */
-    public void checkboxToggleAllSetSelectedNoTrigger(boolean allSelected) {
+    private void checkboxToggleAllSetSelectedNoTrigger(boolean allSelected) {
         ItemListener[] itemListeners = _checkBoxToggleAll.getItemListeners();
 
         for (ItemListener l : itemListeners) {
@@ -327,22 +309,20 @@ public class PartialFilesDialog extends JDialog {
 
     }
 
-    protected void buttonOK_actionPerformed(ActionEvent e) {
-
+    private void buttonOK_actionPerformed(ActionEvent e) {
         TorrentFileInfo[] fileInfos = _model.getFileInfos();
         _filesSelection = new boolean[fileInfos.length];
         for (int i = 0; i < _filesSelection.length; i++) {
             _filesSelection[i] = fileInfos[i].selected;
         }
-
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
 
-    protected void buttonCancel_actionPerformed(ActionEvent e) {
+    private void buttonCancel_actionPerformed(ActionEvent e) {
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
 
-    public boolean[] getFilesSelection() {
+    boolean[] getFilesSelection() {
         return _filesSelection;
     }
 
@@ -351,17 +331,17 @@ public class PartialFilesDialog extends JDialog {
         private final LabeledTextField labelFilter;
         private final int columnIndex;
 
-        public RowFilterExtension(LabeledTextField labelFilter, int columnIndex) {
+        RowFilterExtension(LabeledTextField labelFilter, int columnIndex) {
             this.labelFilter = labelFilter;
             this.columnIndex = columnIndex;
         }
 
         @Override
-        public boolean include(RowFilter.Entry<? extends Object, ? extends Object> entry) {
+        public boolean include(RowFilter.Entry<?, ?> entry) {
 
             Object value = entry.getValue(columnIndex);
 
-            String fileName = value != null && value instanceof String ? (String) value : "";
+            String fileName = value instanceof String ? (String) value : "";
 
             String[] tokens = labelFilter.getText().split(" ");
 
@@ -382,7 +362,7 @@ public class PartialFilesDialog extends JDialog {
         private final TorrentInfo _torrent;
         private final TorrentFileInfo[] _fileInfos;
 
-        public TorrentTableModel(TorrentInfo torrent) {
+        TorrentTableModel(TorrentInfo torrent) {
             _torrent = torrent;
             _fileInfos = new TorrentFileInfo[torrent.numFiles()];
             FileStorage fs = torrent.files();
@@ -468,37 +448,38 @@ public class PartialFilesDialog extends JDialog {
             _buttonOK.setEnabled(!isNoneSelected());
         }
 
-        public void setAllSelected(boolean selected) {
-            for (int i = 0; i < _fileInfos.length; i++) {
-                _fileInfos[i].selected = selected;
+        void setAllSelected(boolean selected) {
+            for (TorrentFileInfo _fileInfo : _fileInfos) {
+                _fileInfo.selected = selected;
             }
             fireTableDataChanged();
         }
 
-        public boolean isAllSelected() {
-            for (int i = 0; i < _fileInfos.length; i++) {
-                if (!_fileInfos[i].selected) {
+        boolean isAllSelected() {
+            for (TorrentFileInfo _fileInfo : _fileInfos) {
+                if (!_fileInfo.selected) {
                     return false;
                 }
             }
             return true;
         }
 
-        public boolean isNoneSelected() {
-            for (int i = 0; i < _fileInfos.length; i++) {
-                if (_fileInfos[i].selected) {
+        boolean isNoneSelected() {
+            for (TorrentFileInfo _fileInfo : _fileInfos) {
+                if (_fileInfo.selected) {
                     return false;
                 }
             }
             return true;
         }
 
-        public TorrentFileInfo[] getFileInfos() {
+        TorrentFileInfo[] getFileInfos() {
             return _fileInfos;
         }
 
         private String guessHumanType(String extension) {
             try {
+                //noinspection ConstantConditions
                 return NamedMediaType.getFromExtension(extension).getMediaType().getDescriptionKey();
             } catch (Throwable t) {
                 return I18n.tr("Unknown");
