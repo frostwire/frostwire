@@ -159,7 +159,7 @@ public class HexHivePanel extends JPanel {
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
 
-        graphics.fillRect(leftPadding, topPadding, drawingProperties.width - rightPadding, drawingProperties.height - bottomPadding);
+        graphics.fillRect(0, 0, drawingProperties.width, drawingProperties.height);
 
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

@@ -47,10 +47,10 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 0xf2f2f2,
                 0x33b5e5,
                 0xffffff,
+                5,
                 0,
                 0,
-                0,
-                0,
+                5,
                 true);
         hexHivePanelAdapter = new HexHiveAdapter();
 
