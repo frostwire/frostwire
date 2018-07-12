@@ -255,7 +255,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return false;
         }
         final BTDownload btDownload = findBTDownload(saveLocation);
-        return btDownload != null && isActive(btDownload);
+        return isActive(btDownload);
     }
 
     @Override
@@ -496,7 +496,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 btdownloadList.add(btDownloadDataLine.getInitializeObject());
             }
         }
-        return btdownloadList.toArray(new BTDownload[btdownloadList.size()]);
+        return btdownloadList.toArray(new BTDownload[0]);
     }
 
     /**
@@ -796,7 +796,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             BTDownload downloader = line.getInitializeObject();
             downloaders.add(downloader);
         }
-        return downloaders.toArray(new BTDownload[downloaders.size()]);
+        return downloaders.toArray(new BTDownload[0]);
     }
 
     public List<BTDownload> getDownloads() {

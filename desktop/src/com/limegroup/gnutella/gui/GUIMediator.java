@@ -656,12 +656,7 @@ public final class GUIMediator {
     }
 
     public final void openTorrentFile(File torrentFile, boolean partialSelection) {
-        Runnable onOpenRunnable = new Runnable() {
-            @Override
-            public void run() {
-                showTransfers(TransfersTab.FilterMode.ALL);
-            }
-        };
+        Runnable onOpenRunnable = () -> showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
 
     }
