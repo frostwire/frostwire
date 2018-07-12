@@ -25,6 +25,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.frostwire.android.BuildConfig;
@@ -70,10 +71,6 @@ public final class AboutFragment extends AbstractFragment {
         Button loveFrostWireButton = findView(rootView, R.id.fragment_about_love_frostwire);
         setupClickUrl(loveFrostWireButton, Constants.FROSTWIRE_GIVE_URL + "plus-about");
 
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            loveFrostWireButton.setVisibility(View.GONE);
-        }
-
         ImageButton facebookButton = findView(rootView, R.id.fragment_about_facebook_button);
         ImageButton twitterButton = findView(rootView, R.id.fragment_about_twitter_button);
         ImageButton redditButton = findView(rootView, R.id.fragment_about_reddit_button);
@@ -89,6 +86,7 @@ public final class AboutFragment extends AbstractFragment {
 
         //Remaining elements including text content
         TextView supportFrostWire = findView(rootView, R.id.fragment_about_support_frostwire);
+        ImageView supportFrostWireDivider = findView(rootView, R.id.fragment_about_support_frostwire_divider);
         TextView translateHelp = findView(rootView, R.id.fragment_about_translate);
         TextView contactUs = findView(rootView, R.id.fragment_about_contact_us);
 
@@ -99,6 +97,12 @@ public final class AboutFragment extends AbstractFragment {
         TextView content = findView(rootView, R.id.fragment_about_content);
         content.setText(Html.fromHtml(getAboutText()));
         content.setMovementMethod(LinkMovementMethod.getInstance());
+
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            loveFrostWireButton.setVisibility(View.GONE);
+            supportFrostWire.setVisibility(View.GONE);
+            supportFrostWireDivider.setVisibility(View.GONE);
+        }
     }
 
     private String getAboutText() {
