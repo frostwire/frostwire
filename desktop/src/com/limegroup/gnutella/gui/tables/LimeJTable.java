@@ -161,10 +161,7 @@ public class LimeJTable extends JTable implements JSortTable {
      */
     public void ensureRowVisible(int row) {
         if (row != -1) {
-            Rectangle cellRect = getCellRect(row, 0, false);
-            Rectangle visibleRect = getVisibleRect();
-            if (!visibleRect.intersects(cellRect))
-                scrollRectToVisible(cellRect);
+            scrollRectToVisible(getCellRect(row, 0, true));
         }
     }
 
@@ -179,12 +176,11 @@ public class LimeJTable extends JTable implements JSortTable {
      * Determines if the given row is visible.
      */
     public boolean isRowVisible(int row) {
-        if (row != -1) {
-            Rectangle cellRect = getCellRect(row, 0, false);
-            Rectangle visibleRect = getVisibleRect();
-            return visibleRect.intersects(cellRect);
-        } else
+        if (row == -1) {
             return false;
+        }
+        Rectangle cellRect = getCellRect(row, 0, false);
+        return getVisibleRect().intersects(cellRect);
     }
 
     /**
