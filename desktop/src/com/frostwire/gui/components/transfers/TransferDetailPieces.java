@@ -96,6 +96,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     private void updateTotalPiecesLabel(String totalPieces) {
         totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
+        totalPiecesLabel.paintImmediately(totalPiecesLabel.getVisibleRect());
     }
 
     ////////////////////////////////////////////////////////////////////////////////
