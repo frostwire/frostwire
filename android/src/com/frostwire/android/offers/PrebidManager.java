@@ -131,7 +131,7 @@ public final class PrebidManager {
 
     // TODO: Interstitial Placement support -> initInterstitial(Placement)
 
-    public void onBannerLoaded(final Context context, final MoPubView banner, final Placement placement) {
+    public void onBannerLoaded(final MoPubView banner, final Placement placement) {
         if (!manager.initialized()) {
             LOG.info("onBannerLoaded: aborted, Prebid not ready yet for attachBids");
             return;
@@ -141,14 +141,14 @@ public final class PrebidManager {
         }
         AdUnit adUnit = getAdUnit(placement);
         if (adUnit != null) {
-            Prebid.attachBids(banner, adUnit.getCode(), context);
+            Prebid.attachBids(banner, adUnit.getCode(), appContext);
             LOG.info("onBannerLoaded: Prebid.attachBids invoked on placement <" + placement + ">");
         } else {
             LOG.warn("onBannerLoaded: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
         }
     }
 
-    public void onBannerFailed(final Context context, final MoPubView banner, final Placement placement, MoPubErrorCode errorCode) {
+    public void onBannerFailed(final MoPubView banner, final Placement placement, MoPubErrorCode errorCode) {
         if (!manager.initialized()) {
             LOG.info("onBannerFailed: aborted, Prebid not ready yet for attachBids");
             return;
@@ -158,7 +158,7 @@ public final class PrebidManager {
         }
         AdUnit adUnit = getAdUnit(placement);
         if (adUnit != null) {
-            Prebid.attachBids(banner, adUnit.getConfigId(), context);
+            Prebid.attachBids(banner, adUnit.getConfigId(), appContext);
             LOG.info("onBannerFailed: Prebid.attachBids invoked for placement <" + placement + ">, errorCode: " + errorCode);
         } else {
             LOG.warn("onBannerFailed: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
