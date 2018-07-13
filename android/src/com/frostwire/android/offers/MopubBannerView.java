@@ -170,7 +170,7 @@ public class MopubBannerView extends LinearLayout {
             }
 
             if (!Offers.MOPUB.started()) {
-                LOG.warn("MopubSquaredBanner.loadMoPubBanner() abort moPubView loading, MOPUB not started");
+                LOG.warn("MopubBannerView.loadMoPubBanner() abort moPubView loading, MOPUB not started");
                 return;
             }
 
@@ -182,7 +182,8 @@ public class MopubBannerView extends LinearLayout {
             try {
                 moPubView.loadAd();
             } catch (Throwable e) {
-                LOG.warn("MopubSquaredBanner banner could not be loaded", e);
+                LOG.warn("MopubBannerView banner could not be loaded", e);
+                e.printStackTrace();
                 loadFallbackBanner(adUnitId);
                 moPubView.destroy();
             }
