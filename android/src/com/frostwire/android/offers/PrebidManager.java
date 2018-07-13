@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.android.offers;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -42,10 +42,11 @@ import java.util.HashMap;
  * @author marcelinkaaa
  *         Created on 2/22/18.
  */
-
-
 public final class PrebidManager {
+
     private final static Logger LOG = Logger.getLogger(PrebidManager.class);
+
+    private final Context appContext;
     private boolean initialized = false;
     private boolean enabled = true;
     private final ArrayList<AdUnit> adUnits;
@@ -76,17 +77,18 @@ public final class PrebidManager {
         }
     }
 
-    public static PrebidManager getInstance(final Context applicationContext) {
+    public static PrebidManager getInstance(@NonNull Context context) {
         synchronized (initLock) {
             if (manager == null) {
                 LOG.info("Creating PrebidManager singleton");
-                manager = new PrebidManager(applicationContext);
+                manager = new PrebidManager(context.getApplicationContext());
             }
             return manager;
         }
     }
 
-    private PrebidManager(final Context applicationContext) {
+    private PrebidManager(Context context) {
+        this.appContext = context;
         adUnits = new ArrayList<>();
         placementAdUnitHashMap = new HashMap<>();
         if (Offers.disabledAds()) {
@@ -102,7 +104,7 @@ public final class PrebidManager {
             return;
         }
         initAdUnits();
-        initializePrebid(applicationContext);
+        initializePrebid();
     }
 
     public boolean initialized() {
@@ -167,7 +169,7 @@ public final class PrebidManager {
         return placementAdUnitHashMap.get(placement);
     }
 
-    private void initializePrebid(Context applicationContext) {
+    private void initializePrebid() {
         if (initialized) {
             return;
         }
@@ -181,7 +183,7 @@ public final class PrebidManager {
             String ACCOUNT_ID = "01e786a8-b070-4fb3-a21f-a76866f15c80";
             TargetingParams.setLocationDecimalDigits(2);
             TargetingParams.setLocationEnabled(true);
-            Prebid.init(applicationContext, adUnits, ACCOUNT_ID, Prebid.AdServer.MOPUB, Prebid.Host.APPNEXUS);
+            Prebid.init(appContext, adUnits, ACCOUNT_ID, Prebid.AdServer.MOPUB, Prebid.Host.APPNEXUS);
             initialized = true;
             enabled = true;
             LOG.info("initializePrebid(): success");
