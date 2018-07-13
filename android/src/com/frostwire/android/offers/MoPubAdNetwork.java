@@ -60,10 +60,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
 
         SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
-        MoPub.initializeSdk(activity, sdkConfiguration,
-                () -> LOG.info("MoPub initialization finished"));
-        start();
-        loadNewInterstitial(activity);
+        MoPub.initializeSdk(activity, sdkConfiguration, () -> {
+            LOG.info("MoPub initialization finished");
+            start();
+            loadNewInterstitial(activity);
+        });
     }
 
     private void initPlacementMappings(boolean isTablet) {
