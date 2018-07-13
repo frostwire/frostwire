@@ -20,9 +20,12 @@ package com.frostwire.gui.tabs;
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
 import com.frostwire.util.Logger;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
+import org.limewire.concurrent.ExecutorsHelper;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -112,7 +115,17 @@ public final class TransfersTab extends AbstractTab {
             } else if (selected instanceof BittorrentDownload) {
                 BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
                 showTransferDetailsComponent(bittorrentDownload);
-                downloadMediator.ensureDownloadVisible(bittorrentDownload);
+                downloadMediator.getComponent().validate();
+                // Hack. Need to let the UI thread re-calculate the dimensions
+                // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
+                // to calculate the new location of the row that's to be scrolled to.
+                BackgroundExecutorService.schedule(() -> {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {
+                    }
+                    GUIMediator.safeInvokeLater(() -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
+                });
             }
         }
     }
@@ -151,18 +164,15 @@ public final class TransfersTab extends AbstractTab {
             return;
         }
         boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
+        transferDetailComponent.setVisible(true);
         transferDetailComponent.updateData(selected);
 
         if (!transferDetailComponentWasAlreadyVisible) {
-            transferDetailComponent.setVisible(true);
-
             int totalComponentsHeight = (int) (transferDetailSplitter.getTopComponent().getMinimumSize().getHeight() +
                                 transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight());
-
             if (lastSplitterLocationWithDetailsVisible >= totalComponentsHeight) {
                 lastSplitterLocationWithDetailsVisible = (int) transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight();
             }
-
             transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
         }
     }

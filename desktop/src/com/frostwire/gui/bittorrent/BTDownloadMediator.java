@@ -104,6 +104,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         if (row == -1) {
             return;
         }
+        TABLE.validate();
         TABLE.ensureRowVisible(row);
     }
 
