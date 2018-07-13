@@ -36,7 +36,6 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     private HexHivePanel hexHivePanel;
     private HexHiveAdapter hexHivePanelAdapter;
     private boolean pieceSizeAlreadySet = false;
-    private boolean totalPiecesAlreadySet = false;
     private BittorrentDownload bittorrentDownload;
 
     TransferDetailPieces() {
@@ -73,7 +72,6 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     @Override
     public void updateData(BittorrentDownload btDownload) {
         pieceSizeAlreadySet = (bittorrentDownload == btDownload);
-        totalPiecesAlreadySet = (bittorrentDownload == btDownload);
         bittorrentDownload = btDownload;
 
         hexHivePanelAdapter.updateData(bittorrentDownload);
@@ -97,10 +95,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     }
 
     private void updateTotalPiecesLabel(String totalPieces) {
-        if (!totalPiecesAlreadySet) {
-            totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
-            totalPiecesAlreadySet = true;
-        }
+        totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
     }
 
     ////////////////////////////////////////////////////////////////////////////////
