@@ -82,8 +82,8 @@ public final class PrebidManager {
                 LOG.info("Creating PrebidManager singleton");
                 manager = new PrebidManager(applicationContext);
             }
+            return manager;
         }
-        return manager;
     }
 
     private PrebidManager(final Context applicationContext) {
