@@ -24,6 +24,9 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.common.SdkInitializationListener;
 import com.mopub.mobileads.MoPubInterstitial;
 
 import java.util.HashMap;
@@ -56,16 +59,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         }
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
 
-        // Note 1: Not performing this .initializeSdk(...) call for now.
-        // It's only needed for personalized ads and rewarded videos which we don't have.
-        // It was causing the FrostWire process to be relaunched after a shutdown.
-
-        // Note 2: unsure how this works for many ads, and multiple networks.
-        // for now just adding the main search banner seems to work for other
-        // banner units
-        //SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
-        //MoPub.initializeSdk(activity, sdkConfiguration, null);
-        // TODO: Note 3: the call to initializeSdk is probably a MUST
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
+        MoPub.initializeSdk(activity, sdkConfiguration,
+                () -> LOG.info("MoPub initialization finished"));
         start();
         loadNewInterstitial(activity);
     }
