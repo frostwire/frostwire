@@ -166,6 +166,10 @@ public final class TransfersTab extends AbstractTab {
             Container parent = transferDetailSplitter.getParent();
             int h = parent.getSize().height;
             lastSplitterLocationWithDetailsVisible = 2 * h / 3;
+            // special case of too much space
+            if (h > 800) {
+                lastSplitterLocationWithDetailsVisible = h - 500;
+            }
             transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
         }
     }
