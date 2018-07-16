@@ -717,4 +717,6 @@
     <string name="use_tpb_summary">TPB అనేది అయస్కాంత ఆధారితది, Wi-Fi లో పనిచేస్తుంది</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ఉచిత 7 రోజుల ట్రయల్</string>
     <string name="play_store_out_of_sync">Play Store సమకాలీకరించాల్సిన అవసరం ఉంది, కొన్ని నిమిషాలు వేచి ఉండండి</string>
+    <string name="contact_us">మమ్మల్ని సంప్రదించండి</string>
+    <string name="join_frostwire_chat">ఫ్రోస్ట్వైర్ చాట్లో చేరండి</string>
 </resources>

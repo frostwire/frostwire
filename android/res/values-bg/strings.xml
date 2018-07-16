@@ -716,4 +716,6 @@
     <string name="vpn_find_out_more">Открийте повече</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Безплатен 7-дневен пробен период</string>
     <string name="play_store_out_of_sync">Google Play Магазин трябва да се синхронизира, изчакайте няколко минути</string>
+    <string name="contact_us">Свържете се с нас</string>
+    <string name="join_frostwire_chat">Присъединете се към FrostWire чата</string>
 </resources>

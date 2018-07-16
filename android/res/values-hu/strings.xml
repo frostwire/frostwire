@@ -719,4 +719,6 @@
     <string name="add_tracker">Tracker hozzáadása</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Ingyenes 7 napos próba</string>
     <string name="play_store_out_of_sync">Szinkronizálnia kell a Google Play Áruházat, várjon néhány percet</string>
+    <string name="contact_us">Lépjen kapcsolatba velünk</string>
+    <string name="join_frostwire_chat">Csatlakozzon a FrostWire chathez</string>
 </resources>

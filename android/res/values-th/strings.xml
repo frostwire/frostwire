@@ -674,4 +674,6 @@
     <string name="play_store_out_of_sync">Google Play สโตร์ต้องซิงโครไนซ์รอสักครู่</string>
     <string name="one_file_shared">ไฟล์หนึ่งไฟล์ถูกแชร์กับอุปกรณ์ FrostWire บนเครือข่าย Wi-Fi เดียวกัน</string>
     <string name="n_files_shared">มีการแชร์ไฟล์ %d ไฟล์กับอุปกรณ์ FrostWire บนเครือข่าย Wi-Fi เดียวกัน</string>
+    <string name="contact_us">ติดต่อเรา</string>
+    <string name="join_frostwire_chat">เข้าร่วมการแชท FrostWire</string>
 </resources>

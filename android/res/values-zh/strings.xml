@@ -719,4 +719,6 @@
     <string name="title_activity_transfer_detail">转移细节</string>
     <string name="piece_size_header">件大小：</string>
     <string name="add_tracker">添加跟踪器</string>
+    <string name="contact_us">联系我们</string>
+    <string name="join_frostwire_chat">加入FrostWire聊天</string>
 </resources>
