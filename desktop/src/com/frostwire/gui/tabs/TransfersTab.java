@@ -163,11 +163,9 @@ public final class TransfersTab extends AbstractTab {
         transferDetailComponent.updateData(selected);
 
         if (!transferDetailComponentWasAlreadyVisible) {
-            int totalComponentsHeight = (int) (transferDetailSplitter.getTopComponent().getMinimumSize().getHeight() +
-                    transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight());
-            if (lastSplitterLocationWithDetailsVisible >= totalComponentsHeight) {
-                lastSplitterLocationWithDetailsVisible = (int) transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight();
-            }
+            Container parent = transferDetailSplitter.getParent();
+            int h = parent.getSize().height;
+            lastSplitterLocationWithDetailsVisible = 2 * h / 3;
             transferDetailSplitter.setDividerLocation(lastSplitterLocationWithDetailsVisible);
         }
     }
