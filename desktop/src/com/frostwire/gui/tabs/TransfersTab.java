@@ -112,7 +112,6 @@ public final class TransfersTab extends AbstractTab {
             } else if (selected instanceof BittorrentDownload) {
                 BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
                 showTransferDetailsComponent(bittorrentDownload);
-                downloadMediator.getComponent().validate();
                 // Hack. Need to let the UI thread re-calculate the dimensions
                 // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
                 // to calculate the new location of the row that's to be scrolled to.
@@ -153,7 +152,6 @@ public final class TransfersTab extends AbstractTab {
         }
         lastSplitterLocationWithDetailsVisible = transferDetailSplitter.getDividerLocation();
         transferDetailComponent.setVisible(false);
-        mainComponent.validate();
     }
 
     private void showTransferDetailsComponent(BittorrentDownload selected) {
