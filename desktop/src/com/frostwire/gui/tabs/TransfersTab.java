@@ -134,7 +134,9 @@ public final class TransfersTab extends AbstractTab {
             transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             transferDetailSplitter.setDividerLocation(270);
             transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
-            transferDetailSplitter.add(downloadMediator.getComponent());
+            JComponent transfersComponent = downloadMediator.getComponent();
+            transfersComponent.setMinimumSize(new Dimension(100, 200));
+            transferDetailSplitter.add(transfersComponent);
             transferDetailComponent = new TransferDetailComponent();
             transferDetailSplitter.add(transferDetailComponent);
             mainComponent.add(transferDetailSplitter, "cell 0 1 2 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
