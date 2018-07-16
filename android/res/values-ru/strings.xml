@@ -720,4 +720,6 @@
     <string name="vpn_find_out_more">Узнать больше</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Бесплатная 7-дневная пробная версия</string>
     <string name="play_store_out_of_sync">Play Store необходимо синхронизировать, подождать несколько минут</string>
+    <string name="contact_us">Свяжитесь с нами</string>
+    <string name="join_frostwire_chat">Присоединяйтесь к чату FrostWire</string>
 </resources>

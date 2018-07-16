@@ -719,4 +719,6 @@
     <string name="title_activity_transfer_detail">Detail prevodu</string>
     <string name="piece_size_header">Veľkosť kusu:</string>
     <string name="add_tracker">Pridať sledovač</string>
+    <string name="contact_us">Kontaktuj nás</string>
+    <string name="join_frostwire_chat">Zapojte sa do chatu FrostWire</string>
 </resources>

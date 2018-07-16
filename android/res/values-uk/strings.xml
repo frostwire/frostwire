@@ -719,4 +719,6 @@
     <string name="piece_size_header">Розмір шрифту:</string>
     <string name="add_tracker">Додати трекер</string>
     <string name="play_store_out_of_sync">Google Play Маркет потрібно синхронізувати, зачекайте декілька хвилин</string>
+    <string name="contact_us">Зв\'яжіться з нами</string>
+    <string name="join_frostwire_chat">Приєднуйтесь до чату FrostWire</string>
 </resources>

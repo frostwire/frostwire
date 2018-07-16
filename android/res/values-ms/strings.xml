@@ -720,4 +720,6 @@
     <string name="title_activity_transfer_detail">Butiran Pemindahan</string>
     <string name="piece_size_header">Saiz potongan:</string>
     <string name="add_tracker">Tambah tracker</string>
+    <string name="contact_us">Hubungi Kami</string>
+    <string name="join_frostwire_chat">Sertai sembang FrostWire</string>
 </resources>

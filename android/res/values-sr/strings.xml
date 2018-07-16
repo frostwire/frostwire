@@ -721,4 +721,6 @@
     <string name="piece_size_header">Величина комада:</string>
     <string name="add_tracker">Додај траку</string>
     <string name="play_store_out_of_sync">Гоогле Плаи продавница мора да се синхронизује, сачекајте неколико минута</string>
+    <string name="contact_us">Контактирајте нас</string>
+    <string name="join_frostwire_chat">Придружите FrostWire цхат</string>
 </resources>

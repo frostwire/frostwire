@@ -670,4 +670,6 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
     <string name="play_store_out_of_sync">Play Store perlu melakukan sinkronisasi, tunggu beberapa menit</string>
     <string name="one_file_shared">Satu file telah dibagikan ke perangkat FrostWire di jaringan Wi-Fi yang sama.</string>
+    <string name="contact_us">Hubungi kami</string>
+    <string name="join_frostwire_chat">Bergabung FrostWire chatting</string>
 </resources>

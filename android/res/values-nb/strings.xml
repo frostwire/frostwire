@@ -719,4 +719,6 @@
     <string name="piece_size_header">Stykke Størrelse:</string>
     <string name="add_tracker">Legg til tracker</string>
     <string name="play_store_out_of_sync">Google Play Butikk må synkroniseres, vent noen minutter</string>
+    <string name="contact_us">Kontakt oss</string>
+    <string name="join_frostwire_chat">Bli med på FrostWire chat</string>
 </resources>

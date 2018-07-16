@@ -718,4 +718,6 @@
     <string name="title_activity_transfer_detail">העברת פרטים</string>
     <string name="piece_size_header">גודל:</string>
     <string name="add_tracker">הוסף גשש</string>
+    <string name="contact_us">צור קשר</string>
+    <string name="join_frostwire_chat">הצטרף לצ\'אט FrostWire</string>
 </resources>
