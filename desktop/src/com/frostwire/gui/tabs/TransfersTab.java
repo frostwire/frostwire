@@ -19,13 +19,11 @@ package com.frostwire.gui.tabs;
 
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.concurrent.ExecutorsHelper;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -37,7 +35,7 @@ import java.awt.event.*;
  * @author aldenml
  */
 public final class TransfersTab extends AbstractTab {
-    private static final Logger LOG = Logger.getLogger(TransfersTab.class);
+
     private final BTDownloadMediator downloadMediator; // holds the JTable
 
     /**
@@ -102,15 +100,14 @@ public final class TransfersTab extends AbstractTab {
         @Override
         public void onTransferSelected(BTDownload selected) {
             if (!dedicatedTransfersTabAvailable) {
-                LOG.info("Transfer Details not available in this search/transfers split screen mode");
                 hideTransferDetailsComponent();
                 return;
             }
             if (selected == null ||
-                selected instanceof YouTubeDownload ||
-                selected instanceof SoundcloudDownload ||
-                selected instanceof HttpDownload ||
-                selected instanceof TorrentFetcherDownload) {
+                    selected instanceof YouTubeDownload ||
+                    selected instanceof SoundcloudDownload ||
+                    selected instanceof HttpDownload ||
+                    selected instanceof TorrentFetcherDownload) {
                 hideTransferDetailsComponent();
             } else if (selected instanceof BittorrentDownload) {
                 BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
@@ -169,7 +166,7 @@ public final class TransfersTab extends AbstractTab {
 
         if (!transferDetailComponentWasAlreadyVisible) {
             int totalComponentsHeight = (int) (transferDetailSplitter.getTopComponent().getMinimumSize().getHeight() +
-                                transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight());
+                    transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight());
             if (lastSplitterLocationWithDetailsVisible >= totalComponentsHeight) {
                 lastSplitterLocationWithDetailsVisible = (int) transferDetailSplitter.getBottomComponent().getMinimumSize().getHeight();
             }
