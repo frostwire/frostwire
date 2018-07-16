@@ -307,7 +307,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         final Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         if (getPackageManager().resolveActivity(intent, 0) == null) {
             final MenuItem effects = menu.findItem(R.id.menu_player_audio_player_equalizer);
-            effects.setVisible(false);
+            if (effects != null) {
+                effects.setVisible(false);
+            }
         }
         MenuItem favoriteMenuItem = menu.findItem(R.id.menu_player_favorite);
         if (favoriteMenuItem != null) {
