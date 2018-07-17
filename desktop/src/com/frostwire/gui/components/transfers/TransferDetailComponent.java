@@ -60,7 +60,9 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
     }
 
     public TransferDetailComponent() {
-        super(new MigLayout("fill, insets 0 0 0 0"));
+        super(new MigLayout("fill, insets 0 0 0 0",
+                "",
+                "[top][grow]"));
         add(new JLabel(I18n.tr("Transfer Detail")), "left, gapleft 10px, growx");
         add(createDetailSwitcherButtons(), "right, wrap");
         add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
