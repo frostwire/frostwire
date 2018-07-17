@@ -269,7 +269,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         copyMagnetURLButton.addActionListener(copyMagnetURLActionListener);
 
         createdOnLabel.setText(btDownload.getCreated().toString());
-        commentLabel.setText(torrentInfo.comment());
+        commentLabel.setText("<html><body><p style='width: 600px;'>" + torrentInfo.comment() + "</p></body></html>");
     }
 
     /**
