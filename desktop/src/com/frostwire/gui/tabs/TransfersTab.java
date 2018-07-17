@@ -112,6 +112,7 @@ public final class TransfersTab extends AbstractTab {
             } else if (selected instanceof BittorrentDownload) {
                 BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
                 showTransferDetailsComponent(bittorrentDownload);
+                // TODO: remove this hack and the validate call inside ensureDownloadVisible
                 // Hack. Need to let the UI thread re-calculate the dimensions
                 // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
                 // to calculate the new location of the row that's to be scrolled to.
