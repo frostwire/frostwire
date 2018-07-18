@@ -18,6 +18,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.tabs.*;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.gui.updates.UpdateManager;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
@@ -123,6 +124,7 @@ public final class MainFrame {
         new DropTarget(FRAME, new TransferHandlerDropTargetListener(DNDUtils.DEFAULT_TRANSFER_HANDLER));
 
         TABBED_PANE = new JPanel(new CardLayout());
+        TABBED_PANE.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
 
         // Add a listener for saving the dimensions of the window &
         // position the search icon overlay correctly.
