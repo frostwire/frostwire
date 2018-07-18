@@ -191,7 +191,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Set up the necessary constants.
      */
     protected void setupConstants() {
-        MAIN_PANEL = new PaddedPanel(I18n.tr("Transfers"));
+        MAIN_PANEL = new PaddedPanel();
         transfersFilter = new TransfersFilter();
         DATA_MODEL = new BTDownloadRowFilteredModel(transfersFilter);//new BTDownloadModel();
         TABLE = new LimeJTable(DATA_MODEL);
