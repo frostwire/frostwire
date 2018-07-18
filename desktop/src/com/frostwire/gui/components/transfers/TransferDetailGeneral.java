@@ -184,7 +184,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBackground(new Color(0xf3f5f7));
         scrollPane.setOpaque(true);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         scrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         add(scrollPane, "grow");
 
