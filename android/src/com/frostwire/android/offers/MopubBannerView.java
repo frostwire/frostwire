@@ -170,7 +170,8 @@ public class MopubBannerView extends LinearLayout {
             }
 
             if (!Offers.MOPUB.started()) {
-                LOG.warn("MopubBannerView.loadMoPubBanner() abort moPubView loading, MOPUB not started");
+                LOG.warn("MopubBannerView.loadMoPubBanner() abort moPubView loading, MOPUB not started. Loading fallback");
+                loadFallbackBanner(adUnitId);
                 return;
             }
 
@@ -203,6 +204,7 @@ public class MopubBannerView extends LinearLayout {
         }
         InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
         setVisible(Visibility.FALLBACK, true);
+        setVisibility(View.VISIBLE);
     }
 
     public void setVisible(Visibility visibility, boolean visible) {
