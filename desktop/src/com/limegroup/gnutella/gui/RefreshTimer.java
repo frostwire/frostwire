@@ -32,6 +32,10 @@ final class RefreshTimer {
         timer.start();
     }
 
+    void stopTimer() {
+        timer.stop();
+    }
+
     /**
      * Refreshes all of the gui elements.
      */

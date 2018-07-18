@@ -231,6 +231,8 @@ public final class GUIMediator {
      */
     private static boolean _allowVisible = false;
 
+    private final RefreshTimer timer;
+
     /**
      * Private constructor to ensure that this class cannot be constructed from
      * another class.
@@ -241,6 +243,7 @@ public final class GUIMediator {
 
         _remoteDownloadsAllowed = true;
 
+        this.timer = new RefreshTimer();
     }
 
     /**
@@ -265,11 +268,6 @@ public final class GUIMediator {
      * Notification that the core has been initialized.
      */
     void coreInitialized() {
-        startTimer();
-    }
-
-    private void startTimer() {
-        RefreshTimer timer = new RefreshTimer();
         timer.startTimer();
     }
 
@@ -836,6 +834,7 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
+        instance().timer.stopTimer(); // TODO: refactor this singleton pattern
         hideVideoPlayerWindow();
         Finalizer.shutdown();
     }
