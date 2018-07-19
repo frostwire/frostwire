@@ -70,7 +70,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                 tableMediator.add(dhtTrackerItemHolder);
             } catch (Throwable e) {
                 LOG.error("Error updating data: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
