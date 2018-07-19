@@ -18,13 +18,14 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
-import com.frostwire.jlibtorrent.AnnounceEndpoint;
-import com.frostwire.jlibtorrent.AnnounceEntry;
+import com.frostwire.jlibtorrent.*;
 import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -32,8 +33,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
     private static final Logger LOG = Logger.getLogger(TransferDetailTrackers.class);
 
     private final TransferDetailTrackersTableMediator tableMediator;
-    private BittorrentDownload btDownload;
-
 
     TransferDetailTrackers() {
         super(new MigLayout("fillx, gap 0 0, insets 0 0 0 0"));
@@ -44,29 +43,118 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
     @Override
     public void updateData(BittorrentDownload btDownload) {
         if (btDownload != null && btDownload.getDl() != null) {
-            if (this.btDownload != btDownload) {
-                tableMediator.clearTable();
-            }
-            this.btDownload = btDownload;
+            tableMediator.clearTable();
             try {
-                List<AnnounceEntry> items = btDownload.getDl().getTorrentHandle().trackers();
+                TorrentHandle torrentHandle = btDownload.getDl().getTorrentHandle();
+                if (torrentHandle == null) {
+                    return;
+                }
+
+                // Let's create the DHT, LSD and PEX TrackerItemHolders
+                List<PeerInfo> peerInfos = torrentHandle.peerInfo();
+                LinkedList<PeerInfo> peerInfosCopy = new LinkedList<>();
+                // Make a copy and work with the copy to do the math as peer lists
+                // change rapidly. Perhaps unnecessary, trying to avoid weird mem crashes with swig and GC.
+                if (peerInfos != null && peerInfos.size() > 0) {
+                    peerInfosCopy.addAll(peerInfos);
+                }
+
+                List<AnnounceEntry> items = torrentHandle.trackers();
                 if (items != null && items.size() > 0) {
-                    if (tableMediator.getSize() == 0) {
-                        int i = 0;
-                        for (AnnounceEntry item : items) {
-                            tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
-                        }
-                    } else {
-                        int i = 0;
-                        for (AnnounceEntry item : items) {
-                            tableMediator.update(new TransferDetailTrackers.TrackerItemHolder(i++, item));
-                        }
+                    int i = 0;
+                    for (AnnounceEntry item : items) {
+                        tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
                     }
                 }
+
+                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, btDownload, peerInfosCopy);
+                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, btDownload, peerInfosCopy);
+                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, btDownload, peerInfosCopy);
+
+                // gotta add them last and in reverse order so they appear at the top by default
+                tableMediator.add(pexTrackerItemHolder);
+                tableMediator.add(lsdTrackerItemHolder);
+                tableMediator.add(dhtTrackerItemHolder);
             } catch (Throwable e) {
                 LOG.error("Error updating data: " + e.getMessage());
+                e.printStackTrace();
             }
         }
+    }
+
+    private enum SpecialAnnounceEntryType {
+        DHT,
+        LSD,
+        PEX
+    }
+
+    private TrackerItemHolder getSpecialAnnounceEntry(SpecialAnnounceEntryType entryType, BittorrentDownload btDownload, List<PeerInfo> peerInfosCopy) {
+        boolean isActive = false;
+        int seeds = 0;
+        int peers = 0;
+        int downloaded = 0;
+        int trackerOffset = tableMediator.getSize();
+        BTDownload dl = btDownload.getDl();
+        TorrentHandle torrentHandle = dl.getTorrentHandle();
+        TorrentStatus status = torrentHandle.status();
+        if (status != null) {
+            switch (entryType) {
+                case DHT:
+                    trackerOffset += 2;
+                    isActive = status.announcingToDht();
+                    break;
+                case LSD:
+                    trackerOffset += 1;
+                    isActive = status.announcingToLsd();
+                    break;
+                case PEX:
+                    // will be set to true if we find a single peer that came via PEX
+                    isActive = false;
+                    break;
+            }
+        }
+        if (!peerInfosCopy.isEmpty()) {
+            for (PeerInfo peer : peerInfosCopy) {
+                byte PEER_SOURCE_FLAG_DHT = 2;
+                boolean entryDHTMatchesSource = entryType == SpecialAnnounceEntryType.DHT &&
+                        (peer.source() & PEER_SOURCE_FLAG_DHT) == PEER_SOURCE_FLAG_DHT;
+
+                byte PEER_SOURCE_FLAG_LSD = 8;
+                boolean entryLSDMatchesSource = entryType == SpecialAnnounceEntryType.LSD &&
+                        (peer.source() & PEER_SOURCE_FLAG_LSD) == PEER_SOURCE_FLAG_LSD;
+
+                byte PEER_SOURCE_FLAG_PEX = 4;
+                boolean entryPEXMatchesSource = entryType == SpecialAnnounceEntryType.PEX &&
+                        (peer.source() & PEER_SOURCE_FLAG_PEX) == PEER_SOURCE_FLAG_PEX;
+
+                if (entryDHTMatchesSource || entryLSDMatchesSource || entryPEXMatchesSource) {
+                    int PEER_FLAG_SEED = 1024;
+                    if ((peer.flags() & PEER_FLAG_SEED) == PEER_FLAG_SEED) {
+                        seeds++;
+                        // QUESTION for aldenml: shouldn't we consider seeds as peers too?
+                        // qTorrent isn't but I was under the impression that peers were also counted as peers
+                    } else {
+                        peers++;
+                    }
+                    downloaded += peer.totalDownload();
+                }
+            }
+        }
+
+        if (entryType == SpecialAnnounceEntryType.PEX) {
+            isActive = (peers > 0) || (seeds > 0);
+        }
+
+        boolean stateObjAvailable = status != null;
+        boolean activeState = false;
+        if (stateObjAvailable) {
+            TorrentStatus.State state = status.state();
+            activeState = !state.equals(TorrentStatus.State.FINISHED) &&
+                    !state.equals(TorrentStatus.State.UNKNOWN);
+        }
+        isActive = isActive && activeState;
+
+        return new TrackerItemHolder(trackerOffset, isActive, seeds, peers, downloaded, entryType.name());
     }
 
     public class TrackerItemHolder {
@@ -77,9 +165,16 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         public final int downloaded;
         public String url;
 
-        TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
+        TrackerItemHolder(int trackerOffset, boolean isActive, int seeds, int peers, int downloaded, String url) {
             this.trackerOffset = trackerOffset;
-            this.url = announceEntry.url();
+            this.isActive = isActive;
+            this.seeds = seeds;
+            this.peers = peers;
+            this.downloaded = downloaded;
+            this.url = url;
+        }
+
+        TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
             int s = 0;
             int p = 0;
             int d = 0;
@@ -92,6 +187,8 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     a = true;
                 }
             }
+            this.trackerOffset = trackerOffset;
+            this.url = announceEntry.url();
             this.seeds = s;
             this.peers = p;
             this.downloaded = d;
