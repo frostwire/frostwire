@@ -18,14 +18,12 @@
 
 package com.frostwire.gui.components.transfers;
 
-import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.util.LinkedList;
 import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
@@ -49,6 +47,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                 if (torrentHandle == null) {
                     return;
                 }
+                TorrentStatus status = torrentHandle.status();
 
                 // Let's create the DHT, LSD and PEX TrackerItemHolders
                 List<PeerInfo> peerInfos = torrentHandle.peerInfo();
@@ -60,9 +59,9 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     }
                 }
 
-                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, btDownload, peerInfos);
-                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, btDownload, peerInfos);
-                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, btDownload, peerInfos);
+                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, status, peerInfos);
+                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, status, peerInfos);
+                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, status, peerInfos);
 
                 // gotta add them last and in reverse order so they appear at the top by default
                 tableMediator.add(pexTrackerItemHolder);
@@ -80,15 +79,12 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         PEX
     }
 
-    private TrackerItemHolder getSpecialAnnounceEntry(SpecialAnnounceEntryType entryType, BittorrentDownload btDownload, List<PeerInfo> peerInfosCopy) {
+    private TrackerItemHolder getSpecialAnnounceEntry(SpecialAnnounceEntryType entryType, TorrentStatus status, List<PeerInfo> peerInfosCopy) {
         boolean isActive = false;
         int seeds = 0;
         int peers = 0;
         int downloaded = 0;
         int trackerOffset = tableMediator.getSize();
-        BTDownload dl = btDownload.getDl();
-        TorrentHandle torrentHandle = dl.getTorrentHandle();
-        TorrentStatus status = torrentHandle.status();
         if (status != null) {
             switch (entryType) {
                 case DHT:
