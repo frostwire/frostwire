@@ -149,13 +149,14 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         return new TrackerItemHolder(trackerOffset, isActive, seeds, peers, downloaded, entryType.name());
     }
 
-    public class TrackerItemHolder {
+    public static final class TrackerItemHolder {
+
         final int trackerOffset;
         final boolean isActive;
-        public final int seeds;
-        public final int peers;
-        public final int downloaded;
-        public String url;
+        final int seeds;
+        final int peers;
+        final int downloaded;
+        final String url;
 
         TrackerItemHolder(int trackerOffset, boolean isActive, int seeds, int peers, int downloaded, String url) {
             this.trackerOffset = trackerOffset;
