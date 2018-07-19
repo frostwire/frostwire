@@ -52,13 +52,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
 
                 // Let's create the DHT, LSD and PEX TrackerItemHolders
                 List<PeerInfo> peerInfos = torrentHandle.peerInfo();
-                LinkedList<PeerInfo> peerInfosCopy = new LinkedList<>();
-                // Make a copy and work with the copy to do the math as peer lists
-                // change rapidly. Perhaps unnecessary, trying to avoid weird mem crashes with swig and GC.
-                if (peerInfos != null && peerInfos.size() > 0) {
-                    peerInfosCopy.addAll(peerInfos);
-                }
-
                 List<AnnounceEntry> items = torrentHandle.trackers();
                 if (items != null && items.size() > 0) {
                     int i = 0;
@@ -67,9 +60,9 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     }
                 }
 
-                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, btDownload, peerInfosCopy);
-                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, btDownload, peerInfosCopy);
-                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, btDownload, peerInfosCopy);
+                TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, btDownload, peerInfos);
+                TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, btDownload, peerInfos);
+                TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, btDownload, peerInfos);
 
                 // gotta add them last and in reverse order so they appear at the top by default
                 tableMediator.add(pexTrackerItemHolder);
