@@ -1,3 +1,17 @@
+frostwire (6.7.1) stable; urgency=high
+  * UX: Torrent Transfer Tracker viewer now tracks DHT, LSD and PEX information
+  * UX: Added border at the top of the global status bar at the bottom of the screen
+  * UX: Transfer tab title, search filter box and filter buttons in the same row
+	saving precious vertical screen space for smaller screens
+  * UX: better resizing of transfer detail components
+  * UX: transfer detail component rendering optimizations
+  * Translations updated
+  * Search fixes
+  * Crash fixed when translating tooltips
+  * Crashes and optimizations
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 19 Jul 2018 01:09:08 -0600
+
 frostwire (6.7.0) stable; urgency=high
   * New Torrent Transfer Details components
   * New Torrent Transfer General viewer
