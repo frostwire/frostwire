@@ -147,6 +147,7 @@ public final class SearchHeaderBanner extends LinearLayout {
         }
         setBannerViewVisibility(BannerType.MOPUB, false);
         loadFallbackBanner();
+        dismissBannerButton.setOnClickListener(new DismissBannerButtonClickListener(this));
 
         if (!Offers.MOPUB.started()) {
             return;
@@ -167,7 +168,6 @@ public final class SearchHeaderBanner extends LinearLayout {
             loadFallbackBanner();
             moPubView.destroy();
         }
-        dismissBannerButton.setOnClickListener(new DismissBannerButtonClickListener(this));
     }
 
 
