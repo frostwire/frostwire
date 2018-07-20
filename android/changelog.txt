@@ -1,4 +1,4 @@
-FrostWire 2.0.7 build 548 - JUL/17/2018
+FrostWire 2.0.7 build 548 - JUL/19/2018
  - Crash on Audio Player equalizer menu
  - Translations updated: Croatian, new strings on all
  - Library updates: applovin 8.1.0, (dev) gradle 4.9
