@@ -32,6 +32,7 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -51,8 +52,8 @@ public class InstallerUpdater implements Runnable {
     private static final Logger LOG = Logger.getLogger(InstallerUpdater.class);
 
     private TorrentHandle torrentHandle = null;
-    private UpdateMessage _updateMessage;
-    private File _executableFile;
+    private final UpdateMessage updateMessage;
+    private File executableFile;
 
     private static String lastMD5;
     private static boolean isDownloadingUpdate = false;
@@ -60,8 +61,8 @@ public class InstallerUpdater implements Runnable {
 
     private final boolean forceUpdate;
 
-    InstallerUpdater(UpdateMessage updateMessage, boolean force) {
-        _updateMessage = updateMessage;
+    InstallerUpdater(UpdateMessage um, boolean force) {
+        updateMessage = um;
         forceUpdate = force;
         isDownloadingUpdate = false;
     }
@@ -89,9 +90,9 @@ public class InstallerUpdater implements Runnable {
         } else {
             isDownloadingUpdate = true;
 
-            if (_updateMessage.getTorrent() != null) {
+            if (updateMessage.getTorrent() != null) {
                 handleTorrentDownload();
-            } else if (_updateMessage.getInstallerUrl() != null) {
+            } else if (updateMessage.getInstallerUrl() != null) {
                 handleHttpDownload();
             } else {
                 isDownloadingUpdate = false;
@@ -119,15 +120,15 @@ public class InstallerUpdater implements Runnable {
     }
 
     private String getFileNameFromHttpUrl() {
-        int index = _updateMessage.getInstallerUrl().lastIndexOf('/');
-        return _updateMessage.getInstallerUrl().substring(index + 1);
+        int index = updateMessage.getInstallerUrl().lastIndexOf('/');
+        return updateMessage.getInstallerUrl().substring(index + 1);
     }
 
     private void handleHttpDownload() {
         File updateFolder = UpdateSettings.UPDATES_DIR;
 
-        String fileName = _updateMessage.getSaveAs() != null ?
-                _updateMessage.getSaveAs() : getFileNameFromHttpUrl();
+        String fileName = updateMessage.getSaveAs() != null ?
+                updateMessage.getSaveAs() : getFileNameFromHttpUrl();
 
         File installerFileLocation = new File(updateFolder, fileName);
 
@@ -169,21 +170,21 @@ public class InstallerUpdater implements Runnable {
                 }
             });
             try {
-                httpClient.save(_updateMessage.getInstallerUrl(), installerFileLocation, true);
+                httpClient.save(updateMessage.getInstallerUrl(), installerFileLocation, true);
             } catch (HttpRangeException e) {
                 // recovery in case the server does not support resume
-                httpClient.save(_updateMessage.getInstallerUrl(), installerFileLocation, false);
+                httpClient.save(updateMessage.getInstallerUrl(), installerFileLocation, false);
             } catch (IOException e2) {
                 if (e2.getMessage().contains("416")) {
                     // HTTP Request Range error came through IOException.
-                    httpClient.save(_updateMessage.getInstallerUrl(), installerFileLocation, false);
+                    httpClient.save(updateMessage.getInstallerUrl(), installerFileLocation, false);
                 }
             }
             isDownloadingUpdate = false;
             downloadComplete();
         } catch (Throwable e) {
             isDownloadingUpdate = false;
-            LOG.error("Failed to download installer: " + _updateMessage.getInstallerUrl(), e);
+            LOG.error("Failed to download installer: " + updateMessage.getInstallerUrl(), e);
         }
     }
 
@@ -249,14 +250,14 @@ public class InstallerUpdater implements Runnable {
 
                     AlertType type = alert.type();
                     System.out.println("InstallerUpdater.AlertListener: " + type);
-                    printDownloadManagerStatus(th);
+                    printTorrentHandleStatus(th);
 
                     switch (type) {
                         case TORRENT_RESUMED:
-                            printDownloadManagerStatus(th);
+                            printTorrentHandleStatus(th);
                         case FILE_ERROR:
                         case PIECE_FINISHED:
-                            printDownloadManagerStatus(th);
+                            printTorrentHandleStatus(th);
                             onStateChanged(th, th.status().state());
                             int progress = (int) (torrentHandle.status().progress() * 100);
                             if (progress == 100) {
@@ -288,24 +289,42 @@ public class InstallerUpdater implements Runnable {
 
     private void showUpdateMessage() {
         GUIMediator.safeInvokeLater(() -> {
-            if (_executableFile == null) {
+            if (executableFile == null) {
                 return;
             }
 
-            DialogOption result = GUIMediator.showYesNoMessage(_updateMessage.getMessageInstallerReady(), I18n.tr("Update"), JOptionPane.INFORMATION_MESSAGE);
+            String buildsMissedMessage = getBuildsMissedMessage();
+
+            DialogOption result = GUIMediator.showYesNoMessage(buildsMissedMessage + updateMessage.getMessageInstallerReady(), I18n.tr("Update"), JOptionPane.INFORMATION_MESSAGE);
 
             if (result == DialogOption.YES) {
-                UpdateMediator.openInstallerAndShutdown(_executableFile);
+                UpdateMediator.openInstallerAndShutdown(executableFile);
             }
         });
+    }
+
+    private String getBuildsMissedMessage() {
+        if (updateMessage.getBuild() != null) {
+            try {
+                int newBuildNumber = Integer.parseInt(updateMessage.getBuild());
+                int buildDelta = newBuildNumber - FrostWireUtils.getBuildNumber();
+
+                if (buildDelta > 1) {
+                    return "<html>" + I18n.tr("Time flies! You have missed the last {0} updates.", buildDelta) + "<br><br>&nbsp;";
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+        return "";
     }
 
     private File downloadDotTorrent() {
 
         File appSpecialShareFolder = UpdateSettings.UPDATES_DIR;
 
-        int index = _updateMessage.getTorrent().lastIndexOf('/');
-        File torrentFileLocation = new File(appSpecialShareFolder, _updateMessage.getTorrent().substring(index + 1));
+        int index = updateMessage.getTorrent().lastIndexOf('/');
+        File torrentFileLocation = new File(appSpecialShareFolder, updateMessage.getTorrent().substring(index + 1));
 
         if (!appSpecialShareFolder.exists() && appSpecialShareFolder.mkdir()) {
             appSpecialShareFolder.setWritable(true);
@@ -313,7 +332,7 @@ public class InstallerUpdater implements Runnable {
 
         //We always re-download the torrent just in case.
         try {
-            downloadTorrentFile(_updateMessage.getTorrent(), torrentFileLocation);
+            downloadTorrentFile(updateMessage.getTorrent(), torrentFileLocation);
         } catch (Throwable e) {
             LOG.error("Error downloading update torrent file", e);
         }
@@ -325,17 +344,13 @@ public class InstallerUpdater implements Runnable {
         if (th == null) {
             return;
         }
-        if (torrentHandle == null) {
-            torrentHandle = th;
-        }
-        //printDiskManagerPieces(th.getDiskManager());
-        printDownloadManagerStatus(th);
+        torrentHandle = th;
+        printTorrentHandleStatus(th);
 
         if (torrentDataDownloadedToDisk()) {
             isDownloadingUpdate = false;
             return;
         }
-
         System.out.println("InstallerUpdater.stateChanged() - " + state + " completed: " + torrentHandle.status().isFinished());
 
         if (state == TorrentStatus.State.SEEDING) {
@@ -360,7 +375,7 @@ public class InstallerUpdater implements Runnable {
             //manager.stopIt(DownloadManager.STATE_READY, false, true);
             try {
                 BTEngine.getInstance().remove(th, SessionHandle.DELETE_FILES);
-                //processMessage(_updateMessage);
+                //processMessage(updateMessage);
             } catch (Throwable e) {
                 LOG.error("Error removing download manager on error", e);
             }
@@ -373,7 +388,7 @@ public class InstallerUpdater implements Runnable {
 
     private void downloadComplete() {
         System.out.println("InstallerUpdater.downloadComplete()!!!!");
-        printDownloadManagerStatus(torrentHandle);
+        printTorrentHandleStatus(torrentHandle);
         cleanupInvalidUpdates();
 
         if (checkIfDownloaded()) {
@@ -391,7 +406,7 @@ public class InstallerUpdater implements Runnable {
             return;
         }
 
-        String currentMD5 = _updateMessage.getRemoteMD5();
+        String currentMD5 = updateMessage.getRemoteMD5();
 
         for (File file : files) {
             try {
@@ -407,7 +422,7 @@ public class InstallerUpdater implements Runnable {
     }
 
     private boolean checkIfDownloaded() {
-        String installerFilename = UpdateMediator.getInstallerFilename(_updateMessage);
+        String installerFilename = UpdateMediator.getInstallerFilename(updateMessage);
         if (installerFilename == null) {
             return false;
         }
@@ -415,10 +430,10 @@ public class InstallerUpdater implements Runnable {
         if (!f.exists()) {
             return false;
         }
-        _executableFile = f;
+        executableFile = f;
         try {
             lastMD5 = DigestUtils.getMD5(f);
-            return DigestUtils.compareMD5(lastMD5, _updateMessage.getRemoteMD5());
+            return DigestUtils.compareMD5(lastMD5, updateMessage.getRemoteMD5());
         } catch (Throwable e) {
             LOG.error("Error checking update MD5", e);
             return false;
@@ -429,15 +444,15 @@ public class InstallerUpdater implements Runnable {
         return torrentHandle != null && torrentHandle.isValid() && (torrentHandle.status().isFinished() || torrentHandle.status().isSeeding());
     }
 
-    private static void printDownloadManagerStatus(TorrentHandle manager) {
-        if (manager == null) {
+    private static void printTorrentHandleStatus(TorrentHandle th) {
+        if (th == null) {
             return;
         }
         StringBuilder buf = new StringBuilder();
         buf.append("Infohash: ");
-        buf.append(manager.infoHash().toHex());
+        buf.append(th.infoHash().toHex());
         buf.append(" Completed:");
-        TorrentStatus stats = manager.status();
+        TorrentStatus stats = th.status();
         buf.append(stats.progress());
         buf.append('%');
         buf.append(" Seeds:");
@@ -456,7 +471,7 @@ public class InstallerUpdater implements Runnable {
             buf.append(' ');
         }
         buf.append(" TO:");
-        buf.append(manager.savePath());
+        buf.append(th.savePath());
         System.out.println(buf.toString());
     }
 
