@@ -83,7 +83,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         boolean isActive = false;
         int seeds = 0;
         int peers = 0;
-        int downloaded = 0;
+        long downloaded = 0;
         int trackerOffset = tableMediator.getSize();
         if (status != null) {
             switch (entryType) {
@@ -151,10 +151,10 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         final boolean isActive;
         final int seeds;
         final int peers;
-        final int downloaded;
+        final long downloaded;
         final String url;
 
-        TrackerItemHolder(int trackerOffset, boolean isActive, int seeds, int peers, int downloaded, String url) {
+        TrackerItemHolder(int trackerOffset, boolean isActive, int seeds, int peers, long downloaded, String url) {
             this.trackerOffset = trackerOffset;
             this.isActive = isActive;
             this.seeds = seeds;
@@ -166,7 +166,7 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
         TrackerItemHolder(int trackerOffset, AnnounceEntry announceEntry) {
             int s = 0;
             int p = 0;
-            int d = 0;
+            long d = 0;
             boolean a = false;
             for (AnnounceEndpoint endPoint : announceEntry.endpoints()) {
                 s = Math.max(endPoint.scrapeComplete(), s);

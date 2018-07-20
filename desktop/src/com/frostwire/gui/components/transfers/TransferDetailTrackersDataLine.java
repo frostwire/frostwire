@@ -21,6 +21,7 @@ package com.frostwire.gui.components.transfers;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
+import com.limegroup.gnutella.gui.tables.SizeHolder;
 
 public final class TransferDetailTrackersDataLine extends AbstractDataLine<TransferDetailTrackers.TrackerItemHolder> {
 
@@ -35,7 +36,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
         new LimeTableColumn(STATUS_COLUMN_ID, "STATUS", I18n.tr("Status"), 180, true, true, true, String.class),
         new LimeTableColumn(SEEDS_COLUMN_ID, "SEEDS", I18n.tr("Seeds"), 180, true, true, true, String.class),
         new LimeTableColumn(PEERS_COLUMN_ID, "PEERS", I18n.tr("Peers"), 180, true, true, true, String.class),
-        new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 180, true, true, true, String.class),
+        new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 180, true, true, true, SizeHolder.class),
     };
 
     public TransferDetailTrackersDataLine() {
@@ -79,7 +80,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
             case PEERS_COLUMN_ID:
                 return holder.peers;
             case DOWNLOADED_COLUMN_ID:
-                return holder.downloaded;
+                return new SizeHolder(holder.downloaded);
         }
         return null;
     }
