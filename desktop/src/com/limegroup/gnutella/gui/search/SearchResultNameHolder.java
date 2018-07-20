@@ -1,25 +1,26 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
 
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.NameHolder;
+
+import java.util.HashSet;
 
 /**
  * 
@@ -50,27 +51,35 @@ final class SearchResultNameHolder extends NameHolder {
     }
 
     private static String simpleHighlighter(String query, String str) {
-        if (!query.isEmpty()) {
-            for (String token : query.split("\\s+")) {
-                StringBuilder sb = new StringBuilder(2 * str.length());
-                for (int i = 0; i < str.length();) {
-                    if (i + token.length() <= str.length()) {
-                        String s = str.substring(i, token.length() + i);
-                        if (s.equalsIgnoreCase(token)) {
-                            sb.append("<b>").append(s).append("</b>");
-                            i += s.length();
-                        } else {
-                            sb.append(str.charAt(i));
-                            i++;
-                        }
-                    } else {
-                        sb.append(str.charAt(i));
-                        i++;
-                    }
+        if (query == null || query.isEmpty()) {
+            return str;
+        }
+
+        // Get unique tokens in the query
+        String[] rawTokens = query.split("\\s+");
+        HashSet<String> uniqueTokens = new HashSet<>();
+        for (String token : rawTokens) {
+            uniqueTokens.add(token.trim());
+        }
+
+        // Replace all instances of unique tokens for bolded versions in original string
+        for (String token : uniqueTokens) {
+            // find case insensitive regions where our token could be
+            int offset=0;
+            int regionEnd = offset + token.length();
+            while (regionEnd < str.length()) {
+                if (str.regionMatches(true, offset, token, 0, token.length())) {
+                    String tokenAsFoundInStr = str.substring(offset, offset + token.length());
+                    str = str.substring(0, offset) + "<b>" + tokenAsFoundInStr + "</b>" +
+                          str.substring(offset + token.length());
+                    offset += token.length() + 7;
+                } else {
+                    offset += 1;
                 }
-                str = sb.toString();
+                regionEnd = offset + token.length();
             }
         }
+
         return str;
     }
 }
