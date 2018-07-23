@@ -130,7 +130,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             case SOURCE_COLUMN_ID:
                 return getSourceAsString(peer.source());
             case DOWNLOADED_COLUMN_ID:
-                return holder.peerItem.totalDownload();
+                return new SizeHolder(holder.peerItem.totalDownload());
             case PROGRESS_COLUMN_ID:
                 return 100*peer.progress() + "%";
             case UPLOADED_COLUMN_ID:
