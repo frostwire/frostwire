@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-04 22:26-0600\n"
-"PO-Revision-Date: 2018-04-08 13:08-0400\n"
+"PO-Revision-Date: 2018-07-23 16:40-0300\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ja\n"
@@ -673,7 +673,7 @@ msgstr "アルバム名、映画のタイトル、本のタイトル、ゲーム
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:102
 msgid "Attribution URL"
-msgstr ""
+msgstr "アトリビューション"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CopyrightLicenseSelectorPanel.java:104
 msgid ""
@@ -803,9 +803,8 @@ msgstr ""
 "フォルダのファイルあるいはコンテンツどちらでも。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:206
-#, fuzzy
 msgid "Select File"
-msgstr "フォルダ選択"
+msgstr "ファイルを選ぶ"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:207
 msgid ""
@@ -1373,13 +1372,12 @@ msgid "Support %s with a tip, donation or voluntary payment"
 msgstr "ヒント、寄付や自発的な支払いと %s をサポートします。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:64
-#, fuzzy
 msgid "Transfer Detail"
-msgstr "転送"
+msgstr "転送の詳細"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:108
 msgid "General"
-msgstr ""
+msgstr "一般"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:109
 #, fuzzy
@@ -1387,76 +1385,64 @@ msgid "Files"
 msgstr "ファイル"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:110
-#, fuzzy
 msgid "Pieces"
-msgstr "ピースサイズ"
+msgstr "ピース"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:92
-#, fuzzy
 msgid "complete"
-msgstr "収集した"
+msgstr "コンプリート"
 
 #. time elapsed, time left, download speed
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:100
 msgid "Time elapsed"
-msgstr ""
+msgstr "時間が経過した"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:102
-#, fuzzy
 msgid "Time left"
-msgstr "時間："
+msgstr "残り時間"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:104
-#, fuzzy
 msgid "Download speed"
-msgstr "ダウンロード速度："
+msgstr "ダウンロード速度"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:112
-#, fuzzy
 msgid "Download speed limit"
-msgstr "ダウンロード速度："
+msgstr "ダウンロード速度制限"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:121
-#, fuzzy
 msgid "Upload speed"
-msgstr "アップロード速度："
+msgstr "アップロードの速さ"
 
 #. Total Size, Peers, Upload speed limit
 #. Share Ratio
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:126
-#, fuzzy
 msgid "Total size"
-msgstr "アップロード合計値"
+msgstr "全体の大きさ"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:130
-#, fuzzy
 msgid "Upload speed limit"
-msgstr "アップロード速度："
+msgstr "アップロード速度制限"
 
 #. TODO: Add settings_gray button and dialog to adjust upload speed limit
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:133
-#, fuzzy
 msgid "Share ratio"
-msgstr "共有率"
+msgstr "株式比率"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:146
-#, fuzzy
 msgid "Save location"
-msgstr "共有率"
+msgstr "位置を保存"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:152
-#, fuzzy
 msgid "InfoHash"
-msgstr "情報ハシュをコピー"
+msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr ""
+msgstr "マグネットURL"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
-#, fuzzy
 msgid "Created On"
-msgstr "作成"
+msgstr "作成日"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:163
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:97
@@ -1466,19 +1452,18 @@ msgstr "コメント"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:211
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:220
-#, fuzzy
 msgid "connected"
-msgstr "接続していない"
+msgstr "接続された"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:212
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:221
 msgid "of"
-msgstr ""
+msgstr "の"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:214
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:223
 msgid "total"
-msgstr ""
+msgstr "合計"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:77
 msgid "IP"
@@ -1486,11 +1471,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:78
 msgid "Client"
-msgstr ""
+msgstr "クライアント"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:79
 msgid "Flags"
-msgstr ""
+msgstr "フラグ"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:80
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
@@ -1504,12 +1489,12 @@ msgstr "再開"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:178
 msgid "Incoming"
-msgstr ""
+msgstr "着信"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:58
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:101
 msgid "Total Pieces"
-msgstr ""
+msgstr "総数"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:38
 msgid "URL"
@@ -1528,7 +1513,7 @@ msgstr "FrostWireのオプションで共有するフォルダを設定できる
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:194
 msgid "Add to"
-msgstr ""
+msgstr "追加"
 
 #. Buttons
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:264
@@ -1695,9 +1680,8 @@ msgstr "起動します"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:731
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:669
-#, fuzzy
 msgid "Launch Selected Files in"
-msgstr "選択したファイルを次の場所で起動します："
+msgstr "選択したファイルを起動する"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:773
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:711
@@ -2221,12 +2205,13 @@ msgid ""
 "Browse, Search and Play files in your computer. Wi-Fi sharing, Internet "
 "Radio and more."
 msgstr ""
+"お使いのコンピューターで検索・再生ファイルを参照します。共有、インター ネッ"
+"ト ラジオの Wi-Fi."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTab.java:29
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTransfersTab.java:43
-#, fuzzy
 msgid "Search and Download Files from the Internet."
-msgstr "検索してファイルをダウンロードする"
+msgstr "インターネットからのファイルの検索とダウンロード。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:49
 msgid "filter transfers here"
@@ -2917,37 +2902,36 @@ msgstr "常にこの答えを使う"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:45
 msgid "How can we make FrostWire better?"
-msgstr ""
+msgstr "どうやったら作れる FrostWire 良いですか。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:46
 msgid "Please make sure your firewall or antivirus is not blocking FrostWire"
 msgstr ""
+"ファイアウォールやアンチ ウイルス FrostWire がブロックされていないか確認して"
+"ください。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:52
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:149
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:153
 msgid "Send Feedback"
-msgstr ""
+msgstr "フィードバックを送信"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:96
-#, fuzzy
 msgid "Email (Optional)"
-msgstr "イメージ・オプション"
+msgstr "メール アドレス (オプション)"
 
 #. Optional name
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:112
-#, fuzzy
 msgid "Your Name (Optional)"
-msgstr "その他オプション"
+msgstr "あなたの名前（オプション）"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:187
-#, fuzzy
 msgid "Sending"
-msgstr "シード"
+msgstr "送信"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:192
 msgid "Thank you"
-msgstr ""
+msgstr "ありがとうございました"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ShutdownWindow.java:21
 msgid "Shutting down FrostWire..."
@@ -3022,7 +3006,7 @@ msgstr "私たちをフォロしてください：@frostwire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:196
 msgid "Follow FrostWire on Instagram"
-msgstr ""
+msgstr "Instagram の FrostWire に従ってください。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:202
 msgid ""
@@ -3034,7 +3018,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:208
 msgid "Circle FrostWire on G+"
-msgstr ""
+msgstr "G + でサークル FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 #, fuzzy
@@ -3051,9 +3035,8 @@ msgstr ""
 "有することができます。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:467
-#, fuzzy
 msgid "Not Seeding"
-msgstr "検索"
+msgstr "シードしていない"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:486
 msgid "FrostWire has not detected a firewall"
@@ -3081,7 +3064,7 @@ msgstr "ネットワークへの接続は最適化されています"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:579
 msgid "nodes"
-msgstr ""
+msgstr "節"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:683
 msgid "Show Connection Quality"
@@ -3104,9 +3087,8 @@ msgid "Show Bandwidth Consumption"
 msgstr "処理能力の消費の表示"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:759
-#, fuzzy
 msgid "Show Donation Buttons"
-msgstr "マグネット・ミックス・ボタンを表示する"
+msgstr "寄付ボタンを表示"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:791
 msgid "Downloads:"
@@ -3886,18 +3868,15 @@ msgid "Find out more..."
 msgstr "さらに検索..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentPanel.java:63
-#, fuzzy, java-format
+#, java-format
 msgid "I <b>will not</b> use FrostWire {0} for copyright infringement."
-msgstr ""
-"<div display=\"block\" color=\"#515151\" size=\"13\">私は、著作権侵害に関する"
-"FrostWireの{0}を使用<b>していません。</b></div>"
+msgstr "私は、著作権侵害に関するFrostWireの{0}を使用<b>していません。</b>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentPanel.java:71
-#, fuzzy, java-format
+#, java-format
 msgid "I <b>might use</b> FrostWire {0} for copyright infringement."
 msgstr ""
-"<div display=\"block\" color=\"#515151\" size=\"13\">私は、著作権侵害に関する"
-"FrostWireの{0}を<b>使用したかもしれません。</b></div>"
+"私は、著作権侵害に関するFrostWireの{0}を<b>使用したかもしれません。</b>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/IntentWindow.java:40
 msgid "State Your Intent"
@@ -4157,28 +4136,27 @@ msgstr "FrostWire に関する情報"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:154
 msgid "Show Send Feedback Window"
-msgstr ""
+msgstr "フィードバックの送信ウィンドウを表示します。"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "seconds"
-msgstr ""
+msgstr "秒"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "second"
-msgstr ""
+msgstr "秒"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minutes"
-msgstr ""
+msgstr "分"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minute"
-msgstr ""
+msgstr "分"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:180
-#, fuzzy
 msgid "Please wait"
-msgstr "お待ちください..."
+msgstr "お待ちください"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/MenuMediator.java:91
 msgid "Loading Menus..."
@@ -4648,11 +4626,11 @@ msgstr "手動ポート範囲"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:77
 msgid "TCP port start:"
-msgstr ""
+msgstr "TCP ポートの開始:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:87
 msgid "TCP port end:"
-msgstr ""
+msgstr "TCPポートの終わり："
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:157
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:161
