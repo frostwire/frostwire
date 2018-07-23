@@ -783,7 +783,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Helper-function to clear selected items.
      */
-    protected void clearSelection() {
+    public void clearSelection() {
         TABLE.clearSelection();
         handleNoSelection();
     }

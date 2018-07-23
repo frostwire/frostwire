@@ -146,7 +146,7 @@ public final class TransfersTab extends AbstractTab {
             transfersComponent.setMinimumSize(new Dimension(100, 200));
             transferDetailSplitter.add(transfersComponent);
 
-            transferDetailComponent = new TransferDetailComponent(e -> downloadMediator.removeSelection());
+            transferDetailComponent = new TransferDetailComponent(e -> downloadMediator.clearSelection());
             transferDetailSplitter.add(transferDetailComponent);
 
             mainComponent.add(transferDetailSplitter, "cell 0 1 3 1, grow, pushy, hmax 10000px, wrap"); // "cell <column> <row> <width> <height>"
