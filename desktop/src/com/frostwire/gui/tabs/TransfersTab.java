@@ -128,20 +128,28 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private void initComponents() {
-        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][][grow]", "[][grow]"));
+        mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][][grow]"));
+        // removed last parameter: rowConstraints="[][grow]"
+        // it was causing the entire transfer tab not to grow vertically on bigger screens
+
+        // Transfers [ text filter]           [filter buttons] row
         mainComponent.add(new JLabel(I18n.tr("Transfers")), "h 30!, gapleft 10px, left");
         mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
         mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
+
         if (dedicatedTransfersTabAvailable) {
             transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             transferDetailSplitter.setDividerLocation(270);
             transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
+
             JComponent transfersComponent = downloadMediator.getComponent();
             transfersComponent.setMinimumSize(new Dimension(100, 200));
             transferDetailSplitter.add(transfersComponent);
-            transferDetailComponent = new TransferDetailComponent();
+
+            transferDetailComponent = new TransferDetailComponent(e -> downloadMediator.removeSelection());
             transferDetailSplitter.add(transferDetailComponent);
-            mainComponent.add(transferDetailSplitter, "cell 0 1 3 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
+
+            mainComponent.add(transferDetailSplitter, "cell 0 1 3 1, grow, pushy, hmax 10000px, wrap"); // "cell <column> <row> <width> <height>"
         } else {
             mainComponent.add(downloadMediator.getComponent(), "cell 0 1 3 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
         }
@@ -212,7 +220,7 @@ public final class TransfersTab extends AbstractTab {
         filterFinishedButton.addActionListener(new OnFilterButtonToggledListener(FilterMode.FINISHED));
         final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
         final Dimension buttonDimension = new Dimension(115, 28);
-        applyFontAndDimensionToFilterToggleButtons(smallHelvetica, buttonDimension,
+        applyFontAndDimensionToButtons(smallHelvetica, buttonDimension,
                 filterAllButton, filterDownloadingButton, filterSeedingButton, filterFinishedButton);
         filterGroup.add(filterAllButton);
         filterGroup.add(filterDownloadingButton);
@@ -225,8 +233,8 @@ public final class TransfersTab extends AbstractTab {
         return filterButtonsContainer;
     }
 
-    private void applyFontAndDimensionToFilterToggleButtons(Font font, Dimension dimension, JToggleButton... buttons) {
-        for (JToggleButton button : buttons) {
+    private void applyFontAndDimensionToButtons(Font font, Dimension dimension, JComponent... buttons) {
+        for (JComponent button : buttons) {
             button.setFont(font);
             button.setMinimumSize(dimension);
             button.setMaximumSize(dimension);
