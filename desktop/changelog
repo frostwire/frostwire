@@ -6,12 +6,14 @@ frostwire (6.7.1) stable; urgency=high
   * UX: better resizing of transfer detail components
   * UX: transfer detail component rendering optimizations
   * UX: fixes bug in search result rendering
+  * UX: window resizing fixes for Transfers tab, Library explorer
+  * Windscribe VPN false-negative detection in Windows fixed
   * Translations updated
   * Search fixes
   * Crash fixed when translating tooltips
   * Crashes and optimizations
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 19 Jul 2018 09:29:38 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 24 Jul 2018 00:01:08 -0600
 
 frostwire (6.7.0) stable; urgency=high
   * New Torrent Transfer Details components
