@@ -1,20 +1,21 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.frostwire.gui.library;
 
@@ -76,7 +77,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     void refreshSelection(boolean clearCache) {
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
-        String searchPrompt = null;
+        String searchPrompt;
         if (node == null) {
             return;
         }
@@ -111,9 +112,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
             BackgroundExecutorService.schedule(new SearchByMediaTypeRunnable(mtsfdh));
         }
         saveLastSelectedDirectoryHolder();
-        if (searchPrompt == null) {
-            searchPrompt = I18n.tr("Search your") + " " + node.getUserObject();
-        }
+
+        searchPrompt = I18n.tr("Search your") + " " + node.getUserObject();
+
         LibraryMediator.instance().getLibrarySearch().clear();
         LibraryMediator.instance().getLibrarySearch().setSearchPrompt(searchPrompt);
     }
@@ -127,8 +128,8 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     protected void setupUI() {
         setLayout(new BorderLayout());
-        setMinimumSize(new Dimension(177,113));
-        setPreferredSize(new Dimension(177,232));
+        setMinimumSize(new Dimension(177,170));
+        setPreferredSize(new Dimension(177,170));
         GUIMediator.addRefreshListener(this);
 
         setupModel();
@@ -197,7 +198,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     DirectoryHolder getSelectedDirectoryHolder() {
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
-        return node != null && node instanceof DirectoryHolderNode ? ((DirectoryHolderNode) node).getDirectoryHolder() : null;
+        return node instanceof DirectoryHolderNode ? ((DirectoryHolderNode) node).getDirectoryHolder() : null;
     }
 
     public void clearSelection() {
@@ -232,20 +233,16 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
         public void run() {
             try {
-                GUIMediator.safeInvokeLater(new Runnable() {
-                    public void run() {
-                        LibraryMediator.instance().clearLibraryTable();
-                    }
-                });
+                GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().clearLibraryTable());
 
-                final List<File> cache = new ArrayList<File>(_mtsfdh.getCache());
+                final List<File> cache = new ArrayList<>(_mtsfdh.getCache());
                 if (cache.size() == 0) {
 
                     File torrentDataDirFile = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
 
                     Set<File> ignore = TorrentUtil.getIgnorableFiles();
 
-                    Set<File> directories = new HashSet<File>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+                    Set<File> directories = new HashSet<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
                     directories.removeAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
 
                     for (File dir : directories) {
@@ -254,18 +251,12 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                         }
                         if (dir.equals(torrentDataDirFile)) {
                             search(dir, ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
-                        } else if (dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) && !_mtsfdh.getMediaType().equals(MediaType.getAudioMediaType())) {
-                            continue;
-                        } else {
-                            search(dir, new HashSet<File>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                        } else if (!dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) || _mtsfdh.getMediaType().equals(MediaType.getAudioMediaType())) {
+                            search(dir, new HashSet<>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                         }
                     }
                 } else {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            LibraryMediator.instance().addFilesToLibraryTable(cache);
-                        }
-                    });
+                    GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addFilesToLibraryTable(cache));
                 }
 
                 LibraryExplorer.this.executePendingRunnables();
@@ -286,8 +277,8 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 selectMediaTypeSavedFilesDirectoryHolderbyType(_mtsfdh.getMediaType());
             }
 
-            List<File> directories = new ArrayList<File>();
-            final List<File> files = new ArrayList<File>();
+            List<File> directories = new ArrayList<>();
+            final List<File> files = new ArrayList<>();
 
             for (File child : FileUtils.listFiles(file)) {// file.listFiles()) {
 
@@ -311,11 +302,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 }
             }
             _mtsfdh.addToCache(files);
-            Runnable r = new Runnable() {
-                public void run() {
-                    LibraryMediator.instance().addFilesToLibraryTable(files);
-                }
-            };
+            Runnable r = () -> LibraryMediator.instance().addFilesToLibraryTable(files);
 
             GUIMediator.safeInvokeLater(r);
 
@@ -328,7 +315,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     private void selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType mediaType) {
         try {
             LibraryNode selectedValue = (LibraryNode) tree.getLastSelectedPathComponent();
-            if (selectedValue != null && selectedValue instanceof DirectoryHolderNode && ((DirectoryHolderNode) selectedValue).getDirectoryHolder() instanceof MediaTypeSavedFilesDirectoryHolder
+            if (selectedValue instanceof DirectoryHolderNode && ((DirectoryHolderNode) selectedValue).getDirectoryHolder() instanceof MediaTypeSavedFilesDirectoryHolder
                     && ((MediaTypeSavedFilesDirectoryHolder) ((DirectoryHolderNode) selectedValue).getDirectoryHolder()).getMediaType().equals(mediaType)) {
                 // already selected
                 try {
@@ -345,12 +332,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 if (node instanceof DirectoryHolderNode) {
                     DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
                     if (holder instanceof MediaTypeSavedFilesDirectoryHolder && ((MediaTypeSavedFilesDirectoryHolder) holder).getMediaType().equals(mediaType)) {
-                        GUIMediator.safeInvokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                tree.setSelectionPath(new TreePath(node.getPath()));
-                                tree.scrollPathToVisible(new TreePath(node.getPath()));
-                            }
+                        GUIMediator.safeInvokeAndWait(() -> {
+                            tree.setSelectionPath(new TreePath(node.getPath()));
+                            tree.scrollPathToVisible(new TreePath(node.getPath()));
                         });
                         return;
                     }
@@ -378,12 +362,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 if (node instanceof DirectoryHolderNode) {
                     DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
                     if (holder instanceof StarredDirectoryHolder) {
-                        GUIMediator.safeInvokeAndWait(new Runnable() {
-                            @Override
-                            public void run() {
-                                tree.setSelectionPath(new TreePath(node.getPath()));
-                                tree.scrollPathToVisible(new TreePath(node.getPath()));
-                            }
+                        GUIMediator.safeInvokeAndWait(() -> {
+                            tree.setSelectionPath(new TreePath(node.getPath()));
+                            tree.scrollPathToVisible(new TreePath(node.getPath()));
                         });
 
                         return;
@@ -397,12 +378,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
 
     public void selectDirectoryHolderAt(final int index) {
         if (index >=0 && index < tree.getRowCount()) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    tree.setSelectionRow(index);
-                    tree.scrollRowToVisible(index);
-                }
+            GUIMediator.safeInvokeLater(() -> {
+                tree.setSelectionRow(index);
+                tree.scrollRowToVisible(index);
             });
         }
     }
@@ -419,12 +397,9 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 if (node instanceof DirectoryHolderNode) {
                     DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
                     if (holder instanceof SavedFilesDirectoryHolder) {
-                        GUIMediator.safeInvokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                tree.setSelectionPath(new TreePath(node.getPath()));
-                                tree.scrollPathToVisible(new TreePath(node.getPath()));
-                            }
+                        GUIMediator.safeInvokeLater(() -> {
+                            tree.setSelectionPath(new TreePath(node.getPath()));
+                            tree.scrollPathToVisible(new TreePath(node.getPath()));
                         });
                         return;
                     }
@@ -438,7 +413,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     private boolean selectionListenerForSameItem(Class<?> clazz) {
         LibraryNode selectedValue = (LibraryNode) tree.getLastSelectedPathComponent();
 
-        if (selectedValue != null && selectedValue instanceof DirectoryHolderNode && clazz.isInstance(((DirectoryHolderNode) selectedValue).getDirectoryHolder())) {
+        if (selectedValue instanceof DirectoryHolderNode && clazz.isInstance(((DirectoryHolderNode) selectedValue).getDirectoryHolder())) {
             // already selected
             try {
                 treeSelectionListener.valueChanged(null);
@@ -451,7 +426,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     }
 
     List<MediaTypeSavedFilesDirectoryHolder> getMediaTypeSavedFilesDirectoryHolders() {
-        List<MediaTypeSavedFilesDirectoryHolder> holders = new ArrayList<MediaTypeSavedFilesDirectoryHolder>();
+        List<MediaTypeSavedFilesDirectoryHolder> holders = new ArrayList<>();
         Enumeration<?> e = root.depthFirstEnumeration();
         while (e.hasMoreElements()) {
             LibraryNode node = (LibraryNode) e.nextElement();
@@ -491,13 +466,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     }
 
     private class RefreshAction extends AbstractAction {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 412879927060208864L;
-
-        public RefreshAction() {
+        RefreshAction() {
             putValue(Action.NAME, I18n.tr("Refresh"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Refresh selected"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_REFRESH");

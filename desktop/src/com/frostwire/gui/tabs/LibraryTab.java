@@ -46,8 +46,7 @@ public final class LibraryTab extends AbstractTab {
     /**
      * Constructs the elements of the tab.
      *
-     * @param LIBRARY_MEDIATOR the <tt>LibraryMediator</tt> instance 
-     * @param PLAYLIST_MEDIATOR the <tt>PlayListMediator</tt> instance 
+     * @param lm the <tt>LibraryMediator</tt> instance
      */
     public LibraryTab(LibraryMediator lm) {
         super(I18n.tr("Library"), I18n.tr("Browse, Search and Play files in your computer. Wi-Fi sharing, Internet Radio and more."), "library_tab");
