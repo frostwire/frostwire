@@ -28,6 +28,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.util.HashMap;
 
 /**
@@ -60,24 +61,20 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         void updateData(BittorrentDownload btDownload);
     }
 
-    public TransferDetailComponent(ActionListener hideDetailsActionListener) {
+    public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
         super(new MigLayout("fill, insets 0 0 0 0",
                 "",
                 "[top][grow]"));
 
-        JPanel labelAndButton = new JPanel(new FlowLayout());
-        JButton hideButton = new JButton(I18n.tr("hide"));
-        final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 12);
-        final Dimension buttonDimension = new Dimension(85, 28);
-        hideButton.setFont(smallHelvetica);
-        hideButton.setMinimumSize(buttonDimension);
-        hideButton.setMaximumSize(buttonDimension);
-        hideButton.setPreferredSize(buttonDimension);
-        hideButton.addActionListener(hideDetailsActionListener);
-        labelAndButton.add(new JLabel(I18n.tr("Transfer Detail")));
-        labelAndButton.add(hideButton, "left, gapleft 5px, growx");
+        JPanel labelAndLink = new JPanel(new FlowLayout());
+        JLabel hideLink = new JLabel("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
+        hideLink.setBorder(BorderFactory.createEmptyBorder(2,0,0,0));
+        hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13));
+        hideLink.addMouseListener(hideDetailsActionListener);
+        labelAndLink.add(new JLabel(I18n.tr("Transfer Detail")));
+        labelAndLink.add(hideLink, "left, gapleft 10px, growx");
 
-        add(labelAndButton, "left, gapleft 10px, growx");
+        add(labelAndLink, "left, gapleft 10px, growx");
         add(createDetailSwitcherButtons(), "push, right, wrap");
         add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
         GUIMediator.addRefreshListener(this);
