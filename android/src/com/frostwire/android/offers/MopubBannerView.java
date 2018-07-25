@@ -206,6 +206,7 @@ public class MopubBannerView extends LinearLayout {
         InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
         setVisible(Visibility.FALLBACK, true);
         setVisibility(View.VISIBLE);
+        dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void setVisible(Visibility visibility, boolean visible) {
