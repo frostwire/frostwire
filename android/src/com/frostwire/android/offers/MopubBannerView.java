@@ -194,13 +194,14 @@ public class MopubBannerView extends LinearLayout {
     private void loadFallbackBanner(final String adUnitId) {
         InHouseBannerFactory.AdFormat adFormat;
         if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
-                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId)) {
+            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
+            MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
             adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
         } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
                 MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
             adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
         } else {
-            throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId  + ">");
+            throw new IllegalArgumentException("MopubBa nnerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId  + ">");
         }
         InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
         setVisible(Visibility.FALLBACK, true);

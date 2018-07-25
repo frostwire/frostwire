@@ -206,7 +206,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                     if (mopubBannerView == null) {
                         mopubBannerView = new MopubBannerView(getContext(), null, true, false);
                         mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-                        mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
+                        mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
                     }
                     return mopubBannerView;
                 }
