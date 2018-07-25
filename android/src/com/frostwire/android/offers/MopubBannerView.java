@@ -201,7 +201,7 @@ public class MopubBannerView extends LinearLayout {
                 MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
             adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
         } else {
-            throw new IllegalArgumentException("MopubBa nnerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId  + ">");
+            throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId  + ">");
         }
         InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
         setVisible(Visibility.FALLBACK, true);
