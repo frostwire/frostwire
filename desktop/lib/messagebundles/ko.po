@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-04 22:26-0600\n"
-"PO-Revision-Date: 2018-04-08 13:15-0400\n"
+"PO-Revision-Date: 2018-07-25 21:48-0300\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ko\n"
@@ -1358,112 +1358,97 @@ msgid "Support %s with a tip, donation or voluntary payment"
 msgstr "팁, 기부와 자발적인 지불 지원 %s"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:64
-#, fuzzy
 msgid "Transfer Detail"
-msgstr "전송"
+msgstr "이체 세부 사항"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:108
 msgid "General"
-msgstr ""
+msgstr "일반"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:109
-#, fuzzy
 msgid "Files"
-msgstr "파일"
+msgstr "파일들"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:110
-#, fuzzy
 msgid "Pieces"
-msgstr "조각 크기"
+msgstr "조각들"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:92
-#, fuzzy
 msgid "complete"
-msgstr "수집했습니다."
+msgstr "완전한"
 
 #. time elapsed, time left, download speed
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:100
 msgid "Time elapsed"
-msgstr ""
+msgstr "경과 시간"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:102
-#, fuzzy
 msgid "Time left"
-msgstr "시간"
+msgstr "남은 시간"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:104
-#, fuzzy
 msgid "Download speed"
-msgstr "다운로드 속도："
+msgstr "다운로드 속도"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:112
-#, fuzzy
 msgid "Download speed limit"
-msgstr "다운로드 속도："
+msgstr "속도 제한 다운로드"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:121
-#, fuzzy
 msgid "Upload speed"
-msgstr "업로드 속도："
+msgstr "업로드 속도"
 
 #. Total Size, Peers, Upload speed limit
 #. Share Ratio
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:126
-#, fuzzy
 msgid "Total size"
-msgstr "총 업스트림:"
+msgstr "총합 크기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:130
-#, fuzzy
 msgid "Upload speed limit"
-msgstr "업로드 속도："
+msgstr "업로드 속도 제한"
 
 #. TODO: Add settings_gray button and dialog to adjust upload speed limit
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:133
-#, fuzzy
 msgid "Share ratio"
-msgstr "비율 공유"
+msgstr "공유 비율"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:146
-#, fuzzy
 msgid "Save location"
-msgstr "비율 공유"
+msgstr "위치 저장"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:152
-#, fuzzy
 msgid "InfoHash"
-msgstr "Infohash 복사"
+msgstr "InfoHash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr ""
+msgstr "자석 URL"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
-#, fuzzy
 msgid "Created On"
-msgstr "작성"
+msgstr "에 만든"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:163
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:97
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:288
 msgid "Comment"
-msgstr "코멘트"
+msgstr "논평"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:211
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:220
-#, fuzzy
 msgid "connected"
-msgstr "접속해제"
+msgstr "연결된"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:212
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:221
 msgid "of"
-msgstr ""
+msgstr "의"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:214
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:223
 msgid "total"
-msgstr ""
+msgstr "합계"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:77
 msgid "IP"
@@ -1471,11 +1456,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:78
 msgid "Client"
-msgstr ""
+msgstr "고객"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:79
 msgid "Flags"
-msgstr ""
+msgstr "국기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:80
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
@@ -1483,19 +1468,17 @@ msgid "Source"
 msgstr "소스"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:175
-#, fuzzy
 msgid "Resumed"
-msgstr "재생"
+msgstr "재개 됨"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:178
-#, fuzzy
 msgid "Incoming"
-msgstr "압축 해제"
+msgstr "들어오는"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:58
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:101
 msgid "Total Pieces"
-msgstr ""
+msgstr "총 조각"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:38
 msgid "URL"
@@ -1750,9 +1733,8 @@ msgid "Starred"
 msgstr "중요"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:220
-#, fuzzy
 msgid "Show all starred items"
-msgstr "방화벽 표시"
+msgstr "별표 표시된 항목 모두 표시"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:441
 msgid "Open Playlist (.m3u)"
@@ -2498,13 +2480,12 @@ msgid "Thanks to Ubuntu/Kubuntu Teams"
 msgstr " Ubuntu/Kubuntu 직원들에게 감사드립니다"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:244
-#, fuzzy
 msgid ""
 "For making the world a better place with such an excellent distro, you'll be "
 "the ones to make a difference on the desktop."
 msgstr ""
-"<p>뛰어난 배포로 세상을 보다 편하게, 데스크탑을 통하여 변화를 만드는 것은 당"
-"신입니다.</p>"
+"뛰어난 배포로 세상을 보다 편하게, 데스크탑을 통하여 변화를 만드는 것은 당신입"
+"니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:246
 #, fuzzy
@@ -3003,17 +2984,16 @@ msgid "Circle FrostWire on G+"
 msgstr "G +의 FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
-#, fuzzy
 msgid "<b>Seeding</b><p>completed torrent downloads.</p>"
-msgstr "<b>완료된</b><p>토렌트 다운로드 배포."
+msgstr "<b>완료된</b><p>토렌트 다운로드 배포.</p>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
-#, fuzzy
 msgid ""
 "<b>Not Seeding</b><p>File chunks might be shared only during a torrent "
 "download.</p>"
 msgstr ""
-"<b>배포하지 않음</b>.<p>토렌트 다운로드 중에만 파일을<p>공유할 수 있습니다."
+"<b>배포하지 않음</b>.<p>토렌트 다운로드 중에만 파일을<p>공유할 수 있습니다.</"
+"p>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:467
 msgid "Not Seeding"
@@ -4080,28 +4060,27 @@ msgstr "FrostWire 에 관한 정보"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:154
 msgid "Show Send Feedback Window"
-msgstr ""
+msgstr "의견 보내기 창 표시"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "seconds"
-msgstr ""
+msgstr "초"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "second"
-msgstr ""
+msgstr "초"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minutes"
-msgstr ""
+msgstr "의사록"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minute"
-msgstr ""
+msgstr "분"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:180
-#, fuzzy
 msgid "Please wait"
-msgstr "기다리십시오. "
+msgstr "기다려주십시오."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/MenuMediator.java:91
 msgid "Loading Menus..."
@@ -4109,7 +4088,7 @@ msgstr "메뉴를 불러오는 중..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:47
 msgid "&Tools"
-msgstr "도구 (&T)"
+msgstr "&도구들"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:71
 msgid "Rebuild iTunes \"FrostWire\" Playlist"
@@ -4213,18 +4192,16 @@ msgid "&Increase Font Size"
 msgstr "&폰트 사이즈 증가"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:47
-#, fuzzy
 msgid "Increases the Table Font Size"
-msgstr "폰트 사이즈 증가"
+msgstr "테이블 글꼴 크기를 늘립니다"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:48
 msgid "&Decrease Font Size"
 msgstr "&폰트 사이즈 감소"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:48
-#, fuzzy
 msgid "Decreases the Table Font Size"
-msgstr "폰트 사이즈 감소"
+msgstr "표 글꼴 크기 줄입니다"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:55
 msgid "C&hange Language"
@@ -4348,9 +4325,8 @@ msgid "System Boot"
 msgstr "시스템 부팅"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:258
-#, fuzzy
 msgid "Usage Statistics"
-msgstr "누계"
+msgstr "사용 통계"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:261
 msgid "System Tray"
@@ -4478,14 +4454,12 @@ msgid "Send Errors Automatically if FrostWire is Frozen"
 msgstr "FrostWire가 정지되면 자동으로 오류를 전송"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/DetailsPaneItem.java:37
-#, fuzzy
 msgid "Details Page"
-msgstr "토렌트 상세정보 페이지"
+msgstr "세부 정보 페이지"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/DetailsPaneItem.java:39
-#, fuzzy
 msgid "Show details web page after a download starts."
-msgstr "다운로드 시작 후 토렌트 세부정보 웹 페이지 보이기.(추천됨)"
+msgstr "다운로드가 시작된 후 세부 정보 웹 페이지를 표시합니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/DownloadLicenseWarningPaneItem.java:18
 msgid "License Warning"
@@ -4877,18 +4851,16 @@ msgstr ""
 "트 콘텐츠의 정보를 FrostWire가 기억하도록 합니다."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:44
-#, fuzzy
 msgid "Enable Smart Search"
-msgstr "스마트 검색 "
+msgstr "스마트 검색 사용"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:46
 msgid "Total torrents indexed"
 msgstr "총 지정된 토렌트"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:50
-#, fuzzy
 msgid "Reset Smart Search Database"
-msgstr "스마트 검색 "
+msgstr "스마트 검색 데이터베이스 재설정"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:78
 #, java-format
@@ -5167,9 +5139,8 @@ msgid "View in Archive.org"
 msgstr "Archive.org에서보기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:89
-#, fuzzy
 msgid "View in Pixabay"
-msgstr "YouTube에서보기"
+msgstr "Pixabay에서보기"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:91
 msgid "Close Tab"
@@ -5216,9 +5187,8 @@ msgstr ""
 "사용)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:109
-#, fuzzy
 msgid "Select content to download from this torrent."
-msgstr "보낼 내용 선택"
+msgstr "이 토런트에서 다운로드 할 컨텐츠를 선택하십시오."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultDisplayer.java:556
 msgid "results"
@@ -5234,9 +5204,8 @@ msgstr "더깊이 검색"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:623
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:624
-#, fuzzy
 msgid "Search tools"
-msgstr "검색 수"
+msgstr "검색 도구"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:739
 msgid "All Free Downloads"
