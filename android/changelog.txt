@@ -1,7 +1,8 @@
-FrostWire 2.0.7 build 548 - JUL/19/2018
+FrostWire 2.0.7 build 549 - JUL/26/2018
  - Crash on Audio Player equalizer menu
  - Translations updated: Croatian, new strings on all
  - Library updates: applovin 8.1.0, (dev) gradle 4.9
+ - Fixes bug on banner dismissal button behavior
 
 FrostWire 2.0.6 build 546 - JUL/10/2018
  - Yify search fixed
