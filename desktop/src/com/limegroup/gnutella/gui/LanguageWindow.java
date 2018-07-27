@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Locale;
 
 public class LanguageWindow extends JDialog {
@@ -94,7 +93,7 @@ public class LanguageWindow extends JDialog {
             }
         }
 
-        localeComboBox = new JComboBox<Object>(localeModel);
+        localeComboBox = new JComboBox<>(localeModel);
         localeComboBox.setFont(dialogFont);
         localeComboBox.setRenderer(LanguageFlagFactory.getListRenderer());
         localeComboBox.setMaximumRowCount(15);
@@ -110,17 +109,15 @@ public class LanguageWindow extends JDialog {
         // reflect the changed language right away so someone who doesn't speak
         // English or whatever language it the default can understand what the
         // buttons say
-        localeComboBox.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Locale selected = (Locale) e.getItem();
-                    if (selected != null && !currentLocale.equals(selected)) {
-                        updateLabels(selected);
-                        // hide the flag by default for english locales to save
-                        // space in the status bar
-                        showLanguageCheckbox.setSelected(!LanguageUtils.isEnglishLocale(selected));
-                        currentLocale = selected;
-                    }
+        localeComboBox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                Locale selected = (Locale) e.getItem();
+                if (selected != null && !currentLocale.equals(selected)) {
+                    updateLabels(selected);
+                    // hide the flag by default for english locales to save
+                    // space in the status bar
+                    showLanguageCheckbox.setSelected(!LanguageUtils.isEnglishLocale(selected));
+                    currentLocale = selected;
                 }
             }
         });
@@ -198,13 +195,7 @@ public class LanguageWindow extends JDialog {
     }
 
     private class OkayAction extends AbstractAction {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -1477512286179401572L;
-
-        public OkayAction() {
+        OkayAction() {
         }
 
         public void actionPerformed(ActionEvent event) {
@@ -215,13 +206,7 @@ public class LanguageWindow extends JDialog {
     }
 
     private class CancelAction extends AbstractAction {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -4642362028590179425L;
-
-        public CancelAction() {
+        CancelAction() {
         }
 
         public void actionPerformed(ActionEvent event) {
@@ -231,13 +216,7 @@ public class LanguageWindow extends JDialog {
     }
 
     private class UseEnglishAction extends AbstractAction {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 569992346803285269L;
-
-        public UseEnglishAction() {
+        UseEnglishAction() {
             // note: this string is intentionally not translated
             putValue(NAME, "Use English");
         }
