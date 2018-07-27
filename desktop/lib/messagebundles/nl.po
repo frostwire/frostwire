@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 4.17\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-27 02:01-0600\n"
-"PO-Revision-Date: 2018-07-26 08:19-0300\n"
+"PO-Revision-Date: 2018-07-27 08:53-0400\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: none\n"
 "Language: nl\n"
@@ -1375,7 +1375,7 @@ msgstr "Ondersteuning %s met een schenking of vrijwillige betaling"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:70
 msgid "hide"
-msgstr ""
+msgstr "verbergen"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:74
 msgid "Transfer Detail"
@@ -1411,9 +1411,8 @@ msgid "Download speed"
 msgstr "Download snelheid"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:115
-#, fuzzy
 msgid "Download limit"
-msgstr "Snelheidslimiet downloaden"
+msgstr "Downloadlimiet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:124
 msgid "Upload speed"
@@ -1429,9 +1428,8 @@ msgid "Share ratio"
 msgstr "Share verhouding"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:132
-#, fuzzy
 msgid "Upload limit"
-msgstr "Upload snelheidslimiet"
+msgstr "Uploadlimiet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:146
 msgid "Save location"
@@ -1505,14 +1503,12 @@ msgid "URL"
 msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Active"
-msgstr "Acties"
+msgstr "Actief"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Inactive"
-msgstr "Verwijder Inactieve"
+msgstr "Inactief"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:166
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:118
@@ -2111,6 +2107,10 @@ msgid ""
 "mplayer already at a custom location, <b>make sure to have a symlink "
 "pointing to your mplayer executable</b> at <b><font color=\"blue\">"
 msgstr ""
+"<br><br>Installeer <b>mplayer</b> in Ubuntu open een terminal venster en typ "
+"\"<b>install sudo apt-get install mplayer</b>\".<br><br>Als je mplayer al op "
+"een aangepaste locatie hebt geïnstalleerd, <b>zorg dan dat er een symlink "
+"naar je mplayer-uitvoerbaar bestand verwijst</b> op <b><font color=\"blue\">"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerLinux.java:32
 msgid ""
@@ -2119,6 +2119,10 @@ msgid ""
 "already at a custom location, <b>make sure to have a symlink pointing to "
 "your mplayer executable</b> at <b><font color=\"blue\">"
 msgstr ""
+"<br><br>Installeer <b>mplayer</b> in Fedora open een terminal venster en typ "
+"\"<b>sudo yum installeer mplayer</b>\".<br><br>Als je mplayer al op een "
+"aangepaste locatie hebt geïnstalleerd, <b>zorg dan dat er een symlink naar "
+"je mplayer-uitvoerbaar bestand verwijst</b> op <b><font color=\"blue\">"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerLinux.java:36
 msgid ""
@@ -2353,7 +2357,7 @@ msgstr "Update"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/InstallerUpdater.java:313
 #, java-format
 msgid "Time flies! You have missed the last {0} updates."
-msgstr ""
+msgstr "De tijd vliegt! U hebt de laatste {0} updates gemist."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/PortableUpdater.java:69
 msgid "Uncompressing files"
@@ -3030,7 +3034,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:208
 msgid "Circle FrostWire on G+"
-msgstr "Circle FrostWire op G +"
+msgstr "Circle FrostWire op G+"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 msgid "<b>Seeding</b><p>completed torrent downloads.</p>"
@@ -3156,34 +3160,37 @@ msgid "Loading tips..."
 msgstr "Tips worden geladen..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:5
-#, fuzzy
 msgid ""
 "Tired of downloads stopping halfway through? It helps to pick search results "
 "with a higher number in the 'Seeds' column. The Seeds are the amount of "
 "unique places on the network that are hosting the file. The more sources, "
 "the better the chance of getting your torrent file!"
 msgstr ""
-"Moe van downloads die halverwge stoppen? Het helpt om zoekresulaten met een "
-"hoger nummer in de kolom '#' te kiezen. De # is het aantal unieke plaatsen "
-"op het netwerk dat het bestand host. Hoe meer bronnen, hoe meer kans om uw "
-"bestand te krijgen! Als een ongewenst resultaat veel bronnen "
+"Moe van downloads halverwege stoppen door? Het helpt om het ophalen van "
+"zoekresultaten met een hoger nummer in de kolom 'Zaden'. De zaden zijn de "
+"hoeveelheid unieke plaatsen op het netwerk die host zijn van het bestand. "
+"Hoe meer bronnen, hoe beter de kans op het krijgen van uw torrent-bestand!"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:23
-#, fuzzy
 msgid ""
 "You can change the look and feel of FrostWire by going to View &gt; Use "
 "Small Icons, Show Icon Text and Increase-Decrease the Font Size."
-msgstr "U kunt het uiterlijk en uitstraling van FrostWire veranderen door naa"
+msgstr ""
+"U kunt de look en feel van FrostWire wijzigen door te gaan naar de weergave "
+"> kleine pictogrammen gebruiken, pictogramtekst weergeven en de "
+"lettergrootte vergroten-verkleinen."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:24
-#, fuzzy
 msgid ""
 "You can sort your search results by clicking on a column. The most useful "
 "column to sort by is the 'Seeds' column if you are looking for a torrent, "
 "Seeds represents an approximate number of computers that have the entire "
 "file and are online."
 msgstr ""
-"U kunt uw zoekresultaten sorteren door op een kolom te klikken. De meest "
+"U kunt uw zoekresultaten sorteren op een kolom te klikken. De nuttigste "
+"kolom wilt sorteren is de 'Zaden' kolom als u op zoek bent naar een torrent, "
+"zaden vertegenwoordigt een geschatte aantal computers die het hele bestand "
+"hebt en on line zijn."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:25
 msgid ""
@@ -3274,17 +3281,17 @@ msgstr ""
 "automatisch!"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:36
-#, fuzzy
 msgid ""
 "Want to share a large file? Send several hundred gigabytes with no problems "
 "at all, just make sure you leave your FrostWire running and seeding while "
 "your friend(s) are downloading. They can pause and resume the download all "
 "they want as long as you or somebody else is seeding the same content."
 msgstr ""
-"Wilt u een groot bestand delen? Verstuur probleemloos honderden gigabytes, "
-"zorg er alleen voor dat uw FrostWire aanstaat terwijl uw vriend(en) aan het "
-"downloaden zijn. Zij kunnen de download pauzeren en hervatten, zolang u of "
-"iemand anders dezelfde inhoud aan het seeden is."
+"Wilt u een groot bestand delen? Stuur enkele honderden gigabytes zonder "
+"problemen, zorg er alleen voor dat u uw FrostWire laat draaien en zaaien "
+"terwijl uw vriend (in) aan het downloaden zijn. Ze kunnen de download "
+"pauzeren en hervatten wat ze willen, zolang jij of iemand anders dezelfde "
+"inhoud zaait."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:37
 msgid ""
@@ -3299,11 +3306,12 @@ msgstr ""
 "link aan, zal de download in FrostWire starten."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:38
-#, fuzzy
 msgid ""
 "Don't want to seed? Go to Tools &gt; Options &gt; Bittorrent or select the "
 "Seeding - No Seeding icon at the bottom bar"
-msgstr "Wilt u niet seeden? Ga naar Tools &gt; Opties &gt; Bittorrent "
+msgstr ""
+"Wil je niet zaad? Ga naar Extra> Opties> Bittorrent of selecteer het Seeding "
+"- No Seeding-pictogram in de balk onderaan"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:49
 msgid ""
@@ -4658,9 +4666,8 @@ msgid "Use random port (Recommended)"
 msgstr "Gebruik willekeurige poort (Aanbevolen)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:52
-#, fuzzy
 msgid "Manual port range"
-msgstr "Handmatige poortdoorverwijzing:"
+msgstr "Handmatige poortbereik"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:77
 msgid "TCP port start:"
@@ -5325,9 +5332,8 @@ msgstr ""
 "Zoeken om te schakelen)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:109
-#, fuzzy
 msgid "Select content to download from this torrent."
-msgstr "Selecteer de inhoud die u wilt versturen"
+msgstr "Selecteer inhoud om te downloaden van deze torrent."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultDisplayer.java:556
 msgid "results"
