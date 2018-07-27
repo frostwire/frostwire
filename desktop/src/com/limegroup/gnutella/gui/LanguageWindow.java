@@ -78,7 +78,7 @@ public class LanguageWindow extends JDialog {
     	GridBagConstraints c = new GridBagConstraints();
 
         // add locales to model and select the best match 
-        DefaultComboBoxModel<Object> localeModel = new DefaultComboBoxModel<Object>();
+        DefaultComboBoxModel<Object> localeModel = new DefaultComboBoxModel<>();
         int selectedScore = -1;
         int selectedIndex = -1;
         Locale systemLocale = Locale.getDefault();

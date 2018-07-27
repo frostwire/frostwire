@@ -61,7 +61,7 @@ public class LanguageUtils {
      * font. If the font is null, all languages are returned.
      */
     public static Locale[] getLocales(Font font) {
-        final List<Locale> locales = new LinkedList<Locale>();
+        final List<Locale> locales = new LinkedList<>();
         
         File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
         if (jar != null) {
@@ -70,24 +70,15 @@ public class LanguageUtils {
             LOG.warn("Could not find bundle jar to determine locales");
         }
         
-        Collections.sort(locales, new Comparator<Locale>() {
-            public int compare(Locale o1, Locale o2) {
-                return o1.getDisplayName(o1).compareToIgnoreCase(
-                        o2.getDisplayName(o2));
-            }
-        });
+        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(
+                o2.getDisplayName(o2)));
         
         locales.remove(Locale.ENGLISH);
         locales.add(0, Locale.ENGLISH);
 
         // remove languages that cannot be displayed using this font
         if (font != null && !OSUtils.isMacOSX()) {
-            for (Iterator<Locale> it = locales.iterator(); it.hasNext();) {
-                Locale locale = it.next();
-                if (!GUIUtils.canDisplay(font, locale.getDisplayName(locale))) {
-                    it.remove();
-                }
-            }
+            locales.removeIf(locale -> !GUIUtils.canDisplay(font, locale.getDisplayName(locale)));
         }
 
         return locales.toArray(new Locale[0]);
@@ -96,21 +87,19 @@ public class LanguageUtils {
     /**
      * Returns the languages as found from the classpath in messages.jar
      */
-    static void addLocalesFromJar(List<Locale> locales, File jar) {
-        ZipFile zip = null;
-        try {
-            zip = new ZipFile(jar);
+    private static void addLocalesFromJar(List<Locale> locales, File jar) {
+        try (ZipFile zip = new ZipFile(jar)) {
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
                 if (!name.startsWith(BUNDLE_PREFIX) || !name.endsWith(BUNDLE_POSTFIX)
-                        || name.indexOf("$") != -1) {
+                        || name.contains("$")) {
                     continue;
                 }
 
                 String iso = name.substring(BUNDLE_PREFIX.length(), name.length()
                         - BUNDLE_POSTFIX.length());
-                List<String> tokens = new ArrayList<String>(Arrays.asList(iso.split("_", 3)));
+                List<String> tokens = new ArrayList<>(Arrays.asList(iso.split("_", 3)));
                 if (tokens.size() < 1) {
                     continue;
                 }
@@ -123,20 +112,13 @@ public class LanguageUtils {
             }
         } catch (IOException e) {
             LOG.warn("Could not determine locales", e);
-        } finally {
-            if (zip != null) {
-                try {
-                    zip.close();
-                } catch (IOException ioe) {
-                }
-            }
         }
     }
 
     /**
      * Returns true if the language of <code>locale</code> is English.
      */
-    public static boolean isEnglishLocale(Locale locale) {
+    static boolean isEnglishLocale(Locale locale) {
         return Locale.ENGLISH.getLanguage().equals(locale.getLanguage());
     }
 
@@ -146,7 +128,7 @@ public class LanguageUtils {
      * 
      * @return -1, if locales do not match, 3 if locales are equal
      */
-    public static int getMatchScore(Locale specificLocale, Locale genericLocale) {
+    static int getMatchScore(Locale specificLocale, Locale genericLocale) {
         int i = 0;
         if (specificLocale.getLanguage().equals(genericLocale.getLanguage())) {
             i += 1;
@@ -173,14 +155,11 @@ public class LanguageUtils {
      * 
      * @see Locale#getDefault()
      */
-    public static boolean matchesDefaultLocale(Locale locale) {
+    static boolean matchesDefaultLocale(Locale locale) {
         Locale systemLocale = Locale.getDefault();
-        if (matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage())
+        return matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage())
                 && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry())
-                && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant())) {
-            return true;
-        }
-        return false;
+                && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
     }
     
     private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
