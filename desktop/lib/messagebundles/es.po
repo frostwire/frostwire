@@ -5066,8 +5066,8 @@ msgstr ""
 "Consejo: Usa las flechas del teclado para mayor precisión."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:38
-msgid "Download Speed:"
-msgstr "Velocidad de descarga:"
+msgid "Download Speed"
+msgstr "Velocidad de descarga"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:50
 msgid "Set the Maximum BitTorrent upload speed in KB/s."
@@ -5082,8 +5082,8 @@ msgstr ""
 "penalizada por algunos rastreadores, resultando en descargas más lentas."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:52
-msgid "Upload Speed:"
-msgstr "Velocidad de subida:"
+msgid "Upload Speed"
+msgstr "Velocidad de subida"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:72
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:100
