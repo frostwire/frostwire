@@ -33,6 +33,10 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
 
 public final class TransferDetailGeneral extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private final JProgressBar completionPercentageProgressbar;
@@ -51,6 +55,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
     private final JLabel peersLabel;
     private final JLabel uploadSpeedLimitLabel;
     private final JLabel shareRatioLabel;
+    private final JGrayLabel saveLocationGrayLabel;
     private final JLabel saveLocationLabel;
     private final JLabel infoHashLabel;
     private final JButton copyInfoHashButton;
@@ -143,7 +148,8 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         lowerPanel.setBackground(Color.WHITE);
         lowerPanel.setOpaque(true);
 
-        lowerPanel.add(new JGrayLabel(I18n.tr("Save location") + ":"),"split 2, gapright 10");
+        saveLocationGrayLabel = new JGrayLabel("<html><a href=\"#\">" + I18n.tr("Save location") + "</a>:</html>");
+        lowerPanel.add(saveLocationGrayLabel,"split 2, gapright 10");
         lowerPanel.add(saveLocationLabel = new JLabel(),"gapright 60, wrap");
 
         final ImageIcon copy_paste_gray = GUIMediator.getThemeImage("copy_paste_gray.png");
@@ -248,6 +254,18 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         shareRatioLabel.setText(guiBtDownload.getShareRatio());
 
         saveLocationLabel.setText(guiBtDownload.getSaveLocation().getAbsolutePath());
+        MouseListener[] mouseListeners = saveLocationGrayLabel.getMouseListeners();
+        if (mouseListeners != null && mouseListeners.length > 0) {
+            for (MouseListener l : mouseListeners) {
+                saveLocationGrayLabel.removeMouseListener(l);
+            }
+        }
+        saveLocationGrayLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GUIMediator.launchExplorer(new File(guiBtDownload.getDl().getSavePath(), guiBtDownload.getName()));
+            }
+        });
 
         infoHashLabel.setText(btDownload.getInfoHash());
         if (copyInfoHashActionListener != null) {

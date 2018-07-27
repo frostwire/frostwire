@@ -1,3 +1,10 @@
+frostwire (6.7.2) stable; urgency=high
+  * UX: Torrent Transfer Detail General > Save Location can be clicked to open
+    the OS's default file explorer to show the file/folder pertinent to the transfer.
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 27 Jul 2018 02:37:37 -0600
+
+
 frostwire (6.7.1) stable; urgency=high
   * UX: Torrent Transfer Tracker viewer now tracks DHT, LSD and PEX information
   * UX: Added border at the top of the global status bar at the bottom of the screen
