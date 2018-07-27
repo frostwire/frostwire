@@ -85,7 +85,7 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         JPanel upperPanel = new JPanel(new MigLayout("insets 17px, gap 0 5px, fill"));
         upperPanel.setBackground(new Color(0xf3f5f7));
         upperPanel.setOpaque(true);
-        upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name:") + "</b></html>"), "left, gapleft 2px, gapright 10px");
+        upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name") + ":</b></html>"), "left, gapleft 2px, gapright 10px");
         upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 10px");
         upperPanel.add(new JLabel("|"), "left, gapright 10px");
         upperPanel.add(completionPercentageLabel = new JLabel("<html><b>0%</b></html>"), "left, gapright 5px");
