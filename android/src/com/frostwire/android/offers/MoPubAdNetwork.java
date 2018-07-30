@@ -19,16 +19,23 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.SdkInitializationListener;
+import com.mopub.common.logging.MoPubLog;
+import com.mopub.common.privacy.ConsentDialogListener;
+import com.mopub.common.privacy.PersonalInfoManager;
+import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -157,6 +164,28 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             if (interstitial != null) {
                 interstitial.destroy();
             }
+        }
+    }
+
+    public static final class MoPubConsentDialogListener implements ConsentDialogListener {
+        private final WeakReference<PersonalInfoManager> pmRef;
+
+        public MoPubConsentDialogListener(PersonalInfoManager pm) {
+            pmRef = Ref.weak(pm);
+        }
+
+        @Override
+        public void onConsentDialogLoaded() {
+            if (!Ref.alive(pmRef)) {
+                return;
+            }
+            PersonalInfoManager personalInfoManager = pmRef.get();
+            personalInfoManager.showConsentDialog();
+        }
+
+        @Override
+        public void onConsentDialogLoadFailed(@NonNull MoPubErrorCode moPubErrorCode) {
+            MoPubLog.i("Consent dialog failed to load.");
         }
     }
 }

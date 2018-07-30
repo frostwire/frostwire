@@ -76,6 +76,7 @@ import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
@@ -84,6 +85,8 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
+import com.mopub.common.MoPub;
+import com.mopub.common.privacy.PersonalInfoManager;
 
 import org.apache.commons.io.IOUtils;
 
@@ -356,7 +359,12 @@ public class MainActivity extends AbstractActivity implements
         ConfigurationManager CM = ConfigurationManager.instance();
         if (CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
-            Offers.initAdNetworks(this);
+            if (Offers.initAdNetworks(this)) {
+                PersonalInfoManager mPersonalInfoManager = MoPub.getPersonalInformationManager();
+                if (mPersonalInfoManager != null && mPersonalInfoManager.shouldShowConsentDialog()) {
+                    mPersonalInfoManager.loadConsentDialog(new MoPubAdNetwork.MoPubConsentDialogListener(mPersonalInfoManager));
+                }
+            }
         } else if (!isShutdown()) {
             controller.startWizardActivity();
         }

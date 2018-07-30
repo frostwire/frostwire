@@ -56,19 +56,19 @@ public final class Offers {
     private Offers() {
     }
 
-    public static void initAdNetworks(Activity activity) {
+    public static boolean initAdNetworks(Activity activity) {
         if (FORCED_DISABLED) {
             LOG.info("Offers.initAdNetworks() aborted, FORCED_DISABLED");
-            return;
+            return false;
         }
         if (stopAdNetworksIfPurchasedRemoveAds(activity)) {
             LOG.info("Offers.initAdNetworks() aborted, user paid for ad removal.");
-            return;
+            return false;
         }
         long now = System.currentTimeMillis();
         if ((now - lastInitAdnetworksInvocationTimestamp) < 5000) {
             LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
-            return;
+            return false;
         }
         lastInitAdnetworksInvocationTimestamp = now;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
@@ -77,13 +77,14 @@ public final class Offers {
             }
         }
         PrebidManager.getInstance(activity);
-        LOG.info("Offers.initAdNetworks() sucess");
+        LOG.info("Offers.initAdNetworks() success");
+        return true;
     }
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (AD_NETWORKS == null) {
-            return;
-        }
+//        if (AD_NETWORKS == null) {
+//            return;
+//        }
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
@@ -412,7 +413,7 @@ public final class Offers {
                     }
                 }
 
-                if (!finishAfterDismiss && !shutdownAfter && tryBack2BackRemoveAdsOffer) {
+                if (!finishAfterDismiss && tryBack2BackRemoveAdsOffer) {
                     LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
                     Offers.tryBackToBackInterstitial(activity);
                 }
