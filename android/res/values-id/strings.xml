@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasi:</b> Meskipun dianjurkan untuk download Anda, terutama setiap kali mengunduh atau menukar informasi sensitif (misalnya perbankan) dan saat menggunakan Wi-Fi publik atau data seluler, <b>Anda tidak perlu VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum melakukannya, kami sarankan menggunakan salah satu layanan di bawah ini untuk mengenkripsi koneksi Anda dan <b>menjaga privasi Anda</b>. ]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Privasi Anda adalah hak asasi manusia yang fundamental</b>. Sambungan tidak terlindungi artinya semua yang Anda lakukan secara online termasuk <b>unduhan, penelusuran, perpesanan</b>, dapat dipantau dan disadap oleh siapa saja di jaringan Anda, mis. Penyedia Layanan Internet, peretas, pemerintah.<br><br><b>Kami SANGAT merekomendasikan menggunakan layanan VPN</b>. <br> Berikut adalah beberapa opsi yang menyediakan layanan andal dan berfungsi baik dengan FrostWire:]]></string>
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
     <string name="activity_chat_name">Percakapan</string>
@@ -696,7 +698,6 @@
     <string name="edit_tracker">Edit pelacak</string>
     <string name="down_speed">Kecepatan mengunduh</string>
     <string name="completed">Lengkap</string>
-    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Privasi Anda adalah hak asasi manusia yang fundamental</b>. Sambungan tidak terlindungi artinya semua yang Anda lakukan secara online termasuk <b>unduhan, penelusuran, perpesanan</b>, dapat dipantau dan disadap oleh siapa saja di jaringan Anda, mis. Penyedia Layanan Internet, peretas, pemerintah.<br><br><b>Kami SANGAT merekomendasikan menggunakan layanan VPN</b>. <br> Berikut adalah beberapa opsi yang menyediakan layanan andal dan berfungsi baik dengan FrostWire:]]></string>
     <string name="downloaded">Mengunduh</string>
     <string name="n_peers">%1$d REKAN</string>
     <string name="sequential_download">Unduhan berurutan</string>
@@ -716,7 +717,6 @@
     <string name="m_of_n_decimals">%1$d dari %2$d</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Tidak dapat membuka Detail Transfer, InfoHash tidak valid</string>
     <string name="details">Detail</string>
-    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum melakukannya, kami sarankan menggunakan salah satu layanan di bawah ini untuk mengenkripsi koneksi Anda dan <b>menjaga privasi Anda</b>. ]]></string>
     <string name="invalid_tracker_url">Invalid Tracker URL</string>
     <string name="title_activity_transfer_detail">Detail transfer</string>
     <string name="piece_size_header">Ukuran potongan:</string>
