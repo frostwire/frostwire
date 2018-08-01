@@ -47,7 +47,9 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
      * Abstract methods from CustomEventInterstitial
      */
     @Override
-    public void loadInterstitial(Context context, CustomEventInterstitial.CustomEventInterstitialListener interstitialListener, Map<String, Object> localExtras, Map<String, String> serverExtras) {
+    public void loadInterstitial(Context context, CustomEventInterstitial.CustomEventInterstitialListener interstitialListener,
+                                 Map<String, Object> localExtras,
+                                 Map<String, String> serverExtras) {
         if (context instanceof Activity) {
             startAppLovin((Activity) context);
         }
@@ -60,7 +62,19 @@ public final class AppLovinInterstitialAdapter extends CustomEventInterstitial i
         }
         LOG.info("Request received for new interstitial.");
         sdk = AppLovinSdk.getInstance(context);
-        sdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
+
+        // Zones support is available on AppLovin SDK 7.5.0 and higher
+        final String zoneId;
+        if (AppLovinSdk.VERSION_CODE >= 750 && serverExtras != null && serverExtras.containsKey("zone_id")) {
+            zoneId = serverExtras.get("zone_id");
+        } else {
+            zoneId = null;
+        }
+        if (zoneId != null && zoneId.length() > 0) {
+            sdk.getAdService().loadNextAdForZoneId(zoneId, this);
+        } else {
+            sdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
+        }
     }
 
     @Override
