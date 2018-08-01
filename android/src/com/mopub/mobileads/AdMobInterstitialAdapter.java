@@ -20,6 +20,7 @@ package com.mopub.mobileads;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.frostwire.android.offers.AdMobAdNetwork;
 import com.frostwire.util.Logger;
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdListener;
@@ -53,7 +54,7 @@ public class AdMobInterstitialAdapter extends CustomEventInterstitial {
                                     CustomEventInterstitialListener customEventInterstitialListener,
                                     Map<String, Object> localExtras,
                                     Map<String, String> serverExtras) {
-        //TODO: Maybe add a startAdMob method and a ADMOB_STARTED static variable
+        AdMobAdNetwork.start(context);
         mInterstitialListener = customEventInterstitialListener;
         final String adUnitId;
 

@@ -20,6 +20,7 @@ package com.mopub.mobileads;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.frostwire.android.offers.AdMobAdNetwork;
 import com.frostwire.util.Logger;
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdListener;
@@ -60,8 +61,7 @@ public class AdMobBannerAdapter extends CustomEventBanner {
                               final CustomEventBannerListener customEventBannerListener,
                               final Map<String, Object> localExtras,
                               final Map<String, String> serverExtras) {
-        //TODO: Maybe add a startAdMob method and a ADMOB_STARTED static variable
-
+        AdMobAdNetwork.start(context);
         mBannerListener = customEventBannerListener;
         final String adUnitId;
         final int adWidth;
