@@ -24,17 +24,10 @@ import com.frostwire.util.Logger;
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.mopub.common.MediationSettings;
-import com.mopub.common.util.Views;
 
 import java.util.Map;
-
-import static com.google.android.gms.ads.AdSize.BANNER;
-import static com.google.android.gms.ads.AdSize.FULL_BANNER;
-import static com.google.android.gms.ads.AdSize.LEADERBOARD;
-import static com.google.android.gms.ads.AdSize.MEDIUM_RECTANGLE;
 
 /**
  * @author aldenml
@@ -43,50 +36,37 @@ import static com.google.android.gms.ads.AdSize.MEDIUM_RECTANGLE;
  * Created on 7/31/18.
  */
 
-public class AdMobBannerAdapter extends CustomEventBanner {
-    private static final Logger LOG = Logger.getLogger(AdMobBannerAdapter.class);
+public class AdMobInterstitialAdapter extends CustomEventInterstitial {
+    private static final Logger LOG = Logger.getLogger(AdMobInterstitialAdapter.class);
+
     /*
      * These keys are intended for MoPub internal use. Do not modify.
      */
     public static final String AD_UNIT_ID_KEY = "adUnitID";
-    public static final String AD_WIDTH_KEY = "adWidth";
-    public static final String AD_HEIGHT_KEY = "adHeight";
+    public static final String LOCATION_KEY = "location";
 
-    private CustomEventBannerListener mBannerListener;
-    private AdView mGoogleAdView;
+    private CustomEventInterstitialListener mInterstitialListener;
+    private InterstitialAd mGoogleInterstitialAd;
 
     @Override
-    protected void loadBanner(final Context context,
-                              final CustomEventBannerListener customEventBannerListener,
-                              final Map<String, Object> localExtras,
-                              final Map<String, String> serverExtras) {
+    protected void loadInterstitial(Context context,
+                                    CustomEventInterstitialListener customEventInterstitialListener,
+                                    Map<String, Object> localExtras,
+                                    Map<String, String> serverExtras) {
         //TODO: Maybe add a startAdMob method and a ADMOB_STARTED static variable
-
-        mBannerListener = customEventBannerListener;
+        mInterstitialListener = customEventInterstitialListener;
         final String adUnitId;
-        final int adWidth;
-        final int adHeight;
 
         if (extrasAreValid(serverExtras)) {
             adUnitId = serverExtras.get(AD_UNIT_ID_KEY);
-            adWidth = Integer.parseInt(serverExtras.get(AD_WIDTH_KEY));
-            adHeight = Integer.parseInt(serverExtras.get(AD_HEIGHT_KEY));
         } else {
-            mBannerListener.onBannerFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
+            mInterstitialListener.onInterstitialFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
             return;
         }
 
-        mGoogleAdView = new AdView(context);
-        mGoogleAdView.setAdListener(new AdViewListener());
-        mGoogleAdView.setAdUnitId(adUnitId);
-
-        final AdSize adSize = calculateAdSize(adWidth, adHeight);
-        if (adSize == null) {
-            mBannerListener.onBannerFailed(MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
-            return;
-        }
-
-        mGoogleAdView.setAdSize(adSize);
+        mGoogleInterstitialAd = new InterstitialAd(context);
+        mGoogleInterstitialAd.setAdListener(new InterstitialAdListener());
+        mGoogleInterstitialAd.setAdUnitId(adUnitId);
 
         AdRequest.Builder builder = new AdRequest.Builder();
         builder.setRequestAgent("MoPub");
@@ -98,31 +78,11 @@ public class AdMobBannerAdapter extends CustomEventBanner {
         AdRequest adRequest = builder.build();
 
         try {
-            mGoogleAdView.loadAd(adRequest);
+            mGoogleInterstitialAd.loadAd(adRequest);
         } catch (NoClassDefFoundError e) {
             // This can be thrown by Play Services on Honeycomb.
-            mBannerListener.onBannerFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            mInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
         }
-    }
-
-    @Override
-    protected void onInvalidate() {
-        Views.removeFromParent(mGoogleAdView);
-        if (mGoogleAdView != null) {
-            mGoogleAdView.setAdListener(null);
-            mGoogleAdView.destroy();
-        }
-    }
-
-    private boolean extrasAreValid(Map<String, String> serverExtras) {
-        try {
-            Integer.parseInt(serverExtras.get(AD_WIDTH_KEY));
-            Integer.parseInt(serverExtras.get(AD_HEIGHT_KEY));
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return serverExtras.containsKey(AD_UNIT_ID_KEY);
     }
 
     private void forwardNpaIfSet(AdRequest.Builder builder) {
@@ -134,56 +94,68 @@ public class AdMobBannerAdapter extends CustomEventBanner {
         }
     }
 
-    private AdSize calculateAdSize(int width, int height) {
-        // Use the smallest AdSize that will properly contain the adView
-        if (width <= BANNER.getWidth() && height <= BANNER.getHeight()) {
-            return BANNER;
-        } else if (width <= MEDIUM_RECTANGLE.getWidth() && height <= MEDIUM_RECTANGLE.getHeight()) {
-            return MEDIUM_RECTANGLE;
-        } else if (width <= FULL_BANNER.getWidth() && height <= FULL_BANNER.getHeight()) {
-            return FULL_BANNER;
-        } else if (width <= LEADERBOARD.getWidth() && height <= LEADERBOARD.getHeight()) {
-            return LEADERBOARD;
+    @Override
+    protected void showInterstitial() {
+        if (mGoogleInterstitialAd.isLoaded()) {
+            mGoogleInterstitialAd.show();
         } else {
-            return null;
+            LOG.debug("Tried to show a Google Play Services interstitial ad before it finished loading. Please try again.");
         }
     }
 
-    private class AdViewListener extends AdListener {
+    @Override
+    protected void onInvalidate() {
+        if (mGoogleInterstitialAd != null) {
+            mGoogleInterstitialAd.setAdListener(null);
+        }
+    }
+
+    private boolean extrasAreValid(Map<String, String> serverExtras) {
+        return serverExtras.containsKey(AD_UNIT_ID_KEY);
+    }
+
+
+    private class InterstitialAdListener extends AdListener {
         /*
          * Google Play Services AdListener implementation
          */
         @Override
         public void onAdClosed() {
-
+            LOG.debug("Google Play Services interstitial ad dismissed.");
+            if (mInterstitialListener != null) {
+                mInterstitialListener.onInterstitialDismissed();
+            }
         }
 
         @Override
         public void onAdFailedToLoad(int errorCode) {
-            LOG.debug("Google Play Services banner ad failed to load.");
-            if (mBannerListener != null) {
-                mBannerListener.onBannerFailed(getMoPubErrorCode(errorCode));
+            LOG.debug("Google Play Services interstitial ad failed to load.");
+            if (mInterstitialListener != null) {
+                mInterstitialListener.onInterstitialFailed(getMoPubErrorCode(errorCode));
             }
         }
 
         @Override
         public void onAdLeftApplication() {
-
+            LOG.debug("Google Play Services interstitial ad clicked.");
+            if (mInterstitialListener != null) {
+                mInterstitialListener.onInterstitialClicked();
+            }
         }
 
         @Override
         public void onAdLoaded() {
-            LOG.debug("Google Play Services banner ad loaded successfully. Showing ad...");
-            if (mBannerListener != null) {
-                mBannerListener.onBannerLoaded(mGoogleAdView);
+            LOG.debug("Google Play Services interstitial ad loaded successfully.");
+            if (mInterstitialListener != null) {
+                mInterstitialListener.onInterstitialLoaded();
             }
         }
 
         @Override
         public void onAdOpened() {
-            LOG.debug("Google Play Services banner ad clicked.");
-            if (mBannerListener != null) {
-                mBannerListener.onBannerClicked();
+            LOG.debug("Showing Google Play Services interstitial ad.");
+            if (mInterstitialListener != null) {
+                mInterstitialListener.onInterstitialShown();
             }
         }
 
@@ -241,7 +213,7 @@ public class AdMobBannerAdapter extends CustomEventBanner {
 
     @Deprecated
         // for testing
-    AdView getGoogleAdView() {
-        return mGoogleAdView;
+    InterstitialAd getGoogleInterstitialAd() {
+        return mGoogleInterstitialAd;
     }
 }
