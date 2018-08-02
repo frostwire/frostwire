@@ -43,10 +43,26 @@ public final class AdMobAdNetwork {
     private static AtomicBoolean ADMOB_STARTED = new AtomicBoolean(false);
     private static final String ADMOB_APP_ID = "ca-app-pub-0657224435269327~1839292928";
 
+    /*
+     * app ID:
+     ca-app-pub-0657224435269327~1839292928
+
+     In case we need this later, here are the Ad Unit Ids as defined in admob
+
+     ad unit IDs:
+     300x250 Music Player: ca-app-pub-0657224435269327/2906648371
+     300x250 Search: ca-app-pub-0657224435269327/9743110343
+     300x250 Video Preview: ca-app-pub-0657224435269327/7336438859
+     320x50 Searchca-app-pub-0657224435269327/5768206318
+     320x50 Video Previewca-app-pub-0657224435269327/4323154909
+     Interstitial (Main)ca-app-pub-0657224435269327/9902784644
+     */
+
     public static void start(Context context) {
         if (ADMOB_STARTED.compareAndSet(false, true)) {
             try {
                 MobileAds.initialize(context, ADMOB_APP_ID);
+                LOG.info("start(): AdMobAdNetwork started");
             } catch (Throwable t) {
                 LOG.error("start(): Could not initialize AdMobAdNetwork", t);
                 ADMOB_STARTED.set(false);
