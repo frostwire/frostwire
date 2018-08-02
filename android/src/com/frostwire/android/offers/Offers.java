@@ -56,19 +56,19 @@ public final class Offers {
     private Offers() {
     }
 
-    public static boolean initAdNetworks(Activity activity) {
+    public static void initAdNetworks(Activity activity) {
         if (FORCED_DISABLED) {
             LOG.info("Offers.initAdNetworks() aborted, FORCED_DISABLED");
-            return false;
+            return;
         }
         if (stopAdNetworksIfPurchasedRemoveAds(activity)) {
             LOG.info("Offers.initAdNetworks() aborted, user paid for ad removal.");
-            return false;
+            return;
         }
         long now = System.currentTimeMillis();
         if ((now - lastInitAdnetworksInvocationTimestamp) < 5000) {
             LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
-            return false;
+            return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
@@ -78,7 +78,7 @@ public final class Offers {
         }
         PrebidManager.getInstance(activity);
         LOG.info("Offers.initAdNetworks() success");
-        return true;
+        return;
     }
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

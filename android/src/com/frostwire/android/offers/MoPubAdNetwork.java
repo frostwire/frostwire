@@ -28,7 +28,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
-import com.mopub.common.SdkInitializationListener;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.ConsentDialogListener;
 import com.mopub.common.privacy.PersonalInfoManager;
@@ -39,6 +38,8 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Created on Nov/8/16 (2016 US election day)
@@ -71,8 +72,17 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
             LOG.info("MoPub initialization finished");
             start();
+            async(MoPubAdNetwork::loadConsentDialogAsync);
             loadNewInterstitial(activity);
         });
+    }
+
+    private static void loadConsentDialogAsync() {
+        PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
+        //personalInfoManager.forceGdprApplies(); //uncomment to test in the US
+        if (personalInfoManager != null && personalInfoManager.shouldShowConsentDialog()) {
+            personalInfoManager.loadConsentDialog(new MoPubAdNetwork.MoPubConsentDialogListener(personalInfoManager));
+        }
     }
 
     private void initPlacementMappings(boolean isTablet) {
