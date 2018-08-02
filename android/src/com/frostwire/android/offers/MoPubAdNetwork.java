@@ -53,6 +53,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
     private Map<String,String> placements;
     private Map<String, MoPubInterstitial> interstitials;
+    private boolean starting = false;
 
     public static final String UNIT_ID_AUDIO_PLAYER = "c737d8a55b2e41189aa1532ae0520ad1";
     public static final String UNIT_ID_HOME = "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
@@ -66,11 +67,20 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             LOG.info("initialize() aborted");
             return;
         }
+        if (activity == null) {
+            LOG.info("initialize() activity is null, aborted");
+            return;
+        }
+        if (starting) {
+            LOG.info("initialize() aborted, starting.");
+            return;
+        }
+        starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
-
         SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
             LOG.info("MoPub initialization finished");
+            starting = false;
             start();
             async(MoPubAdNetwork::loadConsentDialogAsync);
             loadNewInterstitial(activity);
