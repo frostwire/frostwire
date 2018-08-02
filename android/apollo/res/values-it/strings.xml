@@ -126,4 +126,10 @@
   <string name="empty_search">La ricerca non ha prodotto risultati</string>
   <string name="empty_favorite">Le canzoni segnate come preferite verranno mostrate qui.</string>
   <string name="empty_recent">Gli album che hai ascoltato verranno mostrati qui. Provate a sentire un po\' di musica.</string>
+  <string name="now_listening_to_no_artist_available">#Suonando \"<xliff:g id="title">%1$s</xliff:g>\" su #FrostWire</string>
+  <string name="delete_files_title">Cancella file</string>
+  <string name="page_last_added">Ultimo aggiunto</string>
+  <string name="empty_playlist">Questa playlist è vuota.\n\nClicca qui per sapere come aggiungere canzoni.</string>
+  <string name="are_you_sure_delete_files_text">Sei sicuro di voler CANCELLARE PERMANENTEMENTE i file selezionati dal tuo dispositivo?</string>
+  <string name="frostwire_player">Lettore FrostWire</string>
 </resources>
