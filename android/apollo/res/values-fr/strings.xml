@@ -126,4 +126,10 @@
   <string name="empty_search">Aucun résultat de recherche</string>
   <string name="empty_favorite">Vos titres favoris seront affichés ici.</string>
   <string name="empty_recent">Les albums que vous avez écoutés seront affichés ici. Essayer de lire de la musique.</string>
+  <string name="now_listening_to_no_artist_available">#Jouer \"<xliff:g id="title">%1$s</xliff:g>\" sur #FrostWire</string>
+  <string name="delete_files_title">Supprimer les fichiers</string>
+  <string name="page_last_added">Dernier ajouté</string>
+  <string name="empty_playlist">Cette liste de lecture est vide.\n\nCliquez ici pour apprendre comment ajouter des chansons.</string>
+  <string name="are_you_sure_delete_files_text">Êtes-vous sûr de vouloir EFFACER DE MANIÈRE DÉFINITIVE les fichiers sélectionnés sur votre appareil?</string>
+  <string name="frostwire_player">Lecteur FrostWire</string>
 </resources>
