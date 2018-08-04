@@ -126,4 +126,10 @@
   <string name="empty_search">Geen resultate gevind nie</string>
   <string name="empty_favorite">Liedjies wat jy gemerk het as gunstellinge word hier vertoon.</string>
   <string name="empty_recent">Albums wat jy na geluister het sal hier gelys word. Speel \'n bietjie musiek.</string>
+  <string name="now_listening_to_no_artist_available">#Speel \"<xliff:g id="title">%1$s</xliff:g>\" op #FrostWire</string>
+  <string name="delete_files_title">Vee lêers uit</string>
+  <string name="page_last_added">Laas bygevoeg</string>
+  <string name="empty_playlist">Hierdie snitlys is leeg.\n\nKlik hier om te leer hoe om liedjies by te voeg.</string>
+  <string name="are_you_sure_delete_files_text">Is jy seker jy wil die geselekteerde lêers permanent van die toestel verwyder?</string>
+  <string name="frostwire_player">FrostWire Mediaspeler</string>
 </resources>
