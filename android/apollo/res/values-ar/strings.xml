@@ -126,4 +126,10 @@
   <string name="empty_search">لم يتم العثور على نتائج البحث</string>
   <string name="empty_favorite">الأغاني التي وضعت علامة المفضلة ستظهر هنا.</string>
   <string name="empty_recent">ألبوم قمت بلإستماع عليه  سوف تظهر هنا. حاول تشغيل بعض الموسيقى.</string>
+  <string name="now_listening_to_no_artist_available">الان نلعب او نعرض \"<xliff:g id="title">%1$s</xliff:g>\" على #FrostWire</string>
+  <string name="delete_files_title">حذف الملفات</string>
+  <string name="page_last_added">آخر يضاف</string>
+  <string name="empty_playlist">قائمة التشغيل هذه فارغة.\n\nانقر هنا لمعرفة كيفية إضافة الأغاني.</string>
+  <string name="are_you_sure_delete_files_text">هل أنت متأكد أنك تريد دائمًا حذف الملفات المحددة من جهازك؟</string>
+  <string name="frostwire_player">FrostWire مشغل الوسائطr</string>
 </resources>
