@@ -126,4 +126,10 @@
   <string name="empty_search">Nenalezeny žádné výsledky</string>
   <string name="empty_favorite">Zde budou zobrazeny všechny skladby označené jako oblíbené.</string>
   <string name="empty_recent">Zde budou zobrazena všechna alba, která byla poslouchána. Pusťte si nějakou hudbu.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" na #FrostWire</string>
+  <string name="delete_files_title">Vymazat soubory</string>
+  <string name="page_last_added">Poslední přidané</string>
+  <string name="empty_playlist">Tento seznam skladeb je prázdný.\n\nKlepnutím sem se dozvíte, jak přidat skladby.</string>
+  <string name="are_you_sure_delete_files_text">Opravdu chcete soubory ze zařízení trvale smazat?</string>
+  <string name="frostwire_player">Přehrávač médií FrostWire</string>
 </resources>
