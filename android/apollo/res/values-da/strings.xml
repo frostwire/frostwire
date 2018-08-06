@@ -126,4 +126,10 @@
   <string name="empty_search">Ingen søgeresultater fundet</string>
   <string name="empty_favorite">Sange, som du har markeret som favoritter, vil blive vist her.</string>
   <string name="empty_recent">Albums, som du har lyttet til, vil blive vist her. Prøv at spille noget musik.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" på #FrostWire</string>
+  <string name="delete_files_title">Slet filer</string>
+  <string name="page_last_added">Sidst tilføjet</string>
+  <string name="empty_playlist">Denne afspilningsliste er tom.\n\nKlik her for at lære at tilføje sange.</string>
+  <string name="are_you_sure_delete_files_text">Er du sikker på, at du vil slette de valgte filer permanent fra din enhed?</string>
+  <string name="frostwire_player">FrostWire Medieafspiller</string>
 </resources>
