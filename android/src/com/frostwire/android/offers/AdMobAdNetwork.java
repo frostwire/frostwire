@@ -39,8 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 public final class AdMobAdNetwork {
-    private static Logger LOG = Logger.getLogger(AdMobAdNetwork.class);
-    private static AtomicBoolean ADMOB_STARTED = new AtomicBoolean(false);
+    private static final Logger LOG = Logger.getLogger(AdMobAdNetwork.class);
+    private static final AtomicBoolean ADMOB_STARTED = new AtomicBoolean(false);
     private static final String ADMOB_APP_ID = "ca-app-pub-0657224435269327~1839292928";
 
     /*
