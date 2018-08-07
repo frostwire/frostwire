@@ -19,7 +19,9 @@
 -keep class android.support.** {
     <init>(...);
 }
-
+-keep class com.frostwire.android.gui.** {
+    <init>(...);
+}
 # to keep all the names and avoid code mangling
 -keepnames class ** {*;}
 -keepclassmembers enum * {
