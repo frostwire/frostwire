@@ -126,4 +126,10 @@
   <string name="empty_search">Keine Suchergebnisse gefunden</string>
   <string name="empty_favorite">Als Favorit markierte Titel werden hier angezeigt.</string>
   <string name="empty_recent">Hier werden gehörte Alben angezeigt.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" auf #FrostWire</string>
+  <string name="delete_files_title">Dateien löschen</string>
+  <string name="page_last_added">Zuletzt hinzugefügt</string>
+  <string name="empty_playlist">Diese Playlist ist leer.\n\nKlicken Sie hier, um zu erfahren, wie Sie Songs hinzufügen können.</string>
+  <string name="are_you_sure_delete_files_text">Sind Sie sicher, dass Sie die ausgewählten Dateien dauerhaft von Ihrem Gerät löschen möchten?</string>
+  <string name="frostwire_player">Frostwire-Spieler</string>
 </resources>
