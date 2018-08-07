@@ -126,4 +126,10 @@
   <string name="empty_search">Δεν βρέθηκαν αποτελέσματα αναζήτησης</string>
   <string name="empty_favorite">Τραγούδια που έχετε επιλέξει ως αγαπημένα, θα εμφανιστούν εδώ.</string>
   <string name="empty_recent">Άλμπουμ που έχετε ακούσει θα εμφανιστούν εδώ. Δοκιμάστε να παίξετε κάποια μουσική.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" στο #FrostWire</string>
+  <string name="delete_files_title">Διαγραφή αρχείων</string>
+  <string name="page_last_added">Τελευταία προσθήκη</string>
+  <string name="empty_playlist">Αυτή η λίστα αναπαραγωγής είναι κενή.\n\nΚάντε κλικ εδώ για να μάθετε πώς μπορείτε να προσθέσετε τραγούδια.</string>
+  <string name="are_you_sure_delete_files_text">Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά τα επιλεγμένα αρχεία από τη συσκευή σας;</string>
+  <string name="frostwire_player">FrostWire αναπαραγωγής πολυμέσων</string>
 </resources>
