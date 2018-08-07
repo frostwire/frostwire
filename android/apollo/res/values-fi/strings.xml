@@ -126,4 +126,10 @@
   <string name="empty_search">Hakutuloksia ei löytynyt</string>
   <string name="empty_favorite">Suosikeiksi merkitsemäsi kappaleet näkyvät tässä.</string>
   <string name="empty_recent">Kuuntelemasi albumit näkyvät tässä.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" #FrostWire</string>
+  <string name="delete_files_title">Poista tiedostot</string>
+  <string name="page_last_added">Viimeksi lisätty</string>
+  <string name="empty_playlist">Tämä soittolista on tyhjä.\n\nNapsauta tästä saadaksesi lisätietoja kappaleiden lisäämisestä.</string>
+  <string name="are_you_sure_delete_files_text">Haluatko varmasti poistaa valitut tiedostot pysyvästi laitteestasi?</string>
+  <string name="frostwire_player">FrostWire-mediasoitin</string>
 </resources>
