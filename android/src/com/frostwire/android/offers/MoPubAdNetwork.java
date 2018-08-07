@@ -175,6 +175,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
     @Override
     public void stop(Context context) {
         super.stop(context);
+        starting = false;
         if (placements == null || interstitials == null || placements.isEmpty() || interstitials.isEmpty()) {
             return;
         }
