@@ -75,7 +75,7 @@ public class SoundcloudDownload extends HttpDownload {
             simpleHTTP(url, baos, 3000);
             return baos.toByteArray();
         } catch (Throwable e) {
-            LOG.error("Error downloading SoundCloud cover art.", e);
+            LOG.error("Error downloading SoundCloud cover art (url=" + url + ")", e);
         }
         return null;
     }
