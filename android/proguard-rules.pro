@@ -13,7 +13,10 @@
 -keep class com.frostwire.jlibtorrent.swig.libtorrent_jni {*;}
 
 # keep all constructors
--keep class * {
+-keep class com.mopub.** {
+    <init>(...);
+}
+-keep class android.support.** {
     <init>(...);
 }
 
