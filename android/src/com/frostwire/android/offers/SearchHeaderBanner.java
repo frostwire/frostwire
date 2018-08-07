@@ -286,7 +286,7 @@ public final class SearchHeaderBanner extends LinearLayout {
                 Context context = searchHeaderBannerRef.get().getContext();
                 PrebidManager prebidManager = PrebidManager.getInstance(context);
                 if (prebidManager != null) {
-                    PrebidManager.getInstance(context).onBannerLoaded(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50);
+                    prebidManager.onBannerLoaded(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50);
                 }
             }
         }
