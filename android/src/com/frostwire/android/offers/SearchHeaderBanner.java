@@ -284,7 +284,10 @@ public final class SearchHeaderBanner extends LinearLayout {
 
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidManager.getInstance(context).onBannerLoaded(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50);
+                PrebidManager prebidManager = PrebidManager.getInstance(context);
+                if (prebidManager != null) {
+                    PrebidManager.getInstance(context).onBannerLoaded(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50);
+                }
             }
         }
 
@@ -310,7 +313,10 @@ public final class SearchHeaderBanner extends LinearLayout {
             }
             if (Ref.alive(searchHeaderBannerRef)) {
                 Context context = searchHeaderBannerRef.get().getContext();
-                PrebidManager.getInstance(context).onBannerFailed(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50, errorCode);
+                PrebidManager prebidManager = PrebidManager.getInstance(context);
+                if (prebidManager != null) {
+                    prebidManager.onBannerFailed(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50, errorCode);
+                }
             }
         }
 

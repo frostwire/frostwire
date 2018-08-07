@@ -139,12 +139,17 @@ public final class PrebidManager {
             LOG.info("onBannerLoaded: aborted, Prebid disabled");
             return;
         }
-        AdUnit adUnit = getAdUnit(placement);
-        if (adUnit != null) {
-            Prebid.attachBids(banner, adUnit.getCode(), appContext);
-            LOG.info("onBannerLoaded: Prebid.attachBids invoked on placement <" + placement + ">");
-        } else {
-            LOG.warn("onBannerLoaded: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
+
+        try {
+            AdUnit adUnit = getAdUnit(placement);
+            if (adUnit != null) {
+                Prebid.attachBids(banner, adUnit.getCode(), appContext);
+                LOG.info("onBannerLoaded: Prebid.attachBids invoked on placement <" + placement + ">");
+            } else {
+                LOG.warn("onBannerLoaded: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
+            }
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
         }
     }
 
@@ -156,12 +161,17 @@ public final class PrebidManager {
             LOG.info("onBannerFailed: aborted, Prebid disabled");
             return;
         }
-        AdUnit adUnit = getAdUnit(placement);
-        if (adUnit != null) {
-            Prebid.attachBids(banner, adUnit.getConfigId(), appContext);
-            LOG.info("onBannerFailed: Prebid.attachBids invoked for placement <" + placement + ">, errorCode: " + errorCode);
-        } else {
-            LOG.warn("onBannerFailed: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
+
+        try {
+            AdUnit adUnit = getAdUnit(placement);
+            if (adUnit != null) {
+                Prebid.attachBids(banner, adUnit.getConfigId(), appContext);
+                LOG.info("onBannerFailed: Prebid.attachBids invoked for placement <" + placement + ">, errorCode: " + errorCode);
+            } else {
+                LOG.warn("onBannerFailed: Prebid.attachBids not invoked, invalid placement <" + placement + ">");
+            }
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
         }
     }
 

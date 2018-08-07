@@ -268,7 +268,13 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded()");
             setVisible(Visibility.MOPUB, true);
-            PrebidManager.getInstance(getContext()).onBannerLoaded(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
+
+
+            PrebidManager prebidManager = PrebidManager.getInstance(getContext());
+            if (prebidManager != null) {
+                prebidManager.onBannerLoaded(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
+            }
+
             isLoaded = true;
             if (onBannerLoadedListener != null) {
                 try {
@@ -283,7 +289,10 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed");
             loadFallbackBanner(banner.getAdUnitId());
-            PrebidManager.getInstance(getContext()).onBannerFailed(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250, errorCode);
+            PrebidManager prebidManager = PrebidManager.getInstance(getContext());
+            if (prebidManager != null) {
+                prebidManager.onBannerFailed(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250, errorCode);
+            }
             banner.destroy();
             isLoaded = false;
         }
