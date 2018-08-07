@@ -401,9 +401,9 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
-                    if (adNetwork != null) {
-                        adNetwork.stop(activity);
-                    }
+//                    if (adNetwork != null) {
+//                        adNetwork.stop(activity);
+//                    }
 
                     if (activity instanceof MainActivity) {
                         activity.finish();
