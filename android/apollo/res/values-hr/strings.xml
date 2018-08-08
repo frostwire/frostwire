@@ -126,4 +126,10 @@
   <string name="empty_search">Nema rezultata pretraživanja</string>
   <string name="empty_favorite">Pjesme koje označite kao favorite biti će prikazane ovdje.</string>
   <string name="empty_recent">Albumi koje ste slušali će se pojaviti ovdje. Pokušajte svirati neku glazbu.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" na #FrostWire</string>
+  <string name="delete_files_title">Obriši datoteke</string>
+  <string name="page_last_added">Zadnje dodano</string>
+  <string name="empty_playlist">Popis za reprodukciju je prazan.\n\nKliknite ovdje da biste saznali kako dodati pjesme.</string>
+  <string name="are_you_sure_delete_files_text">Jeste li sigurni da želite trajno izbrisati odabrane datoteke s uređaja?</string>
+  <string name="frostwire_player">FrostWire igrač mediji</string>
 </resources>
