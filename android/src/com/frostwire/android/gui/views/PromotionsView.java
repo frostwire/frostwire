@@ -68,6 +68,7 @@ public class PromotionsView extends LinearLayout {
                 // remove all ad slides flagged as advertisement
                 removeAds(slides);
             }
+            destroyPromotionsBanner();
             gridview.setAdapter(new PromotionsAdapter(gridview.getContext(), slides, promotionDownloader));
             gridview.invalidate();
         }
@@ -132,6 +133,13 @@ public class PromotionsView extends LinearLayout {
         // Additionally, I'm recycling the picasso drawables for older devices. 
         unbindPromotionDrawables();
 
+        destroyPromotionsBanner();
+    }
+
+    public void destroyPromotionsBanner() {
+        if (gridview == null) {
+            return;
+        }
         PromotionsAdapter promotionsAdapter = (PromotionsAdapter) gridview.getAdapter();
         if (promotionsAdapter != null) {
             promotionsAdapter.onDestroyView();

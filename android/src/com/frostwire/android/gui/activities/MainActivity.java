@@ -462,6 +462,8 @@ public class MainActivity extends AbstractActivity implements
             // the internal mopub view possible to outlive the activity
             // destruction, creating a context leak
             search.destroyHeaderBanner();
+            // TODO: make a unique call for these destroys
+            search.destroyPromotionsBanner();
         }
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();

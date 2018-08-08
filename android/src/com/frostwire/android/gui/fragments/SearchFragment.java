@@ -267,6 +267,7 @@ public final class SearchFragment extends AbstractFragment implements
         LocalSearchEngine.instance().setListener(null);
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
         destroyHeaderBanner();
+        destroyPromotionsBanner();
         super.onDestroy();
     }
 
@@ -274,6 +275,12 @@ public final class SearchFragment extends AbstractFragment implements
         if (searchHeaderBanner != null) {
             searchHeaderBanner.setSearchFragmentReference(this);
             searchHeaderBanner.onDestroy();
+        }
+    }
+
+    public void destroyPromotionsBanner() {
+        if (promotions != null) {
+            promotions.destroyPromotionsBanner();
         }
     }
 
