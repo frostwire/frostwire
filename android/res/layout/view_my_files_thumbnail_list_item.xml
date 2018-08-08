@@ -49,25 +49,20 @@
     <TextView
         android:id="@+id/view_my_files_thumbnail_list_image_item_file_title"
         style="@style/ListItemTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="3dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="3dp"
         android:layout_marginStart="6dp"
         android:layout_marginTop="4dp"
         android:layout_toEndOf="@id/view_my_files_thumbnail_list_item_browse_thumbnail_container"
-        android:layout_toRightOf="@id/view_my_files_thumbnail_list_item_browse_thumbnail_container"
         android:text="@string/dummy_title" />
 
     <TextView
         android:id="@+id/view_my_files_thumbnail_list_image_item_extra_text"
         style="@style/ListItemExt"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@id/view_my_files_thumbnail_list_image_item_file_title"
-        android:layout_alignLeft="@id/view_my_files_thumbnail_list_image_item_file_title"
-        android:layout_alignRight="@id/view_my_files_thumbnail_list_image_item_file_title"
         android:layout_alignStart="@id/view_my_files_thumbnail_list_image_item_file_title"
         android:layout_below="@id/view_my_files_thumbnail_list_image_item_file_title"
         android:text="@string/dummy_extra" />
@@ -78,7 +73,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/view_my_files_thumbnail_list_item_browse_thumbnail_container"
-        android:layout_alignLeft="@id/view_my_files_thumbnail_list_image_item_file_title"
         android:layout_alignStart="@id/view_my_files_thumbnail_list_image_item_file_title"
         android:layout_marginBottom="2dp"
         android:text="@string/dummy_size" />
@@ -89,7 +83,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/view_my_files_thumbnail_list_image_item_file_size"
         android:layout_toEndOf="@id/view_my_files_thumbnail_list_image_item_file_size"
-        android:layout_toRightOf="@id/view_my_files_thumbnail_list_image_item_file_size"
         android:contentDescription="@null"
         android:src="@drawable/my_files_sd_icon_inactive" />
 
