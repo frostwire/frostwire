@@ -85,6 +85,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             async(MoPubAdNetwork::loadConsentDialogAsync);
             loadNewInterstitial(activity);
         });
+        LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }
 
     private static void loadConsentDialogAsync() {
