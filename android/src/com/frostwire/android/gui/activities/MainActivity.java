@@ -129,6 +129,8 @@ public class MainActivity extends AbstractActivity implements
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private TimerSubscription playerSubscription;
 
+    private boolean shuttingdown = false;
+
     public MainActivity() {
         super(R.layout.activity_main);
         controller = new MainController(this);
@@ -188,6 +190,14 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void shutdown() {
+        if (shuttingdown) {
+            // NOTE: the actual solution should be for a re-architecture for
+            // a guarantee of a single call of this logic.
+            // For now, just mitigate the double call if coming from the exit
+            // and at the same time the close of the interstitial
+            return;
+        }
+        shuttingdown = true;
         LocalSearchEngine.instance().cancelSearch();
         Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
