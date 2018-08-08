@@ -19,6 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -30,7 +31,11 @@ import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.ConsentDialogListener;
+import com.mopub.common.privacy.ConsentStatus;
+import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
+import com.mopub.mobileads.AdMobBannerAdapter;
+import com.mopub.mobileads.AdMobInterstitialAdapter;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
@@ -48,18 +53,18 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author gubatron
  */
 
-public class MoPubAdNetwork extends AbstractAdNetwork {
+public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusChangeListener {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
-    private Map<String,String> placements;
-    private Map<String, MoPubInterstitial> interstitials;
-    private boolean starting = false;
-
     public static final String UNIT_ID_AUDIO_PLAYER = "c737d8a55b2e41189aa1532ae0520ad1";
     public static final String UNIT_ID_HOME = "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
+    private final Bundle npaBundle = new Bundle();
+    private boolean starting = false;
+    private Map<String,String> placements;
+    private Map<String, MoPubInterstitial> interstitials;
 
     @Override
     public void initialize(Activity activity) {
@@ -77,21 +82,27 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
         }
         starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER).build();
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER)
+                .withMediationSettings(
+                        new AdMobBannerAdapter.GooglePlayServicesMediationSettings(npaBundle),
+                        new AdMobInterstitialAdapter.GooglePlayServicesMediationSettings(npaBundle))
+                .build();
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
-            async(MoPubAdNetwork::loadConsentDialogAsync);
+            async(MoPubAdNetwork::loadConsentDialogAsync, this);
             loadNewInterstitial(activity);
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }
 
-    private static void loadConsentDialogAsync() {
+    private static void loadConsentDialogAsync(MoPubAdNetwork mopubAdNetwork) {
         PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
         //personalInfoManager.forceGdprApplies(); //uncomment to test in the US
+
         if (personalInfoManager != null && personalInfoManager.shouldShowConsentDialog()) {
+            personalInfoManager.subscribeConsentStatusChangeListener(mopubAdNetwork);
             personalInfoManager.loadConsentDialog(new MoPubAdNetwork.MoPubConsentDialogListener(personalInfoManager));
         }
     }
@@ -186,6 +197,17 @@ public class MoPubAdNetwork extends AbstractAdNetwork {
             if (interstitial != null) {
                 interstitial.destroy();
             }
+        }
+    }
+
+    @Override
+    public void onConsentStateChange(@NonNull ConsentStatus oldConsentStatus,
+                                     @NonNull ConsentStatus newConsentStatus,
+                                     boolean canCollectPersonalInformation) {
+        if (!canCollectPersonalInformation) {
+            npaBundle.putString("npa","1");
+        } else {
+            npaBundle.remove("npa");
         }
     }
 
