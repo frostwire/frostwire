@@ -126,4 +126,10 @@
   <string name="empty_search">Nincs találat</string>
   <string name="empty_favorite">Itt a kedvencként megjelölt dalok fognak megjelenni.</string>
   <string name="empty_recent">Itt a legutóbb hallgatott albumok fognak megjelenni.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" a #FrostWire</string>
+  <string name="delete_files_title">Fájlok törlése</string>
+  <string name="page_last_added">Utoljára hozzáadva</string>
+  <string name="empty_playlist">Ez a lejátszási lista üres.\n\nKattintson ide a dalok hozzáadásához.</string>
+  <string name="are_you_sure_delete_files_text">Biztosan törölni szeretné a kijelölt fájlokat a készülékről?</string>
+  <string name="frostwire_player">FrostWire médialejátszó</string>
 </resources>
