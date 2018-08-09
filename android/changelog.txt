@@ -1,7 +1,7 @@
-FrostWire 2.0.7 build 556 - AUG/08/2018
+FrostWire 2.0.7 build 557 - AUG/09/2018
  - Crash on Audio Player equalizer menu
  - Translations updated: Croatian, Thai, Indonesian, Polish, Italian,
-   French, Afrikaans, Arabic, Czech, Danish, Finnish
+   French, Afrikaans, Arabic, Czech, Danish, Finnish, Hungarian
  - Library updates: applovin 8.1.0, (dev) gradle 4.9,
    gms:play-services-base:15.0.1
  - Fixes bug on banner dismissal button behavior
