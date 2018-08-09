@@ -19,6 +19,7 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
@@ -34,12 +35,15 @@ import com.mopub.common.privacy.ConsentDialogListener;
 import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
+import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.AdMobBannerAdapter;
 import com.mopub.mobileads.AdMobInterstitialAdapter;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +91,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
                         new AdMobBannerAdapter.GooglePlayServicesMediationSettings(npaBundle),
                         new AdMobInterstitialAdapter.GooglePlayServicesMediationSettings(npaBundle))
                 .build();
+        fixExecutor(true);
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
+            fixExecutor(false);
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
@@ -95,6 +101,25 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             loadNewInterstitial(activity);
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
+    }
+
+    private void fixExecutor(boolean change) {
+        try {
+            LOG.info("MoPub -> fixExecutor with change=" + change);
+            Field f = Reflection.getPrivateField(AsyncTask.class, "sDefaultExecutor");
+
+            Field modifiersField = Field.class.getDeclaredField("accessFlags");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+
+            if (change) {
+                f.set(null, AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                f.set(null, AsyncTask.SERIAL_EXECUTOR);
+            }
+        } catch (Exception e) {
+            LOG.info("MoPub -> fixExecutor error change=" + change + " msg=" + e.getMessage());
+        }
     }
 
     private static void loadConsentDialogAsync(MoPubAdNetwork mopubAdNetwork) {
