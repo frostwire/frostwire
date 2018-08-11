@@ -126,4 +126,10 @@
   <string name="empty_search">検索結果は見つかりませんでした</string>
   <string name="empty_favorite">お気に入りに追加した曲がここに表示されます。</string>
   <string name="empty_recent">聴いたアルバムがここに表示されます。なにか再生してみましょう。</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" #FrostWire で</string>
+  <string name="delete_files_title">ファイルを削除する</string>
+  <string name="page_last_added">最後に追加された</string>
+  <string name="empty_playlist">このプレイリストは空です。\n\n曲を追加する方法については、こちらをクリックしてください。</string>
+  <string name="are_you_sure_delete_files_text">選択したファイルをデバイスから永久に削除してもよろしいですか？</string>
+  <string name="frostwire_player">FrostWireプレーヤー</string>
 </resources>
