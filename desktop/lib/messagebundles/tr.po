@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: frostwire\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-27 02:01-0600\n"
-"PO-Revision-Date: 2017-04-24 22:36-0300\n"
+"PO-Revision-Date: 2018-08-12 13:57-0300\n"
 "Last-Translator: Alejandro Martinez <alex.ruly@gmail.com>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "Language: tr\n"
@@ -434,9 +434,8 @@ msgid "Stopped"
 msgstr "Durdurulmuş"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:166
-#, fuzzy
 msgid "Pausing"
-msgstr "Duraklatılıyor..."
+msgstr "Duraklatma"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:167
 #, fuzzy
@@ -460,9 +459,8 @@ msgid "Uploading"
 msgstr "yükleme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:172
-#, fuzzy
 msgid "Uncompressing"
-msgstr "Tamamlanmayan Dosyalar"
+msgstr "Sonucunda sıkıştırma"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadDataLine.java:173
 msgid "Demuxing"
@@ -536,9 +534,8 @@ msgstr "Gelişmiş"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:190
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:124
-#, fuzzy
 msgid "Trackers"
-msgstr "Parça"
+msgstr "İzleyicileri"
 
 #. advanced > Download Speed Menu //
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:228
@@ -600,7 +597,7 @@ msgstr "İzleyiciyi Güncelle"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:492
 msgid "Scrape Tracker"
-msgstr ""
+msgstr "Kazıma İzleyicileri"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/BTDownloadMediatorAdvancedMenuFactory.java:518
 msgid "Edit trackers"
@@ -1381,86 +1378,73 @@ msgstr "%s bir ipucu, bağış veya gönüllü ödeme ile destek"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:70
 msgid "hide"
-msgstr ""
+msgstr "saklamak"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:74
-#, fuzzy
 msgid "Transfer Detail"
-msgstr "Aktarımlar"
+msgstr "Transfer Detayı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:121
 msgid "General"
-msgstr ""
+msgstr "Genel"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:122
-#, fuzzy
 msgid "Files"
-msgstr "Dosya"
+msgstr "Dosyalar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:123
-#, fuzzy
 msgid "Pieces"
-msgstr "Parça boyutu"
+msgstr "Parçalar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:92
-#, fuzzy
 msgid "complete"
-msgstr "Tamamlandı"
+msgstr "tamamlayınız"
 
 #. time elapsed, time left, download speed, status
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:101
 msgid "Time elapsed"
-msgstr ""
+msgstr "Geçen süre"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:103
-#, fuzzy
 msgid "Time left"
-msgstr "Süre"
+msgstr "Kalan zaman"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:105
-#, fuzzy
 msgid "Download speed"
-msgstr "İndirme Hızı:"
+msgstr "İndirme hızı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:115
-#, fuzzy
 msgid "Download limit"
-msgstr "İndirme Hızı:"
+msgstr "İndirme sınırı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:124
-#, fuzzy
 msgid "Upload speed"
-msgstr "Yükleme Hızı:"
+msgstr "Yükleme hızı"
 
 #. Total Size, share ratio, upload limit
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:128
-#, fuzzy
 msgid "Total size"
-msgstr "Toplam Yükleme Akışı:"
+msgstr "Toplam boyut"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:130
-#, fuzzy
 msgid "Share ratio"
-msgstr "Dosya Paylaşın"
+msgstr "Pay oranı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:132
-#, fuzzy
 msgid "Upload limit"
-msgstr "Yükleme Hızı:"
+msgstr "Yükleme sınırı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:146
-#, fuzzy
 msgid "Save location"
-msgstr "Dosya Paylaşın"
+msgstr "Konumu kaydet"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:152
-#, fuzzy
 msgid "InfoHash"
-msgstr "Infohash'i Kopyalayın"
+msgstr "InfoHash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr ""
+msgstr "Mıknatıs URL'si"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
 #, fuzzy
@@ -1475,19 +1459,18 @@ msgstr "Yorum"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:233
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:242
-#, fuzzy
 msgid "connected"
-msgstr "Bağlantı Kesildi"
+msgstr "bağlı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:234
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:243
 msgid "of"
-msgstr ""
+msgstr "arasında"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:236
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:245
 msgid "total"
-msgstr ""
+msgstr "toplam"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:74
 msgid "IP"
@@ -1495,11 +1478,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:75
 msgid "Client"
-msgstr ""
+msgstr "Müşteri"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:76
 msgid "Flags"
-msgstr ""
+msgstr "Bayraklar"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:77
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
@@ -1507,33 +1490,29 @@ msgid "Source"
 msgstr "Kaynak"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:170
-#, fuzzy
 msgid "Resumed"
-msgstr "Devam Et"
+msgstr "Devam ettirildi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:173
-#, fuzzy
 msgid "Incoming"
-msgstr "Tamamlanmayan Dosyalar"
+msgstr "Gelen"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:57
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:98
 msgid "Total Pieces"
-msgstr ""
+msgstr "Toplam parça"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:35
 msgid "URL"
 msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Active"
-msgstr "Eylem"
+msgstr "Aktif"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Inactive"
-msgstr "Aktif Değil"
+msgstr "Aktif Olmayan"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:166
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:118
@@ -2381,7 +2360,7 @@ msgstr "Güncelle"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/InstallerUpdater.java:313
 #, java-format
 msgid "Time flies! You have missed the last {0} updates."
-msgstr ""
+msgstr "Zaman uçar! Son {0} güncellemeyi kaçırdınız."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/PortableUpdater.java:69
 msgid "Uncompressing files"
@@ -2517,9 +2496,8 @@ msgid "And also to the Support Volunteer Helpers:"
 msgstr "Gönüllü Destek Yardımcılarına teşekkürlerimizi bir borç biliriz:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:181
-#, fuzzy
 msgid "Thanks to the LibTorrent Team"
-msgstr "Automatix Ekibi'ne Teşekkürler"
+msgstr "LibTorrent takım sayesinde"
 
 #. azureus/vuze devs.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:189
@@ -2560,13 +2538,12 @@ msgid "Thanks to Ubuntu/Kubuntu Teams"
 msgstr "Ubuntu/Kubuntu Ekiplerine Teşekkürler"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:244
-#, fuzzy
 msgid ""
 "For making the world a better place with such an excellent distro, you'll be "
 "the ones to make a difference on the desktop."
 msgstr ""
-"<p>Böylesi mükemmel bir dağıtıcı program yaptığınız için, masa-üstü "
-"yazılımlar arasında büyük bir farklılık yaratanlar olacaksınız.</p>"
+"Böylesi mükemmel bir dağıtıcı program yaptığınız için, masa-üstü yazılımlar "
+"arasında büyük bir farklılık yaratanlar olacaksınız."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:246
 #, fuzzy
@@ -2574,11 +2551,10 @@ msgid "Thanks to the NSIS Project"
 msgstr "NSIS Projesine Teşekkürler"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:247
-#, fuzzy
 msgid "Thanks for such an awesome installer builder system and documentation."
 msgstr ""
-"<p>Böylesi harika bir kurucu geliştirici sistem ve dökümantasyonu için "
-"teşekkürler.</p>"
+"Böylesi harika bir kurucu geliştirici sistem ve dökümantasyonu için "
+"teşekkürler."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:249
 #, fuzzy
@@ -2636,37 +2612,31 @@ msgstr "Hayır"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:45
 msgid "Support FrostWire development with a Bitcoin donation"
-msgstr "FrostWire Bitcoin bağış ile destek"
+msgstr "Bitcoin bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:46
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Cash donation"
-msgstr "FrostWire Bitcoin bağış ile destek"
+msgstr "Bitcoin Cash bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:47
-#, fuzzy
 msgid "Support FrostWire development with an Ether donation"
-msgstr "FrostWire Bitcoin bağış ile destek"
+msgstr "Ether bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:48
-#, fuzzy
 msgid "Support FrostWire development with a Dash donation"
-msgstr "FrostWire geliştirme USD $1 bağış ile destek"
+msgstr "Dash geliştirme USD $1 bağış ile destek"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:49
-#, fuzzy
 msgid "Support FrostWire development with a Litecoin donation"
-msgstr "FrostWire Bitcoin bağış ile destek"
+msgstr "Litecoin bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Bir Paypal Bağış ile destek FrostWire geliştirme"
+msgstr "ZCash bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "FrostWire Bitcoin bağış ile destek"
+msgstr "Bitcoin Gold bağışı ile FrostWire gelişimini destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
@@ -2963,37 +2933,36 @@ msgstr "Daima bu cevabı kullan"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:45
 msgid "How can we make FrostWire better?"
-msgstr ""
+msgstr "FrostWire'ı nasıl daha iyi yapabiliriz?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:46
 msgid "Please make sure your firewall or antivirus is not blocking FrostWire"
 msgstr ""
+"Lütfen güvenlik duvarı veya virüsten koruma FrostWire engellemediğinden emin "
+"olun"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:52
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:149
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:153
 msgid "Send Feedback"
-msgstr ""
+msgstr "Geribildirim yolla"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:96
-#, fuzzy
 msgid "Email (Optional)"
-msgstr "Resim Seçenekleri"
+msgstr "Email (İsteğe Bağlı)"
 
 #. Optional name
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:112
-#, fuzzy
 msgid "Your Name (Optional)"
-msgstr "Daha Fazla Seçenek"
+msgstr "İsminiz (İsteğe Bağlı)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:187
-#, fuzzy
 msgid "Sending"
-msgstr "Tohumculuk "
+msgstr "Gönderme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:192
 msgid "Thank you"
-msgstr ""
+msgstr "Teşekkürler"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ShutdownWindow.java:21
 msgid "Shutting down FrostWire..."
@@ -3059,7 +3028,7 @@ msgstr "Bizi @frostwire'da takip edin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:196
 msgid "Follow FrostWire on Instagram"
-msgstr ""
+msgstr "FrostWire Instagram üzerinde izleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:202
 msgid ""
@@ -3071,7 +3040,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:208
 msgid "Circle FrostWire on G+"
-msgstr "Daire FrostWire G +"
+msgstr "Daire FrostWire G+"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:223
 #, fuzzy
@@ -4107,23 +4076,20 @@ msgstr ""
 "Internet bağlantınızı ve online gizliliğinizi korumak hakkında bilgi edinin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
-#, fuzzy
 msgid "Support FrostWire"
-msgstr "FrostWire Hakkında"
+msgstr "FrostWire'ı destekleyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:60
 msgid "Support with CryptoCurrencies"
-msgstr ""
+msgstr "CryptoCurrencies ile destek"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:61
-#, fuzzy
 msgid "Bitcoin"
-msgstr "bitcoins"
+msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:62
-#, fuzzy
 msgid "Bitcoin Cash"
-msgstr "bitcoins"
+msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:63
 msgid "Ethereum"
@@ -4142,32 +4108,28 @@ msgid "ZCash"
 msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:67
-#, fuzzy
 msgid "Bitcoin Gold"
-msgstr "bitcoins"
+msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:71
 msgid "Free Legal Downloads"
 msgstr "Ücretsiz Kanuni İndirmeler"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:75
-#, fuzzy
 msgid "Follow us on Facebook"
-msgstr "Facebook'da FrostWire"
+msgstr "Bizi Facebook'ta takip et"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:75
 msgid "Come and say hi to the community on Facebook"
 msgstr "Gelin ve Facebook'taki topluluğa bir merhaba deyin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:77
-#, fuzzy
 msgid "Follow us on G+"
-msgstr "Bizi Twitter'da Takip Edin"
+msgstr "Bizi G+'ta takip et"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:79
-#, fuzzy
 msgid "Follow us on Instagram"
-msgstr "Bizi Twitter'da Takip Edin"
+msgstr "Bizi Instagram'ta takip et"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:81
 msgid "Follow us on Twitter"
@@ -4210,28 +4172,27 @@ msgstr "FrostWire hakkında Bilgi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:154
 msgid "Show Send Feedback Window"
-msgstr ""
+msgstr "Göndermek geribildirim penceresini göster"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "seconds"
-msgstr ""
+msgstr "saniye"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "second"
-msgstr ""
+msgstr "saniye"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minutes"
-msgstr ""
+msgstr "dakika"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minute"
-msgstr ""
+msgstr "dakika"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:180
-#, fuzzy
 msgid "Please wait"
-msgstr "Lütfen bekleyiniz..."
+msgstr "Lütfen bekle"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/MenuMediator.java:91
 msgid "Loading Menus..."
@@ -4291,14 +4252,12 @@ msgid "Update FrostWire to the latest version"
 msgstr "FrostWire son sürüme güncelleme"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:128
-#, fuzzy
 msgid "You are up to date with FrostWire"
-msgstr "FrostWire ile Oluşturulmuş Torrent Dosyası"
+msgstr "FrostWire ile güncel bilgilere"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:130
-#, fuzzy
 msgid "Downloading update..."
-msgstr "İndiriliyor"
+msgstr "Güncelleme indiriliyor..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:133
 msgid "Install update"
@@ -4860,9 +4819,8 @@ msgid "Allow Partial Sharing:"
 msgstr "Kısmi Dosya Paylaşımına İzin Ver"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/PlayerPaneItem.java:35
-#, fuzzy
 msgid "FrostWire Media Player"
-msgstr "FrostWire Medya Oynatıcısını kullan"
+msgstr "FrostWire Medya Oynatıcı"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/PlayerPaneItem.java:37
 msgid ""
@@ -5195,7 +5153,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:35
 msgid "Anonymous Usage Statistics"
-msgstr ""
+msgstr "Anonim Kullanım İstatistikleri"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:37
 msgid ""
@@ -5204,14 +5162,18 @@ msgid ""
 "any information that can personally identify you will be stored on disk or "
 "sent through the network."
 msgstr ""
+"Anonim kullanım istatistiklerini gönderin, böylece FrostWire daha etkili bir "
+"şekilde geliştirilebilir. Aranan, paylaşılan veya oynatılan içerikle ilgili "
+"hiçbir bilgi veya sizi kişisel olarak tanımlayabilecek hiçbir bilgi diskte "
+"saklanmayacak veya ağ üzerinden gönderilecektir."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:39
 msgid "Send anonymous usage statistics"
-msgstr ""
+msgstr "Anonim kullanım istatistikleri gönder"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/VideoPlayerPaneItem.java:25
 msgid "Video Options"
-msgstr "video seçenekleri"
+msgstr "Video Seçenekleri"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/VideoPlayerPaneItem.java:27
 msgid "You can choose which video player to use."
@@ -5323,9 +5285,8 @@ msgid "View in Archive.org"
 msgstr "Archive.org görünümünde"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:92
-#, fuzzy
 msgid "View in Pixabay"
-msgstr "Youtube'da Görüntüle"
+msgstr "Pixabay Görüntüle"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:94
 msgid "Close Tab"
