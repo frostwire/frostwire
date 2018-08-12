@@ -126,4 +126,10 @@
   <string name="empty_search">검색 결과 없음</string>
   <string name="empty_favorite">즐겨찾기에 추가한 노래들이 여기에 표시됩니다.</string>
   <string name="empty_recent">최근에 재생했던 앨범들이 여기에 표시됩니다. 아무 음악이나 틀어보세요.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" #FrostWire 에서</string>
+  <string name="delete_files_title">파일 삭제</string>
+  <string name="page_last_added">마지막으로 추가 된 항목</string>
+  <string name="empty_playlist">이 재생 목록은 비어 있습니다.\n\n노래를 추가하는 방법을 보려면 여기를 클릭하십시오.</string>
+  <string name="are_you_sure_delete_files_text">장치에서 선택한 파일을 영구적으로 삭제 하시겠습니까?</string>
+  <string name="frostwire_player">FrostWire 미디어 플레이어...</string>
 </resources>
