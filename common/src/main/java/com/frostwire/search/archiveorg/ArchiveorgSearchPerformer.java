@@ -59,7 +59,7 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         ArchiveorgResponse response = JsonUtils.toObject(page, ArchiveorgResponse.class);
 
         for (ArchiveorgItem item : response.response.docs) {
-            if (!isStopped()) {
+            if (!isStopped() && filter(item)) {
                 ArchiveorgSearchResult sr = new ArchiveorgSearchResult(getDomainName(), item);
                 result.add(sr);
             }
@@ -96,7 +96,7 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         return list;
     }
 
-    private List<ArchiveorgFile> readFiles(String json) throws Exception {
+    private List<ArchiveorgFile> readFiles(String json) {
         List<ArchiveorgFile> result = new LinkedList<>();
 
         JsonElement element = new JsonParser().parse(json);
@@ -139,6 +139,10 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         }
 
         return size;
+    }
+
+    private boolean filter(ArchiveorgItem item) {
+        return !(item.collection != null && item.collection.contains("samples_only"));
     }
 
     private boolean filter(ArchiveorgFile file) {
