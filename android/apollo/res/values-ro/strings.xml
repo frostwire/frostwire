@@ -126,4 +126,10 @@
   <string name="empty_search">Nu am găsit rezultate la căutare</string>
   <string name="empty_favorite">Melodiile marcate de dvs ca favorite vor fi afișate aici.</string>
   <string name="empty_recent">Albumele ascultate de dvs vor fi afișate aici. Încearcă să asculți ceva muzică.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" pe #FrostWire</string>
+  <string name="delete_files_title">Sterge fisierele</string>
+  <string name="page_last_added">Ultimele adăugate</string>
+  <string name="empty_playlist">Acest playlist este gol.\n\nFaceți clic aici pentru a afla cum să adăugați melodii.</string>
+  <string name="are_you_sure_delete_files_text">Sigur doriți să DELETEȚI PERMANENT fișierele selectate de pe dispozitiv?</string>
+  <string name="frostwire_player">FrostWire Player</string>
 </resources>
