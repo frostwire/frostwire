@@ -271,7 +271,7 @@ public class MacEventHandler {
         @SuppressWarnings("unchecked")
         public static List<File> getFiles(Object event) {
             try {
-                Method m = event.getClass().getDeclaredMethod("getFiles");
+                Method m = event.getClass().getMethod("getFiles");
                 return (List<File>) m.invoke(event);
             } catch (Throwable e) {
                 LOG.error("Error invoking getFiles in event: " + event);
