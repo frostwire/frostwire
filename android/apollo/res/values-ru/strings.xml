@@ -127,4 +127,9 @@
   <string name="empty_search">Поиск не дал результатов.</string>
   <string name="empty_favorite">Треки, отмеченные как избранные, будут показаны здесь.</string>
   <string name="empty_recent">Прослушанные альбомы будут показаны здесь.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" в #FrostWire</string>
+  <string name="delete_files_title">Удалить файлы</string>
+  <string name="empty_playlist">Этот плейлист пуст.\n\nНажмите здесь, чтобы узнать, как добавлять песни.</string>
+  <string name="are_you_sure_delete_files_text">Вы уверены, что хотите ПОСТОЯННО УДАЛИТЬ выбранные файлы с вашего устройства?</string>
+  <string name="frostwire_player">Медиаплеер FrostWire</string>
 </resources>
