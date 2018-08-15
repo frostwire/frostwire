@@ -1,9 +1,11 @@
 frostwire (6.7.2) stable; urgency=high
+  * Search: YT, Archive.org fixes
   * UX: Torrent Transfer Detail General > Save Location can be clicked to open
     the OS's default file explorer to show the file/folder pertinent to the transfer
-  * Translations updated (Ukranian)
+  * Fixes bug in macOS handling opened files
+  * Translations updated (Ukranian, Norwegian, Turkish)
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 31 Jul 2018 05:50:22 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 15 Aug 2018 12:18:33 -0600
 
 
 frostwire (6.7.1) stable; urgency=high
