@@ -21,7 +21,7 @@
     package="com.frostwire.android"
     android:installLocation="auto"
     android:versionCode="557"
-    android:versionName="2.0.7">
+    android:versionName="2.0.8">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
