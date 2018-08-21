@@ -126,4 +126,10 @@
   <string name="empty_search">Nie znaleziono pasujących wyników</string>
   <string name="empty_favorite">Tutaj pojawią się utwory oznaczone jako ulubione.</string>
   <string name="empty_recent">Ostatnio przesłuchane albumy pojawią się tutaj. Zobaczysz je po odtworzeniu kilku utworów.</string>
+  <string name="now_listening_to_no_artist_available">#TerazSłucham \"<xliff:g id="title">%1$s</xliff:g>\" na #FrostWire</string>
+  <string name="delete_files_title">Usuń Pliki</string>
+  <string name="page_last_added">Ostatnio Dodane</string>
+  <string name="empty_playlist">Ta playlista jest pusta.\n\nKliknij tutaj aby dowiedzieć się jak dodać piosenki.</string>
+  <string name="are_you_sure_delete_files_text">Czy na pewno chcesz NA ZAWSZE USUNĄĆ wybrane pliki z urządzenia?</string>
+  <string name="frostwire_player">Odtwarzacz FrostWire</string>
 </resources>
