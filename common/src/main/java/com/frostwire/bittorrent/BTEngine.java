@@ -156,7 +156,16 @@ public final class BTEngine extends SessionManager {
 
         String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3]);
         sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
+
+        String userAgent = String.format("FrostWire/%d.%d.%d libtorrent/%s",
+                ctx.version[0],
+                ctx.version[1],
+                ctx.version[2],
+                libtorrent.version());
+        sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
+
         System.out.println("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
+        System.out.println("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
 
         super.start(params);
     }
