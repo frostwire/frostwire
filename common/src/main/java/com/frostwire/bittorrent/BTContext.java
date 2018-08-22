@@ -31,6 +31,7 @@ public final class BTContext {
     public String interfaces;
     public int retries;
     public boolean optimizeMemory;
+    public final int[] version = {0,0,0,0};
 
     /**
      * Indicates if the engine starts with the DHT enable.

@@ -17,6 +17,7 @@
 
 package com.limegroup.gnutella.util;
 
+import com.frostwire.bittorrent.BTContext;
 import org.apache.commons.io.IOUtils;
 import org.limewire.setting.SettingsFactory;
 import org.limewire.util.CommonUtils;
@@ -169,5 +170,17 @@ public final class FrostWireUtils {
         }
 
         return videoFile;
+    }
+
+    /**
+     *
+     * @return 4 int array with { MAJOR.MINOR.REVISION.BUILD
+     */
+    public static void getFrostWireVersionBuild(final int result[]) {
+        String[] vStrArray = getFrostWireVersion().split("\\.");
+        result[0] = Integer.valueOf(vStrArray[0]);
+        result[1] = Integer.valueOf(vStrArray[1]);
+        result[2] = Integer.valueOf(vStrArray[2]);
+        result[3] = getBuildNumber();
     }
 }
