@@ -23,6 +23,7 @@ import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
@@ -150,6 +151,11 @@ public class MainApplication extends Application {
 //                Thread.sleep(60000);
 //            } catch (InterruptedException e) {
 //            }
+            String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
+            ctx.version[0] = Integer.valueOf(vStrArray[0]);
+            ctx.version[1] = Integer.valueOf(vStrArray[1]);
+            ctx.version[2] = Integer.valueOf(vStrArray[2]);
+            ctx.version[3] = BuildConfig.VERSION_CODE % 100;
 
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
