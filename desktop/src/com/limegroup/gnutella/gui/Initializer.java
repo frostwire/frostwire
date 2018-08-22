@@ -29,6 +29,7 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.MacOSXUtils;
 import org.limewire.service.ErrorService;
 import org.limewire.util.CommonUtils;
@@ -479,6 +480,8 @@ public final class Initializer {
         ctx.retries = port1 - port0;
 
         ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
+
+        FrostWireUtils.getFrostWireVersionBuild(ctx.version);
 
         BTEngine.ctx = ctx;
         BTEngine.onCtxSetupComplete();
