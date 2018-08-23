@@ -1,11 +1,14 @@
 frostwire (6.7.2) stable; urgency=high
+  * New jlibtorrent 1.2.0.18-RC11
+  * Library updates: openssl-1.1.1-pre9
+  * New user agent and peer finger print for tracker announcement
   * Search: YT, Archive.org fixes
   * UX: Torrent Transfer Detail General > Save Location can be clicked to open
     the OS's default file explorer to show the file/folder pertinent to the transfer
   * Fixes bug in macOS handling opened files
   * Translations updated (Ukranian, Norwegian, Turkish)
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 15 Aug 2018 12:18:33 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 22 Aug 2018 18:23:44 -0600
 
 
 frostwire (6.7.1) stable; urgency=high
