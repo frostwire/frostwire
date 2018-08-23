@@ -121,8 +121,6 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
 
                 if (client == null || client.isEmpty()) {
                     client = I18n.tr("Unknown");
-                } else if (client.contains("libtorrent/1.2")) {
-                    client = "FrostWire";
                 }
                 return client;
             case FLAGS_COLUMN_ID:
