@@ -1,7 +1,10 @@
-FrostWire 2.0.8 build 557 - AUG/15/2018
+FrostWire 2.0.8 build 558 - AUG/22/2018
  - YT search fixed
  - Archive.org search fixed
  - Translations updated: Hebrew, Japanese, Dutch, Romanian
+ - New jlibtorrent 1.2.0.18-RC11
+ - Library updates: openssl-1.1.1-pre9
+ - New user agent and peer finger print for tracker announcement
 
 FrostWire 2.0.7 build 556 - AUG/09/2018
  - Crash on Audio Player equalizer menu
