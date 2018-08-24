@@ -52,6 +52,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
@@ -157,7 +158,8 @@ public final class BTEngine extends SessionManager {
         String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3]);
         sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
 
-        String userAgent = String.format("FrostWire/%d.%d.%d libtorrent/%s",
+        String userAgent = String.format(Locale.ENGLISH,
+                "FrostWire/%d.%d.%d libtorrent/%s",
                 ctx.version[0],
                 ctx.version[1],
                 ctx.version[2],
