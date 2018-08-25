@@ -77,7 +77,6 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -199,12 +198,10 @@ public class MainActivity extends AbstractActivity implements
         }
         shuttingdown = true;
         LocalSearchEngine.instance().cancelSearch();
-        Offers.stopAdNetworks(this);
         //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
         finish();
         Engine.instance().shutdown();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
-        SystemUtils.requestKillProcess(this);
     }
 
     @Override
@@ -483,7 +480,7 @@ public class MainActivity extends AbstractActivity implements
             mToken = null;
         }
         // necessary unregisters broadcast its internal receivers, avoids leaks.
-        Offers.destroyMopubInterstitials(this);
+        Offers.destroyMopubInterstitials();
     }
 
     private void saveLastFragment(Bundle outState) {
@@ -504,6 +501,9 @@ public class MainActivity extends AbstractActivity implements
                 firstTime = false;
                 Engine.instance().startServices(); // it's necessary for the first time after wizard
             }
+        }
+        if (Engine.instance().wasShutdown()) {
+            Engine.instance().startServices();
         }
         SoftwareUpdater.getInstance().checkForUpdate(this);
     }

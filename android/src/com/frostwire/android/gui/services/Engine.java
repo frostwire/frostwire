@@ -63,8 +63,13 @@ public final class Engine implements IEngineService {
     // the creation of the service is not (and can't be) synchronized
     // with the main activity resume.
     private boolean pendingStartServices = false;
+    private boolean wasShutdown;
 
     private Engine() {
+    }
+
+    public boolean wasShutdown() {
+        return wasShutdown;
     }
 
     private static class Loader {
@@ -116,8 +121,9 @@ public final class Engine implements IEngineService {
     }
 
     public void startServices() {
-        if (service != null) {
-            service.startServices();
+        if (service != null || wasShutdown) {
+            service.startServices(wasShutdown);
+            wasShutdown = false;
         } else {
             // save pending startServices call
             pendingStartServices = true;
@@ -163,6 +169,7 @@ public final class Engine implements IEngineService {
                 }
             }
             service.shutdown();
+            wasShutdown = true;
         }
     }
 

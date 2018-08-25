@@ -97,8 +97,8 @@ public final class Offers {
         return AD_NETWORKS;
     }
 
-    public static void destroyMopubInterstitials(Context context) {
-        MOPUB.stop(context);
+    public static void destroyMopubInterstitials() {
+        MOPUB.destroyInterstitials();
     }
 
     public static void stopAdNetworks(Context context) {
