@@ -78,13 +78,9 @@ public final class Offers {
         }
         PrebidManager.getInstance(activity);
         LOG.info("Offers.initAdNetworks() success");
-        return;
     }
 
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        if (AD_NETWORKS == null) {
-//            return;
-//        }
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
@@ -386,10 +382,6 @@ public final class Offers {
 
             if (activity != null) {
                 if (shutdownAfter) {
-                    if (adNetwork != null) {
-                        adNetwork.stop(activity);
-                    }
-
                     if (activity instanceof MainActivity) {
                         LOG.info("dismissAndOrShutdownIfNecessary: MainActivity.shutdown()");
                         ((MainActivity) activity).shutdown();
@@ -401,10 +393,6 @@ public final class Offers {
                 }
 
                 if (finishAfterDismiss) {
-//                    if (adNetwork != null) {
-//                        adNetwork.stop(activity);
-//                    }
-
                     if (activity instanceof MainActivity) {
                         activity.finish();
                     } else {
