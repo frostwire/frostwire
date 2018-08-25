@@ -22,17 +22,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.andrew.apollo.MediaButtonIntentReceiver;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -40,8 +37,6 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.NotificationUpdateDemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Vectors;
@@ -113,7 +108,6 @@ public class EngineService extends Service implements IEngineService {
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
-        async(this, EngineService::enableComponentsTask, true);
         async(this, EngineService::startPermanentNotificationUpdatesTask);
         return START_STICKY;
     }
@@ -125,7 +119,7 @@ public class EngineService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        enableComponentsTask(this, false); // we're already on a shutdown thread
+        //enableComponentsTask(this, false); // we're already on a shutdown thread
         stopPermanentNotificationUpdates();
         cancelAllNotificationsTask(this);
         stopServices(false);
@@ -138,12 +132,9 @@ public class EngineService extends Service implements IEngineService {
             LOG.debug("onDestroy, BTEngine didn't have a chance to start, no need to stop it");
         }
 
-        ImageLoader.getInstance(this).shutdown();
-        PlayStore.getInstance(this).dispose();
+        //ImageLoader.getInstance(this).shutdown();
         stopOkHttp();
-
         stopForeground(true);
-        stopSelf();
     }
 
     // what a bad design to properly shutdown the framework threads!
@@ -193,6 +184,10 @@ public class EngineService extends Service implements IEngineService {
     }
 
     public synchronized void startServices() {
+        startServices(false);
+    }
+
+    public synchronized void startServices(boolean wasShutdown) {
         // hard check for TOS
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             return;
@@ -206,12 +201,20 @@ public class EngineService extends Service implements IEngineService {
             return;
         }
 
-        async(this, EngineService::resumeBTEngineTask);
+        async(this, EngineService::resumeBTEngineTask, wasShutdown);
     }
 
-    private static void resumeBTEngineTask(EngineService engineService) {
+    private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
         engineService.state = STATE_STARTING;
-        BTEngine.getInstance().resume();
+        BTEngine btEngine = BTEngine.getInstance();
+        if (!wasShutdown) {
+            btEngine.resume();
+        } else {
+            btEngine.start();
+            TransferManager.instance().loadTorrentsTask();
+            btEngine.resume();
+
+        }
         engineService.state = STATE_STARTED;
         LOG.info("resumeBTEngineTask(): Engine started", true);
     }
@@ -380,37 +383,37 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-    private static void enableComponent(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
-        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-        ComponentName receiver = new ComponentName(engineService, clazz);
-        int currentState = pm.getComponentEnabledSetting(receiver);
-        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-            LOG.info("Receiver " + receiver + " was disabled");
-        } else {
-            LOG.info("Receiver " + receiver + " was enabled");
-        }
-        pm.setComponentEnabledSetting(receiver,
-                newState,
-                PackageManager.DONT_KILL_APP);
-        currentState = pm.getComponentEnabledSetting(receiver);
-        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-            LOG.info("Receiver " + receiver + " now is disabled");
-        } else {
-            LOG.info("Receiver " + receiver + " now is enabled");
-        }
-    }
+//    private static void enableComponent(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
+//        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+//                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+//        ComponentName receiver = new ComponentName(engineService, clazz);
+//        int currentState = pm.getComponentEnabledSetting(receiver);
+//        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+//            LOG.info("Receiver " + receiver + " was disabled");
+//        } else {
+//            LOG.info("Receiver " + receiver + " was enabled");
+//        }
+//        pm.setComponentEnabledSetting(receiver,
+//                newState,
+//                PackageManager.DONT_KILL_APP);
+//        currentState = pm.getComponentEnabledSetting(receiver);
+//        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+//            LOG.info("Receiver " + receiver + " now is disabled");
+//        } else {
+//            LOG.info("Receiver " + receiver + " now is enabled");
+//        }
+//    }
 
-    private static void enableComponentsTask(EngineService engineService, boolean enable) {
-        try {
-            PackageManager pm = engineService.getPackageManager();
-            // receivers
-            async(engineService, EngineService::enableComponent, pm, EngineBroadcastReceiver.class, enable);
-            async(engineService, EngineService::enableComponent, pm, MediaButtonIntentReceiver.class, enable);
-        } catch (Throwable t) {
-            LOG.warn(t.getMessage(), t);
-        }
-    }
+//    private static void enableComponentsTask(EngineService engineService, boolean enable) {
+//        try {
+//            PackageManager pm = engineService.getPackageManager();
+//            // receivers
+//            async(engineService, EngineService::enableComponent, pm, EngineBroadcastReceiver.class, enable);
+//            async(engineService, EngineService::enableComponent, pm, MediaButtonIntentReceiver.class, enable);
+//        } catch (Throwable t) {
+//            LOG.warn(t.getMessage(), t);
+//        }
+//    }
 
     private static void cancelAllNotificationsTask(EngineService engineService) {
         try {

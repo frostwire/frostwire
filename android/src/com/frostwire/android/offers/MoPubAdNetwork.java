@@ -43,6 +43,8 @@ import com.mopub.mobileads.MoPubInterstitial;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,7 +155,28 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             listener.dismissActivityAfterwards(dismissActivityAfterward);
             listener.wasPlayingMusic(MusicUtils.isPlaying());
         }
-        return listener != null && interstitial.isReady() && interstitial.show();
+        if (listener == null) {
+            LOG.warn("showInterstitial() failed, no listener set, check your logic");
+            return false;
+        }
+
+        // reflection hack to check if MoPub interstitial is destroyed (.isDestroyed is not public)
+        if (!interstitial.isReady()) {
+            try {
+                Method isDestroyedMethod = interstitial.getClass().getDeclaredMethod("isDestroyed");
+                isDestroyedMethod.setAccessible(true);
+                boolean isDestroyed = (boolean) isDestroyedMethod.invoke(interstitial);
+                isDestroyedMethod.setAccessible(false);
+
+                if (isDestroyed) {
+                    loadNewInterstitial(activity);
+                }
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
+            return false;
+        }
+        return interstitial.show();
     }
 
     @Override
@@ -213,6 +236,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public void stop(Context context) {
         super.stop(context);
         starting = false;
+        destroyInterstitials();
+    }
+
+    public void destroyInterstitials() {
         if (placements == null || interstitials == null || placements.isEmpty() || interstitials.isEmpty()) {
             return;
         }
