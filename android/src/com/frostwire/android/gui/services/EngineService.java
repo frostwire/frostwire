@@ -213,7 +213,6 @@ public class EngineService extends Service implements IEngineService {
             btEngine.start();
             TransferManager.instance().loadTorrentsTask();
             btEngine.resume();
-
         }
         engineService.state = STATE_STARTED;
         LOG.info("resumeBTEngineTask(): Engine started", true);

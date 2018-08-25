@@ -858,10 +858,7 @@ public class MainActivity extends AbstractActivity implements
         try {
             File data = Platforms.data();
             File parent = data.getParentFile();
-            if (!AndroidPlatform.saf(parent)) {
-                return false;
-            }
-            return (!Platforms.fileSystem().canWrite(parent) && !SDPermissionDialog.visible);
+            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent) && !SDPermissionDialog.visible);
         } catch (Throwable e) {
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
