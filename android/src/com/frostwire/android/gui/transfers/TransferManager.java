@@ -568,7 +568,7 @@ public final class TransferManager {
 
     }
 
-    private void loadTorrentsTask() {
+    public void loadTorrentsTask() {
         bittorrentDownloadsList.clear();
         bittorrentDownloadsMap.clear();
         final BTEngine btEngine = BTEngine.getInstance();
