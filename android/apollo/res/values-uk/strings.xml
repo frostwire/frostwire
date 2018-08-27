@@ -126,4 +126,10 @@
   <string name="empty_search">Нічого не знайдено</string>
   <string name="empty_favorite">Тут відображатимуться улюблені пісні.</string>
   <string name="empty_recent">Тут відображатимуться прослухані пісні. </string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" У #FrostWire</string>
+  <string name="delete_files_title">Видалити файли</string>
+  <string name="page_last_added">Останні додані</string>
+  <string name="empty_playlist">Цей список відтворення порожній.\n\nНатисніть тут, щоб дізнатись, як додати пісні.</string>
+  <string name="are_you_sure_delete_files_text">Ви впевнені, що хочете постійно видаляти обрані файли з вашого пристрою?</string>
+  <string name="frostwire_player">Медіаплеєр FrostWire</string>
 </resources>
