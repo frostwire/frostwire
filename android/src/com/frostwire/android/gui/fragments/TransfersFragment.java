@@ -286,6 +286,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     public void onTime() {
+        if (!isVisible()) {
+            return;
+        }
+
         if (adapter != null) {
             async(this,
                     TransfersFragment::sortSelectedStatusTransfersInBackground,
