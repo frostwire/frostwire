@@ -718,6 +718,10 @@ public final class BTEngine extends SessionManager {
             }
         } else { // new download
             download(ti, saveDir, resumeFile, priorities, peers);
+            th = find(ti.infoHash());
+            if (th != null) {
+                fireDownloadUpdate(th);
+            }
         }
     }
 
