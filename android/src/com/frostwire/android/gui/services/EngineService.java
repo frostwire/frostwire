@@ -211,7 +211,7 @@ public class EngineService extends Service implements IEngineService {
             btEngine.resume();
         } else {
             btEngine.start();
-            TransferManager.instance().loadTorrentsTask();
+            TransferManager.instance().reset();
             btEngine.resume();
         }
         engineService.state = STATE_STARTED;
@@ -226,6 +226,7 @@ public class EngineService extends Service implements IEngineService {
         state = STATE_STOPPING;
 
         LOG.info("Pausing BTEngine...");
+        TransferManager.instance().onShutdown();
         BTEngine.getInstance().pause();
         LOG.info("Pausing BTEngine paused");
 

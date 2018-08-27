@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Looper;
@@ -68,6 +69,7 @@ public final class TransferManager {
     private int downloadsToReview;
     private int startedTransfers = 0;
     private final Object alreadyDownloadingMonitor = new Object();
+    private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
     private volatile static TransferManager instance;
 
     public static TransferManager instance() {
@@ -78,12 +80,31 @@ public final class TransferManager {
     }
 
     private TransferManager() {
+        onSharedPreferenceChangeListener = (sharedPreferences, key) -> onPreferenceChanged(key);
         registerPreferencesChangeListener();
         this.httpDownloads = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsList = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsMap = new HashMap<>(0);
         this.downloadsToReview = 0;
         async(this::loadTorrentsTask);
+    }
+
+    public void reset() {
+        registerPreferencesChangeListener();
+        clearTransfers();
+        async(this::loadTorrentsTask);
+    }
+
+    public void onShutdown() {
+        clearTransfers();
+        unregisterPreferencesChangeListener();
+    }
+
+    private void clearTransfers() {
+        this.httpDownloads.clear();
+        this.bittorrentDownloadsList.clear();
+        this.bittorrentDownloadsMap .clear();
+        this.downloadsToReview = 0;
     }
 
     /**
@@ -540,9 +561,17 @@ public final class TransferManager {
 
     private void registerPreferencesChangeListener() {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key)));
+            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
         } else {
-            ConfigurationManager.instance().registerOnPreferenceChange((sharedPreferences, key) -> onPreferenceChanged(key));
+            ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener);
+        }
+    }
+
+    private void unregisterPreferencesChangeListener() {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
+        } else {
+            ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener);
         }
     }
 
@@ -568,7 +597,7 @@ public final class TransferManager {
 
     }
 
-    public void loadTorrentsTask() {
+    private void loadTorrentsTask() {
         bittorrentDownloadsList.clear();
         bittorrentDownloadsMap.clear();
         final BTEngine btEngine = BTEngine.getInstance();
