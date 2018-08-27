@@ -186,7 +186,7 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC11'
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC11'
     implementation 'com.google.android:flexbox:1.0.0'
-    implementation(name: 'presage-moat-3.0.17-3.0.11', ext: 'aar')
+    implementation(name: 'presage-moat-3.0.23-3.0.14', ext: 'aar')
 }
 
 class DeployRelease extends DefaultTask {
