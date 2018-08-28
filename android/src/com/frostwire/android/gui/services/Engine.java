@@ -38,8 +38,10 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.util.Ref;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
 import static com.frostwire.android.util.Asyncs.async;
@@ -88,7 +90,7 @@ public final class Engine implements IEngineService {
      * @param application the application object
      */
     public void onApplicationCreate(Application application) {
-        async(application, this::engineServiceStarter);
+        async(new EngineApplicationRefsHolder(this, application), Engine::engineServiceStarter);
     }
 
     @Override
@@ -124,6 +126,10 @@ public final class Engine implements IEngineService {
         if (service != null || wasShutdown) {
             if (service != null) {
                 service.startServices(wasShutdown);
+            }
+            if (wasShutdown) {
+                async(new EngineApplicationRefsHolder(this, getApplication()),
+                      Engine::engineServiceStarter);
             }
             wasShutdown = false;
         } else {
@@ -274,10 +280,27 @@ public final class Engine implements IEngineService {
         }
     }
 
-    private void engineServiceStarter(Application application) {
+    private class EngineApplicationRefsHolder {
+        WeakReference<Engine> engineRef;
+        WeakReference<Application> appRef;
+        EngineApplicationRefsHolder(Engine engine, Application application) {
+            engineRef = Ref.weak(engine);
+            appRef = Ref.weak(application);
+        }
+    }
+
+    private static void engineServiceStarter(EngineApplicationRefsHolder refsHolder) {
+        if (!Ref.alive(refsHolder.engineRef)) {
+            return;
+        }
+        if (!Ref.alive(refsHolder.appRef)) {
+            return;
+        }
+        Engine engine = refsHolder.engineRef.get();
+        Application application = refsHolder.appRef.get();
         if (application != null) {
-            vibrator = new FWVibrator(application);
-            startEngineService(application);
+            engine.vibrator = new FWVibrator(application);
+            engine.startEngineService(application);
         }
     }
 }
