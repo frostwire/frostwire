@@ -64,7 +64,6 @@ public final class Engine implements IEngineService {
     // with the main activity resume.
     private boolean pendingStartServices = false;
     private boolean wasShutdown;
-    private long lastRestarted;
 
     private Engine() {
     }
@@ -123,17 +122,14 @@ public final class Engine implements IEngineService {
 
     public void startServices() {
         if (service != null || wasShutdown) {
-            service.startServices(wasShutdown);
+            if (service != null) {
+                service.startServices(wasShutdown);
+            }
             wasShutdown = false;
-            lastRestarted = System.currentTimeMillis();
         } else {
             // save pending startServices call
             pendingStartServices = true;
         }
-    }
-
-    public long lastRestarted() {
-        return lastRestarted;
     }
 
     public void stopServices(boolean disconnected) {

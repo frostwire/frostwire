@@ -316,18 +316,16 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         @Override
         public void finished(BTDownload dl) {
+            // this method will be called for all finished transfers even right after the app has been opened the first
+            // time, right after it's done resuming transfers
+
             pauseSeedingIfNecessary(dl);
             TransferManager.instance().incrementDownloadsToReview();
-            File saveLocation = getSavePath().getAbsoluteFile();
+            File savePath = getSavePath().getAbsoluteFile(); // e.g. "Torrent Data"
             Engine engine = Engine.instance();
-            engine.notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
-            long lastRestarted = engine.lastRestarted();
-            // if restarted, wait at least 1 minute before performing a file system scan
-            if (lastRestarted == -1 || ((System.currentTimeMillis() - lastRestarted) > 60000)) {
-                Platforms.fileSystem().scan(saveLocation);
-            } else {
-                LOG.info("StatusListener.finished() - skipping file system scan, too early");
-            }
+            engine.notifyDownloadFinished(getDisplayName(), savePath, dl.getInfoHash());
+            File torrentSaveFolder = dl.getContentSavePath();
+            Platforms.fileSystem().scan(torrentSaveFolder);
         }
 
         private void pauseSeedingIfNecessary(BTDownload dl) {
