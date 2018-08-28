@@ -126,4 +126,10 @@
   <string name="empty_search">Nerasta jokių paieškos rezultatų</string>
   <string name="empty_favorite">Dainas, kurias pažymite kaip mėgstamas bus rodomos čia.</string>
   <string name="empty_recent">Albumai kuriuos klausėtes bus rodomi čia. Pabandykite paleisti šiek tiek muzikos.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" ant #FrostWire</string>
+  <string name="delete_files_title">Ištrinti failus</string>
+  <string name="page_last_added">Paskutiniai įtraukti</string>
+  <string name="empty_playlist">Šis grojaraštis tuščias.\n\nSpustelėkite čia, jei norite sužinoti, kaip pridėti dainų.</string>
+  <string name="are_you_sure_delete_files_text">Ar tikrai norite visada pašalinti pasirinktus failus iš savo įrenginio?</string>
+  <string name="frostwire_player">FrostWire Medijos Leistuvas</string>
 </resources>
