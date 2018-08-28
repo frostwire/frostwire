@@ -323,7 +323,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             engine.notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
             long lastRestarted = engine.lastRestarted();
             // if restarted, wait at least 1 minute before performing a file system scan
-            if (lastRestarted == -1 || ((System.currentTimeMillis()-lastRestarted) > 60000)) {
+            if (lastRestarted == -1 || ((System.currentTimeMillis() - lastRestarted) > 60000)) {
                 Platforms.fileSystem().scan(saveLocation);
             } else {
                 LOG.info("StatusListener.finished() - skipping file system scan, too early");
