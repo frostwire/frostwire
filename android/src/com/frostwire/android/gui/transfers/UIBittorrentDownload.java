@@ -33,6 +33,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
@@ -318,8 +319,15 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             pauseSeedingIfNecessary(dl);
             TransferManager.instance().incrementDownloadsToReview();
             File saveLocation = getSavePath().getAbsoluteFile();
-            Engine.instance().notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
-            Platforms.fileSystem().scan(saveLocation);
+            Engine engine = Engine.instance();
+            engine.notifyDownloadFinished(getDisplayName(), saveLocation, dl.getInfoHash());
+            long lastRestarted = engine.lastRestarted();
+            // if restarted, wait at least 1 minute before performing a file system scan
+            if (lastRestarted == -1 || ((System.currentTimeMillis()-lastRestarted) > 60000)) {
+                Platforms.fileSystem().scan(saveLocation);
+            } else {
+                LOG.info("StatusListener.finished() - skipping file system scan, too early");
+            }
         }
 
         private void pauseSeedingIfNecessary(BTDownload dl) {
