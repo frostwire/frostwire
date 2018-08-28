@@ -383,38 +383,6 @@ public class EngineService extends Service implements IEngineService {
         }
     }
 
-//    private static void enableComponent(EngineService engineService, PackageManager pm, Class<?> clazz, boolean enable) {
-//        int newState = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-//                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-//        ComponentName receiver = new ComponentName(engineService, clazz);
-//        int currentState = pm.getComponentEnabledSetting(receiver);
-//        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-//            LOG.info("Receiver " + receiver + " was disabled");
-//        } else {
-//            LOG.info("Receiver " + receiver + " was enabled");
-//        }
-//        pm.setComponentEnabledSetting(receiver,
-//                newState,
-//                PackageManager.DONT_KILL_APP);
-//        currentState = pm.getComponentEnabledSetting(receiver);
-//        if (currentState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-//            LOG.info("Receiver " + receiver + " now is disabled");
-//        } else {
-//            LOG.info("Receiver " + receiver + " now is enabled");
-//        }
-//    }
-
-//    private static void enableComponentsTask(EngineService engineService, boolean enable) {
-//        try {
-//            PackageManager pm = engineService.getPackageManager();
-//            // receivers
-//            async(engineService, EngineService::enableComponent, pm, EngineBroadcastReceiver.class, enable);
-//            async(engineService, EngineService::enableComponent, pm, MediaButtonIntentReceiver.class, enable);
-//        } catch (Throwable t) {
-//            LOG.warn(t.getMessage(), t);
-//        }
-//    }
-
     private static void cancelAllNotificationsTask(EngineService engineService) {
         try {
             NotificationManager notificationManager = (NotificationManager) engineService.getSystemService(NOTIFICATION_SERVICE);
