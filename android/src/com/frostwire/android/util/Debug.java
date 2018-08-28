@@ -116,6 +116,7 @@ public final class Debug {
                     value instanceof Fragment ||
                     value instanceof View ||
                     value instanceof Dialog) {
+                    System.out.println("Leakable obj instance of " + value.getClass().getCanonicalName());
                     return true;
                 }
             }
