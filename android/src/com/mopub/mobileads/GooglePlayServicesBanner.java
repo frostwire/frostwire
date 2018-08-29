@@ -44,8 +44,8 @@ import static com.google.android.gms.ads.AdSize.MEDIUM_RECTANGLE;
  * Created on 7/31/18.
  */
 
-public class AdMobBannerAdapter extends CustomEventBanner {
-    private static final Logger LOG = Logger.getLogger(AdMobBannerAdapter.class);
+public class GooglePlayServicesBanner extends CustomEventBanner {
+    private static final Logger LOG = Logger.getLogger(GooglePlayServicesBanner.class);
     /*
      * These keys are intended for MoPub internal use. Do not modify.
      */

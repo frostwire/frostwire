@@ -37,8 +37,8 @@ import java.util.Map;
  * Created on 7/31/18.
  */
 
-public class AdMobInterstitialAdapter extends CustomEventInterstitial {
-    private static final Logger LOG = Logger.getLogger(AdMobInterstitialAdapter.class);
+public class GooglePlayServicesInterstitial extends CustomEventInterstitial {
+    private static final Logger LOG = Logger.getLogger(GooglePlayServicesInterstitial.class);
 
     /*
      * These keys are intended for MoPub internal use. Do not modify.

@@ -36,8 +36,8 @@ import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
-import com.mopub.mobileads.AdMobBannerAdapter;
-import com.mopub.mobileads.AdMobInterstitialAdapter;
+import com.mopub.mobileads.GooglePlayServicesBanner;
+import com.mopub.mobileads.GooglePlayServicesInterstitial;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 
@@ -89,8 +89,8 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
         SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER)
                 .withMediationSettings(
-                        new AdMobBannerAdapter.GooglePlayServicesMediationSettings(npaBundle),
-                        new AdMobInterstitialAdapter.GooglePlayServicesMediationSettings(npaBundle))
+                        new GooglePlayServicesBanner.GooglePlayServicesMediationSettings(npaBundle),
+                        new GooglePlayServicesInterstitial.GooglePlayServicesMediationSettings(npaBundle))
                 .build();
         fixExecutor(true);
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {

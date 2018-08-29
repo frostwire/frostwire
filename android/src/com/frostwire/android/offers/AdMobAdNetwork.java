@@ -21,13 +21,15 @@ import android.content.Context;
 
 import com.frostwire.util.Logger;
 import com.google.android.gms.ads.MobileAds;
+import com.mopub.mobileads.GooglePlayServicesBanner;
+import com.mopub.mobileads.GooglePlayServicesInterstitial;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This isn't a real FrostWire AdNetwork as it does not yet extend AbstractAdNetwork.
  * For now it's only used to start the Google MobileAds SDK since we're integrating AdMob
- * via MoPub adapters. See {@link com.mopub.mobileads.AdMobInterstitialAdapter} and {@link com.mopub.mobileads.AdMobBannerAdapter}
+ * via MoPub adapters. See {@link GooglePlayServicesInterstitial} and {@link GooglePlayServicesBanner}
  * <p>
  * We'll only implement showing the ads and handling all their events here if we ever need AdMob to
  * act on its own in our in-house AdNetwork waterfall
