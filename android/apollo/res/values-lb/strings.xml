@@ -64,4 +64,72 @@
   <string name="new_color">Nei</string>
   <string name="app_widget_large_alt">Apollo: 4×2 (Alternativ)</string>
   <string name="empty_search">Keng Sichresultater fonnt</string>
+  <string name="remove_from_queue">Fuert aus Warteschraaft</string>
+  <string name="sort_order_entry_date_added">Datum hinzugefügt</string>
+  <string name="delete_dialog_title">Läschen <xliff:g id="item" example="album">%s</xliff:g>?</string>
+  <string name="menu_equalizer">Ausgläich</string>
+  <string name="settings_data_category">Daten</string>
+  <string name="context_menu_use_as_ringtone">Benotzt als Klingelton</string>
+  <string name="remove_from_favorites">Fuert aus Favoritten</string>
+  <string name="pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> op Ärer Heemechtsplaz gestréckt</string>
+  <string name="empty_recent">Lidder déi Dir héieren hutt wäert et hei weisen. Probéiert eng Musek ze spillen.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" op #FrostWire</string>
+  <string name="settings_download_only_on_wifi_summary">Fir d\'Belaaschtungsgebidder ze reduzéieren, brauche net iwwer mobil Netzwierker</string>
+  <string name="context_menu_more_by_artist">Méi vun der Kënschtlerin</string>
+  <string name="add_to_queue">Fichier mat der Warteschléif</string>
+  <string name="context_menu_fetch_album_art">Fënnt d\'Albumkunst</string>
+  <string name="sort_order_entry_track_list">Track Lëscht</string>
+  <string name="menu_add_to_homescreen">Pin op home screen</string>
+  <string name="menu_shop">Shop fir Themen</string>
+  <string name="add_to_favorites">Fannen op Favoritten</string>
+  <string name="theme_set"><xliff:g id="name">%s</xliff:g> wéi d \'Thema</string>
+  <string name="delete_files_title">Läschen Dateien</string>
+  <string name="no_effects_for_you">Den Equalizer konnt net opgemaach ginn.</string>
+  <string name="accessibility_repeat_one">Wieder Wieder</string>
+  <string name="page_last_added">Lescht geäntwert</string>
+  <string name="use_default">Benotze Standardfaarf</string>
+  <string name="context_menu_remove_from_recent">Entferne vun de läschten</string>
+  <string name="empty_playlist">Dës Playlist ass eidel.\n\nKlickt hei fir ze léieren wéi Dir Lidder u kënnt.</string>
+  <string name="empty_last_added">Lieder déi Dir am Laaf vum leschten Mount huet, ginn hei gewisen.</string>
+  <string name="settings_color_scheme_title">Wielt d\'Faarf vum Apollo Standardfaarf</string>
+  <string name="app_widget_recent">Apollo: zënter kuerzem lauschtert</string>
+  <string name="empty_favorite">Lidder, déi Dir als Favoritten markéiert ass, ginn hei gewisen.</string>
+  <string name="now_listening_to">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" vum <xliff:g id="artist">%2$s</xliff:g> op #FrostWire</string>
+  <string name="sort_order_entry_artist">Kënschtler</string>
+  <string name="empty_music">Nach keng Songs. Versucht e puer Inhalt ze lueden</string>
+  <string name="context_menu_remove_from_playlist">Aus vun der Lëscht vun de Songs ze spillen</string>
+  <string name="menu_grid">Grid</string>
+  <string name="set_as_ringtone">\'<xliff:g id="name" example="Alarm Bell">%s</xliff:g>\' als Klingong</string>
+  <string name="are_you_sure_delete_files_text">Sidd Dir sécher datt Dir déi gewielte Fichier vu Ärem Apparat unzehuelen?</string>
+  <string name="menu_shuffle">All kuscheleg</string>
+  <string name="delete_warning">Dëst wäert d\'cache Biller sinn dauerhaft liesen</string>
+  <string name="settings_delete_cache_summary">Entfernen all zwëschent Biller</string>
+  <string name="menu_clear_queue">Klore Sequenz</string>
+  <string name="settings_download_only_on_wifi_title">Download nëmmen iwwer Wi-Fi</string>
+  <string name="page_artists">Kënschtler</string>
+  <string name="new_photo">Wielt Biller aus der Galerie</string>
+  <string name="share_track_using">Bäisetze weg mat:</string>
+  <string name="cannot_be_undone">Dat kann net rappen</string>
+  <string name="accessibility_prev">Virdrun</string>
+  <string name="add_to_playlist">Zu der Lëscht vun de Lidder ze spillen</string>
+  <string name="frostwire_player">FrostWire Player</string>
+  <string name="settings_storage_category">Späicheren</string>
+  <string name="settings_download_artist_images_title">Luuchte Kënschtler Biller fidderen</string>
+  <string name="context_menu_open_in_play_store">Open am Play Store</string>
+  <string name="page_songs">Lidder</string>
+  <string name="old_photo">Benotzt al Foto</string>
+  <string name="sort_order_entry_number_of_songs">Zuel vu Lidder</string>
+  <string name="context_menu_fetch_artist_image">Gitt Artist Image</string>
+  <string name="menu_sort_by">Zortéieren no</string>
+  <string name="settings_delete_cache_title">Cache läschen</string>
+  <string name="sort_order_entry_number_of_albums">Zuel vu Alben</string>
+  <string name="settings_download_missing_artwork_title">Luucht missen Album Art</string>
+  <string name="sort_order_entry_filename">Fichiersnumm</string>
+  <string name="could_not_be_pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> konnt net op Ärer Heemechtsplaz gestach ginn</string>
+  <string name="settings_open_source_licenses">Open Source Lizenzen</string>
+  <string name="settings_color_scheme_summary">Verännert d\'Akzentfaarf an Apolloo</string>
+  <string name="settings_ui_category">Interface</string>
+  <string name="settings_theme_chooser_title">Thema Auswielen</string>
+  <string name="accessibility_repeat_all">Alles erëm</string>
+  <string name="settings_lopez_summary">Icon a Google Play Store Banner Design</string>
 </resources>
