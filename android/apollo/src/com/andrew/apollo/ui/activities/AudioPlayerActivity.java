@@ -188,9 +188,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private WriteSettingsPermissionActivityHelper writeSettingsHelper;
     private GestureDetector gestureDetector;
 
-    // for removeAds display
-    private long removeAdsPurchaseTime = 0;
-
     private long lastProgressBarTouched;
     private long lastKnownPosition = 0;
     private long lastKnownDuration = 0;
@@ -436,7 +433,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
-            removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
         } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
@@ -496,11 +493,22 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         filter.addAction(MusicPlaybackService.META_CHANGED);
         // Update a list, probably the playlist fragment's
         filter.addAction(MusicPlaybackService.REFRESH);
-        registerReceiver(mPlaybackStatus, filter);
+        safeRegisterReceiver(filter);
         // Refresh the current time
         final long next = refreshCurrentTime(false);
         queueNextRefresh(next);
         MusicUtils.notifyForegroundStateChanged(this, true);
+    }
+
+    private void safeRegisterReceiver(IntentFilter filter) {
+        if (mPlaybackStatus == null || !mPlaybackStatus.refAlive()) {
+            mPlaybackStatus = new PlaybackStatus(this);
+        }
+        try {
+            registerReceiver(mPlaybackStatus, filter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
@@ -1196,6 +1204,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     activity.initAlbumArtBanner();
                     break;
             }
+        }
+
+        public boolean refAlive() {
+            return Ref.alive(mReference);
         }
     }
 
