@@ -126,4 +126,10 @@
   <string name="empty_search">Otsing ei andnud tulemusi</string>
   <string name="empty_favorite">Lemmikuteks märgitud laulud kuvatakse siin.</string>
   <string name="empty_recent">Kuulatud albumid kuvatakse siin. Proovi esitada mõnda lugu.</string>
+  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" #FrostWire\'is</string>
+  <string name="delete_files_title">Kustuta failid</string>
+  <string name="page_last_added">Viimati lisatud</string>
+  <string name="empty_playlist">See esitusloend on tühi.\n\nLoo lisamise kohta lisateabe saamiseks klõpsake siin.</string>
+  <string name="are_you_sure_delete_files_text">Kas olete kindel, et soovite oma seadmest valitud failid püsivalt kustutada?</string>
+  <string name="frostwire_player">FrostWire meediumipleier</string>
 </resources>
