@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -191,8 +191,11 @@ public class PlaylistItem extends LibraryDatabaseEntity {
         return trackNumber;
     }
 
-    public void setTrackNumber(String track) {
-        this.trackNumber = track;
+    public void setTrackNumber(String trackNum) {
+        if ("null".equals(trackNum)) {
+            trackNum = "-1";
+        }
+        this.trackNumber = trackNum;
     }
 
     public String getTrackYear() {
@@ -229,7 +232,7 @@ public class PlaylistItem extends LibraryDatabaseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj instanceof PlaylistItem && this.id == ((PlaylistItem) obj).id;
+        return obj instanceof PlaylistItem && this.id == ((PlaylistItem) obj).id;
     }
 
     @Override

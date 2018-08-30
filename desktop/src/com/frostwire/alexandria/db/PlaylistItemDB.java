@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,8 +55,6 @@ public class PlaylistItemDB {
         String trackNumber = (String) row.get(13);
         String trackYear = (String) row.get(14);
         boolean starred = (Boolean) row.get(15);
-        
-        int sortIndex = row.size() < 17 || row.get(16) == null ? 0 : (Integer) row.get(16);
 
         obj.setId(id);
         obj.setFilePath(filePath);
@@ -74,7 +72,7 @@ public class PlaylistItemDB {
         obj.setTrackNumber(trackNumber);
         obj.setTrackYear(trackYear);
         obj.setStarred(starred);
-        obj.setSortIndexByTrackNumber(sortIndex);
+        obj.setSortIndexByTrackNumber(-1);
     }
 
     public static void save(LibraryDatabase db, PlaylistItem obj, boolean updateStarred) {
@@ -109,7 +107,6 @@ public class PlaylistItemDB {
                 + "FROM PlaylistItems WHERE playlistId = ? ORDER BY sortIndex ASC";
 
         List<List<Object>> result = db.query(query, playlist.getId());
-
         List<PlaylistItem> items = new ArrayList<>(result.size());
 
         for (List<Object> row : result) {

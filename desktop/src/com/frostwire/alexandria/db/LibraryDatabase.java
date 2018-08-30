@@ -241,11 +241,9 @@ public class LibraryDatabase {
             return OBJECT_INVALID_ID;
         }
 
-        Statement statement = null;
         ResultSet resultSet;
 
-        try {
-            statement = _connection.createStatement();
+        try (Statement statement = _connection.createStatement()) {
             resultSet = statement.executeQuery("CALL IDENTITY()");
 
             resultSet.next();
@@ -253,24 +251,15 @@ public class LibraryDatabase {
             return resultSet.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                }
-            }
         }
 
         return OBJECT_INVALID_ID;
     }
 
     private List<List<Object>> query(Connection connection, String statementSql, Object... arguments) {
-        PreparedStatement statement = null;
         ResultSet resultSet;
 
-        try {
-            statement = connection.prepareStatement(statementSql);
+        try (PreparedStatement statement = connection.prepareStatement(statementSql)) {
 
             if (arguments != null) {
                 for (int i = 0; i < arguments.length; i++) {
@@ -283,13 +272,6 @@ public class LibraryDatabase {
             return convertResultSetToList(resultSet);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                }
-            }
         }
 
         return new ArrayList<>();
@@ -297,10 +279,7 @@ public class LibraryDatabase {
 
     private int update(Connection connection, String statementSql, Object... arguments) {
 
-        PreparedStatement statement = null;
-
-        try {
-            statement = connection.prepareStatement(statementSql);
+        try (PreparedStatement statement = connection.prepareStatement(statementSql)) {
 
             if (arguments != null) {
                 for (int i = 0; i < arguments.length; i++) {
@@ -311,13 +290,6 @@ public class LibraryDatabase {
             return statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                }
-            }
         }
 
         return -1;

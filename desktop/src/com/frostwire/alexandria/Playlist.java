@@ -90,6 +90,13 @@ public class Playlist extends LibraryDatabaseEntity {
         return _items;
     }
 
+    public int size() {
+        if (_items == null) {
+            return 0;
+        }
+        return _items.size();
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
