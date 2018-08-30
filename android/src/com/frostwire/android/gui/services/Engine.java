@@ -244,11 +244,19 @@ public final class Engine implements IEngineService {
         return r;
     }
 
-    public FWVibrator getVibrator() {
-        return vibrator;
+    public void onHapticFeedbackPreferenceChanged() {
+        if (vibrator != null) {
+            vibrator.onPreferenceChanged();
+        }
     }
 
-    public static class FWVibrator {
+    public void hapticFeedback() {
+        if (vibrator != null) {
+            vibrator.hapticFeedback();
+        }
+    }
+
+    private static class FWVibrator {
         private final Vibrator vibrator;
         private boolean enabled;
 
@@ -276,7 +284,6 @@ public final class Engine implements IEngineService {
                 hapticFeedback = cm.getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
             }
             return vibrator != null && hapticFeedback;
-
         }
     }
 

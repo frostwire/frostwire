@@ -374,7 +374,7 @@ public final class Offers {
                                                            final boolean tryBack2BackRemoveAdsOffer,
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
-            Engine.instance().getVibrator().hapticFeedback();
+            Engine.instance().hapticFeedback();
 
             // dismissAndOrShutdownIfNecessary is invoked on adNetwork listeners when interstitials are dismissed
             // if a user leaves an ad displayed without interacting with it for too long a second

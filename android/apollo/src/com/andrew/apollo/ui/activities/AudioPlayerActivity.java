@@ -445,7 +445,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onBackPressed() {
-        Engine.instance().getVibrator().hapticFeedback();
+        Engine.instance().hapticFeedback();
         try {
             super.onBackPressed();
         } catch (Throwable ignored) {}

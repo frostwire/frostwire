@@ -30,6 +30,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.uxstats.UXStats;
 
 /**
@@ -75,11 +76,15 @@ public final class OtherFragment extends AbstractPreferenceFragment {
         final CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
         if (cb != null) {
             cb.setOnPreferenceClickListener(preference -> {
-                ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, cb.isChecked());
-                Engine.instance().getVibrator().onPreferenceChanged();
+                Asyncs.async(OtherFragment::onHapticFeedbackPreferenceChangedTask, cb.isChecked());
                 return true;
             });
         }
+    }
+
+    private static void onHapticFeedbackPreferenceChangedTask(boolean checked) {
+        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, checked);
+        Engine.instance().onHapticFeedbackPreferenceChanged();
     }
 
     private void setupUXStatsOption() {

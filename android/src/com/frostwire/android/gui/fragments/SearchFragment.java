@@ -610,7 +610,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
-        Engine.instance().getVibrator().hapticFeedback();
+        Engine.instance().hapticFeedback();
         if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) &&
                 ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult && !(sr instanceof YouTubeSearchResult)) {

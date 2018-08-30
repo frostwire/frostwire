@@ -45,7 +45,7 @@ class StopListener implements View.OnLongClickListener {
 
     @Override
     public boolean onLongClick(View v) {
-        Engine.instance().getVibrator().hapticFeedback();
+        Engine.instance().hapticFeedback();
         async(v, StopListener::stopMusicTask);
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
