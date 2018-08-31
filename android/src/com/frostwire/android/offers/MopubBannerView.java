@@ -37,8 +37,6 @@ import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 /**
  * @author aldenml
  * @author gubatron
@@ -183,18 +181,14 @@ public class MopubBannerView extends LinearLayout {
             moPubView.setAdUnitId(adUnitId);
             moPubView.setBannerAdListener(moPubBannerListener);
 
-            async(this, MopubBannerView::loadMoPubViewAsync, adUnitId);
-        }
-    }
-
-    private static void loadMoPubViewAsync(MopubBannerView mopubBannerView, final String adUnitId) {
-        try {
-            mopubBannerView.moPubView.loadAd();
-        } catch (Throwable e) {
-            LOG.warn("MopubBannerView banner could not be loaded", e);
-            e.printStackTrace();
-            mopubBannerView.loadFallbackBanner(adUnitId);
-            mopubBannerView.moPubView.destroy();
+            try {
+                moPubView.loadAd();
+            } catch (Throwable e) {
+                LOG.warn("MopubBannerView banner could not be loaded", e);
+                e.printStackTrace();
+                loadFallbackBanner(adUnitId);
+                moPubView.destroy();
+            }
         }
     }
 
@@ -300,8 +294,6 @@ public class MopubBannerView extends LinearLayout {
         @Override
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed(errorCode=" + errorCode + "): " + banner);
-            //loadMoPubBanner(banner.getAdUnitId());
-            //banner.destroy();
             setVisible(Visibility.FALLBACK, true);
 //            PrebidManager prebidManager = PrebidManager.getInstance(getContext());
 //            if (prebidManager != null) {
