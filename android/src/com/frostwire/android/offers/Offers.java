@@ -77,7 +77,6 @@ public final class Offers {
             }
         }
         AdMobAdNetwork.start(activity);
-        //PrebidManager.getInstance(activity);
         LOG.info("Offers.initAdNetworks() success");
     }
 

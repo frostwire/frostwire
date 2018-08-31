@@ -281,14 +281,6 @@ public final class SearchHeaderBanner extends LinearLayout {
             }
             searchHeaderBanner.setBannerViewVisibility(BannerType.FALLBACK, false);
             searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, true);
-
-            if (Ref.alive(searchHeaderBannerRef)) {
-                Context context = searchHeaderBannerRef.get().getContext();
-//                PrebidManager prebidManager = PrebidManager.getInstance(context);
-//                if (prebidManager != null) {
-//                    prebidManager.onBannerLoaded(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50);
-//                }
-            }
         }
 
         @Override
@@ -310,13 +302,6 @@ public final class SearchHeaderBanner extends LinearLayout {
             }
             if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
                 searchHeaderBanner.loadFallbackBanner();
-            }
-            if (Ref.alive(searchHeaderBannerRef)) {
-                Context context = searchHeaderBannerRef.get().getContext();
-//                PrebidManager prebidManager = PrebidManager.getInstance(context);
-//                if (prebidManager != null) {
-//                    prebidManager.onBannerFailed(banner, PrebidManager.Placement.SEARCH_HEADER_BANNER_320_50, errorCode);
-//                }
             }
         }
 

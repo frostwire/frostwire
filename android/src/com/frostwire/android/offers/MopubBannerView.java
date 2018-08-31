@@ -276,10 +276,6 @@ public class MopubBannerView extends LinearLayout {
         @Override
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded(): " + banner);
-//            PrebidManager prebidManager = PrebidManager.getInstance(getContext());
-//            if (prebidManager != null) {
-//                prebidManager.onBannerLoaded(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250);
-//            }
             isLoaded = true;
             setVisible(Visibility.MOPUB, true);
             if (onBannerLoadedListener != null) {
@@ -295,10 +291,6 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed(errorCode=" + errorCode + "): " + banner);
             setVisible(Visibility.FALLBACK, true);
-//            PrebidManager prebidManager = PrebidManager.getInstance(getContext());
-//            if (prebidManager != null) {
-//                prebidManager.onBannerFailed(banner, PrebidManager.Placement.AUDIO_PLAYER_BANNER_300_250, errorCode);
-//            }
             isLoaded = false;
         }
 
