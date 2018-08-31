@@ -292,6 +292,8 @@ public class MopubBannerView extends LinearLayout {
             LOG.info("onBannerFailed(errorCode=" + errorCode + "): " + banner);
             setVisible(Visibility.FALLBACK, true);
             isLoaded = false;
+            // NOTE: I've tried waiting on a background thread for 6-10 seconds to re-invoke loadMoPubBanner (on main thread)
+            // and if there's no ads, there's no ads, it's better to let MoPub reload on its own.
         }
 
         @Override
