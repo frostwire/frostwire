@@ -1,14 +1,16 @@
-FrostWire 2.0.8 build 559 - AUG/28/2018
+FrostWire 2.0.8 build 561 - AUG/31/2018
  - YT search fixed
  - Archive.org search fixed
  - Translations updated: Hebrew, Japanese, Dutch, Romanian, Russian, 
    Slovak, Serbian, Dutch, Lithuanian, Turkish
-   Afrikaans, Ukranian
+   Afrikaans, Ukranian, Estonian, Luxembourgish
  - New user agent and peer finger print for tracker announcement
  - Exit, Restart optimizations
  - Possible crash upon fast restart fixed
  - New jlibtorrent 1.2.0.18-RC11
- - Library updates: openssl-1.1.1-pre9, presage-moat-3.0.23-3.0.14
+ - Library updates: openssl-1.1.1-pre9, presage-moat-3.0.23-3.0.14, 
+   mopub 5.3.0, (dev) gradle 4.10
+ - Library removal: prebid
 
 FrostWire 2.0.7 build 556 - AUG/09/2018
  - Crash on Audio Player equalizer menu
