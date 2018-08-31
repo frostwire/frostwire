@@ -210,9 +210,17 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(this, placement);
             moPubInterstitial.setInterstitialAdListener(moPubListener);
             interstitials.put(placement, moPubInterstitial);
+            async(moPubInterstitial, MoPubAdNetwork::loadMoPubInterstitialAsync);
+        } catch (Throwable e) {
+            LOG.warn("loadMoPubInterstitial(activity, placement): Mopub Interstitial couldn't be loaded", e);
+        }
+    }
+
+    private static void loadMoPubInterstitialAsync(final MoPubInterstitial moPubInterstitial) {
+        try {
             moPubInterstitial.load();
         } catch (Throwable e) {
-            LOG.warn("Mopub Interstitial couldn't be loaded", e);
+            LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): Mopub Interstitial couldn't be loaded");
         }
     }
 
