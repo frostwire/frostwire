@@ -373,7 +373,7 @@ public final class SoftwareUpdater {
         int uxMinEntries = 10;
         int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
-        int mopubSearchHeaderBannerIntervalInMs = 300000; // 5 mins
+        int mopubSearchHeaderBannerIntervalInMs = 60000; // 1 min
     }
 
     private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
