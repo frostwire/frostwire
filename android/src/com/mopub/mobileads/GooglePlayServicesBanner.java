@@ -107,11 +107,12 @@ public class GooglePlayServicesBanner extends CustomEventBanner {
 
     @Override
     protected void onInvalidate() {
-        Views.removeFromParent(mGoogleAdView);
-        if (mGoogleAdView != null) {
-            mGoogleAdView.setAdListener(null);
-            mGoogleAdView.destroy();
-        }
+        //EXPERIMENT: This seems to get called as soon as an AdMob Banner is loaded
+//        Views.removeFromParent(mGoogleAdView);
+//        if (mGoogleAdView != null) {
+//            mGoogleAdView.setAdListener(null);
+//            mGoogleAdView.destroy();
+//        }
     }
 
     private boolean extrasAreValid(Map<String, String> serverExtras) {
@@ -150,12 +151,19 @@ public class GooglePlayServicesBanner extends CustomEventBanner {
     }
 
     private class AdViewListener extends AdListener {
+        @Override
+        public void onAdImpression() {
+            if (mBannerListener != null) {
+                mBannerListener.onBannerImpression();
+            }
+        }
+
         /*
          * Google Play Services AdListener implementation
          */
         @Override
         public void onAdClosed() {
-
+            LOG.debug("Google Play Services banner ad closed.");
         }
 
         @Override
