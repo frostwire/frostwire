@@ -225,7 +225,7 @@ public class CreateTorrentDialog extends JDialog {
 
         checkStartSeeding = new JCheckBox(I18n.tr("Start seeding"), true);
         checkStartSeeding.setToolTipText(I18n
-                .tr("Announce yourself as a seed for the content indexed by this torrent as soon as it's created.\nIf nobody is seeding the torrent won't work. (Recommended)"));
+                .tr("Announce yourself as a seed for the content indexed by this torrent as soon as it's created.\nIf nobody is seeding the torrent, it won't work. (Recommended)"));
         torrentTrackingPanel.add(checkStartSeeding, "align right, gapright 10, wrap");
 
         labelTrackers = new JLabel("<html><p>" + I18n.tr("Tracker Announce URLs") + "</p><p>(" + I18n.tr("One tracker per line") + ")</p></html>");
