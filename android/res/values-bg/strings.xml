@@ -21,6 +21,8 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Разкриване:</b> Въпреки че се препоръчва за вашите файлове за изтегляне, особено когато изтегляте или обменяте чувствителна информация (например банкиране) и докато използвате обществени Wi-Fi или мобилни данни, <b>Вие не се нуждаят от VPN, за да използвате FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Информация:</b> Докоснете приложените маркери до]]></string>
+    <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Вашият личен живот е основно човешко право</b>. Незащитена връзка означава, че всичко, което правите онлайн, включително <b> изтегляния, търсения и съобщения</b>, може да бъде наблюдавано и задържано от всеки в мрежата ви, напр. Доставчици на интернет услуги, хакери, правителства.<br><br><b>Ние силно препоръчваме да използвате VPN услуга</b>. <br> Ето някои опции, които осигуряват надеждно обслужване и работят добре с FrostWire:]]></string>
+    <string name="protected_connections_visibility_bullet_html"><![CDATA[ Вие сте свързани към Интернет чрез VPN. <br><br> Ако още не сте, препоръчваме да използвате една от долупосочените услуги, за да шифровате връзката си и <b>да запазите поверителността си</b>. ]]></string>
     <string name="vpn_not_found">Не VPN. Помислете за криптиране на връзката.</string>
     <string name="azureus_peer_manager_status_finished">Завършил</string>
     <string name="activity_mediaplayer_name">Медиен плейър</string>
@@ -718,4 +720,5 @@
     <string name="play_store_out_of_sync">Google Play Магазин трябва да се синхронизира, изчакайте няколко минути</string>
     <string name="contact_us">Свържете се с нас</string>
     <string name="join_frostwire_chat">Присъединете се към FrostWire чата</string>
+    <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
 </resources>
