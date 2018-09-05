@@ -761,7 +761,7 @@ msgstr "Typ licencji:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:104
 msgid "Auto Detect"
-msgstr ""
+msgstr "Wykrywj Automatycznie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:168
 msgid "Contents and Tracking"
@@ -780,7 +780,7 @@ msgstr "Płatności/Napiwki"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:710
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:319
 msgid "Create New Torrent"
-msgstr "Nowy Torrent"
+msgstr "Utwórz Nowy Torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:199
 msgid "Torrent Contents"
@@ -843,21 +843,21 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:226
 msgid "Start seeding"
-msgstr "Zacznij Seedowanie"
+msgstr "Zacznij seedowanie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:228
 msgid ""
 "Announce yourself as a seed for the content indexed by this torrent as soon "
-"as it's created.\n"
-"If nobody is seeding the torrent won't work. (Recommended)"
+"as it's created.\n""If nobody is seeding the torrent won't work. (Recommended)"
 msgstr ""
+
 "Ogłoś siebie jako seed zawartości zindeksowanej przez ten torrent jak tylko "
 "zostanie stworzony.\n"
-"Jeżeli nikt nie seeduje torrentu, nie pracuj. (Polecane)"
+"Jeżeli nikt nie seeduje torrentu, nie będzie on działał. (Polecane)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:231
 msgid "Tracker Announce URLs"
-msgstr "Tracker ogłaszający URL"
+msgstr "Ogłaszające URLy Trackera"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:231
 msgid "One tracker per line"
@@ -875,21 +875,21 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:243
 msgid "Web Seeds Mirror URLs"
-msgstr "Sieciowe Seedy Mirror URL"
+msgstr "Lustrzane URLy Seedów Sieciowych"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:244
 msgid ""
 "If these files can be downloaded from the web, enter the URLs of each "
 "possible mirror, one per line (GetRight style)."
 msgstr ""
-"Jeżeli te pliki mogą być pobrane z sieci, wpisz adresy URL każdego możliwego "
-"mirror, jeden na linię (styl GetRight)."
+"Jeżeli te pliki mogą być pobrane z sieci, wpisz każde możliwe adresy "
+"URL, jeden na linię (styl GetRight)."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:251
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:56
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:92
 msgid "Piece Size"
-msgstr ""
+msgstr "Rozmiar Fragmentu"
 
 #. first button will dock all the way east,
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:267
@@ -969,47 +969,41 @@ msgid "Save .torrent"
 msgstr "Zapisz .torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:626
-#, fuzzy
 msgid "Adding files..."
-msgstr "Ładowanie wskazówek..."
+msgstr "Dodaję pliki..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:634
-#, fuzzy
 msgid "Adding trackers..."
-msgstr "Edytuj trackery"
+msgstr "Dodaję trackery"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:641
 msgid "Calculating piece hashes..."
-msgstr ""
+msgstr "Kalkuluję hashe fragmentu..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:645
-#, fuzzy
 msgid "Generating torrent entry..."
-msgstr "Zapisywanie Torrentu..."
+msgstr "Generowanie wejścia torrenta..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:653
-#, fuzzy
 msgid "Saving torrent to disk..."
-msgstr "Zapisywanie Torrentu..."
+msgstr "Zapisuję torrent na dysk..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:673
-#, fuzzy
 msgid "Operation failed."
-msgstr "wizard.operationfailed"
+msgstr "Operacja nie powiodła się."
 
 #. check just the first file on all mirrors.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:715
-#, fuzzy
 msgid "Checking Web seed mirror URLs..."
-msgstr "Sprawdzanie Sieciowych Seedów lustrzanych URL..."
+msgstr "Sprawdzam URLy Sieciowych seedów lustrzanych..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:724
 msgid "Web seed not reachable."
-msgstr "Sieć jest nieosiągalna."
+msgstr "Seed sieciowy jest nie osiągalny."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:823
 msgid "Saving Torrent..."
-msgstr "Zapisywanie Torrentu..."
+msgstr "Zapisuję Torrent..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PartialFilesDialog.java:69
 msgid "Select files to download"
@@ -1053,8 +1047,8 @@ msgid ""
 "I am the content creator or I have the right to collect financial "
 "contributions for this work."
 msgstr ""
-"Jestem twórcą tego dzieła lub mam prawa pobierać finansowe opłaty za to "
-"dzieło."
+"Jestem twórcą tego dzieła lub mam prawa pobierać finansowe opłaty "
+"za to dzieło."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:43
 msgid ""
@@ -1063,8 +1057,8 @@ msgid ""
 "infringement."
 msgstr ""
 "Rozumiem że czerpanie zysków finansowych z nieautoryzowanych prac "
-"chronionych prawem autorskim czyni mnie odpowiedzialnym za podrabianie i "
-"karne naruszanie praw autorskich."
+"chronionych prawem autorskim czyni mnie odpowiedzialnym za podrabianie "
+"i karne naruszanie praw autorskich."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/PaymentOptionsPanel.java:103
 msgid "<strong>Bitcoin</strong> receiving wallet address"
@@ -1093,11 +1087,11 @@ msgstr "Określ stawkę, wyślij napiwek lub darowiznę przez Paypal"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/SendFileProgressDialog.java:70
 msgid "Preparing selection"
-msgstr "Przygotowywuje wybrane pliki"
+msgstr "Przygotowywuję wybrane pliki"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/SendFileProgressDialog.java:71
 msgid "please wait..."
-msgstr "prosze zaczekać..."
+msgstr "proszę zaczekać..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/SendFileProgressDialog.java:150
 msgid "Select the content you want to send"
@@ -1156,7 +1150,7 @@ msgid ""
 "at least one other friend."
 msgstr ""
 "<strong>Nie zamykaj FrostWire</strong> dopóki plik nie będzie pobrany przez "
-"co najmniej jednego znajomego"
+"co najmniej jednego przyjaciela."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:187
 msgid ""
@@ -1164,7 +1158,7 @@ msgid ""
 "it can be downloaded by others."
 msgstr ""
 "<strong>Im więcej tym weselej.</strong> Im więcej ludzi udostępnia tym "
-"szybciejmoże być pobrane przez innych."
+"szybciej może być pobrane przez innych."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:188
 msgid ""
@@ -1173,11 +1167,10 @@ msgid ""
 "BitTorrent network."
 msgstr ""
 "<strong>Twoje pliki mogą być odkryte przez innych.</strong> Gdy raz "
-"udostępnisz link i będziesz seedować pliki, będą one dostępne dla każdego w "
-"sieci BitTorrent"
+"udostępnisz link i będziesz seedować pliki, będą one dostępne dla każdego "
+"w sieci BitTorrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/ShareTorrentDialog.java:201
-#, fuzzy
 msgid "Feedback here to clipboard"
 msgstr "Wiadomość skopiowana do schowka"
 
@@ -1273,7 +1266,6 @@ msgid "Seeding Settings"
 msgstr "Ustawienia Seedowania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:71
-#, fuzzy
 msgid ""
 "<strong>Seed finished downloads.</strong> BitTorrent users on the internet "
 "will be able<br/>to download file chunks of the data your torrents seed. "
@@ -1284,16 +1276,15 @@ msgstr ""
 "danych torrentów które seedujesz. (Zalecane)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentSeedingSettingComponent.java:72
-#, fuzzy
 msgid ""
 "<strong>Don't seed finished downloads.</strong> BitTorrent users on the "
 "internet may<br/>only download file chunks of that torrent from you while "
 "you're downloading its<br/>data files. <strong>Some trackers will penalize "
 "this Leeching behavior</strong>."
 msgstr ""
-"<strong>Nie seeduj zakończonych pobrań torrentowych.</strong> Użytkownicy  "
+"<strong>Nie seeduj danych zakończonych pobrań torrentowych.</strong> Użytkownicy  "
 "sieci BitTorrent w internecie<br/>mogą pobrać tylko fragmenty danych plików, "
-"które pobierasz w danej chwili.<br/><strong>Niektóre trackerykarzą takie "
+"które pobierasz w danej chwili.<br/><strong>Niektóre trackery karzą takie "
 "pasożytnicze zachowanie.</strong>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TorrentUtil.java:167
@@ -1315,7 +1306,7 @@ msgstr "Czy chcesz zezwolić na seedowanie torrenta?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:70
 msgid "SHARE the download url/magnet of this seeding transfer"
-msgstr ""
+msgstr "UDOSTĘPNIJ url/magnet pobrania tego seedowanego transferu"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/TransferActionsRenderer.java:86
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultActionsRenderer.java:83
@@ -1327,16 +1318,16 @@ msgstr "Odtwórz/Podgląd"
 msgid ""
 "SEED this torrent transfer so others can download it. The more seeds, the "
 "faster the downloads."
-msgstr ""
+msgstr "SEEDUJ ten torrent aby inni mogli go pobrać. Im więcej źródeł, "
+"tym szybsze pogrania."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:123
 msgid "Leave a tip"
 msgstr "Zostaw napiwek"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:145
-#, fuzzy
 msgid "on"
-msgstr "Tak"
+msgstr "na"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:234
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/slides/SlideControlsOverlay.java:235
@@ -1368,88 +1359,75 @@ msgstr "Wesprzyj %s napiwkiem, darowizną lub dobrowolną płatnością"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:70
 msgid "hide"
-msgstr ""
+msgstr "ukryj"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:74
-#, fuzzy
 msgid "Transfer Detail"
-msgstr "Transfery"
+msgstr "Detale Transferów"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:121
 msgid "General"
-msgstr ""
+msgstr "Ogólne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:122
-#, fuzzy
 msgid "Files"
-msgstr "Plik"
+msgstr "Pliki"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailComponent.java:123
 msgid "Pieces"
-msgstr ""
+msgstr "Fragmenty"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:92
-#, fuzzy
 msgid "complete"
-msgstr "Zakończone"
+msgstr "zakończone"
 
 #. time elapsed, time left, download speed, status
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:101
 msgid "Time elapsed"
-msgstr ""
+msgstr "Czas, jaki upłynął"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:103
-#, fuzzy
 msgid "Time left"
-msgstr "Czas"
+msgstr "Pozostały czas"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:105
-#, fuzzy
 msgid "Download speed"
-msgstr "Szybkość Pobierania:"
+msgstr "Szybkość pobierania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:115
-#, fuzzy
 msgid "Download limit"
-msgstr "Szybkość Pobierania:"
+msgstr "Limit pobierania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:124
-#, fuzzy
 msgid "Upload speed"
-msgstr "Szybkość Wysyłań:"
+msgstr "Szybkość wysyłania"
 
 #. Total Size, share ratio, upload limit
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:128
-#, fuzzy
 msgid "Total size"
-msgstr "Łącznie Wysyłano"
+msgstr "Całkowicie wysyłano"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:130
-#, fuzzy
 msgid "Share ratio"
-msgstr "Share Ratio"
+msgstr "Share ratio"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:132
-#, fuzzy
 msgid "Upload limit"
-msgstr "Szybkość Wysyłań:"
+msgstr "Limit wysyłań:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:146
-#, fuzzy
 msgid "Save location"
-msgstr "Share Ratio"
+msgstr "Lokalizacja zapisywania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:152
-#, fuzzy
 msgid "InfoHash"
-msgstr "Kopiuj Info Hasha"
+msgstr "InfoHash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:156
 msgid "Magnet URL"
-msgstr ""
+msgstr "URL Magnetu"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:160
-#, fuzzy
 msgid "Created On"
 msgstr "Utworzony"
 
@@ -1461,31 +1439,30 @@ msgstr "Komentarz"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:233
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:242
-#, fuzzy
 msgid "connected"
-msgstr "Rozłączony"
+msgstr "połączony"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:234
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:243
 msgid "of"
-msgstr ""
+msgstr "z"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:236
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailGeneral.java:245
 msgid "total"
-msgstr ""
+msgstr "całkowity"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:74
 msgid "IP"
-msgstr ""
+msgstr "IP"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:75
 msgid "Client"
-msgstr ""
+msgstr "Klient"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:76
 msgid "Flags"
-msgstr ""
+msgstr "Flagi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:77
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:49
@@ -1493,33 +1470,29 @@ msgid "Source"
 msgstr "Pochodzenie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:170
-#, fuzzy
 msgid "Resumed"
-msgstr "Wznów"
+msgstr "Wznowiony"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPeersDataLine.java:173
-#, fuzzy
 msgid "Incoming"
-msgstr "Dekompresowanie"
+msgstr "Przychodzące"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:57
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailPieces.java:98
 msgid "Total Pieces"
-msgstr ""
+msgstr "Całkowicie Fragmentów"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:35
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Active"
-msgstr "Akcje"
+msgstr "Aktywne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/components/transfers/TransferDetailTrackersDataLine.java:77
-#, fuzzy
 msgid "Inactive"
-msgstr "Wyczyść Nieaktywne"
+msgstr "Nieaktywne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:166
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:118
@@ -1534,7 +1507,7 @@ msgstr "Możesz wybrać katalogi którymi się dzielisz w Opcjach FrostWire."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:194
 msgid "Add to"
-msgstr ""
+msgstr "Dodaj do"
 
 #. Buttons
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/AbstractLibraryTableMediator.java:264
@@ -1655,7 +1628,7 @@ msgid ""
 "Are you sure you want to delete the selected file(s), thus removing it from "
 "your computer?"
 msgstr ""
-"Czy na pewno chcesz skasować wybrane pliki i tym samym usunąć je z twojego "
+"Czy na pewno chcesz usunąć wybrane pliki i tym samym usunąć je z twojego "
 "komputera?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:442
@@ -1737,7 +1710,6 @@ msgid "Extracting audio from selected video..."
 msgstr "Wydobywam dźwięk z wybranego widea..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:901
-#, fuzzy
 msgid "failed"
 msgstr "zawiodło"
 
@@ -1746,7 +1718,6 @@ msgid "Done extracting audio."
 msgstr "Zakończyłem wydobywanie dźwięku."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryFilesTableMediator.java:956
-#, fuzzy
 msgid "out of"
 msgstr "z "
 
@@ -1774,9 +1745,8 @@ msgid "Starred"
 msgstr "Ulubione"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:219
-#, fuzzy
 msgid "Show all starred items"
-msgstr "Pokaż Status Zapory Internetowej"
+msgstr "Pokaż wszystkie ulubione elementy"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:436
 msgid "Open Playlist (.m3u)"
@@ -1884,7 +1854,7 @@ msgstr "Eksportuj Playlistę do iTunes"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylists.java:854
 msgid "Export this playlist into an iTunes playlist"
-msgstr "Eksportuj tą playlistę jako playlistę z iTunes"
+msgstr "Eksportuj tą playlistę do playlisty iTunes"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableDataLine.java:39
 msgid "Index"
@@ -1938,17 +1908,16 @@ msgid "Folder"
 msgstr "Katalog"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:399
-#, fuzzy
 msgid "Playlist"
-msgstr "playlista"
+msgstr "Playlista"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:432
 msgid "Lyrics"
-msgstr ""
+msgstr "Tekst Piosenki"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:766
 msgid "Delete Selected Files from this playlist"
-msgstr "Usuń Wybrane Pliki z tej Playlisty."
+msgstr "Usuń Wybrane Pliki z tej playlisty."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/LibraryPlaylistsTableMediator.java:841
 msgid "Refresh the audio properties based on ID3 tags"
@@ -1999,7 +1968,7 @@ msgstr "Katalog i podkatalogi są zawarte w Plikotece."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/RecursiveLibraryDirectoryPanel.java:343
 msgid "Folder is not included and no subfolders are included in the Library."
-msgstr "I Katalog i podkatalogi nie są zawarte w Plikotece."
+msgstr "I katalog i podkatalogi nie są zawarte w Plikotece."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/library/RecursiveLibraryDirectoryPanel.java:352
 msgid "Folder's files and some subfolders are included in the Library."
@@ -2024,7 +1993,7 @@ msgstr "Odtwórz"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:58
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:63
 msgid "Long Press to Stop Playback"
-msgstr "Długie wciśnięcie stopuje odtwarzanie"
+msgstr "Długo przyciąnij aby zatrzymać odtwarzanie"
 
 #. *
 #. * Constant for the forward button.
@@ -2058,7 +2027,7 @@ msgstr "Mieszaj Utwory"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:303
 msgid "Repeat songs"
-msgstr "Powtarzaj Utwory"
+msgstr "Powtarzaj utwory"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/player/MediaPlayerComponent.java:890
 msgid "this artist(s)"
@@ -2227,8 +2196,8 @@ msgid ""
 "Browse, Search and Play files in your computer. Wi-Fi sharing, Internet "
 "Radio and more."
 msgstr ""
-"Przeglądaj, Szukaj i Odtwarzaj pliki w twoim komputerze. Udostępnianie Wi-"
-"Fi, Internet Radio i więcej."
+"Przeglądaj, Szukaj i Odtwarzaj pliki w twoim komputerze. Udostępnianie Wi-Fi"
+"Internet Radio i więcej."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTab.java:29
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/SearchTransfersTab.java:43
@@ -2237,7 +2206,7 @@ msgstr "Wyszukuj i Pobieraj Pliki z Internetu"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:51
 msgid "filter transfers here"
-msgstr ""
+msgstr "filtruj transfery tutaj"
 
 #. removed last parameter: rowConstraints="[][grow]"
 #. it was causing the entire transfer tab not to grow vertically on bigger screens
@@ -2249,11 +2218,11 @@ msgstr "Transfery"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:64
 msgid "Transfers tab description goes here."
-msgstr ""
+msgstr "Opis zakładki transferów idzie tutaj"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/tabs/TransfersTab.java:218
 msgid "All"
-msgstr ""
+msgstr "Wszysktie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/theme/BaseFileChooserUI.java:499
 msgid "FileChooser.lookInLabelText"
@@ -2361,7 +2330,7 @@ msgstr "FileChooser.renameErrorText"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/theme/FrostwireInputDialog.java:94
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:103
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/InstallerUpdater.java:298
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateMediator.java:180
@@ -2371,11 +2340,11 @@ msgstr "Aktualizuj"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/InstallerUpdater.java:313
 #, java-format
 msgid "Time flies! You have missed the last {0} updates."
-msgstr ""
+msgstr "Czas leci! Opuściłeś ostanie {0} aktualizacji."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/PortableUpdater.java:69
 msgid "Uncompressing files"
-msgstr "Rozpakowywanie plików"
+msgstr "Dekompresowanie plików"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/ProgressMonitor.java:131
 msgid "OptionPane.cancelButtonText"
@@ -2386,27 +2355,24 @@ msgid "ProgressMonitor.progressText"
 msgstr "ProgressMonitor.progressText"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:239
-#, fuzzy
 msgid "New FrostWire Update Available"
-msgstr "Nowa Wersja jest Dostępna!"
+msgstr "Nowa Wersja FrostWire jest Dostępna!"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:239
-#, fuzzy
 msgid "FrostWire Team Announcement"
 msgstr "Rekomendacje FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:252
-#, fuzzy
 msgid "Download Torrent"
-msgstr "Pobieram torrent"
+msgstr "Pobież Torrent"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:257
 msgid "Thanks, but not now"
-msgstr ""
+msgstr "Dzięki, ale nie teraz"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/updates/UpdateManager.java:258
 msgid "Go to webpage"
-msgstr ""
+msgstr "Idź na stronę"
 
 #. These are used as resource keys to retreive descriptions in the GUI
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/MediaType.java:37
@@ -2443,7 +2409,7 @@ msgstr "Umowa Licencyjna Użytkownika Końcowego"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:70
 msgid "Privacy Policy"
-msgstr "Polityka prywatności"
+msgstr "Polityka Prywatności"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:75
 msgid "Close This Window"
@@ -2475,7 +2441,7 @@ msgid ""
 msgstr ""
 "Dzięki dla każdego kto codziennie pomagał na naszych forach i czatach. Wy "
 "nie tylko pomagacie wszystkim użytkownikom, ale również ostrzegacie zespół "
-"FrostWire przed problemami na naszej sieci. Wielkie dzięki - bez was then "
+"FrostWire przed problemami na naszej sieci. Wielkie dzięki - bez was ten "
 "projekt nie był by możliwy!"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:156
@@ -2505,7 +2471,7 @@ msgstr "A także pomocy od Wolontariuszy"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:181
 #, fuzzy
 msgid "Thanks to the LibTorrent Team"
-msgstr "Podziękowania dla zespołu Automatix"
+msgstr "Podziękowania dla zespołu LibTorrent"
 
 #. azureus/vuze devs.
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:189
@@ -2535,7 +2501,7 @@ msgid ""
 "For helping distribute Frostwire to opensource communities in a very simple "
 "manner."
 msgstr ""
-"Na pomoc w dystrybucji FrostWire społeczności opensource w bardzo prosty "
+"Za pomoc w dystrybucji FrostWire dla społeczności opensource w bardzo prosty "
 "sposób."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:243
@@ -2547,7 +2513,7 @@ msgid ""
 "For making the world a better place with such an excellent distro, you'll be "
 "the ones to make a difference on the desktop."
 msgstr ""
-"Za tworzenie świata lepszym miejscem z tak świetną dystrybucją, będziecie "
+"Za tworzenie lepszego świata z tak świetną dystrybucją, będziecie "
 "tymi którzy dokonali zmiany dla oprogramowania komputerowego."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/AboutWindow.java:246
@@ -2575,17 +2541,16 @@ msgstr ""
 "Inc."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ApplicationHeader.java:69
-#, fuzzy
 msgid "Search or enter a cloud sourced URL"
 msgstr "Wyszukuj lub wpisz URL"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ApplicationHeader.java:186
 msgid "A new update has been downloaded."
-msgstr "Nowa Aktualizacja Została Pobrana"
+msgstr "Nowa aktualizacja została pobrana"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/CheckBoxList.java:581
 msgid "Marks all Items as Selected"
-msgstr "Zaznacz Wszystkie Elementy jako Wybrane"
+msgstr "Zaznacza wszystkie Elementy jako Wybrane"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/CheckBoxList.java:604
 msgid "Deselect All"
@@ -2593,7 +2558,7 @@ msgstr "Odznacz Wszystko"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/CheckBoxList.java:606
 msgid "Deselects all Items in the List"
-msgstr "Odznacz Wszystkie Elementy z Listy"
+msgstr "Odznacza wszystkie Elementy z Listy"
 
 #. NOTE: The IDs are serialized to disk, and should never change.
 #. *
@@ -2617,34 +2582,28 @@ msgid "Support FrostWire development with a Bitcoin donation"
 msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:46
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Cash donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin"
+msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin Cash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:47
-#, fuzzy
 msgid "Support FrostWire development with an Ether donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin"
+msgstr "Wspomagaj rozwój FrostWire darowizną Ether"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:48
-#, fuzzy
 msgid "Support FrostWire development with a Dash donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną 3zł"
+msgstr "Wspomagaj rozwój FrostWire darowizną Dash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:49
-#, fuzzy
 msgid "Support FrostWire development with a Litecoin donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin"
+msgstr "Wspomagaj rozwój FrostWire darowizną Litecoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:50
-#, fuzzy
 msgid "Support FrostWire development with a ZCash donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną Paypal"
+msgstr "Wspomagaj rozwój FrostWire darowizną ZCash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:51
-#, fuzzy
 msgid "Support FrostWire development with a Bitcoin Gold donation"
-msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin"
+msgstr "Wspomagaj rozwój FrostWire darowizną Bitcoin Gold"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/DonationButtons.java:52
 msgid "Support FrostWire development with a Paypal donation"
@@ -2669,7 +2628,7 @@ msgid ""
 "automatically keep trying to connect you to the network unless you select "
 "\"Disconnect\" from the File menu."
 msgstr ""
-"Nie wykryto aktywnego połączenia z internetem lub zaporą sieciową blokuje "
+"Nie wykryto aktywnego połączenia z internetem lub zapora sieciowa blokuje "
 "program przed dostępem do internetu. FrostWire będzie automatycznie ponawiał "
 "próby połączenia się dopóki nie wybierzesz 'Rozłącz' z menu Plik."
 
@@ -2866,15 +2825,15 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:86
 msgid "Current Java Version:"
-msgstr "Aktualna wersja Java"
+msgstr "Aktualna wersja Java:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:87
 msgid "Required Java Version:"
-msgstr "Wymagana wersja Java"
+msgstr "Wymagana wersja Java:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:97
 msgid "Visit"
-msgstr "Wizyt"
+msgstr "Odwiedź"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:109
 msgid "Upgrade Later"
@@ -2891,7 +2850,7 @@ msgstr "Więcej Informacji"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:168
 #, java-format
 msgid "Visit {0}"
-msgstr "Wizyt {0}"
+msgstr "Odwiedź {0}"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/JavaVersionNotice.java:176
 msgid "Remind Me Later"
@@ -2938,41 +2897,38 @@ msgstr "Zawsze używaj tej odpowiedzi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:45
 msgid "How can we make FrostWire better?"
-msgstr ""
+msgstr "Jak możemy ulepszyć FrostWire?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:46
 msgid "Please make sure your firewall or antivirus is not blocking FrostWire"
-msgstr ""
+msgstr "Prosimy sie upewnić ze zapora internetowa lub program antiwirusowy nie blokuje FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:52
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:149
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:153
 msgid "Send Feedback"
-msgstr ""
+msgstr "Prześlij opinię"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:96
-#, fuzzy
 msgid "Email (Optional)"
-msgstr "Opcje Obrazków"
+msgstr "Email (Opcjonalny)"
 
 #. Optional name
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:112
-#, fuzzy
 msgid "Your Name (Optional)"
-msgstr "Więcej Opcji"
+msgstr "Twoje Imię (Opcjonalne)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:187
-#, fuzzy
 msgid "Sending"
-msgstr "Seedowanie"
+msgstr "Wysyłam"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/SendFeedbackDialog.java:192
 msgid "Thank you"
-msgstr ""
+msgstr "Dzięki"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ShutdownWindow.java:21
 msgid "Shutting down FrostWire..."
-msgstr "Trwa Zamykanie FrostWire..."
+msgstr "Trwa zamykanie FrostWire..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/ShutdownWindow.java:45
 msgid "Please wait while FrostWire shuts down..."
@@ -3012,11 +2968,11 @@ msgstr "Uczę się jak używać Facebook..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:148
 msgid "Learning to socialize on Twitter..."
-msgstr "Uczę się jak używać Twitter"
+msgstr "Uczę się jak używać Twitter..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:151
 msgid "Learning to socialize on G+..."
-msgstr "Uczę się jak używać G+"
+msgstr "Uczę się jak używać G+..."
 
 #. male Seeding status label
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:155
@@ -3034,7 +2990,7 @@ msgstr "Obserwuj nas @frostwire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:196
 msgid "Follow FrostWire on Instagram"
-msgstr ""
+msgstr "Obserwuj FrostWire na Instagram"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:202
 msgid ""
@@ -3061,9 +3017,8 @@ msgstr ""
 "pobierania torrentu.</p>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:467
-#, fuzzy
 msgid "Not Seeding"
-msgstr "Seedowanie"
+msgstr "Nie Seeduję"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:486
 msgid "FrostWire has not detected a firewall"
@@ -3127,11 +3082,11 @@ msgstr "Wysyłania:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:798
 msgid "Total Downstream:"
-msgstr "Łącznie Pobrano:"
+msgstr "Całkowicie Pobrano:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/StatusLine.java:800
 msgid "Total Upstream:"
-msgstr "Łącznie Wysyłano"
+msgstr "Całkowicie Wysyłano"
 
 #. *
 #. * The title for the TOTD window.
@@ -3299,7 +3254,7 @@ msgid ""
 msgstr ""
 "Chcesz udostępnić duży plik? Wyślij setki gigabajtów bez żadnych problemów, "
 "upewnij się tylko się że twój FrostWire będzie uruchomiony podczas "
-"pobieraniaprzez znajomych. Mogą wstrzymać i wznowić pobieranie kiedy chcą, "
+"pobierania przez przyjaciół. Mogą wstrzymać i wznowić pobieranie kiedy chcą, "
 "jeżeli ty lub  ktokolwiek seeduje ten sam plik lub katalog."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/TipOfTheDayMessages.java:37
@@ -3536,16 +3491,17 @@ msgstr "Odwiedź nas na www.frostwire.com"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:54
 msgid "VPN-Drop Protection Active"
-msgstr ""
+msgstr "Ochrona przed utratą połączenia z VPN aktywna"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:64
 msgid "BitTorrent is off because your VPN is disconnected"
-msgstr ""
+msgstr "BitTorrent jest wyłączony ponieważ VPN jest rozłączony"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:65
 msgid ""
 "Check the status of your VPN connection or disable the VPN-Drop Protection"
 msgstr ""
+"Sprawdź status twojego połączania z VPN lub wyłącz Ochronę pzed utratą połączania z VPN"
 
 #. Buttons
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:72
@@ -3555,28 +3511,30 @@ msgstr "Czym jest VPN?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:80
 msgid "Disable VPN-Drop protection"
-msgstr ""
+msgstr "Wyłącz Ochronę pzed utratą połączania z VPN"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNDropGuard.java:92
 msgid "VPN-Drop protection disabled. Restarting BitTorrent engine."
-msgstr ""
+msgstr "Ochronę pzed utratą połączania z VPN wyłączona. Uruchamiam silnik BitTorrent."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:59
 msgid "VPN Off: BitTorrent disabled"
-msgstr ""
+msgstr "VPN wyłączony: BitTorrent wyłączony"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:60
 msgid ""
 "Due to current settings without VPN connection BitTorrent will not start. "
 "Click to see the settings screen"
 msgstr ""
+"Ze względu na bieżące ustawienia, bez połączenia VPN, BitTorrent się nie uruchomi."
+"Kliknij, aby wyświetlić ekran ustawień"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:95
 msgid ""
 "FrostWire has detected a VPN connection, your privacy is safe from prying "
 "eyes."
 msgstr ""
-"FrostWire wykrył połączenie VPN twoja prywatność jest zabezpieczona przed "
+"FrostWire wykrył połączenie VPN, twoja prywatność jest zabezpieczona przed "
 "szpiegowaniem."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/VPNStatusButton.java:100
@@ -3643,7 +3601,7 @@ msgstr "Wyślij Plik lub Katalog..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/FileMenuActions.java:335
 msgid "Send a file or a folder to a friend"
-msgstr "Wyślij plik lub katalog do znajomego"
+msgstr "Wyślij plik lub katalog do przyjaciela"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/actions/SearchAction.java:32
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:80
@@ -3947,18 +3905,21 @@ msgstr "Dowiedz się więcej o tych opcjach..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/SocialRecommendationsWindow.java:38
 msgid "Join us."
-msgstr ""
+msgstr "Dołącz się."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/SocialRecommendationsWindow.java:39
 msgid ""
 "Join the FrostWire community and help us spread FrostWire to continue to "
 "have a free and uncensored Internet. Stay in touch through social media "
 "channels for quick feedback, support, ideas or just to say hello."
-msgstr ""
+msgstr "Dołącz do społeczności FrostWire i pomóż nam rozpowszechniać Frostwire"
+"aby wsyscy mogli cieszyć się nieocenzurowanym Internetem. Zostań w kontakcie"
+"na mediach społecznościowych aby udzielać nam krótkich opini, pomagać innym, "
+"dzielić się pomysłami albo po prostu powiedzieć 'Cześć!'"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/SocialRecommendationsWindow.java:48
 msgid "<html><b>Keep in Touch!</b></html>"
-msgstr ""
+msgstr "<html><b>Pozostajemy w kontakcie!</b></html>"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/init/WelcomeWindow.java:33
 msgid ""
@@ -4048,44 +4009,41 @@ msgstr ""
 "Naucz się jak chronić twoje połączenie internetowe i twoją prywatność online"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:58
-#, fuzzy
 msgid "Support FrostWire"
-msgstr "O FrostWire"
+msgstr "Wspieraj FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:60
 msgid "Support with CryptoCurrencies"
-msgstr ""
+msgstr "Podaruj Kryptowaluty"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:61
-#, fuzzy
 msgid "Bitcoin"
-msgstr "bitcoiny"
+msgstr "Bitcoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:62
-#, fuzzy
 msgid "Bitcoin Cash"
-msgstr "bitcoiny"
+msgstr "Bitcoin Cash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:63
 msgid "Ethereum"
-msgstr ""
+msgstr "Ethereum"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:64
 msgid "Dash"
-msgstr ""
+msgstr "Dash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:65
 msgid "LiteCoin"
-msgstr ""
+msgstr "LiteCoin"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:66
 msgid "ZCash"
-msgstr ""
+msgstr "ZCash"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:67
 #, fuzzy
 msgid "Bitcoin Gold"
-msgstr "bitcoiny"
+msgstr "Bitcoin Gold"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:71
 msgid "Free Legal Downloads"
@@ -4094,21 +4052,19 @@ msgstr "Darmowe Legalne Pobierania"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:75
 #, fuzzy
 msgid "Follow us on Facebook"
-msgstr "FrostWire na Facebook"
+msgstr "Obserwuj nas na Facebook"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:75
 msgid "Come and say hi to the community on Facebook"
 msgstr "Odwiedź nas na Facebook i zapoznaj się z innymi użytkownikami"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:77
-#, fuzzy
 msgid "Follow us on G+"
-msgstr "Obserwuj nas na Twitterze"
+msgstr "Obserwuj nas na G+"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:79
-#, fuzzy
 msgid "Follow us on Instagram"
-msgstr "Obserwuj nas na Twitterze"
+msgstr "Obserwuj nas na Instagram"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:81
 msgid "Follow us on Twitter"
@@ -4149,30 +4105,29 @@ msgstr "O FrostWire..."
 msgid "Information about FrostWire"
 msgstr "Informacje o FrostWire."
 
-#: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:154
+#: /Users/gubatron/workspace.frostwire/frostwire/d esktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:154
 msgid "Show Send Feedback Window"
-msgstr ""
+msgstr "Pokaż Okno Presyłania Opini"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "seconds"
-msgstr ""
+msgstr "sekund"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:175
 msgid "second"
-msgstr ""
+msgstr "sekunda"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minutes"
-msgstr ""
+msgstr "minut"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:178
 msgid "minute"
-msgstr ""
+msgstr "minuta"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/HelpMenu.java:180
-#, fuzzy
 msgid "Please wait"
-msgstr "prosze zaczekać..."
+msgstr "Prosze zaczekać..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/MenuMediator.java:91
 msgid "Loading Menus..."
@@ -4253,7 +4208,7 @@ msgstr "Czatuj"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ToolsMenu.java:148
 msgid "Show our community chat"
-msgstr "Pokaż Czat Użytkowników"
+msgstr "Pokaż czat naszych użytkowników"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:42
 msgid "&View"
@@ -4261,7 +4216,7 @@ msgstr "Widok"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:43
 msgid "&Search/Transfers split screen"
-msgstr ""
+msgstr "Wyszukiwanie/Transfery ekran podzielony "
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/menu/ViewMenu.java:44
 msgid "Use &Small Icons"
@@ -4393,7 +4348,7 @@ msgstr "Aktualizacje"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:248
 msgid "Experimental"
-msgstr ""
+msgstr "Eksperymentalne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/OptionsConstructor.java:249
 msgid "Firewall"
@@ -4550,12 +4505,11 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/BugsPaneItem.java:82
 msgid "Send Errors Automatically if FrostWire is Frozen"
-msgstr "Wysyłaj Błędy Automatycznie jeżeli FrostWire się zamrozi"
+msgstr "Wysyłaj Błędy Automatycznie jeżeli FrostWire się zawiesi"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/DetailsPaneItem.java:37
-#, fuzzy
 msgid "Details Page"
-msgstr "Detale"
+msgstr "Strona Detali"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/DetailsPaneItem.java:39
 msgid "Show details web page after a download starts."
@@ -4579,7 +4533,7 @@ msgstr "Pokaż Ostrzeżenia Licencji:"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:43
 msgid "Experimental Features"
-msgstr ""
+msgstr "Funkcje Eksperymentalne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:44
 msgid ""
@@ -4589,6 +4543,11 @@ msgid ""
 "security and privacy could be compromised in unexpected ways. Please procede "
 "with caution."
 msgstr ""
+"Ostrzeżenie: Te funkcje eksperymentalne mogą zmienić, zepsuć się, lub zniknąć "
+"w każdym momencie. Nie składamy żadnych obietnic na to, co może się stać jeżeli "
+"jedną z tych funkcji eksperymentalnych wlączysz. FrostWire może usunąć twoje pliki, "
+"lub twoje bezpieczeństwo lub prywatność moźe być skompromitowana w nieoczekiwany sposób.  "
+"Bądź ostrożny."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:49
 msgid ""
@@ -4598,18 +4557,20 @@ msgstr ""
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:60
 msgid "Enable ALPHA features"
 msgstr ""
+"Zauważ: Wszystkie funkcje są uaktywnione domyślnie kiedy uruchamiasz FrostWire "
+"ze źródła."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:60
 msgid "Bleeding edge, unstable, tested by developers only, very risky."
-msgstr ""
+msgstr "Na krawędzi, niestabilne, testowane tylko przez programistów, bardzo ryzykowne."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:61
 msgid "Enable BETA features"
-msgstr ""
+msgstr "Wlącz funkcje BETA"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ExperimentalFeaturesPaneItem.java:61
 msgid "Feature complete, unknown bugs, tested by QA, somewhat risky."
-msgstr ""
+msgstr "Wszystkie funkcje dostępne, nieznane usterki, testowane przez QA, trochę ryzykowne"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:35
 msgid "Router Configuration"
@@ -4643,11 +4604,11 @@ msgstr "Manualny zakres portu"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:77
 msgid "TCP port start:"
-msgstr "początkowy port TCP"
+msgstr "Początkowy port TCP"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:87
 msgid "TCP port end:"
-msgstr "końcowy port TCP"
+msgstr "Końcowy port TCP"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:157
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ForceIPPaneItem.java:161
@@ -4875,7 +4836,7 @@ msgstr "Wybierz jakie wyszukiwarki ma używać FrostWire."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SearchEnginesPaneItem.java:79
 msgid "Check/Uncheck all"
-msgstr ""
+msgstr "Zaznacz/Odznacz wsystkie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/ShowFrostWireRecommendationsPaneItem.java:33
 msgid "FrostWire Recommendations"
@@ -4954,7 +4915,7 @@ msgstr "Włącz Inteligentne Wyszukiwanie"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:46
 msgid "Total torrents indexed"
-msgstr "Łączna Ilość Zindeksowanych Torrentów"
+msgstr "Całkowita Ilość Zindeksowanych Torrentów"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/SmartSearchDBPaneItem.java:50
 msgid "Reset Smart Search Database"
@@ -4967,6 +4928,9 @@ msgid ""
 "{0} torrents that FrostWire has learned to speed up your search results.\n"
 "Do you wish to continue?"
 msgstr ""
+"Jeżeli będziesz kontynuować, usuniesz wszystkie informacje związane z\n"
+"{0} torrentami o których FrostWire sie już nauczył aby przyspieszyć\n"
+"Twoje wyszukiwania. Chcesz kontynuować?"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/StartupPaneItem.java:22
 msgid ""
@@ -5045,11 +5009,11 @@ msgstr "Maksimum aktywnych seedów"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:40
 msgid "Enable Distributed Hash Table (DHT)"
-msgstr ""
+msgstr "Włącz Rozproszoną Hash Table (DHT)"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentConnectionPaneItem.java:42
 msgid "VPN-Drop Protection. Require VPN connection for BitTorrent"
-msgstr ""
+msgstr "Ochrona pzed utratą połączania z VPN. Wymagaj połączania VPN dla BitTorrentu"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/TorrentGlobalSpeedPaneItem.java:34
 msgid "BitTorrent Global Tranfer Speeds"
@@ -5109,7 +5073,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:35
 msgid "Anonymous Usage Statistics"
-msgstr "Anonimowe statystyki użytkowania"
+msgstr "Anonimowe Statystyki Użytkowania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:37
 msgid ""
@@ -5125,7 +5089,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/UXStatsPaneItem.java:39
 msgid "Send anonymous usage statistics"
-msgstr "Anonimowe statystyki użytkowania"
+msgstr "Wyślij Anonimowe Statystyki Użytkowania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/options/panes/VideoPlayerPaneItem.java:25
 msgid "Video Options"
@@ -5238,33 +5202,29 @@ msgid "View in Archive.org"
 msgstr "Otwórz w Archive.org"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:92
-#, fuzzy
 msgid "View in Pixabay"
-msgstr "Otwórz w YouTube"
+msgstr "Otwórz w Pixabay"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:94
-#, fuzzy
 msgid "Close Tab"
-msgstr "Zamknij"
+msgstr "Zamknij Kartę"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:96
-#, fuzzy
 msgid "Close All Tabs"
-msgstr "Zamknij"
+msgstr "Zamknij Wszyskie Karty"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:98
 msgid "Close Other Tabs"
-msgstr ""
+msgstr "Zamknij Inne Karty"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:100
-#, fuzzy
 msgid "Close Tabs to the Right"
-msgstr "Zamknij i wyjdź z programu."
+msgstr "Zamknij Karty na Prawo"
 
 #. Set the splash screen text...
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:124
 msgid "Loading Search Window..."
-msgstr "Ładowanie Okna Wyszukiwania"
+msgstr "Ładowanie Okna Wyszukiwania..."
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchMediator.java:236
 msgid ""
@@ -5314,9 +5274,8 @@ msgid "Search tools"
 msgstr "Narzędzia Wyszukiwania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchResultMediator.java:722
-#, fuzzy
 msgid "All Free Downloads"
-msgstr "Darmowe Legalne Pobierania"
+msgstr "Wszystkie Darmowe Pobierania"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/search/SearchTableColumns.java:52
 msgid "Created"
@@ -5324,9 +5283,8 @@ msgstr "Utworzony"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:96
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:109
-#, fuzzy
 msgid "FrostWire Torrent"
-msgstr "Koszulki FrostWire"
+msgstr "Torrent FrostWire"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:102
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/shell/FrostAssociations.java:114
@@ -5347,7 +5305,7 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/tables/AbstractActionsRenderer.java:111
 msgid "SHARE the download-url or magnet-url of this file with a friend"
-msgstr ""
+msgstr "DZIEL SIĘ URL pobierania lub magnetem tego pliku z przyjacielem"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/limegroup/gnutella/gui/tables/ColumnSelectionMenu.java:45
 msgid "Revert To Default"
@@ -5383,16 +5341,15 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:182
 msgid "TABLE"
-msgstr ""
+msgstr "TABELA"
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:529
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:546
 msgid "COLUMN_NAME"
-msgstr ""
+msgstr "NAZWA_KOLUMNY"
 
-#, fuzzy
 #~ msgid "Name:"
-#~ msgstr "Nazwa"
+#~ msgstr "Nazwa:"
 
 #~ msgid "Show in Library"
 #~ msgstr "Pokaż w Plikotece"
@@ -5452,7 +5409,6 @@ msgstr ""
 #~ msgid "Torrent File Created with FrostWire http://www.frostwire.com"
 #~ msgstr "Plik Torrent Stworzony przez FrostWire http://www.frostwire.com"
 
-#, fuzzy
 #~ msgid "Tracking"
 #~ msgstr "Śledzenie"
 
