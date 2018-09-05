@@ -87,6 +87,7 @@ public final class OptionsConstructor {
     static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
     static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
     static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
+    static final String IP_FILTER_KEY = "OPTIONS_IP_FILTER_MAIN_TITLE";
     static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
     static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
     static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
@@ -240,13 +241,14 @@ public final class OptionsConstructor {
 
         // filter options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, FILTERS_KEY, I18n.tr("Filters"));
+        addOption(FILTERS_KEY, IP_FILTER_KEY, I18n.tr("IP Filter"), IPFilterPaneItem.class);
         addOption(FILTERS_KEY, RESULTS_KEY, I18n.tr("Keywords"), IgnoreResultsPaneItem.class);
 
         // advanced options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ADVANCED_KEY, I18n.tr("Advanced"));
         addOption(ADVANCED_KEY, PREFERENCING_KEY, I18n.tr("Updates"), AutomaticInstallerDownloadPaneItem.class);
         addOption(ADVANCED_KEY, EXPERIMENTAL_KEY, I18n.tr("Experimental"), ExperimentalFeaturesPaneItem.class);
-        addOption(ADVANCED_KEY, FIREWALL_KEY, I18n.tr("Firewall"), ForceIPPaneItem.class);
+        addOption(ADVANCED_KEY, FIREWALL_KEY, I18n.tr("Firewall"), RouterConfigurationPaneItem.class);
         addOption(ADVANCED_KEY, PROXY_KEY, I18n.tr("Proxy"), ProxyPaneItem.class, ProxyLoginPaneItem.class);
         addOption(ADVANCED_KEY, NETWORK_INTERFACE_KEY, I18n.tr("Network Interface"), NetworkInterfacePaneItem.class);
         if (FrostAssociations.anyAssociationsSupported()) {

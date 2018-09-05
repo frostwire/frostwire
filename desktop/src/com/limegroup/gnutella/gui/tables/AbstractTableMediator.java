@@ -210,7 +210,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * <li> setupTableHeaders </li>
      * <li> handleNoSelection </li>
      * </ul>
-     * Of these, some have are already written as default implementions.
+     * Of these, some have are already written as default implementations.
      * The extending class should call GUIMediator.addRefreshListener(this)
      * if they want to be a refreshListener,
      * and ThemeMediator.addThemeObserver(this) if they want to be
