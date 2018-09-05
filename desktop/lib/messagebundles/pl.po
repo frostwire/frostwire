@@ -848,7 +848,7 @@ msgstr "Zacznij seedowanie"
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/com/frostwire/gui/bittorrent/CreateTorrentDialog.java:228
 msgid ""
 "Announce yourself as a seed for the content indexed by this torrent as soon "
-"as it's created.\n""If nobody is seeding the torrent won't work. (Recommended)"
+"as it's created.\n""If nobody is seeding the torrent, it won't work. (Recommended)"
 msgstr ""
 
 "Ogłoś siebie jako seed zawartości zindeksowanej przez ten torrent jak tylko "
@@ -5341,12 +5341,12 @@ msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:182
 msgid "TABLE"
-msgstr "TABELA"
+msgstr ""
 
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:529
 #: /Users/gubatron/workspace.frostwire/frostwire/desktop/src/org/h2/fulltext/FullTextLucene2.java:546
 msgid "COLUMN_NAME"
-msgstr "NAZWA_KOLUMNY"
+msgstr ""
 
 #~ msgid "Name:"
 #~ msgstr "Nazwa:"
