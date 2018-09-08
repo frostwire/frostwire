@@ -31,8 +31,40 @@ final class YouTubeSig {
     private final JsFunction<String> fn;
 
     public YouTubeSig(String jscode) {
+        String funcname = find1(jscode);
+        if (funcname == null) {
+            funcname = find2(jscode);
+        }
+        if (funcname == null) {
+            funcname = find3(jscode);
+        }
+        if (funcname == null) {
+            throw new IllegalArgumentException("Unable to find signature function name");
+        }
+
+        this.fn = new JsFunction<>(jscode, funcname);
+    }
+
+    public String calc(String sig) {
+        return fn.eval(sig);
+    }
+
+    private static String find1(String jscode) {
+        String pattern = "yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*([$a-zA-Z0-9]+)\\(";
+        Matcher m = Pattern.compile(pattern).matcher(jscode);
+        return m.find() ? m.group(1) : null;
+    }
+
+    private static String find2(String jscode) {
+        // same as find1, but with a fallback to simply "c&&d.set(b,<sig>(c))"
+        String pattern = "c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*([$a-zA-Z0-9]+)\\(";
+        Matcher m = Pattern.compile(pattern).matcher(jscode);
+        return m.find() ? m.group(1) : null;
+    }
+
+    private static String find3(String jscode) {
         //The function is usually found in a block like this:
-        /**
+        /*
          * if (e.sig || e.s) {
          var f = e.sig || gr(e.s);
          e.url = xj(e.url, {
@@ -42,12 +74,6 @@ final class YouTubeSig {
          >> Output: gr
          */
         Matcher m = Pattern.compile("\"signature\"," + JsFunction.WS + "?([$a-zA-Z0-9]+)\\(").matcher(jscode);
-        m.find();
-        String funcname = m.group(1);
-        this.fn = new JsFunction<>(jscode, funcname);
-    }
-
-    public String calc(String sig) {
-        return fn.eval(sig);
+        return m.find() ? m.group(1) : null;
     }
 }
