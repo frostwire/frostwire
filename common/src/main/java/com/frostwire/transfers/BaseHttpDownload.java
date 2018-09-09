@@ -30,6 +30,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -245,13 +246,13 @@ public abstract class BaseHttpDownload implements Transfer {
     protected final void error(Throwable e) {
         if (state != TransferState.CANCELED) {
             complete(TransferState.ERROR);
-            LOG.error("General error in download", e);
+            LOG.error("General error in download " + info, e);
 
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 complete(TransferState.ERROR_DISK_FULL);
             }
 
-            if (e instanceof SSLException) {
+            if (e instanceof SSLException || e instanceof SocketTimeoutException) {
                 complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
             }
 
@@ -397,6 +398,11 @@ public abstract class BaseHttpDownload implements Transfer {
 
         public long size() {
             return size;
+        }
+
+        @Override
+        public String toString() {
+            return "{BaseHttpDownload.Info@" + hashCode() + " url=" + url + " filename=" + filename + " displayname=" + displayName + " size=" + size + "}";
         }
     }
 }
