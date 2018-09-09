@@ -1,7 +1,9 @@
 frostwire (6.7.3) stable; urgency=high
+  * Search: YT fixes
+  * New jlibtorrent 1.2.0.18-RC12
   * Fixes bug in library playlist rendering when a song had no track number
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 30 Aug 2018 12:32:37 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 08 Sep 2018 23:01:15 -0600
 
 frostwire (6.7.2) stable; urgency=high
   * New jlibtorrent 1.2.0.18-RC11
