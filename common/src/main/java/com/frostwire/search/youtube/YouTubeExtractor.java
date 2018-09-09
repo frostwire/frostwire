@@ -267,18 +267,29 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        boolean useSecondJsPlayerLink = false;
-
+        int useJsPlayerLink = 0;
         String playerId = br.getRegex("<script src=\"/yts/jsbin/player-([\\w_\\-]+)/en_US/base.js\".*?name=\"player/base\".*?></script>").getMatch(0);
         if (playerId == null) {
+            useJsPlayerLink = 1;
             playerId = br.getRegex("<script src=\"/yts/jsbin/player_ias-([\\w_\\-]+)/en_US/base.js\".*?name=\"player_ias/base\".*?></script>").getMatch(0);
-            if (playerId != null) {
-                useSecondJsPlayerLink = true;
-            }
         }
-        String jsPlayerLink = useSecondJsPlayerLink ?
-                "http://www.youtube.com/yts/jsbin/player_ias-" + playerId + "/en_US/base.js" :
-                "http://www.youtube.com/yts/jsbin/player-" + playerId + "/en_US/base.js";
+        if (playerId == null) {
+            useJsPlayerLink = 2;
+            playerId = br.getRegex("<script src=\"/yts/jsbin/player_remote_ux-([\\w_\\-]+)/en_US/base.js\".*?name=\"player_remote_ux/base\".*?></script>").getMatch(0);
+        }
+        String jsPlayerLink = null;
+        switch (useJsPlayerLink) {
+            case 0:
+                jsPlayerLink = "http://www.youtube.com/yts/jsbin/player-" + playerId + "/en_US/base.js";
+                break;
+            case 1:
+                jsPlayerLink = "http://www.youtube.com/yts/jsbin/player_ias-" + playerId + "/en_US/base.js";
+                break;
+            case 2:
+                jsPlayerLink = "http://www.youtube.com/yts/jsbin/player_remote_ux-" + playerId + "/en_US/base.js";
+                break;
+        }
+
         YouTubeSig ytSig = getYouTubeSig(jsPlayerLink);
         currentYTSig = ytSig;
 
