@@ -1,8 +1,8 @@
-FrostWire 2.0.8 build 561 - AUG/31/2018
+FrostWire 2.0.8 build 562 - SEP/08/2018
  - YT search fixed
  - Archive.org search fixed
  - Translations updated: Hebrew, Japanese, Dutch, Romanian, Russian, 
-   Slovak, Serbian, Dutch, Lithuanian, Turkish
+   Slovak, Serbian, Dutch, Lithuanian, Turkish, Bulgarian
    Afrikaans, Ukranian, Estonian, Luxembourgish
  - New user agent and peer finger print for tracker announcement
  - Exit, Restart optimizations
