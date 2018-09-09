@@ -267,8 +267,19 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
+        boolean useSecondJsPlayerLink = false;
+
         String playerId = br.getRegex("<script src=\"/yts/jsbin/player-([\\w_\\-]+)/en_US/base.js\".*?name=\"player/base\".*?></script>").getMatch(0);
-        YouTubeSig ytSig = getYouTubeSig("http://www.youtube.com/yts/jsbin/player-" + playerId + "/en_US/base.js");
+        if (playerId == null) {
+            playerId = br.getRegex("<script src=\"/yts/jsbin/player_ias-([\\w_\\-]+)/en_US/base.js\".*?name=\"player_ias/base\".*?></script>").getMatch(0);
+            if (playerId != null) {
+                useSecondJsPlayerLink = true;
+            }
+        }
+        String jsPlayerLink = useSecondJsPlayerLink ?
+                "http://www.youtube.com/yts/jsbin/player_ias-" + playerId + "/en_US/base.js" :
+                "http://www.youtube.com/yts/jsbin/player-" + playerId + "/en_US/base.js";
+        YouTubeSig ytSig = getYouTubeSig(jsPlayerLink);
         currentYTSig = ytSig;
 
         /* html5_fmt_map */
@@ -410,6 +421,9 @@ public final class YouTubeExtractor {
                         if (hitUrl.contains("sig")) {
                             inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true));
                         } else {
+                            if (sig == null) {
+                                System.out.println("signature null");
+                            }
                             inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true) + "&signature=" + sig);
                         }
                         links.put(Integer.parseInt(hitFmt), inst);
