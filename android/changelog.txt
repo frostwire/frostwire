@@ -7,7 +7,7 @@ FrostWire 2.0.8 build 562 - SEP/08/2018
  - New user agent and peer finger print for tracker announcement
  - Exit, Restart optimizations
  - Possible crash upon fast restart fixed
- - New jlibtorrent 1.2.0.18-RC11
+ - New jlibtorrent 1.2.0.18-RC12
  - Library updates: openssl-1.1.1-pre9, presage-moat-3.0.23-3.0.14, 
    mopub 5.3.0, (dev) gradle 4.10
  - Library removal: prebid
