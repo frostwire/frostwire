@@ -182,8 +182,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-interstitial:5.3.0@aar') { transitive = true }
     implementation 'com.applovin:applovin-sdk:8.1.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC11'
-    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC11'
+    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18-RC12'
+    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18-RC12'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation(name: 'presage-moat-3.0.23-3.0.14', ext: 'aar')
 }
