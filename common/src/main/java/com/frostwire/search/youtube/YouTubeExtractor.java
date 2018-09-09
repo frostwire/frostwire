@@ -421,9 +421,9 @@ public final class YouTubeExtractor {
                         if (hitUrl.contains("sig")) {
                             inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true));
                         } else {
-                            if (sig == null) {
-                                System.out.println("signature null");
-                            }
+//                            if (sig == null) {
+//                                System.out.println("signature null");
+//                            }
                             inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true) + "&signature=" + sig);
                         }
                         links.put(Integer.parseInt(hitFmt), inst);
