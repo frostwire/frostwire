@@ -71,12 +71,12 @@ public final class Offers {
             return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
+        AdMobAdNetwork.start(activity);
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 adNetwork.initialize(activity);
             }
         }
-        AdMobAdNetwork.start(activity);
         LOG.info("Offers.initAdNetworks() success");
     }
 
