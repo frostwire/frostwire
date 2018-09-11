@@ -18,6 +18,9 @@
 package com.frostwire.android.offers;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 
 import com.frostwire.util.Logger;
 import com.google.android.gms.ads.MobileAds;
@@ -39,11 +42,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author marcelinkaaa
  * Created on 8/1/18.
  */
-
 public final class AdMobAdNetwork {
     private static final Logger LOG = Logger.getLogger(AdMobAdNetwork.class);
     private static final AtomicBoolean ADMOB_STARTED = new AtomicBoolean(false);
-    private static final String ADMOB_APP_ID = "ca-app-pub-0657224435269327~1839292928";
+
+    private static final String ADMOB_APP_ID_KEY = "com.google.android.gms.ads.APPLICATION_ID";
 
     /*
      * app ID:
@@ -63,7 +66,7 @@ public final class AdMobAdNetwork {
     public static void start(Context context) {
         if (ADMOB_STARTED.compareAndSet(false, true)) {
             try {
-                MobileAds.initialize(context, ADMOB_APP_ID);
+                MobileAds.initialize(context, getApplicationId(context));
                 LOG.info("start(): AdMobAdNetwork started");
             } catch (Throwable t) {
                 LOG.error("start(): Could not initialize AdMobAdNetwork", t);
@@ -71,6 +74,20 @@ public final class AdMobAdNetwork {
             }
         } else {
             LOG.info("start(): AdMobAdNetwork already started, all good");
+        }
+    }
+
+    private static String getApplicationId(Context context) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo inf = pm.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = inf.metaData;
+            if (!bundle.containsKey(ADMOB_APP_ID_KEY)) {
+                throw new IllegalArgumentException("No AdMob application id in manifest metadata");
+            }
+            return bundle.getString(ADMOB_APP_ID_KEY);
+        } catch (Throwable e) {
+            throw new RuntimeException("No AdMob application id found in manifest", e);
         }
     }
 }
