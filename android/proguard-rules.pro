@@ -3,6 +3,10 @@
 
 # MoPub
 -keep class com.mopub.mobileads.WebViewCacheService { *; }
+-dontwarn com.mopub.common.MoPubReward
+-dontwarn com.mopub.nativeads.*
+-dontwarn com.mopub.mobileads.MoPubRewardedVideoManager
+-dontwarn com.mopub.mobileads.CustomEventRewardedVideo
 
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
