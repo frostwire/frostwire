@@ -21,24 +21,26 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.swig.ip_filter;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
-import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.http.JdkHttpClient;
+import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
+import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
 import java.util.zip.GZIPInputStream;
 
 import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
@@ -53,21 +55,24 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     public final static String TITLE = I18n.tr("IP Filter");
     public final static String LABEL = I18n.tr("You can manually enter IPs and IP ranges to filter out, you can also import an IP block list from an URL or a file.");
-    private final String IP_BLOCK_LIST_SEARCH_URL = "https://www.google.com/search?q=ip+filter+block+list+p2p+format";
+    private final String IP_BLOCK_LIST_SEARCH_URL = "https://duckduckgo.com/?q=ip+filter+blocklist&t=h_&ia=noneofyourbusiness";
 
     private IPFilterTableMediator ipFilterTable;
     private JTextField fileUrlTextField;
     private IconButton fileChooserIcon;
     private JButton importButton;
-    private CountDownLatch inputStreamLatch;
 
     private boolean initialized;
+    private int lastPercentage = -1;
+    private long lastImportedPercentageUpdateTimestamp;
+    private final ExecutorService httpExecutor;
+
 
     public IPFilterPaneItem() {
         super(TITLE, LABEL);
         ipFilterTable = null;
+        httpExecutor = ExecutorsHelper.newProcessingQueue("IPFilterPanelItem-http");
     }
-
 
     @Override
     public void initOptions() {
@@ -106,95 +111,55 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void onImportButtonAction() {
-        String filterDataPath = fileUrlTextField.getText();
+        importButton.setText(I18n.tr("Importing..."));
+        importButton.setEnabled(false);
+        String filterDataPath = fileUrlTextField.getText().trim();
         if (null == filterDataPath || "".equals(filterDataPath)) {
             return;
         }
         File f = new File(filterDataPath);
         InputStream is = null;
-        inputStreamLatch = new CountDownLatch(1);
+
         if (f.exists()) {
             try {
                 is = new FileInputStream(f);
-                inputStreamLatch.countDown();
             } catch (IOException e) {
                 is = null;
+                reEnableImportButton();
+                fileUrlTextField.selectAll();
             }
         } else {
+            LOG.info("onImportButtonAction() trying URL");
             try {
                 URI uri = URI.create(filterDataPath);
-                HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+                HttpClient http = new JdkHttpClient();
                 final PipedOutputStream pos = new PipedOutputStream();
-
                 try {
                     is = new PipedInputStream(pos);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                http.setListener(new HttpClient.HttpClientListener() {
+                final PipedInputStream pis = (PipedInputStream) is;
+                http.setListener(new IPFilterHttpListener(pis, pos));
 
-                    private int totalRead = 0;
-
-                    @Override
-                    public void onError(HttpClient client, Throwable e) {
-                        try {
-                            pos.close();
-                        } catch (IOException e2) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onData(HttpClient client, byte[] buffer, int offset, int length) {
-                        try {
-                            pos.write(buffer);
-                            pos.flush();
-                            totalRead += length;
-
-                            if (inputStreamLatch.getCount() == 1 &&totalRead > 2) {
-                                inputStreamLatch.countDown();
+                httpExecutor.execute(() -> {
+                            try {
+                                LOG.info("http.get() -> " + uri.toURL().toString());
+                                http.get(uri.toURL().toString());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                reEnableImportButton();
+                                fileUrlTextField.selectAll();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
-                    }
-
-                    @Override
-                    public void onComplete(HttpClient client) {
-                        try {
-                            pos.flush();
-                            pos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onCancel(HttpClient client) {
-                        try {
-                            pos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-
-                    }
-                });
-
-                BackgroundExecutorService.schedule(() -> {
-                    try {
-                        http.get(uri.toURL().toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+                );
             } catch (IllegalArgumentException syntaxException) {
                 LOG.error("Invalid URI");
                 GUIMediator.showError(I18n.tr("Invalid URI or file path"));
+                syntaxException.printStackTrace();
+                reEnableImportButton();
+                fileUrlTextField.selectAll();
             }
         }
         importFromStreamAsync(is);
@@ -202,14 +167,21 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     private void importFromStreamAsync(final InputStream is) {
         BackgroundExecutorService.schedule(() -> {
+            LOG.info("importFromStreamAsync(): thread invoked", true);
             try {
-                inputStreamLatch.await(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
+                if (is instanceof PipedInputStream) {
+                    synchronized (is) {
+                        LOG.info("importFromStreamAsync() waiting since this is a PipedInputStream", true);
+                        is.wait();
+                    }
+                    LOG.info("importFromStreamAsync() we've been notified to keep going");
+                }
+            } catch (Throwable e) {
                 e.printStackTrace();
                 return;
             }
 
-            InputStream safeInputStream = null;
+            InputStream safeInputStream;
             try {
                 safeInputStream = getDecompressedStream(is);
             } catch (IOException e) {
@@ -232,12 +204,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
-                while (pis.available() > 0) {
+                while (pis.available() != -1) {
                     IPFilterTableMediator.IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
                         ipRange.writeObjectTo(fos);
                         ipFilterTable.getDataModel().add(ipRange);
-                        if (ipFilterTable.getDataModel().getRowCount() % 5 == 0) {
+                        if (ipFilterTable.getDataModel().getRowCount() % 100 == 0) {
                             GUIMediator.safeInvokeLater(() -> ipFilterTable.refresh());
                         }
                     }
@@ -249,7 +221,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 IOUtils.closeQuietly(fos);
                 IOUtils.closeQuietly(pis);
             }
-
         });
     }
 
@@ -274,18 +245,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void onFileChooserIconAction() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle(I18n.tr("Select the IP filter file (p2p format only)"));
-        fileChooser.setApproveButtonText(I18n.tr("Select"));
-        int result = fileChooser.showOpenDialog(getContainer());
-        if (result == JFileChooser.APPROVE_OPTION) {
-            final File selectedFile = fileChooser.getSelectedFile();
+        final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (p2p format only)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.isFile();
+            }
+
+            @Override
+            public String getDescription() {
+                return null;
+            }
+        });
+        if (selectedFile != null) {
             fileUrlTextField.setText(selectedFile.getAbsolutePath());
-        } else if (result == JFileChooser.CANCEL_OPTION) {
-        } else if (result == JFileChooser.ERROR_OPTION) {
-            LOG.error("Error selecting the file");
         }
     }
 
@@ -329,6 +301,35 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
     }
 
+    private void updateImportedPercentage(int percentage) {
+        if (percentage == lastPercentage) {
+            LOG.info("updateImportedPercentage() aborted, percentage hasn't changed (percentage=" + percentage + ")");
+            return;
+        }
+        long timeSinceLastUpdate = System.currentTimeMillis()-lastImportedPercentageUpdateTimestamp;
+        if (percentage < 99 && timeSinceLastUpdate < 1000) {
+            LOG.info("updateImportedPercentage() aborted, too soon (timeSinceLastUpdate = "+ timeSinceLastUpdate + ")");
+            return;
+        }
+        lastPercentage = percentage;
+        GUIMediator.safeInvokeLater(() -> {
+            importButton.setText(I18n.tr("Importing... (" + percentage + "%)"));
+            importButton.setEnabled(false);
+            lastImportedPercentageUpdateTimestamp = System.currentTimeMillis();
+            importButton.repaint();
+        });
+    }
+
+    private void reEnableImportButton() {
+        // we make sure this happens on the UI thread
+        GUIMediator.safeInvokeLater(() -> {
+            importButton.setText(I18n.tr("Import"));
+            importButton.setEnabled(true);
+            lastImportedPercentageUpdateTimestamp = -1;
+            lastPercentage = -1;
+        });
+    }
+
     @Override
     public boolean applyOptions() throws IOException {
         return false;
@@ -358,6 +359,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
         private BufferedReader br;
         private InputStream is;
+
         P2PIPFilterInputStreamReader(InputStream is) {
             br = new BufferedReader(new InputStreamReader(is));
             this.is = is;
@@ -381,6 +383,101 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 e.printStackTrace();
             }
             return null;
+        }
+    }
+
+    class IPFilterHttpListener implements HttpClient.HttpClientListener {
+        private final PipedInputStream pis;
+        private final PipedOutputStream pos;
+        private long contentLength = -1;
+        private int totalRead = 0;
+
+        IPFilterHttpListener(PipedInputStream pis, PipedOutputStream pos) {
+            this.pis = pis;
+            this.pos = pos;
+        }
+
+        private void safePisNotify() {
+            if (pis != null) {
+                synchronized (pis) {
+                    try {
+                        pis.notify();
+                    } catch (Throwable t) {
+                        LOG.error(t.getMessage(), t, true);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onError(HttpClient client, Throwable e) {
+            safePisNotify();
+            LOG.info("onError()");
+            try {
+                pos.close();
+            } catch (IOException e2) {
+                e.printStackTrace();
+            }
+            reEnableImportButton();
+        }
+
+        @Override
+        public void onData(HttpClient client, byte[] buffer, int offset, int length) {
+            //LOG.info("onData()");
+            try {
+                safePisNotify();
+                pos.write(buffer, 0, buffer.length);
+                pos.flush();
+                totalRead += length;
+                if (contentLength != -1) {
+                    LOG.info("onData() totalRead=" + totalRead + " contentLength=" + contentLength);
+                    updateImportedPercentage((int) ((totalRead*100.0f/contentLength)));
+                }
+            } catch (Throwable t) {
+                client.onError((Exception) t);
+                t.printStackTrace();
+                reEnableImportButton();
+            }
+        }
+
+        @Override
+        public void onComplete(HttpClient client) {
+            LOG.info("onComplete()");
+            safePisNotify();
+            try {
+                pos.flush();
+                pos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                updateImportedPercentage(0);
+                reEnableImportButton();
+                return;
+            }
+            updateImportedPercentage(100);
+            reEnableImportButton();
+        }
+
+        @Override
+        public void onCancel(HttpClient client) {
+            LOG.info("onCancel()");
+            safePisNotify();
+            try {
+                pos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            reEnableImportButton();
+        }
+
+        @Override
+        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+            LOG.info("onHeaders()");
+            if (headerFields != null && headerFields.containsKey("Content-Length")) {
+                List<String> contentLengthHeader = headerFields.get("Content-Length");
+                if (contentLengthHeader != null && !contentLengthHeader.isEmpty()) {
+                    contentLength = Long.parseLong(contentLengthHeader.get(0));
+                }
+            }
         }
     }
 }
