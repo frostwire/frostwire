@@ -636,6 +636,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
         mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
         mMopubBannerView.setOnBannerLoadedListener(() -> mAlbumArt.setVisibility(View.GONE));
+        mMopubBannerView.setOnFallbackBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
 
         Asyncs.async(
                 mMopubBannerView,
