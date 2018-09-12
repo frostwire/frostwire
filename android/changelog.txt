@@ -1,3 +1,8 @@
+FrostWire 2.0.9 build 563 - SEP/12/2018
+ - New jlibtorrent 1.2.0.18
+ - Translations updated: Chinese, Hebrew
+ - Library updates: applovin 8.1.2, presage-moat-3.0.26-3.0.14
+
 FrostWire 2.0.8 build 562 - SEP/08/2018
  - YT search fixed
  - Archive.org search fixed
