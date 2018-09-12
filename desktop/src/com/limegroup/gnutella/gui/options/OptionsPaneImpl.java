@@ -42,7 +42,7 @@ final class OptionsPaneImpl implements OptionsPane {
 	 * Constant for the <tt>ArrayList</tt> that contains all of the 
 	 * <tt>PaneItem</tt> instances associated with this panel.
 	 */
-	private final List<PaneItem> PANE_ITEMS_LIST = new ArrayList<PaneItem>();
+	private final List<PaneItem> PANE_ITEMS_LIST = new ArrayList<>();
 
 	/**
 	 * <tt>String</tt> for the name of this panel.  This name is used as the
@@ -92,8 +92,7 @@ final class OptionsPaneImpl implements OptionsPane {
 	 * <tt>ArrayList</tt> of <tt>PaneItem</tt>s when the window is shown.
 	 */
 	public void initOptions() {
-		for(int i=0, size = PANE_ITEMS_LIST.size(); i<size; i++) {
-			PaneItem currentItem = PANE_ITEMS_LIST.get(i);
+		for (PaneItem currentItem : PANE_ITEMS_LIST) {
 			currentItem.initOptions();
 		}
 	}
@@ -110,8 +109,7 @@ final class OptionsPaneImpl implements OptionsPane {
 	 */
 	public boolean applyOptions() throws IOException {
         boolean restartRequired = false;
-		for(int i=0, size = PANE_ITEMS_LIST.size(); i<size; i++) {
-			PaneItem currentItem = PANE_ITEMS_LIST.get(i);
+		for (PaneItem currentItem : PANE_ITEMS_LIST) {
 			restartRequired |= currentItem.applyOptions();
 		}
         return restartRequired;
@@ -122,11 +120,11 @@ final class OptionsPaneImpl implements OptionsPane {
 	 * require saving.
 	 */
 	public boolean isDirty() {
-	    for(int i = 0, size = PANE_ITEMS_LIST.size(); i < size; i++) {
-	        PaneItem currentItem = PANE_ITEMS_LIST.get(i);
-	        if(currentItem.isDirty())
-	            return true;
-	    }
+		for (PaneItem currentItem : PANE_ITEMS_LIST) {
+			if (currentItem.isDirty()) {
+				return true;
+			}
+		}
 	    return false;
     }
 	        

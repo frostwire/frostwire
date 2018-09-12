@@ -36,7 +36,7 @@ public final class OptionsMediator {
     /**
      * Constant for the key for the root node in the tree.
      */
-    public final static String ROOT_NODE_KEY = "OPTIONS_ROOT_NODE";
+    final static String ROOT_NODE_KEY = "OPTIONS_ROOT_NODE";
 
     /**
      * Singleton constant for easy access to the options mediator.
@@ -175,7 +175,7 @@ public final class OptionsMediator {
     /**
      * Reverts options to their defaults.
      */
-    public final void revertOptions() {
+    final void revertOptions() {
         SettingsGroupManager.instance().revertToDefault();
         BTEngine.getInstance().revertToDefaultConfiguration();
         LibrarySettings.setupInitialLibraryFolders();
@@ -195,7 +195,7 @@ public final class OptionsMediator {
     }
 
     // Implements ThemeObserver interface
-    public void updateTheme() {
+    private void updateTheme() {
         _paneManager = new OptionsPaneManager();
         _treeManager = new OptionsTreeManager();
         _constructor = new OptionsConstructor(_treeManager, _paneManager);

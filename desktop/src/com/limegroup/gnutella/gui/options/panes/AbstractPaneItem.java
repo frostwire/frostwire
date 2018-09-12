@@ -44,14 +44,9 @@ public abstract class AbstractPaneItem implements PaneItem {
 	 */
 	private final TitledPaddedPanel CONTAINER = new TitledPaddedPanel();
 
-	private final int LABEL_WIDTH = 415;
-	
 	/**
 	 * This sole constructor overrides the the public accessibility of the 
 	 * default constructor and is usually called implicitly.
-	 *
-	 * @param key the key for obtaining the locale-specific values for
-	 *  displayed strings
 	 */
 	protected AbstractPaneItem(final String title, final String text) {
         this(title, text, null);
@@ -62,7 +57,8 @@ public abstract class AbstractPaneItem implements PaneItem {
 		
 		// make sure the panel always expands to the full width of the dialog
 		add(Box.createHorizontalGlue());
-		
+
+		int LABEL_WIDTH = 415;
 		JComponent label = new MultiLineLabel(text, LABEL_WIDTH, true /* resizable */);
 		GUIUtils.restrictSize(label, SizePolicy.RESTRICT_HEIGHT);
 		add(label);
@@ -123,7 +119,7 @@ public abstract class AbstractPaneItem implements PaneItem {
 	 * @return the constant <tt>Component</tt> used as a standard horizontal
 	 *         separator
 	 */
-	protected final Component getHorizontalSeparator() {
+	final Component getHorizontalSeparator() {
 		return Box.createRigidArea(new Dimension(6, 0));
 	}
 
@@ -133,7 +129,7 @@ public abstract class AbstractPaneItem implements PaneItem {
 	 * @return the constant <tt>Component</tt> used as a standard vertical
 	 *         separator
 	 */
-	protected final Component getVerticalSeparator() {
+	final Component getVerticalSeparator() {
 		return Box.createRigidArea(new Dimension(0, 6));
 	}
 }

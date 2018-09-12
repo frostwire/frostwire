@@ -51,12 +51,12 @@ public final class OptionsPaneManager {
 	 * Constant for the <tt>ArrayList</tt> containing all of the visible
 	 * <tt>OptionsPane</tt> instances.
 	 */
-	private final List<OptionsPane> OPTIONS_PANE_LIST = new ArrayList<OptionsPane>();
+	private final List<OptionsPane> OPTIONS_PANE_LIST = new ArrayList<>();
 	
 	/**
 	 * Stores the already created option panes by key.
 	 */
-	private final Map<String, OptionsPane> panesByKey = new HashMap<String, OptionsPane>();
+	private final Map<String, OptionsPane> panesByKey = new HashMap<>();
 	
 	/**
 	 * The factory which option panes are created from.
@@ -67,12 +67,12 @@ public final class OptionsPaneManager {
 	 * The constructor sets the layout and adds all of the <tt>OptionPane</tt>
 	 * instances.
 	 */
-	public OptionsPaneManager() {
+	OptionsPaneManager() {
 		MAIN_PANEL.setLayout(CARD_LAYOUT);		
     }
 
 	/**
-	 * Shows the options pane speficied by its title.
+	 * Shows the options pane specified by its title.
 	 * <p>
 	 * Lazily creates the options pane if it was not shown before. Its options
 	 * are initialized before it is shown. 
@@ -103,8 +103,7 @@ public final class OptionsPaneManager {
 	 * <tt>ArrayList</tt> of <tt>OptionPane</tt>s when the window is shown.
 	 */
 	public void initOptions() {
-		for (int i = 0, size = OPTIONS_PANE_LIST.size(); i < size; i++) {
-			OptionsPane op = OPTIONS_PANE_LIST.get(i);
+		for (OptionsPane op : OPTIONS_PANE_LIST) {
 			op.initOptions();
 		}
 	}
@@ -117,16 +116,15 @@ public final class OptionsPaneManager {
 	 */
 	public final void applyOptions() throws IOException {
         boolean restartRequired = false;
-        
-		for (int i = 0, size = OPTIONS_PANE_LIST.size(); i < size; i++) {
-			OptionsPane op = OPTIONS_PANE_LIST.get(i);
-            restartRequired |= op.applyOptions();
+
+		for (OptionsPane op : OPTIONS_PANE_LIST) {
+			restartRequired |= op.applyOptions();
 		}
-		
-        if(restartRequired)
-            GUIMediator.showMessage(I18n.tr("One or more options will take effect the next time FrostWire is restarted."));
-        
-        
+
+		if (restartRequired) {
+			GUIMediator.showMessage(I18n.tr("One or more options will take effect the next time FrostWire is restarted."));
+		}
+
         SettingsWarningManager.checkSettingsLoadSaveFailure();
 	}
 	
@@ -134,11 +132,10 @@ public final class OptionsPaneManager {
 	 * Determines if any of the panes are dirty.
 	 */
     public final boolean isDirty() {
-        for (int i = 0, size = OPTIONS_PANE_LIST.size(); i < size; i++) {
-            OptionsPane op = OPTIONS_PANE_LIST.get(i);
-            if (op.isDirty())
-                return true;
-        }
+		for (OptionsPane op : OPTIONS_PANE_LIST) {
+			if (op.isDirty())
+				return true;
+		}
         return false;
     }
 	
@@ -155,14 +152,14 @@ public final class OptionsPaneManager {
 	/**
 	 * Adds the speficied window to the CardLayout based on its title.
 	 *
-	 * @param window the <code>OptionsPane</code> to add
+	 * @param pane the <code>OptionsPane</code> to add
 	 */
-	public final void addPane(final OptionsPane pane) {
+	private void addPane(final OptionsPane pane) {
 		MAIN_PANEL.add(pane.getContainer(), pane.getName());
 		OPTIONS_PANE_LIST.add(pane);
 	}
 
-    public void reinitPane(String paneKey) {
+    void reinitPane(String paneKey) {
         OptionsPane optionsPane = panesByKey.get(paneKey);
         if (optionsPane != null) {
             optionsPane.initOptions();

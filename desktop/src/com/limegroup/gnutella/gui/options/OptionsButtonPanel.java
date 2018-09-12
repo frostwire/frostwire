@@ -14,7 +14,6 @@ import java.io.IOException;
  * This class contains the <tt>ButtonRow</tt> instance for the options
  * window.
  */
-//2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 final class OptionsButtonPanel {
 
 	/**

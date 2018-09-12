@@ -73,7 +73,7 @@ public class TitledPaddedPanel extends JPanel {
      * @param outerPad the padding to use on the outside of the titled border
      * @param innerPad the padding to use on the inside of the titled border
      */
-    public TitledPaddedPanel(String title, int outerPad, int innerPad) {
+    private TitledPaddedPanel(String title, int outerPad, int innerPad) {
         JPanel titlePanel = new JPanel();
         _mainPanel = new BoxPanel();
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);

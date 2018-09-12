@@ -430,7 +430,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 pos.flush();
                 totalRead += length;
                 if (contentLength != -1) {
-                    LOG.info("onData() totalRead=" + totalRead + " contentLength=" + contentLength);
                     updateImportedPercentage((int) ((totalRead*100.0f/contentLength)));
                 }
             } catch (Throwable t) {

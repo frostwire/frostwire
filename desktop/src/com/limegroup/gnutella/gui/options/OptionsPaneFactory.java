@@ -41,9 +41,7 @@ class OptionsPaneFactory {
     }
     
 	/**
-	 * Creates the options pane for a key. 
-	 * @param key keys are listed in {@link OptionsConstructor}.
-	 * @return
+	 * Creates the options pane for a key.
 	 */
 	OptionsPane createOptionsPane(OptionsTreeNode node) {
 	    Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
