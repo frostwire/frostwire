@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMediator.IPFilterModel, IPFilterTableMediator.IPFilterDataLine, IPFilterTableMediator.IPRange> {
 
@@ -81,7 +82,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
 
     }
 
-    public class IPFilterModel extends BasicDataLineModel<IPFilterDataLine, IPRange> {
+    class IPFilterModel extends BasicDataLineModel<IPFilterDataLine, IPRange> {
         IPFilterModel() {
             super(IPFilterDataLine.class);
         }
@@ -152,10 +153,6 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
             this.endAddress = endAddress;
         }
 
-        IPRange() {
-
-        }
-
         public String description() {
             return description;
         }
@@ -170,7 +167,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
 
         void writeObjectTo(OutputStream os) throws IOException {
             os.write(description.length());     // DESCRIPTION LENGTH
-            os.write(description.getBytes("utf-8")); // DESCRIPTION
+            os.write(description.getBytes(StandardCharsets.UTF_8)); // DESCRIPTION
             InetAddress bufferRange = InetAddress.getByName(startAddress);
             boolean isIPv4 = bufferRange instanceof Inet4Address;
             os.write(isIPv4 ? 4 : 6);           // START RANGE IP VERSION TYPE <4 | 6>
@@ -187,7 +184,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
             int descriptionLength = is.read(); // DESCRIPTION LENGTH
             byte[] descBuffer = new byte[descriptionLength];
             is.read(descBuffer); // DESCRIPTION
-            String description = new String(descBuffer, "utf-8");
+            String description = new String(descBuffer, StandardCharsets.UTF_8);
             String startAddress = null;
             int ipVersionType = is.read(); // START RANGE IP VERSION TYPE <4 | 6>
             if (ipVersionType == 4) {

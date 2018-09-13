@@ -38,6 +38,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -59,10 +60,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     private IPFilterTableMediator ipFilterTable;
     private JTextField fileUrlTextField;
-    private IconButton fileChooserIcon;
     private JButton importButton;
+    private IconButton fileChooserIcon;
 
     private boolean initialized;
+    private long contentLength = -1;
     private int lastPercentage = -1;
     private long lastImportedPercentageUpdateTimestamp;
     private final ExecutorService httpExecutor;
@@ -86,7 +88,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             ipFilter = engine.swig().get_ip_filter();
         }
         if (ipFilter == null) {
-            throw new RuntimeException("WTF! no ip filter then????");
+            throw new RuntimeException("Check your logic. No BTEngine ip_filter instance available");
         }
 
         // ipFilterTableModel should be loaded in separate thread
@@ -111,10 +113,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void onImportButtonAction() {
-        importButton.setText(I18n.tr("Importing..."));
-        importButton.setEnabled(false);
+        enableImportControls(false);
         String filterDataPath = fileUrlTextField.getText().trim();
         if (null == filterDataPath || "".equals(filterDataPath)) {
+            enableImportControls(true);
             return;
         }
         File f = new File(filterDataPath);
@@ -123,9 +125,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         if (f.exists()) {
             try {
                 is = new FileInputStream(f);
+                contentLength = f.length();
             } catch (IOException e) {
                 is = null;
-                reEnableImportButton();
+                enableImportControls(true);
                 fileUrlTextField.selectAll();
             }
         } else {
@@ -138,6 +141,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     is = new PipedInputStream(pos);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    enableImportControls(true);
+                    return;
                 }
 
                 final PipedInputStream pis = (PipedInputStream) is;
@@ -149,7 +154,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                                 http.get(uri.toURL().toString());
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                reEnableImportButton();
+                                enableImportControls(true);
                                 fileUrlTextField.selectAll();
                             }
                         }
@@ -158,7 +163,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 LOG.error("Invalid URI");
                 GUIMediator.showError(I18n.tr("Invalid URI or file path"));
                 syntaxException.printStackTrace();
-                reEnableImportButton();
+                enableImportControls(true);
                 fileUrlTextField.selectAll();
             }
         }
@@ -189,14 +194,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 return;
             }
 
+            boolean isGzipped = safeInputStream instanceof GZIPInputStream;
+
             BufferedInputStream bis = new BufferedInputStream(safeInputStream);
             PushbackInputStream pis = new PushbackInputStream(bis, 1024);
 
             IPFilterFormat format = getFileFormat(pis);
-            IPFilterInputStreamReader ipFilterReader = null;
-            if (format == IPFilterFormat.P2P) {
-                ipFilterReader = new P2PIPFilterInputStreamReader(pis);
-            }
+            final IPFilterInputStreamReader ipFilterReader = (format == IPFilterFormat.P2P) ? new P2PIPFilterInputStreamReader(pis) : null;
             if (ipFilterReader == null) {
                 LOG.error("importFromStreamAsync(): Invalid IP Filter file format, only p2p format supported");
                 return;
@@ -204,22 +208,35 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
-                while (pis.available() != -1) {
+                IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+                while (pis.available() > 0) {
                     IPFilterTableMediator.IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
                         ipRange.writeObjectTo(fos);
-                        ipFilterTable.getDataModel().add(ipRange);
-                        if (ipFilterTable.getDataModel().getRowCount() % 100 == 0) {
-                            GUIMediator.safeInvokeLater(() -> ipFilterTable.refresh());
+                        dataModel.add(ipRange, dataModel.getRowCount());
+
+                        // every few imported ipRanges, let's do an UI update
+                        if (dataModel.getRowCount() % 100 == 0) {
+                            GUIMediator.safeInvokeLater(() -> {
+                                if (!isGzipped) {
+                                    updateImportedPercentage((int) ((ipFilterReader.bytesRead() * 100.0f / contentLength)));
+                                }
+                            });
                         }
                     }
                 }
-                GUIMediator.safeInvokeLater(() -> ipFilterTable.refresh());
+                GUIMediator.safeInvokeLater(() -> {
+                    updateImportedPercentage(100);
+                    ipFilterTable.refresh();
+                    enableImportControls(true);
+                    LOG.info("importFromStreamAsync() - done");
+                });
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
                 IOUtils.closeQuietly(fos);
                 IOUtils.closeQuietly(pis);
+                enableImportControls(true);
             }
         });
     }
@@ -231,13 +248,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         } catch (IOException e) {
             return null;
         }
-
-        Matcher matcher = null;
-        try {
-            matcher = P2P_LINE_PATTERN.matcher(new String(sample, "utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        Matcher matcher = P2P_LINE_PATTERN.matcher(new String(sample, StandardCharsets.UTF_8));
         if (matcher.find()) {
             return IPFilterFormat.P2P;
         }
@@ -282,11 +293,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         try {
             long start = System.currentTimeMillis();
             LOG.info("loadSerializedIPFilter(): loading " + ipFilterDBFile.length() + "  bytes from ip filter file");
-            FileInputStream fis = new FileInputStream(ipFilterDBFile);
+            final FileInputStream fis = new FileInputStream(ipFilterDBFile);
             int ranges = 0;
+            final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
             while (fis.available() > 0) {
                 try {
-                    ipFilterTable.getDataModel().add(IPFilterTableMediator.IPRange.readObjectFrom(fis));
+                    dataModel.add(IPFilterTableMediator.IPRange.readObjectFrom(fis), dataModel.getRowCount());
                     ranges++;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -306,9 +318,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             LOG.info("updateImportedPercentage() aborted, percentage hasn't changed (percentage=" + percentage + ")");
             return;
         }
-        long timeSinceLastUpdate = System.currentTimeMillis()-lastImportedPercentageUpdateTimestamp;
+        long timeSinceLastUpdate = System.currentTimeMillis() - lastImportedPercentageUpdateTimestamp;
         if (percentage < 99 && timeSinceLastUpdate < 1000) {
-            LOG.info("updateImportedPercentage() aborted, too soon (timeSinceLastUpdate = "+ timeSinceLastUpdate + ")");
+            LOG.info("updateImportedPercentage() aborted, too soon (timeSinceLastUpdate = " + timeSinceLastUpdate + ")");
             return;
         }
         lastPercentage = percentage;
@@ -320,13 +332,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         });
     }
 
-    private void reEnableImportButton() {
-        // we make sure this happens on the UI thread
+    private void enableImportControls(boolean enable) {
         GUIMediator.safeInvokeLater(() -> {
-            importButton.setText(I18n.tr("Import"));
-            importButton.setEnabled(true);
+            fileUrlTextField.setEnabled(enable);
+            fileChooserIcon.setEnabled(enable);
+            importButton.setText(enable ? I18n.tr("Import") : I18n.tr("Importing..."));
+            importButton.setEnabled(enable);
             lastImportedPercentageUpdateTimestamp = -1;
             lastPercentage = -1;
+            contentLength = -1;
+            if (enable) {
+                fileUrlTextField.requestFocus();
+                fileUrlTextField.selectAll();
+            }
         });
     }
 
@@ -354,15 +372,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     private interface IPFilterInputStreamReader {
         IPFilterTableMediator.IPRange readLine();
+
+        int bytesRead();
     }
 
     private class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
         private BufferedReader br;
         private InputStream is;
+        private int bytesRead;
 
         P2PIPFilterInputStreamReader(InputStream is) {
             br = new BufferedReader(new InputStreamReader(is));
             this.is = is;
+            bytesRead = 0;
         }
 
         @Override
@@ -370,6 +392,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             try {
                 if (is.available() > 0) {
                     String line = br.readLine();
+                    bytesRead += line.length();
                     while (line.startsWith("#") && is.available() > 0) {
                         line = br.readLine();
                     }
@@ -384,12 +407,16 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
             return null;
         }
+
+        @Override
+        public int bytesRead() {
+            return bytesRead;
+        }
     }
 
     class IPFilterHttpListener implements HttpClient.HttpClientListener {
         private final PipedInputStream pis;
         private final PipedOutputStream pos;
-        private long contentLength = -1;
         private int totalRead = 0;
 
         IPFilterHttpListener(PipedInputStream pis, PipedOutputStream pos) {
@@ -418,7 +445,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             } catch (IOException e2) {
                 e.printStackTrace();
             }
-            reEnableImportButton();
+            enableImportControls(true);
         }
 
         @Override
@@ -430,12 +457,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 pos.flush();
                 totalRead += length;
                 if (contentLength != -1) {
-                    updateImportedPercentage((int) ((totalRead*100.0f/contentLength)));
+                    updateImportedPercentage((int) ((totalRead * 100.0f / contentLength)));
                 }
             } catch (Throwable t) {
                 client.onError((Exception) t);
                 t.printStackTrace();
-                reEnableImportButton();
+                enableImportControls(true);
             }
         }
 
@@ -449,11 +476,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             } catch (IOException e) {
                 e.printStackTrace();
                 updateImportedPercentage(0);
-                reEnableImportButton();
+                enableImportControls(true);
                 return;
             }
             updateImportedPercentage(100);
-            reEnableImportButton();
+            enableImportControls(true);
         }
 
         @Override
@@ -465,7 +492,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            reEnableImportButton();
+            enableImportControls(true);
         }
 
         @Override
