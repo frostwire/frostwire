@@ -71,10 +71,18 @@ public final class Offers {
             return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
-        AdMobAdNetwork.start(activity);
+        try {
+            AdMobAdNetwork.start(activity);
+        } catch (Throwable t) {
+            LOG.warn("initAdNetworks() AdMobNetwork initialization failed", t);
+        }
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
-                adNetwork.initialize(activity);
+                try {
+                    adNetwork.initialize(activity);
+                } catch (Throwable t) {
+                    LOG.warn("initAdNetworks() " + adNetwork.getClass().getSimpleName() + " initialization failed", t);
+                }
             }
         }
         LOG.info("Offers.initAdNetworks() success");
