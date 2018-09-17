@@ -18,13 +18,13 @@
 
 package com.frostwire.transfers;
 
-import com.frostwire.util.Logger;
 import com.frostwire.platform.FileSystem;
-import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;

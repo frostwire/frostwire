@@ -148,6 +148,15 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         private String endAddress;
 
         IPRange(String description, String startAddress, String endAddress) {
+            if (description == null) {
+                throw new IllegalArgumentException("IPRange description can't be null (use empty string)");
+            }
+            if (startAddress == null || startAddress.isEmpty()) {
+                throw new IllegalArgumentException("IPRange startAddress can't be null or empty");
+            }
+            if (endAddress == null || endAddress.isEmpty()) {
+                endAddress = startAddress;
+            }
             this.description = description;
             this.startAddress = startAddress;
             this.endAddress = endAddress;
@@ -210,5 +219,25 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
             return new IPRange(description, startAddress, endAddress);
         }
 
+        @Override
+        public String toString() {
+            return "IPRange@" + hashCode() + " { description = \"" + description + "\", startAddress = \"" + startAddress + "\", endAddress = \"" + endAddress + "\" }";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof IPRange)) {
+                return false;
+            }
+            IPRange other = (IPRange) obj;
+            // NPE should be impossible as these values can't be null or empty strings
+            return other.startAddress.equals(startAddress) &&
+                   other.endAddress.equals(endAddress);
+        }
+
+        @Override
+        public int hashCode() {
+            return startAddress.hashCode() * endAddress.hashCode() * 9419;
+        }
     }
 }

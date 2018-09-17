@@ -36,6 +36,10 @@ import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -55,7 +59,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     public final static String TITLE = I18n.tr("IP Filter");
-    public final static String LABEL = I18n.tr("You can manually enter IPs and IP ranges to filter out, you can also import an IP block list from an URL or a file.");
+    public final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
     private final String IP_BLOCK_LIST_SEARCH_URL = "https://duckduckgo.com/?q=ip+filter+blocklist&t=h_&ia=noneofyourbusiness";
 
     private IPFilterTableMediator ipFilterTable;
@@ -93,6 +97,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
         // ipFilterTableModel should be loaded in separate thread
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
+        JLabel findIpLabel = new JLabel("<html><a href=\"" + IP_BLOCK_LIST_SEARCH_URL + "\">" + I18n.tr("Find IP Block Lists") + "</a></html>");
+        findIpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        findIpLabel.addMouseListener(onFindIPBlockListsClick());
+        panel.add(findIpLabel, "wrap");
 
         ipFilterTable = IPFilterTableMediator.getInstance();
         BackgroundExecutorService.schedule(this::loadSerializedIPFilter);
@@ -106,10 +114,27 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         panel.add(fileChooserIcon, "span 1");
         importButton = new JButton(I18n.tr("Import"));
         panel.add(importButton, "span 1, wrap");
+
+        JButton addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
+        addRangeManuallyButton.addActionListener((e) -> onAddRangeManuallyAction());
+        panel.add(addRangeManuallyButton);
+
+        JButton clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
+        clearFilterButton.addActionListener((e) -> onClearFilterAction());
+        panel.add(clearFilterButton);
         add(panel);
 
         fileChooserIcon.addActionListener((e) -> onFileChooserIconAction());
         importButton.addActionListener((e) -> onImportButtonAction());
+    }
+
+    private MouseListener onFindIPBlockListsClick() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                GUIMediator.openURL(IP_BLOCK_LIST_SEARCH_URL);
+            }
+        };
     }
 
     private void onImportButtonAction() {
@@ -168,6 +193,20 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
         }
         importFromStreamAsync(is);
+    }
+
+    private void onClearFilterAction() {
+        enableImportControls(false);
+        ipFilterTable.clearTable();
+        File ipFilterDBFile = getIPFilterDBFile();
+        ipFilterDBFile.delete();
+        try {
+            ipFilterDBFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // TODO: Clear actual IP Filter from BTEngine
+        enableImportControls(true);
     }
 
     private void importFromStreamAsync(final InputStream is) {
@@ -255,6 +294,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return null;
     }
 
+    private void onAddRangeManuallyAction() {
+        new AddRangeManuallyDialog(this).setVisible(true);
+    }
+
     private void onFileChooserIconAction() {
         final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (p2p format only)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
             @Override
@@ -274,7 +317,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
     private void loadSerializedIPFilter() {
         LOG.info("loadSerializedIPFilter() invoked - " + hashCode());
-        File ipFilterDBFile = new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
+        File ipFilterDBFile = getIPFilterDBFile();
         if (!ipFilterDBFile.exists()) {
             try {
                 ipFilterDBFile.createNewFile();
@@ -302,6 +345,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     ranges++;
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (IllegalArgumentException e2) {
+                    LOG.error("Invalid IPRange entry detected", e2);
                 }
             }
             long end = System.currentTimeMillis();
@@ -311,6 +356,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private File getIPFilterDBFile() {
+        return new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
     }
 
     private void updateImportedPercentage(int percentage) {
@@ -414,7 +463,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
     }
 
-    class IPFilterHttpListener implements HttpClient.HttpClientListener {
+    private class IPFilterHttpListener implements HttpClient.HttpClientListener {
         private final PipedInputStream pis;
         private final PipedOutputStream pos;
         private int totalRead = 0;
@@ -504,6 +553,91 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     contentLength = Long.parseLong(contentLengthHeader.get(0));
                 }
             }
+        }
+    }
+
+    private void onRangeManuallyAdded(IPFilterTableMediator.IPRange ipRange) {
+        LOG.info("onRangeManuallyAdded() - " + ipRange);
+    }
+
+    private static class AddRangeManuallyDialog extends JDialog {
+
+        private final IPFilterPaneItem dialogListener;
+        private final JTextField descriptionTextField;
+        private final JTextField rangeStartTextField;
+        private final JTextField rangeEndTextField;
+
+        AddRangeManuallyDialog(IPFilterPaneItem dialogListener) {
+            super(getParentDialog(dialogListener), true);
+            final String addIPRangeManuallyString = I18n.tr("Add IP Range Manually");
+            setTitle(addIPRangeManuallyString);
+            this.dialogListener = dialogListener;
+            JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid"));
+            panel.add(new JLabel(I18n.tr("Description")),"wrap");
+            descriptionTextField = new JTextField();
+            panel.add(descriptionTextField, "growx, wrap");
+
+            panel.add(new JLabel("<html><strong>" + I18n.tr("Starting IP address") + "</strong></html>"),"wrap");
+            rangeStartTextField = new JTextField();
+            panel.add(rangeStartTextField, "w 250px, wrap");
+
+            panel.add(new JLabel("<html><strong>" +
+                    I18n.tr("Ending IP address") +
+                    "</strong><br/><i>" +
+                    I18n.tr("Leave blank or repeat 'Starting IP address' to block a single one") +
+                    "</i></html>"), "growx ,wrap");
+            ;
+            rangeEndTextField = new JTextField();
+            panel.add(rangeEndTextField, "w 250px, gapbottom 10px, wrap");
+
+            fixKeyStrokes(descriptionTextField);
+            fixKeyStrokes(rangeStartTextField);
+            fixKeyStrokes(rangeEndTextField);
+
+            JButton addRangeButton = new JButton(addIPRangeManuallyString);
+            panel.add(addRangeButton,"growx");
+            addRangeButton.addActionListener((e) -> onAddRangeButtonClicked());
+            JButton cancelButton = new JButton(I18n.tr("Cancel"));
+            cancelButton.addActionListener((e) -> dispose());
+            panel.add(cancelButton,"growx");
+            setContentPane(panel);
+            setResizable(false);
+            setLocationRelativeTo(getParent());
+            pack();
+        }
+
+        private void onAddRangeButtonClicked() {
+            if (!validateInput()) {
+                return;
+            }
+            dispose();
+            dialogListener.onRangeManuallyAdded(
+                    new IPFilterTableMediator.IPRange(
+                            descriptionTextField.getText(),
+                            rangeStartTextField.getText(),
+                            rangeEndTextField.getText()));
+        }
+
+        private boolean validateInput() {
+            LOG.warn("AddRangeManuallyDialog::validateInput() NOT IMPLEMENTED");
+            try {
+                new IPFilterTableMediator.IPRange(
+                        descriptionTextField.getText(),
+                        rangeStartTextField.getText(),
+                        rangeEndTextField.getText());
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+            return true;
+        }
+
+        private static JDialog getParentDialog(IPFilterPaneItem paneItem) {
+            Component result = paneItem.getContainer();
+            do {
+                result = result.getParent();
+                LOG.info("getParentDialog: getContainer -> " + result.getClass().getName());
+            } while (!(result instanceof JDialog));
+            return (JDialog) result;
         }
     }
 }
