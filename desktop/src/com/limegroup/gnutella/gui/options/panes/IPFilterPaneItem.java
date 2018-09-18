@@ -28,6 +28,7 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
@@ -55,7 +56,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         P2P
     }
 
-    private final Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)");
+    private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)");
 
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     public final static String TITLE = I18n.tr("IP Filter");
@@ -68,7 +69,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private IconButton fileChooserIcon;
 
     private boolean initialized;
-    private long contentLength = -1;
     private int lastPercentage = -1;
     private long lastImportedPercentageUpdateTimestamp;
     private final ExecutorService httpExecutor;
@@ -144,35 +144,14 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             enableImportControls(true);
             return;
         }
-        File f = new File(filterDataPath);
-        InputStream is = null;
 
-        if (f.exists()) {
-            try {
-                is = new FileInputStream(f);
-                contentLength = f.length();
-            } catch (IOException e) {
-                is = null;
-                enableImportControls(true);
-                fileUrlTextField.selectAll();
-            }
-        } else {
+        if (filterDataPath.toLowerCase().startsWith("http")) {
+            // download file
             LOG.info("onImportButtonAction() trying URL");
             try {
                 URI uri = URI.create(filterDataPath);
                 HttpClient http = new JdkHttpClient();
-                final PipedOutputStream pos = new PipedOutputStream();
-                try {
-                    is = new PipedInputStream(pos);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    enableImportControls(true);
-                    return;
-                }
-
-                final PipedInputStream pis = (PipedInputStream) is;
-                http.setListener(new IPFilterHttpListener(pis, pos));
-
+                http.setListener(new IPFilterHttpListener(new File(CommonUtils.getUserSettingsDir(), "downloaded_blocklist.temp")));
                 httpExecutor.execute(() -> {
                             try {
                                 LOG.info("http.get() -> " + uri.toURL().toString());
@@ -184,15 +163,21 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                             }
                         }
                 );
-            } catch (IllegalArgumentException syntaxException) {
-                LOG.error("Invalid URI");
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
                 GUIMediator.showError(I18n.tr("Invalid URI or file path"));
-                syntaxException.printStackTrace();
                 enableImportControls(true);
                 fileUrlTextField.selectAll();
+                return;
             }
+            return; // HTTP Listener will take care of this from another thread
         }
-        importFromStreamAsync(is);
+        importFromIPBlockFileAsync(new File(filterDataPath), false);
+    }
+
+    private void onGunzipProgress(int percentageGunzipped) {
+        //TODO
+        LOG.info("onGunzipProgress: " + percentageGunzipped);
     }
 
     private void onClearFilterAction() {
@@ -209,81 +194,100 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         enableImportControls(true);
     }
 
-    private void importFromStreamAsync(final InputStream is) {
+    private void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
+        // decompress if zip file
+        // import file
+
         BackgroundExecutorService.schedule(() -> {
             LOG.info("importFromStreamAsync(): thread invoked", true);
+
+            File decompressedFile;
             try {
-                if (is instanceof PipedInputStream) {
-                    synchronized (is) {
-                        LOG.info("importFromStreamAsync() waiting since this is a PipedInputStream", true);
-                        is.wait();
+                if (isGZipped(potentialGunzipFile)) {
+                    decompressedFile = gunzipFile(potentialGunzipFile,
+                            new File(CommonUtils.getUserSettingsDir(), "gunzipped_blocklist.temp"));
+                    if (removeInputFileWhenDone) {
+                        potentialGunzipFile.delete();
                     }
-                    LOG.info("importFromStreamAsync() we've been notified to keep going");
+                } else {
+                    decompressedFile = potentialGunzipFile;
                 }
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return;
-            }
-
-            InputStream safeInputStream;
-            try {
-                safeInputStream = getDecompressedStream(is);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("importFromIPBlockFileAsync(): " + e.getMessage(), e);
+                fileUrlTextField.selectAll();
+                enableImportControls(true);
                 return;
             }
 
-            boolean isGzipped = safeInputStream instanceof GZIPInputStream;
+            final IPFilterFormat format = getIPFilterFileFormat(decompressedFile);
+            if (format == null) {
+                LOG.error("importFromStreamAsync(): IPFilterFormat could not be determined");
+                fileUrlTextField.selectAll();
+                enableImportControls(true);
+                return;
+            }
+            final long decompressedFileSize = decompressedFile.length();
+            final IPFilterInputStreamReader ipFilterReader = (format == IPFilterFormat.P2P) ? new P2PIPFilterInputStreamReader(decompressedFile) : null;
 
-            BufferedInputStream bis = new BufferedInputStream(safeInputStream);
-            PushbackInputStream pis = new PushbackInputStream(bis, 1024);
-
-            IPFilterFormat format = getFileFormat(pis);
-            final IPFilterInputStreamReader ipFilterReader = (format == IPFilterFormat.P2P) ? new P2PIPFilterInputStreamReader(pis) : null;
             if (ipFilterReader == null) {
                 LOG.error("importFromStreamAsync(): Invalid IP Filter file format, only p2p format supported");
+                fileUrlTextField.selectAll();
+                enableImportControls(true);
                 return;
             }
+
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
                 IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
-                while (pis.available() > 0) {
+                while (ipFilterReader.available() > 0) {
                     IPFilterTableMediator.IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
-                        ipRange.writeObjectTo(fos);
-                        dataModel.add(ipRange, dataModel.getRowCount());
+                        try {
+                            ipRange.writeObjectTo(fos);
+                            dataModel.add(ipRange, dataModel.getRowCount());
 
-                        // every few imported ipRanges, let's do an UI update
-                        if (dataModel.getRowCount() % 100 == 0) {
-                            GUIMediator.safeInvokeLater(() -> {
-                                if (!isGzipped) {
-                                    updateImportedPercentage((int) ((ipFilterReader.bytesRead() * 100.0f / contentLength)));
-                                }
-                            });
+                            // every few imported ipRanges, let's do an UI update
+                            if (dataModel.getRowCount() % 100 == 0) {
+                                GUIMediator.safeInvokeLater(() -> updateDownloadedPercentage((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize))));
+                            }
+
+                            // TODO: add to actual ip block filter
+                        } catch (Throwable t) {
+                            LOG.warn(t.getMessage(), t);
+                            // just keep going
                         }
                     }
                 }
                 GUIMediator.safeInvokeLater(() -> {
-                    updateImportedPercentage(100);
+                    updateDownloadedPercentage(100);
                     ipFilterTable.refresh();
                     enableImportControls(true);
+                    fileUrlTextField.setText("");
                     LOG.info("importFromStreamAsync() - done");
                 });
+                if (removeInputFileWhenDone) {
+                    potentialGunzipFile.delete();
+                }
+                if (decompressedFile.getAbsolutePath().contains("gunzipped_blocklist.temp")) {
+                    decompressedFile.delete();
+                }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             } finally {
                 IOUtils.closeQuietly(fos);
-                IOUtils.closeQuietly(pis);
+                ipFilterReader.close();
                 enableImportControls(true);
             }
         });
     }
 
-    private IPFilterFormat getFileFormat(InputStream is) {
+    private IPFilterFormat getIPFilterFileFormat(File decompressedFile) {
         byte[] sample = new byte[1024];
         try {
-            is.read(sample);
+            FileInputStream fis = new FileInputStream(decompressedFile);
+            fis.read(sample);
+            fis.close();
         } catch (IOException e) {
             return null;
         }
@@ -362,14 +366,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
     }
 
-    private void updateImportedPercentage(int percentage) {
+    private void updateDownloadedPercentage(int percentage) {
         if (percentage == lastPercentage) {
-            LOG.info("updateImportedPercentage() aborted, percentage hasn't changed (percentage=" + percentage + ")");
             return;
         }
         long timeSinceLastUpdate = System.currentTimeMillis() - lastImportedPercentageUpdateTimestamp;
         if (percentage < 99 && timeSinceLastUpdate < 1000) {
-            LOG.info("updateImportedPercentage() aborted, too soon (timeSinceLastUpdate = " + timeSinceLastUpdate + ")");
             return;
         }
         lastPercentage = percentage;
@@ -389,7 +391,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             importButton.setEnabled(enable);
             lastImportedPercentageUpdateTimestamp = -1;
             lastPercentage = -1;
-            contentLength = -1;
             if (enable) {
                 fileUrlTextField.requestFocus();
                 fileUrlTextField.selectAll();
@@ -407,32 +408,81 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return false;
     }
 
-    private static InputStream getDecompressedStream(InputStream input) throws IOException {
-        PushbackInputStream pb = new PushbackInputStream(input, 2); //we need a pushbackstream to look ahead
+    private static boolean isGZipped(File f) throws IOException {
         byte[] signature = new byte[2];
-        int len = pb.read(signature); //read the signature
-        pb.unread(signature, 0, len); //push back the signature to the stream
-        if (signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) { //check if matches standard gzip magic number
-            return new GZIPInputStream(pb);
-        } else {
-            return pb;
+        FileInputStream fis = new FileInputStream(f);
+        fis.read(signature);
+        return signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b;
+    }
+
+    private File gunzipFile(File gzipped, File gunzipped) {
+        if (gunzipped.exists()) {
+            gunzipped.delete();
+            try {
+                gunzipped.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
+        try {
+            // NOTE: will work for files under 4GB only, should be fine for IPBlock lists, usually < 10MB
+            RandomAccessFile raf = new RandomAccessFile(gzipped, "r");
+            raf.seek(raf.length() - 4);
+            int b4 = raf.read();
+            int b3 = raf.read();
+            int b2 = raf.read();
+            int b1 = raf.read();
+            raf.close();
+            final int uncompressedSize = (b1 << 24) | (b2 << 16) + (b3 << 8) + b4;
+
+            //4096|8192|16384|32768
+            byte[] buffer = new byte[8192];
+            GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipped), buffer.length);
+            FileOutputStream fileOutputStream = new FileOutputStream(gunzipped, false);
+            int totalGunzipped = 0;
+            while (gzipInputStream.available() == 1) {
+                int read = 0;
+                try {
+                    read = gzipInputStream.read(buffer);
+                    if (read > 0) {
+                        totalGunzipped += read;
+                        fileOutputStream.write(buffer, 0, read);
+                        onGunzipProgress((int) ((totalGunzipped * 100.0f / uncompressedSize)));
+                    }
+                } catch (Throwable t) {
+                    LOG.info("read = " + read);
+                    LOG.info("totalGunzipped = " + totalGunzipped);
+                    LOG.info("buffer = " + buffer);
+                    t.printStackTrace();
+                    gunzipped.delete();
+                    return null;
+                }
+            }
+            onGunzipProgress(100);
+            gzipInputStream.close();
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        } catch (Throwable t) {
+            LOG.error("gunzipFile(): " + t.getMessage(), t);
+            gunzipped.delete();
+            return null;
+        }
+        return new File(gunzipped.getAbsolutePath());
     }
 
-    private interface IPFilterInputStreamReader {
-        IPFilterTableMediator.IPRange readLine();
-
-        int bytesRead();
-    }
-
-    private class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
+    private static class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
         private BufferedReader br;
         private InputStream is;
         private int bytesRead;
 
-        P2PIPFilterInputStreamReader(InputStream is) {
+        P2PIPFilterInputStreamReader(File uncompressedFile) {
+            try {
+                this.is = new FileInputStream(uncompressedFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             br = new BufferedReader(new InputStreamReader(is));
-            this.is = is;
             bytesRead = 0;
         }
 
@@ -444,6 +494,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     bytesRead += line.length();
                     while (line.startsWith("#") && is.available() > 0) {
                         line = br.readLine();
+                        bytesRead += line.length();
                     }
 
                     Matcher matcher = P2P_LINE_PATTERN.matcher(line);
@@ -461,86 +512,83 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         public int bytesRead() {
             return bytesRead;
         }
+
+        @Override
+        public int available() {
+            try {
+                return is.available();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
+
+        @Override
+        public void close() {
+            try {
+                is.close();
+                br.close();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
     }
 
     private class IPFilterHttpListener implements HttpClient.HttpClientListener {
-        private final PipedInputStream pis;
-        private final PipedOutputStream pos;
         private int totalRead = 0;
+        private long contentLength = -1;
+        private final File downloadedFile;
+        private final FileOutputStream fos;
 
-        IPFilterHttpListener(PipedInputStream pis, PipedOutputStream pos) {
-            this.pis = pis;
-            this.pos = pos;
-        }
-
-        private void safePisNotify() {
-            if (pis != null) {
-                synchronized (pis) {
-                    try {
-                        pis.notify();
-                    } catch (Throwable t) {
-                        LOG.error(t.getMessage(), t, true);
-                    }
-                }
+        IPFilterHttpListener(File downloadedFile) throws FileNotFoundException {
+            this.downloadedFile = downloadedFile;
+            try {
+                fos = new FileOutputStream(downloadedFile);
+            } catch (FileNotFoundException e) {
+                LOG.error("IPFilterHttpListener can't create output stream -> " + e.getMessage(), e);
+                throw e;
             }
         }
 
         @Override
         public void onError(HttpClient client, Throwable e) {
-            safePisNotify();
-            LOG.info("onError()");
-            try {
-                pos.close();
-            } catch (IOException e2) {
-                e.printStackTrace();
-            }
+            LOG.info("onError(): " + e.getMessage());
+            LOG.error(e.getMessage(), e);
             enableImportControls(true);
         }
 
         @Override
         public void onData(HttpClient client, byte[] buffer, int offset, int length) {
-            //LOG.info("onData()");
+            totalRead += length;
             try {
-                safePisNotify();
-                pos.write(buffer, 0, buffer.length);
-                pos.flush();
-                totalRead += length;
-                if (contentLength != -1) {
-                    updateImportedPercentage((int) ((totalRead * 100.0f / contentLength)));
-                }
+                fos.write(buffer, offset, length);
             } catch (Throwable t) {
-                client.onError((Exception) t);
-                t.printStackTrace();
-                enableImportControls(true);
+                onError(client, t);
+                return;
+            }
+            if (contentLength != -1) {
+                updateDownloadedPercentage((int) ((totalRead * 100.0f / contentLength)));
             }
         }
 
         @Override
         public void onComplete(HttpClient client) {
             LOG.info("onComplete()");
-            safePisNotify();
             try {
-                pos.flush();
-                pos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                updateImportedPercentage(0);
-                enableImportControls(true);
+                fos.flush();
+                fos.close();
+            } catch (Throwable t) {
+                LOG.error("onComplete(): " + t.getMessage(), t);
+                onError(client, t);
                 return;
             }
-            updateImportedPercentage(100);
+            updateDownloadedPercentage(100);
             enableImportControls(true);
+            importFromIPBlockFileAsync(downloadedFile, true);
         }
 
         @Override
         public void onCancel(HttpClient client) {
-            LOG.info("onCancel()");
-            safePisNotify();
-            try {
-                pos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             enableImportControls(true);
         }
 
@@ -586,7 +634,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     "</strong><br/><i>" +
                     I18n.tr("Leave blank or repeat 'Starting IP address' to block a single one") +
                     "</i></html>"), "growx ,wrap");
-            ;
+
             rangeEndTextField = new JTextField();
             panel.add(rangeEndTextField, "w 250px, gapbottom 10px, wrap");
 
