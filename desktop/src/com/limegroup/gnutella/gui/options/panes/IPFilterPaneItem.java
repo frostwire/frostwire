@@ -38,9 +38,6 @@ import org.limewire.util.CommonUtils;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -61,16 +58,18 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     public final static String TITLE = I18n.tr("IP Filter");
     public final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
-    private final String IP_BLOCK_LIST_SEARCH_URL = "https://duckduckgo.com/?q=ip+filter+blocklist&t=h_&ia=noneofyourbusiness";
+    private final String decompressingString = I18n.tr("Decompressing");
+    private final String downloadingString = I18n.tr("Downloading");
 
     private IPFilterTableMediator ipFilterTable;
     private JTextField fileUrlTextField;
+    private JProgressBar progressBar;
     private JButton importButton;
     private IconButton fileChooserIcon;
 
     private boolean initialized;
     private int lastPercentage = -1;
-    private long lastImportedPercentageUpdateTimestamp;
+    private long lastPercentageUpdateTimestamp;
     private final ExecutorService httpExecutor;
 
 
@@ -97,10 +96,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
         // ipFilterTableModel should be loaded in separate thread
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
-        JLabel findIpLabel = new JLabel("<html><a href=\"" + IP_BLOCK_LIST_SEARCH_URL + "\">" + I18n.tr("Find IP Block Lists") + "</a></html>");
-        findIpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        findIpLabel.addMouseListener(onFindIPBlockListsClick());
-        panel.add(findIpLabel, "wrap");
 
         ipFilterTable = IPFilterTableMediator.getInstance();
         BackgroundExecutorService.schedule(this::loadSerializedIPFilter);
@@ -115,6 +110,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         importButton = new JButton(I18n.tr("Import"));
         panel.add(importButton, "span 1, wrap");
 
+        progressBar = new JProgressBar(0,100);
+        progressBar.setString("Importing...");
+        progressBar.setValue(50);
+        panel.add(progressBar, "growx, wrap");
+
         JButton addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
         addRangeManuallyButton.addActionListener((e) -> onAddRangeManuallyAction());
         panel.add(addRangeManuallyButton);
@@ -126,15 +126,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
         fileChooserIcon.addActionListener((e) -> onFileChooserIconAction());
         importButton.addActionListener((e) -> onImportButtonAction());
-    }
-
-    private MouseListener onFindIPBlockListsClick() {
-        return new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                GUIMediator.openURL(IP_BLOCK_LIST_SEARCH_URL);
-            }
-        };
     }
 
     private void onImportButtonAction() {
@@ -173,11 +164,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             return; // HTTP Listener will take care of this from another thread
         }
         importFromIPBlockFileAsync(new File(filterDataPath), false);
-    }
-
-    private void onGunzipProgress(int percentageGunzipped) {
-        //TODO
-        LOG.info("onGunzipProgress: " + percentageGunzipped);
     }
 
     private void onClearFilterAction() {
@@ -240,6 +226,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             try {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
                 IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
+                final String importingString = I18n.tr("Importing");
                 while (ipFilterReader.available() > 0) {
                     IPFilterTableMediator.IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
@@ -249,7 +236,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
                             // every few imported ipRanges, let's do an UI update
                             if (dataModel.getRowCount() % 100 == 0) {
-                                GUIMediator.safeInvokeLater(() -> updateDownloadedPercentage((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize))));
+                                GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)),importingString));
                             }
 
                             // TODO: add to actual ip block filter
@@ -260,7 +247,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                     }
                 }
                 GUIMediator.safeInvokeLater(() -> {
-                    updateDownloadedPercentage(100);
+                    updateProgressBar(100, "");
                     ipFilterTable.refresh();
                     enableImportControls(true);
                     fileUrlTextField.setText("");
@@ -366,21 +353,25 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
     }
 
-    private void updateDownloadedPercentage(int percentage) {
+    private void updateProgressBar(int percentage, String status) {
         if (percentage == lastPercentage) {
             return;
         }
-        long timeSinceLastUpdate = System.currentTimeMillis() - lastImportedPercentageUpdateTimestamp;
-        if (percentage < 99 && timeSinceLastUpdate < 1000) {
+        long timeSinceLastUpdate = System.currentTimeMillis() - lastPercentageUpdateTimestamp;
+        if (lastPercentage < 99 && timeSinceLastUpdate < 1000) {
             return;
         }
         lastPercentage = percentage;
         GUIMediator.safeInvokeLater(() -> {
-            importButton.setText(I18n.tr("Importing... (" + percentage + "%)"));
-            importButton.setEnabled(false);
-            lastImportedPercentageUpdateTimestamp = System.currentTimeMillis();
-            importButton.repaint();
+            progressBar.setString(status + "...");
+            progressBar.setValue(lastPercentage);
+            progressBar.repaint();
+            lastPercentageUpdateTimestamp = System.currentTimeMillis();
         });
+    }
+
+    private void onGunzipProgress(int percentage) {
+        updateProgressBar(percentage, decompressingString);
     }
 
     private void enableImportControls(boolean enable) {
@@ -389,11 +380,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             fileChooserIcon.setEnabled(enable);
             importButton.setText(enable ? I18n.tr("Import") : I18n.tr("Importing..."));
             importButton.setEnabled(enable);
-            lastImportedPercentageUpdateTimestamp = -1;
+            lastPercentageUpdateTimestamp = -1;
             lastPercentage = -1;
+            progressBar.setVisible(!enable);
             if (enable) {
                 fileUrlTextField.requestFocus();
                 fileUrlTextField.selectAll();
+                updateProgressBar(0,"");
             }
         });
     }
@@ -436,27 +429,19 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             raf.close();
             final int uncompressedSize = (b1 << 24) | (b2 << 16) + (b3 << 8) + b4;
 
-            //4096|8192|16384|32768
-            byte[] buffer = new byte[8192];
+            byte[] buffer = new byte[32768];
             GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipped), buffer.length);
             FileOutputStream fileOutputStream = new FileOutputStream(gunzipped, false);
             int totalGunzipped = 0;
             while (gzipInputStream.available() == 1) {
-                int read = 0;
-                try {
-                    read = gzipInputStream.read(buffer);
-                    if (read > 0) {
-                        totalGunzipped += read;
-                        fileOutputStream.write(buffer, 0, read);
-                        onGunzipProgress((int) ((totalGunzipped * 100.0f / uncompressedSize)));
+                int read = gzipInputStream.read(buffer);
+                if (read > 0) {
+                    if (read != buffer.length) {
+                        LOG.info("gunzipFile(): read = " + read);
                     }
-                } catch (Throwable t) {
-                    LOG.info("read = " + read);
-                    LOG.info("totalGunzipped = " + totalGunzipped);
-                    LOG.info("buffer = " + buffer);
-                    t.printStackTrace();
-                    gunzipped.delete();
-                    return null;
+                    totalGunzipped += read;
+                    fileOutputStream.write(buffer, 0, read);
+                    onGunzipProgress((int) ((totalGunzipped * 100.0f / uncompressedSize)));
                 }
             }
             onGunzipProgress(100);
@@ -567,7 +552,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 return;
             }
             if (contentLength != -1) {
-                updateDownloadedPercentage((int) ((totalRead * 100.0f / contentLength)));
+                updateProgressBar((int) ((totalRead * 100.0f / contentLength)),downloadingString);
             }
         }
 
@@ -582,7 +567,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 onError(client, t);
                 return;
             }
-            updateDownloadedPercentage(100);
+            updateProgressBar(100,"");
             enableImportControls(true);
             importFromIPBlockFileAsync(downloadedFile, true);
         }
