@@ -74,8 +74,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Download Selecionado</string>
     <string name="toggle_sharing_selected_files">Compartilhando Toggle</string>
-    <string name="change_manual_listening_port">Ajustar Porta para Escutar 1000 e 65535</string>
-    <string name="is_not_responding">%s não está respondendo</string>
     <string name="max_concurrent_uploads">Máximo de uploads simultâneos</string>
     <string name="search_no_keywords">Por favor digite as palavras chaves para pesquisar</string>
     <string name="search_select_filetype">Por favor selecione um tipo de arquivo</string>
@@ -84,7 +82,6 @@
     <string name="update_title">Atualizar Hora!</string>
     <string name="update_message">O FrostWire baixou uma nova ATUALIZAÇÃO DE DESEMPENHO para você, por favor, clique no botão OK se você deseja instalar.</string>
     <string name="next_time">Próxima Vez</string>
-    <string name="change_my_nickname">Mude meu Apelido</string>
     <string name="try_changing_your_nickname">Digite seu apelido</string>
     <string name="reconnecting">Reconecatando</string>
     <string name="go_to">Ir Para</string>
@@ -145,7 +142,6 @@
     <string name="open">Abrir</string>
     <string name="connected_to">Conecatdo a</string>
     <string name="sharing_preferences">Preferências de compartilhamento</string>
-    <string name="nickname">Apelido</string>
     <string name="how_other_users_will_see_you">Como outros usuários irão te ver</string>
     <string name="networking_preferences">Preferências de Networking</string>
     <string name="simultaneous_uploads">Uploads Simultâneos</string>
@@ -171,7 +167,6 @@
     <string name="connected_using_dataplan">Conecte usando Data Plan</string>
     <string name="send_to_chat">Envie para o Bate-papo</string>
     <string name="sent_file_to_chat">Envie arquivo para o Bate-papo</string>
-    <string name="choose_wifi_network">Escolha a rede Wi-Fi</string>
     <string name="please_update_to_v">Por favor atualize para v. %s</string>
     <string name="cant_open_file">Desculpe, não sei como abrir esse arquivo.</string>
     <string name="downloading_from_desktop">Baixando o(s) arquivo(s) da área de trabalho</string>
@@ -274,7 +269,6 @@
     <string name="downloading_promotion">Baixando %s</string>
     <string name="activity_about_droidwire_description">FrostWire para Android</string>
     <string name="download_type_not_supported">Tipo de Download não permitido</string>
-    <string name="im_on_it">Eu estou …</string>
     <string name="hint_transfers">Use "menu" para ações em alto volume</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Velocidade Máxima do Download</string>
@@ -292,7 +286,6 @@
     <string name="seed_finished_torrents_wifi_only">Sementei somente no WiFi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Sementei somente quando conectado WiFi para salvar a largura de banda no seu plano de dados</string>
     <string name="seeding_has_been_turned_off">A Semeadura foi desligada</string>
-    <string name="nickname_hint">Apelido</string>
     <string name="show_transfers_on_download_start">Mostre as Transferências no Início do Download</string>
     <string name="dialog_new_transfer_title">Iniciar este download?</string>
     <string name="dialog_new_transfer_text_text">Você tem certeza que deseja baixar %1$s (%2$s)</string>
@@ -351,10 +344,6 @@
     <string name="wifi_sharing">"Compartilhamento Wi-Fi"</string>
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">"Parar"</string>
-    <string name="donate_1">"Doar $1"</string>
-    <string name="donate_5">"Doar $5"</string>
-    <string name="donate_10">"Doar $10"</string>
-    <string name="donate_25">"Doar $25"</string>
     <string name="playing_now_colon">"Rodando agora"</string>
     <string name="my_filetype">Meu %s</string>
     <string name="paused">"Pausado"</string>
@@ -445,7 +434,6 @@
     <string name="saving_to_sd_card">Salvando para o cartão SD.</string>
     <string name="transfers_context_menu_stop_delete_data">Pare e excluir dados</string>
     <string name="use_tpb_summary">TPB é magnet base, só funciona em Wi-Fi</string>
-    <string name="wifi_sharing_settings">Configurações de Compartilhamento Wi-Fi</string>
     <string name="torrent_max_peers">Max Pares</string>
     <string name="app_shutdown_dlg_message">Isto vai fechar todas as transferências e serviços em segundo plano. Você tem certeza?</string>
     <string name="checking_ellipsis">Verificando&#8230;</string>

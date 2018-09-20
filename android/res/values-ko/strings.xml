@@ -76,8 +76,6 @@
     <string name="download">다운로드</string>
     <string name="download_selected_files">선택된 파일 다운로드</string>
     <string name="toggle_sharing_selected_files">토글 공유</string>
-    <string name="change_manual_listening_port">리스닝 포트 1000과 65535 지정하기</string>
-    <string name="is_not_responding">%s 응답하지 않습니다.</string>
     <string name="max_concurrent_uploads">최대 동시 업로드</string>
     <string name="search_no_keywords">검색 키워드를 입력하세요.</string>
     <string name="search_select_filetype">파일 타입을 고르세요.</string>
@@ -86,7 +84,6 @@
     <string name="update_title">시간 업데이트</string>
     <string name="update_message">FrostWire가 업데이트 되었습니다. 지금 새 버전을 다운로드 하시기 원하시면 “OK” 버튼을 눌러주세요.</string>
     <string name="next_time">다음 번에</string>
-    <string name="change_my_nickname">닉네임을 바꿔주세요</string>
     <string name="try_changing_your_nickname">닉네임을 입력하세요</string>
     <string name="reconnecting">다시 연결중</string>
     <string name="go_to">이동</string>
@@ -147,7 +144,6 @@
     <string name="open">열기</string>
     <string name="connected_to">연결되어있음</string>
     <string name="sharing_preferences">공유 환경설정</string>
-    <string name="nickname">닉네임</string>
     <string name="how_other_users_will_see_you">다른 사용자들에게 어떻게 보여지길 원하십니까</string>
     <string name="networking_preferences">연결 설정</string>
     <string name="simultaneous_uploads">동시 업로드</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">데이터 정책을 통해 연결됨</string>
     <string name="send_to_chat">채팅보관함으로 전송</string>
     <string name="sent_file_to_chat">파일을 채팅보관함으로 전송</string>
-    <string name="choose_wifi_network">무선 인터넷 설정</string>
     <string name="please_update_to_v">v로 업데이트 해주세요 %s</string>
     <string name="cant_open_file">파일을 열 수 없습니다.</string>
     <string name="downloading_from_desktop">데스크탑으로부터 파일을 다운로드 하는 중</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">다운로드중 %s</string>
     <string name="activity_about_droidwire_description">안드로이드용FrostWire</string>
     <string name="download_type_not_supported">지원하지 않는 다운로드 형식</string>
-    <string name="im_on_it">받는중</string>
     <string name="hint_transfers">대량 명령 시 메뉴 이용</string>
     <string name="torrent_settings">토렌트</string>
     <string name="torrent_max_download_speed_summary">최대 다운로드 속도 요약</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">무선인터넷 사용시에만 시드</string>
     <string name="seed_finished_torrents_wifi_only_summary">데이터 플랜의 대역폭 저장을 위해 무선인터넷 연결 시에만 시드</string>
     <string name="seeding_has_been_turned_off">시드 꺼짐</string>
-    <string name="nickname_hint">닉네임</string>
     <string name="show_transfers_on_download_start">다운로드 시작 시 이동 보기</string>
     <string name="dialog_new_transfer_title">다운로드를 시작하시겠습니까</string>
     <string name="dialog_new_transfer_text_text">정말 다운로드하시겠습니까?%1$s (%2$s)</string>
@@ -341,7 +334,6 @@
     <string name="activity_mediaplayer_name">미디어 플레이어</string>
     <string name="your_installation_is_complete">설치가 완료되었습니다.</string>
     <string name="error_connection_timed_out">오류 : 연결 시간 초과 / 중단. 다시 시도하십시오.</string>
-    <string name="wifi_sharing_settings">Wi-Fi 공유 설정</string>
     <string name="enable_wifi_sharing_summary">로컬 Wi-Fi 네트워크에서 동료와 파일을 공유합니다.</string>
     <string name="all_free_downloads">무료 다운로드</string>
     <string name="torrent_max_peers">최대 동료</string>
@@ -394,13 +386,11 @@
     <string name="help">도움</string>
     <string name="cloud_downloads_coming">죄송합니다 : 여기에서 시작하는 클라우드 다운로드는 추가 업데이트에서 제공됩니다.</string>
     <string name="menu_space_shortcut_label">공간</string>
-    <string name="donate_10">$10 기부</string>
     <string name="vpn_what_you_get_with">너는 무엇을 얻을 수 있니 </string>
     <string name="confirm_download">다운로드 확인</string>
     <string name="sdcard_storage">SD의 저장소</string>
     <string name="deleted_crawl_cache">크롤링 캐시 삭제됨</string>
     <string name="are_you_sure_you_want_to_download_the_following">다음을 다운로드 하시겠습니까 %1$s (%2$s)?</string>
-    <string name="donate_25">$25 기부</string>
     <string name="player_paused_press_and_hold_to_stop">플레이어가 일시 중지되었습니다. (팁 : 길게 누르면 멈춤)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">전송에 자석 URL이 추가되었습니다. (자석은 Wi-Fi에서 가장 잘 작동합니다)</string>
@@ -561,8 +551,6 @@
     <string name="support">지원하다</string>
     <string name="transfers_context_menu_copy_magnet">자석 복사</string>
     <string name="try_other_keywords">더 적은 수의/다른 키워드 사용해보기</string>
-    <string name="donate_1">$1 기부</string>
-    <string name="donate_5">$5 기부</string>
     <string name="thank_you">고맙습니다!</string>
     <string name="use_frostclick">FrostClick사용</string>
     <string name="get_ExpressVPN">ExpressVPN 받기</string>

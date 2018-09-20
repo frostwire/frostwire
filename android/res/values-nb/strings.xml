@@ -26,15 +26,11 @@
     <string name="activity_mediaplayer_name">Mediaspiller</string>
     <string name="your_installation_is_complete">Installasjonen er fullført.</string>
     <string name="error_connection_timed_out">Feil: tilkobling tids ut/droppet. Prøv igjen.</string>
-    <string name="im_on_it">Jeg er på det…</string>
-    <string name="wifi_sharing_settings">Wi-Fi delingsinnstillinger</string>
-    <string name="is_not_responding">%s svarer ikke</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Del filer med jevnaldrende på den lokale Wi-Fi-nettverk.</string>
     <string name="how_other_users_will_see_you">Hvordan andre brukere vil se deg</string>
     <string name="share_selected_files">Del valgte filer</string>
-    <string name="choose_wifi_network">Velg et Wifi-nettverk</string>
     <string name="device">Enhet</string>
     <string name="connecting">Kobler til</string>
     <string name="all_free_downloads">Alle gratis nedlastinger</string>
@@ -52,7 +48,6 @@
     <string name="sharing_privacy_settings">Deling og personvern</string>
     <string name="alpha_tests_team_thanks">Takk til alle våre frivillige alfa testere for tålmodighet og gode tilbakemeldinger, spesiell takk til</string>
     <string name="azureus_manager_item_ready">Venter på andre torrents til kø</string>
-    <string name="nickname">Kallenavn</string>
     <string name="drawer_close">Lukk navigasjonsmenyen</string>
     <string name="why_we_need_storage_permissions_summary">Frostwire er en fil nettleser og overførte app, derfor må den være i stand til å få tilgang til disken.\n\nUten tillatelsene Frostwire ikke kan arbeide.\n\nLyst til å prøve igjen?</string>
     <string name="peer_http_upload_status_unknown">Ukjent</string>
@@ -86,7 +81,6 @@
     <string name="delete_this_track">Slett dette stykket</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Laster…</string>
-    <string name="nickname_hint">Kallenavn</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Uventet feil plukking lagerbane</string>
     <string name="torrent_preferences_header">Torrent Innstillinger</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">Plass</string>
     <string name="connected_using_dataplan">Koblet med Data Plan</string>
     <string name="tip_rename_your_files">Tips: Gi nytt navn filer slik at de kan bli funnet</string>
-    <string name="donate_10">Donere $10</string>
     <string name="disconnect">Frakople</string>
     <string name="vpn_what_you_get_with">Hva får du med </string>
     <string name="download_finished">Last Ferdig</string>
     <string name="confirm_download">Bekreft Last ned</string>
     <string name="input_text_hint">Hva ser du etter? (hint fra Google)</string>
-    <string name="change_my_nickname">Endre kallenavnet mitt</string>
     <string name="notification_other_header">Viktige opplysninger og annet</string>
     <string name="still_listening_on_port">Fortsatt lytter på port</string>
     <string name="sdcard_storage">SD-kort lagring</string>
@@ -184,7 +176,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Alle overføringer vil stoppe.\nEr du sikker?</string>
     <string name="unshare_selected_files">Ikke dele valgte filer</string>
     <string name="are_you_sure_you_want_to_download_the_following">Er du sikker på at du vil laste ned følgende %1$s (%2$s)?</string>
-    <string name="donate_25">Donere $25</string>
     <string name="resume_torrent_menu_action">Gjenoppta</string>
     <string name="downloading_from_desktop">Laste ned filer fra skrivebordet</string>
     <string name="next_time">Neste gang</string>
@@ -324,7 +315,6 @@
     <string name="playing_now_colon">Spiller nå:</string>
     <string name="please_enter_valid_url">Vennligst skriv inn en gyldig URL</string>
     <string name="search_no_keywords">Fyll inn søkeord</string>
-    <string name="change_manual_listening_port">Sett Lytte Port 1000 og 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Må ha minst en opplasting slot</string>
     <string name="stop">Stoppe</string>
     <string name="distraction_free_search_results_summary">Skjule brukergrensesnitt komponenter for å vise flere resultater. Trenger app restart skal tre i kraft.</string>
@@ -547,8 +537,6 @@
     <string name="try_other_keywords">Prøv færre/andre søkeord</string>
     <string name="use_upnp_port_mapping_summary">Lang Trykk her for å stille manuell portnummer</string>
     <string name="activity_media_player_image_description">Medier bilde</string>
-    <string name="donate_1">Donere $1</string>
-    <string name="donate_5">Donere $5</string>
     <string name="clear_complete_transfers">Dette vil fjerne alle de ferdige overføringer</string>
     <string name="torrent_max_upload_speed">Maks opplastingshastighet</string>
     <string name="download_type_not_supported">Nedlastingstype støttes ikke</string>

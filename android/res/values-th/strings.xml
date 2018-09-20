@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">การติดตั้งเสร็จสมบูรณ์</string>
     <string name="error_connection_timed_out">ข้อผิดพลาด: หมดเวลาเชื่อมต่อ/ลดลง ลองอีกครั้ง.</string>
-    <string name="im_on_it">ผมกับมัน…</string>
-    <string name="wifi_sharing_settings">ตั้งค่าการแชร์ Wifi</string>
-    <string name="is_not_responding">%s ไม่ตอบสนอง</string>
     <string name="azureus_manager_item_seeding">การเพาะ</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">แชร์ไฟล์กับเพื่อนบนเครือข่าย WiFi ท้องถิ่น</string>
     <string name="how_other_users_will_see_you">วิธีที่ผู้ใช้อื่น ๆ จะเห็นคุณ</string>
     <string name="share_selected_files">แบ่งปันไฟล์ที่เลือก</string>
-    <string name="choose_wifi_network">เลือกเครือข่าย WiFi</string>
     <string name="device">เครื่อง</string>
     <string name="connecting">การเชื่อมต่อ</string>
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">Wifi ที่ใช้ร่วมกัน</string>
     <string name="alpha_tests_team_thanks">ขอขอบคุณทุกทดสอบอัลฟาสมัครใจของเราสำหรับความอดทนและข้อเสนอแนะที่ดีขอขอบคุณเป็นพิเศษ</string>
     <string name="azureus_manager_item_ready">การรอคอยสำหรับเพลงอื่น ๆ ที่จะคิว</string>
-    <string name="nickname">ชื่อเล่น</string>
     <string name="drawer_close">ปิดลิ้นชักการนำทาง</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire เป็นเบราว์เซอร์ของไฟล์และดาวน์โหลดแอพพลิเคจึงต้องการที่จะสามารถเข้าถึงดิสก์ของคุณ\n\nโดยไม่ต้องสิทธิ์ของคุณ FrostWire ไม่สามารถทำงานได้\n\nต้องการที่จะลองอีกครั้งหรือไม่</string>
     <string name="peer_http_upload_status_unknown">ไม่ทราบ</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">ลบงานชิ้นนี้</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">กำลังโหลด…</string>
-    <string name="nickname_hint">ชื่อเล่น</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">ข้อผิดพลาดที่ไม่คาดคิดการเลือกเส้นทางการจัดเก็บ</string>
     <string name="hint_transfers">ใช้ "เมนู" สำหรับการทำงานเป็นกลุ่ม</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">ช่องว่าง</string>
     <string name="connected_using_dataplan">เชื่อมต่อโดยใช้ข้อมูลแผน</string>
     <string name="tip_rename_your_files">เคล็ดลับ: เปลี่ยนชื่อไฟล์เพื่อให้พวกเขาสามารถพบได้</string>
-    <string name="donate_10">บริจาค $10</string>
     <string name="disconnect">ปลด</string>
     <string name="vpn_what_you_get_with">คุณได้อะไรกับ </string>
     <string name="download_finished">ดาวน์โหลดสำเร็จรูป</string>
     <string name="confirm_download">ยืนยันการดาวน์โหลด</string>
     <string name="input_text_hint">คุณกำลังมองหาอะไร? (คำแนะนำโดย Google)</string>
-    <string name="change_my_nickname">เปลี่ยนชื่อเล่นของฉัน</string>
     <string name="still_listening_on_port">ยังคงฟังพอร์ต</string>
     <string name="sdcard_storage">การจัดเก็บข้อมูล SD</string>
     <string name="pending">อยู่ระหว่างดำเนินการ</string>
@@ -183,7 +175,6 @@
     <string name="all_transfers_will_stop_are_you_sure">การถ่ายโอนทั้งหมดจะหยุด\nคุณแน่ใจไหม?</string>
     <string name="unshare_selected_files">ยกเลิกการแชร์ไฟล์ที่เลือก</string>
     <string name="are_you_sure_you_want_to_download_the_following">คุณแน่ใจหรือไม่ว่าคุณต้องการดาวน์โหลดต่อไปนี้ %1$s (%2$s)?</string>
-    <string name="donate_25">บริจาค $25</string>
     <string name="resume_torrent_menu_action">ประวัติย่อ</string>
     <string name="downloading_from_desktop">การดาวน์โหลดไฟล์จากเดสก์ทอป</string>
     <string name="next_time">ครั้งหน้า</string>
@@ -321,7 +312,6 @@
     <string name="playing_now_colon">เล่นในขณะนี้:</string>
     <string name="please_enter_valid_url">โปรดป้อน URL ที่ถูกต้อง</string>
     <string name="search_no_keywords">กรุณาใส่คำค้นหา</string>
-    <string name="change_manual_listening_port">ตั้งพอร์ต 1000 และ 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">ต้องมีอย่างน้อยหนึ่งช่องอัปโหลด</string>
     <string name="stop">หยุด</string>
     <string name="distraction_free_search_results_summary">ซ่อนส่วนประกอบ UI ที่จะแสดงผลการค้นหาเพิ่มเติม ความต้องการเริ่มต้นแอปจะมีผล</string>
@@ -542,8 +532,6 @@
     <string name="try_other_keywords">ลองใช้คำหลักน้อยลง/ที่แตกต่างกัน</string>
     <string name="use_upnp_port_mapping_summary">ลองกดที่นี่เพื่อตั้งหมายเลขพอร์ตคู่มือการใช้งาน…</string>
     <string name="activity_media_player_image_description">ภาพสื่อ</string>
-    <string name="donate_1">บริจาค $1</string>
-    <string name="donate_5">บริจาค $5</string>
     <string name="clear_complete_transfers">นี้จะล้างออกทั้งหมดโอนเสร็จแล้ว</string>
     <string name="torrent_max_upload_speed">แม็กซ์ความเร็วในการอัพโหลด</string>
     <string name="download_type_not_supported">ดาวน์โหลดประเภทได้รับการสนับสนุน</string>

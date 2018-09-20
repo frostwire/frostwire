@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Médialejátszó</string>
     <string name="your_installation_is_complete">A telepítés befejezése után.</string>
     <string name="error_connection_timed_out">Hiba: kapcsolat időtúllépés/csökkent. Próbáld újra.</string>
-    <string name="im_on_it">Rajta vagyok…</string>
-    <string name="wifi_sharing_settings">Wifi megosztási beállítások</string>
-    <string name="is_not_responding">%s nem válaszol</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Fájlok megosztása a társaik a helyi WiFi hálózatra.</string>
     <string name="how_other_users_will_see_you">Ahogyan a többi felhasználó is látni</string>
     <string name="share_selected_files">Megosztása kiválasztott fájlok</string>
-    <string name="choose_wifi_network">Válasszon egy Wi-Fi hálózat</string>
     <string name="device">Eszköz</string>
     <string name="connecting">Csatlakozó</string>
     <string name="all_free_downloads">Minden ingyenes letöltések</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">WiFi megosztása</string>
     <string name="alpha_tests_team_thanks">Köszönet minden kedves önkéntes alfatesztelők a türelmet és jó visszajelzéseket, külön köszönet</string>
     <string name="azureus_manager_item_ready">Várakozás más torrentek a sorhoz</string>
-    <string name="nickname">Becenév</string>
     <string name="drawer_close">Navigációs fiók bezárása</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire egy fájl böngésző és letöltő alkalmazás, ezért képesnek kell lennie, hogy hozzáférjen a lemezre.\n\nAnélkül, hogy a jogosultságok FrostWire nem tud dolgozni.\n\nMegpróbálod újra?</string>
     <string name="peer_http_upload_status_unknown">Ismeretlen</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">A szám törlése</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Betöltés…</string>
-    <string name="nickname_hint">Becenév</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Váratlan hiba szedés tárolási útvonalat</string>
     <string name="hint_transfers">Használd a "menü" ömlesztett akciók</string>
@@ -165,13 +159,11 @@
     <string name="menu_space_shortcut_label">Tér</string>
     <string name="connected_using_dataplan">Kapcsolják adat terv</string>
     <string name="tip_rename_your_files">Tipp: Nevezze át a fájlokat, így azok megtalálhatók</string>
-    <string name="donate_10">Adományoz $10</string>
     <string name="disconnect">Szétkapcsol</string>
     <string name="vpn_what_you_get_with">Mit kapsz </string>
     <string name="download_finished">Letöltés kész</string>
     <string name="confirm_download">Letöltés megerősítése</string>
     <string name="input_text_hint">Mit keresel? (Tippeket Google)</string>
-    <string name="change_my_nickname">Változás a becenevem</string>
     <string name="still_listening_on_port">Még porton</string>
     <string name="sdcard_storage">Tárolás SD kártya</string>
     <string name="pending">függőben levő</string>
@@ -181,7 +173,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Minden transzfer leáll.\nBiztos vagy ebben?</string>
     <string name="unshare_selected_files">Megosztás megszüntetése a kiválasztott fájlok</string>
     <string name="are_you_sure_you_want_to_download_the_following">Biztos benne, hogy le akarja tölteni a következő %1$s (%2$s)?</string>
-    <string name="donate_25">Adományoz $25</string>
     <string name="resume_torrent_menu_action">Visszanyer</string>
     <string name="downloading_from_desktop">Fájlok letöltése az asztali</string>
     <string name="next_time">Legközelebb</string>
@@ -317,7 +308,6 @@
     <string name="playing_now_colon">Lejátszott most:</string>
     <string name="please_enter_valid_url">Kérem, írjon be egy érvényes url-t</string>
     <string name="search_no_keywords">Kérjük, írja be a keresendő kulcsszavakat</string>
-    <string name="change_manual_listening_port">Állítsa figyelt port 1000 és 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Gotta legalább egy feltöltési slot</string>
     <string name="stop">Megáll</string>
     <string name="notify_frostwire_is_running_summary">Itt található az állandó Android értesítést állapotát transzferek</string>
@@ -532,8 +522,6 @@
     <string name="try_other_keywords">Próbáljon kevesebb/más kulcsszavakkal</string>
     <string name="use_upnp_port_mapping_summary">Hosszan nyomja meg itt, hogy állítsa be a kézi port száma</string>
     <string name="activity_media_player_image_description">Média kép</string>
-    <string name="donate_1">Adományoz $1</string>
-    <string name="donate_5">Adományoz $5</string>
     <string name="clear_complete_transfers">Ez törli ki az összes elkészült transzferek</string>
     <string name="torrent_max_upload_speed">Max feltöltési sebesség</string>
     <string name="download_type_not_supported">Letöltés típusa nem támogatott</string>

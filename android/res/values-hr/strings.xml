@@ -74,8 +74,6 @@
     <string name="download">Preuzmi</string>
     <string name="download_selected_files">Preuzmi odabrano</string>
     <string name="toggle_sharing_selected_files">Prebaci dijeljenje</string>
-    <string name="change_manual_listening_port">Postavi slušački port 1000 i 65535</string>
-    <string name="is_not_responding">%s ne odgovara</string>
     <string name="max_concurrent_uploads">Maksimum istovremenih slanja</string>
     <string name="search_no_keywords">Unesite ključne riječi za pretraživanje</string>
     <string name="search_select_filetype">Molimo odaberite tip datoteke</string>
@@ -84,7 +82,6 @@
     <string name="update_title">Vrijeme je za nadogradnju!</string>
     <string name="update_message">FrostWire je preuzeo novu nadogradnju za performanse, molimo kliknite OK gumb ukoliko ga želite preuzeti sada.</string>
     <string name="next_time">Sljedeći put</string>
-    <string name="change_my_nickname">Promijeni moj nadimak</string>
     <string name="try_changing_your_nickname">Upišite svoj nadimak</string>
     <string name="reconnecting">Ponovno spajanje</string>
     <string name="go_to">Idi</string>
@@ -145,7 +142,6 @@
     <string name="open">Otvori</string>
     <string name="connected_to">Spojen na</string>
     <string name="sharing_preferences">Postavke dijeljenja</string>
-    <string name="nickname">Nadimak</string>
     <string name="how_other_users_will_see_you">Kako će vas vidjeti ostali korisnici</string>
     <string name="networking_preferences">Postavke mreže</string>
     <string name="simultaneous_uploads">Istovremena slanja</string>
@@ -218,7 +214,6 @@
     <string name="clear_complete">Pročiščavanje gotovo</string>
     <string name="downloading_promotion">Preuzimam %s</string>
     <string name="torrent_settings">Torrent postavke</string>
-    <string name="nickname_hint">Nadimak</string>
     <string name="clear">Pročistiti</string>
     <string name="wizard_previous">Prijašnje</string>
     <string name="wizard_next">Sljedeće</string>
@@ -240,10 +235,6 @@
     <string name="support_frostwire">Podrži FrostWire</string>
     <string name="loading">Učitavam</string>
     <string name="stop">Zaustavi</string>
-    <string name="donate_1">Doniraj $1</string>
-    <string name="donate_5">Doniraj $5</string>
-    <string name="donate_10">Doniraj $10</string>
-    <string name="donate_25">Doniraj $25</string>
     <string name="playing_now_colon">Trenutno svira:</string>
     <string name="paused">Zaustavljeno</string>
     <string name="youtube_download_status_verifying">Potvrđujem</string>
@@ -273,9 +264,7 @@
     <string name="help_translate_frostwire">Pomogni prevesti FrostWire</string>
     <string name="azureus_peer_manager_status_finished">Završeno</string>
     <string name="activity_mediaplayer_name">Medijski svirač</string>
-    <string name="im_on_it">Radim na tome…</string>
     <string name="share_selected_files">Dijeli odabrane datoteke</string>
-    <string name="choose_wifi_network">Odaberi Wi-Fi mrežu</string>
     <string name="torrent_max_download_speed">Maksimalna brzina preuzimanja</string>
     <string name="activity_uploads_title_text">Slanja</string>
     <string name="torrent_max_peers">Maksimalni broj preuzimatelja</string>
@@ -314,7 +303,6 @@
     <string name="torrent_max_download_speed_summary">Maksimalna brzina preuzimanja</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android će obrisati preuzete datoteke ako je FrostWire deinstaliran.</string>
     <string name="device_memory">Memorija uređaja</string>
-    <string name="wifi_sharing_settings">Wi-Fi postavke dijeljenja</string>
     <string name="app_shutdown_dlg_message">Ovo će ugasiti sve prijenose i servise u pozadini. Jeste li sigurni?</string>
     <string name="saving_to_internal_memory">Spremam u internu memoriju</string>
     <string name="deleted_crawl_cache">Deleted crawl cache</string>

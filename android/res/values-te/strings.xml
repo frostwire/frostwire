@@ -25,9 +25,6 @@
     <string name="your_installation_is_complete">మీ సంస్థాపన పూర్తయింది.</string>
     <string name="error_connection_timed_out">లోపం: కనెక్షన్ సమయం ముగిసింది/పడిపోయింది. మళ్ళీ ప్రయత్నించండి.</string>
     <string name="vpn_client_feature_2_ExpressVPN">అపరిమిత డౌన్లోడ్ వేగం</string>
-    <string name="im_on_it">నేను దాని మీదే వున్నాను…</string>
-    <string name="wifi_sharing_settings">Wi-Fi భాగస్వామ్య సెట్టింగ్లు</string>
-    <string name="is_not_responding">%s ప్రతిస్పందించడం లేదు</string>
     <string name="vpn_client_feature_3_ExpressVPN">ప్రైవేట్ మరియు లాగింగ్ బ్రౌజింగ్ లేదు</string>
     <string name="azureus_manager_item_seeding">నాట్లు</string>
     <string name="application_label">FrostWire</string>
@@ -36,7 +33,6 @@
     <string name="how_other_users_will_see_you">ఇతర వినియోగదారులు మిమ్మల్ని ఎలా చూస్తారు</string>
     <string name="cloud_download_aborted_on_mobile_data">ప్రస్తుత సెట్టింగ్ Wi-Fi నెట్వర్క్లో లేనప్పుడు డౌన్లోడ్ చేయడాన్ని నిరోధిస్తుంది</string>
     <string name="share_selected_files">ఎంచుకున్న ఫైల్లను భాగస్వామ్యం చెయ్యండి</string>
-    <string name="choose_wifi_network">Wi-Fi నెట్వర్క్ని ఎంచుకోండి</string>
     <string name="filter_ellipsis">వడపోత…</string>
     <string name="device">పరికరం</string>
     <string name="connecting">కనెక్ట్</string>
@@ -59,7 +55,6 @@
     <string name="sharing_privacy_settings">భాగస్వామ్యం మరియు గోప్యత</string>
     <string name="alpha_tests_team_thanks">ఓర్పు మరియు గొప్ప అభిప్రాయం కోసం మా స్వచ్ఛంద ఆల్ఫా పరీక్షకులకు ధన్యవాదాలు, ప్రత్యేక ధన్యవాదాలు</string>
     <string name="azureus_manager_item_ready">ఇతర టోరెంట్స్ కోసం వేచి ఉంది</string>
-    <string name="nickname">మారుపేరు</string>
     <string name="drawer_close">నావిగేషన్ డ్రాయర్ను మూసివేయి</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire అనేది ఒక ఫైల్ బ్రౌజర్ మరియు డౌన్లోడ్ చేసే అనువర్తనం, అందువల్ల ఇది మీ డిస్క్ను ప్రాప్యత చేయగలదు.\n\nమీ అనుమతులు లేకుండా ఫ్రోస్ట్వైర్ పనిచేయదు.\n\nమళ్ళీ ప్రయత్నించాలనుకుంటున్నారా?</string>
     <string name="fix_instructions">సమాచారం మరియు పరిష్కార సూచనల కోసం support.frostwire.com ను చూడండి</string>
@@ -100,7 +95,6 @@
     <string name="seeding_settings_explanation">ఇంటర్నెట్లో బిటొరెంట్ వినియోగదారులు మీ టోరెంట్స్ సీడ్ యొక్క డేటా రాళ్లను డౌన్లోడ్ చేయగలుగుతారు.</string>
     <string name="transfer_detail_storage_header">నిల్వ మార్గం:</string>
     <string name="loading_indeterminate">లోడ్…</string>
-    <string name="nickname_hint">మారుపేరు</string>
     <string name="storage_picker_treeuri_error">ఊహించని లోపం నిల్వ మార్గం ఎంచుకోవడం</string>
     <string name="torrent_preferences_header">టొరెంట్ ప్రాధాన్యతలు</string>
     <string name="seeding_time">విత్తన సమయం</string>
@@ -198,14 +192,12 @@
     <string name="connected_using_dataplan">డేటా ప్లాన్ను ఉపయోగించి కనెక్ట్ చేయబడింది</string>
     <string name="vpn_on_toast_notification">మీరు VPN కు కనెక్ట్ చేయబడ్డారు.</string>
     <string name="tip_rename_your_files">తప్పనిసరిగా తెలుసుకోవాలి: ఫైల్లను పేరు మార్చండి, అందువల్ల వాటిని కనుగొనవచ్చు</string>
-    <string name="donate_10">$10 దానం</string>
     <string name="disconnect">డిస్కనెక్ట్</string>
     <string name="add_trackers">ట్రాక్లను జోడించండి</string>
     <string name="vpn_what_you_get_with">మీరు ఏమి తో వచ్చారు </string>
     <string name="download_finished">డౌన్లోడ్ పూర్తయింది</string>
     <string name="confirm_download">డౌన్లోడ్ నిర్ధారించండి</string>
     <string name="input_text_hint">మీరు వెతుకుతున్నారా? (Google ద్వారా సూచనలు)</string>
-    <string name="change_my_nickname">నా మారుపేరుని మార్చండి</string>
     <string name="notification_other_header">నోటిఫికేషన్లు మరియు ఇతర</string>
     <string name="still_listening_on_port">ఇప్పటికీ పోర్ట్లో వినడం</string>
     <string name="sdcard_storage">SD యొక్క నిల్వ</string>
@@ -216,7 +208,6 @@
     <string name="all_transfers_will_stop_are_you_sure">అన్ని బదిలీలు ఆగిపోతాయి.\nమీరు చెప్పేది నిజమా?</string>
     <string name="unshare_selected_files">ఎంచుకున్న ఫైల్లను భాగస్వామ్యం చేయవద్దు</string>
     <string name="are_you_sure_you_want_to_download_the_following">మీరు ఖచ్చితంగా దిగువ డౌన్ లోడ్ చేయాలనుకుంటున్నారా %1$s (%2$s)?</string>
-    <string name="donate_25">$25 దానం</string>
     <string name="resume_torrent_menu_action">పునఃప్రారంభం</string>
     <string name="downloading_from_desktop">డెస్క్టాప్ నుండి ఫైళ్లను డౌన్లోడ్ చేయడం</string>
     <string name="next_time">మరల ఇంకెప్పుడైనా</string>
@@ -387,7 +378,6 @@
     <string name="playing_now_colon">ఇప్పుడు ఆడుతున్నారు:</string>
     <string name="please_enter_valid_url">దయచేసి చెల్లుబాటు అయ్యే URL ను నమోదు చేయండి</string>
     <string name="search_no_keywords">దయచేసి శోధన కీలకపదాలను నమోదు చేయండి</string>
-    <string name="change_manual_listening_port">Listening Port 1000 మరియు 65535 సెట్ చెయ్యండి</string>
     <string name="gotta_have_at_least_one_upload_slot">గాట్లకు కనీసం ఒక అప్లోడ్ స్లాట్ ఉంది</string>
     <string name="stop">ఆపు</string>
     <string name="distraction_free_search_results_summary">మరిన్ని ఫలితాలను చూపించడానికి వినియోగదారు ఇంటర్ఫేస్ భాగాలను దాచు. ప్రభావం చూపడానికి అనువర్తనానికి పునఃప్రారంభం అవసరం.</string>
@@ -648,9 +638,7 @@
     <string name="try_other_keywords">తక్కువ/విభిన్న కీలక పదాలను ప్రయత్నించండి</string>
     <string name="use_upnp_port_mapping_summary">మాన్యువల్ పోర్ట్ సంఖ్యను సెట్ చేయడానికి ఇక్కడ లాంగ్ ప్రెస్ చేయండి</string>
     <string name="activity_media_player_image_description">మీడియా చిత్రం</string>
-    <string name="donate_1">$1 దానం</string>
     <string name="vpn_drop_protection_summary">మీ గోప్యతను రక్షించండి. ఎన్క్రిప్టెడ్ VPN కనెక్షన్ సక్రియం కాకపోతే స్వయంచాలకంగా BitTorrent బదిలీలను డిసేబుల్ చేస్తుంది</string>
-    <string name="donate_5">$5 దానం</string>
     <string name="clear_complete_transfers">ఇది పూర్తి చేయబడిన బదిలీలను క్లియర్ చేస్తుంది</string>
     <string name="torrent_max_upload_speed">మాక్స్ అప్లోడ్ స్పీడ్</string>
     <string name="download_type_not_supported">డౌన్లోడ్ రకం మద్దతు లేదు</string>

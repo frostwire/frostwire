@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Медіа плеєр</string>
     <string name="your_installation_is_complete">Ваша установка завершена.</string>
     <string name="error_connection_timed_out">Помилка: тайм-аут підключення/впав. Спробуйте ще раз.</string>
-    <string name="im_on_it">Я на ньому…</string>
-    <string name="wifi_sharing_settings">Налаштування загального доступу Wi-Fi</string>
-    <string name="is_not_responding">%s не відповідає</string>
     <string name="azureus_manager_item_seeding">посів</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Загальний доступ до файлів з колегами по локальній мережі Wi-Fi.</string>
     <string name="how_other_users_will_see_you">Як інші користувачі будуть бачити вас</string>
     <string name="share_selected_files">Частка вибраних файлів</string>
-    <string name="choose_wifi_network">Виберіть мережу Wi-Fi</string>
     <string name="device">Пристрій</string>
     <string name="connecting">Підключення</string>
     <string name="all_free_downloads">Всі вільні скачування</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">Wi-Fi загального доступу</string>
     <string name="alpha_tests_team_thanks">Спасибі всім нашим добровільним альфа-тестерів за терпіння і великий зворотного зв\'язку, особливу подяку</string>
     <string name="azureus_manager_item_ready">В очікуванні інших торрентів в черги</string>
-    <string name="nickname">Нік</string>
     <string name="drawer_close">Закрити панель навігації</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire є файловий браузер і додаток-завантажувач, тому він повинен бути в змозі отримати доступ до диска.\n\nБез ваших дозволів FrostWire не може працювати.\n\nХочете спробувати ще раз?</string>
     <string name="peer_http_upload_status_unknown">Невідомий</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">Видалити цей шматок</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Загрузка…</string>
-    <string name="nickname_hint">Нік</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Несподівана помилка вибору шляху зберігання</string>
     <string name="hint_transfers">користування "меню" для об\'ємних дій</string>
@@ -165,13 +159,11 @@
     <string name="menu_space_shortcut_label">простір</string>
     <string name="connected_using_dataplan">Підключення з використанням планових даних</string>
     <string name="tip_rename_your_files">Порада: Перейменування файлів, таким чином вони можуть бути знайдені</string>
-    <string name="donate_10">Внесок $10</string>
     <string name="disconnect">Відключити</string>
     <string name="vpn_what_you_get_with">Що ви отримуєте з </string>
     <string name="download_finished">Завантажити Закінчено</string>
     <string name="confirm_download">Підтвердіть Завантажити</string>
     <string name="input_text_hint">Що ти шукаєш? (Натяки на Google)</string>
-    <string name="change_my_nickname">Змінити мій нік</string>
     <string name="still_listening_on_port">Проте на порту</string>
     <string name="sdcard_storage">SDs зберігання</string>
     <string name="pending">очікує підтвердження</string>
@@ -181,7 +173,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Всі трансфери зупиниться.\nТи впевнений?</string>
     <string name="unshare_selected_files">Вибрані файли приховувати мої</string>
     <string name="are_you_sure_you_want_to_download_the_following">Ви впевнені, що ви хочете завантажити наступні %1$s (%2$s)?</string>
-    <string name="donate_25">Внесок $25</string>
     <string name="resume_torrent_menu_action">Перезавантаження</string>
     <string name="downloading_from_desktop">Завантаження файлів з робочого столу</string>
     <string name="next_time">Наступного разу</string>
@@ -317,7 +308,6 @@
     <string name="playing_now_colon">Зараз гра:</string>
     <string name="please_enter_valid_url">Введіть дійсний URL</string>
     <string name="search_no_keywords">Будь ласка, введіть ключові слова для пошуку</string>
-    <string name="change_manual_listening_port">Встановіть порт прослуховування 1000 і 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Повинен мати принаймні один слот завантаження</string>
     <string name="stop">Стоп</string>
     <string name="notify_frostwire_is_running_summary">Показати постійний Android повідомлення зі статусом передач</string>
@@ -532,8 +522,6 @@
     <string name="try_other_keywords">Спробуйте зменшити кількість/інші ключові слова.</string>
     <string name="use_upnp_port_mapping_summary">Довгі Натисніть тут, щоб встановити вручну номер порту</string>
     <string name="activity_media_player_image_description">Медіа-образ</string>
-    <string name="donate_1">Внесок $1</string>
-    <string name="donate_5">Внесок $5</string>
     <string name="clear_complete_transfers">Це прибере всі готові переклади</string>
     <string name="torrent_max_upload_speed">Max Upload Speed</string>
     <string name="download_type_not_supported">Тип завантаження не підтримується</string>

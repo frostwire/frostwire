@@ -77,8 +77,6 @@
     <string name="download">Tải về</string>
     <string name="download_selected_files">Tải về những tập tin đã chọn</string>
     <string name="toggle_sharing_selected_files">Ẩn/hiện chia sẻ</string>
-    <string name="change_manual_listening_port">Thiết lập cổng nghe từ 1000 đến 65535</string>
-    <string name="is_not_responding">%s không có tín hiệu phản hồi</string>
     <string name="max_concurrent_uploads">Số kết nối tải lên tối đa cùng lúc</string>
     <string name="search_no_keywords">Vui lòng nhập từ khóa tìm kiếm</string>
     <string name="search_select_filetype">Vui lòng chọn kiểu tập tin</string>
@@ -87,7 +85,6 @@
     <string name="update_title">Cập nhật thời gian!</string>
     <string name="update_message">FrostWire đã tải về một bản cập nhật mới cho bạn, vui lòng tiếp tục và nhấn vào nút OK nếu bạn muốn cài đặt nó ngay bây giờ.</string>
     <string name="next_time">Lần Sau</string>
-    <string name="change_my_nickname">Thay đổi nickname của tôi</string>
     <string name="try_changing_your_nickname">Nhập nickname của bạn</string>
     <string name="reconnecting">Kết nối lại</string>
     <string name="go_to">Go To</string>
@@ -147,7 +144,6 @@
     <string name="open">Mở</string>
     <string name="connected_to">Đã kết nối đến</string>
     <string name="sharing_preferences">Tùy chọn chia sẻ</string>
-    <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">Làm thế nào những người dùng khác có thể thấy bạn</string>
     <string name="networking_preferences">Tùy chọn hệ thống mạng</string>
     <string name="simultaneous_uploads">Tải lên cùng lúc</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Kết nối sử dụng kế hoạch dữ liệuC</string>
     <string name="send_to_chat">Gửi qua Chat</string>
     <string name="sent_file_to_chat">Gửi tập tin qua Chat</string>
-    <string name="choose_wifi_network">Chọn một mạng Wifi</string>
     <string name="please_update_to_v">Vui lòng Update lên v. %s</string>
     <string name="cant_open_file">Xin lỗi, không thể mở được tập tin này.</string>
     <string name="downloading_from_desktop">Đang tải về tập tin từ Desktop</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">Đang tải về %s</string>
     <string name="activity_about_droidwire_description">FrostWire cho Android</string>
     <string name="download_type_not_supported">Kiểu tải về này không được hỗ trợ</string>
-    <string name="im_on_it">Tôi ở trên nóâ€¦</string>
     <string name="hint_transfers">Dùng "menu" cho nhiều hoạt động</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Tốc độ tải về tối đa</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Chỉ Seed trên WiFi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Chỉ Seed khi kết nối thông qua WiFi để tiết kiệm băng thông cho kế hoạch dữ liệu của bạn</string>
     <string name="seeding_has_been_turned_off">Seeding đã tắt</string>
-    <string name="nickname_hint">Nickname</string>
     <string name="show_transfers_on_download_start">Hiển thị chi tiết ngay khi tải về bắt đầu </string>
     <string name="dialog_new_transfer_title">Bắt đầu tải về?</string>
     <string name="dialog_new_transfer_text_text">Bạn có chắc chắn bạn muốn tải về %1$s (%2$s)</string>
@@ -353,7 +346,6 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">cài đặt hoàn tất.</string>
     <string name="error_connection_timed_out">Lỗi: kết nối quá hạn/giảm. Thử lại.</string>
-    <string name="wifi_sharing_settings">Cài đặt chia sẻ wifi</string>
     <string name="enable_wifi_sharing_summary">Chia sẻ tập tin với bạn bè trên các mạng Wifi ở địa phương.</string>
     <string name="all_free_downloads">Tất cả các tải miễn phí</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -402,13 +394,11 @@
     <string name="help">Cứu giúp</string>
     <string name="cloud_downloads_coming">Xin lỗi: Bắt đầu tải đám mây từ đây sẽ có sẵn trên bản cập nhật tiếp theo.</string>
     <string name="menu_space_shortcut_label">Không gian</string>
-    <string name="donate_10">Đóng góp $10</string>
     <string name="vpn_what_you_get_with">Những gì bạn nhận được với </string>
     <string name="confirm_download">Xác nhận Tải về</string>
     <string name="sdcard_storage">Lưu trữ SD</string>
     <string name="deleted_crawl_cache">Bộ nhớ cache bò xóa</string>
     <string name="are_you_sure_you_want_to_download_the_following">Bạn có chắc chắn bạn muốn tải về sau %1$s (%2$s)?</string>
-    <string name="donate_25">Đóng góp $25</string>
     <string name="player_paused_press_and_hold_to_stop">Máy nghe nhạc dừng lại. (Mẹo: Bấm và giữ để ngăn chặn)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">URL Magnet thêm vào chuyển. (Nam châm làm việc tốt nhất trên Wi-Fi)</string>
@@ -562,8 +552,6 @@
     <string name="support">Ủng hộ</string>
     <string name="transfers_context_menu_copy_magnet">Sao chép Magnet</string>
     <string name="try_other_keywords">Thử ít từ khóa/khác nhau</string>
-    <string name="donate_1">Đóng góp $1</string>
-    <string name="donate_5">Đóng góp $5</string>
     <string name="thank_you">Cảm ơn bạn!</string>
     <string name="use_frostclick">Chọn FrostClick</string>
     <string name="get_ExpressVPN">Nhận ExpressVPN</string>

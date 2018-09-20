@@ -77,8 +77,6 @@
     <string name="download">Téléchargement</string>
     <string name="download_selected_files">Télécharger la sélection</string>
     <string name="toggle_sharing_selected_files">Activer le partage</string>
-    <string name="change_manual_listening_port">Réglez le port d\'écoute sur 1000 et 65535</string>
-    <string name="is_not_responding">%s ne répondent pas</string>
     <string name="max_concurrent_uploads">Transferts simultanés maximum</string>
     <string name="search_no_keywords">Veuillez taper les mots-clés de recherche</string>
     <string name="search_select_filetype">Veuillez sélectionner le type de fichier</string>
@@ -87,7 +85,6 @@
     <string name="update_title">Actualiser l\'heure!</string>
     <string name="update_message">FrostWire vous a téléchargé une nouvelle MISE A JOUR DE PERFORMANCE, veuillez toucher le bouton OK pour l’installer maintenant.</string>
     <string name="next_time">La prochaine fois</string>
-    <string name="change_my_nickname">Changer mon pseudo</string>
     <string name="try_changing_your_nickname">Tapez votre pseudo</string>
     <string name="reconnecting">Reconnexion</string>
     <string name="go_to">Aller à</string>
@@ -148,7 +145,6 @@
     <string name="open">Ouvrir</string>
     <string name="connected_to">Connecté à</string>
     <string name="sharing_preferences">Options de partage</string>
-    <string name="nickname">Pseudo</string>
     <string name="how_other_users_will_see_you">Comment les autres utilisateurs vont vous voir</string>
     <string name="networking_preferences">Options de mise en réseau</string>
     <string name="simultaneous_uploads">Transferts simultanés</string>
@@ -174,7 +170,6 @@
     <string name="connected_using_dataplan">Connexion avec votre forfait de données</string>
     <string name="send_to_chat">Envoyer au Chat</string>
     <string name="sent_file_to_chat">Envoyer un fichier au Chat</string>
-    <string name="choose_wifi_network">Sélectionnez le réseau Wi-Fi</string>
     <string name="please_update_to_v">Veuillez actualiser à v. %s</string>
     <string name="cant_open_file">Désolé, impossible d\'ouvrir ce fichier.</string>
     <string name="downloading_from_desktop">Télécharge le(s) fichier(s) à partir d\'un ordinateur de bureau</string>
@@ -277,7 +272,6 @@
     <string name="downloading_promotion">Téléchargement %s</string>
     <string name="activity_about_droidwire_description">FrostWire pour Androïde</string>
     <string name="download_type_not_supported">Type de téléchargement non prise en charge</string>
-    <string name="im_on_it">Je suis partant…</string>
     <string name="hint_transfers">Utilisez le “menu” pour les différentes actions </string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Vitesse de téléchargement maximale </string>
@@ -295,7 +289,6 @@
     <string name="seed_finished_torrents_wifi_only">Ensemencement en WiFi uniquement</string>
     <string name="seed_finished_torrents_wifi_only_summary">Ensemencez seulement avec la connexion WiFi pour économiser les bandes passantes de votre forfait de données</string>
     <string name="seeding_has_been_turned_off">L\'ensemencement a été arrêté </string>
-    <string name="nickname_hint">Pseudo </string>
     <string name="show_transfers_on_download_start">Afficher les transferts au démarrage de téléchargement </string>
     <string name="dialog_new_transfer_title">Démarrer ce téléchargement?</string>
     <string name="dialog_new_transfer_text_text">Voulez-vous vraiment télécharger %1$s (%2$s)</string>
@@ -354,10 +347,6 @@
     <string name="wifi_sharing">Réseau Wi-Fi</string>
     <string name="activity_mediaplayer_name">Lecteur</string>
     <string name="stop">Arrêter</string>
-    <string name="donate_1">Don $1</string>
-    <string name="donate_5">Don $5</string>
-    <string name="donate_10">Don $10</string>
-    <string name="donate_25">Don $25</string>
     <string name="playing_now_colon">Joue en ce moment:</string>
     <string name="my_filetype">Mon %s</string>
     <string name="paused">En pause</string>
@@ -452,7 +441,6 @@
     <string name="vpn_not_found">Pas de VPN (réseau privé virtuel). Considérez chiffrer la connexion.</string>
     <string name="your_installation_is_complete">L\'installation est terminée.</string>
     <string name="error_connection_timed_out">Erreur: connexion a expiré. Réessayer.</string>
-    <string name="wifi_sharing_settings">Paramètres de partage Wifi</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Demander à nouveau</string>
     <string name="restarting_summary">FrostWire va redémarrer pour les autorisations accordées prennent effet</string>

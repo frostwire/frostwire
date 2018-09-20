@@ -76,8 +76,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Download Geselecteerde</string>
     <string name="toggle_sharing_selected_files">Toggle Delen</string>
-    <string name="change_manual_listening_port">Stel Luisterpoort 1000 en 65535 in</string>
-    <string name="is_not_responding">%s antwoordt niet</string>
     <string name="max_concurrent_uploads">Maximale Gelijktijdige Uploads</string>
     <string name="search_no_keywords">Vul alsjeblieft keywoorden in om te zoeken</string>
     <string name="search_select_filetype">Selecteer alsjeblieft een file type</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Update Tijd!</string>
     <string name="update_message">FrostWire heeft een nieuwe PRESTATIE UPDATE voor je gedownload, ga verder en druk op de OK knop als je deze nu wilt installeren.</string>
     <string name="next_time">Volgende Keer</string>
-    <string name="change_my_nickname">Verander mijn Nicknaam</string>
     <string name="try_changing_your_nickname">Vul je nicknaam in</string>
     <string name="reconnecting">Opnieuw verbinding maken</string>
     <string name="go_to">Ga Naar</string>
@@ -147,7 +144,6 @@
     <string name="open">Open</string>
     <string name="connected_to">Verbonden met</string>
     <string name="sharing_preferences">Voorkeuren Delen</string>
-    <string name="nickname">Nicknaam</string>
     <string name="how_other_users_will_see_you">Hoe andere gebruikers je zien</string>
     <string name="networking_preferences">Netwerkvoorkeuren</string>
     <string name="simultaneous_uploads">Gelijktijdige Uploads</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Verbonden met gebruik van Data Plan</string>
     <string name="send_to_chat">Verstuur voor Chat</string>
     <string name="sent_file_to_chat">Verstuur file naar Chat</string>
-    <string name="choose_wifi_network">Kies een Wi-Fi netwerk</string>
     <string name="please_update_to_v">Update alsjeblieft naar v. %s</string>
     <string name="cant_open_file">Sorry, weet niet hoe dit file geopend moet worden.</string>
     <string name="downloading_from_desktop">Downloaden van file(s) vanaf desktop</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">Downloaden van %s</string>
     <string name="activity_about_droidwire_description">FrostWire voor Android</string>
     <string name="download_type_not_supported">Download Type niet ondersteund</string>
-    <string name="im_on_it">Ik ben ermee bezig…</string>
     <string name="hint_transfers">Gebruik "menu" voor groepsacties</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Max Download Snelheid</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Seed alleen op WiFi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Seed alleen wanneer verbonden via WiFi, om bandwijdte op je dataplan te besparen</string>
     <string name="seeding_has_been_turned_off">Seeding is uitgezet</string>
-    <string name="nickname_hint">Nicknaam</string>
     <string name="show_transfers_on_download_start">Toon Transfers op Download Start</string>
     <string name="dialog_new_transfer_title">Start deze Download?</string>
     <string name="dialog_new_transfer_text_text">Weet je zeker dat je %1$s (%2$s) wilt downloaden</string>
@@ -354,7 +347,6 @@
     <string name="activity_mediaplayer_name">Mediaspeler</string>
     <string name="your_installation_is_complete">Uw installatie is voltooid.</string>
     <string name="error_connection_timed_out">Fout: verbinding time-out/gedaald. Probeer het nog eens.</string>
-    <string name="wifi_sharing_settings">het delen van Wifi-instellingen</string>
     <string name="enable_wifi_sharing_summary">Deel bestanden met collega\'s op het lokale netwerk Wifi.</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Vraag weer</string>
@@ -402,13 +394,11 @@
     <string name="help">Hulp</string>
     <string name="cloud_downloads_coming">Sorry: vanaf wolk downloads vanaf hier zal beschikbaar zijn op verdere updates zijn.</string>
     <string name="menu_space_shortcut_label">Ruimte</string>
-    <string name="donate_10">Schenken $10</string>
     <string name="vpn_what_you_get_with">Wat krijg je met </string>
     <string name="confirm_download">Bevestig downloaden</string>
     <string name="sdcard_storage">SD-opslag</string>
     <string name="deleted_crawl_cache">Verwijderde crawl cachegeheugen</string>
     <string name="are_you_sure_you_want_to_download_the_following">Weet u zeker dat u het volgende downloaden %1$s (%2$s)?</string>
-    <string name="donate_25">Schenken $25</string>
     <string name="player_paused_press_and_hold_to_stop">Speler pauze. (Tip: Houd ingedrukt om te stoppen)</string>
     <string name="menu_delete_shortcut_label">Verwijder</string>
     <string name="magnet_url_added">Magneet URL toegevoegd aan transfers. (Magneten werken het beste op Wifi)</string>
@@ -558,8 +548,6 @@
     <string name="support">Ondersteuning</string>
     <string name="transfers_context_menu_copy_magnet">Magneet Kopieer</string>
     <string name="try_other_keywords">Probeer minder/verschillende trefwoorden</string>
-    <string name="donate_1">Doneren $1</string>
-    <string name="donate_5">Doneren $5</string>
     <string name="thank_you">Dank je!</string>
     <string name="use_frostclick">Gebruik FrostClick</string>
     <string name="get_ExpressVPN">Krijg ExpressVPN</string>

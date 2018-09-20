@@ -74,8 +74,6 @@
     <string name="download">تنزيل</string>
     <string name="download_selected_files">تنزيل المحددة</string>
     <string name="toggle_sharing_selected_files">Toggle مشاركة</string>
-    <string name="change_manual_listening_port">ضبط منافذ الاستماع 1000و 65535</string>
-    <string name="is_not_responding">%s لا يستجيب</string>
     <string name="max_concurrent_uploads">الحد الأقصى للتحميلات المتزامنة</string>
     <string name="search_no_keywords">يرجى ادخال كلمات البحث</string>
     <string name="search_select_filetype">يرجى اختيار نوع الملف</string>
@@ -84,7 +82,6 @@
     <string name="update_title">!حان وقت التحديث</string>
     <string name="update_message">لقد قام فروست واير بتنزيل تحديث للأداء من أجلك,يرجى الاستمرار والضغط على موافق إذا كنت ترغب في تثبيته.</string>
     <string name="next_time">المرة الثانية</string>
-    <string name="change_my_nickname">تغيير كنيتك</string>
     <string name="try_changing_your_nickname">ادخل كنيتك</string>
     <string name="reconnecting">إعادة الاتصال</string>
     <string name="go_to">الذهاب إلى</string>
@@ -145,7 +142,6 @@
     <string name="open">مفتوح</string>
     <string name="connected_to">متصل بواسطة</string>
     <string name="sharing_preferences">تفضيلات المشاركة</string>
-    <string name="nickname">الكنية</string>
     <string name="how_other_users_will_see_you">كيف سوف يراك المستخدمون الأخرون</string>
     <string name="networking_preferences">تفضيلات الشبكة</string>
     <string name="simultaneous_uploads">التحميلات المتزامنة</string>
@@ -171,7 +167,6 @@
     <string name="connected_using_dataplan">اتصال باستخدام خطة بيانات</string>
     <string name="send_to_chat">ارسال للدردشة</string>
     <string name="sent_file_to_chat">ارسال ملف للدردشة</string>
-    <string name="choose_wifi_network">اختيار شبكة واي فاي</string>
     <string name="please_update_to_v">يرجى التحديث للنسخة %s</string>
     <string name="cant_open_file">.اسف لا أعلم\كيفية فتح هذا الملف</string>
     <string name="downloading_from_desktop">تنزيل ملف (ملفات) من سطح المكتب</string>
@@ -274,7 +269,6 @@
     <string name="downloading_promotion">تنزيل %s</string>
     <string name="activity_about_droidwire_description">فروست واير للأندرويد</string>
     <string name="download_type_not_supported">نوع التنزيل غير مرغوب</string>
-    <string name="im_on_it">…أنا\فيه</string>
     <string name="hint_transfers">استخدم "القائمة" للأوامر الكثيرة</string>
     <string name="torrent_settings">إعدادات تورينت</string>
     <string name="torrent_max_download_speed_summary">السرعة القصوى للتنزيل</string>
@@ -292,7 +286,6 @@
     <string name="seed_finished_torrents_wifi_only">شارك فقط على الواي فاي</string>
     <string name="seed_finished_torrents_wifi_only_summary">شارك فقط عند اتصالك من واي فاي حتى توفر في حزم بيانات خطتك</string>
     <string name="seeding_has_been_turned_off">تم إغلاق المشاركة</string>
-    <string name="nickname_hint">الكنية</string>
     <string name="show_transfers_on_download_start">عرض الملفات المنقولة في بداية التنزيل</string>
     <string name="dialog_new_transfer_title">ابدأ في تحميل هذا الملف؟</string>
     <string name="dialog_new_transfer_text_text">هل أنت متأكد انك تريد تنزيل %1$s (%2$s)</string>
@@ -351,10 +344,6 @@
     <string name="wifi_sharing">مشاركة واي فاي</string>
     <string name="activity_mediaplayer_name">مشغل الوسائط</string>
     <string name="stop">ايقاف</string>
-    <string name="donate_1">تبرع $1</string>
-    <string name="donate_5">تبرع $5</string>
-    <string name="donate_10">تبرع $10</string>
-    <string name="donate_25">تبرع $25</string>
     <string name="one_file_shared" >.تم مشاركة ملف واحد مع أجهزة فروست واير على نفس شبكة الواي فاي</string>
     <string name="n_files_shared" > ملفات تم مشاركتها مع أجهزة فروست واير على نفس شبكة الواي فاي %d</string>
     <string name="playing_now_colon">:جاري التشغيل الآن</string>
@@ -393,7 +382,6 @@
     <string name="vpn_not_found">لا VPN. النظر في تشفير الاتصال.</string>
     <string name="your_installation_is_complete">التثبيت كاملة.</string>
     <string name="error_connection_timed_out">خطأ: انتهت مهلة الاتصال. حاول ثانية.</string>
-    <string name="wifi_sharing_settings">إعدادات المشاركة واي فاي</string>
     <string name="all_free_downloads">كل البرامج المجانية</string>
     <string name="torrent_max_peers">ماكس النبلاء</string>
     <string name="request_again">طلب مرة أخرى</string>

@@ -79,8 +79,6 @@
     <string name="download">Descargar</string>
     <string name="download_selected_files">Descargar lo seleccionado</string>
     <string name="toggle_sharing_selected_files">Compartir/Dejar de compartir</string>
-    <string name="change_manual_listening_port">Cambiar los Puertos 1000 y 65535</string>
-    <string name="is_not_responding">%s no está respondiendo</string>
     <string name="max_concurrent_uploads">Cargas Simultáneas Máximas</string>
     <string name="search_no_keywords">Por favor, introduce los términos de búsqueda</string>
     <string name="search_select_filetype">Por favor, selecciona un tipo de archivo</string>
@@ -89,7 +87,6 @@
     <string name="update_title">¡Es hora de actualizar!</string>
     <string name="update_message">FrostWire te ha descargado una ACTUALIZACIÓN DEL RENDIMIENTO nueva. Por favor, toca el botón de OK si quieres instalarla ahora.</string>
     <string name="next_time">La próxima vez</string>
-    <string name="change_my_nickname">Cambiar mi nombre</string>
     <string name="try_changing_your_nickname"> Introduce tu nombre</string>
     <string name="reconnecting">Reconectando</string>
     <string name="go_to">Ir a</string>
@@ -150,7 +147,6 @@
     <string name="open">Abrir</string>
     <string name="connected_to">Conectado a</string>
     <string name="sharing_preferences">Preferencias de Compartir</string>
-    <string name="nickname">Nombre</string>
     <string name="how_other_users_will_see_you">Cómo te verán los demás</string>
     <string name="networking_preferences">Preferencias de Red</string>
     <string name="simultaneous_uploads">Cargas Simultáneas</string>
@@ -176,7 +172,6 @@
     <string name="connected_using_dataplan">Conectado usando el Plan de Datos</string>
     <string name="send_to_chat">Enviar al Chat</string>
     <string name="sent_file_to_chat">Enviar archivo al Chat</string>
-    <string name="choose_wifi_network">Elige una red Wi-Fi</string>
     <string name="please_update_to_v">Por favor, actualízalo a v. %s</string>
     <string name="cant_open_file">Lo siento, no sé cómo abrir este archivo.</string>
     <string name="downloading_from_desktop">Descargando archivo(s) del escritorio</string>
@@ -279,7 +274,6 @@
     <string name="downloading_promotion">Descargando %s</string>
     <string name="activity_about_droidwire_description">FrostWire para Android</string>
     <string name="download_type_not_supported">Este Tipo de Descarga no es compatible</string>
-    <string name="im_on_it">Estoy en ello…</string>
     <string name="hint_transfers">Usa el "menú" para acciones en grupo</string>
     <string name="torrent_settings">Ajustes de Torrents</string>
     <string name="torrent_max_download_speed_summary">Velocidad Máxima de Descarga (0 significa ilimitada)</string>
@@ -298,7 +292,6 @@
     <string name="seed_finished_torrents_wifi_only_summary">Compartir sólo cuando se conecte a Wi-Fi y así ahorrar ancho de banda en tu plan de datos</string>
     <string name="seeding_has_been_turned_off">Compartir está apagado</string>
     <string name="wifi_seeding_has_been_turned_off">No hay Wi-Fi, Compartir está apagado</string>
-    <string name="nickname_hint">Nombre</string>
     <string name="show_transfers_on_download_start">Mostrar Transferencias al comienzo de la descarga</string>
     <string name="dialog_new_transfer_title">¿Deseas comenzar esta descarga?</string>
     <string name="dialog_new_transfer_text_text">¿Estás seguro de que quieres descargar %1$s (%2$s)?</string>
@@ -358,10 +351,6 @@
     <string name="wifi_sharing">Red Wi-Fi</string>
     <string name="activity_mediaplayer_name">Reproductor</string>
     <string name="stop">Detener</string>
-    <string name="donate_1">Donar $1</string>
-    <string name="donate_5">Donar $5</string>
-    <string name="donate_10">Donar $10</string>
-    <string name="donate_25">Donar $25</string>
     <string name="playing_now_colon">Tocando ahora:</string>
     <string name="my_filetype">Mis %s</string>
     <string name="paused">Pausado</string>
@@ -451,7 +440,6 @@
     <string name="saving_to_internal_memory">Guardando en la Memoria Interna</string>
     <string name="storage_setting_confirm_dialog_text">Entiendo que todos los archivos descargados a la tarjeta SD por FrostWire serán borrados POR ANDROID en el momento que la aplicación FrostWire sea desinstalada de este dispositivo y no voy a mantener a FrostWire LLC como responsable de archivos perdidos.</string>
     <string name="saving_to_sd_card">Guardando en la tarjeta SD.</string>
-    <string name="wifi_sharing_settings">Compartiendo en Wi-Fi</string>
     <string name="torrent_max_peers">Max Usuarios</string>
     <string name="app_shutdown_dlg_message">Esto cancelará todas las transferencias y servicios ejecutados en segundo plano. ¿Estás seguro?</string>
     <string name="checking_ellipsis">Chequeando&#8230;</string>

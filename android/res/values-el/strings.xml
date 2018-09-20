@@ -76,8 +76,6 @@
     <string name="download">Κατέβασε</string>
     <string name="download_selected_files">Κατέβασε τα επιλεγμένα</string>
     <string name="toggle_sharing_selected_files">Εναλλαγή Μοιράσματος</string>
-    <string name="change_manual_listening_port">Όρισε τα Ανοιχτά Ports 1000 και 65535</string>
-    <string name="is_not_responding">Ο %s δεν ανταποκρίνεται</string>
     <string name="max_concurrent_uploads">Μέγιστα Ταυτόχρονα Uploads</string>
     <string name="search_no_keywords">Γράψε λέξεις-κλειδιά για αναζήτηση</string>
     <string name="search_select_filetype">Διάλεξε έναν τύπο αρχείου</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Ώρα για ενημέρωση!</string>
     <string name="update_message">Το FrostWire κατέβασε για σένα μία ΠΙΟ ΓΡΗΓΟΡΗ ΕΝΗΜΕΡΩΣΗ. Άγγιξε το OK για να την εγκαταστήσεις τώρα.</string>
     <string name="next_time">Αργότερα</string>
-    <string name="change_my_nickname">Αλλαγή του ψευδώνυμού μου</string>
     <string name="try_changing_your_nickname">Γράψε το ψευδώνυμό σου</string>
     <string name="reconnecting">Επανασύνδεση</string>
     <string name="go_to">Πήγαινε Στο</string>
@@ -147,7 +144,6 @@
     <string name="open">Άνοιγμα</string>
     <string name="connected_to">Συνδεδεμένοι στο</string>
     <string name="sharing_preferences">Προτιμήσεις Μοιράσματος</string>
-    <string name="nickname">Ψευδώνυμο</string>
     <string name="how_other_users_will_see_you">Πώς σε βλέπουν οι άλλοι χρήστες</string>
     <string name="networking_preferences">Προτιμήσεις Δικτύου</string>
     <string name="simultaneous_uploads">Ταυτόχρονα Uploads</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Συνδεθήκαμε μέσω δικτύου δεδομένων</string>
     <string name="send_to_chat">Αποστολή στο Chat</string>
     <string name="sent_file_to_chat">Το αρχείο στάλθηκε στο Chat</string>
-    <string name="choose_wifi_network">Διάλεξε ένα ασύρματο δίκτυο</string>
     <string name="please_update_to_v">Παρακαλώ κάνε ενημέρωση στην έκδοση v. %s</string>
     <string name="cant_open_file">Συγγνώμη, δεν ξέρω πώς να ανοίξω αυτό το αρχείο.</string>
     <string name="downloading_from_desktop">Κατεβάζω τα αρχεία από τον υπολογιστή</string>
@@ -279,7 +274,6 @@
     <string name="downloading_promotion">Κατεβαίνει %s</string>
     <string name="activity_about_droidwire_description">FrostWire για Android</string>
     <string name="download_type_not_supported">Ο τύπος download δεν υποστηρίζεται</string>
-    <string name="im_on_it">Ένα λεπτό…</string>
     <string name="hint_transfers">Χρήση "menu" για μαζικές ενέργειες</string>
     <string name="torrent_settings">Ρυθμίσεις Torrent</string>
     <string name="torrent_max_download_speed_summary">Μέγιστη Ταχύτητα Download</string>
@@ -297,7 +291,6 @@
     <string name="seed_finished_torrents_wifi_only">Μοιράσου μόνο στο ασύρματο δίκτυο</string>
     <string name="seed_finished_torrents_wifi_only_summary">Μοιράσου μόνο μέσω ασύρματου δικτύου για να γλυτώσεις bandwidth στο δίκτυο δεδομένων</string>
     <string name="seeding_has_been_turned_off">Το μοίρασμα απενεργοποιήθηκε</string>
-    <string name="nickname_hint">Ψευδώνυμο</string>
     <string name="show_transfers_on_download_start">Δείξε τις μεταφορές όταν ξεκινάει το Download</string>
     <string name="dialog_new_transfer_title">Ξεκίνημα του Download;</string>
     <string name="dialog_new_transfer_text_text">Θέλεις σίγουρα να κατεβάσεις το %1$s (%2$s)</string>
@@ -357,10 +350,6 @@
     <string name="wifi_sharing">Ασύρματο Μοίρασμα</string>
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">Σταμάτημα</string>
-    <string name="donate_1">Δωρεά $1</string>
-    <string name="donate_5">Δωρεά $5</string>
-    <string name="donate_10">Δωρεά $10</string>
-    <string name="donate_25">Δωρεά $25</string>
     <string name="one_file_shared" >Ένα αρχείο μοιράστηκε σε συσκευές FrostWire στο ίδιο ασύρματο δίκτυο.</string>
     <string name="n_files_shared" >%d αρχεία μοιράστηκαν σε συσκευές FrostWire στο ίδιο ασύρματο δίκτυο.</string>
     <string name="playing_now_colon">Παίζει τώρα:</string>
@@ -452,7 +441,6 @@
     <string name="vpn_not_found">Αριθ VPN. Εξετάστε την κρυπτογράφηση σύνδεσης.</string>
     <string name="your_installation_is_complete">εγκατάσταση σας είναι πλήρης.</string>
     <string name="error_connection_timed_out">Σφάλμα: η σύνδεση έληξε/έπεσε. Προσπάθησε ξανά.</string>
-    <string name="wifi_sharing_settings">Wifi Ρυθμίσεις κοινής χρήσης</string>
     <string name="all_free_downloads">Όλα τα δωρεάν downloads</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Ζητήστε πάλι</string>

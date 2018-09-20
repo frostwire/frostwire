@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Pemain media</string>
     <string name="your_installation_is_complete">Pemasangan anda selesai.</string>
     <string name="error_connection_timed_out">Ralat: sambungan tamat masa/gugur. Cuba lagi.</string>
-    <string name="im_on_it">Saya di atasnya…</string>
-    <string name="wifi_sharing_settings">Wi-Fi Tetapan Perkongsian</string>
-    <string name="is_not_responding">%s tidak bertindak balas</string>
     <string name="azureus_manager_item_seeding">Pembenihan</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Berkongsi fail dengan rakan-rakan di rangkaian Wi-Fi tempatan.</string>
     <string name="how_other_users_will_see_you">Bagaimana pengguna lain akan melihat anda</string>
     <string name="share_selected_files">Berkongsi fail dipilih</string>
-    <string name="choose_wifi_network">Pilih rangkaian Wifi</string>
     <string name="device">Peranti</string>
     <string name="connecting">Bersambung</string>
     <string name="all_free_downloads">Semua muat turun percuma</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">Perkongsian Wi-Fi</string>
     <string name="alpha_tests_team_thanks">Terima kasih kepada semua penguji alpha sukarela kami untuk kesabaran dan maklum balas yang hebat, terima kasih khas untuk</string>
     <string name="azureus_manager_item_ready">Menunggu torrents lain beratur</string>
-    <string name="nickname">Nama samaran</string>
     <string name="drawer_close">Tutup laci navigasi</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire adalah aplikasi pelayar fail dan Downloader, oleh itu ia perlu boleh mengakses cakera anda.\n\nTanpa keizinan anda FrostWire tidak boleh bekerja.\n\nIngin mencuba lagi?</string>
     <string name="peer_http_upload_status_unknown">Tidak diketahui</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">Memadam trek ini</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Pembebanan…</string>
-    <string name="nickname_hint">Nama samaran</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Ralat tidak dijangka laluan penyimpanan memetik</string>
     <string name="hint_transfers">Gunakan "menu" untuk tindakan pukal</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">Ruang</string>
     <string name="connected_using_dataplan">Disambungkan menggunakan Pelan Data</string>
     <string name="tip_rename_your_files">Petua: Namakan semula fail supaya mereka boleh didapati</string>
-    <string name="donate_10">Menderma $10</string>
     <string name="disconnect">Putuskan sambungan</string>
     <string name="vpn_what_you_get_with">Apa yang anda dapat dengan </string>
     <string name="download_finished">Muat turun selesai</string>
     <string name="confirm_download">Sahkan Muat turun</string>
     <string name="input_text_hint">Apa yang anda cari? (Petunjuk oleh Google)</string>
-    <string name="change_my_nickname">Tukar nama samaran saya</string>
     <string name="still_listening_on_port">Masih mendengar pada port</string>
     <string name="sdcard_storage">Masih mendengar pada port</string>
     <string name="pending">yang belum selesai</string>
@@ -183,7 +175,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Semua pindahan akan berhenti.\nAdakah anda pasti?</string>
     <string name="unshare_selected_files">Fail yang dipilih nyahkongsi</string>
     <string name="are_you_sure_you_want_to_download_the_following">Adakah anda pasti anda ingin muat turun berikut %1$s (%2$s)?</string>
-    <string name="donate_25">Menderma $25</string>
     <string name="resume_torrent_menu_action">Menyambung</string>
     <string name="downloading_from_desktop">Memuat turun fail dalam desktop</string>
     <string name="next_time">Lain kali</string>
@@ -321,7 +312,6 @@
     <string name="playing_now_colon">Yang sedang bermain:</string>
     <string name="please_enter_valid_url">Sila masukkan URL yang sah</string>
     <string name="search_no_keywords">Sila masukkan kata kunci carian</string>
-    <string name="change_manual_listening_port">Set Mendengar Port 1000 dan 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Harus mempunyai sekurang-kurangnya satu slot muat naik</string>
     <string name="stop">Hentikan</string>
     <string name="distraction_free_search_results_summary">Menyembunyikan komponen UI untuk menunjukkan lebih banyak keputusan. Keperluan dimulakan semula untuk kuasa.</string>
@@ -542,8 +532,6 @@
     <string name="try_other_keywords">Cuba kata kunci yang lebih/berbeza</string>
     <string name="use_upnp_port_mapping_summary">Tekan lama di sini untuk menetapkan nombor port manual</string>
     <string name="activity_media_player_image_description">Imej Media</string>
-    <string name="donate_1">Menderma $1</string>
-    <string name="donate_5">Menderma $5</string>
     <string name="clear_complete_transfers">Ini akan membersihkan semua pemindahan selesai</string>
     <string name="torrent_max_upload_speed">Dagangan naik kelajuan</string>
     <string name="download_type_not_supported">Muat turun jenis tidak disokong</string>

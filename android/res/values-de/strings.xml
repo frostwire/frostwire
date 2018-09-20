@@ -76,8 +76,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Ausgewählte herunterladen</string>
     <string name="toggle_sharing_selected_files">Freigabe ein- und ausschalten</string>
-    <string name="change_manual_listening_port">Listening-Ports einstellen 1000 und 65535.</string>
-    <string name="is_not_responding">%s reagiert nicht</string>
     <string name="max_concurrent_uploads">Maximum von gleichzeitigen Uploads</string>
     <string name="search_no_keywords">Bitte Suchbegriffe eingeben.</string>
     <string name="search_select_filetype">Bitte wähle einen Dateityp</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Aktualisierungszeit!</string>
     <string name="update_message">FrostWire hat eine neues PERFORMANCE UPDATE für dich heruntergeladen. Tippe die OK-Schaltfläche an, wenn du die Update jetzt installieren willst.</string>
     <string name="next_time">Nächstes Mal</string>
-    <string name="change_my_nickname">Meinen Nicknamen ändern</string>
     <string name="try_changing_your_nickname">Gebe deinen Nicknamen ein</string>
     <string name="reconnecting">Verbinde erneut</string>
     <string name="go_to">Gehe bitte zu</string>
@@ -147,7 +144,6 @@
     <string name="open">Öffnen</string>
     <string name="connected_to">Verbunden mit</string>
     <string name="sharing_preferences">Einstellungen freigeben</string>
-    <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">Wie andere Benutzer dich sehen</string>
     <string name="networking_preferences">Netzwerk-Einstellungen</string>
     <string name="simultaneous_uploads">Gleichzeitige Uploads</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Verbindung mittels Datendienst</string>
     <string name="send_to_chat">Zum Chat senden</string>
     <string name="sent_file_to_chat">Datei zum Chat senden</string>
-    <string name="choose_wifi_network">Wähle ein WLAN-Netzwerk aus.</string>
     <string name="please_update_to_v">Bitte aktualisiere jetzt auf v. %s</string>
     <string name="cant_open_file">Sorry. Ich kann die Datei nicht öffnen.</string>
     <string name="downloading_from_desktop">Datei(n) vom Desktop herunterladen.</string>
@@ -284,7 +279,6 @@
     <string name="downloading_promotion">%s werden heruntergeladen</string>
     <string name="activity_about_droidwire_description">FrostWire für Android</string>
     <string name="download_type_not_supported">Download-Typ wird nicht länger unterstützt</string>
-    <string name="im_on_it">Ich bin dabei…</string>
     <string name="hint_transfers">Verwende "Menü" für Batchaktionen </string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Max. Download-Geschwindigkeit</string>
@@ -302,7 +296,6 @@
     <string name="seed_finished_torrents_wifi_only">Seed nur auf WLAN</string>
     <string name="seed_finished_torrents_wifi_only_summary">Seeds nur dann wenn über WLAN verbunden, um Bandbreite auf deinem Datendienst zu sparen.</string>
     <string name="seeding_has_been_turned_off">Seeden wurde deaktiviert</string>
-    <string name="nickname_hint">Nickname</string>
     <string name="show_transfers_on_download_start">Zeige Übertragungen zu Beginn des Downloads an.</string>
     <string name="dialog_new_transfer_title">Diesen Download starten?</string>
     <string name="dialog_new_transfer_text_text">Bist du sicher, du willst %1$s (%2$s) herunterladen?</string>
@@ -354,10 +347,6 @@
     <string name="storage_preference_title">Speicherort wählen</string>
     <string name="storage_preference_summary">Der Standard-Speicherort, an denen Dateien gespeichert werden sollen.</string>
     <string name="stop">Stop</string>
-    <string name="donate_1">Spenden $1</string>
-    <string name="donate_5">Spenden $5</string>
-    <string name="donate_10">Spenden $10</string>
-    <string name="donate_25">Spenden $25</string>
     <string name="my_filetype">Meine %s</string>
     <string name="donate">Spenden</string>
     <string name="one_dollar">$1</string>
@@ -374,7 +363,6 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">Installation abgeschlossen.</string>
     <string name="error_connection_timed_out">Fehler: Verbindung Zeitüberschreitung/gesunken. Versuch es noch einmal.</string>
-    <string name="wifi_sharing_settings">Wi-Fi Sharing Einstellungen</string>
     <string name="enable_wifi_sharing_summary">Gemeinsame Nutzung von Dateien mit Kollegen auf dem lokalen Wi-Fi-Netzwerk.</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Erneut anfordern</string>

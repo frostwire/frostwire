@@ -76,8 +76,6 @@
     <string name="download">Pobierz</string>
     <string name="download_selected_files">Pobierz Wybrane</string>
     <string name="toggle_sharing_selected_files">Przełącz Udostępnianie</string>
-    <string name="change_manual_listening_port">Ustaw Port Nasłuchiwania 1000 i 65535</string>
-    <string name="is_not_responding">%s nie odpowiada</string>
     <string name="max_concurrent_uploads">Maksymalna Liczba Połączeń Wychodzących</string>
     <string name="search_no_keywords">Proszę podać wyszukiwane słowa kluczowe</string>
     <string name="search_select_filetype">Wybierz rodzaj pliku</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Czas Aktualizacji!</string>
     <string name="update_message">FrostWire pobrał nową AKTUALIZACJĘ WYDAJNOŚCI, proszę przejść dalej i kliknąć przycisk OK, jeśli chcesz ją teraz zainstalować.</string>
     <string name="next_time">Następnym Razem</string>
-    <string name="change_my_nickname">Zmień Nick</string>
     <string name="try_changing_your_nickname">Wprowadź swój Nick</string>
     <string name="reconnecting">Ponawianie połączenia</string>
     <string name="go_to">Idź Do</string>
@@ -147,7 +144,6 @@
     <string name="open">Otwórz</string>
     <string name="connected_to">Podłączony do</string>
     <string name="sharing_preferences">Ustawienia Udostępniania</string>
-    <string name="nickname">Nick</string>
     <string name="how_other_users_will_see_you">Jak inni użytkownicy będą cię widzieć</string>
     <string name="networking_preferences">Ustawienia Sieci</string>
     <string name="simultaneous_uploads">Połączenia Wychodzące</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Podłączony za pomocą Mobilnej Transmisji Danych</string>
     <string name="send_to_chat">Wyślij do Czatu</string>
     <string name="sent_file_to_chat">Wysłano plik na Czat</string>
-    <string name="choose_wifi_network">Wybierz sieć Wi-Fi</string>
     <string name="please_update_to_v">Proszę zaktualizować do w %s</string>
     <string name="cant_open_file">Przepraszam, nie wiem jak otworzyć ten plik.</string>
     <string name="downloading_from_desktop">Pobieranie pliku(ów) z pulpitu</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">Pobieranie %s</string>
     <string name="activity_about_droidwire_description">FrostWire dla Android</string>
     <string name="download_type_not_supported">Pobieranie typy nie są obsługiwane</string>
-    <string name="im_on_it">Pracuję nad tym…</string>
     <string name="hint_transfers">Użyj "menu" dla większego wyboru akcji</string>
     <string name="torrent_settings">Ustawienia Torrentów</string>
     <string name="torrent_max_download_speed_summary">Maksymalna Szybkość Pobierania</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Seeduj tylko przez Wi-Fi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Seeduj tylko podczas połączenia przez Wi-Fi w celu zaoszczędzenia przepustowości w twoim planie danych</string>
     <string name="seeding_has_been_turned_off">Seedowanie zostało wyłączone</string>
-    <string name="nickname_hint">Nick</string>
     <string name="show_transfers_on_download_start">Pokaż Transfery przy Starcie Pobierania</string>
     <string name="dialog_new_transfer_title">Rozpocząć Pobieranie?</string>
     <string name="dialog_new_transfer_text_text">Czy na pewno chcesz pobrać %1$s (%2$s)</string>
@@ -353,10 +346,6 @@
     <string name="wifi_sharing">Udostępnianie przez Wi-Fi</string>
     <string name="activity_mediaplayer_name">Odtwarzacz Multimedialny</string>
     <string name="stop">Zatrzymaj</string>
-    <string name="donate_1">Podaruj $1</string>
-    <string name="donate_5">Podaruj $5</string>
-    <string name="donate_10">Podaruj $10</string>
-    <string name="donate_25">Podaruj $25</string>
     <string name="playing_now_colon">Odtwarzane teraz:</string>
     <string name="my_filetype">Moje %s</string>
     <string name="paused">Wstrzymano</string>
@@ -456,7 +445,6 @@
     <string name="canceling">Anulowanie</string>
     <string name="torrent_max_peers">Maksimum Peerów</string>
     <string name="torrent_max_peers_summary">Maksimum Peerów</string>
-    <string name="wifi_sharing_settings">Ustawienia Udostępniania przez Wi-Fi</string>
     <string name="app_shutdown_dlg_message">Zamknięcie aplikacji zakończy wszystkie transfery i serwisy. Jesteś pewien?</string>
     <string name="error_no_space_left_on_device">Błąd: Brak miejsca na zachowanie pliku</string>
     <string name="my_music">Moja Muzyka</string>

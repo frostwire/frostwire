@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Mediaspelare</string>
     <string name="your_installation_is_complete">Installationen är klar.</string>
     <string name="error_connection_timed_out">Fel: anslutningen har avbrutits/sjunkit. Försök igen.</string>
-    <string name="im_on_it">Jag är på det…</string>
-    <string name="wifi_sharing_settings">Wi-Fi Delningsinställningar</string>
-    <string name="is_not_responding">%s svarar inte</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Dela filer med kollegor på lokala Wi-Fi-nätverk.</string>
     <string name="how_other_users_will_see_you">Hur andra användare kommer att se dig</string>
     <string name="share_selected_files">Dela valda filer</string>
-    <string name="choose_wifi_network">Välj ett WiFi-nätverk</string>
     <string name="device">Anordning</string>
     <string name="connecting">Ansluta</string>
     <string name="all_free_downloads">Alla gratis nedladdningar</string>
@@ -54,7 +50,6 @@
     <string name="sharing_privacy_settings">Delning och sekretess</string>
     <string name="alpha_tests_team_thanks">Tack till alla våra frivilliga alfa testare för tålamod och bra feedback, speciellt tack till</string>
     <string name="azureus_manager_item_ready">Väntar på andra torrents att köa</string>
-    <string name="nickname">Smeknamn</string>
     <string name="drawer_close">Stäng navigeringspanelen</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire är en filhanterare och dataöverföring app, därför måste kunna komma åt din disk.\n\nUtan dina behörigheter FrostWire inte kan arbeta.\n\nVill du försöka igen?</string>
     <string name="peer_http_upload_status_unknown">Okänd</string>
@@ -88,7 +83,6 @@
     <string name="delete_this_track">Radera detta spår</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Läser in…</string>
-    <string name="nickname_hint">Smeknamn</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Oväntat fel plocka lagringsbana</string>
     <string name="torrent_preferences_header">Torrent Inställningar</string>
@@ -169,13 +163,11 @@
     <string name="menu_space_shortcut_label">Utrymme</string>
     <string name="connected_using_dataplan">Ansluts med dataabonnemang</string>
     <string name="tip_rename_your_files">Tips: Byt namn på filer så att de kan hittas</string>
-    <string name="donate_10">Donera $10</string>
     <string name="disconnect">Koppla från</string>
     <string name="vpn_what_you_get_with">Vad får du med </string>
     <string name="download_finished">Hämta Färdig</string>
     <string name="confirm_download">Bekräfta Hämta</string>
     <string name="input_text_hint">Vad letar du efter? (tips från Google)</string>
-    <string name="change_my_nickname">Ändra mitt smeknamn</string>
     <string name="notification_other_header">Anmälningar och annan</string>
     <string name="still_listening_on_port">Fortfarande lyssnar på port</string>
     <string name="sdcard_storage">SD-kort lagring</string>
@@ -186,7 +178,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Alla överföringar kommer att sluta.\nÄr du säker?</string>
     <string name="unshare_selected_files">Ta bort delning valda filer</string>
     <string name="are_you_sure_you_want_to_download_the_following">Är du säker på att du vill hämta följande %1$s (%2$s)?</string>
-    <string name="donate_25">Donera $25</string>
     <string name="resume_torrent_menu_action">Återuppta</string>
     <string name="downloading_from_desktop">Ladda ner filer från skrivbordet</string>
     <string name="next_time">Nästa gång</string>
@@ -326,7 +317,6 @@
     <string name="playing_now_colon">Spelar nu:</string>
     <string name="please_enter_valid_url">Var god och skriv in en giltig url</string>
     <string name="search_no_keywords">Ange nyckelord för sökningen</string>
-    <string name="change_manual_listening_port">Ställ Lyssna Port 1000 och 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Måste få åtminstone en uppladdnings slits</string>
     <string name="stop">Sluta</string>
     <string name="distraction_free_search_results_summary">Göm användargränssnittskomponenter för att visa fler resultat. Behöver app omstart ska börja gälla.</string>
@@ -549,8 +539,6 @@
     <string name="try_other_keywords">Prova färre/olika sökord</string>
     <string name="use_upnp_port_mapping_summary">Långt tryck här för att ställa in manuellt portnummer</string>
     <string name="activity_media_player_image_description">Mediebild</string>
-    <string name="donate_1">Donera $1</string>
-    <string name="donate_5">Donera $5</string>
     <string name="clear_complete_transfers">Detta kommer att rensa ut alla de färdiga överföringar</string>
     <string name="torrent_max_upload_speed">Max uppladdningshastighet</string>
     <string name="download_type_not_supported">Typ av nedladdning stöds inte</string>

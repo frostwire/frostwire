@@ -76,8 +76,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Download valgt</string>
     <string name="toggle_sharing_selected_files">Skift deling</string>
-    <string name="change_manual_listening_port">Sæt Lytning Port 1000 og 65535</string>
-    <string name="is_not_responding">%s ikke reagerer</string>
     <string name="max_concurrent_uploads">Maksimum samtidige uploads</string>
     <string name="search_no_keywords">Indtast venligst nøgleord til søgning</string>
     <string name="search_select_filetype">Vælg venligst en filtype</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Opdater tid!</string>
     <string name="update_message">FrostWire har hentet ny RESULTATER OPDATERING for dig, gå venligst videre og tryk på OK-knappen, hvis du ønsker at installere det nu.</string>
     <string name="next_time">Næste gang</string>
-    <string name="change_my_nickname">Ændre mit Brugernavn</string>
     <string name="try_changing_your_nickname">Skriv dit brugernavn</string>
     <string name="reconnecting">Genopretter</string>
     <string name="go_to">Gå til</string>
@@ -147,7 +144,6 @@
     <string name="open">Åben</string>
     <string name="connected_to">Forbundet til</string>
     <string name="sharing_preferences">Deling af indstillinger</string>
-    <string name="nickname">Brugernavn</string>
     <string name="how_other_users_will_see_you">Hvordan andre brugere vil se dig</string>
     <string name="networking_preferences">Netværkindstillinger</string>
     <string name="simultaneous_uploads">samtidige uploads</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Forbundet ved hjælp af dataplan</string>
     <string name="send_to_chat">Send til Chat</string>
     <string name="sent_file_to_chat">Send filen til Chat</string>
-    <string name="choose_wifi_network">Vælg et Wi-Fi netværk</string>
     <string name="please_update_to_v">Opdater venligst til v. %s</string>
     <string name="cant_open_file">Desværre, ved ikke hvordan man åbner denne fil.</string>
     <string name="downloading_from_desktop">Hentning fil (er) fra desktop</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">Downloading %s</string>
     <string name="activity_about_droidwire_description">FrostWire for Android</string>
     <string name="download_type_not_supported">Download typen er ikke understøttet</string>
-    <string name="im_on_it">Jeg er på det…</string>
     <string name="hint_transfers">Brug "menu" for flere handlinger</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Maks Download Hastighed</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Frø kun på WiFi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Frø kun når den er forbundet via WiFi at spare båndbredde på dine data plan</string>
     <string name="seeding_has_been_turned_off">Føring er blevet slukket</string>
-    <string name="nickname_hint">Brugernavn</string>
     <string name="show_transfers_on_download_start">is overførsler på begyndelsen af download</string>
     <string name="dialog_new_transfer_title">Begynd denne download?</string>
     <string name="dialog_new_transfer_text_text">Er du sikker at downloade %1$s (%2$s)</string>
@@ -353,7 +346,6 @@
     <string name="activity_mediaplayer_name">Medie afspiller</string>
     <string name="your_installation_is_complete">Din installationen er færdig.</string>
     <string name="error_connection_timed_out">Fejl: tilslutning timeout/droppet. Prøv igen.</string>
-    <string name="wifi_sharing_settings">Wifi Indstillinger for deling</string>
     <string name="enable_wifi_sharing_summary">Del filer med jævnaldrende på det lokale Wifi netværk.</string>
     <string name="all_free_downloads">Alle gratis downloads</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -402,13 +394,11 @@
     <string name="help">Hjælp</string>
     <string name="cloud_downloads_coming">Undskyld: Fra cloud downloads herfra vil være tilgængelig på yderligere opdateringer.</string>
     <string name="menu_space_shortcut_label">Plads</string>
-    <string name="donate_10">Doner $10</string>
     <string name="vpn_what_you_get_with">Hvad får du med </string>
     <string name="confirm_download">Bekræft download</string>
     <string name="sdcard_storage">SD\'s Storage</string>
     <string name="deleted_crawl_cache">Slettet kravle cache</string>
     <string name="are_you_sure_you_want_to_download_the_following">Er du sikker på, du vil downloade følgende %1$s (%2$s)?</string>
-    <string name="donate_25">Doner $25</string>
     <string name="player_paused_press_and_hold_to_stop">Player sat på pause. (Tip: Tryk og hold for at stoppe)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL tilføjet til overførsler. (Magneter virker bedst på Wi-Fi)</string>
@@ -561,8 +551,6 @@
     <string name="support">Støtte</string>
     <string name="transfers_context_menu_copy_magnet">Kopiér Magnet</string>
     <string name="try_other_keywords">Prøv færre/forskellige søgeord</string>
-    <string name="donate_1">Doner $1</string>
-    <string name="donate_5">Doner $5</string>
     <string name="thank_you">Tak!</string>
     <string name="use_frostclick">Brug FrostClick</string>
     <string name="get_ExpressVPN">Hent ExpressVPN</string>

@@ -53,7 +53,6 @@
     <string name="documents">دستاویزات</string>
     <string name="use_mobile_data">بٹٹوررینٹ کے لئے 3G/4Gاستعمال کریں </string>
     <string name="use_mobile_data_summary">بٹٹوررینٹ کے لئے اپبا موبائل انٹرنیٹ استعمال کریں. آپ کو پیسے چارج کیے جا سکتے ہیں .احتیاط سے استعمال کریں .</string>
-    <string name="choose_wifi_network">ایک وائی فائی نیٹ ورک کا انتخاب کریں</string>
     <string name="cant_open_file">معاف  کریں یہ فائل کھولنیں نہیں اتی </string>
     <string name="share_finished_downloads">مکمل ڈاونلوڈ کو وایفاے پہ تقسیم کریں</string>
     <string name="share_finished_downloads_summary">مکمل ڈاونلوڈ آپ کے وایفاۓ پہ اور FrostWire استعمال کرنے والوں کو دستیاب ہوں گے</string>
@@ -111,14 +110,11 @@
     <string name="crawl_cache_size">کرال کا کیشے %1$.2fMB</string>
     <string name="deleted_crawl_cache">کرال کا کیشے صاف کریں</string>
     <string name="clear_search_cache">سرچ کا کیشے صاف کریں</string>
-    <string name="wifi_sharing_settings">وایفاے پہ تقسیم کی ترتیبات</string>
     <string name="vpn_not_found">کوئی VPN. کنکشن کو خفیہ کاری پر غور.</string>
     <string name="azureus_peer_manager_status_finished">ختم</string>
     <string name="activity_mediaplayer_name">میڈیا پلیئر</string>
     <string name="your_installation_is_complete">آپ کی تنصیب مکمل ہو گیا ہے.</string>
     <string name="error_connection_timed_out">غلطی: کنکشن / وقت ختم گرا. دوبارہ کوشش کریں.</string>
-    <string name="im_on_it">میں اس پر ہوں…</string>
-    <string name="is_not_responding">%s جواب نہیں ہے</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">مقامی وائی فائی نیٹ ورک پر ساتھیوں کے ساتھ فائلوں کا اشتراک کریں.</string>
     <string name="how_other_users_will_see_you">کس طرح دوسرے یوزرز جو آپ دیکھیں گے</string>
@@ -134,7 +130,6 @@
     <string name="unshare">غیر مشترک</string>
     <string name="alpha_tests_team_thanks">صبر و تحمل اور عظیم کی رائے کے لئے ہمارے تمام رضاکارانہ الفا ٹیسٹرز، کے لئے خصوصی شکریہ کے لئے شکریہ</string>
     <string name="azureus_manager_item_ready">دیگر بارشیں قطار کا انتظار ہے</string>
-    <string name="nickname">عرفیت</string>
     <string name="drawer_close">بند کریں نیویگیشن دراز</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire، ایک فائل براؤزر اور ڈاؤنلوڈر اپلی کیشن ہے اس وجہ سے یہ آپ کی ڈسک تک رسائی حاصل کرنے کے قابل ہو جائے کرنے کی ضرورت ہے.\n\nآپ اجازتوں بغیر FrostWire کام نہیں کر سکتے.\n\nدوبارہ کوشش کرنا چاہتے ہیں؟</string>
     <string name="peer_http_upload_status_unknown">نامعلوم</string>
@@ -163,7 +158,6 @@
     <string name="delete_this_track">اس ٹریک چھپانا</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">لوڈ کر رہا ہے…</string>
-    <string name="nickname_hint">عرفیت</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">غیر متوقع خرابی اٹھا اسٹوریج پاتھ</string>
     <string name="hint_transfers">بلک کے اعمال کے لئے "مینو" کا استعمال کریں</string>
@@ -233,19 +227,16 @@
     <string name="menu_space_shortcut_label">خلائی</string>
     <string name="connected_using_dataplan">ڈیٹا پلان کا استعمال کرتے ہوئے متصل</string>
     <string name="tip_rename_your_files">نکتہ: وہ پایا جا سکتا ہے تاکہ فائلوں کا نام تبدیل</string>
-    <string name="donate_10">عطیہ $10</string>
     <string name="vpn_what_you_get_with"> آپ کے ساتھ کیا ملتا ہے  </string>
     <string name="download_finished">لوڈ فارغ</string>
     <string name="confirm_download">لوڈ کرنے کی توثیق</string>
     <string name="input_text_hint">تم کیا تلاش کر رہے ہو؟ (گوگل کی طرف اشارہ)</string>
-    <string name="change_my_nickname">میرے عرفیت تبدیل کریں</string>
     <string name="still_listening_on_port">پھر بھی بندرگاہ پر سننے</string>
     <string name="sdcard_storage">ایس ڈی کارڈ سٹوریج</string>
     <string name="pending">زیر التوا</string>
     <string name="other_settings">دیگر ترتیبات</string>
     <string name="unshare_selected_files">غیر مشترک منتخب فائلوں</string>
     <string name="are_you_sure_you_want_to_download_the_following"> %1$s (%2$s) کیا آپ واقعی مندرجہ ذیل ڈاؤن لوڈ، اتارنا کرنا چاہتے ہیں</string>
-    <string name="donate_25">عطیہ $25</string>
     <string name="downloading_from_desktop">ڈیسک ٹاپ سے فائلوں کو ڈاؤن لوڈ</string>
     <string name="next_time">اگلی بار</string>
     <string name="name">نام</string>
@@ -361,7 +352,6 @@
     <string name="playing_now_colon">اب چل رہا ہے:</string>
     <string name="please_enter_valid_url">ایک درست URL درج کریں</string>
     <string name="search_no_keywords">تلاش کو درج کریں</string>
-    <string name="change_manual_listening_port">پورٹ 1000 اور 65535 سننا سیٹ کریں</string>
     <string name="gotta_have_at_least_one_upload_slot">چاہیئے کم از کم ایک اپ لوڈ کریں سلاٹ ہے</string>
     <string name="distraction_free_search_results_summary">مزید نتائج دکھانے کے UI اجزاء کو چھپائیں. اثر لینے کے لئے اے پی پی کے دوبارہ شروع کرنے کی ضرورت ہے.</string>
     <string name="notify_frostwire_is_running_summary">کی منتقلی کی حیثیت کے ساتھ ایک مستقل اتارنا Android اطلاع دکھائیں</string>
@@ -549,8 +539,6 @@
     <string name="try_other_keywords">اس سے کم / مختلف مطلوبہ الفاظ کی کوشش کریں</string>
     <string name="use_upnp_port_mapping_summary">یہاں طویل پریس دستی پورٹ تعداد مقرر کرنے</string>
     <string name="activity_media_player_image_description">Media image</string>
-    <string name="donate_1">عطیہ $1</string>
-    <string name="donate_5">عطیہ $5</string>
     <string name="clear_complete_transfers">یہ تمام ختم ٹرانسفر باہر صاف ہو جائے گا</string>
     <string name="download_type_not_supported">لوڈ کی قسم کی سہولت نہیں</string>
     <string name="thank_you">آپ کا شکریہ!</string>

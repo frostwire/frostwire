@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">נגן מדיה</string>
     <string name="your_installation_is_complete">שההתקנה הושלמה.</string>
     <string name="error_connection_timed_out">שגיאה: חיבור הופסק/ירד. נסה שוב.</string>
-    <string name="im_on_it">אני מטפל בזה…</string>
-    <string name="wifi_sharing_settings">הגדרת שיתוף Wifi</string>
-    <string name="is_not_responding">%s אינו מגיב</string>
     <string name="azureus_manager_item_seeding">מתזמן</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">שיתוף קבצים עם עמיתים ברשת Wi-Fi המקומית.</string>
     <string name="how_other_users_will_see_you">איך משתמשים אחרים יראו אותך</string>
     <string name="share_selected_files">קבצים שנבחרו שתפו</string>
-    <string name="choose_wifi_network">בחר רשת Wifi</string>
     <string name="device">התקן</string>
     <string name="connecting">מְקַשֵׁר</string>
     <string name="all_free_downloads">כל ההורדות בחינם</string>
@@ -54,7 +50,6 @@
     <string name="sharing_privacy_settings">שיתוף ופרטיות</string>
     <string name="alpha_tests_team_thanks">תודה לכל בודקי אלפא מהרצון שלנו על הסבלנות ועל משובים נהדרים, תודה מיוחדת</string>
     <string name="azureus_manager_item_ready">מחכה טורנטים אחרים לתור</string>
-    <string name="nickname">כינוי</string>
     <string name="drawer_close">סגור את חלונית הניווט</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire היא תוכנת קובץ דפדפן Downloader, ולכן הוא צריך להיות מסוגל לגשת לדיסק שלך.\n\nללא הרשאות שלך FrostWire לא יכול לעבוד.\n\nרוצה לנסות שוב?</string>
     <string name="peer_http_upload_status_unknown">לא ידוע</string>
@@ -88,7 +83,6 @@
     <string name="delete_this_track">האם למחוק רצועה זו</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">טוען…</string>
-    <string name="nickname_hint">כינוי</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">נתיב אחסון קטיף שגיאה לא צפויה</string>
     <string name="torrent_preferences_header">העדפות Torrent</string>
@@ -169,13 +163,11 @@
     <string name="menu_space_shortcut_label">מֶרחָב</string>
     <string name="connected_using_dataplan">מחובר באמצעות תוכנית נתונים</string>
     <string name="tip_rename_your_files">טיפ: שינוי שם קבצים, כך שניתן יהיה למצוא</string>
-    <string name="donate_10">תרום $10</string>
     <string name="disconnect">לְנַתֵק</string>
     <string name="vpn_what_you_get_with">מה אתה מקבל עם </string>
     <string name="download_finished">הורדה הסתיימה </string>
     <string name="confirm_download">אשר הורד</string>
     <string name="input_text_hint">מה אתה מחפש? (רמזים על ידי Google)</string>
-    <string name="change_my_nickname">לשנות את הכינוי שלי</string>
     <string name="notification_other_header">הודעות ו אחר</string>
     <string name="still_listening_on_port">עדיין מאזין ביציאה</string>
     <string name="sdcard_storage">אחסון כרטיס SD</string>
@@ -186,7 +178,6 @@
     <string name="all_transfers_will_stop_are_you_sure">כל ההעברות תפסקנה.n\האם אתה בטוח?</string>
     <string name="unshare_selected_files">קבצים אל תשתפו שנבחרו</string>
     <string name="are_you_sure_you_want_to_download_the_following"> האם אתה בטוח שאתה רוצה להוריד את הבאה (%1$s (%2$s?</string>
-    <string name="donate_25">תרום $25</string>
     <string name="resume_torrent_menu_action">קורות חיים</string>
     <string name="downloading_from_desktop">הורדת קבצים משולחן העבודה</string>
     <string name="next_time">בפעם הבאה</string>
@@ -326,7 +317,6 @@
     <string name="playing_now_colon">האזנה עכשיו:</string>
     <string name="please_enter_valid_url">אנא הכנס כתובת תקינה</string>
     <string name="search_no_keywords">אנא הזן מילות מפתח לחיפוש</string>
-    <string name="change_manual_listening_port">גדר יציאת האזנת 1000 ו 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">אתה צריך לעבור לפחות חריץ העלאה אחת</string>
     <string name="stop">תפסיק</string>
     <string name="distraction_free_search_results_summary">סתר רכיבי ממשק משתמש כדי להראות תוצאות יותר. צורכים בהפעלת יישום מחדש כדי שהשינויים ייכנסו לתוקף.</string>
@@ -549,8 +539,6 @@
     <string name="try_other_keywords">נסה פחות/מילות מפתח שונות</string>
     <string name="use_upnp_port_mapping_summary">לחיצה ארוכה כאן כדי להגדיר את מספר היציאה הידני</string>
     <string name="activity_media_player_image_description">תמונת מדיה</string>
-    <string name="donate_1">תרום $1</string>
-    <string name="donate_5">תרום $5</string>
     <string name="clear_complete_transfers">פעולה זו תנקה את כל העברות המוגמרות</string>
     <string name="torrent_max_upload_speed">מקס מהירות העלאה</string>
     <string name="download_type_not_supported">סוג ההורדה לא נתמך</string>

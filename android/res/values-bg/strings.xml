@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Медиен плейър</string>
     <string name="your_installation_is_complete">Вашата инсталация е завършена.</string>
     <string name="error_connection_timed_out">Грешка: връзка с изтичане на времето/спадна. Опитай пак.</string>
-    <string name="im_on_it">Заемам се…</string>
-    <string name="wifi_sharing_settings">Wi-Fi настройки за споделяне</string>
-    <string name="is_not_responding">%s не реагира</string>
     <string name="azureus_manager_item_seeding">Засяване</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Споделяне на файлове с връстниците върху местната Wi-Fi мрежа.</string>
     <string name="how_other_users_will_see_you">Как другите потребители ще виждате</string>
     <string name="share_selected_files">Споделете избрани файлове</string>
-    <string name="choose_wifi_network">Изберете Wifi мрежа</string>
     <string name="device">приспособление</string>
     <string name="connecting">Свързване</string>
     <string name="all_free_downloads">Всички свободно сваляне</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">Wi-Fi Споделяне</string>
     <string name="alpha_tests_team_thanks">Благодарение на всички наши доброволни алфа тестери за търпението и голяма обратна връзка, специални благодарности на</string>
     <string name="azureus_manager_item_ready">В очакване на други торенти да се редят на опашка</string>
-    <string name="nickname">Псевдоним</string>
     <string name="drawer_close">Затваряне на панела за навигация</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire е приложение за файлов браузър и изтегляне, затова тя трябва да бъде в състояние за достъп до вашия диск.\n\nБез да ви е разрешено да FrostWire не може да работи.\n\nИскате ли да опитате отново?</string>
     <string name="peer_http_upload_status_unknown">Неизвестен</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">Изтриване на това парче</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Зареждане…</string>
-    <string name="nickname_hint">Псевдоним</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Неочаквана грешка път съхранение бране</string>
     <string name="hint_transfers">Използвайте "меню" за групови действия</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">пространство</string>
     <string name="connected_using_dataplan">Свързана с помощта на план за данни</string>
     <string name="tip_rename_your_files">Съвет: Преименуване на файлове, така че те могат да бъдат намерени</string>
-    <string name="donate_10">Дари $10</string>
     <string name="disconnect">Прекъсване.</string>
     <string name="vpn_what_you_get_with">Какво получавате с </string>
     <string name="download_finished">Свали Завършен</string>
     <string name="confirm_download">Потвърдете изтегляне</string>
     <string name="input_text_hint">Какво търсиш? (съвети от Google)</string>
-    <string name="change_my_nickname">Промяна ника</string>
     <string name="still_listening_on_port">Все още слуша на порт</string>
     <string name="sdcard_storage">Съхранение на SD карта</string>
     <string name="pending">в очакване на</string>
@@ -183,7 +175,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Всички трансфери ще спрат.\nСигурен ли си?</string>
     <string name="unshare_selected_files">Отмяна на споделянето избрани файлове</string>
     <string name="are_you_sure_you_want_to_download_the_following">Сигурни ли сте, че искате да изтеглите следните %1$s (%2$s)?</string>
-    <string name="donate_25">Дари $25</string>
     <string name="resume_torrent_menu_action">Продължи</string>
     <string name="downloading_from_desktop">Сваляне на файлове от работния плот</string>
     <string name="next_time">Следващият път</string>
@@ -321,7 +312,6 @@
     <string name="playing_now_colon">Възпроизвеждане на в момента:</string>
     <string name="please_enter_valid_url">Моля, въведете валиден URL</string>
     <string name="search_no_keywords">Моля, въведете ключови думи за търсене</string>
-    <string name="change_manual_listening_port">Определете Listening Port 1000 и 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Трябва да има поне един качване слот</string>
     <string name="stop">Спри се</string>
     <string name="distraction_free_search_results_summary">Скриване на UI компоненти, за да се покаже по-добри резултати. Има нужда от приложението рестартиране, за да влезе в сила.</string>
@@ -542,8 +532,6 @@
     <string name="try_other_keywords">Опитайте по-малко/различни ключови думи</string>
     <string name="use_upnp_port_mapping_summary">Дълъг натиснете тук, за да зададете броя на потребителя порт</string>
     <string name="activity_media_player_image_description">Медиен изображение</string>
-    <string name="donate_1">Дари $1</string>
-    <string name="donate_5">Дари $5</string>
     <string name="clear_complete_transfers">Това ще изчисти от всички завършени трансфери</string>
     <string name="torrent_max_upload_speed">Максимална скорост на качване</string>
     <string name="download_type_not_supported">Изтегляне тип не се поддържа</string>

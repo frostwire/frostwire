@@ -40,7 +40,7 @@
     <string name="all_transfers_will_stop_are_you_sure">All transfers will stop.\nAre you sure?</string>
     <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
-    <string name="disconnect">Disconnect</string>
+    <string name="disconnect" translatable="false">Disconnect</string>
     <string name="disconnecting">Disconnecting</string>
     <string name="wait">Wait</string>
     <string name="exit">Exit</string>
@@ -82,8 +82,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Download Selected</string>
     <string name="toggle_sharing_selected_files">Toggle Sharing</string>
-    <string name="change_manual_listening_port">Set Listening Port 1000 and 65535</string>
-    <string name="is_not_responding">%s is not responding</string>
     <string name="max_concurrent_uploads">Maximum Simultaneous Uploads</string>
     <string name="search_no_keywords">Please enter search keywords</string>
     <string name="search_select_filetype">Please select a file type</string>
@@ -95,8 +93,6 @@
     <string name="update_title">Update time!</string>
     <string name="update_message">FrostWire has downloaded a new PERFORMANCE UPDATE for you, please go ahead and touch the OK button if you want to install it now.</string>
     <string name="next_time">Next Time</string>
-    <string name="change_my_nickname">Change my nickname</string>
-    <string name="try_changing_your_nickname">Enter your nickname</string>
     <string name="reconnecting">Reconnecting</string>
     <string name="go_to">Go To</string>
     <string name="done">Done</string>
@@ -158,7 +154,6 @@
     <string name="open">Open</string>
     <string name="connected_to">Connected to</string>
     <string name="sharing_preferences">Sharing Settings</string>
-    <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">How other users will see you</string>
     <string name="networking_preferences">Networking Settings</string>
     <string name="simultaneous_uploads">Simultaneous Wi-Fi Uploads</string>
@@ -184,7 +179,6 @@
     <string name="connected_using_dataplan">Connected using Data Plan</string>
     <string name="send_to_chat">Send to Chat</string>
     <string name="sent_file_to_chat">Sent file to Chat</string>
-    <string name="choose_wifi_network">Choose a Wi-Fi network</string>
     <string name="please_update_to_v">Please Update to v. %s</string>
     <string name="cant_open_file">Sorry, don\'t know how to open this file.</string>
     <string name="downloading_from_desktop">Downloading file(s) from desktop</string>
@@ -310,7 +304,6 @@
     <string name="dummy_hint" translatable="false">[Hint]</string>
     <string name="dummy_peer_file_count" translatable="false">[Peer/File count]</string>
     <string name="download_type_not_supported">Download Type not supported</string>
-    <string name="im_on_it">I\'m on it…</string>
     <string name="hint_transfers">Use "menu" for bulk actions</string>
     <string name="torrent_settings">Torrent Settings</string>
     <string name="torrent_max_download_speed_summary">Max Download Speed (0 means unlimited)</string>
@@ -340,7 +333,6 @@
     <string name="dummy_uploads_indicator" translatable="false">0 @ 0 KB/s</string>
     <string name="seeding_has_been_turned_off">Seeding has been turned off</string>
     <string name="wifi_seeding_has_been_turned_off">No Wi-fi available, Seeding has been turned off</string>
-    <string name="nickname_hint">Nickname</string>
     <string name="show_transfers_on_download_start">Show Transfers On Download Start</string>
     <string name="dialog_new_transfer_title">Start this Download?</string>
     <string name="dialog_new_transfer_text_text">Are you sure you want to download %1$s (%2$s)</string>
@@ -406,10 +398,6 @@
     <string name="wifi_sharing">Wi-Fi Sharing</string>
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">Stop</string>
-    <string name="donate_1">Donate $1</string>
-    <string name="donate_5">Donate $5</string>
-    <string name="donate_10">Donate $10</string>
-    <string name="donate_25">Donate $25</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
     <string name="one_file_shared">One file has been shared to FrostWire devices on the same Wi-Fi network.</string>
     <string name="n_files_shared">%d files has been shared to FrostWire devices on the same Wi-Fi network.</string>

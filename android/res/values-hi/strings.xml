@@ -76,8 +76,6 @@
     <string name="download">डाउनलोड</string>
     <string name="download_selected_files">चयनित डाउनलोड करें</string>
     <string name="toggle_sharing_selected_files">साझा टॉगल</string>
-    <string name="change_manual_listening_port">सेट लिसनिंग पोर्ट 1000 आंड 65535</string>
-    <string name="is_not_responding">%s जवाब नहीं मिल रहा है</string>
     <string name="max_concurrent_uploads">अधिकतम एक साथ अपलोड</string>
     <string name="search_no_keywords">खोज कीवर्ड दर्ज करें</string>
     <string name="search_select_filetype">कृपया एक फ़ाइल प्रकार का चयन करें</string>
@@ -86,7 +84,6 @@
     <string name="update_title"> अद्यतन समय!</string>
     <string name="update_message">फ्रॉस्टवाइर आप के लिए एक नया कार्य निष्पादन अद्यतन डाउनलोड किया गया है, आगे जाओ और ओके बटन को छुए  यदि आप इसे अब स्थापित करना चाहते हैं.</string>
     <string name="next_time">अगली बार</string>
-    <string name="change_my_nickname">मेरा उपनाम बदलें</string>
     <string name="try_changing_your_nickname">अपना प्रचलित नाम दर्ज करें</string>
     <string name="reconnecting">पुन: कनेक्ट</string>
     <string name="go_to">करने के लिए जाओ</string>
@@ -147,7 +144,6 @@
     <string name="open">खुला है</string>
     <string name="connected_to">से जोड़ें </string>
     <string name="sharing_preferences">प्राथमिकताएं साझा कर  रहा है</string>
-    <string name="nickname">उपनाम</string>
     <string name="how_other_users_will_see_you">अन्य उपयोगकर्ताओं  आप को कैसे देखेंगे</string>
     <string name="networking_preferences">नेटवर्किंग प्राथमिकताएं</string>
     <string name="simultaneous_uploads">एक साथ अपलोड</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">डेटा योजना का उपयोग कर जोड़ा</string>
     <string name="send_to_chat">चैट के लिए भेजें</string>
     <string name="sent_file_to_chat">चैट के लिए फ़ाइल भेजें</string>
-    <string name="choose_wifi_network">वाई - फाई नेटवर्क चुनें</string>
     <string name="please_update_to_v">कृपया वी अद्यतन करें  %s</string>
     <string name="cant_open_file">खेद है, पता नहीं कैसे यह  फाईल खुलता  है .</string>
     <string name="downloading_from_desktop">डेस्कटॉप से फ़ाइल (ओं) डाउनलोड हो रहा है </string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">डाउनलोड हो रहा है  %s</string>
     <string name="activity_about_droidwire_description">फ्रॉस्टवाइर फॉर आंड्राय्ड</string>
     <string name="download_type_not_supported">डाउनलोड प्रकार समर्थित नहीं है</string>
-    <string name="im_on_it">मैं उस पर  हूँ </string>
     <string name="hint_transfers">थोक कार्यों के लिए "मेनू" का प्रयोग करें</string>
     <string name="torrent_settings">टॉरेंट</string>
     <string name="torrent_max_download_speed_summary">अधिकतम डाउनलोड स्पीड</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">वाईफ़ाई पर केवल सीड </string>
     <string name="seed_finished_torrents_wifi_only_summary">अपने डेटा योजना पर बैंडविड्थ को बचाने के लिए केवल जब वाईफ़ाई के माध्यम से जुड़ा हो तब सीड करें  </string>
     <string name="seeding_has_been_turned_off">सीडिंग बंद कर दिया गया है</string>
-    <string name="nickname_hint">उपनाम</string>
     <string name="show_transfers_on_download_start">डाउनलोड प्रारंभ में स्थानांतरण दिखाएँ</string>
     <string name="dialog_new_transfer_title">इस डाउनलोड को शुरू करें? शुरू </string>
     <string name="dialog_new_transfer_text_text">आप सुनिश्चित करें कि आप डाउनलोड %1$s (%2$s) करना चाहते हैं</string>
@@ -337,7 +330,6 @@
     <string name="activity_mediaplayer_name">मीडिया प्लेयर</string>
     <string name="your_installation_is_complete">आपकी स्थापना पूर्ण है।</string>
     <string name="error_connection_timed_out">त्रुटि: कनेक्शन का समय समाप्त / गिरा दिया। पुनः प्रयास करें।</string>
-    <string name="wifi_sharing_settings">वाईफ़ाई शेयरिंग सेटिंग</string>
     <string name="enable_wifi_sharing_summary">स्थानीय वाईफाई नेटवर्क पर साथियों के साथ फ़ाइलें साझा करें।</string>
     <string name="torrent_max_peers">मैक्स साथियों</string>
     <string name="request_again">फिर से अनुरोध</string>
@@ -390,13 +382,11 @@
     <string name="help">मदद</string>
     <string name="cloud_downloads_coming">क्षमा करें: यहाँ से बादल डाउनलोड शुरू आगे अद्यतन पर उपलब्ध हो जाएगा।</string>
     <string name="menu_space_shortcut_label">अंतरिक्ष</string>
-    <string name="donate_10">दान $ 10</string>
     <string name="vpn_what_you_get_with">आप के साथ क्या मिलता है  </string>
     <string name="confirm_download">डाउनलोड की पुष्टि</string>
     <string name="sdcard_storage">एसडीएस संग्रहण</string>
     <string name="deleted_crawl_cache">हटाए गए क्रॉल कैश</string>
     <string name="are_you_sure_you_want_to_download_the_following">क्या आप वाकई निम्नलिखित डाउनलोड करना चाहते हैं  %1$s (%2$s)?</string>
-    <string name="donate_25">दान $ 25</string>
     <string name="player_paused_press_and_hold_to_stop">प्लेयर रुका हुआ है। (सुझाव: प्रेस और बंद करने के लिए पकड़)</string>
     <string name="menu_delete_shortcut_label">मिटाना</string>
     <string name="magnet_url_added">चुंबक यूआरएल स्थानान्तरण के लिए कहा। (मैग्नेट वाई-फाई पर सबसे अच्छा काम करते हैं)</string>
@@ -558,8 +548,6 @@
     <string name="support">समर्थन</string>
     <string name="transfers_context_menu_copy_magnet">कॉपी चुंबक</string>
     <string name="try_other_keywords">कम / अलग कुंजीशब्दों से प्रयास करें</string>
-    <string name="donate_1">दान $1</string>
-    <string name="donate_5">दान $5</string>
     <string name="thank_you">धन्यवाद!</string>
     <string name="use_frostclick">उपयोग FrostClick</string>
     <string name="get_ExpressVPN">पाना ExpressVPN</string>

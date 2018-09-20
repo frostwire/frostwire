@@ -26,15 +26,11 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">Instalarea este completă.</string>
     <string name="error_connection_timed_out">Eroare: conexiunea a expirat / a scăzut. Încearcă din nou.</string>
-    <string name="im_on_it">Ma ocup…</string>
-    <string name="wifi_sharing_settings">Wi-Fi Setări de distribuire</string>
-    <string name="is_not_responding">%s nu răspunde</string>
     <string name="azureus_manager_item_seeding">Însămânțarea</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Trimiteți fișiere colegii de pe rețeaua WiFi locală.</string>
     <string name="how_other_users_will_see_you">Cum de alți utilizatori veți vedea</string>
     <string name="share_selected_files">Fișierele selecționate</string>
-    <string name="choose_wifi_network">Alegeți o rețea Wi-Fi</string>
     <string name="device">Dispozitiv</string>
     <string name="connecting">Conectarea</string>
     <string name="all_free_downloads">Toate descărcările gratuite</string>
@@ -51,7 +47,6 @@
     <string name="enable_wifi_sharing">Wi-Fi Sharing</string>
     <string name="alpha_tests_team_thanks">Multumita tuturor testerii noastre alfa voluntare pentru răbdarea și feedback-ul mare, datorită speciale</string>
     <string name="azureus_manager_item_ready">În așteptare pentru alte torrent la coadă</string>
-    <string name="nickname">Poreclă</string>
     <string name="drawer_close">Închide sertar de navigare</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire este o aplicație browser de fișiere și downloader, prin urmare, acesta trebuie să fie capabil de a accesa discul.\n\nFără a permisiunile dvs. FrostWire nu poate funcționa.\n\nDoriți să încercați din nou?</string>
     <string name="peer_http_upload_status_unknown">Necunoscut</string>
@@ -85,7 +80,6 @@
     <string name="delete_this_track">Șterge această piesă</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Se incarca…</string>
-    <string name="nickname_hint">Poreclă</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Calea de stocare a cules de eroare neașteptată</string>
     <string name="hint_transfers">Folosiți "meniu" pentru acțiuni în bloc</string>
@@ -163,13 +157,11 @@
     <string name="menu_space_shortcut_label">Spaţiu</string>
     <string name="connected_using_dataplan">Conectate folosind un plan de date</string>
     <string name="tip_rename_your_files">Sfat: Redenumiți fișierele astfel încât acestea să poată fi găsite</string>
-    <string name="donate_10">Doneaza $10</string>
     <string name="disconnect">Deconectare</string>
     <string name="vpn_what_you_get_with">Ce obțineți cu </string>
     <string name="download_finished">Descărcare terminată</string>
     <string name="confirm_download">Confirmaţi descărcarea</string>
     <string name="input_text_hint">Ce cauti? (informatii de la Google)</string>
-    <string name="change_my_nickname">Schimba porecla mea</string>
     <string name="still_listening_on_port">Încă de ascultare pe portul</string>
     <string name="sdcard_storage">Stocare a lui SD</string>
     <string name="pending">in asteptarea</string>
@@ -179,7 +171,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Toate transferurile vor opri.\nEsti sigur?</string>
     <string name="unshare_selected_files">Fișierele selectate anulați distribuirea</string>
     <string name="are_you_sure_you_want_to_download_the_following">Sunteți sigur că doriți să descărcați următoarele %1$s (%2$s)?</string>
-    <string name="donate_25">Doneaza $25</string>
     <string name="resume_torrent_menu_action">Relua</string>
     <string name="downloading_from_desktop">Descărcarea de fișiere de pe desktop</string>
     <string name="next_time">Data viitoare</string>
@@ -315,7 +306,6 @@
     <string name="playing_now_colon">Redarea acum:</string>
     <string name="please_enter_valid_url">Vă rugăm să introduceți o adresă URL validă</string>
     <string name="search_no_keywords">Vă rugăm să introduceți cuvintele cheie pentru căutare</string>
-    <string name="change_manual_listening_port">Set de ascultare Port 1000 și 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Trebuie să aibă cel puțin un spațiu de încărcare</string>
     <string name="stop">Stop</string>
     <string name="notify_frostwire_is_running_summary">Arată o notificare Android permanent cu statut de transferuri</string>
@@ -530,8 +520,6 @@
     <string name="try_other_keywords">Încercați mai puține cuvinte cheie/diferite</string>
     <string name="use_upnp_port_mapping_summary">Apăsați aici pentru a seta mult timp numărul de port manual</string>
     <string name="activity_media_player_image_description">Media image</string>
-    <string name="donate_1">Doneaza $1</string>
-    <string name="donate_5">Doneaza $5</string>
     <string name="clear_complete_transfers">Acest lucru va șterge toate transferurile finite</string>
     <string name="torrent_max_upload_speed">Maxima Viteza de încărcare</string>
     <string name="download_type_not_supported">Tip de descărcare nu este acceptată</string>

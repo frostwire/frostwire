@@ -26,15 +26,11 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">Ваша ўстаноўка завершана.</string>
     <string name="error_connection_timed_out">Памылка: тайм-аўт падключэння/ўпаў. Паспрабуй яшчэ.</string>
-    <string name="im_on_it">Я на ім.…</string>
-    <string name="wifi_sharing_settings">Wi-Fi Налады агульнага доступу</string>
-    <string name="is_not_responding">%s не адказвае</string>
     <string name="azureus_manager_item_seeding">Пасеў</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Агульны доступ да файлаў з калегамі па лакальнай сеткі Wi-Fi.</string>
     <string name="how_other_users_will_see_you">Як іншыя карыстальнікі будуць бачыць вас</string>
     <string name="share_selected_files">Доля абраных файлаў</string>
-    <string name="choose_wifi_network">Абярыце сетку Wi-Fi</string>
     <string name="device">Прылада</string>
     <string name="connecting">Падключэнне</string>
     <string name="all_free_downloads">Усе свабодныя запампоўкі</string>
@@ -51,7 +47,6 @@
     <string name="enable_wifi_sharing">Wi-Fi агульнага доступу</string>
     <string name="alpha_tests_team_thanks">Дзякуй усім нашым добраахвотным альфа-тэстараў за цярпенне і вялікі зваротнай сувязі, асаблівую падзяку</string>
     <string name="azureus_manager_item_ready">У чаканні іншых торэнтаў у чарзе</string>
-    <string name="nickname">Нік</string>
     <string name="drawer_close">Зачыніць панэль навігацыі</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire з\'яўляецца файлавы браўзэр і дадатак-загрузнік, таму ён павінен быць у стане атрымаць доступ да дыска.\n\nБез вашых дазволаў FrostWire не можа працаваць.\n\nХочаце паспрабаваць яшчэ раз?</string>
     <string name="peer_http_upload_status_unknown">Невядомы</string>
@@ -85,7 +80,6 @@
     <string name="delete_this_track">Выдаліць гэты кавалак</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Загрузка…</string>
-    <string name="nickname_hint">Нік</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Нечаканая памылка выбару шляху захоўвання</string>
     <string name="hint_transfers">Выкарыстоўвайце "меню" для аб\'ёмных дзеянняў</string>
@@ -163,13 +157,11 @@
     <string name="menu_space_shortcut_label">Прастору</string>
     <string name="connected_using_dataplan">Падключэнне з выкарыстаннем планавых дадзеных</string>
     <string name="tip_rename_your_files">Рада: Перайменаванне файлаў, такім чынам яны могуць быць знойдзены</string>
-    <string name="donate_10">Ахвяруйце $10</string>
     <string name="disconnect">Адключыць</string>
     <string name="vpn_what_you_get_with">Што вы атрымліваеце з </string>
     <string name="download_finished">Спампаваць Закончанае</string>
     <string name="confirm_download">Пацвердзіце Спампаваць</string>
     <string name="input_text_hint">Што ты шукаеш? (Намёкі на Google)</string>
-    <string name="change_my_nickname">Змяніць мой нік</string>
     <string name="still_listening_on_port">Тым не менш на порту</string>
     <string name="sdcard_storage">SD Карта памяці</string>
     <string name="pending">у чаканні</string>
@@ -179,7 +171,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Усе трансферы спыніцца.\nВы ўпэўнены?</string>
     <string name="unshare_selected_files">Выбраныя файлы хаваць мае</string>
     <string name="are_you_sure_you_want_to_download_the_following">Вы ўпэўненыя, што вы хочаце спампаваць наступныя %1$s (%2$s)?</string>
-    <string name="donate_25">Ахвяруйце $25</string>
     <string name="resume_torrent_menu_action">Рэзюмэ</string>
     <string name="downloading_from_desktop">Загрузка файлаў з працоўнага стала</string>
     <string name="next_time">Наступным разам</string>
@@ -315,7 +306,6 @@
     <string name="playing_now_colon">Музыка зараз грае:</string>
     <string name="please_enter_valid_url">Калі ласка, увядзіце сапраўдны URL</string>
     <string name="search_no_keywords">Калі ласка, увядзіце ключавыя словы для пошуку</string>
-    <string name="change_manual_listening_port">Усталюйце порт праслухоўвання 1000 і 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Павінен мець па крайняй меры адзін слот загрузкі</string>
     <string name="stop">Стоп</string>
     <string name="distraction_free_search_results_summary">Схаваць кампаненты карыстацкага інтэрфейсу, каб паказаць больш вынікаў. Патрабуецца перазагрузка прыкладання ўступілі ў сілу.</string>
@@ -532,8 +522,6 @@
     <string name="try_other_keywords">Паспрабуйце паменшыць колькасць/іншыя ключавыя словы</string>
     <string name="use_upnp_port_mapping_summary">Доўгія Націсніце тут, каб ўсталяваць уручную нумар порта</string>
     <string name="activity_media_player_image_description">медыя выява</string>
-    <string name="donate_1">Ахвяруйце $1</string>
-    <string name="donate_5">Ахвяруйце $5</string>
     <string name="clear_complete_transfers">Гэта прыбярэ ўсе гатовыя пераклады</string>
     <string name="torrent_max_upload_speed">Max Upload Speed</string>
     <string name="download_type_not_supported">Тып загрузкі не падтрымліваецца</string>

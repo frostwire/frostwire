@@ -26,9 +26,6 @@
     <string name="your_installation_is_complete">आपली स्थापना पूर्ण झाली आहे.</string>
     <string name="error_connection_timed_out">त्रुटी: कनेक्शन कालबाह्य/वगळले पुन्हा प्रयत्न करा.</string>
     <string name="vpn_client_feature_2_ExpressVPN">अमर्यादित डाउनलोड गती</string>
-    <string name="im_on_it">मी त्यात आहे…</string>
-    <string name="wifi_sharing_settings">Wi-Fi सामायिकरण सेटिंग्ज</string>
-    <string name="is_not_responding">%s प्रतिसाद देत नाही</string>
     <string name="vpn_client_feature_3_ExpressVPN">खाजगी आणि लॉगलेस ब्राउझिंग</string>
     <string name="azureus_manager_item_seeding">बीजन</string>
     <string name="application_label">FrostWire</string>
@@ -37,7 +34,6 @@
     <string name="how_other_users_will_see_you">इतर वापरकर्ते आपल्याला कसे पाहू शकतील</string>
     <string name="cloud_download_aborted_on_mobile_data">वर्तमान सेटिंग जेव्हा Wi-Fi नेटवर्कवर नाही तेव्हा डाउनलोड करण्यास प्रतिबंधित करते</string>
     <string name="share_selected_files">निवडलेल्या फायली सामायिक करा</string>
-    <string name="choose_wifi_network">एक Wi-Fi नेटवर्क निवडा</string>
     <string name="filter_ellipsis">फिल्टर…</string>
     <string name="device">डिव्हाइस</string>
     <string name="connecting">कनेक्ट करीत आहे</string>
@@ -60,7 +56,6 @@
     <string name="sharing_privacy_settings">सामायिकरण आणि गोपनीयता</string>
     <string name="alpha_tests_team_thanks">संयम आणि उत्कृष्ट प्रतिसादासाठी आमच्या सर्व स्वयंसेवी अल्फा परीक्षकांमुळे धन्यवाद, विशेष धन्यवाद</string>
     <string name="azureus_manager_item_ready">इतर टॉरेन्ट्सना रांगेत वाट पाहत आहे</string>
-    <string name="nickname">टोपणनाव</string>
     <string name="drawer_close">नेव्हिगेशन ड्रॉवर बंद करा</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire एक फाइल ब्राउझर आणि डाउनलोडर अॅप आहे, म्हणून तो आपल्या डिस्कवर प्रवेश करण्यात सक्षम असणे आवश्यक आहे.\n\nआपल्या परवानगीशिवाय फ्रॉस्टवायर काम करू शकत नाही.\n\nपुन्हा प्रयत्न करु इच्छिता?</string>
     <string name="fix_instructions">माहितीसाठी आणि निर्देशांचे निराकरण करण्यासाठी support.frostwire.com पहा</string>
@@ -101,7 +96,6 @@
     <string name="seeding_settings_explanation">इंटरनेटवरील बिटटॉरंट वापरकर्ते आपल्या टॉरेन्ट्स बीडच्या डेटाच्या फाईल भागांमध्ये डाउनलोड करण्यास सक्षम असतील.</string>
     <string name="transfer_detail_storage_header">संचयन पथ:</string>
     <string name="loading_indeterminate">लोड होत आहे…</string>
-    <string name="nickname_hint">टोपणनाव</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">संचयन पाथ निवडण्यात अनपेक्षित त्रुटी</string>
     <string name="torrent_preferences_header">जोरदार प्राधान्ये</string>
@@ -200,14 +194,12 @@
     <string name="connected_using_dataplan">डेटा प्लॅन वापरून कनेक्ट केले</string>
     <string name="vpn_on_toast_notification">आपण एका VPN शी कनेक्ट केलेले आहे.</string>
     <string name="tip_rename_your_files">माहिती: फाइल्स पुनर्नामित करा म्हणजे ते आढळू शकतील</string>
-    <string name="donate_10">दान करा $10</string>
     <string name="disconnect">डिस्कनेक्ट करा</string>
     <string name="add_trackers">ट्रॅकर्स जोडा</string>
     <string name="vpn_what_you_get_with">आपल्याला काय मिळते </string>
     <string name="download_finished">डाउनलोड समाप्त</string>
     <string name="confirm_download">डाउनलोडची पुष्टी करा</string>
     <string name="input_text_hint">आपणास काय हवे आहे? (Google द्वारे इशारे)</string>
-    <string name="change_my_nickname">माझे टोपणनाव बदला</string>
     <string name="notification_other_header">सूचना आणि इतर</string>
     <string name="still_listening_on_port">पोर्टवर अजूनही ऐकत आहे</string>
     <string name="sdcard_storage">SD कार्ड स्टोरेज</string>
@@ -218,7 +210,6 @@
     <string name="all_transfers_will_stop_are_you_sure">सर्व हस्तांतरण थांबेल.\nतुला खात्री आहे?</string>
     <string name="unshare_selected_files">निवडलेल्या फायली सामायिकरण रद्द करा</string>
     <string name="are_you_sure_you_want_to_download_the_following">आपल्याला खात्री आहे की आपण खालील डाउनलोड करू इच्छिता %1$s (%2$s)?</string>
-    <string name="donate_25">दान करा $25</string>
     <string name="resume_torrent_menu_action">पुन्हा सुरू करा</string>
     <string name="downloading_from_desktop">डेस्कटॉपवरून फायली डाउनलोड करणे</string>
     <string name="next_time">पुढच्या वेळेस</string>
@@ -390,7 +381,6 @@
     <string name="playing_now_colon">आता प्ले होत आहे:</string>
     <string name="please_enter_valid_url">कृपया वैध यूआरएल टाका</string>
     <string name="search_no_keywords">कृपया शोध कीवर्ड प्रविष्ट करा</string>
-    <string name="change_manual_listening_port">सूची ऐकणे पोर्ट 1000 आणि 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">जसाकडे किमान एक अपलोड स्लॉट असेल</string>
     <string name="stop">थांबवा</string>
     <string name="distraction_free_search_results_summary">अधिक परिणाम दर्शविण्यासाठी वापरकर्ता इंटरफेस घटक लपवा. प्रभावी होण्यासाठी अॅप रीस्टार्टची आवश्यकता आहे.</string>
@@ -651,9 +641,7 @@
     <string name="try_other_keywords">थोड्या/भिन्न कीवर्ड्सचा प्रयत्न करा</string>
     <string name="use_upnp_port_mapping_summary">मॅन्युअल पोर्ट नंबर सेट करण्यासाठी येथे दाबा</string>
     <string name="activity_media_player_image_description">माध्यम प्रतिमा</string>
-    <string name="donate_1">दान करा $1</string>
     <string name="vpn_drop_protection_summary">आपल्या गोपनीयतेस संरक्षित करा एन्क्रिप्ट केलेले व्हीपीएन कनेक्शन सक्रिय नसल्यास स्वयंचलितपणे बीटटोअर हस्तांतरण अक्षम करा</string>
-    <string name="donate_5">दान करा $5</string>
     <string name="clear_complete_transfers">हे सर्व समाप्त झालेले हस्तांतरण साफ करेल</string>
     <string name="torrent_max_upload_speed">कमाल अपलोड स्पीड</string>
     <string name="download_type_not_supported">डाउनलोड प्रकार समर्थित नाही</string>

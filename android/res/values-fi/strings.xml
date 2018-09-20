@@ -26,15 +26,11 @@
     <string name="activity_mediaplayer_name">Mediasoitin</string>
     <string name="your_installation_is_complete">Asennus on valmis.</string>
     <string name="error_connection_timed_out">Virhe: yhteyden aikakatkaisu/laski. Yritä uudelleen.</string>
-    <string name="im_on_it">Olen sitä…</string>
-    <string name="wifi_sharing_settings">Wi-Fi Jakamisasetukset</string>
-    <string name="is_not_responding">%s ei vastaa</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Jaa tiedostoja ikäisensä paikallisista Wi-Fi-verkkoon.</string>
     <string name="how_other_users_will_see_you">Miten muut käyttäjät näkevät sinut</string>
     <string name="share_selected_files">Jaa valitut tiedostot</string>
-    <string name="choose_wifi_network">Valitse WiFi-verkkoon</string>
     <string name="device">Laite</string>
     <string name="connecting">Yhteyden</string>
     <string name="all_free_downloads">Kaikki ilmaiseksi ladattavia</string>
@@ -52,7 +48,6 @@
     <string name="sharing_privacy_settings">Jakaminen ja yksityisyys</string>
     <string name="alpha_tests_team_thanks">Kiitos kaikille vapaaehtoista alfa testaajat kärsivällisyydestä ja hyvää palautetta, erityiset kiitokset</string>
     <string name="azureus_manager_item_ready">Odotetaan muita torrentit jonoon</string>
-    <string name="nickname">Lempinimi</string>
     <string name="drawer_close">Sulje navigointipaneeli</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire on tiedostoselain ja downloader app, joten se on voitava käyttää levyn.\n\nIlman käyttöoikeudet FrostWire ei voi toimia.\n\nHaluatko yrittää uudelleen?</string>
     <string name="peer_http_upload_status_unknown">Tuntematon</string>
@@ -86,7 +81,6 @@
     <string name="delete_this_track">Poista tämä kappale</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Ladataan…</string>
-    <string name="nickname_hint">Lempinimi</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Odottamaton virhe poiminta tallennuspolun</string>
     <string name="torrent_preferences_header">Torrent Asetukset</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">Avaruus</string>
     <string name="connected_using_dataplan">Liitetty Data Plan</string>
     <string name="tip_rename_your_files">Vihje: Nimeä tiedostot niin niitä löytyy</string>
-    <string name="donate_10">Lahjoittaa $10</string>
     <string name="disconnect">Katkaista</string>
     <string name="vpn_what_you_get_with">Mitä saat kanssa </string>
     <string name="download_finished">Lataa Valmiit</string>
     <string name="confirm_download">Vahvista Lataa</string>
     <string name="input_text_hint">Mitä etsit? (Vihjeitä Google)</string>
-    <string name="change_my_nickname">Muuta lempinimi</string>
     <string name="notification_other_header">Ilmoitukset ja muut</string>
     <string name="still_listening_on_port">Edelleen kuuntelee porttia</string>
     <string name="sdcard_storage">SD-kortti varastointi</string>
@@ -184,7 +176,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Kaikki siirrot pysähtyy.\nOletko varma?</string>
     <string name="unshare_selected_files">Jakamisen poistaminen valitut tiedostot</string>
     <string name="are_you_sure_you_want_to_download_the_following">Oletko varma, että haluat ladata seuraavan %1$s (%2$s)?</string>
-    <string name="donate_25">Lahjoittaa $25</string>
     <string name="resume_torrent_menu_action">Jatkaa</string>
     <string name="downloading_from_desktop">Tiedostojen lataaminen työpöydältä</string>
     <string name="next_time">Seuraavalla kerralla</string>
@@ -324,7 +315,6 @@
     <string name="playing_now_colon">Soivan nyt:</string>
     <string name="please_enter_valid_url">Anna kelvollinen URL</string>
     <string name="search_no_keywords">Anna hakusanat</string>
-    <string name="change_manual_listening_port">Aseta portin 1000 ja 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Täytyy olla vähintään yksi upload lovi</string>
     <string name="stop">Stop</string>
     <string name="distraction_free_search_results_summary">Piilota käyttöliittymäkomponentit näyttää enemmän tuloksia. Tarvitsee sovellus uudelleenkäynnistys voimaan.</string>
@@ -547,8 +537,6 @@
     <string name="try_other_keywords">Kokeile vähemmän/eri avainsanoja</string>
     <string name="use_upnp_port_mapping_summary">Pitkä painallus tästä Manuaalisen portin numero</string>
     <string name="activity_media_player_image_description">Media kuva</string>
-    <string name="donate_1">Lahjoittaa $1</string>
-    <string name="donate_5">Lahjoittaa $5</string>
     <string name="clear_complete_transfers">Tämä tyhjentää kaikki valmiin siirrot</string>
     <string name="torrent_max_upload_speed">Maksimi Lähetysnopeus</string>
     <string name="download_type_not_supported">Lataustyyppi ei tueta</string>

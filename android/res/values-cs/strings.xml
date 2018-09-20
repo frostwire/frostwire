@@ -76,8 +76,6 @@
     <string name="download">Ke Stažení</string>
     <string name="download_selected_files">Stáhnout Vybrané</string>
     <string name="toggle_sharing_selected_files">Přepnout Sdílení</string>
-    <string name="change_manual_listening_port">Nastavit port pro komunikaci 1000 a 65535</string>
-    <string name="is_not_responding">%s neodpovídá</string>
     <string name="max_concurrent_uploads">Maximálně Simultánní Odesílání</string>
     <string name="search_no_keywords">Zadejte prosím klíčová slova pro hledání</string>
     <string name="search_select_filetype">Prosím, vyberte typ souboru</string>
@@ -86,7 +84,6 @@
     <string name="update_title">Je Čas Aktualizovat!</string>
     <string name="update_message">FrostWire stahnoul novou AKTUALIZACE VÝKONNOSTI pro tebe, Prosím, jděte do toho a stiskněte tlačítko OK, pokud chcete nyní nainstalovat.</string>
     <string name="next_time">Příště</string>
-    <string name="change_my_nickname">Změnit svůj Nick</string>
     <string name="try_changing_your_nickname">Zadejte svůj nick</string>
     <string name="reconnecting">Opakované připojení</string>
     <string name="go_to">Jít Do</string>
@@ -147,7 +144,6 @@
     <string name="open">Otevřené</string>
     <string name="connected_to">Ořipojeno k</string>
     <string name="sharing_preferences">Sdílení Složek</string>
-    <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">Jak ostatní uživatelé tě vidí</string>
     <string name="networking_preferences">Preference Sítí</string>
     <string name="simultaneous_uploads">Simultánní Odesílání</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Připojen pomocí Datového Tarifu</string>
     <string name="send_to_chat">Odeslat do Chatu</string>
     <string name="sent_file_to_chat">Odesláno soubor do Chatu</string>
-    <string name="choose_wifi_network">Vyberte si Wi-Fi sítí</string>
     <string name="please_update_to_v">Prosím aktualizujte do v. %s</string>
     <string name="cant_open_file">Omlouváme se, ale nevím, jak tento soubor otevřít.</string>
     <string name="downloading_from_desktop">Stažení souboru(y) z desktopu</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">Stahování %s</string>
     <string name="activity_about_droidwire_description">FrostWire pro Android</string>
     <string name="download_type_not_supported">Stáhněty typ není podporován</string>
-    <string name="im_on_it">Já jsem na to…</string>
     <string name="hint_transfers">Použit "menu" pro hromadné akce</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Maximální Rychlost Stahování</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Seed jen na WiFi</string>
     <string name="seed_finished_torrents_wifi_only_summary">pouze při připojení přes WiFi uložit šířku pásma na datový tarif</string>
     <string name="seeding_has_been_turned_off">Seeding byl vypnut</string>
-    <string name="nickname_hint">Nickname</string>
     <string name="show_transfers_on_download_start">Zobrazit Transfery na Spustit ke Stažení</string>
     <string name="dialog_new_transfer_title">Spustit ke Stažení?</string>
     <string name="dialog_new_transfer_text_text">Jste si jisti, že chcete stáhnout %1$s (%2$s)</string>
@@ -353,7 +346,6 @@
     <string name="activity_mediaplayer_name">Přehrávač médií</string>
     <string name="your_installation_is_complete">Vaše instalace je dokončena.</string>
     <string name="error_connection_timed_out">Chyba: Připojení vypršel/poklesla. Zkus to znovu.</string>
-    <string name="wifi_sharing_settings">Wifi Nastavení sdílení</string>
     <string name="enable_wifi_sharing_summary">Sdílení souborů s vrstevníky na lokální WiFi síti.</string>
     <string name="all_free_downloads">Všichni ke stažení zdarma</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -402,13 +394,11 @@
     <string name="help">Pomoc</string>
     <string name="cloud_downloads_coming">Omlouváme: Počínaje stažení cloudových odtud budou k dispozici další aktualizace.</string>
     <string name="menu_space_shortcut_label">Místo</string>
-    <string name="donate_10">Darovat $10</string>
     <string name="vpn_what_you_get_with">Co získáte s </string>
     <string name="confirm_download">Potvrdit stažení</string>
     <string name="sdcard_storage">SD\'s Storage</string>
     <string name="deleted_crawl_cache">Vypouští mezipaměti kraul</string>
     <string name="are_you_sure_you_want_to_download_the_following">Jste si jisti, že chcete stáhnout následující %1$s (%2$s)?</string>
-    <string name="donate_25">Darovat $25</string>
     <string name="player_paused_press_and_hold_to_stop">Hráč pozastaveno. (Tip: stiskněte a podržte pro zastavení)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magnet URL přidána do převodů. (Magnety fungují nejlépe přes Wi-Fi)</string>
@@ -561,8 +551,6 @@
     <string name="support">Podpora</string>
     <string name="transfers_context_menu_copy_magnet">Kopie Magnet</string>
     <string name="try_other_keywords">Zkuste méně/různá klíčová slova</string>
-    <string name="donate_1">Darovat $1</string>
-    <string name="donate_5">Darovat $5</string>
     <string name="thank_you">Děkuji!</string>
     <string name="use_frostclick">Použít FrostClick</string>
     <string name="get_ExpressVPN">Zíscat ExpressVPN</string>

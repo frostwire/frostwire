@@ -28,9 +28,6 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">Jou installasie is voltooi.</string>
     <string name="vpn_client_feature_2_ExpressVPN">Onbeperkte aflaai spoed</string>
-    <string name="im_on_it">Ek is besig met dit…</string>
-    <string name="wifi_sharing_settings">Wi-Fi-deelinstellings</string>
-    <string name="is_not_responding">%s reageer nie</string>
     <string name="vpn_client_feature_3_ExpressVPN">Privaat en loglose blaai</string>
     <string name="azureus_manager_item_seeding">Saai</string>
     <string name="application_label">FrostWire</string>
@@ -39,7 +36,6 @@
     <string name="how_other_users_will_see_you">Hoe ander gebruikers jou sal sien</string>
     <string name="cloud_download_aborted_on_mobile_data">Huidige instelling verhoed dat aflaai wanneer dit nie op Wi-Fi-netwerk is nie</string>
     <string name="share_selected_files">Deel geselekteerde lêers</string>
-    <string name="choose_wifi_network">Kies \'n Wi-Fi-netwerk</string>
     <string name="filter_ellipsis">Filter…</string>
     <string name="device">Device</string>
     <string name="connecting">Koppel</string>
@@ -58,7 +54,6 @@
     <string name="sharing_privacy_settings">Deel en privaatheid</string>
     <string name="alpha_tests_team_thanks">Baie dankie aan al ons vrywillige alfa testers vir die geduld en goeie terugvoering</string>
     <string name="azureus_manager_item_ready">Wag vir ander torrents om te wag</string>
-    <string name="nickname">Bynaam</string>
     <string name="drawer_close">Maak die navigasielaaier toe</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire is \'n lêerblaaier en aflaaiprogram, daarom moet jy toegang hê tot jou skyf.\n\nSonder jou toestemming kan FrostWire nie werk nie.\n\nWil jy weer probeer?</string>
     <string name="fix_instructions">Sien support.frostwire.com vir inligting en regstellings</string>
@@ -98,7 +93,6 @@
     <string name="dismiss">Ontslaan</string>
     <string name="seeding_settings_explanation">BitTorrent-gebruikers op die internet sal lêer stukke van die data wat jou torrents saad kan aflaai.</string>
     <string name="loading_indeterminate">Laai…</string>
-    <string name="nickname_hint">Bynaam</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Onverwagse fout kies berging pad</string>
     <string name="torrent_preferences_header">Torrent Voorkeure</string>
@@ -191,13 +185,11 @@
     <string name="connected_using_dataplan">Gekoppel met behulp van Data Plan</string>
     <string name="vpn_on_toast_notification">Jy is gekoppel aan \'n Skynprivaatnetwerk.</string>
     <string name="tip_rename_your_files">Wenk: Hernoem lêers sodat hulle gevind kan word</string>
-    <string name="donate_10">Skenk $10</string>
     <string name="disconnect">Ontkoppel</string>
     <string name="vpn_what_you_get_with">Wat kry jy met </string>
     <string name="download_finished">Aflaai klaar</string>
     <string name="confirm_download">Bevestig aflaai</string>
     <string name="input_text_hint">Waarvoor soek jy? (wenke deur Google)</string>
-    <string name="change_my_nickname">Verander my bynaam</string>
     <string name="notification_other_header">Kennisgewings en Ander</string>
     <string name="still_listening_on_port">Luister steeds op die hawe</string>
     <string name="sdcard_storage">SD berging</string>
@@ -208,7 +200,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Alle oordragte sal ophou.\nIs jy seker?</string>
     <string name="unshare_selected_files">Unshare geselekteerde lêers</string>
     <string name="are_you_sure_you_want_to_download_the_following">Is jy seker dat jy die volgende wil aflaai %1$s (%2$s)?</string>
-    <string name="donate_25">Skenk $25</string>
     <string name="resume_torrent_menu_action">Begin weer</string>
     <string name="downloading_from_desktop">Laai lêers van die lessenaar af</string>
     <string name="next_time">Volgende Tyd</string>
@@ -363,7 +354,6 @@
     <string name="playing_now_colon">Speel nou:</string>
     <string name="please_enter_valid_url">Voer asseblief \'n geldige URL in</string>
     <string name="search_no_keywords">Voer asseblief sleutelwoorde in</string>
-    <string name="change_manual_listening_port">Stel luisterpoort 1000 en 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Moet ten minste een oplaaisleuf hê</string>
     <string name="stop">Stop</string>
     <string name="distraction_free_search_results_summary">Versteek UI-komponente om meer resultate te wys. Moet program herlaai om in werking te tree.</string>
@@ -608,9 +598,7 @@
     <string name="try_other_keywords">Probeer minder/verskillende sleutelwoorde</string>
     <string name="use_upnp_port_mapping_summary">Lang Druk hier om die handleiding nommer in te stel</string>
     <string name="activity_media_player_image_description">Mediabeeld</string>
-    <string name="donate_1">Skenk $1</string>
     <string name="vpn_drop_protection_summary">Beskerm jou privaatheid. Skakel BitTorrent-oordragte outomaties uit tensy \'n geïnkripteer Skynprivaatnetwerkverbinding aktief is</string>
-    <string name="donate_5">Skenk $5</string>
     <string name="clear_complete_transfers">Dit sal al die voltooide oordragte uitvee</string>
     <string name="torrent_max_upload_speed">Maksimum oplaaispoed</string>
     <string name="download_type_not_supported">Laai Tipe nie ondersteun nie</string>

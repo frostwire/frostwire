@@ -76,8 +76,6 @@
     <string name="download">Download</string>
     <string name="download_selected_files">Download Selezionato</string>
     <string name="toggle_sharing_selected_files">Attiva condivisione</string>
-    <string name="change_manual_listening_port">Imposta Porta d\'ascolto 1000 e 65535</string>
-    <string name="is_not_responding">%s non risponde</string>
     <string name="max_concurrent_uploads">Massimo di upload in contemporanea</string>
     <string name="search_no_keywords">Inserisci parole chiave</string>
     <string name="search_select_filetype">Seleziona un tipo di file</string>
@@ -86,7 +84,6 @@
     <string name="update_title">E\' ora di aggiornare!</string>
     <string name="update_message">FrostWire ha scaricato un nuovo AGGIORNAMENTO per te, tocca il pulsante OK se vuoi installarlo ora</string>
     <string name="next_time">Prossima volta</string>
-    <string name="change_my_nickname">Cambia nickname</string>
     <string name="try_changing_your_nickname">Inserisci il tuo nickname</string>
     <string name="reconnecting">Riconnessione in corso</string>
     <string name="go_to">Vai a</string>
@@ -147,7 +144,6 @@
     <string name="open">Apri</string>
     <string name="connected_to">Connesso a</string>
     <string name="sharing_preferences">Condividi preferenze</string>
-    <string name="nickname">Nickname</string>
     <string name="how_other_users_will_see_you">Come ti vedono gli altri utenti</string>
     <string name="networking_preferences">Preferenze di rete</string>
     <string name="simultaneous_uploads">Upload simultanei</string>
@@ -173,7 +169,6 @@
     <string name="connected_using_dataplan">Connesso tramite un Piano dati</string>
     <string name="send_to_chat">Invia alla Chat</string>
     <string name="sent_file_to_chat">Invia il file alla Chat</string>
-    <string name="choose_wifi_network">Scegli una rete Wi-fi</string>
     <string name="please_update_to_v">Aggiornare alla versione %s</string>
     <string name="cant_open_file">Siamo spiacenti ma il file non può essere aperto</string>
     <string name="downloading_from_desktop">Scaricamento file dal computer</string>
@@ -276,7 +271,6 @@
     <string name="downloading_promotion">%s in download</string>
     <string name="activity_about_droidwire_description">FrostWire per Android</string>
     <string name="download_type_not_supported">Tipo di download non supportato</string>
-    <string name="im_on_it">Ci sono…</string>
     <string name="hint_transfers">Usa il menu per più azioni</string>
     <string name="torrent_settings">Torrent</string>
     <string name="torrent_max_download_speed_summary">Massima velocità in download</string>
@@ -294,7 +288,6 @@
     <string name="seed_finished_torrents_wifi_only">Seeda solo su Wi-fi</string>
     <string name="seed_finished_torrents_wifi_only_summary">Seeda solo se connesso via Wi-fi per risparmiare traffico sul tuo Piano dati</string>
     <string name="seeding_has_been_turned_off">Seeding disattivato </string>
-    <string name="nickname_hint">Nickname</string>
     <string name="show_transfers_on_download_start">Mostra trasferimenti all\'inizio del download</string>
     <string name="dialog_new_transfer_title">Procedere con il download?</string>
     <string name="dialog_new_transfer_text_text">Sei sicuro di voler scaricare %1$s (%2$s)</string>
@@ -354,7 +347,6 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="your_installation_is_complete">L\'installazione è terminata.</string>
     <string name="error_connection_timed_out">Errore: connessione scaduta / caduto. Riprova.</string>
-    <string name="wifi_sharing_settings">Impostazioni di condivisione Wifi</string>
     <string name="enable_wifi_sharing_summary">Condividere file con i coetanei sulla rete Wi-Fi locale.</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Richiedere nuovamente</string>
@@ -402,13 +394,11 @@
     <string name="help">Aiuto</string>
     <string name="cloud_downloads_coming">Scusate!: Partendo download nube da qui sarà disponibile su ulteriori aggiornamenti.</string>
     <string name="menu_space_shortcut_label">Spazio</string>
-    <string name="donate_10">Donare $10</string>
     <string name="vpn_what_you_get_with">Che cosa si ottiene con </string>
     <string name="confirm_download">Conferma download</string>
     <string name="sdcard_storage">Memoria SD</string>
     <string name="deleted_crawl_cache">Eliminata cache di strisciare</string>
     <string name="are_you_sure_you_want_to_download_the_following">Sei sicuro di voler scaricare la seguente %1$s (%2$s)?</string>
-    <string name="donate_25">Donare $25</string>
     <string name="player_paused_press_and_hold_to_stop">Pausa Player. (Suggerimento: Tenere premuto per fermare)</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">URL magnete aggiunto ai trasferimenti. (Magneti funzionano meglio sul sito Wifi)</string>
@@ -558,8 +548,6 @@
     <string name="support">Supporto</string>
     <string name="transfers_context_menu_copy_magnet">Copia Magnet</string>
     <string name="try_other_keywords">Prova con meno parole chiave/diversi</string>
-    <string name="donate_1">Donare $1</string>
-    <string name="donate_5">Donare $5</string>
     <string name="thank_you">Grazie!</string>
     <string name="use_frostclick">Utilizzare FrostClick</string>
     <string name="get_ExpressVPN">Ottenere ExpressVPN</string>

@@ -28,15 +28,11 @@
     <string name="activity_mediaplayer_name">Mediálny prehrávač</string>
     <string name="your_installation_is_complete">Vaša inštalácia je dokončená.</string>
     <string name="error_connection_timed_out">Chyba: Pripojenie vypršal/poklesla. Skúste to znova.</string>
-    <string name="im_on_it">Idem na to…</string>
-    <string name="wifi_sharing_settings">Wifi Nastavenie zdieľania</string>
-    <string name="is_not_responding">%s nereaguje</string>
     <string name="azureus_manager_item_seeding">Siatie</string>
     <string name="application_label">FrostWire</string>
     <string name="enable_wifi_sharing_summary">Zdieľanie súborov s rovesníkmi na lokálnej WiFi sieti.</string>
     <string name="how_other_users_will_see_you">Ako ostatní užívatelia vás uvidia</string>
     <string name="share_selected_files">Zdieľať vybrané súbory</string>
-    <string name="choose_wifi_network">Vyberte WiFi sieť</string>
     <string name="device">Zariadenie</string>
     <string name="connecting">Pripojenie</string>
     <string name="all_free_downloads">Všetci na stiahnutie zadarmo</string>
@@ -53,7 +49,6 @@
     <string name="enable_wifi_sharing">Wifi zdieľanie</string>
     <string name="alpha_tests_team_thanks">Ďakujeme všetkým našim dobrovoľným alfa-testerov pre trpezlivosť a veľkú spätnú väzbu, Zvláštne poďakovanie</string>
     <string name="azureus_manager_item_ready">Čakanie na ďalšie torrentov do fronty</string>
-    <string name="nickname">Prezývka</string>
     <string name="drawer_close">Zavrieť navigačný panel</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire je prehliadač súborov a downloader app, a preto musí byť schopný získať prístup k disku.\n\nBez toho aby svoje oprávnenia FrostWire nemôže fungovať.\n\nChcete to skúsiť znova?</string>
     <string name="peer_http_upload_status_unknown">Neznáme</string>
@@ -87,7 +82,6 @@
     <string name="delete_this_track">Zmazať tento kus</string>
     <string name="five_dollars">$5</string>
     <string name="loading_indeterminate">Načítava…</string>
-    <string name="nickname_hint">Prezývka</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Neočakávaná chyba skladovanie picking cesta</string>
     <string name="hint_transfers">Použite "menu" pre hromadné akcie</string>
@@ -167,13 +161,11 @@
     <string name="menu_space_shortcut_label">Miesto</string>
     <string name="connected_using_dataplan">Pripojené pomocou dátový program</string>
     <string name="tip_rename_your_files">Tip: Premenovanie súborov, takže je možné nájsť</string>
-    <string name="donate_10">Darovať $10</string>
     <string name="disconnect">Odpojiť</string>
     <string name="vpn_what_you_get_with">Čo získate s </string>
     <string name="download_finished">Sťahovanie dokončené</string>
     <string name="confirm_download">Potvrdiť stiahnutie</string>
     <string name="input_text_hint">Čo hľadáš? (Narážky od Googlu)</string>
-    <string name="change_my_nickname">Zmením prezývku</string>
     <string name="still_listening_on_port">Stále počúva na porte</string>
     <string name="sdcard_storage">Skladovanie SD karty.</string>
     <string name="pending">až do</string>
@@ -183,7 +175,6 @@
     <string name="all_transfers_will_stop_are_you_sure">Všetky prevody sa zastaví.\nSi si istý?</string>
     <string name="unshare_selected_files">Zrušiť zdieľanie vybrané súbory</string>
     <string name="are_you_sure_you_want_to_download_the_following">Ste si istí, že chcete stiahnuť nasledujúce %1$s (%2$s)?</string>
-    <string name="donate_25">Darovať $25</string>
     <string name="resume_torrent_menu_action">Pokračovať</string>
     <string name="downloading_from_desktop">Sťahovanie súborov z počítača</string>
     <string name="next_time">Nabudúce</string>
@@ -321,7 +312,6 @@
     <string name="playing_now_colon">Prehrávanie teraz:</string>
     <string name="please_enter_valid_url">Zadajte platnú adresu URL</string>
     <string name="search_no_keywords">Prosím, zadajte kľúčové slová</string>
-    <string name="change_manual_listening_port">Nastavte port pre načúvanie port 1000 a 65535</string>
     <string name="gotta_have_at_least_one_upload_slot">Musí mať aspoň jeden slot pre nahrávanie</string>
     <string name="stop">Prestať</string>
     <string name="distraction_free_search_results_summary">Skryť UI komponenty pre zobrazenie viac výsledkov. Potrebuje reštart aplikácie sa prejaví.</string>
@@ -542,8 +532,6 @@
     <string name="try_other_keywords">Skúste menej/rôzne kľúčové slová</string>
     <string name="use_upnp_port_mapping_summary">Dlhé stlačenie tu nastaviť ručne číslo portu</string>
     <string name="activity_media_player_image_description">Mediálny obraz</string>
-    <string name="donate_1">Darovať $1</string>
-    <string name="donate_5">Darovať $5</string>
     <string name="clear_complete_transfers">To vymaže všetky hotové prevody</string>
     <string name="torrent_max_upload_speed">Maximálna rýchlosť uploadu</string>
     <string name="download_type_not_supported">Typ súboru na stiahnutie nie je podporované</string>
