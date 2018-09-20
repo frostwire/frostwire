@@ -1,3 +1,10 @@
+frostwire (6.7.4) stable; urgency=high
+  * New BitTorrent IP Filter with support for P2P-format block list files (tentative)
+  * New jlibtorrent 1.2.0.18
+  * Translation updates: Croatian
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 20 Sep 2018 10:35:15 -0600
+
 frostwire (6.7.3) stable; urgency=high
   * Search: YT fixes
   * New jlibtorrent 1.2.0.18-RC12
