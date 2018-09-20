@@ -111,8 +111,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         panel.add(importButton, "span 1, wrap");
 
         progressBar = new JProgressBar(0,100);
-        progressBar.setString("Importing...");
-        progressBar.setValue(50);
+        progressBar.setStringPainted(true);
+        progressBar.setVisible(false);
         panel.add(progressBar, "growx, wrap");
 
         JButton addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
