@@ -53,7 +53,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         P2P
     }
 
-    private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)");
+    private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
 
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     public final static String TITLE = I18n.tr("IP Filter");
@@ -65,6 +65,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private JTextField fileUrlTextField;
     private JProgressBar progressBar;
     private JButton importButton;
+    private JButton clearFilterButton;
+    private JButton addRangeManuallyButton;
     private IconButton fileChooserIcon;
 
     private boolean initialized;
@@ -115,11 +117,11 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         progressBar.setVisible(false);
         panel.add(progressBar, "growx, wrap");
 
-        JButton addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
+        addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
         addRangeManuallyButton.addActionListener((e) -> onAddRangeManuallyAction());
         panel.add(addRangeManuallyButton);
 
-        JButton clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
+        clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
         clearFilterButton.addActionListener((e) -> onClearFilterAction());
         panel.add(clearFilterButton);
         add(panel);
@@ -210,6 +212,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 LOG.error("importFromStreamAsync(): IPFilterFormat could not be determined");
                 fileUrlTextField.selectAll();
                 enableImportControls(true);
+                GUIMediator.showError(I18n.tr("Invalid IP Filter file format, only P2P (PeerGuardian) format supported"));
                 return;
             }
             final long decompressedFileSize = decompressedFile.length();
@@ -279,7 +282,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             return null;
         }
         Matcher matcher = P2P_LINE_PATTERN.matcher(new String(sample, StandardCharsets.UTF_8));
-        if (matcher.find()) {
+        if (matcher.find() && matcher.find() && matcher.find()) { // no coincidences
             return IPFilterFormat.P2P;
         }
         return null;
@@ -290,7 +293,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private void onFileChooserIconAction() {
-        final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (p2p format only)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
+        final File selectedFile = FileChooserHandler.getInputFile(getContainer(), I18n.tr("Select the IP filter file (P2P/PeerGuardian format only supported)"), FileChooserHandler.getLastInputDirectory(), new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.isFile();
@@ -380,6 +383,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             fileChooserIcon.setEnabled(enable);
             importButton.setText(enable ? I18n.tr("Import") : I18n.tr("Importing..."));
             importButton.setEnabled(enable);
+            clearFilterButton.setEnabled(enable);
+            addRangeManuallyButton.setEnabled(enable);
             lastPercentageUpdateTimestamp = -1;
             lastPercentage = -1;
             progressBar.setVisible(!enable);
