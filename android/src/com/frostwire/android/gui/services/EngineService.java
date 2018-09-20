@@ -209,6 +209,7 @@ public class EngineService extends Service implements IEngineService {
         BTEngine btEngine = BTEngine.getInstance();
         if (!wasShutdown) {
             btEngine.resume();
+            TransferManager.instance().forceReannounceTorrents();
         } else {
             btEngine.start();
             TransferManager.instance().reset();

@@ -31,6 +31,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
+import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -100,6 +101,15 @@ public final class TransferManager {
             clearTransfers();
         }
         unregisterPreferencesChangeListener();
+    }
+
+    public void forceReannounceTorrents() {
+        for (BittorrentDownload d : bittorrentDownloadsList) {
+            if (d instanceof BTDownload) {
+                BTDownload bt = (BTDownload) d;
+                bt.getTorrentHandle().forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+            }
+        }
     }
 
     private void clearTransfers() {
