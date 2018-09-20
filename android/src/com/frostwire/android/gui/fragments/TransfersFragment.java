@@ -232,6 +232,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onResume() {
         super.onResume();
+        initStorageRelatedRichNotifications(null);
         onTime();
     }
 
