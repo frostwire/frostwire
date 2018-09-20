@@ -1,6 +1,7 @@
 FrostWire 2.0.9 build 564 - SEP/20/2018
  - New jlibtorrent 1.2.0.18
  - Bug fix on connection drop and transfer state loss
+ - Bug fix where a "Saving to Internal Memory" rich notification would linger after picking an SD Card location
  - Translations updated: Chinese, Hebrew
  - Library updates: applovin 8.1.2, presage-moat-3.0.26-3.0.14
  - Optimizations and fixes
