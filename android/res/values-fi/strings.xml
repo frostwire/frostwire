@@ -32,7 +32,6 @@
     <string name="how_other_users_will_see_you">Miten muut käyttäjät näkevät sinut</string>
     <string name="share_selected_files">Jaa valitut tiedostot</string>
     <string name="device">Laite</string>
-    <string name="connecting">Yhteyden</string>
     <string name="all_free_downloads">Kaikki ilmaiseksi ladattavia</string>
     <string name="torrent_max_download_speed">Suurin Latausnopeus</string>
     <string name="go_to">Mene</string>
@@ -112,7 +111,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s haluaa lähettää sinulle %2$s yhteensä %3$s</string>
     <string name="invalid_torrent_file">Virheellinen Torrent File</string>
     <string name="activity_downloads_title_text">Lataukset</string>
-    <string name="disconnecting">Katkaiseminen</string>
     <string name="activity_media_player_name">Mediasoitin</string>
     <string name="choose_email_app">Valitse sähköpostisovellus…</string>
     <string name="failed_to_add_download">Lisääminen epäonnistui ladattavissa</string>
@@ -161,7 +159,6 @@
     <string name="menu_space_shortcut_label">Avaruus</string>
     <string name="connected_using_dataplan">Liitetty Data Plan</string>
     <string name="tip_rename_your_files">Vihje: Nimeä tiedostot niin niitä löytyy</string>
-    <string name="disconnect">Katkaista</string>
     <string name="vpn_what_you_get_with">Mitä saat kanssa </string>
     <string name="download_finished">Lataa Valmiit</string>
     <string name="confirm_download">Vahvista Lataa</string>
@@ -193,7 +190,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Oletko varma, että haluat peruuttaa tämän latauksen (ladatut tiedot toistaiseksi poistetaan)?</string>
     <string name="activity_VPN">Liitäntä</string>
     <string name="downloads_added_to_queue">%s tiedostot lataaminen alkaa</string>
-    <string name="connect">Yhdistä</string>
     <string name="azureus_general_view_yes">Kyllä</string>
     <string name="use_upnp_port_mapping">Käytä automaattista porttitaulukkoa (UPnP)</string>
     <string name="use_youtube">Käytä YouTube.com</string>
@@ -400,7 +396,6 @@
     <string name="issue_with_tip_donation_uri">Siinä on jotain vikaa lahjoitus verkko-osoite</string>
     <string name="frostwire_is_running">FrostWire on käynnissä</string>
     <string name="http_download_status_save_dir_error">Tallenna hakemistoon ei ole tai ei voida luoda</string>
-    <string name="disconnected">Yhteys katkaistu</string>
     <string name="view_transfer_list_item_group_indicator_description">Lisää/Vähemmän tietoa</string>
     <string name="install_bitcoin_wallet">Asenna Bitcoin Wallet</string>
     <string name="select_option_below">Valitse vaihtoehto alla:</string>

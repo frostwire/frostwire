@@ -28,12 +28,7 @@
     <string name="activity_uploads_name">Aktif Yüklemeler</string>
     <string name="activity_about">Hakkında</string>
     <string name="activity_debug_name">Hata Ayıklayıcı</string>
-    <string name="disconnected">Bağlantısız</string>
     <string name="all_transfers_will_stop_are_you_sure">Bütün transferler duracak.\nEmin misiniz?</string>
-    <string name="connect">Bağlan</string>
-    <string name="connecting">Bağlanıyor</string>
-    <string name="disconnect">Bağlantıyı Kes</string>
-    <string name="disconnecting">Bağlantı Kesiliyor</string>
     <string name="wait">Bekle</string>
     <string name="exit">Çıkış</string>
     <string name="no_wifi_want_to_fix_it_question">Bir WiFi ağına bağlı değilsiniz\n\nNasıl bağlanmak istersiniz?</string>

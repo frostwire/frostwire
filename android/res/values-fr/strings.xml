@@ -31,12 +31,7 @@
     <string name="activity_uploads_name">Transfert actif</string>
     <string name="activity_about"> A propos</string>
     <string name="activity_debug_name">Déboguer </string>
-    <string name="disconnected">Déconnecter</string>
     <string name="all_transfers_will_stop_are_you_sure">Tous les transferts s\'arrêteront.\n Êtes-vous sûr?</string>
-    <string name="connect">Connecter</string>
-    <string name="connecting">Connexion</string>
-    <string name="disconnect">Déconnecter</string>
-    <string name="disconnecting">Déconnexion </string>
     <string name="wait">Patienter</string>
     <string name="exit">Quitter </string>
     <string name="no_wifi_want_to_fix_it_question">Vous n\'êtes pas connecté à un réseau WiFi.\n Comment voulez-vous vous connecter?</string>

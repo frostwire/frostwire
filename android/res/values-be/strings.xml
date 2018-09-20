@@ -32,7 +32,6 @@
     <string name="how_other_users_will_see_you">Як іншыя карыстальнікі будуць бачыць вас</string>
     <string name="share_selected_files">Доля абраных файлаў</string>
     <string name="device">Прылада</string>
-    <string name="connecting">Падключэнне</string>
     <string name="all_free_downloads">Усе свабодныя запампоўкі</string>
     <string name="torrent_max_download_speed">Максімальная хуткасць запампоўкі</string>
     <string name="go_to">Перайсці да</string>
@@ -109,7 +108,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s хоча адправіць вам %2$s на агульную суму %3$s</string>
     <string name="invalid_torrent_file">Няправільны торэнт-файл</string>
     <string name="activity_downloads_title_text">Загрузкі</string>
-    <string name="disconnecting">Раз\'яднанне</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="choose_email_app">Выберыце Email App…</string>
     <string name="failed_to_add_download">Не атрымалася дадаць спампаваць</string>
@@ -157,7 +155,6 @@
     <string name="menu_space_shortcut_label">Прастору</string>
     <string name="connected_using_dataplan">Падключэнне з выкарыстаннем планавых дадзеных</string>
     <string name="tip_rename_your_files">Рада: Перайменаванне файлаў, такім чынам яны могуць быць знойдзены</string>
-    <string name="disconnect">Адключыць</string>
     <string name="vpn_what_you_get_with">Што вы атрымліваеце з </string>
     <string name="download_finished">Спампаваць Закончанае</string>
     <string name="confirm_download">Пацвердзіце Спампаваць</string>
@@ -188,7 +185,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Вы ўпэўненыя, што хочаце адмяніць загрузку (загружаныя дадзеныя да гэтага часу будуць выдалены)?</string>
     <string name="activity_VPN">Падключэнне</string>
     <string name="downloads_added_to_queue">%s файлы будуць пачаць загрузку</string>
-    <string name="connect">Падключыць</string>
     <string name="azureus_general_view_yes">Так</string>
     <string name="use_upnp_port_mapping">Выкарыстоўвайце аўтаматычнае адлюстраванне партоў (UPnP)</string>
     <string name="use_youtube">Выкарыстоўвайце YouTube.com</string>
@@ -390,7 +386,6 @@
     <string name="issue_with_tip_donation_uri">Там нешта не так з вэб-адрас ахвяраванні</string>
     <string name="frostwire_is_running">FrostWire працуе</string>
     <string name="http_download_status_save_dir_error">Захаваць каталог не існуе ці не можа быць створаны</string>
-    <string name="disconnected">Адключаны</string>
     <string name="view_transfer_list_item_group_indicator_description">Больш/Менш інфармацыі</string>
     <string name="install_bitcoin_wallet">Ўсталяваць Bitcoin Кошелек</string>
     <string name="select_option_below">Выберыце варыянт ніжэй:</string>

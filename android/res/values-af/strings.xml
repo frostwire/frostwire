@@ -38,7 +38,6 @@
     <string name="share_selected_files">Deel geselekteerde lêers</string>
     <string name="filter_ellipsis">Filter…</string>
     <string name="device">Device</string>
-    <string name="connecting">Koppel</string>
     <string name="all_free_downloads">Alle gratis downloads</string>
     <string name="include">Insluit</string>
     <string name="torrent_max_download_speed">Maksimale aflaai spoed</string>
@@ -126,7 +125,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s wil jou stuur %2$s in totaal %3$s</string>
     <string name="invalid_torrent_file">Ongeldige Torrent-lêer</string>
     <string name="activity_downloads_title_text">Downloads</string>
-    <string name="disconnecting">Ontkoppel</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="choose_email_app">Kies \'n e-posprogram…</string>
     <string name="failed_to_add_download">Kon nie aflaai laai nie</string>
@@ -185,7 +183,6 @@
     <string name="connected_using_dataplan">Gekoppel met behulp van Data Plan</string>
     <string name="vpn_on_toast_notification">Jy is gekoppel aan \'n Skynprivaatnetwerk.</string>
     <string name="tip_rename_your_files">Wenk: Hernoem lêers sodat hulle gevind kan word</string>
-    <string name="disconnect">Ontkoppel</string>
     <string name="vpn_what_you_get_with">Wat kry jy met </string>
     <string name="download_finished">Aflaai klaar</string>
     <string name="confirm_download">Bevestig aflaai</string>
@@ -221,7 +218,6 @@
     <string name="cannot_start_engine_without_vpn">BitTorrent sal nie begin nie, tensy \'n Skynprivaatnetwerk beskikbaar is. (Gaan jou instellings na</string>
     <string name="number_picker_tip">Wenk: raak gekose nommer om sleutelbord te gebruik</string>
     <string name="downloads_added_to_queue">%s lêers sal begin aflaai</string>
-    <string name="connect">Verbind</string>
     <string name="azureus_general_view_yes">Ja</string>
     <string name="use_upnp_port_mapping">Gebruik outomatiese poort kartering (UPnP)</string>
     <string name="use_youtube">Gebruik YouTube.com</string>
@@ -450,7 +446,6 @@
     <string name="issue_with_tip_donation_uri">Daar is iets fout met die donasie webadres</string>
     <string name="frostwire_is_running">FrostWire loop</string>
     <string name="http_download_status_save_dir_error">Stoor gids bestaan nie of kan nie geskep word nie</string>
-    <string name="disconnected">Ontkoppel</string>
     <string name="view_transfer_list_item_group_indicator_description">Meer/Minder inligting</string>
     <string name="install_bitcoin_wallet">Installeer Bitcoin Wallet</string>
     <string name="select_option_below">Kies opsie hieronder:</string>

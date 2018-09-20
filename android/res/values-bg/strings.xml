@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">Как другите потребители ще виждате</string>
     <string name="share_selected_files">Споделете избрани файлове</string>
     <string name="device">приспособление</string>
-    <string name="connecting">Свързване</string>
     <string name="all_free_downloads">Всички свободно сваляне</string>
     <string name="torrent_max_download_speed">Максимална скорост на изтегляне</string>
     <string name="go_to">Отиди на</string>
@@ -112,7 +111,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s иска да ви изпрати %2$s на обща стойност %3$s</string>
     <string name="invalid_torrent_file">Невалиден торент файл</string>
     <string name="activity_downloads_title_text">Свалян</string>
-    <string name="disconnecting">Прекъсване на връзката</string>
     <string name="activity_media_player_name">Медиен плейър</string>
     <string name="choose_email_app">Избери Електронна поща на приложението…</string>
     <string name="failed_to_add_download">Неуспешно добавяне на изтегляне</string>
@@ -161,7 +159,6 @@
     <string name="menu_space_shortcut_label">пространство</string>
     <string name="connected_using_dataplan">Свързана с помощта на план за данни</string>
     <string name="tip_rename_your_files">Съвет: Преименуване на файлове, така че те могат да бъдат намерени</string>
-    <string name="disconnect">Прекъсване.</string>
     <string name="vpn_what_you_get_with">Какво получавате с </string>
     <string name="download_finished">Свали Завършен</string>
     <string name="confirm_download">Потвърдете изтегляне</string>
@@ -192,7 +189,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Сигурни ли сте че искате да откажете този файл за изтегляне (изтеглени данни до момента, ще бъдат изтрити)?</string>
     <string name="activity_VPN">Връзка</string>
     <string name="downloads_added_to_queue">%s файлове ще започнат да се изтеглят</string>
-    <string name="connect">Свържете</string>
     <string name="azureus_general_view_yes">Да</string>
     <string name="use_upnp_port_mapping">Използвайте автоматичното портове (UPnP)</string>
     <string name="use_youtube">Използвайте YouTube.com</string>
@@ -397,7 +393,6 @@
     <string name="issue_with_tip_donation_uri">Нещо не е наред с уеб адреса на дарение</string>
     <string name="frostwire_is_running">FrostWire е стартиран</string>
     <string name="http_download_status_save_dir_error">Запази директория не съществува или не може да бъде създаден</string>
-    <string name="disconnected">Прекъсната</string>
     <string name="view_transfer_list_item_group_indicator_description">Повече/По-малко информация</string>
     <string name="install_bitcoin_wallet">Инсталирайте Bitcoin Wallet</string>
     <string name="select_option_below">Изберете опция по-долу:</string>

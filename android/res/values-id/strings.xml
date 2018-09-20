@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Unggahan-unggahan Aktif</string>
     <string name="activity_about">Tentang</string>
     <string name="activity_debug_name">Awakutu</string>
-    <string name="disconnected">Terputus</string>
     <string name="all_transfers_will_stop_are_you_sure">Semua transfer akan terhenti. Apakah Anda yakin?</string>
-    <string name="connect">Menghubungkan</string>
-    <string name="connecting">Sedang Menghubungkan</string>
-    <string name="disconnect">Memutuskan</string>
-    <string name="disconnecting">Sedang Memutuskan</string>
     <string name="wait">Menungggu</string>
     <string name="exit">Keluar</string>
     <string name="no_wifi_want_to_fix_it_question">Anda tidak terhubung dengan jaringan WiFi. Bagaimana Anda ingin terhubung?</string>

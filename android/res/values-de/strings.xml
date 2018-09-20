@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Aktive Uploads</string>
     <string name="activity_about">Über</string>
     <string name="activity_debug_name">Fehlersuche</string>
-    <string name="disconnected">Unterbrochen</string>
     <string name="all_transfers_will_stop_are_you_sure">Alle Übertragungen werden gestoppt\nBist du sicher?</string>
-    <string name="connect">Verbinden</string>
-    <string name="connecting">Verbindung wird hergestellt</string>
-    <string name="disconnect">Verbindung trennen</string>
-    <string name="disconnecting">Trennen der Verbindung</string>
     <string name="wait">Warten</string>
     <string name="exit">Beenden</string>
     <string name="no_wifi_want_to_fix_it_question">Du bist nicht mit einem WLAN Netzwerk verbunden\n\nWas für eine Verbindung wills du herstellen?</string>

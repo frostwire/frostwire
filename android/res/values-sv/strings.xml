@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">Hur andra användare kommer att se dig</string>
     <string name="share_selected_files">Dela valda filer</string>
     <string name="device">Anordning</string>
-    <string name="connecting">Ansluta</string>
     <string name="all_free_downloads">Alla gratis nedladdningar</string>
     <string name="torrent_max_download_speed">Max Totalt nedladdningshastighet</string>
     <string name="go_to">Gå till</string>
@@ -114,7 +113,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s vill skicka %2$s totalt %3$s</string>
     <string name="invalid_torrent_file">Ogiltig Torrent-fil</string>
     <string name="activity_downloads_title_text">Nedladdningar</string>
-    <string name="disconnecting">Koppla</string>
     <string name="activity_media_player_name">Mediaspelare</string>
     <string name="choose_email_app">Välj ett e-postprogram…</string>
     <string name="failed_to_add_download">Det gick inte att lägga till nedladdning</string>
@@ -163,7 +161,6 @@
     <string name="menu_space_shortcut_label">Utrymme</string>
     <string name="connected_using_dataplan">Ansluts med dataabonnemang</string>
     <string name="tip_rename_your_files">Tips: Byt namn på filer så att de kan hittas</string>
-    <string name="disconnect">Koppla från</string>
     <string name="vpn_what_you_get_with">Vad får du med </string>
     <string name="download_finished">Hämta Färdig</string>
     <string name="confirm_download">Bekräfta Hämta</string>
@@ -195,7 +192,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Är du säker på att du vill avbryta denna film (hämtade data så långt kommer att raderas)?</string>
     <string name="activity_VPN">Förbindelse</string>
     <string name="downloads_added_to_queue">%s filer kommer att börja ladda ner</string>
-    <string name="connect">Ansluta</string>
     <string name="azureus_general_view_yes">Ja</string>
     <string name="use_upnp_port_mapping">Använd automatisk port mapping (UPnP)</string>
     <string name="use_youtube">Använda YouTube.com</string>
@@ -402,7 +398,6 @@
     <string name="issue_with_tip_donation_uri">Det är något fel med donationen webbadress</string>
     <string name="frostwire_is_running">FrostWire är igång</string>
     <string name="http_download_status_save_dir_error">Spara katalogen finns inte eller kan inte skapas</string>
-    <string name="disconnected">Frånkopplad</string>
     <string name="view_transfer_list_item_group_indicator_description">Mer/mindre information</string>
     <string name="install_bitcoin_wallet">Installera Bitcoin Wallet</string>
     <string name="select_option_below">Välj alternativ nedan:</string>

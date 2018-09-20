@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Aktivovat Odesílání</string>
     <string name="activity_about">Informace o</string>
     <string name="activity_debug_name">Debug</string>
-    <string name="disconnected">Odpojený</string>
     <string name="all_transfers_will_stop_are_you_sure">Veškeré transfery se zastaví.\nJste si jisti?</string>
-    <string name="connect">Připojit</string>
-    <string name="connecting">Probíhá Připojení</string>
-    <string name="disconnect">Odpojit</string>
-    <string name="disconnecting">Probíhá Odpojení</string>
     <string name="wait">Počkejte</string>
     <string name="exit">Východ</string>
     <string name="no_wifi_want_to_fix_it_question">Nejste připojeni k sítí WiFi.\n\nJak se chcete připojit?</string>

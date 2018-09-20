@@ -36,13 +36,7 @@
     <string name="activity_about">About</string>
     <string name="activity_debug_name">Debug</string>
     <string name="activity_VPN">Connection</string>
-    <string name="disconnected">Disconnected</string>
     <string name="all_transfers_will_stop_are_you_sure">All transfers will stop.\nAre you sure?</string>
-    <string name="connect">Connect</string>
-    <string name="connecting">Connecting</string>
-    <string name="disconnect" translatable="false">Disconnect</string>
-    <string name="disconnecting">Disconnecting</string>
-    <string name="wait">Wait</string>
     <string name="exit">Exit</string>
     <string name="no_wifi_want_to_fix_it_question">You\'re not connected to a Wi-Fi network.\n\nHow do you want to connect?</string>
     <string name="your_connection_has_dropped_stopping_services">Your Wi-Fi connection has dropped. Stopping services.</string>
@@ -518,7 +512,6 @@
     <string name="http_download_status_temp_dir_error">Temporary directory does not exist or can\'t be created</string>
     <string name="my_music">My Music</string>
     <string name="support">Support</string>
-    <string name="wifi_sharing_settings">Wi-Fi Sharing Settings</string>
     <string name="free_download">Free Download</string>
     <string name="error_no_space_left_on_device">Error: No space left to save file</string>
     <string name="free_sponsored_app">Free Sponsored App</string>

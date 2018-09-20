@@ -33,12 +33,7 @@
     <string name="activity_uploads_name">Cargas Activas</string>
     <string name="activity_about">Acerca de</string>
     <string name="activity_debug_name">Depurar</string>
-    <string name="disconnected">Desconectado</string>
     <string name="all_transfers_will_stop_are_you_sure">Todas las transferencias se detendrán.\n¿Deseas continuar?</string>
-    <string name="connect">Conectar</string>
-    <string name="connecting">Conectando</string>
-    <string name="disconnect">Desconectar</string>
-    <string name="disconnecting">Desconectando</string>
     <string name="wait">Esperar</string>
     <string name="exit">Salir</string>
     <string name="no_wifi_want_to_fix_it_question">No estás conectado(a) a una red Wi-Fi.\n\n¿Cómo te quieres conectar?</string>

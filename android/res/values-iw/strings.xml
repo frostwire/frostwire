@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">איך משתמשים אחרים יראו אותך</string>
     <string name="share_selected_files">קבצים שנבחרו שתפו</string>
     <string name="device">התקן</string>
-    <string name="connecting">מְקַשֵׁר</string>
     <string name="all_free_downloads">כל ההורדות בחינם</string>
     <string name="torrent_max_download_speed">מהירות הורדה מקסימלית</string>
     <string name="go_to">לך ל</string>
@@ -114,7 +113,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s wants to send you %2$s totalling %3$s</string>
     <string name="invalid_torrent_file">קובץ הטורנט לא חוקי</string>
     <string name="activity_downloads_title_text">הורדות</string>
-    <string name="disconnecting">ניתוק</string>
     <string name="activity_media_player_name">נגן מדיה</string>
     <string name="choose_email_app">בחר יישום דוא"ל…</string>
     <string name="failed_to_add_download">נכשל ניסיון להוסיף להורדה</string>
@@ -163,7 +161,6 @@
     <string name="menu_space_shortcut_label">מֶרחָב</string>
     <string name="connected_using_dataplan">מחובר באמצעות תוכנית נתונים</string>
     <string name="tip_rename_your_files">טיפ: שינוי שם קבצים, כך שניתן יהיה למצוא</string>
-    <string name="disconnect">לְנַתֵק</string>
     <string name="vpn_what_you_get_with">מה אתה מקבל עם </string>
     <string name="download_finished">הורדה הסתיימה </string>
     <string name="confirm_download">אשר הורד</string>
@@ -195,7 +192,6 @@
     <string name="yes_no_cancel_delete_transfer_question">האם אתה בטוח שאתה רוצה לבטל הורדה זו (נתונים שהורדו עד כה יימחקו)?</string>
     <string name="activity_VPN">חיבור</string>
     <string name="downloads_added_to_queue">%s קבצים יתחיל להוריד</string>
-    <string name="connect">לְחַבֵּר</string>
     <string name="azureus_general_view_yes">כן</string>
     <string name="use_upnp_port_mapping">השתמש במיפוי נמל אוטומטי (UPnP)</string>
     <string name="use_youtube">השתמש YouTube.com</string>
@@ -402,7 +398,6 @@
     <string name="issue_with_tip_donation_uri">יש משהו לא בסדר עם כתובת אינטרנט התרומה</string>
     <string name="frostwire_is_running">FrostWire פועל</string>
     <string name="http_download_status_save_dir_error">בספרייה שמורה אינה קיימת או לא ניתן ליצור</string>
-    <string name="disconnected">מְנוּתָק</string>
     <string name="view_transfer_list_item_group_indicator_description">עוד/מידע פחות</string>
     <string name="install_bitcoin_wallet">התקן ארנק ביטקוין</string>
     <string name="select_option_below">בחר אפשרות למטה:</string>

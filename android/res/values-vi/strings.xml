@@ -31,12 +31,7 @@
     <string name="activity_uploads_name">Tải lên đang hoạt động</string>
     <string name="activity_about">Giới thiệu</string>
     <string name="activity_debug_name">Debug</string>
-    <string name="disconnected">Ngắt kết nối</string>
     <string name="all_transfers_will_stop_are_you_sure">Tất cả quá trình chia sẻ sẽ dừng lại.\nBạn chắc chứ?</string>
-    <string name="connect">Kết nối</string>
-    <string name="connecting">Đang kết nối</string>
-    <string name="disconnect">Ngắt kết nối</string>
-    <string name="disconnecting">Đang ngắt kết nối</string>
     <string name="wait">Chờ</string>
     <string name="exit">Thoát</string>
     <string name="no_wifi_want_to_fix_it_question">Bạn đang không kết nối đến mạng wifi nào cả.\n\nBn phi làm th nào kt ni?</string>

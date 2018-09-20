@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">アクティブアップロード</string>
     <string name="activity_about">詳細</string>
     <string name="activity_debug_name">デバッグする</string>
-    <string name="disconnected">切断されました</string>
     <string name="all_transfers_will_stop_are_you_sure">すべての送信が中断されます。\n続行しますか？</string>
-    <string name="connect">接続する</string>
-    <string name="connecting">接続中</string>
-    <string name="disconnect">切断されました</string>
-    <string name="disconnecting">切断中</string>
     <string name="wait">待つ</string>
     <string name="exit">終了する</string>
     <string name="no_wifi_want_to_fix_it_question">あなたはWi>Fiネットワークに接続していません。\n\nどのように接続しますか？</string>

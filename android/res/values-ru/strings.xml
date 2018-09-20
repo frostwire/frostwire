@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Активные раздачи</string>
     <string name="activity_about">Об активности</string>
     <string name="activity_debug_name">Отладка</string>
-    <string name="disconnected">Разъединено</string>
     <string name="all_transfers_will_stop_are_you_sure">Все передачи будут остановлены. Вы уверены?</string>
-    <string name="connect">Подключиться</string>
-    <string name="connecting">Подключение</string>
-    <string name="disconnect">Отключиться</string>
-    <string name="disconnecting">Отключение</string>
     <string name="wait">Подождите</string>
     <string name="exit">Выйти</string>
     <string name="no_wifi_want_to_fix_it_question">Вы не подсоединены к Wi-Fi сети. Как Вы хотите подключиться?</string>

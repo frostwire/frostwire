@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">सक्रिय अपलोड</string>
     <string name="activity_about">क बारे में</string>
     <string name="activity_debug_name">डीबग करें</string>
-    <string name="disconnected">अलगाया हुआ</string>
     <string name="all_transfers_will_stop_are_you_sure">सभी हस्तांतरण रुक जाएगा\nक्या आपको यकीन है?</string>
-    <string name="connect">जोड़ें</string>
-    <string name="connecting">जुड़ रहा है </string>
-    <string name="disconnect">वियोजित करें</string>
-    <string name="disconnecting">वियोजित हो रहा है </string>
     <string name="wait">प्रतीक्षा करें</string>
     <string name="exit">निकास</string>
     <string name="no_wifi_want_to_fix_it_question">आप एक वाई> फाई नेटवर्क से नहीं जुड़ें है \n\nनःओव आप कनेक्ट करना चाहते हैं?</string>

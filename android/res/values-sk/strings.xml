@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">Ako ostatní užívatelia vás uvidia</string>
     <string name="share_selected_files">Zdieľať vybrané súbory</string>
     <string name="device">Zariadenie</string>
-    <string name="connecting">Pripojenie</string>
     <string name="all_free_downloads">Všetci na stiahnutie zadarmo</string>
     <string name="torrent_max_download_speed">Maximálna rýchlosť sťahovania</string>
     <string name="go_to">Ísť do</string>
@@ -112,7 +111,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s chce poslať %2$s celkom %3$s</string>
     <string name="invalid_torrent_file">Neplatný súbor torrent</string>
     <string name="activity_downloads_title_text">K stiahnutiu</string>
-    <string name="disconnecting">Odpojenie</string>
     <string name="activity_media_player_name">Mediálny prehrávač</string>
     <string name="choose_email_app">Vyberte e-mailovú aplikáciu…</string>
     <string name="failed_to_add_download">Nepodarilo sa pridať k stiahnutiu</string>
@@ -161,7 +159,6 @@
     <string name="menu_space_shortcut_label">Miesto</string>
     <string name="connected_using_dataplan">Pripojené pomocou dátový program</string>
     <string name="tip_rename_your_files">Tip: Premenovanie súborov, takže je možné nájsť</string>
-    <string name="disconnect">Odpojiť</string>
     <string name="vpn_what_you_get_with">Čo získate s </string>
     <string name="download_finished">Sťahovanie dokončené</string>
     <string name="confirm_download">Potvrdiť stiahnutie</string>
@@ -192,7 +189,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Ste si istí, že chcete zrušiť túto stiahnutie (stiahnuté dáta tak ďaleko budú vymazané)?</string>
     <string name="activity_VPN">Spojenie</string>
     <string name="downloads_added_to_queue">%s súbory začne sťahovať</string>
-    <string name="connect">Pripojiť</string>
     <string name="azureus_general_view_yes">Áno</string>
     <string name="use_upnp_port_mapping">Použite automatické mapovanie portu (UPnP)</string>
     <string name="use_youtube">Použiť YouTube.com</string>
@@ -397,7 +393,6 @@
     <string name="issue_with_tip_donation_uri">Je tu niečo, čo sa na internetovej adrese darovanie zle</string>
     <string name="frostwire_is_running">FrostWire beží</string>
     <string name="http_download_status_save_dir_error">Uložiť adresár neexistuje alebo nemôže byť vytvorený</string>
-    <string name="disconnected">Odpojený</string>
     <string name="view_transfer_list_item_group_indicator_description">Viac/Menej informácií</string>
     <string name="install_bitcoin_wallet">Nainštalovať Bitcoin Wallet</string>
     <string name="select_option_below">Možnosť zvoliť nižšie:</string>

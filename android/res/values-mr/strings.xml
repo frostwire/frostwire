@@ -36,7 +36,6 @@
     <string name="share_selected_files">निवडलेल्या फायली सामायिक करा</string>
     <string name="filter_ellipsis">फिल्टर…</string>
     <string name="device">डिव्हाइस</string>
-    <string name="connecting">कनेक्ट करीत आहे</string>
     <string name="all_free_downloads">सर्व विनामूल्य डाउनलोड</string>
     <string name="include">समाविष्ट करा</string>
     <string name="torrent_max_download_speed">कमाल डाउनलोड स्पीड</string>
@@ -133,7 +132,6 @@
     <string name="invalid_torrent_file">अवैध टॉरेंट फाईल</string>
     <string name="activity_downloads_title_text">डाउनलोड</string>
     <string name="storage_picker_treeuri_not_directory">निवडलेला पथ निर्देशिका नाही</string>
-    <string name="disconnecting">डिस्कनेक्ट होत आहे</string>
     <string name="activity_media_player_name">मीडिया प्लेअर</string>
     <string name="choose_email_app">एक ईमेल अॅप निवडा…</string>
     <string name="failed_to_add_download">डाउनलोड जोडण्यात अयशस्वी</string>
@@ -193,7 +191,6 @@
     <string name="connected_using_dataplan">डेटा प्लॅन वापरून कनेक्ट केले</string>
     <string name="vpn_on_toast_notification">आपण एका VPN शी कनेक्ट केलेले आहे.</string>
     <string name="tip_rename_your_files">माहिती: फाइल्स पुनर्नामित करा म्हणजे ते आढळू शकतील</string>
-    <string name="disconnect">डिस्कनेक्ट करा</string>
     <string name="add_trackers">ट्रॅकर्स जोडा</string>
     <string name="vpn_what_you_get_with">आपल्याला काय मिळते </string>
     <string name="download_finished">डाउनलोड समाप्त</string>
@@ -235,7 +232,6 @@
     <string name="speed_limits">गती मर्यादा</string>
     <string name="created_on">रोजी तयार केले</string>
     <string name="downloads_added_to_queue">%s फायली डाउनलोड करणे प्रारंभ होईल</string>
-    <string name="connect">कनेक्ट करा</string>
     <string name="azureus_general_view_yes">होय</string>
     <string name="use_upnp_port_mapping">स्वयंचलित पोर्ट मॅपिंग वापरा (UPnP)</string>
     <string name="use_youtube">YouTube.com वापरा</string>
@@ -481,7 +477,6 @@
     <string name="issue_with_tip_donation_uri">देणगीच्या वेब पत्त्यामध्ये काहीतरी चुकीचे आहे</string>
     <string name="frostwire_is_running">FrostWire चालू आहे</string>
     <string name="http_download_status_save_dir_error">जतन करा निर्देशिका अस्तित्वात नाही किंवा तयार केली जाऊ शकत नाही</string>
-    <string name="disconnected">डिस्कनेक्ट केले</string>
     <string name="view_transfer_list_item_group_indicator_description">अधिक/कमी माहिती</string>
     <string name="install_bitcoin_wallet">स्थापित करा Bitcoin Wallet</string>
     <string name="select_option_below">खालील पर्याय निवडाः</string>

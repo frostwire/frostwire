@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">Bagaimana pengguna lain akan melihat anda</string>
     <string name="share_selected_files">Berkongsi fail dipilih</string>
     <string name="device">Peranti</string>
-    <string name="connecting">Bersambung</string>
     <string name="all_free_downloads">Semua muat turun percuma</string>
     <string name="torrent_max_download_speed">Maksimum Muat turun Speed</string>
     <string name="go_to">Pergi ke</string>
@@ -112,7 +111,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s mahu menghantar %2$s berjumlah %3$s</string>
     <string name="invalid_torrent_file">Fail Torrent tidak sah</string>
     <string name="activity_downloads_title_text">Muat turun</string>
-    <string name="disconnecting">Memutuskan sambungan</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="choose_email_app">Pilih Email Aplikasi…</string>
     <string name="failed_to_add_download">Gagal untuk menambah muat turun</string>
@@ -161,7 +159,6 @@
     <string name="menu_space_shortcut_label">Ruang</string>
     <string name="connected_using_dataplan">Disambungkan menggunakan Pelan Data</string>
     <string name="tip_rename_your_files">Petua: Namakan semula fail supaya mereka boleh didapati</string>
-    <string name="disconnect">Putuskan sambungan</string>
     <string name="vpn_what_you_get_with">Apa yang anda dapat dengan </string>
     <string name="download_finished">Muat turun selesai</string>
     <string name="confirm_download">Sahkan Muat turun</string>
@@ -192,7 +189,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Adakah anda pasti anda mahu membatalkan muat turun ini (data yang dimuat turun setakat ini akan dipadamkan)?</string>
     <string name="activity_VPN">Sambungan</string>
     <string name="downloads_added_to_queue">%s fail akan mula memuat turun</string>
-    <string name="connect">Sambungkan</string>
     <string name="azureus_general_view_yes">Ya</string>
     <string name="use_upnp_port_mapping">Gunakan Port pemetaan automatik (UPnP)</string>
     <string name="use_youtube">Gunakan YouTube.com</string>
@@ -397,7 +393,6 @@
     <string name="issue_with_tip_donation_uri">Ada sesuatu yang tidak kena dengan alamat web derma</string>
     <string name="frostwire_is_running">FrostWire sedang berjalan</string>
     <string name="http_download_status_save_dir_error">Simpan direktori tidak wujud atau tidak boleh dicipta</string>
-    <string name="disconnected">Terputus</string>
     <string name="view_transfer_list_item_group_indicator_description">Lebih maklumat/Kurang</string>
     <string name="install_bitcoin_wallet">Pasang Bitcoin Wallet</string>
     <string name="select_option_below">Pilih pilihan di bawah:</string>

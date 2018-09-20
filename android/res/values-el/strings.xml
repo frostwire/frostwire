@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Ενεργά Uploads</string>
     <string name="activity_about">Πληροφορίες</string>
     <string name="activity_debug_name">Debug</string>
-    <string name="disconnected">Αποσυνδέθηκε</string>
     <string name="all_transfers_will_stop_are_you_sure">Όλες οι μεταφορές θα σταματήσουν.\nΘέλεις να συνεχίσεις;</string>
-    <string name="connect">Σύνδεση</string>
-    <string name="connecting">Σύνδεση</string>
-    <string name="disconnect">Αποσύνδεση</string>
-    <string name="disconnecting">Αποσύνδεση</string>
     <string name="wait">Περίμενε</string>
     <string name="exit">Έξοδος</string>
     <string name="no_wifi_want_to_fix_it_question">Δεν είσαι συνδεδεμένος σε κάποιο ασύρματο δίκτυο.\n\nΠώς θέλεις να συνδεθείς;</string>

@@ -28,12 +28,7 @@
     <string name="activity_uploads_name">التحميلات النشطة</string>
     <string name="activity_about">حول</string>
     <string name="activity_debug_name">إصلاح</string>
-    <string name="disconnected">غير متصل</string>
     <string name="all_transfers_will_stop_are_you_sure">سوف تتوقف جميع عمليات النقل.\nهل أنت متأكد؟</string>
-    <string name="connect">اتصال</string>
-    <string name="connecting">جاري الاتصال</string>
-    <string name="disconnect">غير متصل</string>
-    <string name="disconnecting">جاري قطع الاتصال</string>
     <string name="wait">انتظار</string>
     <string name="exit">خروج</string>
     <string name="no_wifi_want_to_fix_it_question">أنت\غير متصل بشبكة واي فاي.\n\nHكيف ترغب في الاتصال؟</string>

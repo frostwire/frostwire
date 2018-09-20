@@ -32,7 +32,6 @@
     <string name="how_other_users_will_see_you">Cum de alți utilizatori veți vedea</string>
     <string name="share_selected_files">Fișierele selecționate</string>
     <string name="device">Dispozitiv</string>
-    <string name="connecting">Conectarea</string>
     <string name="all_free_downloads">Toate descărcările gratuite</string>
     <string name="torrent_max_download_speed">Maxima viteza de descărcare</string>
     <string name="go_to">Du-te la</string>
@@ -109,7 +108,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s vrea să vă trimită %2$s în valoare totală %3$s</string>
     <string name="invalid_torrent_file">Fișier torrent nevalid</string>
     <string name="activity_downloads_title_text">Descărcări în</string>
-    <string name="disconnecting">Deconectând</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="choose_email_app">Alege un e-mail App…</string>
     <string name="failed_to_add_download">Nu a reușit să adăugați descărcare</string>
@@ -157,7 +155,6 @@
     <string name="menu_space_shortcut_label">Spaţiu</string>
     <string name="connected_using_dataplan">Conectate folosind un plan de date</string>
     <string name="tip_rename_your_files">Sfat: Redenumiți fișierele astfel încât acestea să poată fi găsite</string>
-    <string name="disconnect">Deconectare</string>
     <string name="vpn_what_you_get_with">Ce obțineți cu </string>
     <string name="download_finished">Descărcare terminată</string>
     <string name="confirm_download">Confirmaţi descărcarea</string>
@@ -188,7 +185,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Sunteți sigur că doriți să anulați această descărcare (date descărcate până acum vor fi șterse)?</string>
     <string name="activity_VPN">Conexiune</string>
     <string name="downloads_added_to_queue">%s fișiere vor începe descărcarea</string>
-    <string name="connect">Conectați</string>
     <string name="azureus_general_view_yes">Da</string>
     <string name="use_upnp_port_mapping">Utilizați portul de cartografiere automată (UPnP)</string>
     <string name="use_youtube">Utilizați YouTube.com</string>
@@ -389,7 +385,6 @@
     <string name="issue_with_tip_donation_uri">E ceva în neregulă cu adresa de web donare</string>
     <string name="frostwire_is_running">FrostWire se execută</string>
     <string name="http_download_status_save_dir_error">Directorul Salvați nu există sau nu pot fi create</string>
-    <string name="disconnected">Deconectată</string>
     <string name="view_transfer_list_item_group_indicator_description">Mai mult/Mai puține informații</string>
     <string name="install_bitcoin_wallet">Instalați Bitcoin Wallet</string>
     <string name="select_option_below">Selectați opțiunea de mai jos:</string>

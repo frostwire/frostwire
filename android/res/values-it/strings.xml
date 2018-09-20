@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Upload attivi</string>
     <string name="activity_about">Informazioni</string>
     <string name="activity_debug_name">Debug</string>
-    <string name="disconnected">Disconnesso</string>
     <string name="all_transfers_will_stop_are_you_sure">Tutti i trasferimenti verranno interrotti \nSei sicuro?</string>
-    <string name="connect">Connetti</string>
-    <string name="connecting">In connessione</string>
-    <string name="disconnect">Disconnetti</string>
-    <string name="disconnecting">Disconnettendo</string>
     <string name="wait">Aspetta</string>
     <string name="exit">Esci</string>
     <string name="no_wifi_want_to_fix_it_question">Non sei connesso a nessuna rete wi-fi \n\nCome vuoi connetterti?</string>

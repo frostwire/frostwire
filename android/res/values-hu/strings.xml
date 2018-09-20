@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">Ahogyan a többi felhasználó is látni</string>
     <string name="share_selected_files">Megosztása kiválasztott fájlok</string>
     <string name="device">Eszköz</string>
-    <string name="connecting">Csatlakozó</string>
     <string name="all_free_downloads">Minden ingyenes letöltések</string>
     <string name="torrent_max_download_speed">Max letöltési sebesség</string>
     <string name="go_to">Látogatás</string>
@@ -111,7 +110,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s akar küldeni %2$s összesen %3$s</string>
     <string name="invalid_torrent_file">Érvénytelen torrent fájl</string>
     <string name="activity_downloads_title_text">Letöltések</string>
-    <string name="disconnecting">Leválasztása</string>
     <string name="activity_media_player_name">Médialejátszó</string>
     <string name="choose_email_app">Válasszon egy e-mail alkalmazás…</string>
     <string name="failed_to_add_download">Nem sikerült hozzáadni letöltés</string>
@@ -159,7 +157,6 @@
     <string name="menu_space_shortcut_label">Tér</string>
     <string name="connected_using_dataplan">Kapcsolják adat terv</string>
     <string name="tip_rename_your_files">Tipp: Nevezze át a fájlokat, így azok megtalálhatók</string>
-    <string name="disconnect">Szétkapcsol</string>
     <string name="vpn_what_you_get_with">Mit kapsz </string>
     <string name="download_finished">Letöltés kész</string>
     <string name="confirm_download">Letöltés megerősítése</string>
@@ -190,7 +187,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Biztosan törölni szeretné ezt a letöltést (letöltött adatok eddig törlődik)?</string>
     <string name="activity_VPN">Kapcsolat</string>
     <string name="downloads_added_to_queue">%s fájlok elkezdi letölteni</string>
-    <string name="connect">Csatlakozás</string>
     <string name="azureus_general_view_yes">Igen</string>
     <string name="use_upnp_port_mapping">Használja az automatikus port mapping (UPnP)</string>
     <string name="use_youtube">Használja YouTube.com</string>
@@ -391,7 +387,6 @@
     <string name="issue_with_tip_donation_uri">Valami baj van a véradás webcímet</string>
     <string name="frostwire_is_running">FrostWire fut</string>
     <string name="http_download_status_save_dir_error">Save könyvtár nem létezik vagy nem hozható létre</string>
-    <string name="disconnected">Szétkapcsolt</string>
     <string name="view_transfer_list_item_group_indicator_description">Több/Kevesebb információt</string>
     <string name="install_bitcoin_wallet">Telepítse Bitcoin Wallet</string>
     <string name="select_option_below">Válassza az alábbi lehetőségek közül:</string>

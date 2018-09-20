@@ -33,12 +33,7 @@
     <string name="activity_about">О томе</string>
     <string name="activity_debug_name">Debug</string>
     <string name="activity_VPN">веза</string>
-    <string name="disconnected">искључен</string>
     <string name="all_transfers_will_stop_are_you_sure">Сви трансфери ће престати.\nДа ли сте сигурни?</string>
-    <string name="connect">повезати</string>
-    <string name="connecting">спојни</string>
-    <string name="disconnect">искључити</string>
-    <string name="disconnecting">Дисцоннецтинг</string>
     <string name="wait">Чекати</string>
     <string name="exit">Exit</string>
     <string name="no_wifi_want_to_fix_it_question">Нисте повезани на ВиФи мрежу.\n\nКако желите да се повежете?</string>

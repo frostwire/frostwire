@@ -34,7 +34,6 @@
     <string name="how_other_users_will_see_you">วิธีที่ผู้ใช้อื่น ๆ จะเห็นคุณ</string>
     <string name="share_selected_files">แบ่งปันไฟล์ที่เลือก</string>
     <string name="device">เครื่อง</string>
-    <string name="connecting">การเชื่อมต่อ</string>
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
     <string name="torrent_max_download_speed">แม็กซ์ความเร็วในการดาวน์โหลด</string>
     <string name="go_to">ไปที่</string>
@@ -112,7 +111,6 @@
     <string name="dialog_desktop_upload_request_text_text">%1$s ต้องการส่ง %2$s รวมเป็นเงินทั้งสิ้น %3$s</string>
     <string name="invalid_torrent_file">ไฟล์ Torrent ที่ไม่ถูกต้อง</string>
     <string name="activity_downloads_title_text">ดาวน์โหลด</string>
-    <string name="disconnecting">ยกเลิกการเชื่อมต่อ</string>
     <string name="activity_media_player_name">Media Player</string>
     <string name="choose_email_app">เลือกโปรแกรมอีเมล…</string>
     <string name="failed_to_add_download">ไม่สามารถเพิ่มดาวน์โหลด</string>
@@ -161,7 +159,6 @@
     <string name="menu_space_shortcut_label">ช่องว่าง</string>
     <string name="connected_using_dataplan">เชื่อมต่อโดยใช้ข้อมูลแผน</string>
     <string name="tip_rename_your_files">เคล็ดลับ: เปลี่ยนชื่อไฟล์เพื่อให้พวกเขาสามารถพบได้</string>
-    <string name="disconnect">ปลด</string>
     <string name="vpn_what_you_get_with">คุณได้อะไรกับ </string>
     <string name="download_finished">ดาวน์โหลดสำเร็จรูป</string>
     <string name="confirm_download">ยืนยันการดาวน์โหลด</string>
@@ -192,7 +189,6 @@
     <string name="yes_no_cancel_delete_transfer_question">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะยกเลิกการดาวน์โหลดนี้ (ข้อมูลที่ดาวน์โหลดเพื่อให้ห่างไกลจะถูกลบ)?</string>
     <string name="activity_VPN">สัมพันธ์</string>
     <string name="downloads_added_to_queue">%s ไฟล์ที่จะเริ่มต้นการดาวน์โหลด</string>
-    <string name="connect">เชื่อมต่อ</string>
     <string name="azureus_general_view_yes">ใช่</string>
     <string name="use_upnp_port_mapping">ใช้แผนที่พอร์ตอัตโนมัติ (UPnP)</string>
     <string name="use_youtube">ใช้ YouTube.com</string>
@@ -397,7 +393,6 @@
     <string name="issue_with_tip_donation_uri">มีบางอย่างผิดปกติกับที่อยู่เว็บบริจาคเป็น</string>
     <string name="frostwire_is_running">FrostWire กำลังทำงาน</string>
     <string name="http_download_status_save_dir_error">บันทึกไดเรกทอรีไม่มีอยู่หรือไม่สามารถสร้าง</string>
-    <string name="disconnected">ตัดการเชื่อมต่อ</string>
     <string name="view_transfer_list_item_group_indicator_description">รายละเอียดเพิ่มเติม/น้อย</string>
     <string name="install_bitcoin_wallet">ติดตั้ง Bitcoin Wallet</string>
     <string name="select_option_below">ตัวเลือกเลือกด้านล่าง:</string>

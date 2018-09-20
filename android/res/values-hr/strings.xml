@@ -28,12 +28,7 @@
     <string name="activity_uploads_name">Aktivna slanja</string>
     <string name="activity_about">O</string>
     <string name="activity_debug_name">Ispravi</string>
-    <string name="disconnected">Odspojen</string>
     <string name="all_transfers_will_stop_are_you_sure">Svi prijenosi će biti zaustavljeni.\nJeste li sigurni?</string>
-    <string name="connect">Spoji</string>
-    <string name="connecting">Spajam</string>
-    <string name="disconnect">Odspoji</string>
-    <string name="disconnecting">Odspajam</string>
     <string name="wait">Čekaj</string>
     <string name="exit">Izađi</string>
     <string name="no_wifi_want_to_fix_it_question">Niste povezani na Wi-Fi mrežu.\n\nKako se želite povezati?</string>

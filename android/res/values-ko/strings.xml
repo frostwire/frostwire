@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">진행중인 업로드</string>
     <string name="activity_about">어바웃</string>
     <string name="activity_debug_name">디버그</string>
-    <string name="disconnected">연결끊김</string>
     <string name="all_transfers_will_stop_are_you_sure">모든 트랜스퍼가 중지됩니다..\n그래도 진행하시겠습니까?</string>
-    <string name="connect">연결</string>
-    <string name="connecting">연결중</string>
-    <string name="disconnect">연결 끄기</string>
-    <string name="disconnecting">연결 끄는 중</string>
     <string name="wait">잠시만 기다리세요</string>
     <string name="exit">나가기</string>
     <string name="no_wifi_want_to_fix_it_question">현재 무선인터넷에 연결되지 않았습니다.\n\n어떻게 연결해드릴까요?</string>

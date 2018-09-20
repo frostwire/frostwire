@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Aktywne Wysyłanie</string>
     <string name="activity_about">O nas</string>
     <string name="activity_debug_name">Debugowanie</string>
-    <string name="disconnected">Rozłączony</string>
     <string name="all_transfers_will_stop_are_you_sure">Wszystkie transfery się zatrzymają.\nJesteś tego pewny?</string>
-    <string name="connect">Połącz</string>
-    <string name="connecting">Łączenie</string>
-    <string name="disconnect">Rozłącz</string>
-    <string name="disconnecting">Rozłączanie</string>
     <string name="wait">Czekaj</string>
     <string name="exit">Zamknij</string>
     <string name="no_wifi_want_to_fix_it_question">Nie jesteś podłączony do sieci Wi-Fi.\n\nChciałbyś się połączyć?</string>

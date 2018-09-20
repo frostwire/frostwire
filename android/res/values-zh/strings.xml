@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">主动上传</string>
     <string name="activity_about">关于</string>
     <string name="activity_debug_name">排错</string>
-    <string name="disconnected">断开</string>
     <string name="all_transfers_will_stop_are_you_sure">所有传输中断.\是否确定?</string>
-    <string name="connect">连接</string>
-    <string name="connecting">连接中</string>
-    <string name="disconnect">断开</string>
-    <string name="disconnecting">断开中</string>
     <string name="wait">等待</string>
     <string name="exit">退出</string>
     <string name="no_wifi_want_to_fix_it_question">无法连接无线网络.你想如何连接?</string>

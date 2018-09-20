@@ -35,7 +35,6 @@
     <string name="share_selected_files">ఎంచుకున్న ఫైల్లను భాగస్వామ్యం చెయ్యండి</string>
     <string name="filter_ellipsis">వడపోత…</string>
     <string name="device">పరికరం</string>
-    <string name="connecting">కనెక్ట్</string>
     <string name="all_free_downloads">అన్ని ఉచిత డౌన్లోడ్లు</string>
     <string name="include">చేర్చండి</string>
     <string name="torrent_max_download_speed">మాక్స్ డౌన్లోడ్ వేగం</string>
@@ -131,7 +130,6 @@
     <string name="invalid_torrent_file">చెల్లని టొరెంట్ ఫైల్</string>
     <string name="activity_downloads_title_text">డౌన్ లోడ్</string>
     <string name="storage_picker_treeuri_not_directory">ఎంచుకున్న మార్గం డైరెక్టరీ కాదు</string>
-    <string name="disconnecting">డిస్కనెక్ట్</string>
     <string name="activity_media_player_name">మీడియా ప్లేయర్</string>
     <string name="choose_email_app">ఇమెయిల్ అనువర్తనాన్ని ఎంచుకోండి…</string>
     <string name="failed_to_add_download">డౌన్లోడ్ను జోడించడంలో విఫలమైంది</string>
@@ -191,7 +189,6 @@
     <string name="connected_using_dataplan">డేటా ప్లాన్ను ఉపయోగించి కనెక్ట్ చేయబడింది</string>
     <string name="vpn_on_toast_notification">మీరు VPN కు కనెక్ట్ చేయబడ్డారు.</string>
     <string name="tip_rename_your_files">తప్పనిసరిగా తెలుసుకోవాలి: ఫైల్లను పేరు మార్చండి, అందువల్ల వాటిని కనుగొనవచ్చు</string>
-    <string name="disconnect">డిస్కనెక్ట్</string>
     <string name="add_trackers">ట్రాక్లను జోడించండి</string>
     <string name="vpn_what_you_get_with">మీరు ఏమి తో వచ్చారు </string>
     <string name="download_finished">డౌన్లోడ్ పూర్తయింది</string>
@@ -232,7 +229,6 @@
     <string name="speed_limits">వేగ పరిమితులు</string>
     <string name="created_on">సృష్టించబడింది</string>
     <string name="downloads_added_to_queue">%s ఫైల్లు డౌన్లోడ్ చేయబడతాయి</string>
-    <string name="connect">కనెక్ట్</string>
     <string name="azureus_general_view_yes">అవును</string>
     <string name="use_upnp_port_mapping">ఆటోమేటిక్ పోర్ట్ మాపింగ్ (UPnP) ఉపయోగించండి</string>
     <string name="use_youtube">YouTube.com ఉపయోగించండి</string>
@@ -478,7 +474,6 @@
     <string name="issue_with_tip_donation_uri">విరాళం వెబ్ చిరునామాతో ఏదో తప్పు ఉంది</string>
     <string name="frostwire_is_running">FrostWire రన్</string>
     <string name="http_download_status_save_dir_error">డైరెక్టరీ సేవ్ లేదు లేదా సృష్టించబడదు</string>
-    <string name="disconnected">డిస్కనెక్ట్</string>
     <string name="view_transfer_list_item_group_indicator_description">మరింత/తక్కువ సమాచారం</string>
     <string name="install_bitcoin_wallet">Bitcoin Wallet ను ఇన్స్టాల్ చేయండి</string>
     <string name="select_option_below">దిగువ ఎంపికను ఎంచుకోండి:</string>

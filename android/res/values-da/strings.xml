@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Active Uploads</string>
     <string name="activity_about">Om</string>
     <string name="activity_debug_name">Fejlsøgning</string>
-    <string name="disconnected">Frakoblet</string>
     <string name="all_transfers_will_stop_are_you_sure">Alle overførsler vil stoppe.\nEr du sikker?</string>
-    <string name="connect">Forbind</string>
-    <string name="connecting">Forbinder</string>
-    <string name="disconnect">Frakobl</string>
-    <string name="disconnecting">Frakobling</string>
     <string name="wait">Vent venligst</string>
     <string name="exit">Afslut</string>
     <string name="no_wifi_want_to_fix_it_question">Du er ikke forbundet til et Wi-Fi netværk.\n\nHvordan vil du forbinde?</string>

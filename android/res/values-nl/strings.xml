@@ -30,12 +30,7 @@
     <string name="activity_uploads_name">Actieve Uploads</string>
     <string name="activity_about">Over</string>
     <string name="activity_debug_name">Debug</string>
-    <string name="disconnected">Uitgeschakeld</string>
     <string name="all_transfers_will_stop_are_you_sure">Alle transfers zullen stoppen.\nWeet je het zeker?</string>
-    <string name="connect">Verbind</string>
-    <string name="connecting">Verbinden</string>
-    <string name="disconnect">Uitschakelen</string>
-    <string name="disconnecting">Uitschakelen</string>
     <string name="wait">Wacht</string>
     <string name="exit">Exit</string>
     <string name="no_wifi_want_to_fix_it_question">Je bent niet verbonden met een WiFi netwerk.\n\nHoe wil je verbinding maken?</string>

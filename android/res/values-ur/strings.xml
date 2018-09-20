@@ -26,12 +26,7 @@
     <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
     <string name="activity_uploads_name">موجودہ اپلوڈ</string>
     <string name="activity_about">ہمارے بارے میں</string>
-    <string name="disconnected">رابطہ منقطع</string>
     <string name="all_transfers_will_stop_are_you_sure">سب کی منتقلی رک جائی گی . کیا آپ مطمین ہیں ؟</string>
-    <string name="connect">رابطہ قائم کریں</string>
-    <string name="connecting">رابطہ قائم ہو رہا ہے </string>
-    <string name="disconnect">رابطہ منقطع کریں  </string>
-    <string name="disconnecting">رابطہ منقطع ہو رہا ہے </string>
     <string name="wait">انتظار فرمائیں </string>
     <string name="exit">Exit</string>
     <string name="no_wifi_want_to_fix_it_question"> آپ کا انٹرنیٹ سے رابطہ منقطع ہو گیا ہے . آپ رابطہ کیسے قائم کرنا چاہتے ہیں؟</string>
