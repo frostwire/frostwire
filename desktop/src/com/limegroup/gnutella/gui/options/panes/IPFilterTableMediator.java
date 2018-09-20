@@ -147,7 +147,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         private String startAddress;
         private String endAddress;
 
-        IPRange(String description, String startAddress, String endAddress) {
+        public IPRange(String description, String startAddress, String endAddress) {
             if (description == null) {
                 throw new IllegalArgumentException("IPRange description can't be null (use empty string)");
             }

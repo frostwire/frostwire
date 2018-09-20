@@ -28,6 +28,7 @@ import com.limegroup.gnutella.gui.FileChooserHandler;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
@@ -37,7 +38,6 @@ import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -112,7 +112,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         importButton = new JButton(I18n.tr("Import"));
         panel.add(importButton, "span 1, wrap");
 
-        progressBar = new JProgressBar(0,100);
+        progressBar = new JProgressBar(0, 100);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
         panel.add(progressBar, "growx, wrap");
@@ -239,7 +239,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
                             // every few imported ipRanges, let's do an UI update
                             if (dataModel.getRowCount() % 100 == 0) {
-                                GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)),importingString));
+                                GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)), importingString));
                             }
 
                             // TODO: add to actual ip block filter
@@ -391,7 +391,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             if (enable) {
                 fileUrlTextField.requestFocus();
                 fileUrlTextField.selectAll();
-                updateProgressBar(0,"");
+                updateProgressBar(0, "");
             }
         });
     }
@@ -557,7 +557,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 return;
             }
             if (contentLength != -1) {
-                updateProgressBar((int) ((totalRead * 100.0f / contentLength)),downloadingString);
+                updateProgressBar((int) ((totalRead * 100.0f / contentLength)), downloadingString);
             }
         }
 
@@ -572,7 +572,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 onError(client, t);
                 return;
             }
-            updateProgressBar(100,"");
+            updateProgressBar(100, "");
             enableImportControls(true);
             importFromIPBlockFileAsync(downloadedFile, true);
         }
@@ -594,88 +594,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
     }
 
-    private void onRangeManuallyAdded(IPFilterTableMediator.IPRange ipRange) {
+    public void onRangeManuallyAdded(IPFilterTableMediator.IPRange ipRange) {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
-    }
-
-    private static class AddRangeManuallyDialog extends JDialog {
-
-        private final IPFilterPaneItem dialogListener;
-        private final JTextField descriptionTextField;
-        private final JTextField rangeStartTextField;
-        private final JTextField rangeEndTextField;
-
-        AddRangeManuallyDialog(IPFilterPaneItem dialogListener) {
-            super(getParentDialog(dialogListener), true);
-            final String addIPRangeManuallyString = I18n.tr("Add IP Range Manually");
-            setTitle(addIPRangeManuallyString);
-            this.dialogListener = dialogListener;
-            JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid"));
-            panel.add(new JLabel(I18n.tr("Description")),"wrap");
-            descriptionTextField = new JTextField();
-            panel.add(descriptionTextField, "growx, wrap");
-
-            panel.add(new JLabel("<html><strong>" + I18n.tr("Starting IP address") + "</strong></html>"),"wrap");
-            rangeStartTextField = new JTextField();
-            panel.add(rangeStartTextField, "w 250px, wrap");
-
-            panel.add(new JLabel("<html><strong>" +
-                    I18n.tr("Ending IP address") +
-                    "</strong><br/><i>" +
-                    I18n.tr("Leave blank or repeat 'Starting IP address' to block a single one") +
-                    "</i></html>"), "growx ,wrap");
-
-            rangeEndTextField = new JTextField();
-            panel.add(rangeEndTextField, "w 250px, gapbottom 10px, wrap");
-
-            fixKeyStrokes(descriptionTextField);
-            fixKeyStrokes(rangeStartTextField);
-            fixKeyStrokes(rangeEndTextField);
-
-            JButton addRangeButton = new JButton(addIPRangeManuallyString);
-            panel.add(addRangeButton,"growx");
-            addRangeButton.addActionListener((e) -> onAddRangeButtonClicked());
-            JButton cancelButton = new JButton(I18n.tr("Cancel"));
-            cancelButton.addActionListener((e) -> dispose());
-            panel.add(cancelButton,"growx");
-            setContentPane(panel);
-            setResizable(false);
-            setLocationRelativeTo(getParent());
-            pack();
-        }
-
-        private void onAddRangeButtonClicked() {
-            if (!validateInput()) {
-                return;
-            }
-            dispose();
-            dialogListener.onRangeManuallyAdded(
-                    new IPFilterTableMediator.IPRange(
-                            descriptionTextField.getText(),
-                            rangeStartTextField.getText(),
-                            rangeEndTextField.getText()));
-        }
-
-        private boolean validateInput() {
-            LOG.warn("AddRangeManuallyDialog::validateInput() NOT IMPLEMENTED");
-            try {
-                new IPFilterTableMediator.IPRange(
-                        descriptionTextField.getText(),
-                        rangeStartTextField.getText(),
-                        rangeEndTextField.getText());
-            } catch (IllegalArgumentException e) {
-                return false;
-            }
-            return true;
-        }
-
-        private static JDialog getParentDialog(IPFilterPaneItem paneItem) {
-            Component result = paneItem.getContainer();
-            do {
-                result = result.getParent();
-                LOG.info("getParentDialog: getContainer -> " + result.getClass().getName());
-            } while (!(result instanceof JDialog));
-            return (JDialog) result;
-        }
     }
 }
