@@ -226,7 +226,7 @@ public class EngineService extends Service implements IEngineService {
         state = STATE_STOPPING;
 
         LOG.info("Pausing BTEngine...");
-        TransferManager.instance().onShutdown();
+        TransferManager.instance().onShutdown(disconnected);
         BTEngine.getInstance().pause();
         LOG.info("Pausing BTEngine paused");
 

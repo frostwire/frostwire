@@ -95,8 +95,10 @@ public final class TransferManager {
         async(this::loadTorrentsTask);
     }
 
-    public void onShutdown() {
-        clearTransfers();
+    public void onShutdown(boolean disconnected) {
+        if (!disconnected) {
+            clearTransfers();
+        }
         unregisterPreferencesChangeListener();
     }
 
