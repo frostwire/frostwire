@@ -344,8 +344,6 @@
     <string name="wifi_sharing">Wi-Fi Paylaşımı</string>
     <string name="activity_mediaplayer_name">Medya Oynatıcısı</string>
     <string name="stop">Dur</string>
-    <string name="one_file_shared" >Aynı Wi-Fi ağı üzerinden Frostwire cihazlarına sadece bir dosya paylaşıldı.</string>
-    <string name="n_files_shared" >%d dosyaları aynı Wi-Fi ağı üzerinden FrostWire cihazlarına paylaşıldı.</string>
     <string name="playing_now_colon">Şimdi oynama:</string>
     <string name="my_filetype">Bana ait %s</string>
     <string name="paused">Durdu</string>

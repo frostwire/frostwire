@@ -122,7 +122,6 @@
     <string name="activity_preferences_name">सेटिंग्ज</string>
     <string name="use_torrentdownloads">TorrentDownloads वापरा</string>
     <string name="ten_dollars">$10</string>
-    <string name="one_file_shared">समान फाई नेटवर्कवरील फ्रॉस्टवायर डिव्हाइसेसवर एक फाइल सामायिक केली गेली आहे.</string>
     <string name="my_files">माझ्या फायली</string>
     <string name="pieces">तुकडे</string>
     <string name="no_network_connection">नेटवर्क जोडणी नाही</string>
@@ -484,7 +483,6 @@
     <string name="http_download_status_save_dir_error">जतन करा निर्देशिका अस्तित्वात नाही किंवा तयार केली जाऊ शकत नाही</string>
     <string name="disconnected">डिस्कनेक्ट केले</string>
     <string name="view_transfer_list_item_group_indicator_description">अधिक/कमी माहिती</string>
-    <string name="n_files_shared">%d फाईल्स समान Wi-Fi नेटवर्क वर FrostWire साधने शेअर केले गेले.</string>
     <string name="install_bitcoin_wallet">स्थापित करा Bitcoin Wallet</string>
     <string name="select_option_below">खालील पर्याय निवडाः</string>
     <string name="device_storage">डिव्हाइसचे संचयन</string>

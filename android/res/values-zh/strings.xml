@@ -662,8 +662,6 @@
     <string name="vpn_find_out_more">了解更多</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 免费试用7天</string>
     <string name="play_store_out_of_sync">Google Play商店需要同步，请等待几分钟</string>
-    <string name="one_file_shared">已在同一Wi-Fi网络上向FrostWire设备共享一个文件。</string>
-    <string name="n_files_shared">已向同一Wi-Fi网络上的FrostWire设备共享了 %d 个文件。</string>
     <string name="uploaded">上传的</string>
     <string name="trackers">跟踪器</string>
     <string name="source_type">资源： %1$s</string>

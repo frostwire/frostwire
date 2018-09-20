@@ -356,8 +356,6 @@
     <string name="activity_mediaplayer_name">メディアプレーヤー</string>
     <string name="stop">中断</string>
     <string name="couldnt_share_file">ファイルを共有できません。パスが正しくありません。</string>
-    <string name="one_file_shared" >同じWi-Fiネットワークで1つのファイルがFrostWireデバイスに共有されています。</string>
-    <string name="n_files_shared" >同じWi-Fiネットワークで%dつのファイルがFrostWireデバイスに共有されています。</string>
     <string name="playing_now_colon">現在再生中:</string>
     <string name="my_filetype">マイ %s</string>
     <string name="paused">一時停止</string>

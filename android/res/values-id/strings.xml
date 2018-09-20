@@ -659,7 +659,6 @@
     <string name="vpn_find_out_more">Temukan lebih banyak lagi</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
     <string name="play_store_out_of_sync">Play Store perlu melakukan sinkronisasi, tunggu beberapa menit</string>
-    <string name="one_file_shared">Satu file telah dibagikan ke perangkat FrostWire di jaringan Wi-Fi yang sama.</string>
     <string name="contact_us">Hubungi kami</string>
     <string name="join_frostwire_chat">Bergabung FrostWire chatting</string>
     <string name="uploaded">Diunggah</string>
@@ -691,7 +690,6 @@
     <string name="sequential_download">Unduhan berurutan</string>
     <string name="downloaded_n">Mengunduh %1$s / </string>
     <string name="transfer_detail_title_header">Nama:</string>
-    <string name="n_files_shared">%d perkintalan telah dibagikan ke perangkat FrostWire di jaringan Wi-Fi yang sama.</string>
     <string name="time_elapsed">Waktu berlalu</string>
     <string name="remove_tracker">Hapus pelacak</string>
     <string name="comment">Komentar</string>

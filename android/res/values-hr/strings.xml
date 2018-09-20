@@ -660,8 +660,6 @@
     <string name="vpn_find_out_more">Saznaj više</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Besplatno 7-dnevno probno razdoblje</string>
     <string name="play_store_out_of_sync">Trgovina Google Play treba sinkronizirati, pričekajte nekoliko minuta</string>
-    <string name="one_file_shared">Jedna je datoteka podijeljena s FrostWire uređajima na istoj Wi-Fi mreži.</string>
-    <string name="n_files_shared">Dijeljeno je %d datoteka FrostWire uređajima na istoj Wi-Fi mreži.</string>
     <string name="uploaded">Preneseni</string>
     <string name="trackers">Trackers</string>
     <string name="source_type">Izvor: %1$s</string>

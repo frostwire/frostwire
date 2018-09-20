@@ -664,7 +664,6 @@
     <string name="transfer_detail_storage_header">Đường dẫn lưu trữ:</string>
     <string name="seeding_time">Thời gian gieo hạt</string>
     <string name="working">Đang làm việc</string>
-    <string name="one_file_shared">Một tệp đã được chia sẻ với các thiết bị FrostWire trên cùng một mạng Wi-Fi.</string>
     <string name="pieces">Miếng</string>
     <string name="upload_limit">Giới hạn tải lên</string>
     <string name="enter_valid_tracker_url_here">Nhập url tracker hợp lệ ở đây</string>
@@ -687,7 +686,6 @@
     <string name="sequential_download">Tải tuần tự</string>
     <string name="downloaded_n">Đã tải xuống %1$s / </string>
     <string name="transfer_detail_title_header">Tên:</string>
-    <string name="n_files_shared">%d tệp đã được chia sẻ với các thiết bị FrostWire trên cùng một mạng Wi-Fi.</string>
     <string name="time_elapsed">Thời gian trôi qua</string>
     <string name="remove_tracker">Xóa trình theo dõi</string>
     <string name="comment">Bình luận</string>

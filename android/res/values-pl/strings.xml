@@ -641,7 +641,6 @@
     <string name="transfer_detail_storage_header">Ścieżka zachowania:</string>
     <string name="seeding_time">Czas seedowania</string>
     <string name="working">Pracuję</string>
-    <string name="one_file_shared">Jeden plik został udostępniony urządzeniom z FrostWire w tej samej sieci Wi-Fi</string>
     <string name="pieces">Fragmenty Pliku</string>
     <string name="vpn_money_back_PIA">7-dniowa gwarancja zwrotu pieniędzy</string>
     <string name="seed_all_finished">Seeduj wszystkie zakończone</string>
@@ -681,7 +680,6 @@
     <string name="downloaded_n">Pobrane %1$s / </string>
     <string name="transfer_detail_title_header">Nazwa:</string>
     <string name="vpn_client_feature_3_PIA">Solidna infrastruktura: zasięg ogólnoświatowy</string>
-    <string name="n_files_shared">%d plików zostały udostępnione urządzeniom z FrostWire w tej samej sieci Wi-Fi.</string>
     <string name="time_elapsed">Czas, jaki upłynął</string>
     <string name="contact_us">Skontaktuj się z nami</string>
     <string name="remove_tracker">Usuń trackera</string>

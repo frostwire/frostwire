@@ -667,7 +667,6 @@
     <string name="transfer_detail_storage_header">Laluan Penyimpanan:</string>
     <string name="seeding_time">Masa pembenihan</string>
     <string name="working">Bekerja</string>
-    <string name="one_file_shared">Satu fail telah dikongsi ke peranti FrostWire pada rangkaian Wi-Fi yang sama.</string>
     <string name="pieces">Keping</string>
     <string name="upload_limit">Had muat naik</string>
     <string name="enter_valid_tracker_url_here">Masukkan url pelacak yang sah di sini</string>
@@ -690,7 +689,6 @@
     <string name="sequential_download">Muat turun urutan</string>
     <string name="downloaded_n">Muat turun %1$s / </string>
     <string name="transfer_detail_title_header">Nama:</string>
-    <string name="n_files_shared">%d fail telah dikongsi ke peranti FrostWire pada rangkaian Wi-Fi yang sama.</string>
     <string name="time_elapsed">Masa berlalu</string>
     <string name="remove_tracker">Padam tracker</string>
     <string name="comment">Komen</string>

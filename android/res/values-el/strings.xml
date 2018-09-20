@@ -350,8 +350,6 @@
     <string name="wifi_sharing">Ασύρματο Μοίρασμα</string>
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">Σταμάτημα</string>
-    <string name="one_file_shared" >Ένα αρχείο μοιράστηκε σε συσκευές FrostWire στο ίδιο ασύρματο δίκτυο.</string>
-    <string name="n_files_shared" >%d αρχεία μοιράστηκαν σε συσκευές FrostWire στο ίδιο ασύρματο δίκτυο.</string>
     <string name="playing_now_colon">Παίζει τώρα:</string>
     <string name="my_filetype">Ο %s μου</string>
     <string name="paused">Παύση</string>

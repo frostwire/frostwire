@@ -664,7 +664,6 @@
     <string name="transfer_detail_storage_header">Tárolási útvonal:</string>
     <string name="seeding_time">Vetési idő</string>
     <string name="working">Dolgozó</string>
-    <string name="one_file_shared">Az egyik fájl megosztott a FrostWire eszközökön ugyanazon a Wi-Fi hálózaton.</string>
     <string name="pieces">Darabok</string>
     <string name="upload_limit">Feltöltési limit</string>
     <string name="enter_valid_tracker_url_here">Adjon meg érvényes tracker url itt</string>
@@ -688,7 +687,6 @@
     <string name="sequential_download">Sorozatos letöltés</string>
     <string name="downloaded_n">Letöltött %1$s / </string>
     <string name="transfer_detail_title_header">Név:</string>
-    <string name="n_files_shared">%d fájl került megosztásra a FrostWire készülékekkel ugyanazon a Wi-Fi hálózaton.</string>
     <string name="time_elapsed">Eltelt idő</string>
     <string name="remove_tracker">A tracker eltávolítása</string>
     <string name="comment">Megjegyzés</string>

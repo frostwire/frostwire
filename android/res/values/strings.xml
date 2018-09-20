@@ -399,8 +399,6 @@
     <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">Stop</string>
     <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
-    <string name="one_file_shared">One file has been shared to FrostWire devices on the same Wi-Fi network.</string>
-    <string name="n_files_shared">%d files has been shared to FrostWire devices on the same Wi-Fi network.</string>
     <string name="playing_now_colon">Playing now:</string>
     <string name="my_filetype">My %s</string>
     <string name="paused">Paused</string>

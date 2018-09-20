@@ -662,8 +662,6 @@
     <string name="vpn_find_out_more">Meer te weten komen</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis proefperiode van 7 dagen</string>
     <string name="play_store_out_of_sync">Play Store moet worden gesynchroniseerd, wacht een paar minuten</string>
-    <string name="one_file_shared">Eén bestand is gedeeld met FrostWire-apparaten op hetzelfde Wi-Fi-netwerk.</string>
-    <string name="n_files_shared">%d bestanden zijn gedeeld met FrostWire-apparaten op hetzelfde Wi-Fi-netwerk.</string>
     <string name="contact_us">Neem contact op</string>
     <string name="join_frostwire_chat">Doe mee met FrostWire-chat</string>
     <string name="uploaded">Geüpload</string>

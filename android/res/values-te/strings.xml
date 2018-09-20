@@ -120,7 +120,6 @@
     <string name="activity_preferences_name">సెట్టింగులు</string>
     <string name="use_torrentdownloads">TorrentDownloads ఉపయోగించండి</string>
     <string name="ten_dollars">$10</string>
-    <string name="one_file_shared">అదే ఫైల్ FrostWire పరికరాల్లో అదే Wi-Fi నెట్వర్క్లో భాగస్వామ్యం చేయబడింది.</string>
     <string name="my_files">నా ఫైళ్ళు</string>
     <string name="pieces">పీసెస్</string>
     <string name="no_network_connection">నెట్వర్క్ కనెక్షన్ లేదు</string>
@@ -481,7 +480,6 @@
     <string name="http_download_status_save_dir_error">డైరెక్టరీ సేవ్ లేదు లేదా సృష్టించబడదు</string>
     <string name="disconnected">డిస్కనెక్ట్</string>
     <string name="view_transfer_list_item_group_indicator_description">మరింత/తక్కువ సమాచారం</string>
-    <string name="n_files_shared">%d ఫైళ్ళు అదే Wi-Fi నెట్వర్క్లో FrostWire పరికరాలకు భాగస్వామ్యం చెయ్యబడ్డాయి.</string>
     <string name="install_bitcoin_wallet">Bitcoin Wallet ను ఇన్స్టాల్ చేయండి</string>
     <string name="select_option_below">దిగువ ఎంపికను ఎంచుకోండి:</string>
     <string name="device_storage">పరికరం యొక్క నిల్వ</string>

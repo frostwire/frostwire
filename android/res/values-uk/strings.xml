@@ -665,7 +665,6 @@
     <string name="transfer_detail_storage_header">Шлях до зберігання:</string>
     <string name="seeding_time">Час сіяння</string>
     <string name="working">Робочий</string>
-    <string name="one_file_shared">Один файл був надісланий на пристрої FrostWire в тій же мережі Wi-Fi.</string>
     <string name="pieces">Шматки</string>
     <string name="upload_limit">Ліміт завантаження</string>
     <string name="enter_valid_tracker_url_here">Введіть дійсний URL-адресу трекера тут</string>
@@ -688,7 +687,6 @@
     <string name="sequential_download">Послідовне завантаження</string>
     <string name="downloaded_n">Завантажено %1$s / </string>
     <string name="transfer_detail_title_header">Ім\'я:</string>
-    <string name="n_files_shared">%d файлів було надіслано на пристрої FrostWire в тій же мережі Wi-Fi.</string>
     <string name="time_elapsed">Час минув</string>
     <string name="remove_tracker">Видалити трекер</string>
     <string name="comment">Коментар</string>

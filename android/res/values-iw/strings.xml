@@ -660,8 +660,6 @@
     <string name="vpn_find_out_more">למידע נוסף</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ניסיון חינם ל -7 ימים</string>
     <string name="play_store_out_of_sync">חנות Google Play צריכה לסנכרן, המתן מספר דקות</string>
-    <string name="one_file_shared">קובץ אחד משותף למכשירי FrostWire באותה רשת Wi-Fi.</string>
-    <string name="n_files_shared">%d קבצים משותפים למכשירי FrostWire באותה רשת Wi-Fi.</string>
     <string name="uploaded">הועלה</string>
     <string name="trackers">עוקבים</string>
     <string name="source_type">מָקוֹר: %1$s</string>

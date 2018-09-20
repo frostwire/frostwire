@@ -666,7 +666,6 @@
     <string name="transfer_detail_storage_header">Opbevaring sti:</string>
     <string name="seeding_time">Tidspunkt for såning</string>
     <string name="working">Arbejder</string>
-    <string name="one_file_shared">Én fil er blevet delt til FrostWire-enheder på samme Wi-Fi-netværk.</string>
     <string name="pieces">Stykker</string>
     <string name="upload_limit">Upload grænse</string>
     <string name="enter_valid_tracker_url_here">Indtast gyldig sporingswebadresse her</string>
@@ -689,7 +688,6 @@
     <string name="sequential_download">Sekventiel download</string>
     <string name="downloaded_n">Downloadet %1$s / </string>
     <string name="transfer_detail_title_header">Navn:</string>
-    <string name="n_files_shared">%d filer er blevet delt til FrostWire-enheder på samme Wi-Fi-netværk.</string>
     <string name="time_elapsed">Tid er gået</string>
     <string name="remove_tracker">Fjern tracker</string>
     <string name="comment">Kommentar</string>

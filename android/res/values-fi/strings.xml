@@ -664,7 +664,6 @@
     <string name="transfer_detail_storage_header">Tallennuspolku:</string>
     <string name="seeding_time">Kylvöaika</string>
     <string name="working">Työskentely</string>
-    <string name="one_file_shared">Yksi tiedosto on jaettu FrostWire-laitteille samassa Wi-Fi-verkossa.</string>
     <string name="pieces">Kappaletta</string>
     <string name="upload_limit">Lähetys raja</string>
     <string name="enter_valid_tracker_url_here">Anna kelvollinen tracker-URL-osoite tähän</string>
@@ -688,7 +687,6 @@
     <string name="sequential_download">Jaksottainen lataus</string>
     <string name="downloaded_n">Ladattua %1$s / </string>
     <string name="transfer_detail_title_header">Nimi:</string>
-    <string name="n_files_shared">%d tiedostoa on jaettu FrostWire-laitteille samalla Wi-Fi-verkolla.</string>
     <string name="time_elapsed">Kulunut aika</string>
     <string name="remove_tracker">Poista tracker</string>
     <string name="comment">Kommentti</string>

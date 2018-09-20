@@ -662,7 +662,6 @@
     <string name="transfer_detail_storage_header">Пътека за съхранение:</string>
     <string name="seeding_time">Време за сеене</string>
     <string name="working">Работна</string>
-    <string name="one_file_shared">Един файл бе споделен на FrostWire устройства в същата Wi-Fi мрежа.</string>
     <string name="pieces">Парчета</string>
     <string name="upload_limit">Лимит за качване</string>
     <string name="enter_valid_tracker_url_here">Въведете валиден URL адрес на тракера тук</string>
@@ -685,7 +684,6 @@
     <string name="sequential_download">Последователно изтегляне</string>
     <string name="downloaded_n">Изтеглили %1$s / </string>
     <string name="transfer_detail_title_header">Име:</string>
-    <string name="n_files_shared">%d файла бяха споделени на FrostWire устройства в същата Wi-Fi мрежа.</string>
     <string name="time_elapsed">Изминало време</string>
     <string name="remove_tracker">Премахнете тракера</string>
     <string name="comment">Коментар</string>

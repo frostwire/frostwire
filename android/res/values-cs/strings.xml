@@ -664,7 +664,6 @@
     <string name="transfer_detail_storage_header">Skladovací cesta:</string>
     <string name="seeding_time">Čas sečení</string>
     <string name="working">Pracovní</string>
-    <string name="one_file_shared">Jeden soubor byl sdílen na zařízeních FrostWire ve stejné síti Wi-Fi.</string>
     <string name="pieces">Kousky</string>
     <string name="upload_limit">Limit nahrávání</string>
     <string name="enter_valid_tracker_url_here">Zadejte zde platnou adresu URL trackeru</string>
@@ -687,7 +686,6 @@
     <string name="sequential_download">Sekvenční stahování</string>
     <string name="downloaded_n">Stažený %1$s / </string>
     <string name="transfer_detail_title_header">Název:</string>
-    <string name="n_files_shared">%d souborů bylo sdíleno s FrostWire zařízeními ve stejné síti Wi-Fi.</string>
     <string name="time_elapsed">Uplynulý čas</string>
     <string name="remove_tracker">Odstraňte tracker</string>
     <string name="comment">Komentář</string>

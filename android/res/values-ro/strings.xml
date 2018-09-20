@@ -664,7 +664,6 @@
     <string name="transfer_detail_storage_header">Cale de stocare:</string>
     <string name="seeding_time">Timpul de însămânțare</string>
     <string name="working">Lucru</string>
-    <string name="one_file_shared">Un fișier a fost partajat dispozitivelor FrostWire din aceeași rețea Wi-Fi.</string>
     <string name="pieces">Piese</string>
     <string name="upload_limit">Limită de încărcare</string>
     <string name="enter_valid_tracker_url_here">Introduceți URL-ul trackerului valabil aici</string>
@@ -688,7 +687,6 @@
     <string name="sequential_download">Descărcare secvențială</string>
     <string name="downloaded_n">Descarcat %1$s / </string>
     <string name="transfer_detail_title_header">Name:</string>
-    <string name="n_files_shared">%d fișierele au fost distribuite dispozitivelor FrostWire din aceeași rețea Wi-Fi.</string>
     <string name="time_elapsed">Timpul scurs</string>
     <string name="remove_tracker">Eliminați tracker-ul</string>
     <string name="comment">Cometariu</string>

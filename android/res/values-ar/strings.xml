@@ -344,8 +344,6 @@
     <string name="wifi_sharing">مشاركة واي فاي</string>
     <string name="activity_mediaplayer_name">مشغل الوسائط</string>
     <string name="stop">ايقاف</string>
-    <string name="one_file_shared" >.تم مشاركة ملف واحد مع أجهزة فروست واير على نفس شبكة الواي فاي</string>
-    <string name="n_files_shared" > ملفات تم مشاركتها مع أجهزة فروست واير على نفس شبكة الواي فاي %d</string>
     <string name="playing_now_colon">:جاري التشغيل الآن</string>
     <string name="my_filetype">الخاصة بي %s</string>
     <string name="paused">مؤقوف مؤقتاً</string>

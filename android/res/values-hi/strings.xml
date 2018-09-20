@@ -665,7 +665,6 @@
     <string name="transfer_detail_storage_header">संग्रहण पथ:</string>
     <string name="seeding_time">बीजिंग समय</string>
     <string name="working">काम कर रहे</string>
-    <string name="one_file_shared">एक फ़ाइल को उसी वाई-फाई नेटवर्क पर फ्रॉस्टवायर डिवाइस पर साझा किया गया है।</string>
     <string name="pieces">टुकड़े</string>
     <string name="upload_limit">अपलोड सीमा</string>
     <string name="enter_valid_tracker_url_here">यहां वैध ट्रैकर यूआरएल दर्ज करें</string>
@@ -689,7 +688,6 @@
     <string name="sequential_download">अनुक्रमिक डाउनलोड</string>
     <string name="downloaded_n">डाउनलोड की गई %1$s / </string>
     <string name="transfer_detail_title_header">नाम:</string>
-    <string name="n_files_shared">%d फ़ाइलों को उसी वाई-फाई नेटवर्क पर फ्रॉस्टवायर डिवाइस पर साझा किया गया है।</string>
     <string name="time_elapsed">समय बीत गया</string>
     <string name="remove_tracker">ट्रैकर निकालें</string>
     <string name="comment">टिप्पणी</string>

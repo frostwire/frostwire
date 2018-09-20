@@ -366,8 +366,6 @@
     <string name="activity_mediaplayer_name">медиа плаиер</string>
     <string name="stop">стоп</string>
     <string name="couldnt_share_file">није могао да деле датотеке. Чудан пут фоунд.</string>
-    <string name="one_file_shared" >Један фајл се дели на Фроствире уређаја на истој Ви-Фи мрежи.</string>
-    <string name="n_files_shared" >Бр %d је поделио на Фроствире уређаја на истој Ви-Фи мрежи.</string>
     <string name="playing_now_colon">Плаиинг нов:</string>
     <string name="my_filetype">Moja %s</string>
     <string name="paused">Паузирано</string>

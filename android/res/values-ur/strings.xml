@@ -661,7 +661,6 @@
     <string name="transfer_detail_storage_header">اسٹوریج کا راستہ:</string>
     <string name="seeding_time">بار بار</string>
     <string name="working">کام کرنا</string>
-    <string name="one_file_shared">اسی فائل میں FrostWire آلات کو ایک ہی وائی فائی نیٹ ورک پر اشتراک کیا گیا ہے.</string>
     <string name="pieces">ٹکڑے</string>
     <string name="upload_limit">حد تک اپ لوڈ کریں</string>
     <string name="enter_valid_tracker_url_here">یہاں درست ٹریکر یو آر ایل درج کریں</string>
@@ -684,7 +683,6 @@
     <string name="sequential_download">منظوری ڈاؤن لوڈ</string>
     <string name="downloaded_n">%1$s ڈاؤن لوڈ کردہ / </string>
     <string name="transfer_detail_title_header">نام:</string>
-    <string name="n_files_shared">%d فائلوں کو اسی وائی فائی نیٹ ورک پر FrostWire آلات میں اشتراک کیا گیا ہے.</string>
     <string name="time_elapsed">وقت گزر گیا</string>
     <string name="remove_tracker">ٹریکر کو ہٹا دیں</string>
     <string name="comment">تبصرہ</string>

@@ -663,7 +663,6 @@
     <string name="transfer_detail_storage_header">Chemin de stockage:</string>
     <string name="seeding_time">Temps d\'ensemencement</string>
     <string name="working">Travailler</string>
-    <string name="one_file_shared">Un fichier a été partagé avec des appareils FrostWire sur le même réseau Wi-Fi.</string>
     <string name="pieces">Pièces</string>
     <string name="upload_limit">Limite de téléchargement</string>
     <string name="enter_valid_tracker_url_here">Entrez une URL de suivi valide ici</string>
@@ -686,7 +685,6 @@
     <string name="sequential_download">Téléchargement séquentiel</string>
     <string name="downloaded_n">Téléchargé %1$s / </string>
     <string name="transfer_detail_title_header">Nom:</string>
-    <string name="n_files_shared">%d fichiers ont été partagés avec les appareils FrostWire sur le même réseau Wi-Fi.</string>
     <string name="time_elapsed">Temps écoulé</string>
     <string name="remove_tracker">Supprimer le tracker</string>
     <string name="comment">Commentaire</string>

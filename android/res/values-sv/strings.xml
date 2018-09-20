@@ -665,7 +665,6 @@
     <string name="transfer_detail_storage_header">Förvaringsväg:</string>
     <string name="seeding_time">Såddstid</string>
     <string name="working">Arbetssätt</string>
-    <string name="one_file_shared">En fil har delats till FrostWire-enheter på samma Wi-Fi-nätverk.</string>
     <string name="pieces">Bitar</string>
     <string name="upload_limit">Ladda upp gränsen</string>
     <string name="enter_valid_tracker_url_here">Ange giltig sökvägsadress här</string>
@@ -688,7 +687,6 @@
     <string name="sequential_download">Sekventiell nedladdning</string>
     <string name="downloaded_n">Nedladdat %1$s / </string>
     <string name="transfer_detail_title_header">Namn:</string>
-    <string name="n_files_shared">%d filer har delats till FrostWire-enheter på samma Wi-Fi-nätverk.</string>
     <string name="time_elapsed">Tiden som gått</string>
     <string name="remove_tracker">Ta bort tracker</string>
     <string name="comment">Kommentar</string>
