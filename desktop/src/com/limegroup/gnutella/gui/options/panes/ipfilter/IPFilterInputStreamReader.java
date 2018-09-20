@@ -17,10 +17,8 @@
 
 package com.limegroup.gnutella.gui.options.panes.ipfilter;
 
-import com.limegroup.gnutella.gui.options.panes.IPFilterTableMediator;
-
 public interface IPFilterInputStreamReader {
-    IPFilterTableMediator.IPRange readLine();
+    IPRange readLine();
     int bytesRead();
     int available();
     void close();

@@ -21,7 +21,6 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.options.panes.IPFilterPaneItem;
-import com.limegroup.gnutella.gui.options.panes.IPFilterTableMediator;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -85,7 +84,7 @@ public class AddRangeManuallyDialog extends JDialog {
         }
         dispose();
         dialogListener.onRangeManuallyAdded(
-                new IPFilterTableMediator.IPRange(
+                new IPRange(
                         descriptionTextField.getText(),
                         rangeStartTextField.getText(),
                         rangeEndTextField.getText()));
@@ -116,7 +115,7 @@ public class AddRangeManuallyDialog extends JDialog {
         }
 
         try {
-            new IPFilterTableMediator.IPRange(
+            new IPRange(
                     description,
                     rangeStart,
                     rangeEnd);

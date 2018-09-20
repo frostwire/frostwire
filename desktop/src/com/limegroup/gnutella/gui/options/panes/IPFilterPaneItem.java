@@ -29,7 +29,9 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.AddRangeManuallyDialog;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterHttpListener;
 import com.limegroup.gnutella.gui.options.panes.ipfilter.IPFilterInputStreamReader;
+import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
@@ -41,8 +43,6 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.GZIPInputStream;
 
@@ -59,7 +59,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     public final static String TITLE = I18n.tr("IP Filter");
     public final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
     private final String decompressingString = I18n.tr("Decompressing");
-    private final String downloadingString = I18n.tr("Downloading");
 
     private IPFilterTableMediator ipFilterTable;
     private JTextField fileUrlTextField;
@@ -144,7 +143,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             try {
                 URI uri = URI.create(filterDataPath);
                 HttpClient http = new JdkHttpClient();
-                http.setListener(new IPFilterHttpListener(new File(CommonUtils.getUserSettingsDir(), "downloaded_blocklist.temp")));
+                http.setListener(new IPFilterHttpListener(this, new File(CommonUtils.getUserSettingsDir(), "downloaded_blocklist.temp")));
                 httpExecutor.execute(() -> {
                             try {
                                 LOG.info("http.get() -> " + uri.toURL().toString());
@@ -182,7 +181,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         enableImportControls(true);
     }
 
-    private void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
+    public void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
         // decompress if zip file
         // import file
 
@@ -231,7 +230,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
                 final String importingString = I18n.tr("Importing");
                 while (ipFilterReader.available() > 0) {
-                    IPFilterTableMediator.IPRange ipRange = ipFilterReader.readLine();
+                    IPRange ipRange = ipFilterReader.readLine();
                     if (ipRange != null) {
                         try {
                             ipRange.writeObjectTo(fos);
@@ -335,7 +334,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             final IPFilterTableMediator.IPFilterModel dataModel = ipFilterTable.getDataModel();
             while (fis.available() > 0) {
                 try {
-                    dataModel.add(IPFilterTableMediator.IPRange.readObjectFrom(fis), dataModel.getRowCount());
+                    dataModel.add(IPRange.readObjectFrom(fis), dataModel.getRowCount());
                     ranges++;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -356,7 +355,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return new File(CommonUtils.getUserSettingsDir(), "ip_filter.db");
     }
 
-    private void updateProgressBar(int percentage, String status) {
+    public void updateProgressBar(int percentage, String status) {
         if (percentage == lastPercentage) {
             return;
         }
@@ -377,7 +376,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         updateProgressBar(percentage, decompressingString);
     }
 
-    private void enableImportControls(boolean enable) {
+    public void enableImportControls(boolean enable) {
         GUIMediator.safeInvokeLater(() -> {
             fileUrlTextField.setEnabled(enable);
             fileChooserIcon.setEnabled(enable);
@@ -477,7 +476,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
 
         @Override
-        public IPFilterTableMediator.IPRange readLine() {
+        public IPRange readLine() {
             try {
                 if (is.available() > 0) {
                     String line = br.readLine();
@@ -489,7 +488,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
 
                     Matcher matcher = P2P_LINE_PATTERN.matcher(line);
                     if (matcher.find()) {
-                        return new IPFilterTableMediator.IPRange(matcher.group(1), matcher.group(2), matcher.group(3));
+                        return new IPRange(matcher.group(1), matcher.group(2), matcher.group(3));
                     }
                 }
             } catch (IOException e) {
@@ -524,77 +523,9 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         }
     }
 
-    private class IPFilterHttpListener implements HttpClient.HttpClientListener {
-        private int totalRead = 0;
-        private long contentLength = -1;
-        private final File downloadedFile;
-        private final FileOutputStream fos;
 
-        IPFilterHttpListener(File downloadedFile) throws FileNotFoundException {
-            this.downloadedFile = downloadedFile;
-            try {
-                fos = new FileOutputStream(downloadedFile);
-            } catch (FileNotFoundException e) {
-                LOG.error("IPFilterHttpListener can't create output stream -> " + e.getMessage(), e);
-                throw e;
-            }
-        }
 
-        @Override
-        public void onError(HttpClient client, Throwable e) {
-            LOG.info("onError(): " + e.getMessage());
-            LOG.error(e.getMessage(), e);
-            enableImportControls(true);
-        }
-
-        @Override
-        public void onData(HttpClient client, byte[] buffer, int offset, int length) {
-            totalRead += length;
-            try {
-                fos.write(buffer, offset, length);
-            } catch (Throwable t) {
-                onError(client, t);
-                return;
-            }
-            if (contentLength != -1) {
-                updateProgressBar((int) ((totalRead * 100.0f / contentLength)), downloadingString);
-            }
-        }
-
-        @Override
-        public void onComplete(HttpClient client) {
-            LOG.info("onComplete()");
-            try {
-                fos.flush();
-                fos.close();
-            } catch (Throwable t) {
-                LOG.error("onComplete(): " + t.getMessage(), t);
-                onError(client, t);
-                return;
-            }
-            updateProgressBar(100, "");
-            enableImportControls(true);
-            importFromIPBlockFileAsync(downloadedFile, true);
-        }
-
-        @Override
-        public void onCancel(HttpClient client) {
-            enableImportControls(true);
-        }
-
-        @Override
-        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
-            LOG.info("onHeaders()");
-            if (headerFields != null && headerFields.containsKey("Content-Length")) {
-                List<String> contentLengthHeader = headerFields.get("Content-Length");
-                if (contentLengthHeader != null && !contentLengthHeader.isEmpty()) {
-                    contentLength = Long.parseLong(contentLengthHeader.get(0));
-                }
-            }
-        }
-    }
-
-    public void onRangeManuallyAdded(IPFilterTableMediator.IPRange ipRange) {
+    public void onRangeManuallyAdded(IPRange ipRange) {
         LOG.info("onRangeManuallyAdded() - " + ipRange);
     }
 }
