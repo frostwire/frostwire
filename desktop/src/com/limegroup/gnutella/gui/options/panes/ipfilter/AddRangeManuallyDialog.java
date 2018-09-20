@@ -110,9 +110,14 @@ public class AddRangeManuallyDialog extends JDialog {
             return false;
         }
 
+        String description = descriptionTextField.getText().trim();
+        if (description.isEmpty()) {
+            description = I18n.tr("Not available");
+        }
+
         try {
             new IPFilterTableMediator.IPRange(
-                    descriptionTextField.getText(),
+                    description,
                     rangeStart,
                     rangeEnd);
         } catch (IllegalArgumentException e) {
