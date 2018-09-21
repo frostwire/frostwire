@@ -60,18 +60,11 @@
     <string name="document">Dokument</string>
     <string name="documents">Dokumenti</string>
     <string name="share">Dijeli</string>
-    <string name="unshare">Ne dijeli</string>
-    <string name="sharing">Dijeli</string>
-    <string name="send_pm">Pošalji privatnu poruku</string>
-    <string name="me">Ja</string>
     <string name="delete">Obriši</string>
     <string name="rename">Promijeni ime</string>
     <string name="download">Preuzmi</string>
     <string name="download_selected_files">Preuzmi odabrano</string>
     <string name="toggle_sharing_selected_files">Prebaci dijeljenje</string>
-    <string name="max_concurrent_uploads">Maksimum istovremenih slanja</string>
-    <string name="search_no_keywords">Unesite ključne riječi za pretraživanje</string>
-    <string name="search_select_filetype">Molimo odaberite tip datoteke</string>
     <string name="searching_for">Traženje</string>
     <string name="search_for_type_files">Traži %s dokumente</string>
     <string name="update_title">Vrijeme je za nadogradnju!</string>
@@ -537,7 +530,6 @@
     <string name="ad_free">Nema oglasa</string>
     <string name="current_plan">Trenutačni plan</string>
     <string name="sd_permission_no_accessible_path">Put koji ste odabrali u SD nije dostupna više. Pritisnite OK za ponovni odabir.</string>
-    <string name="select_deselect_all">Odabir/poništenje odabira Sve</string>
     <string name="get_vpn_client">Dobiti ExpressVPN</string>
     <string name="frostwire_is_running">FrostWire je pokrenut</string>
     <string name="select_option_below">Odaberite opciju u nastavku:</string>

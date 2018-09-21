@@ -60,18 +60,11 @@
     <string name="document">Doküman</string>
     <string name="documents">Dökümanlar</string>
     <string name="share">Paylaş</string>
-    <string name="unshare">Paylaşımı Kaldır</string>
-    <string name="sharing">Paylaşıyor</string>
-    <string name="send_pm">Özel Mesaj Gönder</string>
-    <string name="me">Ben</string>
     <string name="delete">Sil</string>
     <string name="rename">İsmini Değiştir</string>
     <string name="download">İndir</string>
     <string name="download_selected_files">Seçilen(ler)i İndir</string>
     <string name="toggle_sharing_selected_files">Aramayı Aç/Kapa</string>
-    <string name="max_concurrent_uploads">Aynı Anda Maksimum Yükleme</string>
-    <string name="search_no_keywords">Lütfen arama anahtar kelimeleri giriniz</string>
-    <string name="search_select_filetype">Lütfen bir dosya türü seçin</string>
     <string name="searching_for">Aranan:</string>
     <string name="search_for_type_files">%s dosyaları için arama</string>
     <string name="update_title">Güncelleme Zamanı!</string>
@@ -493,7 +486,6 @@
     <string name="transfers_context_menu_copy_infohash">InfoHash\'ı kopyala</string>
     <string name="storage_setting_warning">UYARI: Uygulamayı kaldırırsanız, FrostWire tarafından SD karta kaydedilen tüm dosyalar FrostWire değil, ANDROID tarafından silinir.</string>
     <string name="sd_permission_no_accessible_path">SD\'de seçtiğiniz yola artık erişilemiyor. Tekrar seçmek için Tamam düğmesine basın.</string>
-    <string name="select_deselect_all">Tümünü Seç/Seçimi İptal Et</string>
     <string name="canceling">İptal</string>
     <string name="get_vpn_client">ExpressVPN\'yi alın</string>
     <string name="issue_with_tip_donation_uri">Bağış web adresinde bir sorun var</string>

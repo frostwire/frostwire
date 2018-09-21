@@ -62,18 +62,11 @@
     <string name="document">Dokumen</string>
     <string name="documents">Dokumen-dokumen</string>
     <string name="share">Berbagi</string>
-    <string name="unshare">Tidak Berbagi</string>
-    <string name="sharing">Berbagi</string>
-    <string name="send_pm">Kirim Pesan Pribadi</string>
-    <string name="me">Saya</string>
     <string name="delete">Hapus</string>
     <string name="rename">Ubah Nama</string>
     <string name="download">Mengunduh</string>
     <string name="download_selected_files">Mengunduh yang dipilih</string>
     <string name="toggle_sharing_selected_files">Alihkan Berbagi</string>
-    <string name="max_concurrent_uploads">Unggahan Bersama Maksimal</string>
-    <string name="search_no_keywords">Silahkan Masukan Kata Kunci Pencarian</string>
-    <string name="search_select_filetype">Silahkan pilih jenis arsip</string>
     <string name="searching_for">Mencari</string>
     <string name="search_for_type_files">Mencari arsip-arsip %s</string>
     <string name="update_title">Perbarui Waktu!</string>
@@ -483,7 +476,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">PERINGATAN: Semua file yang disimpan oleh FrostWire ke kartu SD akan dihapus BY ANDROID, tidak FrostWire, jika Anda menghapus aplikasi.</string>
     <string name="sd_permission_no_accessible_path">Jalan yang Anda pilih di SD tersebut tidak dapat diakses lagi. Tekan OK untuk memilih lagi.</string>
-    <string name="select_deselect_all">Pilih/Tdk Pilih Semua</string>
     <string name="canceling">Membatalkan</string>
     <string name="get_vpn_client">Dapatkan ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Ada sesuatu yang salah dengan alamat web sumbangan</string>

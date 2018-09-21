@@ -62,18 +62,11 @@
     <string name="document">Dokument</string>
     <string name="documents">Dokumenter</string>
     <string name="share">Dele</string>
-    <string name="unshare">Ophæve delingen</string>
-    <string name="sharing">Deling</string>
-    <string name="send_pm">Send privat besked</string>
-    <string name="me">Mig</string>
     <string name="delete">Slet</string>
     <string name="rename">Omdøb</string>
     <string name="download">Download</string>
     <string name="download_selected_files">Download valgt</string>
     <string name="toggle_sharing_selected_files">Skift deling</string>
-    <string name="max_concurrent_uploads">Maksimum samtidige uploads</string>
-    <string name="search_no_keywords">Indtast venligst nøgleord til søgning</string>
-    <string name="search_select_filetype">Vælg venligst en filtype</string>
     <string name="searching_for">Søgning for</string>
     <string name="search_for_type_files">Søg for %s filer</string>
     <string name="update_title">Opdater tid!</string>
@@ -487,7 +480,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">ADVARSEL: Alle filer gemt af FrostWire på SD-kortet vil blive slettet Android, ikke FrostWire, hvis du afinstallerer den app.</string>
     <string name="sd_permission_no_accessible_path">Stien du valgte i SD er ikke tilgængelig længere. Tryk på OK for at vælge igen.</string>
-    <string name="select_deselect_all">Vælg/Fravælg alle</string>
     <string name="canceling">Annullering</string>
     <string name="get_vpn_client">Hent ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Der er noget galt med donationen webadressen</string>

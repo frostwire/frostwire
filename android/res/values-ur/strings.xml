@@ -117,12 +117,10 @@
     <string name="device">ڈیوائس</string>
     <string name="all_free_downloads">تمام مفت ڈاؤن لوڈ</string>
     <string name="go_to">کے پاس جاؤ</string>
-    <string name="me">مجھے</string>
     <string name="activity_uploads_title_text">اپ لوڈز</string>
     <string name="request_again">درخواست دوبارہ</string>
     <string name="use_zooqle">استعمال Zooqle.com</string>
     <string name="restarting_summary">FrostWire اثر لینے کے لئے حاصل کی جاچکی اجازت کے لئے اب دوبارہ شروع کرے گا</string>
-    <string name="unshare">غیر مشترک</string>
     <string name="alpha_tests_team_thanks">صبر و تحمل اور عظیم کی رائے کے لئے ہمارے تمام رضاکارانہ الفا ٹیسٹرز، کے لئے خصوصی شکریہ کے لئے شکریہ</string>
     <string name="azureus_manager_item_ready">دیگر بارشیں قطار کا انتظار ہے</string>
     <string name="drawer_close">بند کریں نیویگیشن دراز</string>
@@ -140,7 +138,6 @@
     <string name="add_transfer_label">ایک مقناطیس یا سیلاب URL پیسٹ</string>
     <string name="drawer_open">نیویگیشن دراز کھولیں</string>
     <string name="multicast_discovery_summary">کثیر نشریات کے ذریعے مقامی وائی فائی ساتھیوں سے مربوط (مجوزہ)</string>
-    <string name="max_concurrent_uploads">زیادہ سے زیادہ بیک وقت اپ لوڈز</string>
     <string name="use_torlock">استعمال TorLock</string>
     <string name="tos_title">استعمال کرنے کی شرائط</string>
     <string name="summary_files_shared">مقامی طور پر s% فائلوں کا اشتراک</string>
@@ -165,7 +162,6 @@
     <string name="app_shutdown_dlg_message">یہ مرضی سے بند تمام کی منتقلی اور پس منظر کی خدمات. کیا تمہیں یقین ہے؟</string>
     <string name="frostwire_sticker_and_more">FrostWire اسٹیکرز اور زیادہ</string>
     <string name="show_transfers_on_download_start">ٹرانسفر ڈاؤن لوڈ شروع پر شو</string>
-    <string name="sharing">اشتراک کرنا</string>
     <string name="send_feedback">رائے بھیجیں</string>
     <string name="chat_actions">چیٹ کے عوامل</string>
     <string name="tos_refuse">کوڑاکرٹ</string>
@@ -342,11 +338,9 @@
     <string name="torrent_url_added">اوپر کے URL کی منتقلی میں شامل کر دیا.</string>
     <string name="only_up_to_n_uploads_at_the_same_time">ایک ہی وقت میں صرف s% کے اپ لوڈز تک</string>
     <string name="are_you_sure_you_wanna_leave">آپ کے گھر کی سکرین پر واپس جانا چاہتے ہیں؟</string>
-    <string name="search_select_filetype">ایک فائل کی قسم کا انتخاب کریں</string>
     <string name="http_download_status_temp_dir_error">عارضی ڈائریکٹری موجود نہیں ہے یا پیدا نہیں کیا جا سکتا</string>
     <string name="playing_now_colon">اب چل رہا ہے:</string>
     <string name="please_enter_valid_url">ایک درست URL درج کریں</string>
-    <string name="search_no_keywords">تلاش کو درج کریں</string>
     <string name="gotta_have_at_least_one_upload_slot">چاہیئے کم از کم ایک اپ لوڈ کریں سلاٹ ہے</string>
     <string name="distraction_free_search_results_summary">مزید نتائج دکھانے کے UI اجزاء کو چھپائیں. اثر لینے کے لئے اے پی پی کے دوبارہ شروع کرنے کی ضرورت ہے.</string>
     <string name="notify_frostwire_is_running_summary">کی منتقلی کی حیثیت کے ساتھ ایک مستقل اتارنا Android اطلاع دکھائیں</string>
@@ -410,7 +404,6 @@
     <string name="storage_setting_warning">انتباہ: آپ کو اے پی پی ان انسٹال ہے تو SD کارڈ پر FrostWire طرف سے محفوظ تمام فائلوں، ANDROID، نہ FrostWire طرف سے خارج کر دیا جائے گا.</string>
     <string name="not_sharing_files">کسی بھی فائلوں کا اشتراک نہیں کر رہا ہے.</string>
     <string name="sd_permission_no_accessible_path">راستہ آپ SD میں منتخب نہیں قابل رسائی نہیں ہے. OK دبائیں دوبارہ منتخب کرنے کے لیے.</string>
-    <string name="select_deselect_all">منتخب کریں / غیر منتخب کریں: تمام</string>
     <string name="cancel_menu_action">سٹاپ منتقلی</string>
     <string name="torrent_fetcher_download_status_error">خرابی</string>
     <string name="canceling">منسوخ کرنا</string>
@@ -447,7 +440,6 @@
     <string name="file_descriptor_sd_mounted">یہ فائل ایسڈی کارڈ سے خارج کر دیا گیا، یا ایس ڈی کارڈ آپ ڈالا ہے ایک مختلف ایک ہے.</string>
     <string name="downloads">ڈاؤن لوڈز</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">ڈاؤن لوڈ کرنا سیلاب</string>
-    <string name="send_pm">ذاتی پیغام ارسال کریں</string>
     <string name="advertisement">اشتہار</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">فائلوں اٹھاو آپ کو اس سیلاب سے ڈاؤن لوڈ کرنا چاہتے ہیں</string>
     <string name="minimize_frostwire">FrostWire کو کم سے کم</string>

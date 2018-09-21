@@ -65,18 +65,11 @@
     <string name="document">Documento</string>
     <string name="documents">Documentos</string>
     <string name="share">Compartir</string>
-    <string name="unshare">Dejar de compartir</string>
-    <string name="sharing">Compartiendo</string>
-    <string name="send_pm">Enviar un mensaje privado</string>
-    <string name="me">Yo</string>
     <string name="delete">Borrar</string>
     <string name="rename">Renombrar</string>
     <string name="download">Descargar</string>
     <string name="download_selected_files">Descargar lo seleccionado</string>
     <string name="toggle_sharing_selected_files">Compartir/Dejar de compartir</string>
-    <string name="max_concurrent_uploads">Cargas Simultáneas Máximas</string>
-    <string name="search_no_keywords">Por favor, introduce los términos de búsqueda</string>
-    <string name="search_select_filetype">Por favor, selecciona un tipo de archivo</string>
     <string name="searching_for">Buscando</string>
     <string name="search_for_type_files">Busca los archivos de %s</string>
     <string name="update_title">¡Es hora de actualizar!</string>
@@ -564,7 +557,6 @@
     <string name="remove_ads">Remover publicidad</string>
     <string name="i_have_read_and_agree_to_the">He leído y estoy de acuerdo con</string>
     <string name="processing_payment">Procesando pago, vuelve a cargar en unos segundos</string>
-    <string name="select_deselect_all">Seleccionar/Deseleccionar todo</string>
     <string name="terms_of_use">Términos de Uso</string>
     <string name="haptic_feedback">Retroalimentación Táctil</string>
     <string name="advertisement">publicidad</string>

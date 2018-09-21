@@ -62,18 +62,11 @@
     <string name="document">Документ</string>
     <string name="documents">Документы</string>
     <string name="share">Раздавать</string>
-    <string name="unshare">Не раздавать</string>
-    <string name="sharing">Раздаёт</string>
-    <string name="send_pm">Отправить личное сообщение</string>
-    <string name="me">Мне</string>
     <string name="delete">Удалить</string>
     <string name="rename">Переименовать</string>
     <string name="download">Скачать</string>
     <string name="download_selected_files">Скачать выбранное</string>
     <string name="toggle_sharing_selected_files">Вкл/Выкл раздачу</string>
-    <string name="max_concurrent_uploads">Максимум одновременных загрузок</string>
-    <string name="search_no_keywords">Введите слова для поиска</string>
-    <string name="search_select_filetype">Выберите тип файла</string>
     <string name="searching_for">Поиск</string>
     <string name="search_for_type_files">Искать %s файлы</string>
     <string name="update_title">Время обновлений!</string>
@@ -533,7 +526,6 @@
     <string name="current_plan">Текущий план</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="sd_permission_no_accessible_path">Вы выбрали в SD путь не доступен больше. Нажмите кнопку OK, чтобы выбрать снова.</string>
-    <string name="select_deselect_all">Выбрать/Отменить все</string>
     <string name="get_vpn_client">Получить ExpressVPN</string>
     <string name="select_option_below">Выберите вариант ниже:</string>
     <string name="use_limetorrents">Используйте Limetorrents</string>

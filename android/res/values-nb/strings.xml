@@ -35,14 +35,12 @@
     <string name="all_free_downloads">Alle gratis nedlastinger</string>
     <string name="torrent_max_download_speed">Maksimal nedlastingshastighet</string>
     <string name="go_to">Gå til</string>
-    <string name="me">Meg</string>
     <string name="activity_uploads_title_text">Opplastede</string>
     <string name="torrent_max_peers">Maks Peers</string>
     <string name="request_again">Forespørselen på nytt</string>
     <string name="use_zooqle">Bruk Zooqle.com</string>
     <string name="restarting_summary">Frostwire vil starte på nytt nå for gitt tillatelser til å tre i kraft</string>
     <string name="clear_search_cache">Tøm søke cache</string>
-    <string name="unshare">Opphev deling</string>
     <string name="enable_wifi_sharing">Wi-Fi-deling</string>
     <string name="sharing_privacy_settings">Deling og personvern</string>
     <string name="alpha_tests_team_thanks">Takk til alle våre frivillige alfa testere for tålmodighet og gode tilbakemeldinger, spesiell takk til</string>
@@ -64,7 +62,6 @@
     <string name="drawer_open">Åpne navigasjonsmenyen</string>
     <string name="waiting">Venter…</string>
     <string name="multicast_discovery_summary">Koble til lokale Wifi kolleger via multicast (anbefales)</string>
-    <string name="max_concurrent_uploads">Maksimal samtidige opplastinger</string>
     <string name="use_torlock">Bruk TorLock</string>
     <string name="tos_title">Vilkår for bruk</string>
     <string name="activity_downloads_name">Aktive nedlastinger</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">Dette vil nedleggelse alle overføringer og bakgrunnen tjenester. Er du sikker?</string>
     <string name="frostwire_sticker_and_more">Frostwire klistremerker og mer</string>
     <string name="show_transfers_on_download_start">Vis overføringer på Last ned start</string>
-    <string name="sharing">Deling</string>
     <string name="send_feedback">Gi tilbakemelding</string>
     <string name="chat_actions">Chat Handlinger</string>
     <string name="tos_refuse">Avslå</string>
@@ -306,11 +302,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Bare opp til %s opplastinger samtidig</string>
     <string name="are_you_sure_you_wanna_leave">Er du sikker på at du vil gå tilbake til startskjermen?</string>
     <string name="search_label">Søke</string>
-    <string name="search_select_filetype">Velg en filtype</string>
     <string name="http_download_status_temp_dir_error">Midlertidig katalog eksisterer ikke, eller kan ikke opprettes</string>
     <string name="playing_now_colon">Spiller nå:</string>
     <string name="please_enter_valid_url">Vennligst skriv inn en gyldig URL</string>
-    <string name="search_no_keywords">Fyll inn søkeord</string>
     <string name="gotta_have_at_least_one_upload_slot">Må ha minst en opplasting slot</string>
     <string name="stop">Stoppe</string>
     <string name="distraction_free_search_results_summary">Skjule brukergrensesnitt komponenter for å vise flere resultater. Trenger app restart skal tre i kraft.</string>
@@ -386,7 +380,6 @@
     <string name="storage_setting_warning">ADVARSEL: Alle filer lagret av Frostwire til SD-kortet vil bli slettet av Android, ikke Frostwire , hvis du avinstallerer programmet.</string>
     <string name="not_sharing_files">er ikke å dele noen filer.</string>
     <string name="sd_permission_no_accessible_path">Banen du valgte i SD er ikke tilgjengelig lenger. Trykk OK for å velge på nytt.</string>
-    <string name="select_deselect_all">Velg/Fjern alt</string>
     <string name="cancel_menu_action">Stopp overføring</string>
     <string name="torrent_fetcher_download_status_error">Feil</string>
     <string name="canceling">Avbryte</string>
@@ -425,7 +418,6 @@
     <string name="downloads">Nedlastinger</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Laste ned torrent</string>
     <string name="settings_description">Innstillinger for søk</string>
-    <string name="send_pm">Send en privat melding</string>
     <string name="advertisement">annonse</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Plukk filene du ønsker å laste ned fra denne torrenten</string>
     <string name="minimize_frostwire">Minimer Frostwire</string>

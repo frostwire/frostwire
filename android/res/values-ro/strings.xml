@@ -35,14 +35,12 @@
     <string name="all_free_downloads">Toate descărcările gratuite</string>
     <string name="torrent_max_download_speed">Maxima viteza de descărcare</string>
     <string name="go_to">Du-te la</string>
-    <string name="me">Pe mine</string>
     <string name="activity_uploads_title_text">Încărcările</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Din nou Cerere de</string>
     <string name="use_zooqle">Utilizați Zooqle.com</string>
     <string name="restarting_summary">FrostWire va reporni acum pentru permisiunile acordate să aibă efect</string>
     <string name="clear_search_cache">Goliți memoria cache căutare</string>
-    <string name="unshare">Anulați distribuirea</string>
     <string name="enable_wifi_sharing">Wi-Fi Sharing</string>
     <string name="alpha_tests_team_thanks">Multumita tuturor testerii noastre alfa voluntare pentru răbdarea și feedback-ul mare, datorită speciale</string>
     <string name="azureus_manager_item_ready">În așteptare pentru alte torrent la coadă</string>
@@ -63,7 +61,6 @@
     <string name="drawer_open">Deschideți panoul de navigare</string>
     <string name="waiting">Aşteptare…</string>
     <string name="multicast_discovery_summary">Conectați-vă la colegii WiFi locale prin intermediul multicast (recomandat)</string>
-    <string name="max_concurrent_uploads">Încărcările simultane maxime</string>
     <string name="use_torlock">Utilizați TorLock</string>
     <string name="tos_title">Termeni de utilizare</string>
     <string name="activity_downloads_name">Descărcări active</string>
@@ -92,7 +89,6 @@
     <string name="azureus_manager_item_allocating">Alocând</string>
     <string name="app_shutdown_dlg_message">Acest lucru va opri toate transferurile și serviciile de fundal. Esti sigur?</string>
     <string name="show_transfers_on_download_start">Afișați transferurile de descărcare de start</string>
-    <string name="sharing">Împărtăşi</string>
     <string name="send_feedback">Trimite feedback</string>
     <string name="chat_actions">Acțiuni de chat</string>
     <string name="tos_refuse">Refuza</string>
@@ -297,11 +293,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Numai până la %s încărcate în același timp,</string>
     <string name="are_you_sure_you_wanna_leave">Sunteți sigur că doriți să mergeți înapoi la ecranul de start?</string>
     <string name="search_label">Căutare</string>
-    <string name="search_select_filetype">Vă rugăm să selectați un tip de fișier</string>
     <string name="http_download_status_temp_dir_error">Directorul temporar nu există sau nu pot fi create</string>
     <string name="playing_now_colon">Redarea acum:</string>
     <string name="please_enter_valid_url">Vă rugăm să introduceți o adresă URL validă</string>
-    <string name="search_no_keywords">Vă rugăm să introduceți cuvintele cheie pentru căutare</string>
     <string name="gotta_have_at_least_one_upload_slot">Trebuie să aibă cel puțin un spațiu de încărcare</string>
     <string name="stop">Stop</string>
     <string name="notify_frostwire_is_running_summary">Arată o notificare Android permanent cu statut de transferuri</string>
@@ -375,7 +369,6 @@
     <string name="storage_setting_warning">ATENȚIE: Toate fișierele salvate de către FrostWire pe card SD va fi șters de către ANDROID, nu FrostWire, dacă dezinstalați aplicația.</string>
     <string name="not_sharing_files">nu este de partajare orice fișiere</string>
     <string name="sd_permission_no_accessible_path">Calea pe care ați selectat în SD nu mai este accesibil. Apăsați OK pentru a selecta din nou.</string>
-    <string name="select_deselect_all">Selectare/Deselectare Toate</string>
     <string name="cancel_menu_action">Oprește-te prin transfer</string>
     <string name="torrent_fetcher_download_status_error">Eroare</string>
     <string name="canceling">Se anulează</string>
@@ -413,7 +406,6 @@
     <string name="downloads">Download-uri</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Se descarcă torrent</string>
     <string name="settings_description">Setări de căutare</string>
-    <string name="send_pm">Trimite mesaj privat</string>
     <string name="advertisement">publicitate</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Alege fișierele pe care doriți să îl descărcați de pe acest torrent</string>
     <string name="minimize_frostwire">Minimiza FrostWire</string>

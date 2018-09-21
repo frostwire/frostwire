@@ -37,14 +37,12 @@
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
     <string name="torrent_max_download_speed">แม็กซ์ความเร็วในการดาวน์โหลด</string>
     <string name="go_to">ไปที่</string>
-    <string name="me">ผม</string>
     <string name="activity_uploads_title_text">อัปโหลด</string>
     <string name="torrent_max_peers">ทำเนียบแม็กซ์</string>
     <string name="request_again">ขออีกครั้ง</string>
     <string name="use_zooqle">ใช้ Zooqle.comg</string>
     <string name="restarting_summary">FrostWire จะเริ่มต้นใหม่ในขณะนี้สำหรับสิทธิ์อนุญาตให้มีผลบังคับใช้</string>
     <string name="clear_search_cache">แคชล้างการค้นหา</string>
-    <string name="unshare">ยกเลิกการแบ่งปัน</string>
     <string name="enable_wifi_sharing">Wifi ที่ใช้ร่วมกัน</string>
     <string name="alpha_tests_team_thanks">ขอขอบคุณทุกทดสอบอัลฟาสมัครใจของเราสำหรับความอดทนและข้อเสนอแนะที่ดีขอขอบคุณเป็นพิเศษ</string>
     <string name="azureus_manager_item_ready">การรอคอยสำหรับเพลงอื่น ๆ ที่จะคิว</string>
@@ -65,7 +63,6 @@
     <string name="drawer_open">เปิดลิ้นชักการนำทาง</string>
     <string name="waiting">ที่รอ…</string>
     <string name="multicast_discovery_summary">เชื่อมต่อไปยังเพื่อนร่วมงาน Wifi ท้องถิ่นผ่านหลายผู้รับ (แนะนำ)</string>
-    <string name="max_concurrent_uploads">อัปโหลดพร้อมกันสูงสุด</string>
     <string name="use_torlock">ใช้ TorLock</string>
     <string name="tos_title">ข้อกำหนดการใช้งาน</string>
     <string name="activity_downloads_name">ดาวน์โหลดที่ใช้งาน</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">นี้จะปิดการโอนและบริการทั้งหมดพื้นหลัง คุณแน่ใจไหม?</string>
     <string name="frostwire_sticker_and_more">สติกเกอร์ FrostWire และอื่น ๆ</string>
     <string name="show_transfers_on_download_start">แสดงการโอนเงินในการดาวน์โหลดเริ่มต้น</string>
-    <string name="sharing">ใช้งานร่วมกัน</string>
     <string name="send_feedback">ส่งความคิดเห็น</string>
     <string name="chat_actions">การกระทำการพูดคุย</string>
     <string name="tos_refuse">ปฏิเสธ</string>
@@ -303,11 +299,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">เท่านั้นถึง %s ภาพที่ส่งในเวลาเดียวกัน</string>
     <string name="are_you_sure_you_wanna_leave">คุณคุณแน่ใจว่าต้องการที่จะกลับไปที่หน้าจอไป?</string>
     <string name="search_label">ค้นหา</string>
-    <string name="search_select_filetype">โปรดเลือกประเภทไฟล์</string>
     <string name="http_download_status_temp_dir_error">ไดเรกทอรีชั่วคราวไม่อยู่หรือไม่สามารถสร้าง</string>
     <string name="playing_now_colon">เล่นในขณะนี้:</string>
     <string name="please_enter_valid_url">โปรดป้อน URL ที่ถูกต้อง</string>
-    <string name="search_no_keywords">กรุณาใส่คำค้นหา</string>
     <string name="gotta_have_at_least_one_upload_slot">ต้องมีอย่างน้อยหนึ่งช่องอัปโหลด</string>
     <string name="stop">หยุด</string>
     <string name="distraction_free_search_results_summary">ซ่อนส่วนประกอบ UI ที่จะแสดงผลการค้นหาเพิ่มเติม ความต้องการเริ่มต้นแอปจะมีผล</string>
@@ -383,7 +377,6 @@
     <string name="storage_setting_warning">คำเตือน: ไฟล์ทั้งหมดที่บันทึกไว้โดย FrostWire ลงบนการ์ด SD จะถูกลบโดย Android ไม่ FrostWire ถ้าคุณถอนการติดตั้งแอพพลิเค</string>
     <string name="not_sharing_files">ไม่ได้มีการแชร์ไฟล์ใด ๆ</string>
     <string name="sd_permission_no_accessible_path">เส้นทางที่คุณเลือกไว้ใน SD ไม่สามารถเข้าถึงได้อีกต่อไป กดปุ่ม OK เพื่อเลือกอีกครั้ง</string>
-    <string name="select_deselect_all">เลือก/ยกเลิกการเลือกทั้งหมด</string>
     <string name="cancel_menu_action">หยุดการถ่ายโอน</string>
     <string name="torrent_fetcher_download_status_error">ความผิดพลาด</string>
     <string name="canceling">ยกเลิก</string>
@@ -422,7 +415,6 @@
     <string name="downloads">ดาวน์โหลด</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">ดาวน์โหลดฝนตกหนัก</string>
     <string name="settings_description">ตั้งค่าการค้นหา</string>
-    <string name="send_pm">ส่งจดหมายข้อความส่วนตัว</string>
     <string name="advertisement">การโฆษณา</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">เลือกไฟล์ที่คุณต้องการดาวน์โหลดจากฝนตกหนักนี้</string>
     <string name="minimize_frostwire">ลด FrostWire</string>

@@ -62,18 +62,11 @@
     <string name="document">Dokument</string>
     <string name="documents">Dokumenty</string>
     <string name="share">Udostępnij</string>
-    <string name="unshare">Nie Udostępniaj</string>
-    <string name="sharing">Udostępnione</string>
-    <string name="send_pm">Wyślij Prywatną Wiadomość</string>
-    <string name="me">Ja</string>
     <string name="delete">Usuń</string>
     <string name="rename">Zmień Nazwę</string>
     <string name="download">Pobierz</string>
     <string name="download_selected_files">Pobierz Wybrane</string>
     <string name="toggle_sharing_selected_files">Przełącz Udostępnianie</string>
-    <string name="max_concurrent_uploads">Maksymalna Liczba Połączeń Wychodzących</string>
-    <string name="search_no_keywords">Proszę podać wyszukiwane słowa kluczowe</string>
-    <string name="search_select_filetype">Wybierz rodzaj pliku</string>
     <string name="searching_for">Wyszukiwanie dla</string>
     <string name="search_for_type_files">Wyszukiwanie dla %s pliku</string>
     <string name="update_title">Czas Aktualizacji!</string>
@@ -531,7 +524,6 @@
     <string name="ad_free">Bez Reklam</string>
     <string name="current_plan">Obecny Plan</string>
     <string name="sd_permission_no_accessible_path">Wybrana ścieżka na karcie SD nie jest już dostępna. Naciśnij OK, aby wybrać ponownie. </string>
-    <string name="select_deselect_all">Zaznacz/Odznacz Wszystko</string>
     <string name="get_vpn_client">Pobierz ExpressVPN</string>
     <string name="frostwire_is_running">FrostWire jest uruchomiony</string>
     <string name="select_option_below">Wybierz opcję poniżej:</string>

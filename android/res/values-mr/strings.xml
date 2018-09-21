@@ -41,14 +41,12 @@
     <string name="torrent_max_download_speed">कमाल डाउनलोड स्पीड</string>
     <string name="go_to">जा</string>
     <string name="uploaded">अपलोड केलेले</string>
-    <string name="me">मी</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>माहिती:</b> लावलेले लागू टॅग स्पर्श करा]]></string>
     <string name="activity_uploads_title_text">अपलोड</string>
     <string name="torrent_max_peers">कमाल सहकर्मी</string>
     <string name="request_again">पुन्हा विनंती करा</string>
     <string name="restarting_summary">FrostWire प्रभावी करण्यासाठी परवानगी मंजूर केली आहे पुन्हा एकदा सुरू होईल</string>
     <string name="clear_search_cache">शोध कॅशे साफ करा</string>
-    <string name="unshare">सामायिकरण रद्द करा</string>
     <string name="trackers">ट्रॅकर्स</string>
     <string name="enable_wifi_sharing">वाय-फाय शेअरिंग</string>
     <string name="source_type">स्त्रोत: %1$s</string>
@@ -74,7 +72,6 @@
     <string name="waiting">प्रतीक्षा करीत आहे…</string>
     <string name="multicast_discovery_summary">मल्टीकास्टवरून स्थानिक Wi-Fi सहकर्मांशी कनेक्ट व्हा (शिफारस केलेले)</string>
     <string name="delete_started_torrents_summary">सुरवात डाउनलोड केल्यानंतर .torrent फाइल्स काढून टाका</string>
-    <string name="max_concurrent_uploads">कमाल एकाचवेळी अपलोड</string>
     <string name="use_torlock">TorLock वापरा</string>
     <string name="seed_stop">बीजन थांबवा</string>
     <string name="frostwire_features">FROSTWIRE क्रिएटिव्ह कॉमन्स वैशिष्ट्ये</string>
@@ -112,7 +109,6 @@
     <string name="app_shutdown_dlg_message">हे सर्व बदल्या आणि पार्श्वभूमी सेवा बंद करेल तुला खात्री आहे?</string>
     <string name="frostwire_sticker_and_more">FrostWire स्टिकर्स आणि अधिक</string>
     <string name="show_transfers_on_download_start">डाउनलोड प्रारंभ वर हस्तांतरण दर्शवा</string>
-    <string name="sharing">सामायिकरण</string>
     <string name="send_feedback">अभिप्राय पाठवा</string>
     <string name="chat_actions">चॅट क्रिया</string>
     <string name="tos_refuse">नकार द्या</string>
@@ -371,11 +367,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">केवळ एकाच वेळी %s पर्यंतचे अपलोड</string>
     <string name="are_you_sure_you_wanna_leave">आपल्याला खात्री आहे की आपण परत घरी जायचे आहे?</string>
     <string name="search_label">शोध</string>
-    <string name="search_select_filetype">कृपया एक फाइल प्रकार निवडा</string>
     <string name="http_download_status_temp_dir_error">तात्पुरती निर्देशिका अस्तित्वात नाही किंवा तयार केली जाऊ शकत नाही</string>
     <string name="playing_now_colon">आता प्ले होत आहे:</string>
     <string name="please_enter_valid_url">कृपया वैध यूआरएल टाका</string>
-    <string name="search_no_keywords">कृपया शोध कीवर्ड प्रविष्ट करा</string>
     <string name="gotta_have_at_least_one_upload_slot">जसाकडे किमान एक अपलोड स्लॉट असेल</string>
     <string name="stop">थांबवा</string>
     <string name="distraction_free_search_results_summary">अधिक परिणाम दर्शविण्यासाठी वापरकर्ता इंटरफेस घटक लपवा. प्रभावी होण्यासाठी अॅप रीस्टार्टची आवश्यकता आहे.</string>
@@ -467,7 +461,6 @@
     <string name="storage_setting_warning">चेतावणी: SD कार्डवरील FrostWire द्वारे जतन केलेल्या सर्व फायली हटविल्या जातील अॅन्ड्रोइड, FrostWire नुसार, आपण अॅप विस्थापित केल्यास.</string>
     <string name="not_sharing_files">कोणत्याही फायली सामायिक करीत नाही</string>
     <string name="vpn_client_feature_3_PIA">सोलर इन्फ्रास्ट्रक्चर: जागतिक कव्हरेज</string>
-    <string name="select_deselect_all">सर्व निवडा/निवड रद्द करा</string>
     <string name="cancel_menu_action">स्थानांतर थांबवा</string>
     <string name="torrent_fetcher_download_status_error">त्रुटी</string>
     <string name="canceling">रद्द करीत आहे</string>
@@ -508,7 +501,6 @@
     <string name="torrent_fetcher_download_status_downloading_torrent">जोराचा प्रवाह डाउनलोड करीत आहे</string>
     <string name="settings_description">शोध सेटिंग्ज</string>
     <string name="add_transfer">हस्तांतरण जोडा</string>
-    <string name="send_pm">खासगी संदेश पाठवा</string>
     <string name="advertisement">जाहिरात</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">आपण या टॉरेंट वरून डाउनलोड करू इच्छित असलेल्या फायली निवडा</string>
     <string name="minimize_frostwire">FrostWire विंडो लहान करा</string>

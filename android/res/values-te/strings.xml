@@ -40,14 +40,12 @@
     <string name="torrent_max_download_speed">మాక్స్ డౌన్లోడ్ వేగం</string>
     <string name="go_to">వెళ్ళండి</string>
     <string name="uploaded">అప్లోడ్</string>
-    <string name="me">నాకు</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>తెలిసి ఉండాలి:</b> వర్తింపజేసిన ట్యాగ్లను తాకండి]]></string>
     <string name="activity_uploads_title_text">అప్లోడ్లు</string>
     <string name="torrent_max_peers">మాక్స్ పీర్స్</string>
     <string name="request_again">మళ్ళీ అభ్యర్థించండి</string>
     <string name="restarting_summary">FrostWire అమలులోకి రావడానికి మంజూరు అనుమతులు ఇప్పుడు పునఃప్రారంభించబడుతుంది</string>
     <string name="clear_search_cache">శోధన కాష్ను క్లియర్ చేయండి</string>
-    <string name="unshare">భాగస్వామ్యం చేయవద్దు</string>
     <string name="trackers">గుర్తించేవి</string>
     <string name="enable_wifi_sharing">Wi-Fi భాగస్వామ్యం</string>
     <string name="source_type">మూలం: %1$s</string>
@@ -73,7 +71,6 @@
     <string name="waiting">వేచి…</string>
     <string name="multicast_discovery_summary">బహుళ వైస్ట్ (సిఫార్సు చేయబడింది) ద్వారా స్థానిక Wi-Fi సహచరులకు కనెక్ట్ చేయండి</string>
     <string name="delete_started_torrents_summary">.torrent ఫైళ్లను డౌన్లోడ్ చేయటం మొదలుపెట్టిన తర్వాత తొలగించండి</string>
-    <string name="max_concurrent_uploads">గరిష్ట సైమల్టేనియస్ అప్లోడ్లు</string>
     <string name="use_torlock">TorLock ఉపయోగించండి</string>
     <string name="seed_stop">నాట్లు వేయండి</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
@@ -110,7 +107,6 @@
     <string name="app_shutdown_dlg_message">ఇది అన్ని బదిలీలు మరియు నేపథ్య సేవలను మూసివేస్తుంది. మీరు చెప్పేది నిజమా?</string>
     <string name="frostwire_sticker_and_more">FrostWire స్టిక్కర్లు మరియు మరిన్ని</string>
     <string name="show_transfers_on_download_start">డౌన్ లోడ్ ప్రారంభంలో బదిలీలు చూపించు</string>
-    <string name="sharing">పంచుకోవడం</string>
     <string name="send_feedback">అభిప్రాయాన్ని పంపండి</string>
     <string name="chat_actions">చాట్ చర్యలు</string>
     <string name="tos_refuse">తిరస్కరించు</string>
@@ -368,11 +364,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">ఒకే సమయంలో %s అప్లోడ్లకు మాత్రమే</string>
     <string name="are_you_sure_you_wanna_leave">మీరు ఖచ్చితంగా హోమ్ స్క్రీన్కు తిరిగి వెళ్ళాలనుకుంటున్నారా?</string>
     <string name="search_label">శోధన</string>
-    <string name="search_select_filetype">దయచేసి ఒక ఫైల్ రకాన్ని ఎంచుకోండి</string>
     <string name="http_download_status_temp_dir_error">తాత్కాలిక డైరెక్టరీ ఉనికిలో లేదు లేదా సృష్టించబడదు</string>
     <string name="playing_now_colon">ఇప్పుడు ఆడుతున్నారు:</string>
     <string name="please_enter_valid_url">దయచేసి చెల్లుబాటు అయ్యే URL ను నమోదు చేయండి</string>
-    <string name="search_no_keywords">దయచేసి శోధన కీలకపదాలను నమోదు చేయండి</string>
     <string name="gotta_have_at_least_one_upload_slot">గాట్లకు కనీసం ఒక అప్లోడ్ స్లాట్ ఉంది</string>
     <string name="stop">ఆపు</string>
     <string name="distraction_free_search_results_summary">మరిన్ని ఫలితాలను చూపించడానికి వినియోగదారు ఇంటర్ఫేస్ భాగాలను దాచు. ప్రభావం చూపడానికి అనువర్తనానికి పునఃప్రారంభం అవసరం.</string>
@@ -464,7 +458,6 @@
     <string name="storage_setting_warning">హెచ్చరిక: మీరు అన్ఇన్స్టాల్ చేసినట్లయితే, SD కార్డుపై FrostWire ద్వారా సేవ్ చేసిన అన్ని ఫైల్లు ANDROID నుండి తొలగించబడతాయి, ఫ్రోస్ట్వైర్ కాదు.</string>
     <string name="not_sharing_files">ఏ ఫైళ్ళను భాగస్వామ్యం లేదు.</string>
     <string name="vpn_client_feature_3_PIA">ఘన మౌలిక సదుపాయాలు: ప్రపంచవ్యాప్తంగా కవరేజ్</string>
-    <string name="select_deselect_all">అన్ని ఎంచుకోండి/ఎంపికను తీసివేయి</string>
     <string name="cancel_menu_action">బదిలీని ఆపివేయి</string>
     <string name="torrent_fetcher_download_status_error">లోపం</string>
     <string name="canceling">రద్దు</string>
@@ -505,7 +498,6 @@
     <string name="torrent_fetcher_download_status_downloading_torrent">Torrent డౌన్లోడ్</string>
     <string name="settings_description">శోధన సెట్టింగులు</string>
     <string name="add_transfer">బదిలీని జోడించండి</string>
-    <string name="send_pm">ప్రైవేట్ సందేశం పంపండి</string>
     <string name="advertisement">ప్రకటన</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">మీరు ఈ టొరెంట్ నుండి డౌన్లోడ్ చేయదలిచిన ఫైళ్ళను ఎంచుకోండి</string>
     <string name="minimize_frostwire">FrostWire కనిష్టీకరించు</string>

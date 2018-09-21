@@ -62,18 +62,11 @@
     <string name="document">कागजात</string>
     <string name="documents">कागजात</string>
     <string name="share">शेयर</string>
-    <string name="unshare">साझा न करें</string>
-    <string name="sharing">साझा करें</string>
-    <string name="send_pm">निजी संदेश भेजें</string>
-    <string name="me">मुझको</string>
     <string name="delete">हटाना</string>
     <string name="rename">पुन: नामकरण</string>
     <string name="download">डाउनलोड</string>
     <string name="download_selected_files">चयनित डाउनलोड करें</string>
     <string name="toggle_sharing_selected_files">साझा टॉगल</string>
-    <string name="max_concurrent_uploads">अधिकतम एक साथ अपलोड</string>
-    <string name="search_no_keywords">खोज कीवर्ड दर्ज करें</string>
-    <string name="search_select_filetype">कृपया एक फ़ाइल प्रकार का चयन करें</string>
     <string name="searching_for">के लिए खोज</string>
     <string name="search_for_type_files">%s फ़ाइलों के लिए खोज</string>
     <string name="update_title"> अद्यतन समय!</string>
@@ -480,7 +473,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">चेतावनी: सभी फाइलों को एसडी कार्ड पर FrostWire से बचाया, एंड्रॉयड, नहीं FrostWire द्वारा हटा दिया जाएगा आप अनुप्रयोग की स्थापना रद्द करें।</string>
     <string name="sd_permission_no_accessible_path">पथ आप एसडी में चुने गए अब और सुलभ नहीं है। फिर से चयन करने के लिए प्रेस ठीक है।</string>
-    <string name="select_deselect_all">का चयन करें /अचयनित सभी</string>
     <string name="canceling">रद्द</string>
     <string name="get_vpn_client">पाना ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">वहाँ कुछ दान वेब पते के साथ गलत क्या है</string>

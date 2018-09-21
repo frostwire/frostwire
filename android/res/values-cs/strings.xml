@@ -62,18 +62,11 @@
     <string name="document">Dokument</string>
     <string name="documents">Dokumenty</string>
     <string name="share">Sdílet</string>
-    <string name="unshare">Zrušit sdílení</string>
-    <string name="sharing">Sdílení</string>
-    <string name="send_pm">Odeslat Soukromou Zprávu</string>
-    <string name="me">Mě</string>
     <string name="delete">Vymazat</string>
     <string name="rename">Přejmenovat</string>
     <string name="download">Ke Stažení</string>
     <string name="download_selected_files">Stáhnout Vybrané</string>
     <string name="toggle_sharing_selected_files">Přepnout Sdílení</string>
-    <string name="max_concurrent_uploads">Maximálně Simultánní Odesílání</string>
-    <string name="search_no_keywords">Zadejte prosím klíčová slova pro hledání</string>
-    <string name="search_select_filetype">Prosím, vyberte typ souboru</string>
     <string name="searching_for">Vyhledávání pro</string>
     <string name="search_for_type_files">Vyhledávání pro %s souborů</string>
     <string name="update_title">Je Čas Aktualizovat!</string>
@@ -487,7 +480,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">POZOR: Všechny soubory uložené FrostWire na SD kartě budou smazána operačním systémem Android, nikoli FrostWire, pokud jste odinstalovat.</string>
     <string name="sd_permission_no_accessible_path">Kterou jste vybrali v SD cesta není přístupný už ne. Stisknutím tlačítka OK výběr znovu.</string>
-    <string name="select_deselect_all">Vyberte/Zrušit vše</string>
     <string name="canceling">Zrušení</string>
     <string name="get_vpn_client">Zíscat ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Je tu něco, co se na internetové adrese darování špatně</string>

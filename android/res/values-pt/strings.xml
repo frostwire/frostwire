@@ -60,18 +60,11 @@
     <string name="document">Documento</string>
     <string name="documents">Documentos</string>
     <string name="share">Compartilhar</string>
-    <string name="unshare">Descompartilhar</string>
-    <string name="sharing">Compartilhando</string>
-    <string name="send_pm">Enviar Mensagem Particular</string>
-    <string name="me">Eu</string>
     <string name="delete">Deletar</string>
     <string name="rename">Renomear</string>
     <string name="download">Download</string>
     <string name="download_selected_files">Download Selecionado</string>
     <string name="toggle_sharing_selected_files">Compartilhando Toggle</string>
-    <string name="max_concurrent_uploads">Máximo de uploads simultâneos</string>
-    <string name="search_no_keywords">Por favor digite as palavras chaves para pesquisar</string>
-    <string name="search_select_filetype">Por favor selecione um tipo de arquivo</string>
     <string name="searching_for">Procurando por</string>
     <string name="search_for_type_files">Procure por %s arquivos</string>
     <string name="update_title">Atualizar Hora!</string>
@@ -520,7 +513,6 @@
     <string name="current_plan">Serviço ou plan atual</string>
     <string name="transfers_context_menu_copy_infohash">Copiar InfoHash</string>
     <string name="sd_permission_no_accessible_path">O caminho que seleccionou no SD não é mais acessível. Pressione OK para selecionar novamente.</string>
-    <string name="select_deselect_all">Selecionar/desmarcar todas</string>
     <string name="get_vpn_client">Obter ExpressVPN</string>
     <string name="frostwire_is_running">FrostWire está em execução</string>
     <string name="select_option_below">Selecione a opção:</string>

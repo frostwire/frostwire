@@ -63,18 +63,11 @@
     <string name="document">Tài liệu</string>
     <string name="documents">Các tài liệu</string>
     <string name="share">Chia sẻ</string>
-    <string name="unshare">Không chia sẻ</string>
-    <string name="sharing">Đang chia kẻ</string>
-    <string name="send_pm">Gửi tin nhắn</string>
-    <string name="me">Tôi</string>
     <string name="delete">Xóa</string>
     <string name="rename">Đổi tên</string>
     <string name="download">Tải về</string>
     <string name="download_selected_files">Tải về những tập tin đã chọn</string>
     <string name="toggle_sharing_selected_files">Ẩn/hiện chia sẻ</string>
-    <string name="max_concurrent_uploads">Số kết nối tải lên tối đa cùng lúc</string>
-    <string name="search_no_keywords">Vui lòng nhập từ khóa tìm kiếm</string>
-    <string name="search_select_filetype">Vui lòng chọn kiểu tập tin</string>
     <string name="searching_for">Đang tìm kiếm cho</string>
     <string name="search_for_type_files">Đang tìm kiếm cho những kiểu %s tập tin</string>
     <string name="update_title">Cập nhật thời gian!</string>
@@ -487,7 +480,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">Chú ý: Tất cả các tập tin được lưu bởi FrostWire vào thẻ SD sẽ bị xóa BẰNG ANDROID, không FrostWire, nếu bạn gỡ bỏ cài đặt các ứng dụng.</string>
     <string name="sd_permission_no_accessible_path">Đường dẫn bạn chọn trong SD không truy cập được nữa. Nhấn OK để chọn lại.</string>
-    <string name="select_deselect_all">Chọn/Bỏ chọn tất cả</string>
     <string name="canceling">Hủy</string>
     <string name="get_vpn_client">Nhận ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Có điều gì đó sai trái với các địa chỉ web tặng</string>

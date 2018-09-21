@@ -62,18 +62,11 @@
     <string name="document">Document</string>
     <string name="documents">Documenten</string>
     <string name="share">Deel</string>
-    <string name="unshare">Delen stoppen</string>
-    <string name="sharing">Delen</string>
-    <string name="send_pm">Stuur Privé Bericht</string>
-    <string name="me">Ik</string>
     <string name="delete">Verwijder</string>
     <string name="rename">Benoem opnieuw</string>
     <string name="download">Download</string>
     <string name="download_selected_files">Download Geselecteerde</string>
     <string name="toggle_sharing_selected_files">Toggle Delen</string>
-    <string name="max_concurrent_uploads">Maximale Gelijktijdige Uploads</string>
-    <string name="search_no_keywords">Vul alsjeblieft keywoorden in om te zoeken</string>
-    <string name="search_select_filetype">Selecteer alsjeblieft een file type</string>
     <string name="searching_for">Zoeken naar</string>
     <string name="search_for_type_files">Zoeken naar %s files</string>
     <string name="update_title">Update Tijd!</string>
@@ -485,7 +478,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">WAARSCHUWING: Alle bestanden die zijn opgeslagen door FrostWire op de SD-kaart worden gewist door Android, niet FrostWire, als je de app te verwijderen.</string>
     <string name="sd_permission_no_accessible_path">Het pad dat u in de SD geselecteerde is niet meer toegankelijk. Druk op OK om opnieuw te selecteren.</string>
-    <string name="select_deselect_all">Selecteer/Wis alles</string>
     <string name="canceling">Annuleren</string>
     <string name="get_vpn_client">Krijg ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Er is iets mis met de donatie webadres</string>

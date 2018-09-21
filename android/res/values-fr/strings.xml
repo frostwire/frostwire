@@ -63,18 +63,11 @@
     <string name="document">Document</string>
     <string name="documents">Documents</string>
     <string name="share">Partager</string>
-    <string name="unshare">Départager</string>
-    <string name="sharing">Partage</string>
-    <string name="send_pm">Envoyer un message privé</string>
-    <string name="me">Moi</string>
     <string name="delete">Effacer</string>
     <string name="rename">Renommer</string>
     <string name="download">Téléchargement</string>
     <string name="download_selected_files">Télécharger la sélection</string>
     <string name="toggle_sharing_selected_files">Activer le partage</string>
-    <string name="max_concurrent_uploads">Transferts simultanés maximum</string>
-    <string name="search_no_keywords">Veuillez taper les mots-clés de recherche</string>
-    <string name="search_select_filetype">Veuillez sélectionner le type de fichier</string>
     <string name="searching_for">Rechercher</string>
     <string name="search_for_type_files">Rechercher %s fichiers</string>
     <string name="update_title">Actualiser l\'heure!</string>
@@ -510,7 +503,6 @@
     <string name="current_plan">Plan actuel</string>
     <string name="transfers_context_menu_copy_infohash">Copie InfoHash</string>
     <string name="sd_permission_no_accessible_path">Le chemin que vous avez sélectionné dans le SD n\'est plus accessible. Appuyez sur OK pour sélectionner à nouveau.</string>
-    <string name="select_deselect_all">Sélectionner/désélectionner</string>
     <string name="canceling">Annulation</string>
     <string name="get_vpn_client">Obtenez ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Il y a quelque chose de mal avec l\'adresse Web pointe/Donation</string>

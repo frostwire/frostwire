@@ -62,18 +62,11 @@
     <string name="document">Dokument</string>
     <string name="documents">Dokumente</string>
     <string name="share">Freigeben</string>
-    <string name="unshare">Nicht freigeben</string>
-    <string name="sharing">Freigegeben</string>
-    <string name="send_pm">Private Nachricht senden</string>
-    <string name="me">Mich</string>
     <string name="delete">Löschen</string>
     <string name="rename">Umbenennen</string>
     <string name="download">Download</string>
     <string name="download_selected_files">Ausgewählte herunterladen</string>
     <string name="toggle_sharing_selected_files">Freigabe ein- und ausschalten</string>
-    <string name="max_concurrent_uploads">Maximum von gleichzeitigen Uploads</string>
-    <string name="search_no_keywords">Bitte Suchbegriffe eingeben.</string>
-    <string name="search_select_filetype">Bitte wähle einen Dateityp</string>
     <string name="searching_for">Suche nach</string>
     <string name="search_for_type_files">Suche nach %s Dateien</string>
     <string name="update_title">Aktualisierungszeit!</string>
@@ -488,7 +481,6 @@
     <string name="transfers_context_menu_copy_infohash">Kopieren InfoHash</string>
     <string name="storage_setting_warning">ACHTUNG: Alle Dateien, die von Frostwire auf der SD-Karte gespeichert werden von Android, nicht Frostwire gelöscht werden, wenn Sie die App deinstallieren.</string>
     <string name="sd_permission_no_accessible_path">Der Pfad, den Sie in der SD ausgewählt ist nicht mehr zugänglich. Drücken Sie OK erneut.</string>
-    <string name="select_deselect_all">Alle auswählen/abwählen</string>
     <string name="canceling">Abbrechen</string>
     <string name="get_vpn_client">Erhalten ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Es ist etwas falsch mit der Spitze/Spende Web-Adresse</string>

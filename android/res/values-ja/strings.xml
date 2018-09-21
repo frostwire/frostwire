@@ -62,18 +62,11 @@
     <string name="document">ドキュメント</string>
     <string name="documents">ドキュメント</string>
     <string name="share">共有する</string>
-    <string name="unshare">共有しない</string>
-    <string name="sharing">共有中</string>
-    <string name="send_pm">プライベートメッセージを送る</string>
-    <string name="me">私</string>
     <string name="delete">削除する</string>
     <string name="rename">名前を変更する</string>
     <string name="download">ダウンロード</string>
     <string name="download_selected_files">ダウンロードが選択されました</string>
     <string name="toggle_sharing_selected_files">トグル共有中</string>
-    <string name="max_concurrent_uploads">最大の同時アップロード</string>
-    <string name="search_no_keywords">検索キーワードを入力してください</string>
-    <string name="search_select_filetype">ファイルのタイプを選択してください</string>
     <string name="searching_for">を検索中</string>
     <string name="search_for_type_files">%sファイルを検索する</string>
     <string name="update_title">アップデートの時間!</string>
@@ -540,7 +533,6 @@
     <string name="ad_free">広告なし</string>
     <string name="current_plan">現在の計画</string>
     <string name="sd_permission_no_accessible_path">SDで選択したパスにアクセスできなくなりました。 OKを押してもう一度選択してください。</string>
-    <string name="select_deselect_all">すべて選択/選択解除</string>
     <string name="get_vpn_client">ExpressVPNを入手する</string>
     <string name="select_option_below">以下のオプションを選択してください：</string>
     <string name="use_limetorrents">Limetorrentsを使用する</string>

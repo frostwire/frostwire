@@ -37,14 +37,12 @@
     <string name="all_free_downloads">Všetci na stiahnutie zadarmo</string>
     <string name="torrent_max_download_speed">Maximálna rýchlosť sťahovania</string>
     <string name="go_to">Ísť do</string>
-    <string name="me">Ma</string>
     <string name="activity_uploads_title_text">Nahranie</string>
     <string name="torrent_max_peers">Maximálna rovesníkmi</string>
     <string name="request_again">Požiadať znovu</string>
     <string name="use_zooqle">Použiť Zooqle.com</string>
     <string name="restarting_summary">FrostWire bude teraz reštartovať za samozrejmé oprávnenie prejavili</string>
     <string name="clear_search_cache">Vymazať cache vyhľadávania</string>
-    <string name="unshare">Zrušenie zdieľania</string>
     <string name="enable_wifi_sharing">Wifi zdieľanie</string>
     <string name="alpha_tests_team_thanks">Ďakujeme všetkým našim dobrovoľným alfa-testerov pre trpezlivosť a veľkú spätnú väzbu, Zvláštne poďakovanie</string>
     <string name="azureus_manager_item_ready">Čakanie na ďalšie torrentov do fronty</string>
@@ -65,7 +63,6 @@
     <string name="drawer_open">Otvoriť navigačný panel</string>
     <string name="waiting">Čakanie…</string>
     <string name="multicast_discovery_summary">Pripojenie k miestnej Wifi rovesníkmi cez multicast (odporúčané)</string>
-    <string name="max_concurrent_uploads">Maximálna Simultánne Nahrávanie</string>
     <string name="use_torlock">Použiť TorLock</string>
     <string name="tos_title">Podmienky používania</string>
     <string name="activity_downloads_name">Aktívne stiahnutie</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">To bude vypnutý všetky prevody a služby na pozadí. Si si istý?</string>
     <string name="frostwire_sticker_and_more">FrostWire samolepky a ďalšie</string>
     <string name="show_transfers_on_download_start">Zobraziť prevody na stiahnutie Začiatok</string>
-    <string name="sharing">Zdieľanie</string>
     <string name="send_feedback">Poslať spätnú väzbu</string>
     <string name="chat_actions">Chat akcie</string>
     <string name="tos_refuse">Odmietnuť</string>
@@ -303,11 +299,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Iba až %s nahrávanie v rovnakom čase</string>
     <string name="are_you_sure_you_wanna_leave">Ste si istí, že chcete vrátiť na domovskú obrazovku?</string>
     <string name="search_label">Vyhľadanie</string>
-    <string name="search_select_filetype">Prosím, vyberte typ súboru</string>
     <string name="http_download_status_temp_dir_error">Dočasný adresár neexistuje alebo nemôže byť vytvorený</string>
     <string name="playing_now_colon">Prehrávanie teraz:</string>
     <string name="please_enter_valid_url">Zadajte platnú adresu URL</string>
-    <string name="search_no_keywords">Prosím, zadajte kľúčové slová</string>
     <string name="gotta_have_at_least_one_upload_slot">Musí mať aspoň jeden slot pre nahrávanie</string>
     <string name="stop">Prestať</string>
     <string name="distraction_free_search_results_summary">Skryť UI komponenty pre zobrazenie viac výsledkov. Potrebuje reštart aplikácie sa prejaví.</string>
@@ -383,7 +377,6 @@
     <string name="storage_setting_warning">POZOR: Všetky súbory uložené FrostWire na SD karte budú zmazané operačným systémom Android, nie FrostWire, ak ste odinštalovať.</string>
     <string name="not_sharing_files">nie je zdieľanie žiadne súbory.</string>
     <string name="sd_permission_no_accessible_path">Ktorú ste vybrali v SD cesta nie je prístupný už nie. Stlačením tlačidla OK výber znova.</string>
-    <string name="select_deselect_all">Vyberte/Zrušiť všetko</string>
     <string name="cancel_menu_action">Zastaviť Prenos</string>
     <string name="torrent_fetcher_download_status_error">Chyba</string>
     <string name="canceling">Zrušenie</string>
@@ -422,7 +415,6 @@
     <string name="downloads">K stiahnutiu</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Sťahovanie torrent</string>
     <string name="settings_description">Hľadanie Nastavenia</string>
-    <string name="send_pm">Odoslať súkromnú správu</string>
     <string name="advertisement">reklama</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Vybrať súbory, ktoré chcete stiahnuť z tohto torrent</string>
     <string name="minimize_frostwire">Minimalizovať FrostWire</string>

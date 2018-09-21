@@ -62,18 +62,11 @@
     <string name="document">Έγγραφο</string>
     <string name="documents">Έγγραφα</string>
     <string name="share">Μοιράσου</string>
-    <string name="unshare">Μη μοιράζεις</string>
-    <string name="sharing">Μοιράζουμε</string>
-    <string name="send_pm">Στείλε Προσωπικό Μήνυμα</string>
-    <string name="me">Εγώ</string>
     <string name="delete">Διαγραφή</string>
     <string name="rename">Μετονομασία</string>
     <string name="download">Κατέβασε</string>
     <string name="download_selected_files">Κατέβασε τα επιλεγμένα</string>
     <string name="toggle_sharing_selected_files">Εναλλαγή Μοιράσματος</string>
-    <string name="max_concurrent_uploads">Μέγιστα Ταυτόχρονα Uploads</string>
-    <string name="search_no_keywords">Γράψε λέξεις-κλειδιά για αναζήτηση</string>
-    <string name="search_select_filetype">Διάλεξε έναν τύπο αρχείου</string>
     <string name="searching_for">Αναζήτηση για</string>
     <string name="search_for_type_files">Αναζήτηση για %s αρχεία</string>
     <string name="update_title">Ώρα για ενημέρωση!</string>
@@ -512,7 +505,6 @@
     <string name="current_plan">τρέχον σχέδιο</string>
     <string name="transfers_context_menu_copy_infohash">Αντιγραφή InfoHash</string>
     <string name="sd_permission_no_accessible_path">Η διαδρομή που έχετε επιλέξει στην SD δεν είναι προσβάσιμη πια. Πατήστε OK για να επιλέξετε και πάλι.</string>
-    <string name="select_deselect_all">Επιλογή/Αποεπιλογή Όλα</string>
     <string name="canceling">ακύρωση</string>
     <string name="get_vpn_client">Πάρτε ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">Υπάρχει κάποιο πρόβλημα με τη διεύθυνση web δωρεά</string>

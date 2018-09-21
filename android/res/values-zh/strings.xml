@@ -62,18 +62,11 @@
     <string name="document">文档</string>
     <string name="documents">文档</string>
     <string name="share">共享</string>
-    <string name="unshare">不共享</string>
-    <string name="sharing">共享中</string>
-    <string name="send_pm">发送私人信息</string>
-    <string name="me">我</string>
     <string name="delete">删除</string>
     <string name="rename">重命名</string>
     <string name="download">下载</string>
     <string name="download_selected_files">下载选定</string>
     <string name="toggle_sharing_selected_files">切换共享</string>
-    <string name="max_concurrent_uploads">最大同时上传量</string>
-    <string name="search_no_keywords">请输入搜索关键词</string>
-    <string name="search_select_filetype">请选择文件类型</string>
     <string name="searching_for">搜索</string>
     <string name="search_for_type_files">搜索文件</string>
     <string name="update_title">更新时间!</string>
@@ -516,7 +509,6 @@
     <string name="current_plan">当前计划</string>
     <string name="transfers_context_menu_copy_infohash">复制信息哈希</string>
     <string name="sd_permission_no_accessible_path">您在SD中选择的路径不再可访问。 按OK再次选择.</string>
-    <string name="select_deselect_all">选择/取消选择全部</string>
     <string name="get_vpn_client">获取ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">提示/捐款网址有问题</string>
     <string name="frostwire_is_running">FrostWire正在运行</string>

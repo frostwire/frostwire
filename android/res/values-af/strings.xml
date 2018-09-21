@@ -42,13 +42,11 @@
     <string name="include">Insluit</string>
     <string name="torrent_max_download_speed">Maksimale aflaai spoed</string>
     <string name="go_to">Gaan na</string>
-    <string name="me">My</string>
     <string name="activity_uploads_title_text">Oplaaie</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Versoek weer</string>
     <string name="restarting_summary">FrostWire sal nou herbegin as die nodige toestemmings in werking tree</string>
     <string name="clear_search_cache">Maak soek kas leeg</string>
-    <string name="unshare">Ontdeel</string>
     <string name="enable_wifi_sharing">Wi-Fi-deel</string>
     <string name="sharing_privacy_settings">Deel en privaatheid</string>
     <string name="alpha_tests_team_thanks">Baie dankie aan al ons vrywillige alfa testers vir die geduld en goeie terugvoering</string>
@@ -72,7 +70,6 @@
     <string name="waiting">Wag…</string>
     <string name="multicast_discovery_summary">Koppel aan plaaslike Wi-Fi-eweknieë via multicast (aanbeveel)</string>
     <string name="delete_started_torrents_summary">Verwyder .torrent lêers na die begin aflaai</string>
-    <string name="max_concurrent_uploads">Maksimum gelyktydige oplaaie</string>
     <string name="use_torlock">Gebruik TorLock</string>
     <string name="seed_stop">Stop saai</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
@@ -107,7 +104,6 @@
     <string name="app_shutdown_dlg_message">Dit sal alle oordragte en agtergronddienste afsluit. Is jy seker?</string>
     <string name="frostwire_sticker_and_more">FrostWire plakkers en nog baie meer</string>
     <string name="show_transfers_on_download_start">Wys oordragte op aflaai begin</string>
-    <string name="sharing">Deel</string>
     <string name="send_feedback">Stuur terugvoering</string>
     <string name="chat_actions">Kletsaktiwiteite</string>
     <string name="tos_refuse">Weier</string>
@@ -345,11 +341,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Slegs tot %s oplaaie op dieselfde tyd</string>
     <string name="are_you_sure_you_wanna_leave">Is jy seker jy wil terug na die tuisskerm gaan?</string>
     <string name="search_label">Soek</string>
-    <string name="search_select_filetype">Kies asseblief \'n lêertipe</string>
     <string name="http_download_status_temp_dir_error">Tydelike gids bestaan nie of kan nie geskep word nie</string>
     <string name="playing_now_colon">Speel nou:</string>
     <string name="please_enter_valid_url">Voer asseblief \'n geldige URL in</string>
-    <string name="search_no_keywords">Voer asseblief sleutelwoorde in</string>
     <string name="gotta_have_at_least_one_upload_slot">Moet ten minste een oplaaisleuf hê</string>
     <string name="stop">Stop</string>
     <string name="distraction_free_search_results_summary">Versteek UI-komponente om meer resultate te wys. Moet program herlaai om in werking te tree.</string>
@@ -436,7 +430,6 @@
     <string name="storage_setting_warning">WAARSKUWING: Alle lêers wat deur FrostWire gestoor is op die SD-kaart sal uitgevee word deur ANDROID, nie FrostWire nie, as jy die program verwyder.</string>
     <string name="not_sharing_files">deel nie enige lêers nie.</string>
     <string name="vpn_client_feature_3_PIA">Vaste infrastruktuur: wêreldwye dekking</string>
-    <string name="select_deselect_all">Kies/ontkies alles</string>
     <string name="cancel_menu_action">Stop Oordrag</string>
     <string name="torrent_fetcher_download_status_error">Fout</string>
     <string name="canceling">Kanselleer</string>
@@ -476,7 +469,6 @@
     <string name="torrent_fetcher_download_status_downloading_torrent">Aflaai torrent</string>
     <string name="settings_description">Soekinstellings</string>
     <string name="add_transfer">Voeg oordrag by</string>
-    <string name="send_pm">Stuur privaat boodskap</string>
     <string name="advertisement">Advertensie</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Kies die lêers wat jy wil aflaai van hierdie torrent</string>
     <string name="minimize_frostwire">Verminder FrostWire</string>

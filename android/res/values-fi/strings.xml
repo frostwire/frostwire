@@ -35,14 +35,12 @@
     <string name="all_free_downloads">Kaikki ilmaiseksi ladattavia</string>
     <string name="torrent_max_download_speed">Suurin Latausnopeus</string>
     <string name="go_to">Mene</string>
-    <string name="me">Minulle</string>
     <string name="activity_uploads_title_text">Ladatut</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Pyydä Jälleen</string>
     <string name="use_zooqle">Käytä Zooqle.com</string>
     <string name="restarting_summary">FrostWire käynnistyy nyt itsestäänselvyytenä oikeudet otetaan käyttöön</string>
     <string name="clear_search_cache">Tyhjennä haku välimuisti</string>
-    <string name="unshare">Unshare</string>
     <string name="enable_wifi_sharing">Wi-Fi jakaminen</string>
     <string name="sharing_privacy_settings">Jakaminen ja yksityisyys</string>
     <string name="alpha_tests_team_thanks">Kiitos kaikille vapaaehtoista alfa testaajat kärsivällisyydestä ja hyvää palautetta, erityiset kiitokset</string>
@@ -64,7 +62,6 @@
     <string name="drawer_open">Avaa navigointipaneeli</string>
     <string name="waiting">Odotus…</string>
     <string name="multicast_discovery_summary">Yhdistä paikallinen Wifi ikäisensä kautta multicast (suositeltava)</string>
-    <string name="max_concurrent_uploads">Suurin Samanaikainen lataukset</string>
     <string name="use_torlock">Käytä TorLock</string>
     <string name="tos_title">Käyttöehdot</string>
     <string name="activity_downloads_name">Aktiivinen Lataukset</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">Tämä aiotaan sulkea kaikki siirrot ja taustan palveluja. Oletko varma?</string>
     <string name="frostwire_sticker_and_more">FrostWire tarroja ja muuta</string>
     <string name="show_transfers_on_download_start">Näytä Siirrot download alku</string>
-    <string name="sharing">Jakaminen</string>
     <string name="send_feedback">Lähetä palautetta</string>
     <string name="chat_actions">Chat Toiminnot</string>
     <string name="tos_refuse">Kieltäytyä</string>
@@ -306,11 +302,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Ainoastaan enintään %s lisäykset samanaikaisesti</string>
     <string name="are_you_sure_you_wanna_leave">Oletko varma, että haluat palata aloitusnäyttöön?</string>
     <string name="search_label">Haku</string>
-    <string name="search_select_filetype">Valitse tiedostotyyppi</string>
     <string name="http_download_status_temp_dir_error">Väliaikaiset hakemistoa ei ole olemassa tai ei voida luoda</string>
     <string name="playing_now_colon">Soivan nyt:</string>
     <string name="please_enter_valid_url">Anna kelvollinen URL</string>
-    <string name="search_no_keywords">Anna hakusanat</string>
     <string name="gotta_have_at_least_one_upload_slot">Täytyy olla vähintään yksi upload lovi</string>
     <string name="stop">Stop</string>
     <string name="distraction_free_search_results_summary">Piilota käyttöliittymäkomponentit näyttää enemmän tuloksia. Tarvitsee sovellus uudelleenkäynnistys voimaan.</string>
@@ -386,7 +380,6 @@
     <string name="storage_setting_warning">VAROITUS: Kaikki tiedostot tallennetaan FrostWire SD-kortin tiedot poistetaan Android, ei FrostWire, jos poistaa sovelluksen.</string>
     <string name="not_sharing_files">ei jaa tiedostot.</string>
     <string name="sd_permission_no_accessible_path">Polku valitsemasi SD-kortti ei ole käytettävissä enää. Paina OK valitaksesi uudelleen.</string>
-    <string name="select_deselect_all">Valitse/Poista kaikki valinnat</string>
     <string name="cancel_menu_action">Pysäytä Siirto</string>
     <string name="torrent_fetcher_download_status_error">Virhe</string>
     <string name="canceling">Peruuttaminen</string>
@@ -425,7 +418,6 @@
     <string name="downloads">Lataukset</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Lataaminen torrent</string>
     <string name="settings_description">Haku Asetukset</string>
-    <string name="send_pm">Lähetä yksityisviesti</string>
     <string name="advertisement">mainos</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Nouto tiedostot haluat ladata tästä torrent</string>
     <string name="minimize_frostwire">Minimoi FrostWire</string>

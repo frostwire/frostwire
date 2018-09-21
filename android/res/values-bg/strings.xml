@@ -37,14 +37,12 @@
     <string name="all_free_downloads">Всички свободно сваляне</string>
     <string name="torrent_max_download_speed">Максимална скорост на изтегляне</string>
     <string name="go_to">Отиди на</string>
-    <string name="me">Mен</string>
     <string name="activity_uploads_title_text">Качвания</string>
     <string name="torrent_max_peers">Макс връстници</string>
     <string name="request_again">Искане отново</string>
     <string name="use_zooqle">Използвайте Zooqle.com</string>
     <string name="restarting_summary">FrostWire ще се рестартира сега за предоставени разрешения, за да влязат в сила</string>
     <string name="clear_search_cache">Ясно търсене кеш</string>
-    <string name="unshare">Премахване на споделянето</string>
     <string name="enable_wifi_sharing">Wi-Fi Споделяне</string>
     <string name="alpha_tests_team_thanks">Благодарение на всички наши доброволни алфа тестери за търпението и голяма обратна връзка, специални благодарности на</string>
     <string name="azureus_manager_item_ready">В очакване на други торенти да се редят на опашка</string>
@@ -65,7 +63,6 @@
     <string name="drawer_open">Отворен навигация чекмедже</string>
     <string name="waiting">Очакване…</string>
     <string name="multicast_discovery_summary">Свържете се с местните Wifi връстници чрез мултикаст (препоръчително)</string>
-    <string name="max_concurrent_uploads">Максимални едновременни качени</string>
     <string name="use_torlock">Използвайте TorLock</string>
     <string name="tos_title">Условия за ползване</string>
     <string name="activity_downloads_name">Активни изтегляния</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">Това ще изключи всички трансфери и фонови услуги. Сигурен ли си?</string>
     <string name="frostwire_sticker_and_more">FrostWire стикери и повече</string>
     <string name="show_transfers_on_download_start">Показване на преводи по изтегляне старт</string>
-    <string name="sharing">Споделяне</string>
     <string name="send_feedback">Изпратете отзиви</string>
     <string name="chat_actions">Чат Действия</string>
     <string name="tos_refuse">Отказвам</string>
@@ -303,11 +299,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Само до %s добавени в същото време</string>
     <string name="are_you_sure_you_wanna_leave">Сигурни ли сте че искате да се върнете в началния екран?</string>
     <string name="search_label">Търсене</string>
-    <string name="search_select_filetype">Моля, изберете тип файл</string>
     <string name="http_download_status_temp_dir_error">Временната директория не съществува или не може да бъде създаден</string>
     <string name="playing_now_colon">Възпроизвеждане на в момента:</string>
     <string name="please_enter_valid_url">Моля, въведете валиден URL</string>
-    <string name="search_no_keywords">Моля, въведете ключови думи за търсене</string>
     <string name="gotta_have_at_least_one_upload_slot">Трябва да има поне един качване слот</string>
     <string name="stop">Спри се</string>
     <string name="distraction_free_search_results_summary">Скриване на UI компоненти, за да се покаже по-добри резултати. Има нужда от приложението рестартиране, за да влезе в сила.</string>
@@ -383,7 +377,6 @@
     <string name="storage_setting_warning">ВНИМАНИЕ: Всички файлове, записани от FrostWire върху SD картата ще бъде изтрит от ANDROID, не FrostWire, ако го деинсталирате.</string>
     <string name="not_sharing_files">не е споделяне на всякакви файлове.</string>
     <string name="sd_permission_no_accessible_path">Пътят, който сте избрали в SD не е достъпна вече. Натиснете OK, за да изберете отново.</string>
-    <string name="select_deselect_all">Изберете/премахване на избора</string>
     <string name="cancel_menu_action">Стоп трансфер</string>
     <string name="torrent_fetcher_download_status_error">Грешка</string>
     <string name="canceling">Отмяна</string>
@@ -422,7 +415,6 @@
     <string name="downloads">Свалян</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Изтеглянето на торент</string>
     <string name="settings_description">Настройки за търсенето</string>
-    <string name="send_pm">Изпрати лично съобщение</string>
     <string name="advertisement">реклама</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Изберете файловете, които искате да изтеглите от този торент</string>
     <string name="minimize_frostwire">Минимизиране FrostWire</string>

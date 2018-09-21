@@ -62,18 +62,11 @@
     <string name="document">Documento</string>
     <string name="documents">Documenti</string>
     <string name="share">Condividi</string>
-    <string name="unshare">Annulla la condivisione</string>
-    <string name="sharing">In condivisione</string>
-    <string name="send_pm">Invia un Messaggio Privato</string>
-    <string name="me">Io</string>
     <string name="delete">Cancella</string>
     <string name="rename">Rinomina</string>
     <string name="download">Download</string>
     <string name="download_selected_files">Download Selezionato</string>
     <string name="toggle_sharing_selected_files">Attiva condivisione</string>
-    <string name="max_concurrent_uploads">Massimo di upload in contemporanea</string>
-    <string name="search_no_keywords">Inserisci parole chiave</string>
-    <string name="search_select_filetype">Seleziona un tipo di file</string>
     <string name="searching_for">Ricerca in corso</string>
     <string name="search_for_type_files">Cerca file %s</string>
     <string name="update_title">E\' ora di aggiornare!</string>
@@ -485,7 +478,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">ATTENZIONE: Tutti i file salvati dal FrostWire sulla scheda SD sarà cancellato da Android, non FrostWire, se si disinstalla l\'applicazione.</string>
     <string name="sd_permission_no_accessible_path">Il percorso selezionato nella SD non è più accessibile. Premere OK per selezionare di nuovo.</string>
-    <string name="select_deselect_all">Selezionare/deselezionare tutti</string>
     <string name="canceling">Annullamento</string>
     <string name="get_vpn_client">Ottenere ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">C\'è qualcosa di sbagliato con l\'indirizzo web donazione</string>

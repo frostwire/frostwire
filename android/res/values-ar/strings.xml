@@ -60,18 +60,11 @@
     <string name="document">مستند</string>
     <string name="documents">مستندات</string>
     <string name="share">شارك</string>
-    <string name="unshare">لا تشارك</string>
-    <string name="sharing">مشاركة</string>
-    <string name="send_pm">ارسال رسالة خاصة</string>
-    <string name="me">أنا</string>
     <string name="delete">حذف</string>
     <string name="rename">إعادة تسمية</string>
     <string name="download">تنزيل</string>
     <string name="download_selected_files">تنزيل المحددة</string>
     <string name="toggle_sharing_selected_files">Toggle مشاركة</string>
-    <string name="max_concurrent_uploads">الحد الأقصى للتحميلات المتزامنة</string>
-    <string name="search_no_keywords">يرجى ادخال كلمات البحث</string>
-    <string name="search_select_filetype">يرجى اختيار نوع الملف</string>
     <string name="searching_for">البحث عن</string>
     <string name="search_for_type_files">البحث عن %s ملفات</string>
     <string name="update_title">!حان وقت التحديث</string>
@@ -493,7 +486,6 @@
     <string name="transfers_context_menu_copy_infohash">نسخة InfoHash</string>
     <string name="storage_setting_warning">تحذير: جميع الملفات المحفوظة من قبل برنامج FrostWire على بطاقة SD سيتم حذف بواسطة الروبوت، وليس برنامج FrostWire، إذا قمت بإلغاء تثبيت التطبيق.</string>
     <string name="sd_permission_no_accessible_path">المسار الذي حددته في التنمية المستدامة لا يمكن الوصول إليه بعد الآن. اضغط على موافق لتحديد مرة أخرى.</string>
-    <string name="select_deselect_all">اختيار / الغاء اختيار جميع</string>
     <string name="canceling">إلغاء</string>
     <string name="get_vpn_client">الحصول على ExpressVPN</string>
     <string name="issue_with_tip_donation_uri">هناك شيء خاطئ مع عنوان الويب تلميح / تبرع</string>

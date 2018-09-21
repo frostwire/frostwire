@@ -37,14 +37,12 @@
     <string name="all_free_downloads">Semua muat turun percuma</string>
     <string name="torrent_max_download_speed">Maksimum Muat turun Speed</string>
     <string name="go_to">Pergi ke</string>
-    <string name="me">Saya</string>
     <string name="activity_uploads_title_text">Muat naik</string>
     <string name="torrent_max_peers">Negara setara maksimum</string>
     <string name="request_again">Meminta lagi</string>
     <string name="use_zooqle">Gunakan Zooqle.com</string>
     <string name="restarting_summary">FrostWire akan memulakan semula sekarang supaya kebenaran yang diberikan kepada berkuat kuasa</string>
     <string name="clear_search_cache">Kosongkan cache</string>
-    <string name="unshare">Nyahkongsi</string>
     <string name="enable_wifi_sharing">Perkongsian Wi-Fi</string>
     <string name="alpha_tests_team_thanks">Terima kasih kepada semua penguji alpha sukarela kami untuk kesabaran dan maklum balas yang hebat, terima kasih khas untuk</string>
     <string name="azureus_manager_item_ready">Menunggu torrents lain beratur</string>
@@ -65,7 +63,6 @@
     <string name="drawer_open">Laci navigasi terbuka</string>
     <string name="waiting">Menunggu…</string>
     <string name="multicast_discovery_summary">Sambung kepada rakan-rakan Wifi tempatan melalui multicast (disyorkan)</string>
-    <string name="max_concurrent_uploads">Tambahan Serentak maksimum</string>
     <string name="use_torlock">Gunakan TorLock</string>
     <string name="tos_title">Syarat-syarat Penggunaan</string>
     <string name="activity_downloads_name">Muat turun aktif</string>
@@ -95,7 +92,6 @@
     <string name="app_shutdown_dlg_message">Ini akan penutupan semua pemindahan dan perkhidmatan latar belakang. Adakah anda pasti?</string>
     <string name="frostwire_sticker_and_more">FrostWire pelekat dan banyak lagi</string>
     <string name="show_transfers_on_download_start">Show pemindahan di muat permulaan</string>
-    <string name="sharing">Berkongsi</string>
     <string name="send_feedback">Hantar maklumbalas</string>
     <string name="chat_actions">Tindakan Chat</string>
     <string name="tos_refuse">Enggan</string>
@@ -303,11 +299,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Hanya sehingga %s muat naik pada masa yang sama</string>
     <string name="are_you_sure_you_wanna_leave">Adakah anda pasti anda mahu kembali ke skrin utama?</string>
     <string name="search_label">Carian</string>
-    <string name="search_select_filetype">Sila pilih jenis fail</string>
     <string name="http_download_status_temp_dir_error">Direktori sementara tidak wujud atau tidak boleh dicipta</string>
     <string name="playing_now_colon">Yang sedang bermain:</string>
     <string name="please_enter_valid_url">Sila masukkan URL yang sah</string>
-    <string name="search_no_keywords">Sila masukkan kata kunci carian</string>
     <string name="gotta_have_at_least_one_upload_slot">Harus mempunyai sekurang-kurangnya satu slot muat naik</string>
     <string name="stop">Hentikan</string>
     <string name="distraction_free_search_results_summary">Menyembunyikan komponen UI untuk menunjukkan lebih banyak keputusan. Keperluan dimulakan semula untuk kuasa.</string>
@@ -383,7 +377,6 @@
     <string name="storage_setting_warning">AMARAN: Semua fail yang disimpan oleh FrostWire ke dalam kad SD akan dihapuskan OLEH ANDROID, tidak FrostWire, jika anda membuang pemasangan aplikasi.</string>
     <string name="not_sharing_files">tidak berkongsi apa-apa fail.</string>
     <string name="sd_permission_no_accessible_path">Jalan yang anda pilih dalam SD tidak boleh diakses lagi. Tekan OK untuk memilih sekali lagi.</string>
-    <string name="select_deselect_all">Pilih/Nyahpilih Semua</string>
     <string name="cancel_menu_action">Hentikan Pemindahan</string>
     <string name="torrent_fetcher_download_status_error">Ralat</string>
     <string name="canceling">Membatalkan</string>
@@ -422,7 +415,6 @@
     <string name="downloads">Muat turun</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Memuat turun torrent</string>
     <string name="settings_description">Tetapan carian</string>
-    <string name="send_pm">Hantar Mesej Peribadi</string>
     <string name="advertisement">iklan</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Pilihkan fail yang anda ingin muat turun dari torrent ini</string>
     <string name="minimize_frostwire">Kurangkan FrostWire</string>

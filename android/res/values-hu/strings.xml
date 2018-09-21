@@ -37,14 +37,12 @@
     <string name="all_free_downloads">Minden ingyenes letöltések</string>
     <string name="torrent_max_download_speed">Max letöltési sebesség</string>
     <string name="go_to">Látogatás</string>
-    <string name="me">Nekem</string>
     <string name="activity_uploads_title_text">Feltöltések</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Kérése újra</string>
     <string name="use_zooqle">Használja Zooqle.com</string>
     <string name="restarting_summary">FrostWire újraindul most biztosra jogosultságok életbe lépéséhez</string>
     <string name="clear_search_cache">Tiszta keresési gyorsítótár</string>
-    <string name="unshare">Megosztás megszüntetése</string>
     <string name="enable_wifi_sharing">WiFi megosztása</string>
     <string name="alpha_tests_team_thanks">Köszönet minden kedves önkéntes alfatesztelők a türelmet és jó visszajelzéseket, külön köszönet</string>
     <string name="azureus_manager_item_ready">Várakozás más torrentek a sorhoz</string>
@@ -65,7 +63,6 @@
     <string name="drawer_open">Navigációs fiók megnyitása</string>
     <string name="waiting">Várakozás…</string>
     <string name="multicast_discovery_summary">Csatlakozás helyi Wifi társaik keresztül multicast (ajánlott)</string>
-    <string name="max_concurrent_uploads">Maximális egyidejű feltöltések</string>
     <string name="use_torlock">Használja TorLock</string>
     <string name="tos_title">Használati feltételek</string>
     <string name="activity_downloads_name">Aktív letöltések</string>
@@ -94,7 +91,6 @@
     <string name="azureus_manager_item_allocating">Elosztásának</string>
     <string name="app_shutdown_dlg_message">Ez leáll az összes transzfer és a háttér szolgáltatások. Biztos vagy ebben?</string>
     <string name="show_transfers_on_download_start">Megmutatása Átigazolások Azon Letöltés indítása</string>
-    <string name="sharing">Megosztása</string>
     <string name="send_feedback">Visszajelzés küldése</string>
     <string name="chat_actions">Chat Hozzászólások</string>
     <string name="tos_refuse">Megtagadni</string>
@@ -299,11 +295,9 @@
     <string name="only_up_to_n_uploads_at_the_same_time">Legfeljebb csak %s feltöltések egyidejűleg</string>
     <string name="are_you_sure_you_wanna_leave">Biztos benne, hogy vissza szeretne térni a kezdőképernyőre?</string>
     <string name="search_label">Keres</string>
-    <string name="search_select_filetype">Kérjük, válassza ki a fájltípust</string>
     <string name="http_download_status_temp_dir_error">Átmeneti könyvtár nem létezik vagy nem hozható létre</string>
     <string name="playing_now_colon">Lejátszott most:</string>
     <string name="please_enter_valid_url">Kérem, írjon be egy érvényes url-t</string>
-    <string name="search_no_keywords">Kérjük, írja be a keresendő kulcsszavakat</string>
     <string name="gotta_have_at_least_one_upload_slot">Gotta legalább egy feltöltési slot</string>
     <string name="stop">Megáll</string>
     <string name="notify_frostwire_is_running_summary">Itt található az állandó Android értesítést állapotát transzferek</string>
@@ -377,7 +371,6 @@
     <string name="storage_setting_warning">FIGYELMEZTETÉS: A mentett fájlok FrostWire az SD-kártya törlésre kerül az Android, nem FrostWire, ha eltávolítja az alkalmazást.</string>
     <string name="not_sharing_files">nem oszt meg semmilyen fájlt.</string>
     <string name="sd_permission_no_accessible_path">Az útvonal kiválasztott SD nem elérhető többé. Az OK gombbal válassza újra.</string>
-    <string name="select_deselect_all">Jelölje be vagy törölje az összes</string>
     <string name="cancel_menu_action">Stop transzfer</string>
     <string name="torrent_fetcher_download_status_error">Hiba</string>
     <string name="canceling">Megszakítása</string>
@@ -415,7 +408,6 @@
     <string name="downloads">Letöltések</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Letöltése torrent</string>
     <string name="settings_description">Keresési beállítások</string>
-    <string name="send_pm">Privát üzenet küldése</string>
     <string name="advertisement">reklám</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Csákány a kívánt fájlokat letölteni ezt a torrentet</string>
     <string name="minimize_frostwire">Kis méret FrostWire</string>

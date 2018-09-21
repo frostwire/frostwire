@@ -62,18 +62,11 @@
     <string name="document">문서</string>
     <string name="documents">문서들</string>
     <string name="share">공유</string>
-    <string name="unshare">비공유</string>
-    <string name="sharing">공유중</string>
-    <string name="send_pm">메세지 보내기</string>
-    <string name="me">나</string>
     <string name="delete">지우기</string>
     <string name="rename">이름 바꾸기</string>
     <string name="download">다운로드</string>
     <string name="download_selected_files">선택된 파일 다운로드</string>
     <string name="toggle_sharing_selected_files">토글 공유</string>
-    <string name="max_concurrent_uploads">최대 동시 업로드</string>
-    <string name="search_no_keywords">검색 키워드를 입력하세요.</string>
-    <string name="search_select_filetype">파일 타입을 고르세요.</string>
     <string name="searching_for">검색</string>
     <string name="search_for_type_files">%s 파일 검색</string>
     <string name="update_title">시간 업데이트</string>
@@ -484,7 +477,6 @@
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">경고 : FrostWire에서 SD 카드에 저장 한 모든 파일은 앱을 제거하면 FrostWire가 아닌 Android에서 삭제됩니다.</string>
     <string name="sd_permission_no_accessible_path">SD에서 선택한 경로에 더 이상 액세스 할 수 없습니다. OK를 눌러 다시 선택하십시오.</string>
-    <string name="select_deselect_all">모두 선택 / 선택 취소</string>
     <string name="canceling">취소 중</string>
     <string name="get_vpn_client">ExpressVPN 받기</string>
     <string name="issue_with_tip_donation_uri">기부 웹 주소에 문제가 있습니다.</string>
