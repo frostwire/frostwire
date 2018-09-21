@@ -20,67 +20,8 @@
  */
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="Widget.Holo.Light.ActionMode" parent="android:Widget.Holo.ActionMode">
-        <item name="android:titleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionMode.Title</item>
-        <item name="android:subtitleTextStyle">@android:style/TextAppearance.Holo.Widget.ActionMode.Subtitle</item>
-    </style>
-
-    <style name="Widget.Button" parent="android:Widget.Holo.Light.Button">
-        <item name="android:background">@android:drawable/btn_default</item>
-    </style>
 
     <!-- styles for elements -->
-
-    <style name="SearchInputFileTypeButton" parent="android:Widget.CompoundButton.RadioButton">
-        <item name="android:layout_weight">1</item>
-        <item name="android:button">@null</item>
-        <item name="android:background">@drawable/searchinput_button_selector</item>
-        <item name="android:drawableTop">@drawable/radio_button_background_selector</item>
-        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
-    </style>
-
-    <style name="SearchInputFileTypeButtonLand" parent="android:Widget.CompoundButton.RadioButton">
-        <item name="android:layout_weight">1</item>
-        <item name="android:button">@null</item>
-        <item name="android:background">@drawable/searchinput_button_selector</item>
-        <item name="android:drawableLeft">@drawable/radio_button_background_selector</item>
-        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-    </style>
-
-    <style name="BrowseFileTypeButton" parent="android:Widget.CompoundButton.RadioButton">
-        <item name="android:layout_weight">1</item>
-        <item name="android:button">@null</item>
-        <item name="android:background">@drawable/radio_button_background_selector</item>
-        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:layout_gravity">center</item>
-    </style>
-
-    <style name="TransparentListView" parent="@android:style/Widget.ListView">
-        <item name="android:cacheColorHint">@android:color/transparent</item>
-        <item name="android:dividerHeight">0dp</item>
-        <item name="android:divider">@android:color/transparent</item>
-        <item name="android:footerDividersEnabled">false</item>
-        <item name="android:headerDividersEnabled">false</item>
-
-    </style>
-
-    <style name="TransparentExpandableListView" parent="@android:style/Widget.ExpandableListView">
-        <item name="android:cacheColorHint">@android:color/transparent</item>
-        <item name="android:dividerHeight">0dp</item>
-        <item name="android:divider">@android:color/transparent</item>
-        <item name="android:footerDividersEnabled">false</item>
-        <item name="android:headerDividersEnabled">false</item>
-        <item name="android:overScrollFooter">@null</item>
-    </style>
 
     <style name="PreferencesBlueButton">
         <item name="android:background">@drawable/blue_light_button_background_selector</item>
@@ -103,26 +44,6 @@
     </style>
 
     <!-- SlideMenu begin -->
-
-    <style name="SlideMenu"></style>
-
-    <style name="SlideMenu.List">
-        <item name="android:divider">@android:color/transparent</item>
-        <item name="android:dividerHeight">0dip</item>
-        <item name="android:listSelector">@drawable/slidemenu_list_selector</item>
-    </style>
-
-    <style name="SlideMenu.Item"></style>
-
-    <style name="SlideMenu.Item.Image">
-        <item name="android:layout_width">30dp</item>
-        <item name="android:layout_height">30dp</item>
-    </style>
-
-    <style name="SlideMenu.Item.Text">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
-    </style>
 
     <!-- SlideMenu end -->
 
@@ -158,21 +79,6 @@
 
     <!-- Menu Media Type begin -->
 
-    <style name="MenuMediaType"></style>
-
-    <style name="MenuMediaType.Item"></style>
-
-    <style name="MenuMediaType.Item.Text">
-        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
-        <item name="android:textColor">#ff143149</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:drawablePadding">8dp</item>
-        <item name="android:paddingTop">4dp</item>
-        <item name="android:paddingBottom">4dp</item>
-        <item name="android:paddingLeft">6dp</item>
-        <item name="android:paddingRight">18dp</item>
-    </style>
-
     <!-- Menu Media Type end -->
     <!--v21-->
     <style name="RichNotificationTitle">
@@ -187,11 +93,6 @@
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
     <!--v21-->
-    <style name="RichNotificationButtonText">
-        <item name="android:textSize">@dimen/text_x_medium</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/app_text_primary</item>
-    </style>
 
     <!-- Transfers list begin -->
 
@@ -211,27 +112,7 @@
         <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
-    <style name="TransfersList.SubItem"></style>
-
-    <style name="TransfersList.SubItem.Title">
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textColor">@color/app_text_primary</item>
-    </style>
-
     <!-- Transfers list end -->
-
-    <style name="TransfersFileTypeButton">
-        <item name="android:textColor">@drawable/radio_button_textcolor_selector</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:textSize">@dimen/text_x_small</item>
-        <item name="android:gravity">center</item>
-        <item name="android:button">@null</item>
-        <item name="android:background">@drawable/radio_button_background_selector</item>
-        <item name="android:layout_weight">1</item>
-    </style>
 
     <!-- Transfers indicator begin -->
 
@@ -333,39 +214,6 @@
         <item name="android:textColor">@color/basic_blue</item>
     </style>
 
-    <style name="SearchProgressViewRetryButton">
-        <item name="android:background">@drawable/retry_search_button_basic_blue_round_background
-        </item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:height">26dp</item>
-        <item name="android:maxHeight">26dp</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">middle</item>
-        <item name="android:padding">5dp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">26dp</item>
-        <item name="android:layout_margin">3dp</item>
-        <item name="android:minWidth">60dp</item>
-    </style>
-
-    <style name="MediaPlayerHeaderTitle">
-        <item name="android:singleLine">true</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="MediaPlayerHeaderTitleBold">
-        <item name="android:textStyle">bold</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="MediaPlayerNumber">
-        <item name="android:singleLine">true</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Small</item>
-    </style>
-
     <style name="BlueButton">
         <item name="android:background">@drawable/blue_light_button_background_selector</item>
         <item name="android:textColor">@android:color/white</item>
@@ -376,35 +224,12 @@
         <item name="android:textSize">15sp</item>
     </style>
 
-    <style name="GetVPNButton">
-        <item name="android:background">@drawable/vpn_button_background_selector</item>
-        <item name="android:textColor">@color/basic_white</item>
-        <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:paddingLeft">35dp</item>
-        <item name="android:paddingRight">35dp</item>
-        <item name="android:paddingTop">0dp</item>
-        <item name="android:paddingBottom">0dp</item>
-        <item name="android:layout_marginBottom">5dp</item>
-        <item name="android:layout_marginTop">15dp</item>
-    </style>
-
     <style name="GetVPNToastNotification">
         <item name="android:textColor">@color/basic_white</item>
         <item name="android:paddingLeft">15dp</item>
         <item name="android:paddingRight">15dp</item>
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">20dp</item>
-    </style>
-
-    <style name="BrowsePeerActivityHeaderTitle" parent="@android:style/TextAppearance.Small">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="BrowsePeerActivityHeaderNickname" parent="@android:style/TextAppearance.Small">
-        <item name="android:gravity">center</item>
-        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <!-- VPN Activity -->
@@ -414,33 +239,8 @@
         <item name="android:layout_marginTop">-5dp</item>
     </style>
 
-    <style name="VPNTitleSecond">
-        <item name="android:textSize">@dimen/text_size_large</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:layout_marginTop">-5dp</item>
-    </style>
-
-    <style name="VPNTitleSecond.Color">
-        <item name="android:textColor">@color/basic_blue_highlight_dark</item>
-    </style>
-
-    <style name="VPNSubTitle">
-        <item name="android:textSize">@dimen/text_size_medium</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
     <style name="VPNText">
         <item name="android:textSize">@dimen/text_size_medium</item>
-        <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:textColor">@color/app_text_secondary</item>
-    </style>
-
-    <style name="VPNText.Regular">
-        <item name="android:fontFamily">sans-serif-regular</item>
-    </style>
-
-    <style name="VPNSmallText">
-        <item name="android:textSize">@dimen/text_size_small</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">@color/app_text_secondary</item>
     </style>
@@ -680,10 +480,6 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="DefaultDialogTheme.LongText">
-        <item name="android:textSize">@dimen/text_medium</item>
-    </style>
-
     <style name="ToolbarNavigationButtonStyle" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="android:minWidth">0dp</item>
         <item name="android:padding">10dp</item>
@@ -701,13 +497,6 @@
     </style>
 
     <!-- OGURY -->
-    <style name="Presage.Theme.Transparent" parent="android:Theme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
-    </style>
 
     <!-- Music Player View Pager Title -->
     <style name="AppTabLayout" parent="Widget.Design.TabLayout">

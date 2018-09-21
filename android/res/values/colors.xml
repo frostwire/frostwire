@@ -62,7 +62,6 @@
     <color name="app_text_white">@color/basic_white</color>
     <color name="app_text_light">@color/basic_gray_text_light</color>
     <color name="app_text_highlight">@color/basic_blue_highlight_dark</color>
-    <color name="app_text_highlight_light">@color/basic_blue_highlight</color>
     <color name="app_text_wizard">#abb3bc</color>
     <color name="app_text_wizard_dark">#ff6f7d88</color>
 
@@ -73,11 +72,9 @@
     <color name="app_warning_red">@color/basic_red</color>
 
     <!-- TODO: Below colors belong to no longer used player in nav drawer, remove with layouts -->
-    <color name="app_menu_item_pressed">#ff314c61</color>
 
     <!-- Other colors -->
     <color name="tip_tag_blue">#5195ae</color>
     <color name="my_files_listview_item_inactive_background">#ffeff0f1</color>
-    <color name="my_files_listview_item_foreground">@color/app_text_primary</color>
     <color name="my_files_listview_item_inactive_foreground">@color/app_text_secondary</color>
 </resources>

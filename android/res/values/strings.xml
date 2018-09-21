@@ -30,7 +30,6 @@
     <!-- non HTML tags. -->
     <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Settings</string>
-    <string name="activity_about">About</string>
     <string name="activity_VPN">Connection</string>
     <string name="exit">Exit</string>
     <string name="search_label">Search</string>
@@ -59,109 +58,28 @@
     <string name="send_file_using">Send file using</string>
     <string name="my_files">My Files</string>
     <string name="settings">Settings</string>
-    <string name="try_valid_port_next_time">Try a valid port next time 1000 and 65500</string>
-    <string name="still_listening_on_port">Still listening on port</string>
-    <string name="uh_still_listening_on_port">Uh? I\'m still listening on port</string>
-    <string name="new_port_saved">New Port saved</string>
-    <string name="now_on_port">Now on port</string>
-    <string name="stop_all_transfers_message">This will cancel all ongoing and queued downloads. All transferred data will be lost. Are you sure?</string>
     <string name="files">files</string>
-    <string name="touch_filetype_icon">Touch icon to change file type</string>
-    <string name="tos_title">Terms of Use</string>
-    <string name="tos_accept">Accept</string>
-    <string name="tos_refuse">Refuse</string>
-    <string name="downloads">Downloads</string>
     <string name="minimize_frostwire">Minimize FrostWire</string>
     <string name="are_you_sure_you_wanna_leave">Are you sure you want to go back to the home screen?</string>
     <string name="set_as_wallpaper">Set as Wallpaper</string>
     <string name="failed_to_set_wallpaper">Failed to set Wallpaper</string>
-    <string name="tell_others_chooser">Tweet / SMS / Email</string>
-    <string name="tell_others_subject">Got FrostWire for Android yet?</string>
-    <string name="and_choose_what_filetypes_to_share">Check what types of files you\'d like to enable for sharing on the FrostWire Mobile Network and nearby Wi-Fi enabled Desktops.</string>
-    <string name="before_getting_started">Before you get started</string>
-    <string name="user_connecting">User connecting</string>
-    <string name="accept_connection_from">Accept connection from</string>
-    <string name="please_enter_a_number">Please enter a number</string>
-    <string name="gotta_have_at_least_one_upload_slot">Gotta have at least one upload slot</string>
-    <string name="only_up_to_n_uploads_at_the_same_time">Only up to %s uploads at the same time</string>
-    <string name="max_simultaneous_uploads_saved_n">Max Simultaneous Uploads Saved (%s)</string>
     <string name="unknown">Unknown</string>
-    <string name="browse">Browse</string>
-    <string name="files_shared_by">files shared by</string>
-    <string name="mark_your_territory">Mark your Territory</string>
-    <string name="get_a_frostwire_tshirt">Get a FrostWire T-Shirt</string>
-    <string name="internal_port">Internal Port</string>
-    <string name="external_port">External Port</string>
-    <string name="device">Device</string>
-    <string name="manufacturer">Manufacturer</string>
     <string name="name">Name</string>
-    <string name="product">Product</string>
-    <string name="model">Model</string>
-    <string name="release">Release</string>
-    <string name="alpha_tests_team">Alpha Tests Team</string>
-    <string name="alpha_tests_team_thanks">Thanks to all our voluntary alpha testers for the patience and great feedback, special thanks to</string>
-    <string name="pending">pending</string>
-    <string name="manual">manual</string>
     <string name="disabled">disabled</string>
     <string name="open">Open</string>
-    <string name="connected_to">Connected to</string>
-    <string name="sharing_preferences">Sharing Settings</string>
-    <string name="how_other_users_will_see_you">How other users will see you</string>
-    <string name="networking_preferences">Networking Settings</string>
-    <string name="simultaneous_uploads">Simultaneous Wi-Fi Uploads</string>
-    <string name="simultaneous_uploads_summary">Set how many Wi-Fi sharing uploads you want to allow at the same time.</string>
-    <string name="send_my_geo_location">Send my Geo-Location</string>
-    <string name="send_my_geo_location_summary">Pings will send your approximate Geo Location to find closest peers.</string>
-    <string name="use_upnp_port_mapping">Use automatic Port mapping (UPnP)</string>
-    <string name="use_upnp_port_mapping_summary">Long Press here to set the manual port number</string>
-    <string name="multicast_discovery">Multicast Discovery</string>
-    <string name="multicast_discovery_summary">Connect to local Wi-Fi peers via multicast (recommended)</string>
-    <string name="broadcast_discovery">Broadcast Discovery</string>
-    <string name="broadcast_discovery_summary">Connect to local Wi-Fi peers via broadcast (more traffic on router)</string>
-    <string name="internet_discovery">Internet Discovery</string>
-    <string name="internet_discovery_summary">Connect to remote peers on the Internet.</string>
-    <string name="from">From</string>
-    <string name="wants_to_share_a_file">wants to share a file</string>
-    <string name="translators">Translators</string>
-    <string name="tip_rename_your_files">Tip: Rename files so they can be found</string>
     <string name="other_settings">Other Settings</string>
     <string name="vibrate_on_finished_download">Vibrate when download finishes</string>
-    <string name="use_mobile_data">Use 3G/4G for BitTorrent</string>
-    <string name="use_mobile_data_summary">Use mobile network for BitTorrent downloads. Data Overage charges may apply. Use carefully.</string>
-    <string name="connected_using_dataplan">Connected using Data Plan</string>
-    <string name="send_to_chat">Send to Chat</string>
-    <string name="sent_file_to_chat">Sent file to Chat</string>
-    <string name="please_update_to_v">Please Update to v. %s</string>
     <string name="cant_open_file">Sorry, don\'t know how to open this file.</string>
-    <string name="downloading_from_desktop">Downloading file(s) from desktop</string>
     <string name="download_added_to_queue">1 file will start downloading</string>
-    <string name="downloads_added_to_queue">%s files will start downloading</string>
-    <string name="activity_downloads_title_text">Downloads</string>
-    <string name="activity_uploads_title_text">Uploads</string>
-    <string name="updating">Updating</string>
-    <string name="loading_all">Loading All</string>
-    <string name="sharing_num_files">Sharing %1$s files of type %2$s</string>
-    <string name="share_selected_files">Share selected files</string>
-    <string name="unshare_selected_files">Unshare selected files</string>
-    <string name="long_press_for_batch_actions">Touch any file title for batch actions</string>
-    <string name="files_shared">files shared</string>
-    <string name="share_finished_downloads">Share finished downloads on Wi-Fi</string>
-    <string name="share_finished_downloads_summary">Finished downloads will be available to other FrostWire users on your Wi-Fi network.</string>
     <string name="are_you_sure_delete_files">Are you sure you want to PERMANENTLY DELETE the selected files from your device?</string>
     <string name="are_you_sure_delete_playlist">Are you sure you want to delete the %s playlist</string>
     <string name="delete_files">Delete files</string>
-    <string name="searchable_activity_label">Searchable Activity</string>
-    <string name="search_hint">Search Content</string>
-    <string name="search_settings_description">Search for Torrents</string>
     <string name="delete_file_menu_action">Delete</string>
     <string name="delete_file_menu_action_count">Delete (%s)</string>
     <string name="open_menu_action">Open %s</string>
     <string name="cancel_menu_action">Stop Transfer</string>
     <string name="cancel_delete_menu_action">Stop and Delete Data</string>
     <string name="remove_torrent_and_data">Remove Torrent and Data</string>
-    <string name="wanna_download_question">Want to download?</string>
-    <string name="summary_files_shared">Sharing %s files locally</string>
-    <string name="media_type_all_types">All Types</string>
     <string name="media_type_documents">Books/Docs</string>
     <string name="media_type_applications">Applications</string>
     <string name="media_type_audio">Audio</string>
@@ -169,23 +87,12 @@
     <string name="media_type_images">Images</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Downloading torrent</string>
-    <string name="torrent_fetcher_download_status_error">Error</string>
     <string name="torrent_fetcher_download_status_canceled">Canceled</string>
-    <string name="failed_to_add_download">Failed to add download</string>
-    <string name="file_is_already_downloading">File is already downloading</string>
-    <string name="not_connected">Not Connected</string>
-    <string name="mobile_data">Mobile Data</string>
     <string name="media_player_failed">Media player failed</string>
-    <string name="activity_media_player_name">Media Player</string>
-    <string name="search_settings">Search Settings</string>
     <string name="use_tpb">Use TPB</string>
-    <string name="use_tpb_summary">TPB is magnet based, works only on Wi-Fi</string>
     <string name="use_zooqle">Use Zooqle.com</string>
     <string name="use_yify">Use Yify</string>
-    <string name="use_yify_summary">Yify is magnet based, works only on Wi-Fi</string>
     <string name="use_magnet_summary">Magnet based, works only on Wi-Fi</string>
-    <string name="activity_media_player_image_description">Media image</string>
-    <string name="ringtone_set">Ringtone Set</string>
     <string name="ringtone_not_set">Ringtone could not be set</string>
     <string name="search">Search</string>
     <string name="transfers">Transfers</string>
@@ -197,66 +104,28 @@
     <string name="dummy_extra" translatable="false">[Extra]</string>
     <string name="dummy_seeds" translatable="false">[Seeds]</string>
     <string name="dummy_peers" translatable="false">[Peers]</string>
-    <string name="dummy_text" translatable="false">[Text]</string>
-    <string name="dummy_number" translatable="false">[Number]</string>
     <string name="dummy_date" translatable="false">[Date]</string>
     <string name="dummy_path" translatable="false">[Path]</string>
-    <string name="view_transfer_item_list_item_icon">Icon for file type</string>
-    <string name="nickname_sharing_count_files">%1$s - Sharing %2$d files</string>
-    <string name="play_image_description">Play</string>
-    <string name="view_transfer_list_item_button_action_description">Action</string>
     <string name="yes_no_cancel_transfer_question">Are you sure you want to stop and remove this download from the list (no data will be erased)?</string>
     <string name="yes_no_cancel_transfer_question_cloud">Are you sure you want to stop and remove this download from the list?</string>
     <string name="yes_no_cancel_delete_transfer_question">Are you sure you want to cancel this download (downloaded data so far will be erased)?</string>
     <string name="cancel_transfer">Cancel Transfer</string>
-    <string name="view_transfer_list_item_group_indicator_description">More/Less information</string>
-    <string name="view_transfer_list_item_icon_description">File type icon</string>
     <string name="azureus_peer_manager_status_finished">Finished</string>
-    <string name="azureus_peer_manager_status_finishedin">Finished in</string>
-    <string name="azureus_formats_units_alot">A lot !!!</string>
-    <string name="azureus_discarded">discarded</string>
-    <string name="azureus_manager_item_waiting">Waiting</string>
-    <string name="azureus_manager_item_initializing">Initializing</string>
     <string name="azureus_manager_item_allocating">Allocating</string>
-    <string name="azureus_manager_item_checking">Checking</string>
-    <string name="azureus_manager_item_finishing">Finishing</string>
-    <string name="azureus_manager_item_ready">Waiting for other torrent(s) to Queue</string>
     <string name="azureus_manager_item_downloading">Downloading</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="azureus_manager_item_superseeding">Super-Seeding</string>
-    <string name="azureus_manager_item_stopping">Stopping</string>
     <string name="azureus_manager_item_stopped">Stopped</string>
     <string name="azureus_manager_item_paused">Paused</string>
-    <string name="azureus_manager_item_queued">Queued</string>
     <string name="azureus_manager_item_error">Error</string>
-    <string name="azureus_manager_item_forced">Forced</string>
-    <string name="azureus_general_view_yes">Yes</string>
-    <string name="azureus_general_view_no">No</string>
     <string name="pause_torrent_menu_action">Pause</string>
     <string name="resume_torrent_menu_action">Resume</string>
-    <string name="peer_http_download_status_downloading">Downloading</string>
     <string name="peer_http_download_status_complete">Complete</string>
-    <string name="peer_http_download_status_error">Error</string>
-    <string name="peer_http_download_status_cancelled">Cancelled</string>
-    <string name="peer_http_download_status_waiting">Waiting</string>
-    <string name="peer_http_download_status_unknown">Unknown</string>
     <string name="peer_http_upload_status_uploading">Uploading</string>
-    <string name="peer_http_upload_status_streaming">Streaming</string>
-    <string name="peer_http_upload_status_complete">Complete</string>
-    <string name="peer_http_upload_status_error">Error</string>
-    <string name="peer_http_upload_status_cancelled">Cancelled</string>
-    <string name="peer_http_upload_status_unknown">Unknown</string>
-    <string name="loading_indeterminate">Loading…</string>
-    <string name="searching_indeterminate">Searching…</string>
-    <string name="show_exit_button">Show Exit button</string>
     <string name="download_finished">Download Finished</string>
     <string name="clear_complete">Clear Complete</string>
     <string name="downloading_promotion">Downloading %s</string>
     <string name="dummy_hint" translatable="false">[Hint]</string>
-    <string name="dummy_peer_file_count" translatable="false">[Peer/File count]</string>
     <string name="download_type_not_supported">Download Type not supported</string>
-    <string name="hint_transfers">Use "menu" for bulk actions</string>
-    <string name="torrent_settings">Torrent Settings</string>
     <string name="torrent_max_download_speed_summary">Max Download Speed (0 means unlimited)</string>
     <string name="torrent_max_download_speed">Max Download Speed</string>
     <string name="torrent_max_upload_speed_summary">Max Upload Speed (0 means unlimited)</string>
@@ -270,7 +139,6 @@
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="dummy_summary" translatable="false">[Summary]</string>
-    <string name="dummy_version" translatable="false">[Version]</string>
     <string name="dummy_engine" translatable="false">[Engine]</string>
     <string name="dummy_sources" translatable="false">[Sources]</string>
     <string name="empty_string" translatable="false" />
@@ -285,80 +153,40 @@
     <string name="seeding_has_been_turned_off">Seeding has been turned off</string>
     <string name="wifi_seeding_has_been_turned_off">No Wi-fi available, Seeding has been turned off</string>
     <string name="show_transfers_on_download_start">Show Transfers On Download Start</string>
-    <string name="dialog_new_transfer_title">Start this Download?</string>
     <string name="dialog_new_transfer_text_text">Are you sure you want to download %1$s (%2$s)</string>
     <string name="dialog_new_transfer_check_text">Show this next time</string>
     <string name="show_new_transfer_dialog">Show New Transfer dialog</string>
     <string name="dummy_action" translatable="false">[Action]</string>
-    <string name="clear_torrent_index">Clear Torrent Index</string>
-    <string name="clear_torrent_index_summary">Clear Torrent Index</string>
     <string name="clear">Clear</string>
-    <string name="delete_n_torrents_indexed">Deleted %d torrents indexed</string>
-    <string name="there_is_n_torrents_indexed">There is %d torrents indexed</string>
     <string name="wizard_previous">Previous</string>
     <string name="wizard_next">Next</string>
     <string name="wizard_finish">Finish</string>
     <string name="dummy_content_description" translatable="false">[dummy description]</string>
     <string name="welcome_to_frostwire">Welcome to FrostWire %s</string>
-    <string name="let_apos_s_set_you_up_before_we_begin_">Let\'s set you up before we begin.</string>
-    <string name="how_others_see_you_on_the_local_network_wifi_">How others see you on the local network (Wi-Fi)</string>
     <string name="seeding_settings">Seeding Settings</string>
     <string name="seeding_settings_explanation">BitTorrent users on the internet will be able to download file chunks of the data your torrents seed.</string>
     <string name="seeding_wifi_settings_explanation">Seed only when using a Wi-Fi connection. Avoid extra charges from your carrier.</string>
     <string name="intent_text">FrostWire is a peer-to-peer program for sharing authorized files only. Installing and using the program does not constitute a license for obtaining or distributing unauthorized content.</string>
     <string name="accept_intent">I will not use FrostWire for copyright infringement</string>
     <string name="toast_on_disconnect">Disconnected from BitTorrent. All BitTorrent transfers have stopped.</string>
-    <string name="toast_on_connect">BitTorrent core started.</string>
     <string name="seeds">Seeds</string>
     <string name="seeds_n">Seeds: %s</string>
     <string name="peers_n">Peers: %s</string>
     <string name="size_unknown">size unknown</string>
     <string name="playing">Playing</string>
-    <string name="back">Back</string>
-    <string name="input_text_hint">What are you looking for? (hints by Google)</string>
-    <string name="are_you_sure">Are you sure?</string>
-    <string name="stop_all_transfers">This will stop all transfers</string>
-    <string name="clear_complete_transfers">This will clear out all the finished transfers</string>
-    <string name="dummy_media_controller_time" translatable="false">00:00</string>
-    <string name="playing_song_name">Playing %s</string>
-    <string name="dummy_nickname" translatable="false">[Nickname]</string>
-    <string name="invalid_torrent_file">Invalid Torrent File</string>
     <string name="invalid_tracker_url">Invalid Tracker URL</string>
-    <string name="type_here_to_filter">Type here to filter</string>
-    <string name="type_here_to_search">Type here to Search</string>
-    <string name="hints_by_google">Hints by Google</string>
-    <string name="azureus_manager_not_created">Download can\'t be created with SD card mounted</string>
     <string name="http_download_status_uncompressing">Uncompressing</string>
-    <string name="dialog_desktop_upload_request_title">Upload Request</string>
-    <string name="dialog_desktop_upload_request_text_text">%1$s wants to send you %2$s totalling %3$s</string>
     <string name="accept">Accept</string>
-    <string name="reject">Reject</string>
-    <string name="block">Block</string>
-    <string name="block_computer">Block Computer</string>
-    <string name="desktop_transfer_status_transferring">Transferring</string>
-    <string name="desktop_transfer_status_complete">Complete</string>
-    <string name="desktop_transfer_status_cancelled">Cancelled</string>
-    <string name="desktop_transfer_status_unknown">Unknown</string>
     <string name="support_frostwire">Support FrostWire</string>
-    <string name="support_frostwire_summary">Show ads to support the development of this app.</string>
     <string name="storage_preference_title">Select Storage Location</string>
     <string name="storage_preference_summary">The default storage location where files will be saved.</string>
     <string name="bittorrent" translatable="false">BitTorrent</string>
     <string name="bittorrent_network_summary">Connection status</string>
     <string name="loading">Loading</string>
-    <string name="wifi_sharing">Wi-Fi Sharing</string>
-    <string name="activity_mediaplayer_name">Media Player</string>
     <string name="stop">Stop</string>
-    <string name="couldnt_share_file">Could not share the file. Weird path found.</string>
-    <string name="playing_now_colon">Playing now:</string>
     <string name="my_filetype">My %s</string>
-    <string name="paused">Paused</string>
     <string name="use_youtube">Use YouTube.com</string>
     <string name="use_soundcloud">Use Soundcloud.com</string>
-    <string name="enable_wifi_sharing">Wi-Fi Sharing</string>
-    <string name="enable_wifi_sharing_summary">Share files with peers on the local Wi-Fi network.</string>
-    <string name="youtube_download_status_verifying">Verifying</string>
-    <string name="donation_thanks">Thank you so much for Supporting FrostWire</string>
     <string name="torrent_scheme_download_not_supported">Download not supported</string>
     <string name="retry_search">Retry</string>
     <string name="use_archiveorg">Use Archive.org</string>
@@ -367,36 +195,20 @@
     <string name="clear_search_cache">Clear search cache</string>
     <string name="clear_search_cache_summary">Clear search cache entries</string>
     <string name="no_results_feedback">No results were found.</string>
-    <string name="donate">Donate</string>
-    <string name="one_dollar">$1</string>
-    <string name="five_dollars">$5</string>
-    <string name="ten_dollars">$10</string>
-    <string name="twenty_five_dollars">$25</string>
-    <string name="watch_tv">Watch TV</string>
-    <string name="free_apps">Free Apps</string>
     <string name="use_frostclick">Use FrostClick</string>
-    <string name="delete_this_track">Delete this track</string>
-    <string name="are_you_sure_delete_current_track">Are you sure you want to delete the current track?</string>
-    <string name="wifi_sharing_disabled">Wi-fi sharing is off.\n\nWi-fi sharing can be used to share files locally between FrostWire powered devices connected to the same Wi-Fi network.\n\n&lt;a href=\"http://bit.ly/1tVReSt\"&gt;Learn more.&lt;/a&gt;</string>
-    <string name="turn_on_wifi_sharing">Turn on Wi-fi Sharing</string>
-    <string name="are_you_sure_wifi_sharing_off">Turning off Wi-Fi sharing will make all your locally shared files unavailable to other users on the nearby Wi-Fi network.</string>
     <string name="anonymous_usage_statistics">Anonymous Usage Statistics</string>
     <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
-    <string name="paused_song_name">Paused %s</string>
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
-    <string name="player_paused_press_and_hold_to_stop">Player paused. (Tip: Press and hold to stop)</string>
-    <string name="btc" translatable="false">BTC</string>
     <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
     <string name="transfers_select_downloading">downloading</string>
     <string name="transfers_select_seeding">seeding</string>
     <string name="transfers_select_completed">completed</string>
     <string name="transfers_context_menu_clear_finished">Clear all finished transfers</string>
-    <string name="transfers_context_menu_stop_delete_data">Stop and delete data</string>
     <string name="transfers_context_menu_copy_infohash_copied">Infohash copied to clipboard</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet copied to clipboard</string>
     <string name="transfers_context_menu_copy_magnet">Copy Magnet</string>
@@ -406,7 +218,6 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="please_check_connection_status_before_resuming_download">Please check the status of your internet connection before resuming.</string>
-    <string name="donate_in_btc">Donate in bitcoins</string>
     <string name="data_saving_turn_off_transfers">No Wi-fi available, all transfers have been stopped</string>
     <string name="data_saving_kill_http_warning">This will stop all unfinished transfers in progress</string>
     <string name="data_saving_kill_http_warning_title">Warning: Http transfers in progress</string>
@@ -422,27 +233,18 @@
     <string name="cloud_downloads_coming">Sorry: Starting cloud downloads from here will be available on further updates.</string>
     <string name="seed">Seed</string>
     <string name="seed_stop">Stop seeding</string>
-    <string name="torrent_transfer_paused_disconnected_from_bittorrent">The transfer has been paused because you are Disconnected. (Check your BitTorrent connection in Settings)</string>
-    <string name="remove_from_recent">Remove from recent</string>
-    <string name="now_playing">Now playing</string>
     <string name="dummy_author" translatable="false">[Author]</string>
-    <string name="install_bitcoin_wallet">Install Bitcoin Wallet</string>
     <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
-    <string name="cant_seed_torrent_transfers">Cannot seed torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
     <string name="or_enter_url">or enter URL</string>
     <string name="confirm_download">Confirm Download</string>
     <string name="track">track</string>
     <string name="playlist">playlist</string>
     <string name="are_you_sure_you_want_to_download_the_following">Are you sure you want to download the following %1$s (%2$s)?</string>
-    <string name="menu_enter_shortcut_label">Enter</string>
-    <string name="menu_delete_shortcut_label">Del</string>
-    <string name="menu_space_shortcut_label">Space</string>
     <string name="cant_open_file_does_not_exist">I can\'t open %1$s, the file does not exist.</string>
     <string name="saving_to_sd_card">Saving to SD card.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android will erase downloaded files if FrostWire is uninstalled.</string>
     <string name="saving_to_internal_memory">Saving to Internal Memory</string>
     <string name="saving_to_internal_memory_description">You also have an SD card (%1$s free)</string>
-    <string name="device_memory">Device\'s Memory</string>
     <string name="device_storage">Device\'s Storage</string>
     <string name="sdcard_storage">SD\'s Storage</string>
     <string name="storage_setting_warning">WARNING: All files saved by FrostWire onto the SD card will be deleted BY ANDROID, not FrostWire, if you uninstall the app.</string>
@@ -451,7 +253,6 @@
     <string name="available">available</string>
     <string name="file_descriptor_sd_mounted">This file was deleted from the SD card, or the SD card you have inserted is a different one.</string>
     <string name="file_descriptor_sd_unmounted">This file belongs to an SD card, please insert it on your device.</string>
-    <string name="help_translate_frostwire">Help translate FrostWire</string>
     <string name="help_translate_or_proofread_frostwire">Help translate or proofread FrostWire</string>
     <string name="finishing">Finishing</string>
     <string name="scanning">Finishing - Scanning</string>
@@ -468,10 +269,7 @@
     <string name="http_download_status_save_dir_error">Save directory does not exist or can\'t be created</string>
     <string name="http_download_status_temp_dir_error">Temporary directory does not exist or can\'t be created</string>
     <string name="my_music">My Music</string>
-    <string name="support">Support</string>
-    <string name="free_download">Free Download</string>
     <string name="error_no_space_left_on_device">Error: No space left to save file</string>
-    <string name="free_sponsored_app">Free Sponsored App</string>
     <string name="send_bitcoin_tip">Send Bitcoin Tip</string>
     <string name="send_tip_donation">Send Tip/Donation</string>
     <string name="issue_with_tip_donation_uri">There\'s something wrong with the Tip/Donation web address</string>
@@ -483,7 +281,6 @@
     <string name="build">build</string>
     <string name="try_other_keywords">Try fewer/different keywords</string>
     <string name="learn_how_to_get_more_results">Learn how to get more results</string>
-    <string name="action_menu_overflow_description">More options</string>
     <string name="rate_our_app">Rate our App</string>
     <string name="rating_reminder_description">If you love FrostWire please take a moment to rate us.</string>
     <string name="love_frostwire">Love FrostWire</string>
@@ -493,41 +290,14 @@
     <string name="your_installation_is_complete">Your installation is complete.</string>
     <string name="thank_you">Thank you!</string>
     <string name="keep_in_touch">Keep in touch!</string>
-    <string name="frostwire_shutting_down_no_permissions">Sorry, FrostWire can\'t continue without your permission to access disk.</string>
-    <string name="restarting">Restarting…</string>
-    <string name="restarting_summary">FrostWire will restart now for granted permissions to take effect</string>
     <string name="why_we_need_storage_permissions">Why we need storage permissions.</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire is a file browser and downloader app, therefore it needs to be able to access your disk.\n\nWithout your permissions FrostWire cannot work.\n\nWant to try again?</string>
-    <string name="shutting_down">Shutting down…</string>
     <string name="help">Help</string>
     <string name="request_again">Request Again</string>
     <string name="frostwire_is_running">FrostWire is running</string>
-    <string name="vpn_found">VPN found. Connection encrypted.</string>
-    <string name="vpn_not_found">No VPN. Consider encrypting connection.</string>
     <string name="connection_header_title">VPN Connection status:</string>
     <string name="unprotected_connection">unprotected</string>
     <string name="protected_connection">VPN-protected</string>
-    <string name="protect_my_privacy">Protect my privacy</string>
-    <string name="get_ExpressVPN">Get ExpressVPN</string>
-    <string name="get_PIA">Get Private Internet Access</string>
-    <string name="vpn_money_back_ExpressVPN">30-day money-back guarantee</string>
-    <string name="vpn_money_back_PIA">7-day money-back guarantee</string>
-    <string name="vpn_price">from $%1$.2f per month</string>
-    <string name="vpn_what_you_get_with">What do you get with </string>
-    <string name="vpn_client_ExpressVPN">ExpressVPN</string>
-    <string name="vpn_client_PIA">Private Internet Access</string>
-    <string name="get_vpn_client">Get ExpressVPN</string>
-    <string name="visit_vpn_client_ExpressVPN">Visit ExpressVPN</string>
-    <string name="visit_vpn_client_PIA">Visit Private Internet Access</string>
-    <string name="vpn_client_feature_1_ExpressVPN">Military-grade encryption</string>
-    <string name="vpn_client_feature_2_ExpressVPN">Unlimited download speed</string>
-    <string name="vpn_client_feature_3_ExpressVPN">Private and logless browsing</string>
-    <string name="vpn_client_feature_4_ExpressVPN">24/7 customer support</string>
-    <string name="vpn_client_feature_1_PIA">No logging</string>
-    <string name="vpn_client_feature_2_PIA">Really easy to use (we like easy!)</string>
-    <string name="vpn_client_feature_3_PIA">Solid infrastructure: worldwide coverage</string>
-    <string name="vpn_client_feature_4_PIA">24/7 VPN Support</string>
-    <string name="vpn_on_toast_notification">You\'re connected to a VPN.</string>
     <string name="vpn_off_toast_notification">Your connection may not be private.</string>
     <string name="dht_contacts">DHT contacts</string>
     <string name="notify_frostwire_is_running">Notify if FrostWire is running</string>
@@ -538,8 +308,6 @@
     <string name="storage_picker_treeuri_cant_write">FrostWire can\'t write on the selected storage path</string>
     <string name="storage_picker_treeuri_error">Unexpected error picking storage path</string>
     <string name="storage_path">Storage Path</string>
-    <string name="learn_more">Learn more</string>
-    <string name="enable_experimental">Experimental Features</string>
     <string name="selected">selected</string>
     <string name="check_internet_connection">Check Internet connection</string>
     <string name="bittorrent_off_data_saver_on">"BitTorrent off (Data Saver On)"</string>
@@ -579,9 +347,7 @@
     <string name="cheaper_than_parking">Cheaper than Parking</string>
     <string name="cheaper_than_cigarettes">Cheaper than Cigarettes</string>
     <string name="cheaper_than_beer">Cheaper than Beer</string>
-    <string name="cheaper_than_coffee">Cheaper than Coffee</string>
     <string name="cheaper_than_gas">Cheaper than Gas</string>
-    <string name="no_interruptions">No Interruptions</string>
     <string name="keep_the_project_alive">Keep the Project Alive</string>
     <string name="processing_payment">Processing payment, refresh in a few seconds</string>
     <string name="i_have_read_and_agree_to_the">I have read and agree to the</string>
@@ -600,16 +366,12 @@
     <string name="notification_other_header">Notifications and Other</string>
     <string name="wifi_networks_only">Wi-Fi networks only</string>
     <string name="wifi_networks_only_summary">Save data. Download only if Wi-Fi connection is established. </string>
-    <string name="notifications_other_settings">Notifications and Other</string>
     <string name="bandwidth_usage_settings">Bandwidth Usage</string>
-    <string name="search_preferences">Search Preferences</string>
-    <string name="frostwire_sticker_and_more">FrostWire stickers and more</string>
     <string name="donate_your_time">Donate your time</string>
     <string name="changelog">Changelog</string>
     <string name="pro" translatable="false">PRO</string>
     <string name="unlimited">Unlimited</string>
     <string name="search_preferences_one_engine_checked_always">By default, one search engine needs to be checked at all times</string>
-    <string name="number_picker_tip">Tip: touch selected number to use keyboard</string>
     <string name="cannot_start_engine_without_vpn">BitTorrent can\'t start unless a VPN is available. (Check your settings)</string>
     <string name="switch_off_engine_without_vpn">VPN is inactive, stopping the BitTorrent engine.</string>
     <string name="vpn_drop_protection_title">VPN-Drop Protection</string>
@@ -627,12 +389,9 @@
     <string name="sources_channels">Sources / Channels</string>
     <string name="file_extensions">File extensions</string>
     <string name="file_names">File names</string>
-    <string name="touch_applied_tags_to_include_exclude">Touch applied tags to include/exclude</string>
     <string name="or">or</string>
     <string name="include">Include</string>
     <string name="exclude">Exclude</string>
-    <string name="seeing_less_results">Seeing less or no results?</string>
-    <string name="fix_instructions">See support.frostwire.com for info and fix instructions</string>
     <string name="try_changing_applied_filters">Try changing applied filters</string>
     <string name="no_data_check_internet_connection">Network unavailable, please check your Internet connection.</string>
     <string name="use_pixabay">Use Pixabay</string>
@@ -663,14 +422,12 @@
     <string name="transfer_detail_upload_size_dummy" translatable="false">1.7 MB</string>
     <string name="transfer_detail_status_dummy" translatable="false">Seeding</string>
     <string name="transfer_detail_number_of_files_dummy" translatable="false">12 Files</string>
-    <string name="transfer_detail_number_of_peers_dummy" translatable="false">12 Peers</string>
     <string name="transfer_detail_files_number_dummy" translatable="false">12</string>
     <string name="transfer_detail_trackers_address_dummy" translatable="false">udp://9.rarbg.com:2710/announce</string>
     <string name="transfer_detail_peers_address_dummy" translatable="false">BT://198.50.174.100:51413</string>
     <string name="transfer_detail_peers_address_source_dummy" translatable="false">FrostWire 2.0</string>
     <string name="transfer_detail_piece_size_dummy" translatable="false">1001/1190</string>
     <string name="infinity" translatable="false">&#8734;</string>
-    <string name="transfer_detail_title_header">Name:</string>
     <string name="transfer_detail_storage_header">Storage Path:</string>
     <string name="add_trackers">Add trackers</string>
     <string name="add_tracker">Add tracker</string>
@@ -683,12 +440,8 @@
     <string name="seeding_time">Seeding time</string>
     <string name="sequential_download">Sequential download</string>
     <string name="completed">Completed</string>
-    <string name="seeding_on">Seeding ON</string>
     <string name="time_left">Time left</string>
-    <string name="time_elapsed">Time elapsed</string>
-    <string name="download_limit">Download limit</string>
     <string name="downloaded">Downloaded</string>
-    <string name="upload_limit">Upload limit</string>
     <string name="uploaded">Uploaded</string>
     <string name="total_size">Total size</string>
     <string name="share_ratio">Share ratio</string>
@@ -697,8 +450,6 @@
     <string name="created_on">Created on</string>
     <string name="comment">Comment</string>
     <string name="speed_limits">Speed limits</string>
-    <string name="up_speed">Up speed</string>
-    <string name="down_speed">Down speed</string>
     <string name="working">Working</string>
     <string name="tracker" translatable="false">Tracker</string>
     <string name="dht" translatable="false">DHT</string>
@@ -718,9 +469,7 @@
     <string name="remove_tracker">Remove tracker</string>
     <string name="downloaded_n">Downloaded %1$s / </string>
     <string name="uploaded_n">Uploaded %1$s</string>
-    <string name="rtt_ms" translatable="false">RTT %1$d ms</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Could not open Transfer Details, invalid InfoHash</string>
-    <string name="vpn_suggestion_pia" translatable="false">PIA</string>
     <string name="vpn_suggestion_expressvpn" translatable="false">ExpressVPN</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Free 7-day trial</string>
     <string name="vpn_find_out_more">Find out more</string>

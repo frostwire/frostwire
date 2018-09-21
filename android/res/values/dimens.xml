@@ -21,14 +21,9 @@
 <resources>
     <bool name="isTablet">false</bool>
 
-    <dimen name="mainmenu_width">250dp</dimen>
-    <dimen name="mainmenu_shadow_width">15dp</dimen>
-    
     <!-- Donations View -->
-    <dimen name="view_donations_button_width">50dp</dimen>
 
     <!-- Promotions -->
-    <dimen name="promo_download_button_width">130dp</dimen>
 
     <dimen name="view_transfer_list_item_title_left_drawable">20dp</dimen>
 
@@ -47,7 +42,6 @@
     <dimen name="title_text">20sp</dimen>
     <dimen name="subtitle_text">16sp</dimen>
     <dimen name="body_text">14sp</dimen>
-    <dimen name="micro_text">12sp</dimen>
 
     <dimen name="dialog_min_width_major">200dp</dimen>
     <dimen name="dialog_min_width_minor">300dp</dimen>

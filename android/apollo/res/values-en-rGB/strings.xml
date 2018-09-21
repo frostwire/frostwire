@@ -21,11 +21,5 @@
     <string name="remove_from_favorites">Remove from favourites</string>
     <string name="playlist_favorite">Favourite</string>
     <string name="playlist_favorites">Favourites</string>
-    <string name="settings_color_scheme_title">Choose Apollo\'s default colour scheme</string>
-    <string name="settings_color_scheme_summary">Changes the accent colour in Apollo</string>
-    <string name="settings_open_source_licenses">Open source licences</string>
-    <string name="color_picker_title">Colour scheme</string>
-    <string name="app_widget_large_alt">Apollo: 4×2 (alternative)</string>
     <string name="no_effects_for_you">The equaliser could not be opened.</string>
-    <string name="empty_favorite">Songs you mark as favourites will be shown here.</string>
 </resources>

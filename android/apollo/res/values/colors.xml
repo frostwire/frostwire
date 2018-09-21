@@ -43,18 +43,13 @@
     <color name="holo_blue_light_transparent">#9933b5e5</color>
 
     <!-- A light Holo shade of green -->
-    <color name="holo_green_light">#ff99cc00</color>
 
     <!-- A light Holo shade of red -->
-    <color name="holo_red_light">#ffff4444</color>
 
     <!-- A Holo shade of purple -->
-    <color name="holo_purple">#ffaa66cc</color>
 
     <!-- A light Holo shade of orange -->
-    <color name="holo_orange_light">#ffffbb33</color>
 
     <!-- A dark Holo shade of orange -->
-    <color name="holo_orange_dark">#ffff8800</color>
 
 </resources>

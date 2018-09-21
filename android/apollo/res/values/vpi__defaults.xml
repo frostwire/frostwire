@@ -15,18 +15,4 @@
 -->
 
 <resources>
-    <dimen name="default_title_indicator_clip_padding">4dp</dimen>
-    <color name="default_title_indicator_footer_color">#FF33B5E5</color>
-    <dimen name="default_title_indicator_footer_line_height">0dp</dimen>
-    <integer name="default_title_indicator_footer_indicator_style">2</integer>
-    <dimen name="default_title_indicator_footer_indicator_height">6dp</dimen>
-    <dimen name="default_title_indicator_footer_indicator_underline_padding">20dp</dimen>
-    <dimen name="default_title_indicator_footer_padding">12dp</dimen>
-    <integer name="default_title_indicator_line_position">0</integer>
-    <color name="default_title_indicator_selected_color">#FFFFFFFF</color>
-    <bool name="default_title_indicator_selected_bold">true</bool>
-    <color name="default_title_indicator_text_color">#BBFFFFFF</color>
-    <dimen name="default_title_indicator_text_size">15dp</dimen>
-    <dimen name="default_title_indicator_title_padding">5dp</dimen>
-    <dimen name="default_title_indicator_top_padding">12dp</dimen>
 </resources>

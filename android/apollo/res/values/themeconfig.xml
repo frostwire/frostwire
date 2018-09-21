@@ -22,19 +22,15 @@
     <color name="action_bar_title">@color/white</color>
 
     <!-- The action bar sub title color -->
-    <color name="action_bar_subtitle">@color/transparent_white</color>
 
     <!-- Adpater lines -->
     <color name="line_one">@color/app_text_primary</color>
-    <color name="line_two">@color/app_text_primary</color>
-    <color name="line_three">@color/app_text_primary</color>
 
     <!-- Now playing -->
     <color name="audio_player_current_time">#ff000000</color>
     <color name="audio_player_total_time">#ff000000</color>
     <color name="audio_player_line_one">#ff000000</color>
     <color name="audio_player_line_two">#ff000000</color>
-    <color name="audio_player_pager_container">@color/action_bar_color</color>
 
     <!-- Bottom action bar -->
     <color name="bottom_action_bar">@color/app_background_dark_highlight</color>
@@ -42,9 +38,5 @@
     <color name="bab_line_two">@color/transparent_white</color>
 
     <!-- Action bar items -->
-    <color name="favorite_normal">@color/transparent_white</color>
-    <color name="search_action">@color/transparent_white</color>
-    <color name="shop_action">@color/transparent_white</color>
-    <color name="pinn_to_action">@color/transparent_white</color>
 
 </resources>

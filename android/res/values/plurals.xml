@@ -24,14 +24,6 @@
         <item quantity="one">%d source</item>
         <item quantity="other">%d sources</item>
     </plurals>
-    <plurals name="count_torrents_indexed">
-        <item quantity="one">There is 1 indexed torrent</item>
-        <item quantity="other">There are %d indexed torrents</item>
-    </plurals>
-    <plurals name="num_files">
-        <item quantity="one">1 file</item>
-        <item quantity="other">%d files</item>
-    </plurals>
     <plurals name="unit_downloads">
         <item quantity="one">%d download</item>
         <item quantity="other">%d downloads</item>
