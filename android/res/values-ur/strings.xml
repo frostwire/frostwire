@@ -22,29 +22,14 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[افشا: اگرچہ آپ کے ڈاؤن لوڈ کے لئے سفارش کی گئی ہے، آپ کو FrostWire استعمال کرنے کے لئے ایک وی پی این کی ضرورت نہیں ہے.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="activity_preferences_name">ترتیبات</string>
-    <string name="activity_chat_name">بات چیت</string>
-    <string name="activity_downloads_name">موجودہ ڈونلوڈ</string>
-    <string name="activity_uploads_name">موجودہ اپلوڈ</string>
     <string name="activity_about">ہمارے بارے میں</string>
-    <string name="all_transfers_will_stop_are_you_sure">سب کی منتقلی رک جائی گی . کیا آپ مطمین ہیں ؟</string>
-    <string name="wait">انتظار فرمائیں </string>
     <string name="exit">Exit</string>
-    <string name="no_wifi_want_to_fix_it_question"> آپ کا انٹرنیٹ سے رابطہ منقطع ہو گیا ہے . آپ رابطہ کیسے قائم کرنا چاہتے ہیں؟</string>
-    <string name="your_connection_has_dropped_stopping_services">آپ کا انٹرنیٹ سے رابطہ منقطع ہو گیا ہے .تمام کام رک رہا ہے</string>
-    <string name="wifi_network_changed_restarting_services">آپ کا انٹرنیٹ  نیٹ ورک بدل  گیا ہے .تمام کام بحال ہو رہا ہے </string>
-    <string name="no_network_connection">کوئی نیٹورک کنکشن نہیں </string>
-    <string name="leaving_already">ابھی چل دیے ؟</string>
     <string name="search_label">ڈھونڈو </string>
-    <string name="settings_description">ڈھونڈنے کے ترتیبات</string>
-    <string name="clear_finished">مکمل صاف کریں</string>
     <string name="waiting">انتظار ہو رها ہے</string>
-    <string name="copy">کاپی</string>
     <string name="video">ویڈیو</string>
-    <string name="application">سافٹ ویئر</string>
     <string name="applications">سافٹ ویئرذ</string>
     <string name="picture">تصویر</string>
     <string name="pictures">تصاویر</string>
-    <string name="document">دستاویز</string>
     <string name="documents">دستاویزات</string>
     <string name="use_mobile_data">بٹٹوررینٹ کے لئے 3G/4Gاستعمال کریں </string>
     <string name="use_mobile_data_summary">بٹٹوررینٹ کے لئے اپبا موبائل انٹرنیٹ استعمال کریں. آپ کو پیسے چارج کیے جا سکتے ہیں .احتیاط سے استعمال کریں .</string>
@@ -116,7 +101,6 @@
     <string name="share_selected_files">سیکنڈ اور منتخب کردہ فائلوں</string>
     <string name="device">ڈیوائس</string>
     <string name="all_free_downloads">تمام مفت ڈاؤن لوڈ</string>
-    <string name="go_to">کے پاس جاؤ</string>
     <string name="activity_uploads_title_text">اپ لوڈز</string>
     <string name="request_again">درخواست دوبارہ</string>
     <string name="use_zooqle">استعمال Zooqle.com</string>
@@ -163,7 +147,6 @@
     <string name="frostwire_sticker_and_more">FrostWire اسٹیکرز اور زیادہ</string>
     <string name="show_transfers_on_download_start">ٹرانسفر ڈاؤن لوڈ شروع پر شو</string>
     <string name="send_feedback">رائے بھیجیں</string>
-    <string name="chat_actions">چیٹ کے عوامل</string>
     <string name="tos_refuse">کوڑاکرٹ</string>
     <string name="use_torrentdownloads">استعمال TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
@@ -185,9 +168,7 @@
     <string name="paused">موقوف</string>
     <string name="retry_search">دوبارہ کوشش کریں</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">فائل کو ترجیح نہیں ہوسکی. BitTorrent کے منقطع رہے گا.</string>
-    <string name="toggle_sharing_selected_files">ٹوگل شیئرنگ</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">اگر FrostWire ان انسٹال کیا جاتا ہے لوڈ، اتارنا Android ڈاؤن لوڈ فائلوں کو مٹا دے گا.</string>
-    <string name="please_connect">اس خصوصیت کو استعمال کرنے کے لئے رابطہ قائم کریں</string>
     <string name="protected_connection">VPN کے ذریعہ محفوظ</string>
     <string name="use_eztv">استعمال Eztv</string>
     <string name="media_type_torrents">Torrents</string>
@@ -210,7 +191,6 @@
     <string name="wifi_networks_only_summary">ڈیٹا کو محفوظ کریں. لوڈ صرف وائی فائی کنکشن قائم ہے تو.</string>
     <string name="or_enter_url">یا یو آر ایل درج کریں</string>
     <string name="azureus_manager_item_initializing">شروع</string>
-    <string name="fetching_file_list">اشتراک کیا کی بازیابی فہرست</string>
     <string name="toast_on_connect">BitTorrent کے کور کا آغاز کیا.</string>
     <string name="help">مدد</string>
     <string name="disabled">معذور افراد</string>
@@ -229,10 +209,8 @@
     <string name="unshare_selected_files">غیر مشترک منتخب فائلوں</string>
     <string name="are_you_sure_you_want_to_download_the_following"> %1$s (%2$s) کیا آپ واقعی مندرجہ ذیل ڈاؤن لوڈ، اتارنا کرنا چاہتے ہیں</string>
     <string name="downloading_from_desktop">ڈیسک ٹاپ سے فائلوں کو ڈاؤن لوڈ</string>
-    <string name="next_time">اگلی بار</string>
     <string name="name">نام</string>
     <string name="player_paused_press_and_hold_to_stop">پلیئر روک دیا گیا. (ٹپ: پریس اور روکنے کی پکڑ)</string>
-    <string name="search_for_type_files">%s فائلوں کے لیے تلاش</string>
     <string name="menu_delete_shortcut_label">حذف کریں</string>
     <string name="magnet_url_added">مقناطیس URL کی منتقلی میں شامل کر دیا. (میگنےٹ وائی فائی پر بہترین کام کریں)</string>
     <string name="frostwire_shutting_down_no_permissions">معذرت، FrostWire ڈسک تک رسائی کے لئے آپ کی اجازت کے بغیر جاری نہیں کر سکتے.</string>
@@ -270,7 +248,6 @@
     <string name="delete_file_menu_action">حذف کریں</string>
     <string name="not_connected">منسلک نہیں</string>
     <string name="clear_complete">واضح مکمل</string>
-    <string name="done">ہوگیا</string>
     <string name="media_type_documents">کتب / دستاویزات</string>
     <string name="open">کھولیں</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">آپ کی ترتیبات کے مطابق میں بوائ شروع نہیں کر سکتا جب تک کہ آپ کو وائی فائی پر ہیں. جب آپ کو وائی فائی نیٹ ورک چالو حالت میں ایک انٹرنیٹ کو واپس مل فائل خود کار طریقے کی بوائ کے لئے تیار ہو جائے گا.</string>
@@ -295,7 +272,6 @@
     <string name="help_translate_frostwire">FrostWire ترجمہ کرنے میں مدد</string>
     <string name="tell_others_subject">ابھی تک لوڈ، اتارنا Android کے لئے FrostWire ملا؟</string>
     <string name="files_shared_by">کی طرف سے مشترکہ فائلوں</string>
-    <string name="clear_messages">واضح پیغامات</string>
     <string name="best_value">بہترین قیمت</string>
     <string name="transfers_context_menu_clear_finished">تمام ختم ٹرانسفر صاف کریں</string>
     <string name="files">فائلوں</string>
@@ -308,7 +284,6 @@
     <string name="you_need_a_bitcoin_wallet_app">آپ کو بی ٹی سی کے عطیہ پیش کرنے کے لئے ایک Bitcoin پرس آپ کے آلے پر نصب کی ضرورت ہے.</string>
     <string name="transfers_select_all">تمام</string>
     <string name="desktop_transfer_status_cancelled">منسوخ</string>
-    <string name="use_icons_to_browse">فائلوں کو براؤز کرنے کے لئے ماؤس کو آاکنوں استعمال کریں.</string>
     <string name="seeds_n">بیج: %s</string>
     <string name="media_type_audio">آڈیو</string>
     <string name="internal_port">اندرونی پورٹ</string>
@@ -321,7 +296,6 @@
     <string name="pausing">موقوف</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">کس طرح دوسروں کے مقامی نیٹ ورک پر آپ کو دیکھ کر (وائی فائی)</string>
     <string name="yes_no_cancel_transfer_question">آپ کو روکنے اور فہرست میں سے یہ ڈاؤن لوڈ ہٹانے کے لیے چاہتے ہیں (کوئی ڈیٹا مٹا دیا جائے گا)؟</string>
-    <string name="activity_about_droidwire_description">لوڈ، اتارنا Android کے لئے FrostWire</string>
     <string name="dialog_new_transfer_check_text">اس اگلی بار دکھائیں</string>
     <string name="azureus_manager_not_created">لوڈ ایسڈی کارڈ کے ساتھ پیدا نہیں کیا جا سکتا نصب</string>
     <string name="peers">ہم عمر</string>
@@ -348,8 +322,6 @@
     <string name="uh_still_listening_on_port">اہ؟ میں اب بھی بندرگاہ پر سن رہا ہوں</string>
     <string name="storage_path">ذخیرہ راہ</string>
     <string name="settings">ترتیبات</string>
-    <string name="audio_music">آڈیو / موسیقی</string>
-    <string name="remove">دور</string>
     <string name="file_is_already_downloading">فائل پہلے سے ہی ڈاؤن لوڈ کی جاتی ہے</string>
     <string name="release">رہائی</string>
     <string name="nickname_sharing_count_files">%1$s - Sharing %2$d files</string>
@@ -373,7 +345,6 @@
     <string name="donate">عطیہ</string>
     <string name="torrent_transfer_consuming_mobile_data">انتباہ: یہ سیلاب ٹرانسفر آپ 3G / 4G ڈیٹا کا استعمال کرتے ہوئے کیا جاتا ہے. (آپ کو صرف وائی فائی پر BitTorrent کے استعمال کرنے کے لئے چاہتے ہیں تو آپ کے نیٹ ورک کی ترتیبات چیک کریں)</string>
     <string name="search_preferences">تلاش ترجیحات</string>
-    <string name="activity_debug_name">ڈیبگ</string>
     <string name="multicast_discovery">کثیر نشریات ڈسکوری</string>
     <string name="downloading_promotion">ڈاؤن لوڈ کرنا %s</string>
     <string name="search_settings_description">بارشیں کے لئے تلاش کریں</string>
@@ -402,7 +373,6 @@
     <string name="wanna_download_question">اتارنا کرنے کے لئے چاہتے ہیں؟</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">انتباہ: آپ کو اے پی پی ان انسٹال ہے تو SD کارڈ پر FrostWire طرف سے محفوظ تمام فائلوں، ANDROID، نہ FrostWire طرف سے خارج کر دیا جائے گا.</string>
-    <string name="not_sharing_files">کسی بھی فائلوں کا اشتراک نہیں کر رہا ہے.</string>
     <string name="sd_permission_no_accessible_path">راستہ آپ SD میں منتخب نہیں قابل رسائی نہیں ہے. OK دبائیں دوبارہ منتخب کرنے کے لیے.</string>
     <string name="cancel_menu_action">سٹاپ منتقلی</string>
     <string name="torrent_fetcher_download_status_error">خرابی</string>
@@ -449,7 +419,6 @@
     <string name="seeding_settings_explanation">انٹرنیٹ پر BitTorrent کے صارفین کا ڈیٹا آپ بارشیں بیج کی فائل کو حصوں کو ڈاؤن لوڈ کرنے کے قابل ہو جائے گا.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">آپ ایک وائی فائی نیٹ ورک سے منسلک ہے جب تک اوپر کی منتقلی شروع نہیں کرے گا. (3G / 4G ڈیٹا کے استعمال کے سلسلے میں آپ کے نیٹ ورک کی ترتیبات چیک کریں)</string>
     <string name="azureus_discarded">ضائع</string>
-    <string name="searching_for">کے لیے تلاش</string>
     <string name="distraction_free_search_results">تباہی مفت تلاش (بیٹا)</string>
     <string name="automatic_renewal">خودکار تجدید</string>
     <string name="model">ماڈل</string>
@@ -461,7 +430,6 @@
     <string name="seeding_is_currently_disabled_in_settings">بوائ فی الحال آپ کی ترتیبات میں غیر فعال ہے. کیا آپ اس فائل کا اشتراک کرنے کے لئے مجھ سے بوائ چالو کرنے کے لئے پسند کریں گے؟</string>
     <string name="cheaper_than_lattes">Lattes سے سستا</string>
     <string name="hints_by_google">گوگل کی طرف اشارہ</string>
-    <string name="ringtone">رنگ ٹونز</string>
     <string name="vpn_off_toast_notification">آپ کا کنکشن نجی نہیں ہو سکتا.</string>
     <string name="help_translate_or_proofread_frostwire">ترجمہ یا تصحیح املاء FrostWire مدد</string>
     <string name="downloading_metadata">ڈاؤن لوڈ ہو میٹاڈیٹا</string>
@@ -487,7 +455,6 @@
     <string name="support_frostwire_summary">اس اپلی کیشن کی ترقی کی حمایت کرنے کے لئے اشتھارات دکھائیں.</string>
     <string name="searchable_activity_label">تلاش سرگرمی</string>
     <string name="media_preview">%s پیش نظارہ</string>
-    <string name="home">ہوم</string>
     <string name="view_transfer_item_list_item_icon">فائل کی قسم کے لئے آئکن</string>
     <string name="media_type_all_types">تمام اقسام</string>
     <string name="menu_enter_shortcut_label">درج</string>
@@ -499,7 +466,6 @@
     <string name="view_transfer_list_item_icon_description">فائل کی قسم کا آئکن</string>
     <string name="enable_experimental">تجرباتی خصوصیات</string>
     <string name="file_descriptor_sd_unmounted">یہ فائل ایک ایسڈی کارڈ سے تعلق رکھتا ہے، آپ کے آلے پر یہ داخل کریں براہ مہربانی.</string>
-    <string name="download_selected_files">لوڈ منتخب</string>
     <string name="manufacturer">ڈویلپر</string>
     <string name="donate_in_btc">Bitcoins کے میں عطیہ</string>
     <string name="about">کے بارے میں</string>
@@ -520,7 +486,6 @@
     <string name="tos_accept">قبول کریں</string>
     <string name="support">سپورٹ</string>
     <string name="seeding_has_been_turned_off">بوائ بند کردیا گیا ہے</string>
-    <string name="try_changing_your_nickname">آپ عرفیت درج کریں</string>
     <string name="dialog_new_transfer_title">اس ڈاؤن لوڈ شروع کریں؟</string>
     <string name="transfers_context_menu_copy_magnet">کاپی مقناطیس</string>
     <string name="try_other_keywords">اس سے کم / مختلف مطلوبہ الفاظ کی کوشش کریں</string>
@@ -541,7 +506,6 @@
     <string name="internet_discovery">انٹرنیٹ ڈسکوری</string>
     <string name="send_my_geo_location">میرے جغرافیائی محل وقوع کا حساب</string>
     <string name="anonymous_usage_statistics">نامعلوم استعمال کے اعدادوشمار</string>
-    <string name="reconnecting">پھر جڑ</string>
     <string name="view_transfer_list_item_button_action_description">عمل</string>
     <string name="delete">حذف کریں</string>
     <string name="saving_to_sd_card">ایسڈی کارڈ میں محفوظ کرنا.</string>
@@ -564,7 +528,6 @@
     <string name="ringtone_set">رنگ ٹون طے</string>
     <string name="transfers">ٹرانسفر</string>
     <string name="keep_the_project_alive">پروجیکٹ زندہ رکھنے کے</string>
-    <string name="show_love">FrostWire پسند ہے؟</string>
     <string name="remove_ads">اشتھارات ہٹا</string>
     <string name="use_tpb_summary">TPB مقناطیس کی بنیاد پر ہے، صرف وائی فائی پر کام کرتا ہے</string>
     <string name="cloud_download_aborted_on_mobile_data">موجودہ ترتیب وائی فائی نیٹ ورک پر جب نہیں ڈاؤن لوڈ کرنے سے روکتا ہے</string>

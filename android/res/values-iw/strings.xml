@@ -36,7 +36,6 @@
     <string name="device">התקן</string>
     <string name="all_free_downloads">כל ההורדות בחינם</string>
     <string name="torrent_max_download_speed">מהירות הורדה מקסימלית</string>
-    <string name="go_to">לך ל</string>
     <string name="activity_uploads_title_text">העלאות</string>
     <string name="torrent_max_peers">Peers המקסימלי</string>
     <string name="request_again">בקש שוב</string>
@@ -66,8 +65,6 @@
     <string name="multicast_discovery_summary">חבר עמיתי Wifi מקומית באמצעות שידור (מומלץ)</string>
     <string name="use_torlock">השתמש TorLock</string>
     <string name="tos_title">תנאי שימוש</string>
-    <string name="activity_downloads_name">הורדות הפעיל</string>
-    <string name="wait">לַחֲכוֹת</string>
     <string name="summary_files_shared">שיתוף s% קבצים באופן מקומי</string>
     <string name="search">לחפש</string>
     <string name="bittorrent_off">BitTorrent off</string>
@@ -95,14 +92,12 @@
     <string name="frostwire_sticker_and_more">מדבקות FrostWire ועוד</string>
     <string name="show_transfers_on_download_start">העברות הצג על התחל הורדה</string>
     <string name="send_feedback">שלח משוב</string>
-    <string name="chat_actions">פעולות צ\'\אט</string>
     <string name="tos_refuse">מסרב</string>
     <string name="torrent_max_total_connections">חיבורים סה"כ מקסימאליים</string>
     <string name="activity_preferences_name">הגדרות</string>
     <string name="use_torrentdownloads">השתמש TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
     <string name="my_files">הקבצים שלי</string>
-    <string name="no_network_connection">אין חיבור לרשת</string>
     <string name="and_choose_what_filetypes_to_share">בדוק אילו סוגי קבצים ברצונך לאפשר לשיתוף ברשת הניידת FrostWire ו- Wifi הסמוך מופעלים שולחניים.</string>
     <string name="delete_n_torrents_indexed">%d הורדות שנמחקו באינדקס</string>
     <string name="saving_to_internal_memory">שמירת זיכרון פנימי</string>
@@ -121,11 +116,8 @@
     <string name="paused">מושהה</string>
     <string name="retry_search">נסה שוב</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">הקובץ לא להיות זרע. ביטורנט יישאר מנותק.</string>
-    <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ימחק קבצים שהורדו אם FrostWire יוסר.</string>
-    <string name="please_connect">התחבר להשתמש בתכונה זו</string>
     <string name="protected_connection">VPN-מוגן</string>
-    <string name="clear_finished">נקה סיום</string>
     <string name="use_eztv">השתמש Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">השתמש TPB</string>
@@ -149,7 +141,6 @@
     <string name="or_enter_url">או זן כתובת האתר</string>
     <string name="azureus_manager_item_initializing">מאתחל</string>
     <string name="documents">מסמכים</string>
-    <string name="fetching_file_list">באחזור רשימה משותף</string>
     <string name="toast_on_connect">הליבה ביטורנט נכתבה.</string>
     <string name="help">עֶזרָה</string>
     <string name="disabled">מבוטל מאופשר</string>
@@ -168,16 +159,13 @@
     <string name="other_settings">הגדרות אחרות</string>
     <string name="deleted_crawl_cache">מטמון לזחול שנמחק</string>
     <string name="size_unknown">גודל לא ידוע</string>
-    <string name="all_transfers_will_stop_are_you_sure">כל ההעברות תפסקנה.n\האם אתה בטוח?</string>
     <string name="unshare_selected_files">קבצים אל תשתפו שנבחרו</string>
     <string name="are_you_sure_you_want_to_download_the_following"> האם אתה בטוח שאתה רוצה להוריד את הבאה (%1$s (%2$s?</string>
     <string name="resume_torrent_menu_action">קורות חיים</string>
     <string name="downloading_from_desktop">הורדת קבצים משולחן העבודה</string>
-    <string name="next_time">בפעם הבאה</string>
     <string name="name">שֵׁם</string>
     <string name="player_paused_press_and_hold_to_stop">נגן עצר. (טיפ: לחץ והחזק כדי לעצור)</string>
     <string name="are_you_sure_delete_files">האם אתה בטוח שברצונך לצמיתות למחוק את הקבצים שנבחרו מהמכשיר שלך?</string>
-    <string name="search_for_type_files">חיפוש עבור s% קבצים</string>
     <string name="menu_delete_shortcut_label">לִמְחוֹק</string>
     <string name="magnet_url_added">כתובת אתר מגנט הוסיף להעברות. (מגנטים פועלים בצורה הטובה ביותר על ה- Wi-Fi)</string>
     <string name="share_finished_downloads_summary">הורדות סיום תהיינה זמינות למשתמשי FrostWire אחרים ברשת ה- Wi-Fi.</string>
@@ -222,7 +210,6 @@
     <string name="delete_file_menu_action">לִמְחוֹק</string>
     <string name="not_connected">לא מחובר</string>
     <string name="clear_complete">שלם נקה</string>
-    <string name="done">בוצע</string>
     <string name="media_type_documents">ספרים / מסמכים</string>
     <string name="open">לִפְתוֹחַ</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">על פי ההגדרות שלך אני לא יכול להתחיל זריעה אלא אם כן אתה על Wi-Fi. הקובץ יהיה מוכן זריעה אוטומטית כשתחזור אל אינטרנט אפשרת רשת Wi-Fi.</string>
@@ -247,12 +234,10 @@
     <string name="now_playing">עכשיו משחק</string>
     <string name="use_soundcloud">השתמש Soundcloud.com</string>
     <string name="desktop_transfer_status_complete">לְהַשְׁלִים</string>
-    <string name="copy">עותק</string>
     <string name="updating">עִדכּוּן</string>
     <string name="help_translate_frostwire">עזור לתרגם FrostWire</string>
     <string name="tell_others_subject">יש FrostWire עבור אנדרואיד עדיין?</string>
     <string name="files_shared_by">קבצים משותפים על ידי</string>
-    <string name="clear_messages">מסרים ברורים</string>
     <string name="best_value">בעל הערך הטוב ביותר</string>
     <string name="transfers_context_menu_clear_finished">נקה את כל העברות המוגמרות</string>
     <string name="files">קבצים</string>
@@ -265,11 +250,9 @@
     <string name="you_need_a_bitcoin_wallet_app">אתה צריך ארנק ביטקוין מותקן במכשיר להגיש תרומת BTC.</string>
     <string name="transfers_select_all">את כל</string>
     <string name="desktop_transfer_status_cancelled">מבוטל</string>
-    <string name="use_icons_to_browse">השתמש בסמלים כדי לעיין בקבצים.</string>
     <string name="seeds_n">זרעים: %s</string>
     <string name="peer_http_download_status_error">שְׁגִיאָה</string>
     <string name="media_type_audio">שֶׁמַע</string>
-    <string name="no_wifi_want_to_fix_it_question">אינך מחובר לרשת WiFi.\n\nאיך אתה רוצה להתחבר?</string>
     <string name="internal_port">יציאה פנימית</string>
     <string name="thirty_days">30 ימים</string>
     <string name="peer_http_upload_status_error">שְׁגִיאָה</string>
@@ -283,7 +266,6 @@
     <string name="pausing">השהיית</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">איך אחרים רואים אותך ברשת המקומית (Wi-Fi)</string>
     <string name="yes_no_cancel_transfer_question">האם אתה בטוח שאתה רוצה לעצור להסיר הורדה זו מהרשימה (לא נתונים יימחקו)?</string>
-    <string name="activity_about_droidwire_description">FrostWire עבור אנדרואיד</string>
     <string name="dialog_new_transfer_check_text">הצג בפעם הבאה זה</string>
     <string name="azureus_manager_not_created">הורדה לא ניתן ליצור עם כרטיס SD רכוב</string>
     <string name="peers">Peers</string>
@@ -315,8 +297,6 @@
     <string name="uh_still_listening_on_port">אה? אני עדיין מאזין ביציאה</string>
     <string name="storage_path">נתיב לשמירה</string>
     <string name="settings">הגדרות</string>
-    <string name="audio_music">שמע / מוסיקה</string>
-    <string name="remove">לְהַסִיר</string>
     <string name="azureus_manager_item_superseeding">Super-Seeding</string>
     <string name="file_is_already_downloading">הקובץ כבר מוריד</string>
     <string name="release">לְשַׁחְרֵר</string>
@@ -324,7 +304,6 @@
     <string name="finishing">גימור</string>
     <string name="set_as_wallpaper">קבע כרקע</string>
     <string name="available">זמין</string>
-    <string name="leaving_already">כבר הולך?</string>
     <string name="are_you_sure_wifi_sharing_off">כיבוי שיתוף האינטרנט אלחוטי יעשה את כל הקבצים שלך באופן מקומי המשותפים לא זמינים למשתמשים אחרים ברשת Wifi הסמוכה.</string>
     <string name="check_internet_connection">בדוק את החיבור לאינטרנט</string>
     <string name="azureus_manager_item_stopped">עצר</string>
@@ -346,7 +325,6 @@
     <string name="donate">לִתְרוֹם</string>
     <string name="torrent_transfer_consuming_mobile_data">אזהרה: העברת סיקור זה משתמשת נתוני 3G / 4G שלך. (בדוק את הגדרות הרשת שלך אם אתה רוצה להשתמש BitTorrent רק ב- WiFi)</string>
     <string name="search_preferences">Search Preferences</string>
-    <string name="activity_debug_name">Debug</string>
     <string name="multicast_discovery">Multicast Discovery</string>
     <string name="downloading_promotion">הורדת %s</string>
     <string name="search_settings_description">חפש Torrents</string>
@@ -380,7 +358,6 @@
     <string name="wanna_download_question">רוצה להוריד?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">אזהרה: כל הקבצים השמורים על ידי FrostWire על גבי כרטיס SD תימחק על ידי אנדרואיד, לא FrostWire, אם תסיר את האפליקציה.</string>
-    <string name="not_sharing_files">לא משתף את כל קבצים.</string>
     <string name="sd_permission_no_accessible_path">הנתיב שבחרת SD אינו נגיש עוד. לחץ על OK כדי לבחור שוב.</string>
     <string name="cancel_menu_action">העברת עצור</string>
     <string name="torrent_fetcher_download_status_error">שְׁגִיאָה</string>
@@ -412,14 +389,12 @@
     <string name="select_all">בחר הכל</string>
     <string name="external_port">חיצוני נמל</string>
     <string name="clear_search_cache_summary">ערכי מטמון החיפוש נקו</string>
-    <string name="document">מסמך</string>
     <string name="cheaper_than_drinks">זול יותר מאשר משקאות</string>
     <string name="restarting">הפעלה מחדש…</string>
     <string name="delete_file_menu_action_count">לִמְחוֹק (s%)</string>
     <string name="file_descriptor_sd_mounted">קובץ זה נמחק מכרטיס SD, או כרטיס SD שהוספת הוא אחר.</string>
     <string name="downloads">הורדות</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">סיקור הורדה</string>
-    <string name="settings_description">הגדרות חיפוש</string>
     <string name="advertisement">פרסומת</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">בחר את הקבצים שאתה רוצה להוריד מ טורנט זה</string>
     <string name="minimize_frostwire">מזער FrostWire</string>
@@ -429,10 +404,8 @@
     <string name="seeding_settings_explanation">משתמש ביטורנט באינטרנט תוכל להוריד נתחי קובץ של זרע טורנטים הנתונים שלך.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">העברות Torrent לא יתחיל עד שתתחבר לרשת Wi-Fi. (בדוק את הגדרות הרשת שלך לגבי השימוש בנתונים 3G/4G)</string>
     <string name="azureus_discarded">מוּשׁלָך</string>
-    <string name="searching_for">מחפש אחר</string>
     <string name="distraction_free_search_results">הסחת דעת חיפוש חופשי (בטא)</string>
     <string name="automatic_renewal">חידוש אוטומטי</string>
-    <string name="activity_uploads_name">העלאות פעילות</string>
     <string name="model">Model</string>
     <string name="audio">Audio</string>
     <string name="search_hint">תוכן חיפוש</string>
@@ -443,10 +416,8 @@
     <string name="azureus_manager_item_stopping">סְתִימָה</string>
     <string name="cheaper_than_lattes">זול יותר מאשר Lattes</string>
     <string name="hints_by_google">רמזים על ידי Google</string>
-    <string name="ringtone">רינגטונים</string>
     <string name="vpn_off_toast_notification">החיבור שלך לא יכול להיות פרטי.</string>
     <string name="search_header">לחפש</string>
-    <string name="activity_chat_name">לְשׂוֹחֵחַ</string>
     <string name="help_translate_or_proofread_frostwire">עזור לתרגם או להגיה FrostWire</string>
     <string name="loading">טוען</string>
     <string name="downloading_metadata">מטה הורדה</string>
@@ -477,7 +448,6 @@
     <string name="back">חזור</string>
     <string name="searchable_activity_label">פעילות לחיפוש</string>
     <string name="media_preview">%s תצוגה מקדימה</string>
-    <string name="home">בית</string>
     <string name="view_transfer_item_list_item_icon">אייקון עבור סוג הקובץ</string>
     <string name="media_type_all_types">כל הסוגים</string>
     <string name="menu_enter_shortcut_label">להיכנס</string>
@@ -485,7 +455,6 @@
     <string name="azureus_manager_item_paused">מושהה</string>
     <string name="track">מַסלוּל</string>
     <string name="exit">יְצִיאָה</string>
-    <string name="wifi_network_changed_restarting_services">רשת Wifi השתנתה. הפעלה מחדש של שירותים.</string>
     <string name="send_tip_donation">שלח תרומה</string>
     <string name="dialog_desktop_upload_request_title">בקשת העלאה</string>
     <string name="type_to_filter_results">סוג לסינון תוצאות.</string>
@@ -493,7 +462,6 @@
     <string name="view_transfer_list_item_icon_description">סמל סוג הקובץ</string>
     <string name="enable_experimental">תכונות ניסיוניות</string>
     <string name="file_descriptor_sd_unmounted">קובץ זה שייך לכרטיס SD, הכנס אותו במכשיר שלך.</string>
-    <string name="download_selected_files">נבחר להורדה</string>
     <string name="manufacturer">יַצרָן</string>
     <string name="donate_in_btc">תרום ב ביטקוין</string>
     <string name="about">על אודות</string>
@@ -517,7 +485,6 @@
     <string name="tos_accept">לְקַבֵּל</string>
     <string name="support">תמיכה</string>
     <string name="seeding_has_been_turned_off">מתזמן כובתה</string>
-    <string name="try_changing_your_nickname">הכנס את הכינוי שלך</string>
     <string name="peer_http_download_status_cancelled">מבוטל</string>
     <string name="dialog_new_transfer_title">התחל בהורדה זו?</string>
     <string name="transfers_context_menu_copy_magnet">מגנט העתק</string>
@@ -542,7 +509,6 @@
     <string name="internet_discovery">Internet Discovery</string>
     <string name="send_my_geo_location">שלח המיקום הגיאוגרפי שלי</string>
     <string name="anonymous_usage_statistics">נתוני שימוש אנונימיים</string>
-    <string name="reconnecting">מתחבר מחדש</string>
     <string name="view_transfer_list_item_button_action_description">פעולה</string>
     <string name="delete">לִמְחוֹק</string>
     <string name="saving_to_sd_card">שמירה לכרטיס SD.</string>
@@ -560,7 +526,6 @@
     <string name="media_player_failed">ונגן מדיה נכשל</string>
     <string name="six_months">6 חודשים</string>
     <string name="are_you_sure">האם אתה בטוח?</string>
-    <string name="application">יישום</string>
     <string name="update_title">עדכון זמן!</string>
     <string name="peer_http_download_status_downloading">הורדת</string>
     <string name="picture">תְמוּנָה</string>
@@ -572,9 +537,7 @@
     <string name="ringtone_set">סט רינגטונים</string>
     <string name="transfers">העברות</string>
     <string name="keep_the_project_alive">שמור את הפרויקט בחיים</string>
-    <string name="show_love">אהבת FrostWire?</string>
     <string name="remove_ads">הסר פרסומות</string>
-    <string name="your_connection_has_dropped_stopping_services">חיבור Wifi שלך ירד. עוצר שירותים.</string>
     <string name="use_tpb_summary">TPB הוא מבוסס מגנט, עובד רק על Wifi</string>
     <string name="cloud_download_aborted_on_mobile_data">הגדרה נוכחית מונעת הורדה כשאינה ברשת Wifi</string>
     <string name="delete_started_torrents_summary">מחיקת קבצים .torrent לאחר תחילת ההורדה</string>

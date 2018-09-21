@@ -34,7 +34,6 @@
     <string name="device">Enhet</string>
     <string name="all_free_downloads">Alle gratis nedlastinger</string>
     <string name="torrent_max_download_speed">Maksimal nedlastingshastighet</string>
-    <string name="go_to">Gå til</string>
     <string name="activity_uploads_title_text">Opplastede</string>
     <string name="torrent_max_peers">Maks Peers</string>
     <string name="request_again">Forespørselen på nytt</string>
@@ -64,8 +63,6 @@
     <string name="multicast_discovery_summary">Koble til lokale Wifi kolleger via multicast (anbefales)</string>
     <string name="use_torlock">Bruk TorLock</string>
     <string name="tos_title">Vilkår for bruk</string>
-    <string name="activity_downloads_name">Aktive nedlastinger</string>
-    <string name="wait">Vente</string>
     <string name="summary_files_shared">Dele %s filer lokalt</string>
     <string name="search">Søke</string>
     <string name="bittorrent_off">BitTorrent off</string>
@@ -93,14 +90,12 @@
     <string name="frostwire_sticker_and_more">Frostwire klistremerker og mer</string>
     <string name="show_transfers_on_download_start">Vis overføringer på Last ned start</string>
     <string name="send_feedback">Gi tilbakemelding</string>
-    <string name="chat_actions">Chat Handlinger</string>
     <string name="tos_refuse">Avslå</string>
     <string name="torrent_max_total_connections">Maksimale totale Tilkoblinger</string>
     <string name="activity_preferences_name">Innstillinger</string>
     <string name="use_torrentdownloads">Bruk TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
     <string name="my_files">Mine filer</string>
-    <string name="no_network_connection">Ingen nettverkstilkobling</string>
     <string name="and_choose_what_filetypes_to_share">Sjekk hvilke typer filer du vil aktivere for deling på Frostwire Mobile Network og nærliggende Wifi aktivert Desktops.</string>
     <string name="delete_n_torrents_indexed">Slettede %d torrents indeksert</string>
     <string name="saving_to_internal_memory">Lagrer til internminne</string>
@@ -119,11 +114,8 @@
     <string name="paused">Pauset</string>
     <string name="retry_search">Prøv på nytt</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunne ikke bli seedet. BitTorrent vil forbli frakoblet.</string>
-    <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vil slette filer hvis Frostwire er avinstallert.</string>
-    <string name="please_connect">Koble å bruke denne funksjonen</string>
     <string name="protected_connection">VPN-beskyttet</string>
-    <string name="clear_finished">Klar Ferdig</string>
     <string name="use_eztv">Bruk Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Bruk TPB</string>
@@ -147,7 +139,6 @@
     <string name="or_enter_url">eller skriv inn URL</string>
     <string name="azureus_manager_item_initializing">Initial</string>
     <string name="documents">Dokumenter</string>
-    <string name="fetching_file_list">Henter liste over delte</string>
     <string name="toast_on_connect">BitTorrent kjerne startet.</string>
     <string name="help">Hjelp</string>
     <string name="disabled">deaktivert</string>
@@ -166,16 +157,13 @@
     <string name="other_settings">Andre innstillinger</string>
     <string name="deleted_crawl_cache">Slettet crawl cache</string>
     <string name="size_unknown">størrelse ukjent</string>
-    <string name="all_transfers_will_stop_are_you_sure">Alle overføringer vil stoppe.\nEr du sikker?</string>
     <string name="unshare_selected_files">Ikke dele valgte filer</string>
     <string name="are_you_sure_you_want_to_download_the_following">Er du sikker på at du vil laste ned følgende %1$s (%2$s)?</string>
     <string name="resume_torrent_menu_action">Gjenoppta</string>
     <string name="downloading_from_desktop">Laste ned filer fra skrivebordet</string>
-    <string name="next_time">Neste gang</string>
     <string name="name">Navn</string>
     <string name="player_paused_press_and_hold_to_stop">Spiller på pause. (Tips: Trykk og hold for å stoppe)</string>
     <string name="are_you_sure_delete_files">Er du sikker på at du vil slette de valgte filene fra enheten?</string>
-    <string name="search_for_type_files">Søk etter %s filer</string>
     <string name="menu_delete_shortcut_label">Slett</string>
     <string name="magnet_url_added">Magnet URL lagt til overføringer. (Magneter fungerer best på Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Ferdige nedlastninger vil være tilgjengelig for andre Frostwire brukere på Wi-Fi-nettverk.</string>
@@ -220,7 +208,6 @@
     <string name="delete_file_menu_action">Slett</string>
     <string name="not_connected">Ikke tilkoblet</string>
     <string name="clear_complete">Clear Komplett</string>
-    <string name="done">Ferdig</string>
     <string name="media_type_documents">Bøker/Dokumenter</string>
     <string name="open">Åpen</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">Henhold til innstillingene dine Jeg kan ikke starte seeding med mindre du er på Wi-Fi. Filen vil være klar for såing automatisk når du kommer tilbake til en Internett-aktivert Wi-Fi-nettverk.</string>
@@ -245,12 +232,10 @@
     <string name="now_playing">Spilles nå</string>
     <string name="use_soundcloud">Bruk Soundcloud.com</string>
     <string name="desktop_transfer_status_complete">Fullstendig</string>
-    <string name="copy">Kopiere</string>
     <string name="updating">Oppdatering</string>
     <string name="help_translate_frostwire">Hjelp sette Frostwire</string>
     <string name="tell_others_subject">Fikk Frostwire for Android ennå?</string>
     <string name="files_shared_by">filer som deles av</string>
-    <string name="clear_messages">Klare meldinger</string>
     <string name="best_value">Beste verdi</string>
     <string name="transfers_context_menu_clear_finished">Fjerne alle ferdige overføringer</string>
     <string name="files">filer</string>
@@ -263,11 +248,9 @@
     <string name="you_need_a_bitcoin_wallet_app">Du trenger en Bitcoin lommebok installert på enheten for å sende inn en BTC donasjon.</string>
     <string name="transfers_select_all">alle</string>
     <string name="desktop_transfer_status_cancelled">Avbrutt</string>
-    <string name="use_icons_to_browse">Bruk ikonene for å bla gjennom filer.</string>
     <string name="seeds_n">Seeds: %s</string>
     <string name="peer_http_download_status_error">Feil</string>
     <string name="media_type_audio">Audio</string>
-    <string name="no_wifi_want_to_fix_it_question">Du er ikke koblet til et Wi-Fi-nettverk.\n\nHvordan ønsker du å koble til?</string>
     <string name="internal_port">Internt port</string>
     <string name="thirty_days">30 dager</string>
     <string name="peer_http_upload_status_error">Feil</string>
@@ -281,7 +264,6 @@
     <string name="pausing">Midlertidig stans</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Hvordan andre ser du på det lokale nettverket (Wi-Fi)</string>
     <string name="yes_no_cancel_transfer_question">Er du sikker på at du vil stoppe og fjerne denne nedlastingen fra listen (ingen data vil bli slettet)?</string>
-    <string name="activity_about_droidwire_description">Frostwire for Android</string>
     <string name="dialog_new_transfer_check_text">Vis dette neste gang</string>
     <string name="azureus_manager_not_created">Nedlasting kan ikke opprettes med SD-kortet</string>
     <string name="peers">Peers</string>
@@ -313,8 +295,6 @@
     <string name="uh_still_listening_on_port">Uh? Jeg er fortsatt lytter på port</string>
     <string name="storage_path">Lagring Sti</string>
     <string name="settings">Innstillinger</string>
-    <string name="audio_music">Lyd/Musikk</string>
-    <string name="remove">Fjerne</string>
     <string name="azureus_manager_item_superseeding">Super-Seeding</string>
     <string name="file_is_already_downloading">Filen er allerede lastet ned</string>
     <string name="release">Utgivelse</string>
@@ -322,7 +302,6 @@
     <string name="finishing">Ferdigbehandling</string>
     <string name="set_as_wallpaper">Sett som bakgrunn</string>
     <string name="available">tilgjengelig</string>
-    <string name="leaving_already">Du lar allerede?</string>
     <string name="are_you_sure_wifi_sharing_off">Slå av Wi-Fi-deling vil gjøre alle dine lokalt delte filer tilgjengelig for andre brukere på den nærliggende Wi-Fi-nettverk.</string>
     <string name="check_internet_connection">Sjekk Internett-tilkobling</string>
     <string name="azureus_manager_item_stopped">Stoppet</string>
@@ -344,7 +323,6 @@
     <string name="donate">Donere</string>
     <string name="torrent_transfer_consuming_mobile_data">Advarsel: Denne torrenten overføring ved hjelp av 3G/4G data. (Kontroller nettverksinnstillingene hvis du ønsker å bruke BitTorrent bare på WiFi)</string>
     <string name="search_preferences">Søkevalg</string>
-    <string name="activity_debug_name">Debug</string>
     <string name="multicast_discovery">Multicast Discovery</string>
     <string name="downloading_promotion">Nedlasting %s</string>
     <string name="search_settings_description">Søk etter torrents</string>
@@ -378,7 +356,6 @@
     <string name="wanna_download_question">Ønsker du å laste ned?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">ADVARSEL: Alle filer lagret av Frostwire til SD-kortet vil bli slettet av Android, ikke Frostwire , hvis du avinstallerer programmet.</string>
-    <string name="not_sharing_files">er ikke å dele noen filer.</string>
     <string name="sd_permission_no_accessible_path">Banen du valgte i SD er ikke tilgjengelig lenger. Trykk OK for å velge på nytt.</string>
     <string name="cancel_menu_action">Stopp overføring</string>
     <string name="torrent_fetcher_download_status_error">Feil</string>
@@ -410,14 +387,12 @@
     <string name="select_all">Velg alle</string>
     <string name="external_port">Eksternt port</string>
     <string name="clear_search_cache_summary">Fjern søkehurtigbufferoppføringer</string>
-    <string name="document">Dokument</string>
     <string name="cheaper_than_drinks">Billigere enn Drikke</string>
     <string name="restarting">Omstart…</string>
     <string name="delete_file_menu_action_count">Slett (%s)</string>
     <string name="file_descriptor_sd_mounted">Denne filen ble slettet fra SD-kortet, eller SD-kortet du har satt inn er en annen.</string>
     <string name="downloads">Nedlastinger</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Laste ned torrent</string>
-    <string name="settings_description">Innstillinger for søk</string>
     <string name="advertisement">annonse</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Plukk filene du ønsker å laste ned fra denne torrenten</string>
     <string name="minimize_frostwire">Minimer Frostwire</string>
@@ -427,10 +402,8 @@
     <string name="seeding_settings_explanation">BitTorrent-brukere på Internett vil være i stand til å laste ned filen biter av data til torrents frø.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent overføringer vil ikke starte før du kobler til et Wi-Fi-nettverk. (Kontroller nettverksinnstillingene vedrørende 3G/4G databruk)</string>
     <string name="azureus_discarded">forkastet</string>
-    <string name="searching_for">Leter etter</string>
     <string name="distraction_free_search_results">Distraksjon Free Search (beta)</string>
     <string name="automatic_renewal">Automatisk fornyelse</string>
-    <string name="activity_uploads_name">Aktive opplastninger</string>
     <string name="model">Modell</string>
     <string name="audio">Audio</string>
     <string name="search_hint">Søk innhold</string>
@@ -441,10 +414,8 @@
     <string name="azureus_manager_item_stopping">Stoppe</string>
     <string name="cheaper_than_lattes">Billigere enn Lattes</string>
     <string name="hints_by_google">Tips fra Google</string>
-    <string name="ringtone">Ringtone</string>
     <string name="vpn_off_toast_notification">Tilkoblingen kan ikke være privat.</string>
     <string name="search_header">Søke</string>
-    <string name="activity_chat_name">Chat</string>
     <string name="help_translate_or_proofread_frostwire">Hjelp sette eller korrekturlese Frostwire</string>
     <string name="loading">Laster</string>
     <string name="downloading_metadata">Nedlasting av metadata</string>
@@ -475,7 +446,6 @@
     <string name="back">Tilbake</string>
     <string name="searchable_activity_label">Søkbar aktivitet</string>
     <string name="media_preview">%s forhåndsvisning</string>
-    <string name="home">Hjem</string>
     <string name="view_transfer_item_list_item_icon">Ikon for filtype</string>
     <string name="media_type_all_types">Alle typer</string>
     <string name="menu_enter_shortcut_label">Tast inn</string>
@@ -483,7 +453,6 @@
     <string name="azureus_manager_item_paused">Pauset</string>
     <string name="track">spor</string>
     <string name="exit">Exit</string>
-    <string name="wifi_network_changed_restarting_services">Wifi-nettverk har endret seg. Omstart tjenester.</string>
     <string name="send_tip_donation">Send donasjon</string>
     <string name="dialog_desktop_upload_request_title">Last opp forespørsel</string>
     <string name="type_to_filter_results">Skriv for å filtrere resultatene.</string>
@@ -491,7 +460,6 @@
     <string name="view_transfer_list_item_icon_description">Filtypeikonet</string>
     <string name="enable_experimental">Eksperimentelle funksjoner</string>
     <string name="file_descriptor_sd_unmounted">Denne filen tilhører et SD-kort, sett det på enheten.</string>
-    <string name="download_selected_files">Last ned Valgt</string>
     <string name="manufacturer">Produsent</string>
     <string name="donate_in_btc">Donere i Bitcoins</string>
     <string name="about">Handle om</string>
@@ -515,7 +483,6 @@
     <string name="tos_accept">Aksepterer</string>
     <string name="support">Støtte</string>
     <string name="seeding_has_been_turned_off">Seeding er slått av</string>
-    <string name="try_changing_your_nickname">Skriv inn ditt kallenavn</string>
     <string name="peer_http_download_status_cancelled">Avbrutt</string>
     <string name="dialog_new_transfer_title">Begynner et nedlasting?</string>
     <string name="transfers_context_menu_copy_magnet">Kopier Magnet</string>
@@ -540,7 +507,6 @@
     <string name="internet_discovery">Internett Discovery</string>
     <string name="send_my_geo_location">Send geolocation</string>
     <string name="anonymous_usage_statistics">Anonym brukerstatistikk</string>
-    <string name="reconnecting">Koble</string>
     <string name="view_transfer_list_item_button_action_description">Handling</string>
     <string name="delete">Slett</string>
     <string name="saving_to_sd_card">Lagrer til SD-kort.</string>
@@ -558,7 +524,6 @@
     <string name="media_player_failed">Mediespiller mislyktes</string>
     <string name="six_months">6 måneder</string>
     <string name="are_you_sure">Er du sikker?</string>
-    <string name="application">Applikasjonsprogramvare</string>
     <string name="update_title">Oppdater tid!</string>
     <string name="peer_http_download_status_downloading">Nedlasting</string>
     <string name="picture">Bilde</string>
@@ -570,9 +535,7 @@
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Overganger</string>
     <string name="keep_the_project_alive">Holde prosjektet i live</string>
-    <string name="show_love">Elsker Frostwire?</string>
     <string name="remove_ads">Fjern annonser</string>
-    <string name="your_connection_has_dropped_stopping_services">Din WiFi-tilkobling har falt. Stoppe tjenester.</string>
     <string name="use_tpb_summary">TPB er magnet basert, fungerer bare på Wifi</string>
     <string name="cloud_download_aborted_on_mobile_data">Aktuell innstilling forhindrer nedlasting når den ikke er på Wifi-nettverk</string>
     <string name="delete_started_torrents_summary">Slett .torrent filer etter begynner å laste ned</string>

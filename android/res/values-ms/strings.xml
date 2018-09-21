@@ -36,7 +36,6 @@
     <string name="device">Peranti</string>
     <string name="all_free_downloads">Semua muat turun percuma</string>
     <string name="torrent_max_download_speed">Maksimum Muat turun Speed</string>
-    <string name="go_to">Pergi ke</string>
     <string name="activity_uploads_title_text">Muat naik</string>
     <string name="torrent_max_peers">Negara setara maksimum</string>
     <string name="request_again">Meminta lagi</string>
@@ -65,8 +64,6 @@
     <string name="multicast_discovery_summary">Sambung kepada rakan-rakan Wifi tempatan melalui multicast (disyorkan)</string>
     <string name="use_torlock">Gunakan TorLock</string>
     <string name="tos_title">Syarat-syarat Penggunaan</string>
-    <string name="activity_downloads_name">Muat turun aktif</string>
-    <string name="wait">Tunggu</string>
     <string name="summary_files_shared">Berkongsi %s fail tempatan</string>
     <string name="search">Carian</string>
     <string name="bittorrent_off">BitTorrent off</string>
@@ -93,14 +90,12 @@
     <string name="frostwire_sticker_and_more">FrostWire pelekat dan banyak lagi</string>
     <string name="show_transfers_on_download_start">Show pemindahan di muat permulaan</string>
     <string name="send_feedback">Hantar maklumbalas</string>
-    <string name="chat_actions">Tindakan Chat</string>
     <string name="tos_refuse">Enggan</string>
     <string name="torrent_max_total_connections">Maksimum Jumlah Sambungan</string>
     <string name="activity_preferences_name">Tetapan</string>
     <string name="use_torrentdownloads">Gunakan TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
     <string name="my_files">Fail-fail saya</string>
-    <string name="no_network_connection">Tiada Sambungan Rangkaian</string>
     <string name="and_choose_what_filetypes_to_share">Semak apa jenis fail yang anda ingin untuk membolehkan untuk perkongsian di Rangkaian Mobile FrostWire dan Wifi berdekatan membolehkan Desktop.</string>
     <string name="delete_n_torrents_indexed">Dipadam %d torrents diindeks</string>
     <string name="saving_to_internal_memory">Menyimpan ke Memori Dalaman</string>
@@ -119,11 +114,8 @@
     <string name="paused">Dihentikan sementara</string>
     <string name="retry_search">Cuba semula</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fail tidak boleh diletakkan sebagai pilihan. BitTorrent akan kekal diputuskan.</string>
-    <string name="toggle_sharing_selected_files">Perkongsian Toggle</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan memadam fail yang dimuat turun jika FrostWire adalah pemasangan.</string>
-    <string name="please_connect">Sila sambung untuk menggunakan ciri-ciri ini</string>
     <string name="protected_connection">VPN yang dilindungi</string>
-    <string name="clear_finished">Kosongkan selesai</string>
     <string name="use_eztv">Gunakan Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Gunakan TPB</string>
@@ -147,7 +139,6 @@
     <string name="or_enter_url">atau masukkan URL</string>
     <string name="azureus_manager_item_initializing">Memulakan</string>
     <string name="documents">Dokumen</string>
-    <string name="fetching_file_list">Senarai Mengambil dikongsi</string>
     <string name="toast_on_connect">BitTorrent teras bermula.</string>
     <string name="help">Bantu</string>
     <string name="disabled">Kurang upaya</string>
@@ -165,16 +156,13 @@
     <string name="other_settings">Tetapan lain</string>
     <string name="deleted_crawl_cache">Cache merangkak dipadam</string>
     <string name="size_unknown">saiz tidak diketahui</string>
-    <string name="all_transfers_will_stop_are_you_sure">Semua pindahan akan berhenti.\nAdakah anda pasti?</string>
     <string name="unshare_selected_files">Fail yang dipilih nyahkongsi</string>
     <string name="are_you_sure_you_want_to_download_the_following">Adakah anda pasti anda ingin muat turun berikut %1$s (%2$s)?</string>
     <string name="resume_torrent_menu_action">Menyambung</string>
     <string name="downloading_from_desktop">Memuat turun fail dalam desktop</string>
-    <string name="next_time">Lain kali</string>
     <string name="name">Nama</string>
     <string name="player_paused_press_and_hold_to_stop">Pemain dihentikan sementara. (Tip: Tekan dan tahan untuk berhenti)</string>
     <string name="are_you_sure_delete_files">Adakah anda pasti anda mahu kekal memadam fail yang dipilih dari peranti anda?</string>
-    <string name="search_for_type_files">Cari %s fail</string>
     <string name="menu_delete_shortcut_label">Padam</string>
     <string name="magnet_url_added">URL Magnet ditambah kepada pemindahan. (Magnet bekerja terbaik pada Wi-Fi)</string>
     <string name="share_finished_downloads_summary">Muat turun selesai akan disalurkan ke bahagian FrostWire lain pada rangkaian Wi-Fi anda.</string>
@@ -218,7 +206,6 @@
     <string name="delete_file_menu_action">Padam</string>
     <string name="not_connected">Tidak Bersambung</string>
     <string name="clear_complete">Kosongkan lengkap</string>
-    <string name="done">Selesai</string>
     <string name="media_type_documents">Buku/Dokumen</string>
     <string name="open">Buka</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">Mengikut tetapan anda saya tidak boleh memulakan pembenihan melainkan jika anda berada di Wi-Fi. Fail akan bersedia untuk pembenihan secara automatik apabila anda kembali ke internet yang dihidupkan rangkaian Wi-Fi.</string>
@@ -242,12 +229,10 @@
     <string name="now_playing">Bermain sekarang</string>
     <string name="use_soundcloud">Gunakan Soundcloud.com</string>
     <string name="desktop_transfer_status_complete">Lengkap</string>
-    <string name="copy">Salinan</string>
     <string name="updating">Pengemaskinian</string>
     <string name="help_translate_frostwire">Membantu menterjemahkannya FrostWire</string>
     <string name="tell_others_subject">Got FrostWire untuk Android lagi?</string>
     <string name="files_shared_by">fail yang dikongsi oleh</string>
-    <string name="clear_messages">Mesej yang jelas</string>
     <string name="best_value">Nilai terbaik</string>
     <string name="transfers_context_menu_clear_finished">Kosongkan semua pemindahan selesai</string>
     <string name="files">fail</string>
@@ -260,11 +245,9 @@
     <string name="you_need_a_bitcoin_wallet_app">Anda memerlukan dompet Bitcoin dipasang pada peranti anda untuk menyerahkan sumbangan BTC.</string>
     <string name="transfers_select_all">semua</string>
     <string name="desktop_transfer_status_cancelled">Dibatalkan</string>
-    <string name="use_icons_to_browse">Gunakan ikon untuk melihat-lihat fail.</string>
     <string name="seeds_n">Benih: %s</string>
     <string name="peer_http_download_status_error">Ralat</string>
     <string name="media_type_audio">Audio</string>
-    <string name="no_wifi_want_to_fix_it_question">Anda tidak disambungkan kepada rangkaian Wifi.\n\nBagaimana anda hendak sambungkan?</string>
     <string name="internal_port">Port dalaman</string>
     <string name="thirty_days">30 hari</string>
     <string name="peer_http_upload_status_error">Ralat</string>
@@ -278,7 +261,6 @@
     <string name="pausing">Berhenti</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Bagaimana orang lain melihat anda pada rangkaian tempatan (Wi-Fi)</string>
     <string name="yes_no_cancel_transfer_question">Adakah anda pasti anda mahu berhenti dan mengalih keluar muat turun ini dari senarai (tiada data akan dipadamkan)?</string>
-    <string name="activity_about_droidwire_description">FrostWire untuk Android</string>
     <string name="dialog_new_transfer_check_text">Menunjukkan masa ini akan datang</string>
     <string name="azureus_manager_not_created">Muat turun tidak boleh diwujudkan dengan kad SD dipasang</string>
     <string name="peers">Rakan-rakan</string>
@@ -310,8 +292,6 @@
     <string name="uh_still_listening_on_port">Uh? Saya masih mendengar pada port</string>
     <string name="storage_path">Laluan Penyimpanan</string>
     <string name="settings">Tetapan</string>
-    <string name="audio_music">Audio/Muzik</string>
-    <string name="remove">Buang</string>
     <string name="azureus_manager_item_superseeding">Super-Seeding</string>
     <string name="file_is_already_downloading">Fail sudah memuat turun</string>
     <string name="release">Akhbar</string>
@@ -319,7 +299,6 @@
     <string name="finishing">Kemasan</string>
     <string name="set_as_wallpaper">Tetapkan sebagai kertas dinding</string>
     <string name="available">ada</string>
-    <string name="leaving_already">Meninggalkan Sudah?</string>
     <string name="are_you_sure_wifi_sharing_off">Mematikan perkongsian Wi-Fi akan membuat semua fail yang dikongsi dalam negara anda tidak ada kepada pengguna lain pada rangkaian Wi-Fi yang berdekatan.</string>
     <string name="check_internet_connection">Periksa sambungan Internet</string>
     <string name="azureus_manager_item_stopped">Dihentikan</string>
@@ -341,7 +320,6 @@
     <string name="donate">Menderma</string>
     <string name="torrent_transfer_consuming_mobile_data">Amaran: Pemindahan torrent menggunakan data 3G/4G anda. (Semak Tetapan Rangkaian anda jika anda ingin menggunakan BitTorrent hanya pada WiFi)</string>
     <string name="search_preferences">Cari Keutamaan</string>
-    <string name="activity_debug_name">Debug</string>
     <string name="multicast_discovery">Multicast Discovery</string>
     <string name="downloading_promotion">Memuat turun %s</string>
     <string name="search_settings_description">Cari Torrents</string>
@@ -375,7 +353,6 @@
     <string name="wanna_download_question">Ingin muat turun?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">AMARAN: Semua fail yang disimpan oleh FrostWire ke dalam kad SD akan dihapuskan OLEH ANDROID, tidak FrostWire, jika anda membuang pemasangan aplikasi.</string>
-    <string name="not_sharing_files">tidak berkongsi apa-apa fail.</string>
     <string name="sd_permission_no_accessible_path">Jalan yang anda pilih dalam SD tidak boleh diakses lagi. Tekan OK untuk memilih sekali lagi.</string>
     <string name="cancel_menu_action">Hentikan Pemindahan</string>
     <string name="torrent_fetcher_download_status_error">Ralat</string>
@@ -407,14 +384,12 @@
     <string name="select_all">Pilih semua</string>
     <string name="external_port">Port luar</string>
     <string name="clear_search_cache_summary">Jelas entri cache carian</string>
-    <string name="document">Dokumen</string>
     <string name="cheaper_than_drinks">Lebih murah daripada Minuman</string>
     <string name="restarting">Memulakan semula…</string>
     <string name="delete_file_menu_action_count">Padam (%s)</string>
     <string name="file_descriptor_sd_mounted">Fail ini telah dipadam dari kad SD, atau kad SD anda telah dimasukkan adalah satu yang berbeza.</string>
     <string name="downloads">Muat turun</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Memuat turun torrent</string>
-    <string name="settings_description">Tetapan carian</string>
     <string name="advertisement">iklan</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Pilihkan fail yang anda ingin muat turun dari torrent ini</string>
     <string name="minimize_frostwire">Kurangkan FrostWire</string>
@@ -424,10 +399,8 @@
     <string name="seeding_settings_explanation">Pengguna BitTorrent di internet akan dapat memuat turun ketulan fail data benih torrents anda.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Pemindahan Torrent tidak akan bermula sehingga anda bersambung ke rangkaian Wi-Fi. (Semak Tetapan Rangkaian anda mengenai penggunaan data 3G/4G)</string>
     <string name="azureus_discarded">dibuang</string>
-    <string name="searching_for">Mencari</string>
     <string name="distraction_free_search_results">Gangguan Search Percuma (beta)</string>
     <string name="automatic_renewal">Pembaharuan automatik</string>
-    <string name="activity_uploads_name">Tambahan aktif</string>
     <string name="model">Model</string>
     <string name="audio">Audio</string>
     <string name="search_hint">Carian kandungan</string>
@@ -438,9 +411,7 @@
     <string name="azureus_manager_item_stopping">Menghentikan</string>
     <string name="cheaper_than_lattes">Lebih murah daripada Lattes</string>
     <string name="hints_by_google">Petua oleh Google</string>
-    <string name="ringtone">Ringtone</string>
     <string name="vpn_off_toast_notification">Sambungan anda mungkin tidak peribadi.</string>
-    <string name="activity_chat_name">Chat</string>
     <string name="help_translate_or_proofread_frostwire">Membantu menterjemahkannya atau mengoreksi FrostWire</string>
     <string name="loading">Pembebanan</string>
     <string name="downloading_metadata">Metadata memuat turun</string>
@@ -470,7 +441,6 @@
     <string name="back">Kembali</string>
     <string name="searchable_activity_label">Aktiviti dicari</string>
     <string name="media_preview">%s pratonton</string>
-    <string name="home">Laman</string>
     <string name="view_transfer_item_list_item_icon">Ikon untuk jenis fail</string>
     <string name="media_type_all_types">Semua jenis</string>
     <string name="menu_enter_shortcut_label">Masukkan</string>
@@ -478,7 +448,6 @@
     <string name="azureus_manager_item_paused">Dihentikan sementara</string>
     <string name="track">trek</string>
     <string name="exit">Keluar</string>
-    <string name="wifi_network_changed_restarting_services">Rangkaian Wifi telah berubah. Perkhidmatan Memulakan semula.</string>
     <string name="send_tip_donation">Menghantar derma.</string>
     <string name="dialog_desktop_upload_request_title">Naik Permintaan</string>
     <string name="type_to_filter_results">Taip untuk menapis keputusan.</string>
@@ -486,7 +455,6 @@
     <string name="view_transfer_list_item_icon_description">Ikon jenis fail</string>
     <string name="enable_experimental">Ciri-ciri eksperimen</string>
     <string name="file_descriptor_sd_unmounted">Fail ini tergolong ke kad SD, sila masukkannya pada peranti anda.</string>
-    <string name="download_selected_files">Muat turun Dipilih</string>
     <string name="manufacturer">Pengeluar</string>
     <string name="donate_in_btc">Menderma dalam bitcoins</string>
     <string name="about">Mengenai</string>
@@ -510,7 +478,6 @@
     <string name="tos_accept">Terima</string>
     <string name="support">Sokongan</string>
     <string name="seeding_has_been_turned_off">Pembenihan telah dimatikan</string>
-    <string name="try_changing_your_nickname">Masukkan nama panggilan anda</string>
     <string name="peer_http_download_status_cancelled">Dibatalkan</string>
     <string name="dialog_new_transfer_title">Mula turun ini?</string>
     <string name="transfers_context_menu_copy_magnet">Salinan Magnet</string>
@@ -535,7 +502,6 @@
     <string name="internet_discovery">Internet Discovery</string>
     <string name="send_my_geo_location">Menghantar geolokasi saya</string>
     <string name="anonymous_usage_statistics">Anonymous Statistik Penggunaan</string>
-    <string name="reconnecting">Menyambung semula</string>
     <string name="view_transfer_list_item_button_action_description">Tindakan</string>
     <string name="delete">Padam</string>
     <string name="saving_to_sd_card">Menyimpan ke kad SD.</string>
@@ -553,7 +519,6 @@
     <string name="media_player_failed">Pemain media gagal</string>
     <string name="six_months">6 bulan</string>
     <string name="are_you_sure">Adakah anda pasti?</string>
-    <string name="application">Permohonan</string>
     <string name="update_title">Kemas kini masa!</string>
     <string name="peer_http_download_status_downloading">Memuat turun</string>
     <string name="picture">Gambar</string>
@@ -565,9 +530,7 @@
     <string name="ringtone_set">Ringtone Set</string>
     <string name="transfers">Pemindahan</string>
     <string name="keep_the_project_alive">Memastikan projek itu hidup</string>
-    <string name="show_love">Cinta FrostWire?</string>
     <string name="remove_ads">Mengeluarkan iklan</string>
-    <string name="your_connection_has_dropped_stopping_services">Sambungan Wifi anda telah digugurkan. perkhidmatan henti.</string>
     <string name="use_tpb_summary">TPB adalah berasaskan magnet, hanya berfungsi pada Wifi</string>
     <string name="cloud_download_aborted_on_mobile_data">tetapan semasa menghalang dimuat turun apabila tidak pada rangkaian Wifi</string>
     <string name="sharing_privacy_settings">Perkongsian dan Privasi</string>

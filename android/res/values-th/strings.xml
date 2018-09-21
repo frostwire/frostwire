@@ -36,7 +36,6 @@
     <string name="device">เครื่อง</string>
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
     <string name="torrent_max_download_speed">แม็กซ์ความเร็วในการดาวน์โหลด</string>
-    <string name="go_to">ไปที่</string>
     <string name="activity_uploads_title_text">อัปโหลด</string>
     <string name="torrent_max_peers">ทำเนียบแม็กซ์</string>
     <string name="request_again">ขออีกครั้ง</string>
@@ -65,8 +64,6 @@
     <string name="multicast_discovery_summary">เชื่อมต่อไปยังเพื่อนร่วมงาน Wifi ท้องถิ่นผ่านหลายผู้รับ (แนะนำ)</string>
     <string name="use_torlock">ใช้ TorLock</string>
     <string name="tos_title">ข้อกำหนดการใช้งาน</string>
-    <string name="activity_downloads_name">ดาวน์โหลดที่ใช้งาน</string>
-    <string name="wait">รอ</string>
     <string name="summary_files_shared">การแชร์ไฟล์ %s ในประเทศ</string>
     <string name="search">ค้นหา</string>
     <string name="bittorrent_off">BitTorrent ปิด</string>
@@ -93,14 +90,12 @@
     <string name="frostwire_sticker_and_more">สติกเกอร์ FrostWire และอื่น ๆ</string>
     <string name="show_transfers_on_download_start">แสดงการโอนเงินในการดาวน์โหลดเริ่มต้น</string>
     <string name="send_feedback">ส่งความคิดเห็น</string>
-    <string name="chat_actions">การกระทำการพูดคุย</string>
     <string name="tos_refuse">ปฏิเสธ</string>
     <string name="torrent_max_total_connections">การเชื่อมต่อสูงสุดรวม</string>
     <string name="activity_preferences_name">การตั้งค่า</string>
     <string name="use_torrentdownloads">ใช้ TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
     <string name="my_files">ไฟล์ของฉัน</string>
-    <string name="no_network_connection">ไม่มีการเชื่อมต่อเครือข่าย</string>
     <string name="and_choose_what_filetypes_to_share">ตรวจสอบสิ่งที่ประเภทของไฟล์ที่คุณต้องการเปิดใช้งานสำหรับการแชร์บนเครือข่ายมือถือและ WiFi FrostWire อยู่บริเวณใกล้เคียงเปิดการใช้งานเดสก์ท็</string>
     <string name="delete_n_torrents_indexed">ที่ถูกลบ %d torrents การจัดทำดัชนี</string>
     <string name="saving_to_internal_memory">บันทึกลงหน่วยความจำภายใน</string>
@@ -119,11 +114,8 @@
     <string name="paused">หยุดชั่วคราว</string>
     <string name="retry_search">ลองใหม่อีกครั้ง</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ไฟล์ที่ไม่สามารถเมล็ด BitTorrent จะยังคงตัดการเชื่อมต่อ</string>
-    <string name="toggle_sharing_selected_files">สลับการใช้งานร่วมกัน</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android จะลบไฟล์ที่ดาวน์โหลด FrostWire ถ้ายกเลิกการติดตั้ง</string>
-    <string name="please_connect">โปรดเชื่อมต่อเพื่อใช้คุณลักษณะนี้</string>
     <string name="protected_connection">VPN ที่มีการป้องกัน</string>
-    <string name="clear_finished">ล้างเสร็จสิ้น</string>
     <string name="use_eztv">ใช้ Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">ใช้ TPB</string>
@@ -147,7 +139,6 @@
     <string name="or_enter_url">หรือป้อน URL</string>
     <string name="azureus_manager_item_initializing">การเริ่มต้น</string>
     <string name="documents">เอกสาร</string>
-    <string name="fetching_file_list">รายการดึงข้อมูลที่ใช้ร่วมกัน</string>
     <string name="toast_on_connect">BitTorrent หลักเริ่มต้น</string>
     <string name="help">ช่วยด้วย</string>
     <string name="disabled">พิการ</string>
@@ -165,16 +156,13 @@
     <string name="other_settings">ตั้งค่าอื่น ๆ</string>
     <string name="deleted_crawl_cache">แคชรวบรวมข้อมูลที่ถูกลบ</string>
     <string name="size_unknown">ไม่ทราบขนาด</string>
-    <string name="all_transfers_will_stop_are_you_sure">การถ่ายโอนทั้งหมดจะหยุด\nคุณแน่ใจไหม?</string>
     <string name="unshare_selected_files">ยกเลิกการแชร์ไฟล์ที่เลือก</string>
     <string name="are_you_sure_you_want_to_download_the_following">คุณแน่ใจหรือไม่ว่าคุณต้องการดาวน์โหลดต่อไปนี้ %1$s (%2$s)?</string>
     <string name="resume_torrent_menu_action">ประวัติย่อ</string>
     <string name="downloading_from_desktop">การดาวน์โหลดไฟล์จากเดสก์ทอป</string>
-    <string name="next_time">ครั้งหน้า</string>
     <string name="name">ชื่อ</string>
     <string name="player_paused_press_and_hold_to_stop">ผู้เล่นหยุดชั่วคราว (เคล็ดลับ: กดค้างไว้จะหยุด)</string>
     <string name="are_you_sure_delete_files">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะลบไฟล์ที่เลือกจากอุปกรณ์ของคุณหรือไม่</string>
-    <string name="search_for_type_files">ค้นหา %s ไฟล์</string>
     <string name="menu_delete_shortcut_label">ลบ</string>
     <string name="magnet_url_added">URL แม่เหล็กเพิ่มให้กับการถ่ายโอน (แม่เหล็กทำงานได้ดีที่สุดบน Wi-Fi)</string>
     <string name="share_finished_downloads_summary">การดาวน์โหลดเสร็จสิ้นจะสามารถใช้ได้กับผู้ใช้งาน FrostWire อื่น ๆ บนเครือข่าย Wi-Fi ของคุณ</string>
@@ -218,7 +206,6 @@
     <string name="delete_file_menu_action">ลบ</string>
     <string name="not_connected">ไม่เชื่อมต่อ</string>
     <string name="clear_complete">สมบูรณ์ชัดเจน</string>
-    <string name="done">เสร็จสิ้น</string>
     <string name="media_type_documents">หนังสือ/เอกสาร</string>
     <string name="open">เปิด</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">ตามการตั้งค่าของคุณฉันไม่สามารถเริ่มต้นการเพาะถ้าคุณเป็น Wi-Fi ไฟล์ที่จะพร้อมสำหรับการเพาะโดยอัตโนมัติเมื่อคุณได้รับกลับไปอินเทอร์เน็ตเปิดการใช้งานเครือข่าย Wi-Fi</string>
@@ -242,12 +229,10 @@
     <string name="now_playing">กำลังเล่น</string>
     <string name="use_soundcloud">ใช้ Soundcloud.com</string>
     <string name="desktop_transfer_status_complete">สมบูรณ์</string>
-    <string name="copy">สำเนา</string>
     <string name="updating">อัปเดต</string>
     <string name="help_translate_frostwire">ช่วยแปล FrostWire</string>
     <string name="tell_others_subject">มี FrostWire สำหรับ Android ยัง?</string>
     <string name="files_shared_by">ไฟล์ที่ใช้ร่วมกันโดย</string>
-    <string name="clear_messages">ข้อความที่ชัดเจน</string>
     <string name="best_value">ค่าที่ดีที่สุด</string>
     <string name="transfers_context_menu_clear_finished">ล้างโอนเสร็จแล้วทั้งหมด</string>
     <string name="files">ไฟล์</string>
@@ -260,11 +245,9 @@
     <string name="you_need_a_bitcoin_wallet_app">คุณจำเป็นต้องมีกระเป๋าสตางค์ Bitcoin ติดตั้งบนอุปกรณ์ของคุณจะส่งเงินบริจาค BTC</string>
     <string name="transfers_select_all">ทั้งหมด</string>
     <string name="desktop_transfer_status_cancelled">ยกเลิก</string>
-    <string name="use_icons_to_browse">ใช้ไอคอนเพื่อเรียกดูไฟล์</string>
     <string name="seeds_n">เมล็ด: %s</string>
     <string name="peer_http_download_status_error">ความผิดพลาด</string>
     <string name="media_type_audio">เสียง</string>
-    <string name="no_wifi_want_to_fix_it_question">คุณไม่ได้เชื่อมต่อกับเครือข่าย WiFi\n\nคุณจะทำอย่างไรต้องการเชื่อมต่อ?</string>
     <string name="internal_port">พอร์ตภายใน</string>
     <string name="thirty_days">30 วัน</string>
     <string name="peer_http_upload_status_error">ความผิดพลาด</string>
@@ -278,7 +261,6 @@
     <string name="pausing">การหยุดชั่วคราว</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">วิธีการอื่น ๆ เห็นคุณบนเครือข่ายท้องถิ่น (Wi-Fi)</string>
     <string name="yes_no_cancel_transfer_question">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะหยุดและเอาดาวน์โหลดนี้ออกจากรายการ (ไม่มีข้อมูลที่จะถูกลบ)?</string>
-    <string name="activity_about_droidwire_description">FrostWire สำหรับ Android</string>
     <string name="dialog_new_transfer_check_text">แสดงครั้งต่อไปนี้</string>
     <string name="azureus_manager_not_created">ดาวน์โหลดไม่สามารถสร้างขึ้นด้วยการ์ด SD ติด</string>
     <string name="peers">เพื่อนร่วมงาน</string>
@@ -310,8 +292,6 @@
     <string name="uh_still_listening_on_port">เอ่อ? ฉันยังคงฟังพอร์ต</string>
     <string name="storage_path">เส้นทางการจัดเก็บ</string>
     <string name="settings">การตั้งค่า</string>
-    <string name="audio_music">เสียง/เพลง</string>
-    <string name="remove">เอาออก</string>
     <string name="azureus_manager_item_superseeding">Super-เมล็ด</string>
     <string name="file_is_already_downloading">ไฟล์ที่มีอยู่แล้วการดาวน์โหลด</string>
     <string name="release">ปล่อย</string>
@@ -319,7 +299,6 @@
     <string name="finishing">จบ</string>
     <string name="set_as_wallpaper">ตั้งเป็นภาพพื้นหลัง</string>
     <string name="available">ใช้ได้</string>
-    <string name="leaving_already">ออกจากแล้วหรือยัง?</string>
     <string name="are_you_sure_wifi_sharing_off">การปิดการใช้งานร่วมกัน Wi-Fi จะทำให้ไฟล์ทั้งหมดของคุณที่ใช้ร่วมกันในประเทศไม่สามารถใช้ได้กับผู้ใช้งานอื่น ๆ บนเครือข่ายไร้สายในบริเวณใกล้เคียง</string>
     <string name="check_internet_connection">ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="azureus_manager_item_stopped">หยุด</string>
@@ -341,7 +320,6 @@
     <string name="donate">บริจาค</string>
     <string name="torrent_transfer_consuming_mobile_data">คำเตือน: การถ่ายโอนฝนตกหนักนี้กำลังใช้ข้อมูล 3G/4G ของคุณ (ตรวจสอบการตั้งค่าเครือข่ายของคุณถ้าคุณต้องการที่จะใช้ BitTorrent เฉพาะบน WiFi)</string>
     <string name="search_preferences">ตั้งค่าการค้นหา</string>
-    <string name="activity_debug_name">การแก้ปัญหา</string>
     <string name="multicast_discovery">multicast การค้นพบ</string>
     <string name="downloading_promotion">ดาวน์โหลด %s</string>
     <string name="search_settings_description">ค้นหา torrents</string>
@@ -375,7 +353,6 @@
     <string name="wanna_download_question">ต้องการที่จะดาวน์โหลด?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">คำเตือน: ไฟล์ทั้งหมดที่บันทึกไว้โดย FrostWire ลงบนการ์ด SD จะถูกลบโดย Android ไม่ FrostWire ถ้าคุณถอนการติดตั้งแอพพลิเค</string>
-    <string name="not_sharing_files">ไม่ได้มีการแชร์ไฟล์ใด ๆ</string>
     <string name="sd_permission_no_accessible_path">เส้นทางที่คุณเลือกไว้ใน SD ไม่สามารถเข้าถึงได้อีกต่อไป กดปุ่ม OK เพื่อเลือกอีกครั้ง</string>
     <string name="cancel_menu_action">หยุดการถ่ายโอน</string>
     <string name="torrent_fetcher_download_status_error">ความผิดพลาด</string>
@@ -407,14 +384,12 @@
     <string name="select_all">เลือกทั้งหมด</string>
     <string name="external_port">พอร์ตภายนอก</string>
     <string name="clear_search_cache_summary">รายการแคชล้างการค้นหา</string>
-    <string name="document">เอกสาร</string>
     <string name="cheaper_than_drinks">ราคาถูกกว่าเครื่องดื่ม</string>
     <string name="restarting">การเริ่มต้นใหม่…</string>
     <string name="delete_file_menu_action_count">ลบ (%s)</string>
     <string name="file_descriptor_sd_mounted">ไฟล์นี้ถูกลบออกจากการ์ด SD หรือการ์ด SD ที่คุณใส่อยู่ที่แตกต่างกันอย่างใดอย่างหนึ่ง</string>
     <string name="downloads">ดาวน์โหลด</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">ดาวน์โหลดฝนตกหนัก</string>
-    <string name="settings_description">ตั้งค่าการค้นหา</string>
     <string name="advertisement">การโฆษณา</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">เลือกไฟล์ที่คุณต้องการดาวน์โหลดจากฝนตกหนักนี้</string>
     <string name="minimize_frostwire">ลด FrostWire</string>
@@ -424,10 +399,8 @@
     <string name="seeding_settings_explanation">ผู้ใช้ BitTorrent บนอินเทอร์เน็ตจะสามารถดาวน์โหลดไฟล์ชิ้นของข้อมูลเมล็ด torrents ของคุณ</string>
     <string name="torrent_transfer_aborted_on_mobile_data">การถ่ายโอนฝนตกหนักจะไม่เริ่มต้นจนกว่าคุณจะเชื่อมต่อกับเครือข่าย Wi-Fi. (ตรวจสอบการตั้งค่าเครือข่ายของคุณเกี่ยวกับข้อมูลการใช้งาน 3G/4G)</string>
     <string name="azureus_discarded">ทิ้ง</string>
-    <string name="searching_for">ค้นหา</string>
     <string name="distraction_free_search_results">สิ่งที่ทำให้ไขว้เขวฟรีค้นหา (เบต้า)</string>
     <string name="automatic_renewal">การต่ออายุโดยอัตโนมัติ</string>
-    <string name="activity_uploads_name">การอัปโหลดที่ใช้งานอยู่</string>
     <string name="model">แบบ</string>
     <string name="audio">เสียง</string>
     <string name="search_hint">การค้นหาเนื้อหา</string>
@@ -438,9 +411,7 @@
     <string name="azureus_manager_item_stopping">การหยุด</string>
     <string name="cheaper_than_lattes">ราคาถูกกว่าลาเต้</string>
     <string name="hints_by_google">คำแนะนำโดย Google</string>
-    <string name="ringtone">เสียงเรียกเข้า</string>
     <string name="vpn_off_toast_notification">เชื่อมต่อของคุณอาจจะไม่เป็นส่วนตัว</string>
-    <string name="activity_chat_name">พูดคุย</string>
     <string name="help_translate_or_proofread_frostwire">ช่วยแปลหรือพิสูจน์อักษร FrostWire</string>
     <string name="loading">กำลังโหลด</string>
     <string name="downloading_metadata">เมตาดาต้าดาวน์โหลด</string>
@@ -470,7 +441,6 @@
     <string name="back">กลับ</string>
     <string name="searchable_activity_label">กิจกรรมที่สามารถค้นหาได้</string>
     <string name="media_preview">%s ภาพตัวอย่าง</string>
-    <string name="home">บ้าน</string>
     <string name="view_transfer_item_list_item_icon">ไอคอนสำหรับชนิดแฟ้ม</string>
     <string name="media_type_all_types">ทุกประเภท</string>
     <string name="menu_enter_shortcut_label">เข้าสู่</string>
@@ -478,7 +448,6 @@
     <string name="azureus_manager_item_paused">หยุดชั่วคราว</string>
     <string name="track">ชิ้น</string>
     <string name="exit">ทางออก</string>
-    <string name="wifi_network_changed_restarting_services">เครือข่ายไร้สายที่มีการเปลี่ยนแปลง เริ่มต้นบริการใหม่</string>
     <string name="send_tip_donation">ส่งเงินบริจาค</string>
     <string name="dialog_desktop_upload_request_title">ขออัปโหลด</string>
     <string name="type_to_filter_results">พิมพ์เพื่อกรองผลการค้นหา</string>
@@ -486,7 +455,6 @@
     <string name="view_transfer_list_item_icon_description">ไอคอนประเภทไฟล์</string>
     <string name="enable_experimental">คุณลักษณะทดลอง</string>
     <string name="file_descriptor_sd_unmounted">ไฟล์นี้เป็นการ์ด SD โปรดใส่บนอุปกรณ์ของคุณ</string>
-    <string name="download_selected_files">ดาวน์โหลดที่เลือก</string>
     <string name="manufacturer">ผู้ผลิต</string>
     <string name="donate_in_btc">บริจาคใน Bitcoins</string>
     <string name="about">เกี่ยวกับ</string>
@@ -510,7 +478,6 @@
     <string name="tos_accept">ยอมรับ</string>
     <string name="support">สนับสนุน</string>
     <string name="seeding_has_been_turned_off">เมล็ดถูกปิด</string>
-    <string name="try_changing_your_nickname">ใส่ชื่อเล่นของคุณ</string>
     <string name="peer_http_download_status_cancelled">ยกเลิก</string>
     <string name="dialog_new_transfer_title">เริ่มดาวน์โหลดนี้หรือไม่?</string>
     <string name="transfers_context_menu_copy_magnet">คัดลอกแม่เหล็ก</string>
@@ -535,7 +502,6 @@
     <string name="internet_discovery">การสำรวจอินเทอร์เน็ต</string>
     <string name="send_my_geo_location">ส่งตำแหน่งทางภูมิศาสตร์ของฉัน</string>
     <string name="anonymous_usage_statistics">สถิติการใช้งานที่ไม่ระบุชื่อ</string>
-    <string name="reconnecting">เชื่อมต่อใหม่</string>
     <string name="view_transfer_list_item_button_action_description">การกระทำ</string>
     <string name="delete">ลบ</string>
     <string name="saving_to_sd_card">บันทึกไปยังการ์ด SD</string>
@@ -553,7 +519,6 @@
     <string name="media_player_failed">เครื่องเล่นสื่อล้มเหลว</string>
     <string name="six_months">6 เดือน</string>
     <string name="are_you_sure">คุณแน่ใจไหม?</string>
-    <string name="application">ใบสมัคร</string>
     <string name="update_title">อัพเดทเวลา!</string>
     <string name="peer_http_download_status_downloading">ดาวน์โหลด</string>
     <string name="picture">ภาพ</string>
@@ -565,9 +530,7 @@
     <string name="ringtone_set">ตั้งเสียงเรียกเข้า</string>
     <string name="transfers">บริการรถรับส่ง</string>
     <string name="keep_the_project_alive">ให้โครงการยังมีชีวิตอยู่</string>
-    <string name="show_love">รัก FrostWire?</string>
     <string name="remove_ads">ลบโฆษณา</string>
-    <string name="your_connection_has_dropped_stopping_services">การเชื่อมต่อไร้สายของคุณได้ลดลง หยุดให้บริการ</string>
     <string name="use_tpb_summary">TPB เป็นแม่เหล็กที่ใช้งานได้เฉพาะใน WiFi</string>
     <string name="cloud_download_aborted_on_mobile_data">การตั้งค่าปัจจุบันจะช่วยป้องกันการดาวน์โหลดเมื่อไม่ได้อยู่บนเครือข่ายไร้สาย</string>
     <string name="sharing_privacy_settings">ร่วมกันและความเป็นส่วนตัว</string>

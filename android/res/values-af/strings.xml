@@ -41,7 +41,6 @@
     <string name="all_free_downloads">Alle gratis downloads</string>
     <string name="include">Insluit</string>
     <string name="torrent_max_download_speed">Maksimale aflaai spoed</string>
-    <string name="go_to">Gaan na</string>
     <string name="activity_uploads_title_text">Oplaaie</string>
     <string name="torrent_max_peers">Max Peers</string>
     <string name="request_again">Versoek weer</string>
@@ -74,8 +73,6 @@
     <string name="seed_stop">Stop saai</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
     <string name="tos_title">Gebruiksvoorwaardes</string>
-    <string name="activity_downloads_name">Aktiewe aflaaie</string>
-    <string name="wait">Wag</string>
     <string name="summary_files_shared">Plaas %s lêers plaaslik</string>
     <string name="search">Soek</string>
     <string name="bittorrent_off">BitTorrent af</string>
@@ -105,7 +102,6 @@
     <string name="frostwire_sticker_and_more">FrostWire plakkers en nog baie meer</string>
     <string name="show_transfers_on_download_start">Wys oordragte op aflaai begin</string>
     <string name="send_feedback">Stuur terugvoering</string>
-    <string name="chat_actions">Kletsaktiwiteite</string>
     <string name="tos_refuse">Weier</string>
     <string name="touch_applied_tags_to_include_exclude">Raak toegepaste etikette om in te sluit / uit te sluit</string>
     <string name="torrent_max_total_connections">Maks Totale verbindings</string>
@@ -113,7 +109,6 @@
     <string name="use_torrentdownloads">Gebruik TorrentDownloads</string>
     <string name="ten_dollars">$10</string>
     <string name="my_files">My lêers</string>
-    <string name="no_network_connection">Geen netwerkverbinding nie</string>
     <string name="and_choose_what_filetypes_to_share">Gaan na watter tipe lêers jy wil aktiveer om op die FrostWire-netwerk en nabygeleë Wi-Fi-geaktiveerde desktops te deel.</string>
     <string name="delete_n_torrents_indexed">Verwyder %d torrents geïndekseer</string>
     <string name="vpn_money_back_PIA">7-dag geld-terug waarborg</string>
@@ -135,14 +130,11 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Die lêer kon nie geplant word nie. BitTorrent sal ontkoppel bly.</string>
     <string name="seed_all_finished">Saad Alles Voltooi</string>
     <string name="exclude">Uitsluit</string>
-    <string name="toggle_sharing_selected_files">Toggle Sharing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android sal afgelaaide lêers uitvee as FrostWire verwyder word.</string>
     <string name="wifi_sharing">Wi-Fi-deel</string>
     <string name="search_preferences_one_engine_checked_always">By verstek moet een soekenjin te alle tye nagegaan word</string>
-    <string name="please_connect">Koppel asseblief om hierdie funksie te gebruik</string>
     <string name="transfers_context_menu_stop_delete_data">Stop en verwyder data</string>
     <string name="protected_connection">VPN-beskerm</string>
-    <string name="clear_finished">Helder klaar</string>
     <string name="use_zooqle">Gebruik Zooqle.com</string>
     <string name="use_eztv">Gebruik Eztv</string>
     <string name="media_type_torrents">Torrents</string>
@@ -170,7 +162,6 @@
     <string name="or_enter_url">of voer URL in</string>
     <string name="azureus_manager_item_initializing">Inisialiseer</string>
     <string name="documents">Dokumente</string>
-    <string name="fetching_file_list">Haal lys van gedeelde</string>
     <string name="toast_on_connect">BitTorrent kern begin.</string>
     <string name="help">Hulp</string>
     <string name="disabled">gestremde</string>
@@ -190,16 +181,13 @@
     <string name="other_settings">Ander instellings</string>
     <string name="deleted_crawl_cache">Crawl Cache verwyder</string>
     <string name="size_unknown">grootte onbekend</string>
-    <string name="all_transfers_will_stop_are_you_sure">Alle oordragte sal ophou.\nIs jy seker?</string>
     <string name="unshare_selected_files">Unshare geselekteerde lêers</string>
     <string name="are_you_sure_you_want_to_download_the_following">Is jy seker dat jy die volgende wil aflaai %1$s (%2$s)?</string>
     <string name="resume_torrent_menu_action">Begin weer</string>
     <string name="downloading_from_desktop">Laai lêers van die lessenaar af</string>
-    <string name="next_time">Volgende Tyd</string>
     <string name="name">Naam</string>
     <string name="player_paused_press_and_hold_to_stop">Speler pouseer. (Wenk: druk en hou om te stop)</string>
     <string name="are_you_sure_delete_files">Is jy seker jy wil die geselekteerde lêers PERMANENTE van jou toestel verwyder?</string>
-    <string name="search_for_type_files">Soek vir %s lêers</string>
     <string name="menu_delete_shortcut_label">Del</string>
     <string name="magnet_url_added">Magneet URL bygevoeg aan oordragte. (Magnete werk die beste op Wi-Fi)</string>
     <string name="would_you_like_to_seed_your_finished_torrent_transfers">Wil jy jou voltooide torrent-oordragte saad?</string>
@@ -253,7 +241,6 @@
     <string name="delete_file_menu_action">Verwyder</string>
     <string name="not_connected">Nie gekonnekteer nie</string>
     <string name="clear_complete">Duidelik Voltooi</string>
-    <string name="done">Gedaan</string>
     <string name="media_type_documents">Boeke/Dokumente</string>
     <string name="open">Oop</string>
     <string name="according_to_settings_i_cant_seed_unless_wifi">Volgens jou instellings kan ek nie saai nie, tensy jy op Wi-Fi is. Die lêer sal gereed wees om outomaties te saai wanneer u terugkom na \'n internet-geaktiveerde Wi-Fi-netwerk.</string>
@@ -278,13 +265,11 @@
     <string name="now_playing">Speel nou</string>
     <string name="use_soundcloud">Gebruik Soundcloud.com</string>
     <string name="desktop_transfer_status_complete">Volledige</string>
-    <string name="copy">Kopie</string>
     <string name="updating">Opdatering</string>
     <string name="help_translate_frostwire">Help om FrostWire te vertaal</string>
     <string name="tell_others_subject">Het jy FrostWire vir Android nog?</string>
     <string name="files_shared_by">lêers gedeel deur</string>
     <string name="file_extensions">Lêeruitbreidings</string>
-    <string name="clear_messages">Vee boodskappe uit</string>
     <string name="best_value">Beste waarde</string>
     <string name="transfers_context_menu_clear_finished">Maak al die voltooide oordragte skoon</string>
     <string name="files">lêers</string>
@@ -299,11 +284,9 @@
     <string name="you_need_a_bitcoin_wallet_app">Jy benodig \'n Bitcoin-beursie op jou toestel om \'n BTC-skenking in te dien.</string>
     <string name="transfers_select_all">alle</string>
     <string name="desktop_transfer_status_cancelled">Gekanselleer</string>
-    <string name="use_icons_to_browse">Gebruik die ikone om lêers te blaai.</string>
     <string name="seeds_n">Sade: %s</string>
     <string name="peer_http_download_status_error">Fout</string>
     <string name="media_type_audio">Audio</string>
-    <string name="no_wifi_want_to_fix_it_question">Jy is nie aan \'n Wifi-netwerk gekoppel nie.\n\nHoe wil jy koppel?</string>
     <string name="internal_port">Interne Port</string>
     <string name="thirty_days">30 dae</string>
     <string name="peer_http_upload_status_error">Fout</string>
@@ -318,7 +301,6 @@
     <string name="pausing">Pousering</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">Hoe ander mense jou op die plaaslike netwerk (Wi-Fi) sien</string>
     <string name="yes_no_cancel_transfer_question">Is jy seker jy wil stop en verwyder hierdie aflaai van die lys (geen data sal uitgevee word nie)?</string>
-    <string name="activity_about_droidwire_description">FrostWire vir Android</string>
     <string name="dialog_new_transfer_check_text">Wys hierdie volgende keer</string>
     <string name="azureus_manager_not_created">Aflaai kan nie geskep word met SD-kaart gemonteer nie</string>
     <string name="peers">Peers</string>
@@ -356,8 +338,6 @@
     <string name="settings">Instellings</string>
     <string name="enable_seeding">Aktiveer saai</string>
     <string name="data_saving_turn_off_transfers">Geen Wi-Fi beskikbaar nie, alle oordragte is gestop</string>
-    <string name="audio_music">Audio/Musiek</string>
-    <string name="remove">Verwyder</string>
     <string name="azureus_manager_item_superseeding">Super-Seeding</string>
     <string name="file_is_already_downloading">Lêer word alreeds afgelaai</string>
     <string name="use_pixabay">Gebruik Pixabay</string>
@@ -366,7 +346,6 @@
     <string name="finishing">Afwerking</string>
     <string name="set_as_wallpaper">Stel as plakpapier</string>
     <string name="available">beskikbaar</string>
-    <string name="leaving_already">Alreeds verlaat?</string>
     <string name="get_ExpressVPN">Kry ExpressVPN</string>
     <string name="are_you_sure_wifi_sharing_off">As jy Wi-Fi-gedeeltes afskakel, sal al jou lokaal gedeelde lêers nie beskikbaar wees vir ander gebruikers op die nabygeleë Wi-Fi-netwerk nie.</string>
     <string name="check_internet_connection">Kontroleer internet konneksie</string>
@@ -391,7 +370,6 @@
     <string name="donate">Skenk</string>
     <string name="torrent_transfer_consuming_mobile_data">Waarskuwing: Hierdie torrent-oordrag gebruik jou 3G/4G-data. (Gaan jou netwerkinstellings na as jy slegs BitTorrent wil gebruik op WiFi)</string>
     <string name="search_preferences">Soekvoorkeure</string>
-    <string name="activity_debug_name">Debug</string>
     <string name="multicast_discovery">Multicast Discovery</string>
     <string name="downloading_promotion">Aflaai %s</string>
     <string name="search_settings_description">Soek vir Torrents</string>
@@ -428,7 +406,6 @@
     <string name="wanna_download_question">Wil jy aflaai?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">WAARSKUWING: Alle lêers wat deur FrostWire gestoor is op die SD-kaart sal uitgevee word deur ANDROID, nie FrostWire nie, as jy die program verwyder.</string>
-    <string name="not_sharing_files">deel nie enige lêers nie.</string>
     <string name="vpn_client_feature_3_PIA">Vaste infrastruktuur: wêreldwye dekking</string>
     <string name="cancel_menu_action">Stop Oordrag</string>
     <string name="torrent_fetcher_download_status_error">Fout</string>
@@ -460,14 +437,12 @@
     <string name="select_all">Kies Alles</string>
     <string name="external_port">Eksterne poort</string>
     <string name="clear_search_cache_summary">Vee soekkasinskrywings uit</string>
-    <string name="document">Dokument</string>
     <string name="cheaper_than_drinks">Goedkoper as Drank</string>
     <string name="delete_file_menu_action_count">Verwyder (%s)</string>
     <string name="deselect_all">Deselecteer alles</string>
     <string name="file_descriptor_sd_mounted">Hierdie lêer is van die SD-kaart verwyder, of die SD-kaart wat jy ingevoeg het, is \'n ander een.</string>
     <string name="downloads">Downloads</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Aflaai torrent</string>
-    <string name="settings_description">Soekinstellings</string>
     <string name="add_transfer">Voeg oordrag by</string>
     <string name="advertisement">Advertensie</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">Kies die lêers wat jy wil aflaai van hierdie torrent</string>
@@ -478,12 +453,10 @@
     <string name="cancel_delete_menu_action">Stop en verwyder data</string>
     <string name="torrent_transfer_aborted_on_mobile_data">Torrent-oordragte sal nie begin voordat jy aan \'n Wi-Fi-netwerk koppel nie. (Gaan jou netwerk instellings rakende 3G/4G data gebruik)</string>
     <string name="azureus_discarded">weggegooi</string>
-    <string name="searching_for">Soek vir</string>
     <string name="distraction_free_search_results">Afleiding Vrye Soek (Beta)</string>
     <string name="your_android_wall_paper_will_change">Jou Android-agtergrond sal oor \'n paar sekondes verander</string>
     <string name="automatic_renewal">Outomatiese Hernuwing</string>
     <string name="sources_channels">Bronne / Kanale</string>
-    <string name="activity_uploads_name">Aktiewe oplaaie</string>
     <string name="model">Model</string>
     <string name="audio">Audio</string>
     <string name="search_hint">Soek inhoud</string>
@@ -494,11 +467,9 @@
     <string name="azureus_manager_item_stopping">Stopping</string>
     <string name="cheaper_than_lattes">Goedkoper as Lattes</string>
     <string name="hints_by_google">Wenke deur Google</string>
-    <string name="ringtone">Ringtone</string>
     <string name="vpn_off_toast_notification">Jou verbinding is dalk nie privaat nie.</string>
     <string name="delete_started_torrents">Verwyder .torrent lêers</string>
     <string name="search_header">Soek</string>
-    <string name="activity_chat_name">Chat</string>
     <string name="help_translate_or_proofread_frostwire">Help om FrostWire te vertaal of te proeflees</string>
     <string name="loading">Laai</string>
     <string name="downloading_metadata">Laai van metadata</string>
@@ -534,7 +505,6 @@
     <string name="searchable_activity_label">Soekbare Aktiwiteit</string>
     <string name="visit_vpn_client_ExpressVPN">Besoek ExpressVPN</string>
     <string name="media_preview">%s voorskou</string>
-    <string name="home">Huis</string>
     <string name="view_transfer_item_list_item_icon">Ikoon vir lêertipe</string>
     <string name="clear_all">Maak alles skoon</string>
     <string name="media_type_all_types">Alle tipes</string>
@@ -543,7 +513,6 @@
     <string name="azureus_manager_item_paused">Onderbreek</string>
     <string name="track">spoor</string>
     <string name="exit">Uitgang</string>
-    <string name="wifi_network_changed_restarting_services">Die Wi-Fi-netwerk is verander. Dienste herlaai.</string>
     <string name="vpn_client_feature_2_PIA">Eintlik maklik om te gebruik (ons wil maklik!)</string>
     <string name="send_tip_donation">Stuur donasie</string>
     <string name="unprotected_connection">onbeskermde</string>
@@ -551,7 +520,6 @@
     <string name="view_transfer_list_item_icon_description">Lêertipe ikoon</string>
     <string name="enable_experimental">Eksperimentele kenmerke</string>
     <string name="file_descriptor_sd_unmounted">Hierdie lêer behoort aan \'n SD-kaart, plaas dit asseblief op u toestel.</string>
-    <string name="download_selected_files">Laai geselekteerde af</string>
     <string name="manufacturer">Vervaardiger</string>
     <string name="donate_in_btc">Skenk in bitcoins</string>
     <string name="about">Oor</string>
@@ -576,7 +544,6 @@
     <string name="tos_accept">Aanvaar</string>
     <string name="support">Ondersteuning</string>
     <string name="seeding_has_been_turned_off">Saai is afgeskakel</string>
-    <string name="try_changing_your_nickname">Voer jou bynaam in</string>
     <string name="peer_http_download_status_cancelled">Gekanselleer</string>
     <string name="dialog_new_transfer_title">Begin hierdie aflaai?</string>
     <string name="transfers_context_menu_copy_magnet">Kopieer Magneet</string>
@@ -603,7 +570,6 @@
     <string name="internet_discovery">Internet Discovery</string>
     <string name="send_my_geo_location">Stuur my Geo-ligging</string>
     <string name="anonymous_usage_statistics">Anonieme Gebruikstatistiek</string>
-    <string name="reconnecting">Heraansluiting</string>
     <string name="view_transfer_list_item_button_action_description">Aksie</string>
     <string name="delete">Skrap</string>
     <string name="saving_to_sd_card">Stoor na SD kaart.</string>
@@ -623,7 +589,6 @@
     <string name="six_months">6 maande</string>
     <string name="are_you_sure">Is jy seker?</string>
     <string name="vpn_client_feature_1_ExpressVPN">Militêre-enkripsie</string>
-    <string name="application">Aansoek</string>
     <string name="update_title">Dateer tyd!</string>
     <string name="error_connection_timed_out">Fout: verbinding uitgestel/laat val. Probeer weer.</string>
     <string name="peer_http_download_status_downloading">Aflaai</string>
@@ -639,9 +604,7 @@
     <string name="vpn_client_PIA">Private Internet Access</string>
     <string name="file_information">Lêer inligting</string>
     <string name="keep_the_project_alive">Hou die projek in die lewe</string>
-    <string name="show_love">Love FrostWire?</string>
     <string name="remove_ads">Verwyder advertensies</string>
-    <string name="your_connection_has_dropped_stopping_services">Jou Wifi-verbinding het gedaal. Stopdienste.</string>
     <string name="use_tpb_summary">TPB is magneet gebaseer, werk net op Wifi</string>
     <string name="could_not_open_transfer_detail_invalid_infohash">Kon nie Oordragbesonderhede, ongeldige InfoHash oopmaak nie</string>
     <string name="invalid_tracker_url">Ongeldige Tracker-URL</string>

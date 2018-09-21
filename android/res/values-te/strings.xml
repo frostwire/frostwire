@@ -38,7 +38,6 @@
     <string name="all_free_downloads">అన్ని ఉచిత డౌన్లోడ్లు</string>
     <string name="include">చేర్చండి</string>
     <string name="torrent_max_download_speed">మాక్స్ డౌన్లోడ్ వేగం</string>
-    <string name="go_to">వెళ్ళండి</string>
     <string name="uploaded">అప్లోడ్</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>తెలిసి ఉండాలి:</b> వర్తింపజేసిన ట్యాగ్లను తాకండి]]></string>
     <string name="activity_uploads_title_text">అప్లోడ్లు</string>
@@ -75,8 +74,6 @@
     <string name="seed_stop">నాట్లు వేయండి</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
     <string name="tos_title">ఉపయోగ నిబంధనలు</string>
-    <string name="activity_downloads_name">యాక్టివ్ డౌన్లోడ్లు</string>
-    <string name="wait">వేచి</string>
     <string name="summary_files_shared">స్థానికంగా %s ఫైళ్ళను పంచుకోవడం</string>
     <string name="search">శోధన</string>
     <string name="bittorrent_off">బిట్ టోర్రెంట్ ఆఫ్</string>
@@ -108,7 +105,6 @@
     <string name="frostwire_sticker_and_more">FrostWire స్టిక్కర్లు మరియు మరిన్ని</string>
     <string name="show_transfers_on_download_start">డౌన్ లోడ్ ప్రారంభంలో బదిలీలు చూపించు</string>
     <string name="send_feedback">అభిప్రాయాన్ని పంపండి</string>
-    <string name="chat_actions">చాట్ చర్యలు</string>
     <string name="tos_refuse">తిరస్కరించు</string>
     <string name="touch_applied_tags_to_include_exclude">చేర్చండి/మినహాయించాలని అనువర్తిత ట్యాగ్లను తాకండి</string>
     <string name="torrent_max_total_connections">గరిష్ట మొత్తం కనెక్షన్లు</string>
@@ -117,7 +113,6 @@
     <string name="ten_dollars">$10</string>
     <string name="my_files">నా ఫైళ్ళు</string>
     <string name="pieces">పీసెస్</string>
-    <string name="no_network_connection">నెట్వర్క్ కనెక్షన్ లేదు</string>
     <string name="and_choose_what_filetypes_to_share">మీరు FrostWire మొబైల్ నెట్వర్క్ భాగస్వామ్య మరియు సమీపంలోని Wifi ఎనేబుల్ డెస్క్టాప్లు కోసం ఎనేబుల్ చేయాలనుకుంటున్నా ఫైళ్ల రకాల తనిఖీ.</string>
     <string name="delete_n_torrents_indexed">తొలగించిన %d టోరెంట్లను తొలగించారు</string>
     <string name="vpn_money_back_PIA">7 రోజుల డబ్బు తిరిగి హామీ</string>
@@ -140,13 +135,10 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ఫైల్ సీడ్ చేయబడలేదు. BitTorrent డిస్కనెక్ట్ చేయబడి ఉంటుంది.</string>
     <string name="seed_all_finished">సీడ్ అన్నీ పూర్తయ్యాయి</string>
     <string name="exclude">మినహాయించాలని</string>
-    <string name="toggle_sharing_selected_files">టోగుల్ భాగస్వామ్యం</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">ఫ్రోస్ట్వైర్ అన్ఇన్స్టాల్ చేయబడి ఉంటే Android డౌన్లోడ్ చేయబడిన ఫైళ్లను తుడిచివేస్తుంది.</string>
     <string name="wifi_sharing">Wi-Fi భాగస్వామ్యం</string>
     <string name="search_preferences_one_engine_checked_always">అప్రమేయంగా, ఒక శోధన ఇంజిన్ ఎప్పుడైనా తనిఖీ చేయాలి</string>
-    <string name="please_connect">దయచేసి ఈ లక్షణాన్ని ఉపయోగించడానికి కనెక్ట్ చేయండి</string>
     <string name="protected_connection">VPN రక్షిత</string>
-    <string name="clear_finished">క్లియర్ పూర్తయింది</string>
     <string name="use_zooqle">Zooqle.com ఉపయోగించండి</string>
     <string name="use_eztv">Eztv ఉపయోగించండి</string>
     <string name="media_type_torrents">Torrents</string>
@@ -175,7 +167,6 @@
     <string name="or_enter_url">లేదా URL ను నమోదు చేయండి</string>
     <string name="azureus_manager_item_initializing">ప్రారంభమవుతోంది</string>
     <string name="documents">పత్రాలు</string>
-    <string name="fetching_file_list">భాగస్వామ్య జాబితాను పొందుతోంది</string>
     <string name="toast_on_connect">బిటొరెంట్ కోర్ ప్రారంభమైంది.</string>
     <string name="help">సహాయం</string>
     <string name="enter_valid_tracker_url_here">ఇక్కడ చెల్లుబాటు అయ్యే ట్రాకర్ url ను నమోదు చేయండి</string>
@@ -197,17 +188,14 @@
     <string name="other_settings">ఇతర సెట్టింగులు</string>
     <string name="deleted_crawl_cache">తొలగించిన క్రాల్ కాష్</string>
     <string name="size_unknown">పరిమాణం తెలియదు</string>
-    <string name="all_transfers_will_stop_are_you_sure">అన్ని బదిలీలు ఆగిపోతాయి.\nమీరు చెప్పేది నిజమా?</string>
     <string name="unshare_selected_files">ఎంచుకున్న ఫైల్లను భాగస్వామ్యం చేయవద్దు</string>
     <string name="are_you_sure_you_want_to_download_the_following">మీరు ఖచ్చితంగా దిగువ డౌన్ లోడ్ చేయాలనుకుంటున్నారా %1$s (%2$s)?</string>
     <string name="resume_torrent_menu_action">పునఃప్రారంభం</string>
     <string name="downloading_from_desktop">డెస్క్టాప్ నుండి ఫైళ్లను డౌన్లోడ్ చేయడం</string>
-    <string name="next_time">మరల ఇంకెప్పుడైనా</string>
     <string name="name">పేరు</string>
     <string name="player_paused_press_and_hold_to_stop">ప్లేయర్ పాజ్ చేయబడింది. (చిట్కా: ఆపడానికి నొక్కండి మరియు పట్టుకోండి)</string>
     <string name="edit">మార్చు</string>
     <string name="are_you_sure_delete_files">మీరు ఖచ్చితంగా మీ పరికరంలో ఎంచుకున్న ఫైల్లను పూర్తిగా తొలగించాలనుకుంటున్నారా?</string>
-    <string name="search_for_type_files">%s ఫైళ్ళ కోసం శోధించండి</string>
     <string name="menu_delete_shortcut_label">తొలగించు</string>
     <string name="active_time">సక్రియ సమయం</string>
     <string name="magnet_url_added">మాగ్నెట్ URL బదిలీలకు జోడించబడింది. (Wi-Fi లో అయస్కాంతాలను ఉత్తమంగా పని చేస్తాయి)</string>
@@ -268,7 +256,6 @@
     <string name="delete_file_menu_action">తొలగించు</string>
     <string name="not_connected">కనెక్ట్ కాలేదు</string>
     <string name="clear_complete">క్లియర్ పూర్తయింది</string>
-    <string name="done">పూర్తి</string>
     <string name="media_type_documents">పుస్తకాలు/పత్రాలు</string>
     <string name="download_limit">డౌన్లోడ్ పరిమితి</string>
     <string name="open">ఓపెన్</string>
@@ -294,14 +281,12 @@
     <string name="now_playing">ఇప్పుడు ఆడుతున్నారు</string>
     <string name="use_soundcloud">Soundcloud.com ఉపయోగించండి</string>
     <string name="desktop_transfer_status_complete">పూర్తి</string>
-    <string name="copy">కాపీ</string>
     <string name="updating">నవీకరిస్తోంది</string>
     <string name="seeding_on">నాటడం</string>
     <string name="help_translate_frostwire">ఫ్రోస్ట్వైర్ని అనువదించడానికి సహాయం చెయ్యండి</string>
     <string name="tell_others_subject">ఇంకా Android కోసం గాట్ ఫ్రోస్ట్వైర్ ఉన్నాయా?</string>
     <string name="files_shared_by">భాగస్వామ్యం చేసిన ఫైల్లు</string>
     <string name="file_extensions">ఫైల్ పొడిగింపులు</string>
-    <string name="clear_messages">సందేశాలను క్లియర్ చేయండి</string>
     <string name="edit_tracker">ట్రాక్ను సవరించండి</string>
     <string name="best_value">ఉత్తమ విలువ</string>
     <string name="transfers_context_menu_clear_finished">పూర్తి చేసిన బదిలీలను క్లియర్ చేయండి</string>
@@ -317,12 +302,10 @@
     <string name="you_need_a_bitcoin_wallet_app">BTC విరాళం సమర్పించడానికి మీ పరికరంలో Bitcoin వాలెట్ ఇన్స్టాల్ చేయబడాలి.</string>
     <string name="transfers_select_all">అన్ని</string>
     <string name="desktop_transfer_status_cancelled">రద్దు</string>
-    <string name="use_icons_to_browse">ఫైళ్ళను బ్రౌజ్ చేయడానికి చిహ్నాలను ఉపయోగించండి.</string>
     <string name="seeds_n">విత్తనాలు: %s</string>
     <string name="peer_http_download_status_error">లోపం</string>
     <string name="media_type_audio">ఆడియో</string>
     <string name="down_speed">డౌన్లోడ్ వేగం</string>
-    <string name="no_wifi_want_to_fix_it_question">మీరు Wi-Fi నెట్వర్క్కు కనెక్ట్ చేయబడరు.\n\nమీరు ఎలా కనెక్ట్ చేయాలనుకుంటున్నారు?</string>
     <string name="internal_port">అంతర్గత నౌకాశ్రయం</string>
     <string name="thirty_days">30 రోజులు</string>
     <string name="peer_http_upload_status_error">లోపం</string>
@@ -339,7 +322,6 @@
     <string name="pausing">విరామం చేసే</string>
     <string name="how_others_see_you_on_the_local_network_wifi_">ఇతరులు మిమ్మల్ని స్థానిక నెట్వర్క్లో (Wi-Fi) ఎలా చూస్తారు</string>
     <string name="yes_no_cancel_transfer_question">మీరు జాబితా నుండి ఈ డౌన్లోడ్ను ఖచ్చితంగా నిలిపివేయాలని మరియు తీసివేయాలనుకుంటున్నారా (డేటా తొలగించబడదు)?</string>
-    <string name="activity_about_droidwire_description">Android కోసం FrostWire</string>
     <string name="downloaded">డౌన్ లోడ్ చేయబడిన</string>
     <string name="dialog_new_transfer_check_text">ఈ తదుపరిసారి చూపించు</string>
     <string name="azureus_manager_not_created">SD కార్డ్ మౌంట్తో డౌన్లోడ్ చేయబడదు</string>
@@ -380,8 +362,6 @@
     <string name="settings">సెట్టింగులు</string>
     <string name="enable_seeding">నాటడం ప్రారంభించు</string>
     <string name="data_saving_turn_off_transfers">Wi-fi అందుబాటులో లేదు, అన్ని బదిలీలు నిలిపివేయబడ్డాయి</string>
-    <string name="audio_music">ఆడియో / సంగీతం</string>
-    <string name="remove">తొలగించు</string>
     <string name="azureus_manager_item_superseeding">సూపర్-నాట్లు</string>
     <string name="file_is_already_downloading">ఫైల్ ఇప్పటికే డౌన్లోడ్ చేస్తోంది</string>
     <string name="use_pixabay">Pixabay ఉపయోగించండి</string>
@@ -390,7 +370,6 @@
     <string name="finishing">పూర్తి</string>
     <string name="set_as_wallpaper">వాల్పేపర్గా సెట్ చేయండి</string>
     <string name="available">అందుబాటులో</string>
-    <string name="leaving_already">ఇప్పటికే వదలిపెట్టాలా?</string>
     <string name="get_ExpressVPN">ExpressVPN పొందండి</string>
     <string name="are_you_sure_wifi_sharing_off">Wi-Fi భాగస్వామ్యాన్ని ఆపివేయడం వలన సమీపంలోని Wi-Fi నెట్వర్క్లోని ఇతర వినియోగదారులకు మీ అన్ని స్థానికంగా భాగస్వామ్యం చేయని ఫైల్లు అందుబాటులో ఉండవు.</string>
     <string name="check_internet_connection">ఇంటర్నెట్ కనెక్షన్ను తనిఖీ చేయండి</string>
@@ -416,7 +395,6 @@
     <string name="donate">దానం</string>
     <string name="torrent_transfer_consuming_mobile_data">హెచ్చరిక: ఈ torrent బదిలీ మీ 3G / 4G డేటాను ఉపయోగిస్తుంది. (మీరు WiFi లో మాత్రమే బిట్ టొరెంట్ను ఉపయోగించాలనుకుంటే మీ నెట్వర్క్ సెట్టింగ్లను తనిఖీ చేయండి)</string>
     <string name="search_preferences">శోధన ప్రాధాన్యతలు</string>
-    <string name="activity_debug_name">డీబగ్</string>
     <string name="multicast_discovery">మల్టీకాస్ట్ డిస్కవరీ</string>
     <string name="downloading_promotion">డౌన్లోడ్ చేస్తోంది %s</string>
     <string name="search_settings_description">టోరెంట్స్ కోసం శోధించండి</string>
@@ -456,7 +434,6 @@
     <string name="wanna_download_question">డౌన్లోడ్ చేయాలనుకుంటున్నారా?</string>
     <string name="twenty_five_dollars">$25</string>
     <string name="storage_setting_warning">హెచ్చరిక: మీరు అన్ఇన్స్టాల్ చేసినట్లయితే, SD కార్డుపై FrostWire ద్వారా సేవ్ చేసిన అన్ని ఫైల్లు ANDROID నుండి తొలగించబడతాయి, ఫ్రోస్ట్వైర్ కాదు.</string>
-    <string name="not_sharing_files">ఏ ఫైళ్ళను భాగస్వామ్యం లేదు.</string>
     <string name="vpn_client_feature_3_PIA">ఘన మౌలిక సదుపాయాలు: ప్రపంచవ్యాప్తంగా కవరేజ్</string>
     <string name="cancel_menu_action">బదిలీని ఆపివేయి</string>
     <string name="torrent_fetcher_download_status_error">లోపం</string>
@@ -489,14 +466,12 @@
     <string name="select_all">అన్ని ఎంచుకోండి</string>
     <string name="external_port">బాహ్య పోర్ట్</string>
     <string name="clear_search_cache_summary">శోధన కాష్ నమోదులను క్లియర్ చేయండి</string>
-    <string name="document">డాక్యుమెంట్</string>
     <string name="cheaper_than_drinks">పానీయాలు కంటే చీ</string>
     <string name="delete_file_menu_action_count">తొలగించు (%s)</string>
     <string name="deselect_all">అన్ని ఎంపికలను తీసివేయండి</string>
     <string name="file_descriptor_sd_mounted">SD కార్డ్ నుండి ఈ ఫైల్ తొలగించబడింది లేదా మీరు చేర్చిన SD కార్డు వేరొకది.</string>
     <string name="downloads">డౌన్ లోడ్</string>
     <string name="torrent_fetcher_download_status_downloading_torrent">Torrent డౌన్లోడ్</string>
-    <string name="settings_description">శోధన సెట్టింగులు</string>
     <string name="add_transfer">బదిలీని జోడించండి</string>
     <string name="advertisement">ప్రకటన</string>
     <string name="pick_the_files_you_want_to_download_from_this_torrent">మీరు ఈ టొరెంట్ నుండి డౌన్లోడ్ చేయదలిచిన ఫైళ్ళను ఎంచుకోండి</string>
@@ -507,12 +482,10 @@
     <string name="cancel_delete_menu_action">ఆపు మరియు డేటా తొలగించు</string>
     <string name="torrent_transfer_aborted_on_mobile_data">మీరు Wi-Fi నెట్వర్క్కు కనెక్ట్ చేసే వరకు టోరెంట్ బదిలీలు ప్రారంభం కావు. (3G/4G డేటా వినియోగానికి సంబంధించి మీ నెట్వర్క్ సెట్టింగ్లను తనిఖీ చేయండి)</string>
     <string name="azureus_discarded">విస్మరించిన</string>
-    <string name="searching_for">కొరకు వెతుకుట</string>
     <string name="distraction_free_search_results">డిస్ట్రాక్షన్ ఫ్రీ సెర్చ్ (బీటా)</string>
     <string name="your_android_wall_paper_will_change">మీ Android వాల్పేపర్ కొద్ది సెకన్లలో మారుతుంది</string>
     <string name="automatic_renewal">స్వయంచాలక పునరుద్ధరణ</string>
     <string name="sources_channels">సోర్సెస్ / ఛానెల్లు</string>
-    <string name="activity_uploads_name">యాక్టివ్ అప్లోడ్లు</string>
     <string name="remove_tracker">ట్రాకర్ను తీసివేయండి</string>
     <string name="model">మోడల్</string>
     <string name="audio">ఆడియో</string>
@@ -526,11 +499,9 @@
     <string name="azureus_manager_item_stopping">ఆపటం</string>
     <string name="cheaper_than_lattes">లేటీస్ కంటే చీటి</string>
     <string name="hints_by_google">Google ద్వారా సూచనలు</string>
-    <string name="ringtone">రింగ్టోన్</string>
     <string name="vpn_off_toast_notification">మీ కనెక్షన్ ప్రైవేట్ కాకపోవచ్చు.</string>
     <string name="delete_started_torrents">.torrent ఫైళ్లను తొలగించండి</string>
     <string name="search_header">శోధన</string>
-    <string name="activity_chat_name">చాట్</string>
     <string name="help_translate_or_proofread_frostwire">అనువదించడానికి లేదా సరిచూసుకున్నారు FrostWire సహాయం</string>
     <string name="loading">లోడ్</string>
     <string name="downloading_metadata">మెటాడేటాను డౌన్లోడ్ చేస్తోంది</string>
@@ -568,7 +539,6 @@
     <string name="searchable_activity_label">శోధించదగిన కార్యాచరణ</string>
     <string name="visit_vpn_client_ExpressVPN">ఎక్స్ప్రెస్ VPN సందర్శించండి</string>
     <string name="media_preview">%s ప్రివ్యూ</string>
-    <string name="home">హోమ్</string>
     <string name="view_transfer_item_list_item_icon">ఫైల్ రకం కోసం ఐకాన్</string>
     <string name="clear_all">అన్నింటినీ క్లియర్ చేయండి</string>
     <string name="media_type_all_types">అన్ని రకాలు</string>
@@ -578,7 +548,6 @@
     <string name="azureus_manager_item_paused">పాజ్</string>
     <string name="track">ట్రాక్</string>
     <string name="exit">నిష్క్రమించు</string>
-    <string name="wifi_network_changed_restarting_services">Wi-Fi నెట్వర్క్ మార్చబడింది. పునఃప్రారంభ సేవలు.</string>
     <string name="vpn_client_feature_2_PIA">నిజంగా సులభం (మేము సులభం ఇష్టం!)</string>
     <string name="send_tip_donation">విరాళం పంపండి</string>
     <string name="unprotected_connection">అసురక్షిత</string>
@@ -587,7 +556,6 @@
     <string name="view_transfer_list_item_icon_description">ఫైల్ రకం చిహ్నం</string>
     <string name="enable_experimental">ప్రయోగాత్మక లక్షణాలు</string>
     <string name="file_descriptor_sd_unmounted">ఈ ఫైల్ SD కార్డుకు చెందినది, దయచేసి మీ పరికరంలో దాన్ని చొప్పించండి.</string>
-    <string name="download_selected_files">ఎంచుకున్న డౌన్లోడ్</string>
     <string name="manufacturer">తయారీదారు</string>
     <string name="donate_in_btc">Bitcoins లో దానం</string>
     <string name="about">గురించి</string>
@@ -612,7 +580,6 @@
     <string name="tos_accept">అంగీకరించు</string>
     <string name="support">మద్దతు</string>
     <string name="seeding_has_been_turned_off">నాటడం నిలిపివేయబడింది</string>
-    <string name="try_changing_your_nickname">మీ మారుపేరును నమోదు చేయండి</string>
     <string name="uploaded_n">అప్లోడ్ %1$s</string>
     <string name="peer_http_download_status_cancelled">రద్దు</string>
     <string name="dialog_new_transfer_title">ఈ డౌన్లోడ్ ప్రారంభించాలా?</string>
@@ -642,7 +609,6 @@
     <string name="internet_discovery">ఇంటర్నెట్ డిస్కవరీ</string>
     <string name="send_my_geo_location">నా జియో-స్థానం పంపండి</string>
     <string name="anonymous_usage_statistics">అజ్ఞాత వాడుక గణాంకాలు</string>
-    <string name="reconnecting">మళ్లీ కనెక్ట్</string>
     <string name="view_transfer_list_item_button_action_description">యాక్షన్</string>
     <string name="delete">తొలగించు</string>
     <string name="vpn_find_out_more">మరింత తెలుసుకోవడానికి</string>
@@ -664,7 +630,6 @@
     <string name="six_months">6 నెలల</string>
     <string name="are_you_sure">మీరు చెప్పేది నిజమా?</string>
     <string name="vpn_client_feature_1_ExpressVPN">సైనిక-స్థాయి గుప్తీకరణ</string>
-    <string name="application">అప్లికేషన్</string>
     <string name="details">వివరాలు</string>
     <string name="update_title">సమయం అప్డేట్!</string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ మీరు VPN ని ఉపయోగించి ఇంటర్నెట్కి కనెక్ట్ అయ్యారు. <br><br> మీరు ఇప్పటికే లేకపోతే, మీ కనెక్షన్ను గుప్తీకరించడానికి క్రింద ఉన్న సేవల్లో ఒకదాన్ని ఉపయోగించాలని మేము సిఫార్సు చేస్తున్నాము <b>మీ గోప్యతను కాపాడుకోండి</b>. ]]></string>
@@ -684,9 +649,7 @@
     <string name="file_information">ఫైల్ సమాచారం</string>
     <string name="keep_the_project_alive">ప్రాజెక్ట్ అలైవ్ ఉంచండి</string>
     <string name="add_tracker">ట్రాకర్ని జోడించండి</string>
-    <string name="show_love">FrostWire లవ్?</string>
     <string name="remove_ads">ప్రకటనలు తొలగించండి</string>
-    <string name="your_connection_has_dropped_stopping_services">మీ Wi-Fi కనెక్షన్ తగ్గింది. సేవలను ఆపడం.</string>
     <string name="use_tpb_summary">TPB అనేది అయస్కాంత ఆధారితది, Wi-Fi లో పనిచేస్తుంది</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ఉచిత 7 రోజుల ట్రయల్</string>
     <string name="play_store_out_of_sync">Play Store సమకాలీకరించాల్సిన అవసరం ఉంది, కొన్ని నిమిషాలు వేచి ఉండండి</string>
