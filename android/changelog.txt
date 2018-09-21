@@ -4,6 +4,7 @@ FrostWire 2.0.9 build 564 - SEP/20/2018
  - Bug fix where a "Saving to Internal Memory" rich notification would linger after picking an SD Card location
  - Translations updated: Chinese, Hebrew
  - Library updates: applovin 8.1.2, presage-moat-3.0.26-3.0.14
+ - Unused resources and translations cleanup, over 1Mb size reduction in .apk installer
  - Optimizations and fixes
 
 FrostWire 2.0.8 build 562 - SEP/08/2018

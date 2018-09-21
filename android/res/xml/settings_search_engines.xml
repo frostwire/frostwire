@@ -20,7 +20,7 @@
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.preference_category.select_all"
-        android:title="@string/select_deselect_all"
+        android:title="@string/select_all"
         android:layout="@layout/view_preference_search_select_all" />
     <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"

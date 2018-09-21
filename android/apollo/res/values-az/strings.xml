@@ -22,11 +22,9 @@
   <string name="page_albums">Albomlar</string>
   <string name="page_songs">Mahnılar</string>
   <string name="page_genres">Janrlar</string>
-  <string name="menu_settings">Tənzimləmələr</string>
   <string name="menu_search">Axtar</string>
   <string name="menu_shuffle">Hamısını qarışdır</string>
-  <string name="menu_shop">Tema satın al</string>
-  <string name="menu_share">Paylaş</string>
+    <string name="menu_share">Paylaş</string>
   <string name="menu_equalizer">Ekvalayzer</string>
   <string name="menu_simple">Sadə</string>
   <string name="menu_view_as">Görünüşü</string>
@@ -48,34 +46,11 @@
   <string name="cancel">İmtina</string>
   <string name="overwrite">Üzərinə yaz</string>
   <string name="delete_dialog_title"><xliff:g id="item" example="album">%s</xliff:g> silinsin?</string>
-  <string name="new_photo">Qalereyadan fotoşəkil seç</string>
-  <string name="google_search">Google-da axtar</string>
-  <string name="old_photo">Köhnə fotoşəkildən istifadə et</string>
-  <string name="context_menu_rename_playlist">Yenidən adlandır</string>
+    <string name="context_menu_rename_playlist">Yenidən adlandır</string>
   <string name="context_menu_delete">Sil</string>
   <string name="accessibility_next">Sonrakı</string>
   <string name="accessibility_prev">Əvvəlki</string>
-  <string name="theme_set"><xliff:g id="name">%s</xliff:g> tema olaraq tənzimləndi</string>
-  <string name="settings_storage_category">Yaddaş</string>
-  <string name="settings_data_category">Məlumat</string>
-  <string name="settings_about_category">Haqqında</string>
-  <string name="settings_author_title">Müəllif</string>
-  <string name="settings_about_apollo">Apollo Haqqında</string>
-  <string name="settings_special_thanks">Xüsusi təşəkkürlər</string>
-  <string name="settings_theme_chooser_title">Tema seçən</string>
-  <string name="settings_delete_cache_title">Önyaddaşı sil</string>
-  <string name="settings_download_only_on_wifi_title">Yalnız Wi-Fi ilə endir</string>
-  <string name="settings_download_missing_artwork_title">Əskik albom şəklini endir</string>
-  <string name="settings_download_artist_images_title">Əskik müğənni şəklini endir</string>
-  <string name="settings_open_source_licenses">Açıq mənbə lisenziyaları</string>
-  <string name="settings_version_title">Versiya nömrəsi</string>
-  <string name="share_track_using">Mahnını paylaş:</string>
-  <string name="color_picker_title">Rəng sxemi</string>
-  <string name="current_color">Hazırki</string>
-  <string name="new_color">Yeni</string>
-  <string name="app_widget_large_alt">Apollo: 4×2 (alternativ)</string>
-  <string name="app_widget_recent">Apollo: ən son dinlənilən</string>
-  <string name="no_effects_for_you">Ekvalayzer açıla bilmədi.</string>
+    <string name="share_track_using">Mahnını paylaş:</string>
+    <string name="no_effects_for_you">Ekvalayzer açıla bilmədi.</string>
   <string name="empty_music">Kompüterinizdən cihazınıza musiqi kopyalamaq üçün USB kabelindən istifadə edin.</string>
-  <string name="empty_favorite">Seçilmiş olaraq işarələdiyiniz mahnılar burada göstəriləcəkdir.</string>
 </resources>

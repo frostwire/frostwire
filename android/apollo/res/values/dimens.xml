@@ -22,9 +22,6 @@
     <dimen name="text_size_medium">16.0sp</dimen>
     <dimen name="text_size_large">18.0sp</dimen>
     <dimen name="text_size_x_large">20.0sp</dimen>
-    <dimen name="text_size_xx_large">24.0sp</dimen>
-    <dimen name="text_size_xxx_large">28.0sp</dimen>
-    <dimen name="text_size_dayum">36.0sp</dimen>
 
     <!-- List and grid view padding -->
     <dimen name="list_preferred_item_padding">0dp</dimen>
@@ -47,11 +44,8 @@
 
     <!-- Bottom Action Bar -->
     <dimen name="bottom_action_bar_height">48.0dp</dimen>
-    <dimen name="bottom_action_bar_item_width">56.0dp</dimen>
     <dimen name="bottom_action_bar_item_padding_left">12.0dp</dimen>
     <dimen name="bottom_action_bar_item_padding_right">12.0dp</dimen>
-    <dimen name="bottom_action_bar_album_art_width">30.0dp</dimen>
-    <dimen name="bottom_action_bar_album_art_height">30.0dp</dimen>
     <dimen name="bottom_action_bar_info_padding_left">5.0dp</dimen>
     <dimen name="bottom_action_bar_button_container_width">165.0dp</dimen>
 
@@ -94,7 +88,6 @@
     <dimen name="audio_player_controls_main_button_height">58.0dp</dimen>
 
     <!-- Shadow height -->
-    <dimen name="shadow_height">0dp</dimen>
 
     <!-- Colorstrip -->
     <dimen name="colorstrip_height">0.0dp</dimen>
@@ -103,6 +96,5 @@
     <dimen name="drag_and_drop_handle">26.0dp</dimen>
 
     <!-- Color scheme dialog -->
-    <dimen name="color_scheme_dialog_row_padding">8.0dp</dimen>
 
 </resources>
