@@ -110,7 +110,6 @@
     <string name="send_file_using">Trimitere fișier utilizând</string>
     <string name="yes_no_cancel_delete_transfer_question">Sunteți sigur că doriți să anulați această descărcare (date descărcate până acum vor fi șterse)?</string>
     <string name="activity_VPN">Conexiune</string>
-    <string name="use_youtube">Utilizați YouTube.com</string>
     <string name="torrent_max_uploads">Maxima încărcările</string>
     <string name="show_new_transfer_dialog">Afișați noul dialog de transfer</string>
     <string name="peer_http_upload_status_uploading">Se încarcă</string>

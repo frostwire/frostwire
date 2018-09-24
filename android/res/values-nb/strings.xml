@@ -114,7 +114,6 @@
     <string name="send_file_using">Send filen ved hjelp</string>
     <string name="yes_no_cancel_delete_transfer_question">Er du sikker på at du vil avbryte denne nedlastingen (nedlastet data så langt vil bli slettet)?</string>
     <string name="activity_VPN">Forbindelse</string>
-    <string name="use_youtube">Bruk YouTube.com</string>
     <string name="torrent_max_uploads">Maksimum Uploads</string>
     <string name="show_new_transfer_dialog">Vis nye dialog overføring</string>
     <string name="search_torrent_settings">Søk/Torrent Innstillinger</string>

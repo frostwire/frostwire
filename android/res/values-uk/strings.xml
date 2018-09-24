@@ -112,7 +112,6 @@
     <string name="send_file_using">Відправити файл за допомогою</string>
     <string name="yes_no_cancel_delete_transfer_question">Ви впевнені, що хочете скасувати завантаження (завантажені дані досі будуть видалені)?</string>
     <string name="activity_VPN">З\'єднання</string>
-    <string name="use_youtube">користування YouTube.com</string>
     <string name="torrent_max_uploads">Максимальна кількість Uploads</string>
     <string name="show_new_transfer_dialog">Показати діалог нової передачі</string>
     <string name="peer_http_upload_status_uploading">Uploading</string>

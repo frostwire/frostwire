@@ -116,7 +116,6 @@
     <string name="send_file_using">Skicka fil med</string>
     <string name="yes_no_cancel_delete_transfer_question">Är du säker på att du vill avbryta denna film (hämtade data så långt kommer att raderas)?</string>
     <string name="activity_VPN">Förbindelse</string>
-    <string name="use_youtube">Använda YouTube.com</string>
     <string name="torrent_max_uploads">Max uppladdningar</string>
     <string name="show_new_transfer_dialog">Visa ny dialog överföring</string>
     <string name="search_torrent_settings">Sök/Torrent Inställningar</string>

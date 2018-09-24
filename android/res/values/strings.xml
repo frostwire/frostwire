@@ -185,7 +185,6 @@
     <string name="loading">Loading</string>
     <string name="stop">Stop</string>
     <string name="my_filetype">My %s</string>
-    <string name="use_youtube">Use YouTube.com</string>
     <string name="use_soundcloud">Use Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Download not supported</string>
     <string name="retry_search">Retry</string>

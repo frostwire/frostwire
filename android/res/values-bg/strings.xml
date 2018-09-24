@@ -113,7 +113,6 @@
     <string name="send_file_using">Изпращане на файл с помощта на</string>
     <string name="yes_no_cancel_delete_transfer_question">Сигурни ли сте че искате да откажете този файл за изтегляне (изтеглени данни до момента, ще бъдат изтрити)?</string>
     <string name="activity_VPN">Връзка</string>
-    <string name="use_youtube">Използвайте YouTube.com</string>
     <string name="torrent_max_uploads">Максимални Качени</string>
     <string name="show_new_transfer_dialog">Покажи нов диалогов трансфер</string>
     <string name="peer_http_upload_status_uploading">Качва се</string>

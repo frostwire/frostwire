@@ -137,7 +137,6 @@
     <string name="or_enter_url">ili unesite URL</string>
     <string name="http_download_status_uncompressing">Dekompresiram</string>
     <string name="yes_no_cancel_delete_transfer_question">Jeste li sigurni da želite odbaciti ovo preuzimanje (preuzete datoteke će biti izbrisane)?</string>
-    <string name="use_youtube">Koristi YouTube.com</string>
     <string name="torrent_max_uploads">Maksimalni broj slanja</string>
     <string name="show_new_transfer_dialog">Pokaži dijalog novog prijenosa</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">Pauziraj/zaustavi sve prijenose</string>

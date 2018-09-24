@@ -113,7 +113,6 @@
     <string name="send_file_using">Hantar fail menggunakan</string>
     <string name="yes_no_cancel_delete_transfer_question">Adakah anda pasti anda mahu membatalkan muat turun ini (data yang dimuat turun setakat ini akan dipadamkan)?</string>
     <string name="activity_VPN">Sambungan</string>
-    <string name="use_youtube">Gunakan YouTube.com</string>
     <string name="torrent_max_uploads">Maksimum Tambahan</string>
     <string name="show_new_transfer_dialog">Memaparkan dialog pemindahan baru</string>
     <string name="peer_http_upload_status_uploading">Memuat naik</string>

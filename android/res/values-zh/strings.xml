@@ -161,7 +161,6 @@
     <string name="magnet_url_added">Magnet（磁力）鏈接已添加到傳輸。（磁力在 Wi-Fi 效果最好）</string>
     <string name="or_enter_url">或輸入 URL 鏈接</string>
     <string name="http_download_status_uncompressing">解壓縮</string>
-    <string name="use_youtube">使用 YouTube.com</string>
     <string name="transfers_select_completed">完成</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">暫停/停止全部傳輸</string>
     <string name="transfers_select_downloading">下載中</string>

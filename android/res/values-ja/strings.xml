@@ -148,7 +148,6 @@
     <string name="loading">ロード中</string>
     <string name="stop">中断</string>
     <string name="my_filetype">マイ %s</string>
-    <string name="use_youtube">YouTube.comを使用する</string>
     <string name="use_soundcloud">Soundcloud.comを使用する</string>
     <string name="torrent_scheme_download_not_supported">ダウンロードはサポートされていません</string>
     <string name="retry_search">リトライ</string>

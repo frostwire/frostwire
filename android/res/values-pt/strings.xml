@@ -139,7 +139,6 @@
     <string name="loading">"Carregando"</string>
     <string name="stop">"Parar"</string>
     <string name="my_filetype">Meu %s</string>
-    <string name="use_youtube">"Usar YouTube.com"</string>
     <string name="use_soundcloud">"Usar Soundcloud.com"</string>
     <string name="torrent_scheme_download_not_supported">"O download não é suportado"</string>
     <string name="retry_search">"Tentar novamente"</string>

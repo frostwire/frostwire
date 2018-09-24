@@ -143,7 +143,6 @@
     <string name="loading">Φόρτωση</string>
     <string name="stop">Σταμάτημα</string>
     <string name="my_filetype">Ο %s μου</string>
-    <string name="use_youtube">Χρήση YouTube.com</string>
     <string name="use_soundcloud">Χρήση Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Το κατέβασμα δεν υποστηρίζεται</string>
     <string name="retry_search">Επανάληψη</string>

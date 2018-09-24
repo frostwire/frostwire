@@ -132,7 +132,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Is jy seker jy wil hierdie aflaai kanselleer (afgelaaide data tot dusver sal uitgevee word)?</string>
     <string name="activity_VPN">Verband</string>
     <string name="cannot_start_engine_without_vpn">BitTorrent sal nie begin nie, tensy \'n Skynprivaatnetwerk beskikbaar is. (Gaan jou instellings na</string>
-    <string name="use_youtube">Gebruik YouTube.com</string>
     <string name="torrent_max_uploads">Maksimum oplaaisels</string>
     <string name="show_new_transfer_dialog">Wys Nuwe Oordrag dialoog</string>
     <string name="search_torrent_settings">Soek/Torrent instellings</string>

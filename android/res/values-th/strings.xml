@@ -113,7 +113,6 @@
     <string name="send_file_using">ส่งไฟล์โดยใช้</string>
     <string name="yes_no_cancel_delete_transfer_question">คุณแน่ใจหรือไม่ว่าคุณต้องการที่จะยกเลิกการดาวน์โหลดนี้ (ข้อมูลที่ดาวน์โหลดเพื่อให้ห่างไกลจะถูกลบ)?</string>
     <string name="activity_VPN">สัมพันธ์</string>
-    <string name="use_youtube">ใช้ YouTube.com</string>
     <string name="torrent_max_uploads">แม็กซ์อัปโหลด</string>
     <string name="show_new_transfer_dialog">แสดงโต้ตอบการถ่ายโอน</string>
     <string name="peer_http_upload_status_uploading">อัปโหลด</string>

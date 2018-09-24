@@ -142,7 +142,6 @@
     <string name="loading">Загрузка</string>
     <string name="stop">Остановить</string>
     <string name="my_filetype">Мои %s</string>
-    <string name="use_youtube">Использовать YouTube</string>
     <string name="use_soundcloud">Использовать SoundCloud</string>
     <string name="torrent_scheme_download_not_supported">Загрузка не поддерживается</string>
     <string name="retry_search">Повторить поиск</string>

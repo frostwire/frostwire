@@ -139,7 +139,6 @@
     <string name="loading">Yükleniyor</string>
     <string name="stop">Dur</string>
     <string name="my_filetype">Bana ait %s</string>
-    <string name="use_youtube">YouTube.com\'u kullanın</string>
     <string name="use_soundcloud">Soundcloud.com\'u kullanın</string>
     <string name="torrent_scheme_download_not_supported">İndirme desteklenmiyor</string>
     <string name="retry_search">Tekrar Deneyin</string>

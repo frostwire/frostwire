@@ -185,7 +185,6 @@
     <string name="http_download_status_uncompressing">압축 해제</string>
     <string name="one_time_purchase">1 회 구매</string>
     <string name="activity_VPN">연결</string>
-    <string name="use_youtube">YouTube.com사용</string>
     <string name="one_year">일년</string>
     <string name="transfers_select_completed">완료된</string>
     <string name="transfers_context_menu_pause_stop_all_transfers">모든 전송 일시 중지 / 중지</string>

@@ -114,7 +114,6 @@
     <string name="send_file_using">Lähetä tiedosto</string>
     <string name="yes_no_cancel_delete_transfer_question">Oletko varma, että haluat peruuttaa tämän latauksen (ladatut tiedot toistaiseksi poistetaan)?</string>
     <string name="activity_VPN">Liitäntä</string>
-    <string name="use_youtube">Käytä YouTube.com</string>
     <string name="torrent_max_uploads">Enimmäismäärä Lähetysten</string>
     <string name="show_new_transfer_dialog">Näytä uudet siirto dialogi</string>
     <string name="search_torrent_settings">Haku/Torrent Asetukset</string>

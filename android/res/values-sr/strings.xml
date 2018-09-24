@@ -157,7 +157,6 @@
     <string name="loading">утовар</string>
     <string name="stop">стоп</string>
     <string name="my_filetype">Moja %s</string>
-    <string name="use_youtube">Користе YouTube.com</string>
     <string name="use_soundcloud">Користе Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Довнлоад није подржан</string>
     <string name="retry_search">Покушајте поново</string>

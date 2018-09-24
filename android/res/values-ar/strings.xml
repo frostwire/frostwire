@@ -139,7 +139,6 @@
     <string name="loading">جاري العرض</string>
     <string name="stop">ايقاف</string>
     <string name="my_filetype">الخاصة بي %s</string>
-    <string name="use_youtube"> YouTube.com استخدم</string>
     <string name="use_soundcloud">Soundcloud.com استخدم</string>
     <string name="torrent_scheme_download_not_supported">هذا التنزيل غير مدعوم</string>
     <string name="retry_search">إعادة المحاولة</string>

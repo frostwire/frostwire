@@ -141,7 +141,6 @@
     <string name="loading">Ładuję…</string>
     <string name="stop">Zatrzymaj</string>
     <string name="my_filetype">Moje %s</string>
-    <string name="use_youtube">Używaj YouTube.com</string>
     <string name="use_soundcloud">Używaj Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Pobranie nie jest wspomagane</string>
     <string name="retry_search">Ponów</string>

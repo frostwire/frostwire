@@ -112,7 +112,6 @@
     <string name="send_file_using">Küldj fájlt</string>
     <string name="yes_no_cancel_delete_transfer_question">Biztosan törölni szeretné ezt a letöltést (letöltött adatok eddig törlődik)?</string>
     <string name="activity_VPN">Kapcsolat</string>
-    <string name="use_youtube">Használja YouTube.com</string>
     <string name="torrent_max_uploads">Max feltöltések</string>
     <string name="show_new_transfer_dialog">Itt található az új átviteli ablakban</string>
     <string name="peer_http_upload_status_uploading">Feltöltés</string>

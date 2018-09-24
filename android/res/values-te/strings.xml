@@ -143,7 +143,6 @@
     <string name="cannot_start_engine_without_vpn">VPN అందుబాటులో ఉండకపోతే BitTorrent ప్రారంభించబడదు. (మీ సెట్టింగులను పరిశీలించండి)</string>
     <string name="speed_limits">వేగ పరిమితులు</string>
     <string name="created_on">సృష్టించబడింది</string>
-    <string name="use_youtube">YouTube.com ఉపయోగించండి</string>
     <string name="torrent_max_uploads">మాక్స్ అప్లోడ్లు</string>
     <string name="show_new_transfer_dialog">క్రొత్త బదిలీ డైలాగ్ను చూపు</string>
     <string name="search_torrent_settings">శోధన / టొరెంట్ సెట్టింగులు</string>

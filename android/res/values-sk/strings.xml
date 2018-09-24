@@ -113,7 +113,6 @@
     <string name="send_file_using">Odoslať súbor pomocou</string>
     <string name="yes_no_cancel_delete_transfer_question">Ste si istí, že chcete zrušiť túto stiahnutie (stiahnuté dáta tak ďaleko budú vymazané)?</string>
     <string name="activity_VPN">Spojenie</string>
-    <string name="use_youtube">Použiť YouTube.com</string>
     <string name="torrent_max_uploads">Max Nahrávanie</string>
     <string name="show_new_transfer_dialog">Zobraziť nový dialóg prenosu</string>
     <string name="peer_http_upload_status_uploading">Nahrávanie</string>

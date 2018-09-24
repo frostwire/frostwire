@@ -146,7 +146,6 @@
     <string name="cannot_start_engine_without_vpn">व्हीपीएन उपलब्ध असल्याशिवाय बिटटॉरंट प्रारंभ होणार नाही. (आपली सेटिंग्ज तपासा)</string>
     <string name="speed_limits">गती मर्यादा</string>
     <string name="created_on">रोजी तयार केले</string>
-    <string name="use_youtube">YouTube.com वापरा</string>
     <string name="torrent_max_uploads">कमाल अपलोड</string>
     <string name="show_new_transfer_dialog">नवीन स्थानांतरन संवाद दर्शवा</string>
     <string name="search_torrent_settings">शोधा/टॉरेंट सेटिंग्ज</string>

@@ -142,7 +142,6 @@
     <string name="loading">Chargement</string>
     <string name="stop">Arrêter</string>
     <string name="my_filetype">Mon %s</string>
-    <string name="use_youtube">Utilisez YouTube.com</string>
     <string name="use_soundcloud">Utilisez Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Ce type de téléchargement n\'est pas pris en charge</string>
     <string name="retry_search">Réessayez</string>
