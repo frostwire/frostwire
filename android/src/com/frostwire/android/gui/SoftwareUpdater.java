@@ -449,9 +449,6 @@ public final class SoftwareUpdater {
 
             // Even if we're offline, we need to disable these for the Google Play Distro.
             if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                SearchEngine ytSE = SearchEngine.YOUTUBE;
-                ytSE.setActive(false);
-
                 SearchEngine scSE = SearchEngine.SOUNCLOUD;
                 scSE.setActive(false);
 

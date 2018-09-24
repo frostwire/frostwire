@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,8 @@ import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.settings.PlayerSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 
@@ -120,13 +118,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
             if (mediaType != null) {
                 boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
                 if (isVideo) {
-                    boolean videoPreviewInBrowser = !PlayerSettings.USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS.getValue() && sr instanceof YouTubeCrawledStreamableSearchResult;
-                    
-                    if (videoPreviewInBrowser) {
-                        GUIMediator.instance().launchYouTubePreviewInBrowser(((YouTubeCrawledStreamableSearchResult) sr));
-                    } else {
-                        GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
-                    }
+                    GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
                 } else {
                     GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
                 }

@@ -28,7 +28,6 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.StringUtils;
 
 import java.text.Normalizer;
@@ -192,12 +191,7 @@ public final class LocalSearchEngine {
         try {
             for (SearchResult sr : results) {
                 if (sr instanceof CrawledSearchResult) {
-                    if (sr instanceof YouTubeCrawledSearchResult) {
-                        // special case for flv files
-                        if (!((YouTubeCrawledSearchResult) sr).getFilename().endsWith(".flv")) {
-                            list.add(sr);
-                        }
-                    } else if (filter(new LinkedList<>(currentSearchTokens), sr)) {
+                    if (filter(new LinkedList<>(currentSearchTokens), sr)) {
                         list.add(sr);
                     }
                 } else {

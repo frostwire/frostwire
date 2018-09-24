@@ -37,12 +37,10 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
-import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -196,8 +194,6 @@ public final class TransferManager {
             transfer = newBittorrentDownload((TorrentSearchResult) sr);
         } else if (sr instanceof HttpSlideSearchResult) {
             transfer = newHttpDownload((HttpSlideSearchResult) sr);
-        } else if (sr instanceof YouTubeCrawledSearchResult) {
-            transfer = newYouTubeDownload((YouTubeCrawledSearchResult) sr);
         } else if (sr instanceof SoundcloudSearchResult) {
             transfer = newSoundcloudDownload((SoundcloudSearchResult) sr);
         } else if (sr instanceof HttpSearchResult) {
@@ -396,15 +392,6 @@ public final class TransferManager {
 
     private HttpDownload newHttpDownload(HttpSlideSearchResult sr) {
         HttpDownload download = new UIHttpDownload(this, sr.slide());
-
-        httpDownloads.add(download);
-        download.start();
-
-        return download;
-    }
-
-    private Transfer newYouTubeDownload(YouTubeCrawledSearchResult sr) {
-        YouTubeDownload download = new UIYouTubeDownload(this, sr);
 
         httpDownloads.add(download);
         download.start();

@@ -26,7 +26,6 @@ import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.pixabay.PixabayItemSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.ApplicationHeader;
@@ -296,9 +295,7 @@ public final class SearchMediator {
             for (SearchResult sr : results) {
                 if (sr instanceof CrawledSearchResult) {
                     // special case for youtube
-                    if (sr instanceof YouTubeCrawledSearchResult) {
-                        list.add(sr);
-                    } else if (filter(new LinkedList<>(searchTokens), sr)) {
+                    if (filter(new LinkedList<>(searchTokens), sr)) {
                         list.add(sr);
                     }
                 } else {
@@ -397,9 +394,7 @@ public final class SearchMediator {
 
             UISearchResult ui = null;
 
-            if (sr instanceof YouTubeCrawledSearchResult) {
-                ui = new YouTubeUISearchResult((YouTubeCrawledSearchResult) sr, engine, query);
-            } else if (sr instanceof SoundcloudSearchResult) {
+            if (sr instanceof SoundcloudSearchResult) {
                 ui = new SoundcloudUISearchResult((SoundcloudSearchResult) sr, engine, query);
             } else if (sr instanceof TorrentSearchResult) {
                 ui = new TorrentUISearchResult((TorrentSearchResult) sr, engine, query);

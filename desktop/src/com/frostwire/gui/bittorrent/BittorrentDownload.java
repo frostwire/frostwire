@@ -487,7 +487,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                         TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
                         showShareTorrentDialog) {
                     new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
-                } else if (dl instanceof SoundcloudDownload || dl instanceof YouTubeDownload || dl instanceof HttpDownload) {
+                } else if (dl instanceof SoundcloudDownload || dl instanceof HttpDownload) {
                     if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
                         new Thread(() -> {
                             TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);

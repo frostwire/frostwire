@@ -51,7 +51,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
-import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -61,7 +60,6 @@ import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -245,14 +243,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (Ref.alive(srRef)) {
             Engine.instance().hapticFeedback();
             final FileSearchResult fileSearchResult = srRef.get();
-            if (fileSearchResult instanceof YouTubePackageSearchResult) {
-                releaseMediaPlayer();
-                YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(this, (YouTubePackageSearchResult) fileSearchResult);
-                ytDownloadDlg.show(getFragmentManager());
-            } else {
-                NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
-                dlg.show(getFragmentManager());
-            }
+            NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
+            dlg.show(getFragmentManager());
         } else {
             finish();
         }

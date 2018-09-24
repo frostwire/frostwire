@@ -37,7 +37,6 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
-import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -122,7 +121,7 @@ public final class CancelMenuAction extends MenuAction {
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
 
             int yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question;
-            if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload || transfer instanceof HttpDownload) {
+            if (transfer instanceof SoundcloudDownload || transfer instanceof HttpDownload) {
                 yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question_cloud;
             }
 

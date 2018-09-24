@@ -23,7 +23,6 @@ import android.content.Context;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
-import com.frostwire.android.gui.dialogs.YouTubeDownloadDialog;
 import com.frostwire.android.gui.transfers.ExistingDownload;
 import com.frostwire.android.gui.transfers.InvalidDownload;
 import com.frostwire.android.gui.transfers.InvalidTransfer;
@@ -33,7 +32,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
@@ -65,12 +63,7 @@ public class AsyncStartDownload {
                 !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
                         new HandpickedTorrentDownloadDialogOnFetch((Activity) ctx), sr.getDisplayName());
-            } else if (sr instanceof YouTubePackageSearchResult) {
-                //FIXME: this stuff shouldn't be in the background!!!
-                YouTubeDownloadDialog ytDownloadDlg = YouTubeDownloadDialog.newInstance(ctx, (YouTubePackageSearchResult) sr);
-                ytDownloadDlg.show(((Activity) ctx).getFragmentManager());
-            }
-            else {
+            } else {
                 transfer = TransferManager.instance().download(sr);
                 if(!(transfer instanceof InvalidDownload)) {
                     //FIXME: this stuff shouldn't be in the background thread

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -55,7 +54,6 @@ public abstract class SearchEngine {
     private final BooleanSetting _setting;
 
     private static final int TPB_ID = 6;
-    private static final int YOUTUBE_ID = 9;
     private static final int SOUNDCLOUD_ID = 10;
     private static final int ARCHIVEORG_ID = 11;
     private static final int FROSTCLICK_ID = 12;
@@ -72,13 +70,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
-    private static final SearchEngine YOUTUBE = new SearchEngine(YOUTUBE_ID, "YouTube", SearchEnginesSettings.YOUTUBE_SEARCH_ENABLED, "www.youtube.com") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new YouTubeSearchPerformer(YOUTUBE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -190,7 +181,6 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine>  list = Arrays.asList(
-                YOUTUBE,
                 ZOOQLE,
                 TPB,
                 SOUNDCLOUD,
@@ -211,7 +201,7 @@ public abstract class SearchEngine {
             }
         }
         if (!oneEnabled) {
-            YOUTUBE._setting.setValue(true);
+            ARCHIVEORG._setting.setValue(true);
         }
 
         return list;

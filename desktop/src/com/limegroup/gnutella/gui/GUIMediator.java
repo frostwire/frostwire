@@ -30,8 +30,6 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
 import com.frostwire.util.ThreadPool;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
@@ -64,10 +62,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.NetworkInterface;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -1479,28 +1475,6 @@ public final class GUIMediator {
     public void openSoundcloudTrackUrl(String trackUrl, SoundcloudSearchResult sr) {
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, sr);
-    }
-
-    public void openYouTubeItem(YouTubeCrawledSearchResult sr) {
-        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-        getBTDownloadMediator().openYouTubeItem(sr);
-    }
-
-    public void launchYouTubePreviewInBrowser(YouTubeCrawledStreamableSearchResult sr) {
-        try {
-            String displayName = URLEncoder.encode(sr.getDisplayName(), "UTF-8");
-            String source = URLEncoder.encode(sr.getSource(), "UTF-8");
-
-            String preliminaryDetailsUrl = sr.getDetailsUrl();
-            if (preliminaryDetailsUrl.contains("&")) {
-                preliminaryDetailsUrl = preliminaryDetailsUrl.substring(0, preliminaryDetailsUrl.indexOf('&'));
-            }
-            String detailsUrl = URLEncoder.encode(preliminaryDetailsUrl, "UTF-8");
-            String previewUrl = String.format("http://www.frostwire-preview.com/?type=yt&displayName=%s&source=%s&detailsUrl=%s", displayName, source, detailsUrl);
-            openURL(previewUrl);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
     }
 
     public void openSlide(Slide slide) {

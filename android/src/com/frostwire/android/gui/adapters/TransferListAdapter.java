@@ -69,7 +69,6 @@ import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
-import com.frostwire.transfers.YouTubeDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -193,7 +192,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     private boolean isCloudDownload(Object tag) {
-        return tag instanceof HttpDownload || tag instanceof YouTubeDownload;
+        return tag instanceof HttpDownload;
     }
 
     private String populateBittorrentDownloadMenuActions(BittorrentDownload bittorrentDownload, List<MenuAction> items) {
@@ -335,7 +334,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                     try {
                         if (transfer instanceof BittorrentDownload) {
                             populateBittorrentDownload(listItemLinearLayoutHolder, (BittorrentDownload) transfer);
-                        } else if (transfer instanceof YouTubeDownload || transfer instanceof SoundcloudDownload) {
+                        } else if (transfer instanceof SoundcloudDownload) {
                             populateCloudDownload(listItemLinearLayoutHolder, transfer);
                         } else if (transfer instanceof HttpDownload) {
                             populateHttpDownload(listItemLinearLayoutHolder, (HttpDownload) transfer);
@@ -461,13 +460,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 buttonPlay.setOnClickListener(playOnClickListener);
             } else {
                 buttonPlay.setVisibility(View.GONE);
-            }
-            // hack to fill the demuxing state
-            if (download instanceof YouTubeDownload) {
-                YouTubeDownload yt = (YouTubeDownload) download;
-                if (yt.getState() == TransferState.DEMUXING) {
-                    status.setText(transferStateStrings.get(download.getState()) + " (" + yt.demuxingProgress() + "%)");
-                }
             }
             populateFileTypeIndicatorImageView(download);
         }

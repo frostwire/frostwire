@@ -46,9 +46,6 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledStreamableSearchResult;
-import com.frostwire.search.youtube.YouTubePackageSearchResult;
 import com.frostwire.util.Ref;
 import com.frostwire.uxstats.UXAction;
 import com.frostwire.uxstats.UXStats;
@@ -118,10 +115,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         if (sr instanceof TorrentSearchResult) {
             populateTorrentPart(view, (TorrentSearchResult) sr);
         }
-        if (sr instanceof YouTubeCrawledSearchResult) {
-            populateYouTubePart(view, (YouTubeCrawledSearchResult) sr);
-        }
-
         maybeMarkTitleOpened(view, sr);
         populateThumbnail(view, sr);
     }
@@ -136,28 +129,21 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private void populateFilePart(View view, FileSearchResult sr) {
         ImageView fileTypeIcon = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon);
         fileTypeIcon.setImageResource(getFileTypeIconId());
-
         TextView adIndicator = findView(view, R.id.view_bittorrent_search_result_list_item_ad_indicator);
         adIndicator.setVisibility(View.GONE);
-
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
         title.setText(sr.getDisplayName());
-
         TextView fileSize = findView(view, R.id.view_bittorrent_search_result_list_item_file_size);
         if (sr.getSize() > 0) {
             fileSize.setText(UIUtils.getBytesInHuman(sr.getSize()));
         } else {
             fileSize.setText("...");
         }
-
         TextView extra = findView(view, R.id.view_bittorrent_search_result_list_item_text_extra);
         extra.setText(FilenameUtils.getExtension(sr.getFilename()));
-
         TextView seeds = findView(view, R.id.view_bittorrent_search_result_list_item_text_seeds);
         seeds.setText("");
-
         String license = sr.getLicense().equals(Licenses.UNKNOWN) ? "" : " - " + sr.getLicense();
-
         TextView sourceLink = findView(view, R.id.view_bittorrent_search_result_list_item_text_source);
         sourceLink.setText(sr.getSource() + license); // TODO: ask for design
         sourceLink.setTag(sr.getDetailsUrl());
@@ -170,10 +156,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         if (sr.getThumbnailUrl() != null) {
             thumbLoader.load(Uri.parse(sr.getThumbnailUrl()), fileTypeIcon, 96, 96, getFileTypeIconId());
         }
-
         MediaPlaybackStatusOverlayView overlayView = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view);
         fileTypeIcon.setOnClickListener(previewClickListener);
-        if (isAudio(sr) || sr instanceof YouTubePackageSearchResult) {
+        if (isAudio(sr)) {
             fileTypeIcon.setTag(sr);
             overlayView.setTag(sr);
             overlayView.setVisibility(View.VISIBLE);
@@ -185,11 +170,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             overlayView.setVisibility(View.GONE);
             overlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.NONE);
         }
-    }
-
-    private void populateYouTubePart(View view, YouTubeCrawledSearchResult sr) {
-        TextView extra = findView(view, R.id.view_bittorrent_search_result_list_item_text_extra);
-        extra.setText(FilenameUtils.getExtension(sr.getFilename()));
     }
 
     private void populateTorrentPart(View view, TorrentSearchResult sr) {
@@ -217,7 +197,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
         lastFilterCallTimestamp.set(now);
         cachedFilteredSearchResults = filter(list);
-
         this.visualList = cachedFilteredSearchResults.filtered;
         notifyDataSetChanged();
         notifyDataSetInvalidated();
@@ -232,14 +211,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         for (SearchResult sr : results) {
             String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
             MediaType mt = MediaType.getMediaTypeForExtension(extension);
-
-            if ("youtube".equals(extension)) {
-                mt = MediaType.getVideoMediaType();
-            } else if (mt != null && mt.equals(MediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
-                // NOTE: this excludes all non .youtube youtube search results (e.g. 3gp, webm) from appearing on results
-                mt = null;
-            }
-
             boolean passedKeywordFilter = KeywordFilter.passesFilterPipeline(sr, keywordFilters);
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
                 if (keywordFilters.isEmpty() || passedKeywordFilter) {
@@ -264,12 +235,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         if (sr instanceof SoundcloudSearchResult) {
             return true;
         }
-
-        if (sr instanceof YouTubeCrawledStreamableSearchResult) {
-            YouTubeCrawledStreamableSearchResult ytsr = (YouTubeCrawledStreamableSearchResult) sr;
-            return ytsr.getVideo() == null;
-        }
-
         return false;
     }
 
@@ -401,9 +366,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if (v == null) {
                 return;
             }
-
             StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
-
             if (sr != null) {
                 LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
                 PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
@@ -413,13 +376,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                 i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
                 i.putExtra("streamUrl", sr.getStreamUrl());
                 i.putExtra("audio", isAudio(sr));
-                i.putExtra("hasVideo", hasVideo(sr));
+                i.putExtra("hasVideo", false);
                 ctx.startActivity(i);
             }
-        }
-
-        private boolean hasVideo(StreamableSearchResult sr) {
-            return sr instanceof YouTubePackageSearchResult;
         }
     }
 }

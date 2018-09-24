@@ -33,7 +33,6 @@ import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.youtube.YouTubeSearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 
 import java.util.Arrays;
@@ -98,19 +97,10 @@ public abstract class SearchEngine {
         }
         if (!oneEnabled) {
             SearchEngine engineToEnable;
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                engineToEnable = EZTV;
-            } else {
-                engineToEnable = YOUTUBE;
-            }
-
-            // null check in case the logic above changes
-            if (engineToEnable != null) {
-                String prefKey = engineToEnable.getPreferenceKey();
-                ConfigurationManager.instance().setBoolean(prefKey, true);
-            }
+            engineToEnable = ARCHIVE;
+            String prefKey = engineToEnable.getPreferenceKey();
+            ConfigurationManager.instance().setBoolean(prefKey, true);
         }
-
         return ALL_ENGINES;
     }
 
@@ -132,13 +122,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ZooqleSearchPerformer("zooqle.com", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
-    public static final SearchEngine YOUTUBE = new SearchEngine("YouTube", Constants.PREF_KEY_SEARCH_USE_YOUTUBE) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new YouTubeSearchPerformer("www.youtube.com", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -214,7 +197,6 @@ public abstract class SearchEngine {
 
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
             YIFY,
-            YOUTUBE,
             FROSTCLICK,
             ZOOQLE,
             TPB,

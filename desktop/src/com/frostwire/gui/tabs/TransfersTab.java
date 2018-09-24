@@ -104,7 +104,6 @@ public final class TransfersTab extends AbstractTab {
                 return;
             }
             if (selected == null ||
-                    selected instanceof YouTubeDownload ||
                     selected instanceof SoundcloudDownload ||
                     selected instanceof HttpDownload ||
                     selected instanceof TorrentFetcherDownload) {

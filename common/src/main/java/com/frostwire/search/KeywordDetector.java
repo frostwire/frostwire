@@ -18,21 +18,12 @@
 package com.frostwire.search;
 
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-
 import org.apache.commons.io.FilenameUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -135,11 +126,6 @@ public final class KeywordDetector {
                     continue;
                 }
                 KeywordMediaType mt = KeywordMediaType.getMediaTypeForExtension(extension);
-                if (mt != null && mt.equals(KeywordMediaType.getVideoMediaType()) && sr instanceof YouTubeCrawledSearchResult) {
-                    // NOTE: this excludes all non .youtube youtube search results (e.g. 3gp, webm) from appearing on results
-                    mt = null;
-                }
-
                 if (extension != null && !extension.isEmpty() && mt != null) {
                     addSearchTerms(KeywordDetector.Feature.FILE_EXTENSION, extension);
                 }

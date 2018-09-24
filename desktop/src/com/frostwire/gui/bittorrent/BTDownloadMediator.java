@@ -32,7 +32,6 @@ import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.search.youtube.YouTubeCrawledSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
@@ -442,8 +441,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             double httpBandwidth = 0;
             for (BTDownload btDownload : this.getDownloads()) {
                 if (btDownload instanceof HttpDownload ||
-                        btDownload instanceof SoundcloudDownload ||
-                        btDownload instanceof YouTubeDownload) {
+                    btDownload instanceof SoundcloudDownload) {
                     httpBandwidth += btDownload.getDownloadSpeed();
                 }
             }
@@ -604,11 +602,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     private boolean isHttpTransfer(BTDownload d) {
-        return isYouTubeTransfer(d) || d instanceof SoundcloudDownload || d instanceof HttpDownload;
-    }
-
-    private boolean isYouTubeTransfer(BTDownload d) {
-        return d instanceof YouTubeDownload;
+        return d instanceof SoundcloudDownload || d instanceof HttpDownload;
     }
 
     /**
@@ -959,15 +953,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 e.printStackTrace();
             }
         }
-    }
-
-    public void openYouTubeItem(final YouTubeCrawledSearchResult sr) {
-        GUIMediator.safeInvokeLater(() -> {
-            if (!isDownloading(sr.getDownloadUrl())) {
-                BTDownload downloader = new YouTubeDownload(sr);
-                add(downloader);
-            }
-        });
     }
 
     public void openSlide(final Slide slide) {
