@@ -28,7 +28,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:3.2.0'
     }
 }
 
@@ -94,6 +94,7 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
+        minSdkVersion = 19
     }
 
     compileOptions {
