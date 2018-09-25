@@ -71,11 +71,6 @@ public final class Offers {
             return;
         }
         lastInitAdnetworksInvocationTimestamp = now;
-        try {
-            AdMobAdNetwork.start(activity);
-        } catch (Throwable t) {
-            LOG.warn("initAdNetworks() AdMobNetwork initialization failed", t);
-        }
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 try {
