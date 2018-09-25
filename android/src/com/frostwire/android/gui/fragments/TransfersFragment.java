@@ -47,7 +47,6 @@ import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
@@ -291,7 +290,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (!isVisible()) {
             return;
         }
-
         if (adapter != null) {
             async(this,
                     TransfersFragment::sortSelectedStatusTransfersInBackground,
@@ -299,7 +297,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         } else if (this.getActivity() != null) {
             setupAdapter(this.getActivity());
         }
-
         // mark the selected tab
         int i = 0;
         for (TransferStatus transferStatus : tabPositionToTransferStatus) {
@@ -311,18 +308,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                     } else {
                         try {
                             getActivity().runOnUiThread(tab::select);
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) {
+                        }
                     }
                 }
                 break;
             }
             i++;
         }
-
         if (selectedStatus != TransferStatus.SEEDING) {
             transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
         }
-
         // TODO: optimize these calls
         if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
@@ -338,6 +334,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         final String sUp;
         final int downloads;
         final int uploads;
+
         StatusBarData(String sDown, String sUp, int downloads, int uploads) {
             this.sDown = sDown;
             this.sUp = sUp;
@@ -462,7 +459,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    /** When onShown() is called the fragment is still not returning isVisible()==true */
+    /**
+     * When onShown() is called the fragment is still not returning isVisible()==true
+     */
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
@@ -498,10 +497,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         });
         list = findView(v, R.id.fragment_transfers_list);
         recyclerViewLayoutManager = new LinearLayoutManager(this.getActivity());
-
         // TODO: had to comment this out when I switched to RecyclerView
         //list.setOnScrollListener(new ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener());
-
         SwipeLayout swipe = findView(v, R.id.fragment_transfers_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
@@ -530,9 +527,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnRichToast = findView(v, R.id.fragment_transfers_vpn_notification);
         vpnRichToast.setVisibility(View.GONE);
         vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
-
         initVPNStatusButton(v);
-
         transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
     }
 
@@ -558,12 +553,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         sdCardNotification.setVisibility(View.GONE);
         RichNotification internalMemoryNotification = findView(v, R.id.fragment_transfers_internal_memory_notification);
         internalMemoryNotification.setVisibility(View.GONE);
-
         if (!isVisible()) {
             // this will be invoked later again onResume, don't bother now if it's not visible
             return;
         }
-
         if (TransferManager.isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
             String currentPath = ConfigurationManager.instance().getStoragePath();
             boolean inPrivateFolder = currentPath.contains("Android/data");
@@ -707,7 +700,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         String url = addTransferUrlTextView.getText();
         if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
             toggleAddTransferControls();
-            if (url.startsWith("http") && (url.contains("soundcloud.com/") || url.contains("youtube.com/"))) {
+            if (url.startsWith("http") && (url.contains("soundcloud.com/"))) {
                 startCloudTransfer(url);
             } else if (url.startsWith("http")) { //magnets are automatically started if found on the clipboard by autoPasteMagnetOrURL
                 TransferManager.instance().downloadTorrent(url.trim(),
@@ -723,20 +716,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private void startCloudTransfer(String text) {
         if (text.contains("soundcloud.com/")) {
             new AsyncDownloadSoundcloudFromUrl(getActivity(), text.trim());
-        } else if (text.contains("youtube.com/")) {
-            startYouTubeSearchFromUrl(text.trim());
         } else {
             UIUtils.showLongMessage(getActivity(), R.string.cloud_downloads_coming);
         }
-    }
-
-    private void startYouTubeSearchFromUrl(String ytUrl) {
-        //fragments are not supposed to communicate directly so I'll let my activity know
-        //(NOTE: This is a poor implementation of fragment to fragment communication
-        // despite what the android documentation says http://developer.android.com/training/basics/fragments/communicating.html
-        // as this could not scale if you wanted to reuse fragments on other activities)
-        MainActivity activity = (MainActivity) getActivity();
-        activity.performYTSearch(ytUrl);
     }
 
     private void autoPasteMagnetOrURL() {
