@@ -458,7 +458,7 @@ public final class SearchMediator {
             List<BTDownload> downloads =
                     btDownloadMediator.getDownloads();
             for (BTDownload d : downloads) {
-                if (d.getHash().equals(hash)) {
+                if (d.getHash() != null && d.getHash().equals(hash)) {
                     btDownloadMediator.selectBTDownload(d);
                     btDownloadMediator.ensureDownloadVisible(d);
                     return;
