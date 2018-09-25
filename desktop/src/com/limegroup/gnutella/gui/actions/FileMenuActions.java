@@ -67,7 +67,7 @@ public final class FileMenuActions {
 
         private void createDialog() {
 
-            dialog = new JDialog(GUIMediator.getAppFrame(), I18n.tr("Download .Torrent or Magnet or YouTube video link"), true);
+            dialog = new JDialog(GUIMediator.getAppFrame(), I18n.tr("Download .Torrent or Magnet link"), true);
             dialog.addWindowListener(new OpenDialogWindowAdapter());
             JPanel panel = (JPanel) dialog.getContentPane();
             GUIUtils.addHideAction(panel);
@@ -99,8 +99,6 @@ public final class FileMenuActions {
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.insets = new Insets(0, SPACE, 2 * SPACE, 0);
-            //            panel.add(new MultiLineLabel(I18n.tr("Type a magnet link, the file path or web address of a torrent file, or a YouTube Web address and FrostWire will start downloading it for you."),
-            //                   true), constraints);
 
             panel.add(new MultiLineLabel(I18n.tr("Type a magnet link, the file path or web address of a torrent file and FrostWire will start downloading it for you."), true), constraints);
 
@@ -201,9 +199,6 @@ public final class FileMenuActions {
                 String str = PATH_FIELD.getText();
                 if (openMagnetOrTorrent(str, FileMenuActions.ActionInvocationSource.FROM_FILE_MENU)) {
                     dismissDialog();
-                } else if (str.contains("youtube.com/watch?") || str.contains("http://youtu.be/")) {
-                    GUIMediator.instance().startSearch(str);
-                    dismissDialog();
                 } else {
                     GUIMediator.showError(I18n.tr("FrostWire cannot download this address. Make sure you typed it correctly, and then try again."));
                 }
@@ -243,9 +238,6 @@ public final class FileMenuActions {
             GUIMediator.instance().openTorrentURI(userText, true);
             UXStats.instance().log(invokedFrom == ActionInvocationSource.FROM_FILE_MENU ? UXAction.DOWNLOAD_MAGNET_URL_FROM_FILE_ACTION : UXAction.DOWNLOAD_MAGNET_URL_FROM_SEARCH_FIELD);
             return true;
-        } else if (userText.matches(".*youtube.com.*") || userText.matches(".*youtu.be.*") || userText.matches(".*y2u.be.*")) {
-            UXStats.instance().log(invokedFrom == ActionInvocationSource.FROM_FILE_MENU ? UXAction.DOWNLOAD_CLOUD_URL_FROM_FILE_ACTION : UXAction.DOWNLOAD_CLOUD_URL_FROM_SEARCH_FIELD);
-            return false;
         } else if (userText.matches(".*soundcloud.com.*")) {
             //the new soundcloud redirects to what seems to be an ajax page
             String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");

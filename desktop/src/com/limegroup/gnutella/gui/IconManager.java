@@ -71,10 +71,6 @@ public class IconManager {
         if (f != null && ext != null && ext.toLowerCase().endsWith("torrent")) {
             return GUIMediator.getThemeImage("frosthires");
         }
-        
-        if (f != null && ext != null && ext.toLowerCase().endsWith("youtube")) {
-            return GUIMediator.getThemeImage("youtube");
-        }
 
         return fileController.getIconForFile(f);
     }
@@ -89,11 +85,6 @@ public class IconManager {
         if (ext != null && ext.toLowerCase().endsWith("torrent")) {
             return GUIMediator.getThemeImage("frosthires");
         }
-        
-        if (ext != null && ext.toLowerCase().endsWith("youtube")) {
-            return GUIMediator.getThemeImage("youtube");
-        }
-        
         return fileController.getIconForExtension(ext);
     }
     

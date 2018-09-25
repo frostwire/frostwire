@@ -82,8 +82,6 @@ public final class SearchMediator {
 
     static final String TORRENT_DETAILS_STRING = I18n.tr("Torrent Details");
 
-    static final String YOUTUBE_DETAILS_STRING = I18n.tr("View in YouTube");
-
     static final String SOUNDCLOUD_DETAILS_STRING = I18n.tr("View in Soundcloud");
 
     static final String ARCHIVEORG_DETAILS_STRING = I18n.tr("View in Archive.org");
@@ -211,10 +209,6 @@ public final class SearchMediator {
         SearchResultMediator resultTab = addResultTab(token, info);
 
         performSearch(token, info.getQuery());
-
-        if (info.getTitle().startsWith("youtube:")) {
-            resultTab.selectSchemaBoxByMediaType(NamedMediaType.getFromMediaType(MediaType.getVideoMediaType()));
-        }
 
         return token;
     }

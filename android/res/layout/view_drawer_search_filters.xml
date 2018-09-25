@@ -345,7 +345,7 @@
                         frostwire:keyword_tag_count="30"
                         frostwire:keyword_tag_dismissable="false"
                         frostwire:keyword_tag_inclusive="true"
-                        frostwire:keyword_tag_keyword="youtube" />
+                        frostwire:keyword_tag_keyword="archive" />
 
                 </com.google.android.flexbox.FlexboxLayout>
 

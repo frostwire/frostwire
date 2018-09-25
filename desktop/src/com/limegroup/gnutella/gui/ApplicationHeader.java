@@ -492,31 +492,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 }
             }
             
-            if (query.contains("youtube.com/watch?")) {
-                query = query.split("v=")[1];
-                if (query.contains("#")) {
-                    query = query.split("#")[0];
-                }
-
-                if (query.contains("&")) {
-                    query = query.substring(0,query.indexOf("&"));
-                }
-
-                queryTitle = "youtube:" + query;
-            }
-
-            if (query.contains("y2u.be")) {
-                query = query.replace("y2u.be", "youtu.be");
-            }
-
-            if (query.contains("http://youtu.be/")) {
-                query = query.split("be/")[1];
-                if (query.contains("#")) {
-                    query = query.split("#")[0];
-                }
-                queryTitle = "youtube:" + query;
-            }
-
             final SearchInformation info = SearchInformation.createTitledKeywordSearch(query, null, MediaType.getTorrentMediaType(), queryTitle);
 
             // If the search worked, store & clear it.

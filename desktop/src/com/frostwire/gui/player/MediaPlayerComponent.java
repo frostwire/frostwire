@@ -952,7 +952,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
             private boolean isLocalFile;
             private boolean isPlaylistItem;
-            private boolean isYT;
             private boolean isSC;
             private boolean isAR;
 
@@ -976,7 +975,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     StreamMediaSource streamMedia = (StreamMediaSource) currentMedia;
 
                     if (streamMedia.getDetailsUrl() != null) {
-                        isYT = streamMedia.getDetailsUrl().contains("youtube");
                         isSC = streamMedia.getDetailsUrl().contains("soundcloud");
                         isAR = streamMedia.getDetailsUrl().contains("archive");
                     }
@@ -995,10 +993,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 } else if (isPlaylistItem) { //won't be shown in 5.6.x, code here for 6.x
                     tooltipText = I18n.tr("Playing track from") + " " + playlistName;
                     iconUpName = iconDownName = "playlist";
-                } else if (isYT) {
-                    tooltipText = I18n.tr("Open YouTube source page");
-                    iconUpName = "youtube_off";
-                    iconDownName = "youtube_on";
                 } else if (isSC) {
                     tooltipText = I18n.tr("Open SoundCloud source page");
                     iconUpName = "soundcloud_off";
@@ -1010,7 +1004,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 }
 
                 //TODO: Add "isLocalFile || isPlaylistItem ||" on FrostWire 6.x when we have room for 3 buttons.
-                boolean mediaSourceButtonVisible = (currentMedia != null) && (isYT || isSC || isAR);
+                boolean mediaSourceButtonVisible = (currentMedia != null) && (isSC || isAR);
                 //System.out.println("mediaSourceButton should be visible? " + mediaSourceButtonVisible);
                 if (mediaSourceButtonVisible) {
                     mediaSourceButton.init(tooltipText, iconUpName, iconDownName);

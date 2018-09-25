@@ -40,16 +40,6 @@ final class MediaTypeFilter implements TableLineFilter<SearchResultDataLine> {
 
     @Override
     public boolean allow(SearchResultDataLine node) {
-        // TODO: refactor this code block
-        try {
-            // hard coding disable youtube extension
-            if (node.getExtension().equals("youtube")) {
-                return false;
-            }
-        } catch (Throwable e) {
-            // ignore
-        }
-
-        return nmt.equals(node.getNamedMediaType());
+        return node != null && nmt.equals(node.getNamedMediaType());
     }
 }
