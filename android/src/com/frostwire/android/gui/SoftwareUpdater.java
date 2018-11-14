@@ -288,10 +288,6 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, update.config.mopubSearchHeaderBannerThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, update.config.mopubSearchHeaderBannerIntervalInMs);
 
-        CM.setInt(Constants.PREF_KEY_GUI_OGURY_THRESHOLD, update.config.oguryThreshold);
-
-        CM.setInt(Constants.PREF_KEY_GUI_PREBID_THRESHOLD, update.config.prebidThreshold);
-
         CM.setInt(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, update.config.removeAdsB2bThreshold);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, update.config.interstitialOffersTransferStarts);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
@@ -361,8 +357,6 @@ public final class SoftwareUpdater {
         int removeAdsB2bThreshold = 50;
         int mopubAlbumArtBannerThreshold = 50;
         int mopubPreviewBannerThreshold = 101;
-        int oguryThreshold = 101;
-        int prebidThreshold = 101;
         int interstitialOffersTransferStarts = 3;
         int interstitialTransferOffersTimeoutInMinutes = 10;
         int interstitialFirstDisplayDelayInMinutes = 3;

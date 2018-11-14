@@ -77,7 +77,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, 3);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
-        defaultValues.put(Constants.PREF_KEY_GUI_OGURY_THRESHOLD, 101);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_MOPUB,
