@@ -29,8 +29,6 @@
     <!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
     <!-- Don't go nuts, max version number will be: 2,147,483,647 -->
 
-    <uses-sdk android:targetSdkVersion="25" />
-
     <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
