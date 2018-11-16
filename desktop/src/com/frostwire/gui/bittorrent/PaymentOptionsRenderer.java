@@ -24,8 +24,6 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
@@ -121,7 +119,7 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
     }
 
     private void openPaymentOptionsURL(PaymentOptions paymentOptions, PaymentMethod method) {
-        String paymentOptionsUrl = null;
+        String paymentOptionsUrl;
         if (method == PaymentMethod.PAYPAL && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl)) {
             paymentOptionsUrl = paymentOptions.paypalUrl;
         } else {
@@ -137,7 +135,6 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
         if (e.getButton() == MouseEvent.BUTTON1 && labelBitcoin.isActionEnabled()) {
             if (paymentOptions != null && !StringUtils.isNullOrEmpty(paymentOptions.bitcoin)) {
                 openPaymentOptionsURL(paymentOptions, PaymentMethod.BITCOIN);
-                UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
             }
         }
     }
@@ -146,7 +143,6 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
         if (e.getButton() == MouseEvent.BUTTON1 && labelPaypal.isActionEnabled()) {
             if (paymentOptions != null && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl)) {
                 openPaymentOptionsURL(paymentOptions, PaymentMethod.PAYPAL);
-                UXStats.instance().log(UXAction.DOWNLOAD_CLICK_PAYPAL_PAYMENT);
             }
         }
     }

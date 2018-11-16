@@ -25,8 +25,6 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -138,11 +136,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         JComponent comp = super.getScrolledTablePane();
 
         if (adjustmentListener == null) {
-            adjustmentListener = new AdjustmentListener() {
-                public void adjustmentValueChanged(AdjustmentEvent e) {
-                    adjustmentListener_adjustmentValueChanged(e);
-                }
-            };
+            adjustmentListener = this::adjustmentListener_adjustmentValueChanged;
             SCROLL_PANE.getVerticalScrollBar().addAdjustmentListener(adjustmentListener);
         }
 
@@ -280,7 +274,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
             if (result == DialogOption.YES) {
                 new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
                 GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
-                UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_LIBRARY);
             }
         }
     }

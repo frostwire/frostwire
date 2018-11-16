@@ -22,8 +22,6 @@ import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.IconButton;
@@ -55,7 +53,7 @@ final class SlideControlsOverlay extends JPanel {
     private final SlidePanelController controller;
     private final Composite overlayComposite;
 
-    public SlideControlsOverlay(SlidePanelController controller) {
+    SlideControlsOverlay(SlidePanelController controller) {
         this.controller = controller;
         this.overlayComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, BACKGROUND_ALPHA);
 
@@ -229,7 +227,7 @@ final class SlideControlsOverlay extends JPanel {
 
         private SlidePanelController controller;
 
-        public InstallAction(SlidePanelController controller) {
+        InstallAction(SlidePanelController controller) {
             this.controller = controller;
             putValue(Action.NAME, I18n.tr("Install"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Install"));
@@ -248,7 +246,7 @@ final class SlideControlsOverlay extends JPanel {
 
         private SlidePanelController controller;
 
-        public DownloadAction(SlidePanelController controller) {
+        DownloadAction(SlidePanelController controller) {
             this.controller = controller;
             putValue(Action.NAME, I18n.tr("Download"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Download"));
@@ -267,7 +265,7 @@ final class SlideControlsOverlay extends JPanel {
 
         private SlidePanelController controller;
 
-        public PreviewVideoAction(SlidePanelController controller) {
+        PreviewVideoAction(SlidePanelController controller) {
             this.controller = controller;
             putValue(Action.NAME, I18n.tr("Video Preview"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Video Preview"));
@@ -286,7 +284,7 @@ final class SlideControlsOverlay extends JPanel {
 
         private SlidePanelController controller;
 
-        public PreviewAudioAction(SlidePanelController controller) {
+        PreviewAudioAction(SlidePanelController controller) {
             this.controller = controller;
             putValue(Action.NAME, I18n.tr("Audio Preview"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Audio Preview"));
@@ -303,13 +301,13 @@ final class SlideControlsOverlay extends JPanel {
 
     private static final class OverlayIconButton extends IconButton {
 
-        public OverlayIconButton(Action action, boolean useHorizontalText, boolean transparentBackground) {
+        OverlayIconButton(Action action, boolean useHorizontalText, boolean transparentBackground) {
             this(action);
             setHorizontalText(useHorizontalText);
             setUseTransparentBackground(transparentBackground);
         }
 
-        public OverlayIconButton(Action action) {
+        OverlayIconButton(Action action) {
             super(action);
             setForeground(TEXT_FOREGROUND);
             Font f = getFont().deriveFont(getFont().getSize2D() + BASE_TEXT_FONT_SIZE_DELTA);
@@ -324,11 +322,11 @@ final class SlideControlsOverlay extends JPanel {
 
         private final String url;
 
-        public SocialAction(String networkName, String url) {
+        SocialAction(String networkName, String url) {
             this(networkName, url, networkName.toUpperCase());
         }
 
-        public SocialAction(String networkName, String url, String imageName) {
+        SocialAction(String networkName, String url, String imageName) {
             this.url = url;
 
             putValue(Action.SHORT_DESCRIPTION, networkName);
@@ -347,7 +345,7 @@ final class SlideControlsOverlay extends JPanel {
         
         private final String paymentOptionsUrl;
         
-        public PaymentAction(final PaymentOptions paymentOptions, String workTitle) {
+        PaymentAction(final PaymentOptions paymentOptions, String workTitle) {
             putValue(LimeAction.ICON_NAME, "SLIDE_CONTROLS_OVERLAY_TIP_JAR");
             putValue(LimeAction.ICON_NAME_ROLLOVER, "SLIDE_CONTROLS_OVERLAY_TIP_JAR_ROLLOVER");
             putValue(Action.SHORT_DESCRIPTION, String.format(I18n.tr("Support %s with a tip, donation or voluntary payment"), workTitle));
@@ -375,7 +373,6 @@ final class SlideControlsOverlay extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             GUIMediator.openURL(paymentOptionsUrl);
-            UXStats.instance().log(UXAction.MISC_PROMO_CLICK_ON_TIPS);
         }
     }
 }

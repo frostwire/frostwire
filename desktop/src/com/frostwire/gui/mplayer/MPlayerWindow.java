@@ -20,8 +20,6 @@ package com.frostwire.gui.mplayer;
 
 import com.frostwire.gui.player.*;
 import com.frostwire.mplayer.MediaPlaybackState;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.LimeJFrame;
 import org.limewire.util.OSUtils;
 
@@ -102,11 +100,7 @@ public class MPlayerWindow extends JFrame {
         Dimension d = new Dimension(800, 600);
 
         // initialize auto-hide timer
-        hideTimer = new Timer(HIDE_DELAY, new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                MPlayerWindow.this.onHideTimerExpired();
-            }
-        });
+        hideTimer = new Timer(HIDE_DELAY, arg0 -> MPlayerWindow.this.onHideTimerExpired());
         hideTimer.setRepeats(false);
 
         // initialize window
@@ -245,9 +239,7 @@ public class MPlayerWindow extends JFrame {
         if (isVisible()) {
             isFullscreen = !isFullscreen;
             overlayControls.setIsFullscreen(isFullscreen);
-
             positionOverlayControls();
-            UXStats.instance().log(UXAction.LIBRARY_VIDEO_TOGGLE_FULLSCREEN);
         }
     }
 

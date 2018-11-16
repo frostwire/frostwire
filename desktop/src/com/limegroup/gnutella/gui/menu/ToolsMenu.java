@@ -16,8 +16,6 @@
 package com.limegroup.gnutella.gui.menu;
 
 import com.frostwire.gui.updates.UpdateMediator;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -39,16 +37,11 @@ final class ToolsMenu extends AbstractMenu {
      * Creates a new <tt>ToolsMenu</tt>, using the <tt>key</tt>
      * argument for setting the locale-specific title and
      * accessibility text.
-     *
-     * @param key the key for locale-specific string resources unique
-     *            to the menu
      */
     ToolsMenu() {
         super(I18n.tr("&Tools"));
 
         this.updateAction = new UpdateAction();
-
-        addMenuItem(new OpenChatAction());
 
         if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
             addMenuItem(new RebuildiTunesPlaylist());
@@ -67,7 +60,7 @@ final class ToolsMenu extends AbstractMenu {
 
         private static final long serialVersionUID = 8348355619323878579L;
 
-        public RebuildiTunesPlaylist() {
+        RebuildiTunesPlaylist() {
             super(I18n.tr("Rebuild iTunes \"FrostWire\" Playlist"));
             putValue(LONG_DESCRIPTION, I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder."));
         }
@@ -76,13 +69,13 @@ final class ToolsMenu extends AbstractMenu {
         public void actionPerformed(ActionEvent arg0) {
 
             DialogOption result = GUIMediator.showYesNoMessage(I18n.tr(
-                      "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
-                    + "it with one containing all the iTunes compatible files in your \n"
-                    + "Frostwire \"Torrent Data Folder\"\n\n"
-                    + "Please note that it will add the files to the iTunes library as well\n"
-                    + "and this could result in duplicate files on your iTunes library\n\n"
-                    + "Are you sure you want to continue?"),
-             I18n.tr("Warning"), JOptionPane.WARNING_MESSAGE);
+                    "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
+                            + "it with one containing all the iTunes compatible files in your \n"
+                            + "Frostwire \"Torrent Data Folder\"\n\n"
+                            + "Please note that it will add the files to the iTunes library as well\n"
+                            + "and this could result in duplicate files on your iTunes library\n\n"
+                            + "Are you sure you want to continue?"),
+                    I18n.tr("Warning"), JOptionPane.WARNING_MESSAGE);
 
             if (result == DialogOption.YES) {
                 iTunesMediator.instance().resetFrostWirePlaylist();
@@ -93,7 +86,7 @@ final class ToolsMenu extends AbstractMenu {
     private static class ShowOptionsAction extends AbstractAction {
         private static final long serialVersionUID = 6187597973189408647L;
 
-        public ShowOptionsAction() {
+        ShowOptionsAction() {
             super(I18n.tr("&Options"));
             putValue(LONG_DESCRIPTION, I18n.tr("Display the Options Screen"));
         }
@@ -107,7 +100,7 @@ final class ToolsMenu extends AbstractMenu {
 
         private static final long serialVersionUID = 2915214339056016808L;
 
-        public UpdateAction() {
+        UpdateAction() {
             super(I18n.tr("&Update FrostWire"));
             putValue(LONG_DESCRIPTION, I18n.tr("Update FrostWire to the latest version"));
         }
@@ -138,20 +131,6 @@ final class ToolsMenu extends AbstractMenu {
             putValue(NAME, text);
             putValue(LONG_DESCRIPTION, text);
             setEnabled(enabled);
-        }
-    }
-
-    private static class OpenChatAction extends AbstractAction {
-
-        public OpenChatAction() {
-            super(I18n.tr("Chat"));
-            putValue(LONG_DESCRIPTION, I18n.tr("Show our community chat"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            GUIMediator.openURL("http://www.frostwire.com/chat");
-            UXStats.instance().log(UXAction.MISC_CHAT_OPENED_IN_BROWSER);
         }
     }
 }

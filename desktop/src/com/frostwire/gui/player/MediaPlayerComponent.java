@@ -26,8 +26,6 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
 import net.miginfocom.swing.MigLayout;
 
@@ -108,8 +106,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
      */
     private JPanel myMediaPanel = null;
 
-    private float _progress;
-
     private JToggleButton SHUFFLE_BUTTON;
 
     private JButton LOOP_BUTTON;
@@ -153,7 +149,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     /**
      * Constructs the media panel.
-     * 
      */
     private JPanel constructMediaPanel() {
 
@@ -182,7 +177,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
         panel.add(createPlaybackButtonsPanel(), "span 1 2,growy, gapright 0");
         panel.add(createTrackDetailPanel(), "wrap, w 345px");
-        panel.add(createProgressPanel(),"w 345px");
+        panel.add(createProgressPanel(), "w 345px");
 
         return panel;
     }
@@ -287,7 +282,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         return panel;
     }
 
-    public void initPlaylistPlaybackModeControls() {
+    private void initPlaylistPlaybackModeControls() {
         SHUFFLE_BUTTON = new JToggleButton();
         SHUFFLE_BUTTON.setContentAreaFilled(false);
         SHUFFLE_BUTTON.setBackground(null);
@@ -302,20 +297,11 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         LOOP_BUTTON.setIcon(getCurrentLoopButtonImage());
         LOOP_BUTTON.setToolTipText(I18n.tr("Repeat songs"));
 
-        SHUFFLE_BUTTON.addActionListener(new ActionListener() {
+        SHUFFLE_BUTTON.addActionListener(e -> mediaPlayer.setShuffle(SHUFFLE_BUTTON.isSelected()));
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mediaPlayer.setShuffle(SHUFFLE_BUTTON.isSelected());
-            }
-        });
-
-        LOOP_BUTTON.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mediaPlayer.setRepeatMode(mediaPlayer.getRepeatMode().getNextState());
-                LOOP_BUTTON.setIcon(getCurrentLoopButtonImage());
-            }
+        LOOP_BUTTON.addActionListener(e -> {
+            mediaPlayer.setRepeatMode(mediaPlayer.getRepeatMode().getNextState());
+            LOOP_BUTTON.setIcon(getCurrentLoopButtonImage());
         });
 
     }
@@ -338,7 +324,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         PLAY_PAUSE_CARD_LAYOUT.show(PLAY_PAUSE_BUTTON_CONTAINER, "PLAY");
     }
 
-    public void registerListeners() {
+    private void registerListeners() {
         PLAY_BUTTON.addActionListener(new PlayListener());
         PAUSE_BUTTON.addActionListener(new PauseListener());
         NEXT_BUTTON.addActionListener(new NextListener());
@@ -346,12 +332,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         VOLUME.addChangeListener(new VolumeSliderListener());
         PROGRESS.addMouseListener(new ProgressBarMouseAdapter());
 
-        longPressTimer = new Timer(1500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                stopSong();
-            }
-        });
+        longPressTimer = new Timer(1500, e -> stopSong());
         longPressTimer.setRepeats(false);
 
         MouseListener longPressListener = new MouseAdapter() {
@@ -390,26 +371,17 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
      * Updates the current progress of the progress bar, on the Swing thread.
      */
     private void setProgressValue(final int update) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                PROGRESS.setValue(update);
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> PROGRESS.setValue(update));
     }
 
     /**
      * Enables or disables the skipping action on the progress bar safely from
      * the swing event queue
-     * 
-     * @param enabled
-     *            - true to allow skipping, false otherwise
+     *
+     * @param enabled - true to allow skipping, false otherwise
      */
     private void setProgressEnabled(final boolean enabled) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                PROGRESS.setEnabled(enabled);
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> PROGRESS.setEnabled(enabled));
         setProgressValue(0);
     }
 
@@ -442,14 +414,14 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     /**
      * Pauses the currently playing audio file.
      */
-    public void pauseSong() {
+    private void pauseSong() {
         mediaPlayer.togglePause();
     }
 
     /**
      * Stops the currently playing audio file.
      */
-    public void stopSong() {
+    private void stopSong() {
         mediaPlayer.stop();
     }
 
@@ -462,7 +434,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     /**
      * @return the current song that is playing, null if there is no song loaded
-     *         or the song is streaming audio
+     * or the song is streaming audio
      */
     public MediaSource getCurrentMedia() {
         return currentPlayListItem;
@@ -496,17 +468,16 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 return;
             }
 
-            //update controls
-            MediaSource currentMedia = mediaSource;
+            /* update controls */
 
-            updateShareButtonVisibility(currentMedia);
+            updateShareButtonVisibility(mediaSource);
 
-            PlaylistItem playlistItem = currentMedia.getPlaylistItem();
+            PlaylistItem playlistItem = mediaSource.getPlaylistItem();
 
             String currentText = null;
 
-            if (currentMedia != null && currentMedia instanceof StreamMediaSource) {
-                currentText = ((StreamMediaSource) currentMedia).getTitle();
+            if (mediaSource instanceof StreamMediaSource) {
+                currentText = ((StreamMediaSource) mediaSource).getTitle();
             } else if (playlistItem != null) {
                 //Playing from Playlist.
                 String artistName = playlistItem.getTrackArtist();
@@ -519,12 +490,12 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
                 trackTitle.setToolTipText(artistName + " - " + songTitle + albumToolTip + yearToolTip);
 
-            } else if (currentMedia != null && currentMedia.getFile() != null) {
+            } else if (mediaSource != null && mediaSource.getFile() != null) {
                 //playing from Audio.
-                currentText = currentMedia.getFile().getName();
+                currentText = mediaSource.getFile().getName();
 
-                trackTitle.setToolTipText(currentMedia.getFile().getAbsolutePath());
-            } else if (currentMedia != null && currentMedia.getFile() == null && currentMedia.getURL() != null) {
+                trackTitle.setToolTipText(mediaSource.getFile().getAbsolutePath());
+            } else if (mediaSource != null && mediaSource.getFile() == null && mediaSource.getURL() != null) {
                 //
                 //System.out.println("StreamURL: " + currentMedia.getURL().toString());
 
@@ -554,12 +525,9 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
         final String finalCurrentText = currentText;
 
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                trackTitle.setText("<html><u>" + finalCurrentText + "</u></html>");
-                trackTitle.setText(finalCurrentText);
-            }
+        GUIMediator.safeInvokeLater(() -> {
+            trackTitle.setText("<html><u>" + finalCurrentText + "</u></html>");
+            trackTitle.setText(finalCurrentText);
         });
     }
 
@@ -568,8 +536,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
      * frames that have been read, along with position and bytes read
      */
     public void progressChange(MediaPlayer mediaPlayer, float currentTimeInSecs) {
-        _progress = currentTimeInSecs;
-        progressCurrentTime.setText(LibraryUtils.getSecondsInDDHHMMSS((int) _progress));
+        progressCurrentTime.setText(LibraryUtils.getSecondsInDDHHMMSS((int) currentTimeInSecs));
 
         if (currentPlayListItem != null && currentPlayListItem.getURL() == null) {
             progressSongLength.setText(LibraryUtils.getSecondsInDDHHMMSS((int) mediaPlayer.getDurationInSecs()));
@@ -652,11 +619,10 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     /**
      * Returns "ok" on success and a failure message on failure after taking an
      * index into the playlist and remove it.
-     * 
-     * @param index
-     *            index of the item to remove
+     *
+     * @param index index of the item to remove
      * @return "ok" on success and a failure message on failure after taking an
-     *         index into the playlist and remove it;
+     * index into the playlist and remove it;
      */
     String removeFromPlaylist(int index) {
         // PlaylistMediator pl = GUIMediator.getPlayList();
@@ -669,11 +635,10 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     /**
      * Returns "ok" on success and a failure message on failure after taking an
      * index into the playlist and remove it.
-     * 
-     * @param index
-     *            index of the item to remove
+     *
+     * @param index index of the item to remove
      * @return "ok" on success and a failure message on failure after taking an
-     *         index into the playlist and remove it;
+     * index into the playlist and remove it;
      */
     String playIndexInPlaylist(int index) {
         // PlaylistMediator pl = GUIMediator.getPlayList();
@@ -685,7 +650,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     /**
      * @return <code>PROGRESS.getValue() + "\t" + PROGRESS.getMaximum()</code>
-     *         or <code>"stopped"</code> if we're not playing
+     * or <code>"stopped"</code> if we're not playing
      */
     String getProgress() {
         String res;
@@ -717,10 +682,9 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     /**
      * Attempts to stop a song if its playing any song
-     * 
+     * <p>
      * Returns true if it actually stopped, false if there was no need to do so.
-     * 
-     * */
+     */
     public boolean attemptStop() {
 
         if (mediaPlayer.getState() != MediaPlaybackState.Stopped) {
@@ -741,7 +705,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     /**
      * Enables the Volume Slider, And Pause Button
-     * 
      */
     public void enableControls() {
         VOLUME.setEnabled(true);
@@ -849,7 +812,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         }
     }
 
-    public void showCurrentMedia() {
+    private void showCurrentMedia() {
         GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
         LibraryMediator.instance().selectCurrentMedia();
     }
@@ -898,12 +861,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
                 removeSocialButtonActionListeners();
 
-                socialButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent arg0) {
-                        GUIMediator.openURL(socialLink);
-                    }
-                });
+                socialButton.addActionListener(arg0 -> GUIMediator.openURL(socialLink));
             }
 
             private void removeSocialButtonActionListeners() {
@@ -1085,7 +1043,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             if (result == DialogOption.YES) {
                 new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
                 GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
-                UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_PLAYER);
             }
         }
     }

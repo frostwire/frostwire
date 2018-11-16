@@ -17,8 +17,6 @@ package com.limegroup.gnutella.gui.actions;
 
 import com.frostwire.gui.bittorrent.CreateTorrentDialog;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 
@@ -32,7 +30,7 @@ import java.io.File;
 
 public final class FileMenuActions {
 
-    static final int SPACE = 6;
+    private static final int SPACE = 6;
 
     /** Shows the File, Open Magnet or Torrent dialog box to let the user enter a magnet or torrent. */
     public static class OpenMagnetTorrentAction extends AbstractAction {
@@ -72,12 +70,10 @@ public final class FileMenuActions {
             JPanel panel = (JPanel) dialog.getContentPane();
             GUIUtils.addHideAction(panel);
             panel.setLayout(new GridBagLayout());
-            GridBagConstraints constraints = new GridBagConstraints();
-
             panel.setBorder(new EmptyBorder(2 * SPACE, SPACE, SPACE, SPACE));
 
             // download icon
-            constraints = new GridBagConstraints();
+            GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 0;
             constraints.gridwidth = 1;
@@ -162,7 +158,7 @@ public final class FileMenuActions {
              */
             private static final long serialVersionUID = -3351075105994389491L;
 
-            public PasteAction() {
+            PasteAction() {
                 super(I18n.tr("Paste"));
             }
 
@@ -178,7 +174,7 @@ public final class FileMenuActions {
              */
             private static final long serialVersionUID = 3000234847843826596L;
 
-            public BrowseAction() {
+            BrowseAction() {
                 super(I18n.tr("Browse..."));
             }
 
@@ -191,13 +187,13 @@ public final class FileMenuActions {
 
         private class OkAction extends AbstractAction {
 
-            public OkAction() {
+            OkAction() {
                 super(I18n.tr("OK"));
             }
 
             public void actionPerformed(ActionEvent a) {
                 String str = PATH_FIELD.getText();
-                if (openMagnetOrTorrent(str, FileMenuActions.ActionInvocationSource.FROM_FILE_MENU)) {
+                if (openMagnetOrTorrent(str)) {
                     dismissDialog();
                 } else {
                     GUIMediator.showError(I18n.tr("FrostWire cannot download this address. Make sure you typed it correctly, and then try again."));
@@ -212,7 +208,7 @@ public final class FileMenuActions {
              */
             private static final long serialVersionUID = 3350673081539434959L;
 
-            public CancelAction() {
+            CancelAction() {
                 super(I18n.tr("Cancel"));
             }
 
@@ -232,21 +228,18 @@ public final class FileMenuActions {
      * @param userText The text of the path, link, or address the user entered
      * @return true if it was valid and we opened it
      */
-    public static boolean openMagnetOrTorrent(final String userText, ActionInvocationSource invokedFrom) {
+    public static boolean openMagnetOrTorrent(final String userText) {
 
         if (userText.startsWith("magnet:?xt=urn:btih")) {
             GUIMediator.instance().openTorrentURI(userText, true);
-            UXStats.instance().log(invokedFrom == ActionInvocationSource.FROM_FILE_MENU ? UXAction.DOWNLOAD_MAGNET_URL_FROM_FILE_ACTION : UXAction.DOWNLOAD_MAGNET_URL_FROM_SEARCH_FIELD);
             return true;
         } else if (userText.matches(".*soundcloud.com.*")) {
             //the new soundcloud redirects to what seems to be an ajax page
             String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
             GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null);
-            UXStats.instance().log(invokedFrom == ActionInvocationSource.FROM_FILE_MENU ? UXAction.DOWNLOAD_CLOUD_URL_FROM_FILE_ACTION : UXAction.DOWNLOAD_CLOUD_URL_FROM_SEARCH_FIELD);
             return true;
         } else if (userText.startsWith("http://") || (userText.startsWith("https://"))) {
             GUIMediator.instance().openTorrentURI(userText, true);
-            UXStats.instance().log(invokedFrom == ActionInvocationSource.FROM_FILE_MENU ? UXAction.DOWNLOAD_TORRENT_URL_FROM_FILE_ACTION : UXAction.DOWNLOAD_TORRENT_URL_FROM_SEARCH_FIELD);
             return true;
         } else {
 
@@ -256,9 +249,6 @@ public final class FileMenuActions {
                 if (file.exists()) {
                     GUIMediator.instance().openTorrentFile(file, true); // Open the torrent file
                     return true;
-                } else {
-                    // TODO show error dialog telling
-                    // user that they entered a bad file name    
                 }
                 // Not a file
             }
@@ -331,12 +321,6 @@ public final class FileMenuActions {
         public void actionPerformed(ActionEvent e) {
             SendFileProgressDialog dlg = new SendFileProgressDialog(GUIMediator.getAppFrame());
             dlg.setVisible(true);
-            UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_MENU);
         }
-    }
-    
-    public enum ActionInvocationSource {
-        FROM_FILE_MENU,
-        FROM_SEARCH_FIELD
     }
 }

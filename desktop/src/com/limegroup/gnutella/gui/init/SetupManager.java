@@ -15,8 +15,6 @@
 
 package com.limegroup.gnutella.gui.init;
 
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
@@ -30,13 +28,10 @@ import org.limewire.util.OSUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 /**
  * This class manages the setup wizard.  It constructs all of the primary
@@ -135,10 +130,7 @@ public final class SetupManager {
         IntentWindow intentWindow = new IntentWindow(this);
         if (!intentWindow.isConfirmedWillNot()) {
             windows.add(intentWindow);
-        } else {
-            UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_AFTER_UPDATE);
         }
-
         // Nothing to install?.. Begone.
         if (windows.size() == 0) {
             return;
@@ -254,11 +246,7 @@ public final class SetupManager {
         JPanel bottomRow = new JPanel();
         bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.X_AXIS));
         ButtonRow buttons = new ButtonRow(actions, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
-        LanguagePanel languagePanel = new LanguagePanel(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateLanguage();
-            }
-        });
+        LanguagePanel languagePanel = new LanguagePanel(e -> updateLanguage());
         bottomRow.add(languagePanel);
         bottomRow.add(Box.createHorizontalGlue());
         bottomRow.add(buttons);
@@ -369,25 +357,17 @@ public final class SetupManager {
 
         InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(String.valueOf(FrostWireUtils.getBuildNumber()));
 
-        Future<Void> future = BackgroundExecutorService.submit(new Callable<Void>() {
-            public Void call() {
-                SettingsGroupManager.instance().save();
-                return null;
-            }
+        BackgroundExecutorService.schedule(() -> {
+            SettingsGroupManager.instance().save();
         });
 
         if (_currentWindow instanceof IntentWindow) {
             IntentWindow intent = (IntentWindow) _currentWindow;
             if (!intent.isConfirmedWillNot()) {
                 GUIMediator.showWarning("FrostWire is not distributed to people who intend to use it for the purposes of copyright infringement.\n\nThank you for your interest; however, you cannot continue to use FrostWire at this time.");
-                try {
-                    future.get();
-                } catch (Exception ignored) {
-                }
                 System.exit(1);
             }
             intent.applySettings(true);
-            UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_FIRST_TIME);
         }
 
         dialogFrame.getDialog().dispose();

@@ -24,8 +24,6 @@ import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -33,12 +31,9 @@ import net.miginfocom.swing.MigLayout;
 import org.gudy.azureus2.core3.util.Debug;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
@@ -281,42 +276,17 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void buildListeners() {
-        buttonSelectFile.addActionListener(new ActionListener() {
+        buttonSelectFile.addActionListener(arg0 -> onButtonSelectFile());
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                onButtonSelectFile();
-            }
-        });
+        buttonSelectFolder.addActionListener(e -> onButtonSelectFolder());
 
-        buttonSelectFolder.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onButtonSelectFolder();
-            }
-        });
+        buttonClose.addActionListener(this::onButtonClose);
 
-        buttonClose.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onButtonClose(e);
-            }
-        });
+        buttonSaveAs.addActionListener(arg0 -> onButtonSaveAs());
 
-        buttonSaveAs.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                onButtonSaveAs();
-            }
-        });
-
-        checkUseDHT.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent arg0) {
-                boolean useDHT = checkUseDHT.isSelected();
-                updateTrackerRelatedControlsAvailability(useDHT);
-            }
+        checkUseDHT.addChangeListener(arg0 -> {
+            boolean useDHT = checkUseDHT.isSelected();
+            updateTrackerRelatedControlsAvailability(useDHT);
         });
 
         textTrackers.addMouseListener(new MouseAdapter() {
@@ -329,12 +299,7 @@ public class CreateTorrentDialog extends JDialog {
         });
 
         pieceSizeComboBox.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        onPieceSizeSelected(pieceSizeComboBox.getSelectedIndex());
-                    }
-                }
+                e -> onPieceSizeSelected(pieceSizeComboBox.getSelectedIndex())
         );
     }
 
@@ -499,28 +464,15 @@ public class CreateTorrentDialog extends JDialog {
             return;
         }
 
-        new Thread(new Runnable() {
+        new Thread(() -> {
+            if (makeTorrent()) {
+                revertSaveCloseButtons();
+                progressBar.setString(I18n.tr("Torrent Created."));
 
-            @Override
-            public void run() {
-                if (makeTorrent()) {
-                    revertSaveCloseButtons();
-                    progressBar.setString(I18n.tr("Torrent Created."));
+                SwingUtilities.invokeLater(CreateTorrentDialog.this::dispose);
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            CreateTorrentDialog.this.dispose();
-                            UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_FORMALLY);
-                        }
-                    });
-
-                    if (autoOpen) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                GUIMediator.instance().openTorrentForSeed(new File(dotTorrentSavePath), saveDir);
-                            }
-                        });
-                    }
+                if (autoOpen) {
+                    SwingUtilities.invokeLater(() -> GUIMediator.instance().openTorrentForSeed(new File(dotTorrentSavePath), saveDir));
                 }
             }
         }).start();
@@ -739,12 +691,9 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void fixWebSeedMirrorUrl(final String mirror) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                String text = textWebSeeds.getText();
-                textWebSeeds.setText(text.replaceAll(mirror, mirror + "/"));
-            }
+        GUIMediator.safeInvokeLater(() -> {
+            String text = textWebSeeds.getText();
+            textWebSeeds.setText(text.replaceAll(mirror, mirror + "/"));
         });
     }
 
@@ -818,33 +767,21 @@ public class CreateTorrentDialog extends JDialog {
      * buttons of the wizard from next|cancel to close
      */
     private void disableSaveCloseButtons() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                buttonSaveAs.setText(I18n.tr("Saving Torrent..."));
-                buttonSaveAs.setEnabled(false);
-                buttonClose.setEnabled(false);
-            }
+        SwingUtilities.invokeLater(() -> {
+            buttonSaveAs.setText(I18n.tr("Saving Torrent..."));
+            buttonSaveAs.setEnabled(false);
+            buttonClose.setEnabled(false);
         });
     }
     
     private void showWebseedsErrorMessage(Exception webSeedsException) {
         final Exception e = webSeedsException;
         reportCurrentTask(e.getMessage());
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                GUIMediator.showError(e.getMessage());
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> GUIMediator.showError(e.getMessage()));
     }
 
     private void reportCurrentTask(final String task_description) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setString(task_description);
-            }
-        });
+        SwingUtilities.invokeLater(() -> progressBar.setString(task_description));
     }
 
     /*

@@ -20,8 +20,6 @@ package com.limegroup.gnutella.gui.options.panes;
 
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentSeedingSettingComponent;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
@@ -42,7 +40,6 @@ public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
 
     public TorrentSeedingSettingPaneItem() {
         super(TITLE, LABEL);
-
         COMPONENT = new TorrentSeedingSettingComponent(true, false);
         add(COMPONENT);
     }
@@ -61,15 +58,10 @@ public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
     @Override
     public boolean applyOptions() throws IOException {
         SharingSettings.SEED_FINISHED_TORRENTS.setValue(COMPONENT.wantsSeeding());
-
         if (!COMPONENT.wantsSeeding()) {
             BTDownloadMediator.instance().stopCompleted();
         }
-
         GUIMediator.instance().getStatusLine().refresh();
-
-        UXStats.instance().log(SharingSettings.SEED_FINISHED_TORRENTS.getValue() ? UXAction.SHARING_SEEDING_ENABLED : UXAction.SHARING_SEEDING_DISABLED);
-
         return false;
     }
 }

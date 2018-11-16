@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
@@ -30,7 +29,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static com.frostwire.uxstats.UXAction.LIBRARY_SHARE_FROM_ROW_ACTION;
 
 /**
  * @author gubatron
@@ -130,12 +128,9 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
                     BTDownloadMediator.instance().isActiveTorrentDownload(actionsHolder.getFile())) {
                 return;
             }
-
             if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
                 TorrentUtil.makeTorrentAndDownload(actionsHolder.getFile(), null, true);
             }
-
-            UXStats.instance().log(LIBRARY_SHARE_FROM_ROW_ACTION);
         }
     }
 

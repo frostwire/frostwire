@@ -24,8 +24,6 @@ import com.frostwire.jlibtorrent.Vectors;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -180,7 +178,6 @@ public final class TorrentUtil {
             for (BTDownload downloader : downloaders) {
                 downloader.resume();
             }
-            UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
         }
         return allowedToResume;
     }
@@ -238,15 +235,13 @@ public final class TorrentUtil {
 
             final TorrentInfo torrent = TorrentInfo.bdecode(bencoded_torrent_bytes);
 
-            GUIMediator.safeInvokeLater(new Runnable() {
-                public void run() {
-                    if (uiTorrentMakerListener != null) {
-                        uiTorrentMakerListener.beforeOpenForSeedInUIThread();
-                    }
-                    GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
-                    if (showShareTorrentDialog) {
-                        new ShareTorrentDialog(GUIMediator.getAppFrame(), torrent).setVisible(true);
-                    }
+            GUIMediator.safeInvokeLater(() -> {
+                if (uiTorrentMakerListener != null) {
+                    uiTorrentMakerListener.beforeOpenForSeedInUIThread();
+                }
+                GUIMediator.instance().openTorrentForSeed(torrentFile, file.getParentFile());
+                if (showShareTorrentDialog) {
+                    new ShareTorrentDialog(GUIMediator.getAppFrame(), torrent).setVisible(true);
                 }
             });
 

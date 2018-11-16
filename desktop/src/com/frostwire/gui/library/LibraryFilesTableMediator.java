@@ -29,8 +29,6 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
@@ -55,8 +53,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * This class wraps the JTable that displays files in the library,
@@ -301,20 +299,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         if (dirHolder instanceof MediaTypeSavedFilesDirectoryHolder) {
             MediaType mediaType = ((MediaTypeSavedFilesDirectoryHolder) dirHolder).getMediaType();
             setMediaType(mediaType);
-
-            if (mediaType.equals(MediaType.getAudioMediaType())) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_AUDIO);
-            } else if (mediaType == MediaType.getImageMediaType()) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_PICTURES);
-            } else if (mediaType == MediaType.getDocumentMediaType()) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS);
-            } else if (mediaType == MediaType.getVideoMediaType()) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_VIDEOS);
-            } else if (mediaType == MediaType.getTorrentMediaType()) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS);
-            } else if (mediaType == MediaType.getProgramMediaType()) {
-                UXStats.instance().log(UXAction.LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS);
-            }
         } else {
             setMediaType(MediaType.getAnyTypeMediaType());
         }
@@ -325,25 +309,11 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         for (List<File> partition : partitionedFiles) {
             final List<File> fPartition = partition;
 
-            BackgroundExecutorService.schedule(new Runnable() {
-
-                @Override
-                public void run() {
-                    for (final File file : fPartition) {
-                        GUIMediator.safeInvokeLater(new Runnable() {
-                            public void run() {
-                                addUnsorted(file);
-                            }
-                        });
-                    }
-
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            LibraryMediator.instance().getLibrarySearch().addResults(fPartition.size());
-                        }
-                    });
-
+            BackgroundExecutorService.schedule(() -> {
+                for (final File file : fPartition) {
+                    GUIMediator.safeInvokeLater(() -> addUnsorted(file));
                 }
+                GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().getLibrarySearch().addResults(fPartition.size()));
             });
 
         }
@@ -525,7 +495,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         }
         if (getMediaType().equals(MediaType.getAudioMediaType()) && MediaPlayer.isPlayableFile(line.getFile())) {
             MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, null, getFilesView());
-            UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
             return;
         }
         launch(true);
@@ -578,7 +547,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         if (playAudio) {
             GUILauncher.launch(providers);
-            UXStats.instance().log(stopAudio ? UXAction.LIBRARY_VIDEO_PLAY : UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
         } else {
             GUIMediator.launchFile(selectedFile);
         }
@@ -887,6 +855,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
             SwingWorker<Void, Void> demuxWorker = new SwingWorker<Void, Void>() {
 
+                @SuppressWarnings("RedundantThrows")
                 @Override
                 protected Void doInBackground() throws Exception {
                     isDemuxing = true;
@@ -908,12 +877,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         private void selectAudio() {
             final LibraryExplorer explorer = LibraryMediator.instance().getLibraryExplorer();
-            explorer.enqueueRunnable(new Runnable() {
-                @Override
-                public void run() {
-                    explorer.selectAudio();
-                }
-            });
+            explorer.enqueueRunnable(explorer::selectAudio);
             explorer.executePendingRunnables();
         }
 
@@ -942,27 +906,19 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         }
 
         private void updateDemuxingStatus(final File demuxed, final int totalDemuxed, final boolean demuxSuccess) {
-            GUIMediator.safeInvokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    LibraryExplorer explorer = LibraryMediator.instance().getLibraryExplorer();
-                    explorer.enqueueRunnable(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (demuxSuccess) {
-                                add(demuxed, 0);
-                                update(demuxed);
-                                LibraryMediator.instance().getLibrarySearch().pushStatus(I18n.tr("Finished") + " " + demuxedFiles.size() + " " + I18n.tr("out of") + " " + totalDemuxed + ". Extracting audio...");
-                                System.out.println("Finished" + demuxedFiles.size() + " out of " + totalDemuxed + ". Extracting audio...");
-                            } else {
-                                LibraryMediator.instance().getLibrarySearch().pushStatus(I18n.tr("Could not extract audio from") + " " + demuxed.getName());
-                            }
-                        }
-
-                    });
-                    explorer.executePendingRunnables();
-                }
+            GUIMediator.safeInvokeAndWait(() -> {
+                LibraryExplorer explorer = LibraryMediator.instance().getLibraryExplorer();
+                explorer.enqueueRunnable(() -> {
+                    if (demuxSuccess) {
+                        add(demuxed, 0);
+                        update(demuxed);
+                        LibraryMediator.instance().getLibrarySearch().pushStatus(I18n.tr("Finished") + " " + demuxedFiles.size() + " " + I18n.tr("out of") + " " + totalDemuxed + ". Extracting audio...");
+                        System.out.println("Finished" + demuxedFiles.size() + " out of " + totalDemuxed + ". Extracting audio...");
+                    } else {
+                        LibraryMediator.instance().getLibrarySearch().pushStatus(I18n.tr("Could not extract audio from") + " " + demuxed.getName());
+                    }
+                });
+                explorer.executePendingRunnables();
             });
         }
     }

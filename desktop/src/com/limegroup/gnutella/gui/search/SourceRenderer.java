@@ -19,8 +19,6 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
 
@@ -85,7 +83,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
                 if (sourceHolder != null) {
                     sourceHolder.getUISearchResult().showSearchResultWebPage(true);
                     e.consume();
-                    UXStats.instance().log(UXAction.SEARCH_RESULT_SOURCE_VIEW);
                 }
             }
         };

@@ -20,8 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
@@ -38,7 +36,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     private final SoundcloudSearchResult sr;
 
-    public SoundcloudUISearchResult(SoundcloudSearchResult sr, SearchEngine se, String query) {
+    SoundcloudUISearchResult(SoundcloudSearchResult sr, SearchEngine se, String query) {
         super(sr, se, query);
         this.sr = sr;
     }
@@ -48,21 +46,12 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr);
         showSearchResultWebPage(false);
-        UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
     }
 
     @Override
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp) {
-        PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                download(false);
-            }
-        }, popupMenu, lines.length > 0, 1);
-        PopupUtils.addMenuItem(SearchMediator.SOUNDCLOUD_DETAILS_STRING, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showSearchResultWebPage(true);
-            }
-        }, popupMenu, lines.length == 1, 2);
+        PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
+        PopupUtils.addMenuItem(SearchMediator.SOUNDCLOUD_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 2);
 
         return popupMenu;
     }

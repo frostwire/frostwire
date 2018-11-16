@@ -2,7 +2,6 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.util.Logger;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.LimeWireCore;
 import com.limegroup.gnutella.gui.bugs.BugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
@@ -49,8 +48,6 @@ final class Finalizer {
                 try {
                     LOG.info("Shutdown thread started");
                     VPNStatusRefresher.getInstance().shutdown();
-                    //LOG.info("Flushing UXStats...");
-                    UXStats.instance().flush();
                     //LOG.info("SearchMediator shutting down...");
                     SearchMediator.instance().shutdown();
                     //LOG.info("MediaPlayer stopping...");

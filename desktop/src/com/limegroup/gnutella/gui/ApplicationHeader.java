@@ -26,8 +26,6 @@ import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.theme.SkinApplicationHeaderUI;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.gui.updates.UpdateMediator;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.actions.FileMenuActions;
@@ -97,27 +95,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         headerButtonBackgroundSelected = GUIMediator.getThemeImage("selected_header_button_background").getImage();
         headerButtonBackgroundUnselected = GUIMediator.getThemeImage("unselected_header_button_background").getImage();
 
-        cloudSearchField = new GoogleSearchField() {
-            {
-                super.getFindButton().addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        UXStats.instance().log(UXAction.SEARCH_STARTED_SMALL_SEARCH_ICON_CLICK);
-                    }
-                    
-                });
-            }
-            
-            @Override
-            public void processKeyEvent(KeyEvent evt) {
-                if ((evt.getID()  == KeyEvent.KEY_PRESSED) &&
-                    evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                    UXStats.instance().log(UXAction.SEARCH_STARTED_ENTER_KEY);
-                }
-                super.processKeyEvent(evt);
-            }
-        };
-        
+        cloudSearchField = new GoogleSearchField();
         searchPanels = createSearchPanel();
         add(searchPanels, "wmin 240px, wmax 370px, growprio 50, growx, gapright 10px, gapleft 5px");
 
@@ -249,7 +227,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                         }
 
                         if (query != null) {
-                            UXStats.instance().log(UXAction.SEARCH_STARTED_SEARCH_TAB_BUTTON);
                             cloudSearchField.getActionListeners()[0].actionPerformed(null);
                         }
                     }
@@ -414,11 +391,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
             void switchButtonImage(final boolean state) {
                 updateButtonAnimationLastChange = System.currentTimeMillis();
-                GUIMediator.safeInvokeLater(new Runnable() {
-                    public void run() {
-                        updateButton.setIcon(state ? updateImageButtonOn : updateImageButtonOff);
-                    }
-                });
+                GUIMediator.safeInvokeLater(() -> updateButton.setIcon(state ? updateImageButtonOn : updateImageButtonOff));
             }
         };
         t.start();
@@ -456,11 +429,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         // http://developer.java.sun.com/developer/bugParade/bugs/4379600.html
         // http://developer.java.sun.com/developer/bugParade/bugs/4128120.html
         // for related problems.
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                requestSearchFocusImmediately();
-            }
-        });
+        SwingUtilities.invokeLater(() -> requestSearchFocusImmediately());
     }
     
     void startSearch(String query) {
@@ -476,7 +445,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);                
 
             // Start a download from the search box by entering a URL.
-            if (FileMenuActions.openMagnetOrTorrent(query,FileMenuActions.ActionInvocationSource.FROM_SEARCH_FIELD)) {
+            if (FileMenuActions.openMagnetOrTorrent(query)) {
                 cloudSearchField.setText("");
                 cloudSearchField.hidePopup();
                 return;

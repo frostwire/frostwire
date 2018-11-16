@@ -29,11 +29,11 @@ import static com.frostwire.search.eztv.EztvSearchPerformer.TORRENT_DETAILS_PAGE
 
 public final class EztvSearchPerformerTest {
     public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "foo";
+        String TEST_SEARCH_TERM = "origin";
         HttpClient httpClient = HttpClientFactory.newInstance();
         String fileStr;
         try {
-            fileStr = httpClient.get("https://eztv.ag/search/" + TEST_SEARCH_TERM);
+            fileStr = httpClient.get("https://eztv.re/search/" + TEST_SEARCH_TERM);
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Aborting test.");
@@ -51,7 +51,7 @@ public final class EztvSearchPerformerTest {
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
 
-            String detailUrl = "https://eztv.ag" + searchResultsMatcher.group(1);
+            String detailUrl = "https://eztv.re" + searchResultsMatcher.group(1);
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage;

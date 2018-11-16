@@ -16,8 +16,6 @@
 package com.frostwire.gui.updates;
 
 import com.frostwire.util.Logger;
-import com.frostwire.uxstats.UXStats;
-import com.frostwire.uxstats.UXStatsConf;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -37,9 +35,10 @@ import java.util.List;
  * UpdateManager will ask this object if it has announcements or an update
  * message available.
  */
+@SuppressWarnings("RedundantThrows")
 final class UpdateMessageReader implements ContentHandler {
 
-    private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
+    //private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
     private static final String DEFAULT_UPDATE_URL = "http://update.frostwire.com";
 
     private HashSet<UpdateMessage> _announcements = null;
@@ -111,9 +110,6 @@ final class UpdateMessageReader implements ContentHandler {
         }
     }
 
-    public void characters(char[] ch, int start, int length) throws SAXException {
-
-    }
 
     public void endDocument() throws SAXException {
     }
@@ -156,6 +152,11 @@ final class UpdateMessageReader implements ContentHandler {
             _bufferMessage = null;
         }
     } // endElement
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+
+    }
 
     public void endPrefixMapping(String arg0) throws SAXException {
     }
@@ -420,36 +421,11 @@ final class UpdateMessageReader implements ContentHandler {
                     // System.out.println("UpdateMessageReader.startElement overlay intro=false");
                 }
             } // overlays
-
-            if (_bufferMessage.getMessageType().equals("uxstats")) {
-                processUXStatsMsg(atts);
-            }
         }
 
     }
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-    }
-
-    private void processUXStatsMsg(Attributes atts) {
-        try {
-            String enabled = atts.getValue("enabled");
-
-            if (enabled != null && enabled.equals("true") && ApplicationSettings.UX_STATS_ENABLED.getValue()) {
-                String url = "http://ux.frostwire.com/dux";
-                String os = OSUtils.getFullOS();
-                String fwversion = FrostWireUtils.getFrostWireVersion();
-                String fwbuild = String.valueOf(FrostWireUtils.getBuildNumber());
-                int period = Integer.parseInt(atts.getValue("period"));
-                int minEntries = Integer.parseInt(atts.getValue("minEntries"));
-                int maxEntries = Integer.parseInt(atts.getValue("maxEntries"));
-
-                UXStatsConf context = new UXStatsConf(url, os, fwversion, fwbuild, period, minEntries, maxEntries);
-                UXStats.instance().setContext(context);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Unable to process uxstats message from server", e);
-        }
     }
 }

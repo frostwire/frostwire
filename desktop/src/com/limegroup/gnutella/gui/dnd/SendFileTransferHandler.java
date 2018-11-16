@@ -17,8 +17,6 @@ package com.limegroup.gnutella.gui.dnd;
 
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
 import com.frostwire.gui.tabs.TransfersTab;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -59,12 +57,7 @@ public class SendFileTransferHandler extends LimeTransferHandler {
             //We will only send either 1 folder, or 1 file.
             if (files.length == 1) {
                 //return handleFiles(files);
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        handleFiles(files);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> handleFiles(files));
                 return true;
             }
         } catch (Throwable ignored) {
@@ -84,7 +77,6 @@ public class SendFileTransferHandler extends LimeTransferHandler {
         if (result == DialogOption.YES) {
             new SendFileProgressDialog(GUIMediator.getAppFrame(), files[0]).setVisible(true);
             GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-            UXStats.instance().log(UXAction.SHARING_TORRENT_CREATED_WITH_SEND_TO_FRIEND_FROM_DND);
             return true;
         }
         return false;

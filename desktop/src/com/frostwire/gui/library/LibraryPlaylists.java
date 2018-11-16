@@ -27,8 +27,6 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
@@ -400,7 +398,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         selectedPlaylist.save();
         list.repaint();
         textName.setVisible(false);
-        UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_RENAMED);
         LibraryPlaylistsTableMediator.instance().updateTableItems(selectedPlaylist);
     }
 
@@ -416,7 +413,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         model.addElement(cell);
         list.setSelectedValue(cell, true);
         textName.setVisible(false);
-        UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_CREATED);
     }
 
     private void cancelEdit() {
@@ -705,7 +701,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
                 selectedPlaylist.delete();
                 model.removeElement(list.getSelectedValue());
                 LibraryMediator.instance().clearLibraryTable();
-                UXStats.instance().log(UXAction.LIBRARY_PLAYLIST_REMOVED);
             }
         }
     }

@@ -18,16 +18,11 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * 
@@ -39,7 +34,7 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
 
     private TorrentSearchResult sr;
 
-    public TorrentUISearchResult(TorrentSearchResult sr, SearchEngine se, String query) {
+    TorrentUISearchResult(TorrentSearchResult sr, SearchEngine se, String query) {
         super(sr, se, query);
         this.sr = sr;
     }
@@ -58,22 +53,13 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
         GUIMediator gm = GUIMediator.instance();
         gm.openTorrentSearchResult(sr, partial);
         showSearchResultWebPage(false);
-        UXStats.instance().log((sr instanceof TorrentCrawledSearchResult) ? UXAction.DOWNLOAD_PARTIAL_TORRENT_FILE : UXAction.DOWNLOAD_FULL_TORRENT_FILE);
     }
 
     @Override
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator resultPanel) {
-        PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                download(false);
-            }
-        }, popupMenu, lines.length > 0, 1);
+        PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_PARTIAL_FILES_STRING, resultPanel.DOWNLOAD_PARTIAL_FILES_LISTENER, popupMenu, lines.length == 1, 2);
-        PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showSearchResultWebPage(true);
-            }
-        }, popupMenu, lines.length == 1, 3);
+        PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 3);
 
         return popupMenu;
     }

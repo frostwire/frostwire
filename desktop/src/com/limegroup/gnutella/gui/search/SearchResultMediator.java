@@ -27,8 +27,6 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIConstants;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -225,13 +223,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     protected void buildListeners() {
         super.buildListeners();
 
-        DOWNLOAD_LISTENER = e -> {
-            if (e != null && e.getSource() instanceof JButton) {
-                UXStats.instance().log(UXAction.SEARCH_RESULT_BIG_BUTTON_DOWNLOAD);
-            }
-
-            SearchMediator.doDownload(SearchResultMediator.this);
-        };
+        DOWNLOAD_LISTENER = e -> SearchMediator.doDownload(SearchResultMediator.this);
 
         TORRENT_DETAILS_LISTENER = new MouseAdapter() {
             @Override
@@ -384,7 +376,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
     @Override
     public void handleMouseDoubleClick(MouseEvent e) {
-        UXStats.instance().log(UXAction.SEARCH_RESULT_CLICK_DOWNLOAD);
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
 
@@ -392,7 +383,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Forwards the event to DOWNLOAD_LISTENER.
      */
     public void handleActionKey() {
-        UXStats.instance().log(UXAction.SEARCH_RESULT_ENTER_KEY_DOWNLOAD);
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
 
@@ -635,7 +625,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
             if (scrollPaneSearchOptions.isVisible()) {
                 searchOptionsPanel.onOptionsPanelShown();
-                UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
             }
         });
 

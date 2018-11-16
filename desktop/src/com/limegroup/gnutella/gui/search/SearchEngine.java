@@ -117,7 +117,7 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.ag") {
+    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.re") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
