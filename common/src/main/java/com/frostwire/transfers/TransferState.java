@@ -23,7 +23,6 @@ package com.frostwire.transfers;
  * @author aldenml
  */
 public enum TransferState {
-
     FINISHING,
     CHECKING,
     DOWNLOADING_METADATA,
@@ -55,5 +54,18 @@ public enum TransferState {
     REDIRECTING,
     STREAMING,
     SCANNING,
-    ERROR_CONNECTION_TIMED_OUT
+    ERROR_CONNECTION_TIMED_OUT;
+
+    public static boolean isErrored(TransferState state) {
+        return state.equals(TransferState.ERROR) ||
+                state.equals(TransferState.ERROR_MOVING_INCOMPLETE) ||
+                state.equals(TransferState.ERROR_HASH_MD5) ||
+                state.equals(TransferState.ERROR_SIGNATURE) ||
+                state.equals(TransferState.ERROR_NOT_ENOUGH_PEERS) ||
+                state.equals(TransferState.ERROR_NO_INTERNET) ||
+                state.equals(TransferState.ERROR_SAVE_DIR) ||
+                state.equals(TransferState.ERROR_TEMP_DIR) ||
+                state.equals(TransferState.ERROR_DISK_FULL) ||
+                state.equals(TransferState.ERROR_CONNECTION_TIMED_OUT);
+    }
 }
