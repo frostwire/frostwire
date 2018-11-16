@@ -36,8 +36,6 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
-import com.frostwire.uxstats.UXStats;
-import com.frostwire.uxstats.UXStatsConf;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -295,19 +293,6 @@ public final class SoftwareUpdater {
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
-
-        if (update.config.uxEnabled && CM.getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED)) {
-            String url = "http://ux.frostwire.com/aux";
-            String os = SearchEngine.getOSVersionString();
-            String fwversion = Constants.FROSTWIRE_VERSION_STRING;
-            String fwbuild = Constants.FROSTWIRE_BUILD;
-            int period = update.config.uxPeriod;
-            int minEntries = update.config.uxMinEntries;
-            int maxEntries = update.config.uxMaxEntries;
-
-            UXStatsConf uxStatsContext = new UXStatsConf(url, os, fwversion, fwbuild, period, minEntries, maxEntries);
-            UXStats.instance().setContext(uxStatsContext);
-        }
     }
 
     private static class Update {
@@ -362,10 +347,6 @@ public final class SoftwareUpdater {
         int interstitialFirstDisplayDelayInMinutes = 3;
 
         // ux stats
-        boolean uxEnabled = false;
-        int uxPeriod = 3600;
-        int uxMinEntries = 10;
-        int uxMaxEntries = 10000;
         int mopubSearchHeaderBannerThreshold = 80;
         int mopubSearchHeaderBannerIntervalInMs = 60000; // 1 min
     }

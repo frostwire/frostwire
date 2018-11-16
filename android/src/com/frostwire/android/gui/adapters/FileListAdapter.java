@@ -70,8 +70,6 @@ import com.frostwire.android.gui.views.MenuBuilder;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -384,7 +382,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             } else {
                 try {
                     UIUtils.playEphemeralPlaylist(ctx, fd);
-                    UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 } catch (RuntimeException re) {
                     re.printStackTrace();
                     UIUtils.showShortMessage(ctx, R.string.media_player_failed);

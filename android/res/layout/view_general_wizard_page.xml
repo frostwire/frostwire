@@ -100,30 +100,5 @@
             android:paddingLeft="35dp"
             android:text="@string/seeding_wifi_settings_explanation"
             android:textColor="@color/app_text_wizard_dark" />
-
-        <TextView
-            style="@style/WizardText.Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:background="@color/basic_blue_dark"
-            android:paddingBottom="7dp"
-            android:paddingTop="7dp"
-            android:text="@string/other_settings" />
-
-        <CheckBox
-            android:id="@+id/view_general_wizard_page_check_ux_stats"
-            style="@style/WizardSubTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/anonymous_usage_statistics" />
-
-        <TextView
-            style="@style/WizardText.Sub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/anonymous_usage_statistics_summary" />
     </LinearLayout>
 </ScrollView>

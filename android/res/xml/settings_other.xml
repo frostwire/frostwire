@@ -39,10 +39,6 @@
         android:key="frostwire.prefs.gui.distraction_free_search"
         android:summary="@string/distraction_free_search_results_summary"
         android:title="@string/distraction_free_search_results" />
-    <android.support.v7.preference.CheckBoxPreference
-        android:key="frostwire.prefs.uxstats.enabled"
-        android:summary="@string/anonymous_usage_statistics_summary"
-        android:title="@string/anonymous_usage_statistics" />
     <com.frostwire.android.gui.views.preference.ButtonActionPreference
         android:key="frostwire.prefs.internal.clear_index"
         android:summary="@string/clear_search_cache_summary"

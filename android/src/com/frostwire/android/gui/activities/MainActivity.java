@@ -81,8 +81,6 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import org.apache.commons.io.IOUtils;
 
@@ -302,11 +300,9 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_START_TRANSFER_FROM_PREVIEW:
                     if (Ref.alive(NewTransferDialog.srRef)) {
                         SearchFragment.startDownload(this, NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
-                        UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE_FROM_PREVIEW);
                     }
                     break;
                 case Constants.ACTION_REQUEST_SHUTDOWN:
-                    UXStats.instance().log(UXAction.MISC_NOTIFICATION_EXIT);
                     showShutdownDialog();
                     break;
             }
@@ -534,12 +530,10 @@ public class MainActivity extends AbstractActivity implements
             //fresh install
             //Offers.forceDisabledAds(this); // no ads on first session ever
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
-            UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_FIRST_TIME);
         } else if (!currentVersionBuild.equals(lastSeenVersionBuild)) {
             //just updated.
             //Offers.forceDisabledAds(this); // no ads right after update
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
-            UXStats.instance().log(UXAction.CONFIGURATION_WIZARD_AFTER_UPDATE);
         }
     }
 
@@ -563,7 +557,6 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void showShutdownDialog() {
-        UXStats.instance().flush();
         YesNoDialog dlg = YesNoDialog.newInstance(
                 SHUTDOWN_DIALOG_ID,
                 R.string.app_shutdown_dlg_title,

@@ -73,22 +73,17 @@ import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -528,7 +523,6 @@ public final class SearchFragment extends AbstractFragment implements
         LocalSearchEngine.instance().performSearch(query);
         searchProgress.setProgressEnabled(true);
         showSearchView(getView());
-        UXStats.instance().log(UXAction.SEARCH_STARTED_ENTER_KEY);
     }
 
     private void cancelSearch() {
@@ -627,7 +621,6 @@ public final class SearchFragment extends AbstractFragment implements
                 startDownload(getActivity(), sr, toastMessage);
             }
         }
-        uxLogAction(sr);
     }
 
     public static void startDownload(Context ctx, SearchResult sr, String message) {
@@ -698,19 +691,6 @@ public final class SearchFragment extends AbstractFragment implements
             stringDownloadingPromo = getString(R.string.azureus_manager_item_downloading);
         }
         startTransfer(sr, stringDownloadingPromo);
-    }
-
-    private void uxLogAction(SearchResult sr) {
-        UXStats.instance().log(UXAction.SEARCH_RESULT_CLICKED);
-        if (sr instanceof HttpSearchResult) {
-            UXStats.instance().log(UXAction.DOWNLOAD_CLOUD_FILE);
-        } else if (sr instanceof TorrentSearchResult) {
-            if (sr instanceof TorrentCrawledSearchResult) {
-                UXStats.instance().log(UXAction.DOWNLOAD_PARTIAL_TORRENT_FILE);
-            } else {
-                UXStats.instance().log(UXAction.DOWNLOAD_FULL_TORRENT_FILE);
-            }
-        }
     }
 
     @Override
@@ -1027,7 +1007,6 @@ public final class SearchFragment extends AbstractFragment implements
                     pulse = null;
                 }
                 openKeywordFilterDrawerView();
-                UXStats.instance().log(UXAction.SEARCH_FILTER_BUTTON_CLICK);
             });
         }
 

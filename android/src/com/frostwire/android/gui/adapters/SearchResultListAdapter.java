@@ -47,8 +47,6 @@ import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -232,10 +230,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private static boolean isAudio(SearchResult sr) {
-        if (sr instanceof SoundcloudSearchResult) {
-            return true;
-        }
-        return false;
+        return sr instanceof SoundcloudSearchResult;
     }
 
     private int getFileTypeIconId() {
@@ -299,7 +294,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         public void onClick(View v) {
             String url = (String) v.getTag();
             UIUtils.openURL(v.getContext(), url);
-            UXStats.instance().log(UXAction.SEARCH_RESULT_SOURCE_VIEW);
         }
     }
 

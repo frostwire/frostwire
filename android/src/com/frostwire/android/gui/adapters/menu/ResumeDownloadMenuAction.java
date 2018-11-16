@@ -30,8 +30,6 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 /**
  * @author gubatron
@@ -62,7 +60,6 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
                     if (context instanceof TimerObserver) {
                         ((TimerObserver) context).onTime();
                     }
-                    UXStats.instance().log(UXAction.DOWNLOAD_RESUME);
                 }
             } else {
                 UIUtils.showShortMessage(context, R.string.please_check_connection_status_before_resuming_download);

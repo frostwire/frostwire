@@ -31,7 +31,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.util.Asyncs;
-import com.frostwire.uxstats.UXStats;
 
 /**
  * @author gubatron
@@ -47,7 +46,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     protected void initComponents() {
         setupPermanentStatusNotificationOption();
         setupHapticFeedback();
-        setupUXStatsOption();
         setupClearIndex();
     }
 
@@ -85,19 +83,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     private static void onHapticFeedbackPreferenceChangedTask(boolean checked) {
         ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, checked);
         Engine.instance().onHapticFeedbackPreferenceChanged();
-    }
-
-    private void setupUXStatsOption() {
-        CheckBoxPreference checkPref = findPreference(Constants.PREF_KEY_UXSTATS_ENABLED);
-        if (checkPref != null) {
-            checkPref.setOnPreferenceChangeListener((preference, newValue) -> {
-                boolean newVal = (Boolean) newValue;
-                if (!newVal) { // not send ux stats
-                    UXStats.instance().setContext(null);
-                }
-                return true;
-            });
-        }
     }
 
     private void setupClearIndex() {

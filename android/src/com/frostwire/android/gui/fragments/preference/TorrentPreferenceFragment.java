@@ -32,8 +32,6 @@ import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference.CustomSeekBarPreferenceDialog;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 public final class TorrentPreferenceFragment extends AbstractPreferenceFragment {
 
@@ -63,8 +61,6 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
                 if (preferenceSeedingWifiOnly != null) {
                     preferenceSeedingWifiOnly.setEnabled(newVal);
                 }
-
-                UXStats.instance().log(newVal ? UXAction.SHARING_SEEDING_ENABLED : UXAction.SHARING_SEEDING_DISABLED);
                 return true;
             });
         }

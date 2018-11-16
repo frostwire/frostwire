@@ -42,7 +42,6 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
     private TextView textStoragePath;
     private CheckBox checkSeedFinishedTorrents;
     private CheckBox checkSeedFinishedTorrentsWifiOnly;
-    private CheckBox checkUXStats;
 
     public GeneralWizardPage(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -66,7 +65,6 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         checkSeedFinishedTorrentsWifiOnly.setChecked(CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
         checkSeedFinishedTorrentsWifiOnly.setEnabled(checkSeedFinishedTorrents.isChecked());
         checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
-        checkUXStats.setChecked(CM.getBoolean(Constants.PREF_KEY_UXSTATS_ENABLED));
         validate();
     }
 
@@ -75,7 +73,6 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS, checkSeedFinishedTorrents.isChecked());
         CM.setBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY, checkSeedFinishedTorrentsWifiOnly.isChecked());
-        CM.setBoolean(Constants.PREF_KEY_UXSTATS_ENABLED, checkUXStats.isChecked());
     }
 
     @Override
@@ -114,12 +111,8 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
             validate();
         });
 
-
         checkSeedFinishedTorrentsWifiOnly = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents_wifi_only);
         checkSeedFinishedTorrentsWifiOnly.setOnCheckedChangeListener((buttonView, isChecked) -> validate());
-
-        checkUXStats = findViewById(R.id.view_general_wizard_page_check_ux_stats);
-        checkUXStats.setOnCheckedChangeListener((buttonView, isChecked) -> validate());
 
         final TextView welcome_to_frostwire = findViewById(R.id.view_general_wizard_page_welcome_to_frostwire);
         final String basicOrPlus = getContext().getString(Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? R.string.basic : R.string.plus);

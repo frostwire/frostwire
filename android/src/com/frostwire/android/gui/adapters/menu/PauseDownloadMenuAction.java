@@ -24,8 +24,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 /**
  * @author gubatron
@@ -48,7 +46,6 @@ public final class PauseDownloadMenuAction extends MenuAction {
             if (context instanceof TimerObserver) {
                 ((TimerObserver) context).onTime();
             }
-            UXStats.instance().log(UXAction.DOWNLOAD_PAUSE);
         }
     }
 }

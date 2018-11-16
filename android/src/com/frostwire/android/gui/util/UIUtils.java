@@ -56,8 +56,6 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -260,7 +258,6 @@ public final class UIUtils {
                     if (MusicUtils.isPlaying()) {
                         MusicUtils.playOrPause();
                     }
-                    UXStats.instance().log(UXAction.LIBRARY_VIDEO_PLAY);
                 }
                 context.startActivity(i);
             }
@@ -278,7 +275,7 @@ public final class UIUtils {
         view.setDrawingCacheEnabled(true);
         try {
             Thread.sleep(300);
-        } catch (Throwable t) {
+        } catch (Throwable ignore) {
         }
         Bitmap drawingCache = null;
         try {
@@ -363,7 +360,6 @@ public final class UIUtils {
             List<FileDescriptor> fds = Librarian.instance().getFiles(context, filePath, true);
             if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
-                UXStats.instance().log(UXAction.LIBRARY_PLAY_AUDIO_FROM_FILE);
                 return true;
             } else {
                 return false;

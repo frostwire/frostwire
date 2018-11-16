@@ -127,8 +127,6 @@ final class ConfigurationDefaults {
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 
-        defaultValues.put(Constants.PREF_KEY_UXSTATS_ENABLED, true);
-
         defaultValues.put(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE, MusicPlaybackService.REPEAT_ALL);
         defaultValues.put(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED, false);
 

@@ -70,8 +70,6 @@ import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -110,20 +108,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private long lastAdapterRefresh;
     private String previousFilter;
     private final SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
-
-
-
-    // given the byte:fileType as the index, this array will match the corresponding UXAction code.
-    // no if's necessary, random access -> O(1)
-    private final int[] browseUXActions = {
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_AUDIO,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_PICTURES,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_VIDEOS,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_DOCUMENTS,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_APPLICATIONS,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_RINGTONES,
-            UXAction.LIBRARY_BROWSE_FILE_TYPE_TORRENTS
-    };
 
     private final byte[] tabPositionToFileType = new byte[] {
             Constants.FILE_TYPE_AUDIO,
@@ -391,14 +375,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             selectAllModeOn = false;
             selectAllCheckbox.setChecked(false);
             selectAllCheckboxContainer.setVisibility(View.GONE);
-        }
-        logBrowseAction(fileType);
-    }
-
-    private void logBrowseAction(byte fileType) {
-        try {
-            UXStats.instance().log(browseUXActions[fileType]);
-        } catch (Throwable ignored) {
         }
     }
 

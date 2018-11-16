@@ -24,8 +24,6 @@ import android.net.Uri;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 /**
  * Created on 3/21/15 (on a plane from Ft. Lauderdale to San Francisco)
@@ -53,6 +51,5 @@ public final class SendBitcoinTipAction extends MenuAction {
         } catch (Throwable e) {
             UIUtils.showLongMessage(getContext(), R.string.you_need_a_bitcoin_wallet_app);
         }
-        UXStats.instance().log(UXAction.DOWNLOAD_CLICK_BITCOIN_PAYMENT);
     }
 }

@@ -89,8 +89,6 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -1237,7 +1235,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public void onSwipeLeft() {
             try {
                 MusicUtils.musicPlaybackService.next();
-                UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
             } catch (Throwable e) {
                 // ignore
             }
@@ -1247,7 +1244,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public void onSwipeRight() {
             try {
                 MusicUtils.musicPlaybackService.prev();
-                UXStats.instance().log(UXAction.PLAYER_GESTURE_SWIPE_SONG);
             } catch (Throwable e) {
                 // ignore
             }
@@ -1257,7 +1253,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         public boolean onDoubleTap(MotionEvent e) {
             try {
                 toggleFavorite();
-                UXStats.instance().log(UXAction.PLAYER_TOGGLE_FAVORITE);
             } catch (Throwable t) {
                 return false;
             }
@@ -1267,7 +1262,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         private void onMultiTouchEvent() {
             try {
                 MusicUtils.playOrPause();
-                UXStats.instance().log(UXAction.PLAYER_GESTURE_PAUSE_RESUME);
             } catch (Throwable e) {
                 // ignore
             }

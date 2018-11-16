@@ -38,8 +38,6 @@ import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
-import com.frostwire.uxstats.UXAction;
-import com.frostwire.uxstats.UXStats;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -93,7 +91,6 @@ public final class CancelMenuAction extends MenuAction {
         if (context != null) {
             MainActivity.refreshTransfers(context);
         }
-        UXStats.instance().log(UXAction.DOWNLOAD_REMOVE);
     }
 
     public static class CancelMenuActionDialog extends AbstractDialog {
