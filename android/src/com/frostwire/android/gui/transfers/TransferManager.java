@@ -41,6 +41,7 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.SoundcloudDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -206,14 +207,18 @@ public final class TransferManager {
     public void clearComplete() {
         List<Transfer> transfers = getTransfers();
         for (Transfer transfer : transfers) {
-            if (transfer != null && transfer.isComplete()) {
-                if (transfer instanceof BittorrentDownload) {
-                    BittorrentDownload bd = (BittorrentDownload) transfer;
-                    if (bd.isPaused()) {
-                        bd.remove(false);
-                    }
-                } else {
-                    transfer.remove(false);
+            if (transfer == null) {
+                continue;
+            }
+
+            if (!(transfer instanceof BittorrentDownload) && transfer.isComplete()) {
+                transfer.remove(false);
+            } else if (transfer instanceof BittorrentDownload) {
+                BittorrentDownload bd = (BittorrentDownload) transfer;
+                boolean isFinished = bd.isComplete() && bd.isPaused();
+                boolean isErrored = TransferState.isErrored(bd.getState());
+                if (isFinished || isErrored) {
+                    bd.remove(false);
                 }
             }
         }

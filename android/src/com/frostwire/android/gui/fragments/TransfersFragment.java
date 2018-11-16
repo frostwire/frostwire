@@ -161,7 +161,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
         if (transfers != null && transfers.size() > 0) {
-            if (someTransfersComplete(transfers)) {
+            if (someTransfersComplete(transfers) || someTransfersErrored(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
             }
             if (!bittorrentDisconnected) {
@@ -670,6 +670,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private boolean someTransfersComplete(final List<Transfer> transfers) {
         for (Transfer t : transfers) {
+            if (t == null) {
+                continue;
+            }
             if (t.isComplete()) {
                 return true;
             }
@@ -679,6 +682,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private boolean someTransfersSeeding(final List<Transfer> transfers) {
         for (Transfer t : transfers) {
+            if (t == null) {
+                continue;
+            }
             if (t.getState() == TransferState.SEEDING) {
                 return true;
             }
@@ -688,8 +694,23 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private boolean someTransfersActive(List<Transfer> transfers) {
         for (Transfer t : transfers) {
+            if (t == null) {
+                continue;
+            }
             TransferState state = t.getState();
             if (state == TransferState.DOWNLOADING) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean someTransfersErrored(List<Transfer> transfers) {
+        for (Transfer t : transfers) {
+            if (t == null) {
+                continue;
+            }
+            if (TransferState.isErrored(t.getState())) {
                 return true;
             }
         }

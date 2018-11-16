@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 public final class PixabaySearchPerformer extends CrawlPagedWebSearchPerformer<PixabaySearchResult> {
 
-    static final String API_KEY = "1489683-69e83a64e7ef86185e67a5b6f";
+    static final String API_KEY = "7586785-fa461e94129b4f20ceb83a1a7";
 
     public PixabaySearchPerformer(long token, String keywords, int timeout) {
         super("pixabay.com", token, keywords, timeout, 1, 2);
