@@ -40,9 +40,8 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     public static final String TORRENT_DETAILS_PAGE_REGEX =
             "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
                     "Download Links.*?" +
-                    ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" class=\"magnet\".*?" +
-                    //"(<a href=\"(?<magneturl>magnet:\\?.*?)\" title=\"Magnet Link\".*?)?"+
-                    ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" class=\"download_.\".*?" +
+                    ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" (title=\"Download Torrent\"|class=\"download_.\").*?" +
+                    ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" (class=\"magnet\"|title=\"Magnet Link\").*?" +
                     "Seeds: <span.*?>(?<seeds>.*?)</span><br.*?" +
                     "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?" +
                     "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?" +

@@ -29,7 +29,7 @@ import static com.frostwire.search.eztv.EztvSearchPerformer.TORRENT_DETAILS_PAGE
 
 public final class EztvSearchPerformerTest {
     public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "origin";
+        String TEST_SEARCH_TERM = "foo";
         HttpClient httpClient = HttpClientFactory.newInstance();
         String fileStr;
         try {
