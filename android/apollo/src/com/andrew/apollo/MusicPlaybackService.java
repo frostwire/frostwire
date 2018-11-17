@@ -14,6 +14,9 @@ package com.andrew.apollo;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -34,6 +37,7 @@ import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -45,6 +49,9 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -72,7 +79,7 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
  */
-public class MusicPlaybackService extends Service {
+public class MusicPlaybackService extends JobIntentService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
 
@@ -526,6 +533,17 @@ public class MusicPlaybackService extends Service {
         mServiceInUse = true;
     }
 
+
+    private void foregroundStartForAndroidO() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
+            int id = (int) (1 + (System.currentTimeMillis() % 10000));
+            startForeground(id, notification);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -534,6 +552,7 @@ public class MusicPlaybackService extends Service {
         if (D) LOG.info("Creating service");
         super.onCreate();
 
+        foregroundStartForAndroidO();
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -550,6 +569,49 @@ public class MusicPlaybackService extends Service {
                 new Thread(this::initService).start();
             } catch (Throwable ignored) {}
         }
+    }
+
+    @Override
+    protected void onHandleWork(@NonNull Intent intent) {
+        onStartCommand(intent, 0, 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
+        mServiceStartId = startId;
+        foregroundStartForAndroidO();
+
+        if (intent != null) {
+            final String action = intent.getAction();
+
+            if (intent.hasExtra(NOW_IN_FOREGROUND)) {
+                musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
+                updateNotification();
+            }
+
+            if (SHUTDOWN_ACTION.equals(action)) {
+                cancelShutdown();
+                exiting = intent.hasExtra("force");
+                releaseServiceUiAndStop(exiting);
+                return START_NOT_STICKY;
+            }
+
+            handleCommandIntent(intent);
+        }
+
+        // Make sure the service will shut down on its own if it was
+        // just started but not bound to and nothing is playing
+        scheduleDelayedShutdown();
+
+        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
+            MediaButtonIntentReceiver.completeWakefulIntent(intent);
+        }
+
+        return START_STICKY;
     }
 
     private void initService() {
@@ -762,43 +824,6 @@ public class MusicPlaybackService extends Service {
                 // might be underlocked and otherwise causing a crash on shutdown
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
-        mServiceStartId = startId;
-
-        if (intent != null) {
-            final String action = intent.getAction();
-
-            if (intent.hasExtra(NOW_IN_FOREGROUND)) {
-                musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
-                updateNotification();
-            }
-
-            if (SHUTDOWN_ACTION.equals(action)) {
-                cancelShutdown();
-                exiting = intent.hasExtra("force");
-                releaseServiceUiAndStop(exiting);
-                return START_NOT_STICKY;
-            }
-
-            handleCommandIntent(intent);
-        }
-
-        // Make sure the service will shut down on its own if it was
-        // just started but not bound to and nothing is playing
-        scheduleDelayedShutdown();
-
-        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
-            MediaButtonIntentReceiver.completeWakefulIntent(intent);
-        }
-
-        return START_STICKY;
     }
 
     /**

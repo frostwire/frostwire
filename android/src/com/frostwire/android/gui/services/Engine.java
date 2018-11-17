@@ -25,10 +25,12 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Vibrator;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
 import com.frostwire.android.R;
@@ -188,7 +190,11 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            context.startService(i);
+            if (Build.VERSION.SDK_INT >= 26) {
+                ContextCompat.startForegroundService(context, i);
+            } else {
+                context.startService(i);
+            }
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }

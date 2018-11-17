@@ -21,14 +21,17 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -57,7 +60,7 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author gubatron
  * @author aldenml
  */
-public class EngineService extends Service implements IEngineService {
+public class EngineService extends JobIntentService implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineService.class);
     private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
 
@@ -82,6 +85,19 @@ public class EngineService extends Service implements IEngineService {
     @Override
     public void onCreate() {
         notifiedStorage = new NotifiedStorage(this);
+        super.onCreate();
+        foregroundStartForAndroidO();
+
+    }
+
+    private void foregroundStartForAndroidO() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
+            int id = (int) (1 + (System.currentTimeMillis() % 10000));
+            startForeground(id, notification);
+        }
     }
 
     @Override
@@ -90,8 +106,14 @@ public class EngineService extends Service implements IEngineService {
     }
 
     @Override
+    protected void onHandleWork(@NonNull Intent intent) {
+        onStartCommand(intent, 0, 1);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         async(this, EngineService::cancelAllNotificationsTask);
+        foregroundStartForAndroidO();
         if (intent == null) {
             return START_NOT_STICKY;
         }
@@ -281,7 +303,12 @@ public class EngineService extends Service implements IEngineService {
         Context ctx = getApplication();
         Intent i = new Intent(ctx, EngineService.class);
         i.setAction(SHUTDOWN_ACTION);
-        ctx.startService(i);
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            ContextCompat.startForegroundService(ctx, i);
+        } else {
+            ctx.startService(i);
+        }
     }
 
     public class EngineServiceBinder extends Binder {
