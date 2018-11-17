@@ -36,10 +36,10 @@
             android:id="@+id/menu_main_transfers"
             android:icon="@drawable/menu_icon_transfers"
             android:title="@string/transfers"/>
-        <item
-            android:id="@+id/menu_main_support"
-            android:icon="@drawable/menu_icon_support"
-            android:title="@string/help"/>
+        <!--<item-->
+            <!--android:id="@+id/menu_main_support"-->
+            <!--android:icon="@drawable/menu_icon_support"-->
+            <!--android:title="@string/help"/>-->
         <item
             android:id="@+id/menu_main_settings"
             android:icon="@drawable/menu_icon_settings"

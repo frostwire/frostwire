@@ -528,11 +528,9 @@ public class MainActivity extends AbstractActivity implements
         final String currentVersionBuild = Constants.FROSTWIRE_VERSION_STRING + "." + Constants.FROSTWIRE_BUILD;
         if (StringUtils.isNullOrEmpty(lastSeenVersionBuild)) {
             //fresh install
-            //Offers.forceDisabledAds(this); // no ads on first session ever
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
         } else if (!currentVersionBuild.equals(lastSeenVersionBuild)) {
             //just updated.
-            //Offers.forceDisabledAds(this); // no ads right after update
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
         }
     }
