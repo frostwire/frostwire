@@ -21,11 +21,10 @@
 <view xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/profile_tab_carousel"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/profile_carousel_view_height"
+    android:layout_height="wrap_content"
     class="com.andrew.apollo.widgets.ProfileTabCarousel"
     android:fadingEdge="none"
     android:scrollbars="none" >
-
     <LinearLayout
         android:id="@+id/profile_tab_carousel_tab_and_shadow_container"
         android:layout_width="match_parent"

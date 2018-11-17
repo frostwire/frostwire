@@ -48,7 +48,7 @@
                 android:id="@+id/activity_profile_base_tab_carousel"
                 layout="@layout/profile_tab_carousel"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/profile_carousel_view_height"
+                android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true" />
