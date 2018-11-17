@@ -14,9 +14,6 @@ package com.andrew.apollo;
 
 import android.Manifest;
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -37,7 +34,6 @@ import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -51,7 +47,6 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -64,6 +59,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -534,15 +530,7 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
 
-    private void foregroundStartForAndroidO() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
-            int id = (int) (1 + (System.currentTimeMillis() % 10000));
-            startForeground(id, notification);
-        }
-    }
+
 
     /**
      * {@inheritDoc}
@@ -552,7 +540,7 @@ public class MusicPlaybackService extends JobIntentService {
         if (D) LOG.info("Creating service");
         super.onCreate();
 
-        foregroundStartForAndroidO();
+        EngineService.foregroundStartForAndroidO(this);
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -583,7 +571,7 @@ public class MusicPlaybackService extends JobIntentService {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
-        foregroundStartForAndroidO();
+        EngineService.foregroundStartForAndroidO(this);
 
         if (intent != null) {
             final String action = intent.getAction();

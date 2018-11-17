@@ -21,6 +21,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -61,18 +62,17 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author aldenml
  */
 public class EngineService extends JobIntentService implements IEngineService {
+    // members:
     private static final Logger LOG = Logger.getLogger(EngineService.class);
-    private final static long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
-
+    private static final long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
     private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
-
     private final IBinder binder;
-    // services in background
     private final CoreMediaPlayer mediaPlayer;
     private byte state;
     private NotificationUpdateDemon notificationUpdateDemon;
-
     private NotifiedStorage notifiedStorage;
+
+    // public:
 
     public EngineService() {
         binder = new EngineServiceBinder();
@@ -86,18 +86,8 @@ public class EngineService extends JobIntentService implements IEngineService {
     public void onCreate() {
         notifiedStorage = new NotifiedStorage(this);
         super.onCreate();
-        foregroundStartForAndroidO();
+        foregroundStartForAndroidO(this);
 
-    }
-
-    private void foregroundStartForAndroidO() {
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(this, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
-            int id = (int) (1 + (System.currentTimeMillis() % 10000));
-            startForeground(id, notification);
-        }
     }
 
     @Override
@@ -106,14 +96,9 @@ public class EngineService extends JobIntentService implements IEngineService {
     }
 
     @Override
-    protected void onHandleWork(@NonNull Intent intent) {
-        onStartCommand(intent, 0, 1);
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         async(this, EngineService::cancelAllNotificationsTask);
-        foregroundStartForAndroidO();
+        foregroundStartForAndroidO(this);
         if (intent == null) {
             return START_NOT_STICKY;
         }
@@ -137,44 +122,6 @@ public class EngineService extends JobIntentService implements IEngineService {
     @Override
     public void onDestroy() {
         LOG.debug("onDestroy");
-    }
-
-    private void shutdownSupport() {
-        LOG.debug("shutdownSupport");
-        //enableComponentsTask(this, false); // we're already on a shutdown thread
-        stopPermanentNotificationUpdates();
-        cancelAllNotificationsTask(this);
-        stopServices(false);
-
-        if (BTEngine.ctx != null) {
-            LOG.debug("onDestroy, stopping BTEngine...");
-            BTEngine.getInstance().stop();
-            LOG.debug("onDestroy, BTEngine stopped");
-        } else {
-            LOG.debug("onDestroy, BTEngine didn't have a chance to start, no need to stop it");
-        }
-
-        //ImageLoader.getInstance(this).shutdown();
-        stopOkHttp();
-        stopForeground(true);
-    }
-
-    // what a bad design to properly shutdown the framework threads!
-    // TODO: deal with potentially active connections
-    private void stopOkHttp() {
-        ConnectionPool pool = OKHTTPClient.CONNECTION_POOL;
-        try {
-            pool.evictAll();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        try {
-            synchronized (OKHTTPClient.CONNECTION_POOL) {
-                pool.notifyAll();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
     }
 
     public CoreMediaPlayer getMediaPlayer() {
@@ -224,21 +171,6 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
 
         async(this, EngineService::resumeBTEngineTask, wasShutdown);
-    }
-
-    private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
-        engineService.state = STATE_STARTING;
-        BTEngine btEngine = BTEngine.getInstance();
-        if (!wasShutdown) {
-            btEngine.resume();
-            TransferManager.instance().forceReannounceTorrents();
-        } else {
-            btEngine.start();
-            TransferManager.instance().reset();
-            btEngine.resume();
-        }
-        engineService.state = STATE_STARTED;
-        LOG.info("resumeBTEngineTask(): Engine started", true);
     }
 
     public synchronized void stopServices(boolean disconnected) {
@@ -317,6 +249,33 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
     }
 
+    // protected:
+    @Override
+    protected void onHandleWork(@NonNull Intent intent) {
+        onStartCommand(intent, 0, 1);
+    }
+
+    // private:
+    private void shutdownSupport() {
+        LOG.debug("shutdownSupport");
+        //enableComponentsTask(this, false); // we're already on a shutdown thread
+        stopPermanentNotificationUpdates();
+        cancelAllNotificationsTask(this);
+        stopServices(false);
+
+        if (BTEngine.ctx != null) {
+            LOG.debug("onDestroy, stopping BTEngine...");
+            BTEngine.getInstance().stop();
+            LOG.debug("onDestroy, BTEngine stopped");
+        } else {
+            LOG.debug("onDestroy, BTEngine didn't have a chance to start, no need to stop it");
+        }
+
+        //ImageLoader.getInstance(this).shutdown();
+        stopOkHttp();
+        stopForeground(true);
+    }
+
     private int getNotificationIcon() {
         return R.drawable.frostwire_notification_flat;
     }
@@ -325,6 +284,53 @@ public class EngineService extends JobIntentService implements IEngineService {
         if (notificationUpdateDemon != null) {
             notificationUpdateDemon.stop();
         }
+    }
+
+    // what a bad design to properly shutdown the framework threads!
+    // TODO: deal with potentially active connections
+    private void stopOkHttp() {
+        ConnectionPool pool = OKHTTPClient.CONNECTION_POOL;
+        try {
+            pool.evictAll();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        try {
+            synchronized (OKHTTPClient.CONNECTION_POOL) {
+                pool.notifyAll();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // STATIC SECTION
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void foregroundStartForAndroidO(Service service) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+            ((NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(service, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
+            int id = (int) (1 + (System.currentTimeMillis() % 10000));
+            service.startForeground(id, notification);
+        }
+    }
+
+    private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
+        engineService.state = STATE_STARTING;
+        BTEngine btEngine = BTEngine.getInstance();
+        if (!wasShutdown) {
+            btEngine.resume();
+            TransferManager.instance().forceReannounceTorrents();
+        } else {
+            btEngine.start();
+            TransferManager.instance().reset();
+            btEngine.resume();
+        }
+        engineService.state = STATE_STARTED;
+        LOG.info("resumeBTEngineTask(): Engine started", true);
     }
 
     private static long[] buildVenezuelanVibe() {
