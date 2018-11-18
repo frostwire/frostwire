@@ -1,4 +1,5 @@
-FrostWire 2.1.0 build 568 - NOV/17/2018
+FrostWire 2.1.0 build 568 - NOV/18/2018
+ - Android Oreo/Pie compatibility updates
  - Clearing finished transfers also clears errored transfers
  - EZTV search fixed, other search fixes
  - Library updates: mopub 5.4.0, applovin 8.1.4, play-services 17.1.1, com.google.code.gson:gson 2.8.5
