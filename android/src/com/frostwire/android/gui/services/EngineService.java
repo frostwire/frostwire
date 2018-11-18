@@ -25,13 +25,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -230,16 +228,10 @@ public class EngineService extends JobIntentService implements IEngineService {
     @Override
     public void shutdown() {
         LOG.info("shutdown");
-
         Context ctx = getApplication();
         Intent i = new Intent(ctx, EngineService.class);
         i.setAction(SHUTDOWN_ACTION);
-
-        if (Build.VERSION.SDK_INT >= 26) {
-            ContextCompat.startForegroundService(ctx, i);
-        } else {
-            ctx.startService(i);
-        }
+        Engine.startService(ctx, i);
     }
 
     public class EngineServiceBinder extends Binder {

@@ -195,11 +195,7 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            if (Build.VERSION.SDK_INT >= 26) {
-                ContextCompat.startForegroundService(context, i);
-            } else {
-                context.startService(i);
-            }
+            Engine.startService(context, i);
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }
@@ -267,6 +263,21 @@ public final class Engine implements IEngineService {
         }
     }
 
+    public static void startService(final Context context, final Intent intent) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            ContextCompat.startForegroundService(context, intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    /**
+     * Whenever there's a call to ContextCompat.startForegroundService(context, intent)
+     * the service that's supposed to be started in the foreground is expected to perform
+     * a service.startForeground() call along with a notification within the next 5 seconds,
+     * otherwise you get an IllegalState exception crash for not following the 'contract'
+     * @param service
+     */
     public static void foregroundServiceStartForAndroidO(Service service) {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(
