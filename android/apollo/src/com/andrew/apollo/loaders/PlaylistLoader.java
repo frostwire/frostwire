@@ -98,13 +98,17 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
      * @return The {@link Cursor} used to run the playlist query.
      */
     public static Cursor makePlaylistCursor(final Context context) {
-        return context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                new String[] {
-                        /* 0 */
-                        BaseColumns._ID,
-                        /* 1 */
-                        PlaylistsColumns.NAME
-                }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
+        try {
+            return context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                    new String[]{
+                            /* 0 */
+                            BaseColumns._ID,
+                            /* 1 */
+                            PlaylistsColumns.NAME
+                    }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
+        } catch (android.database.sqlite.SQLiteException t) {
+            return null;
+        }
     }
 
     public Cursor makeCursor(Context context) {
