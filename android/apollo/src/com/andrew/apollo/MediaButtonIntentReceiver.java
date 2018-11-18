@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.andrew.apollo.ui.activities.HomeActivity;
+import com.frostwire.android.gui.services.EngineService;
 
 /**
  * Used to control headset playback.

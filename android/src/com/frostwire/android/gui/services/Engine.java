@@ -18,6 +18,10 @@
 package com.frostwire.android.gui.services;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +34,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
@@ -259,6 +264,24 @@ public final class Engine implements IEngineService {
     public void hapticFeedback() {
         if (vibrator != null) {
             vibrator.hapticFeedback();
+        }
+    }
+
+    public static void foregroundServiceStartForAndroidO(Service service) {
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(
+                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
+                    "FrostWire",
+                    NotificationManager.IMPORTANCE_LOW);
+            ((NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE)).
+                    createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(
+                    service,
+                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).
+                    setContentTitle("").
+                    setContentText("").
+                    build();
+            service.startForeground(1337, notification);
         }
     }
 

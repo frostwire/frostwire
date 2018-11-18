@@ -59,7 +59,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.EngineService;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -540,7 +540,7 @@ public class MusicPlaybackService extends JobIntentService {
         if (D) LOG.info("Creating service");
         super.onCreate();
 
-        EngineService.foregroundStartForAndroidO(this);
+        Engine.foregroundServiceStartForAndroidO(this);
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -571,7 +571,7 @@ public class MusicPlaybackService extends JobIntentService {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
-        EngineService.foregroundStartForAndroidO(this);
+        Engine.foregroundServiceStartForAndroidO(this);
 
         if (intent != null) {
             final String action = intent.getAction();
