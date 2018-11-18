@@ -310,11 +310,19 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     public static void foregroundStartForAndroidO(Service service) {
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-            ((NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
-            Notification notification = new NotificationCompat.Builder(service, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).setContentTitle("").setContentText("").build();
-            int id = (int) (1 + (System.currentTimeMillis() % 10000));
-            service.startForeground(id, notification);
+            NotificationChannel channel = new NotificationChannel(
+                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
+                    "FrostWire",
+                    NotificationManager.IMPORTANCE_LOW);
+            ((NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE)).
+                    createNotificationChannel(channel);
+            Notification notification = new NotificationCompat.Builder(
+                    service,
+                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).
+                    setContentTitle("").
+                    setContentText("").
+                    build();
+            service.startForeground(1337, notification);
         }
     }
 
