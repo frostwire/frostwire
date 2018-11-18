@@ -639,14 +639,19 @@ public final class MusicUtils {
                 AudioColumns.ALBUM_ID
         };
         final String selection = AudioColumns._ID + "=" + songId + " AND " + AudioColumns.IS_MUSIC + "=1";
-        Cursor cursor = context.getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                selection,
-                null,
-                null,
-                null
-        );
+        Cursor cursor;
+        try {
+            cursor = context.getContentResolver().query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    null,
+                    null,
+                    null
+            );
+        } catch (android.database.sqlite.SQLiteException t) {
+            cursor = null;
+        }
         if (cursor != null) {
             cursor.moveToFirst();
             try {
@@ -654,7 +659,7 @@ public final class MusicUtils {
             } catch (CursorIndexOutOfBoundsException oob) {
                 return -1;
             } finally {
-                if (cursor != null && !cursor.isClosed()) {
+                if (!cursor.isClosed()) {
                     cursor.close();
                 }
             }
