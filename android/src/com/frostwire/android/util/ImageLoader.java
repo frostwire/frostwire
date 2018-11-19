@@ -599,6 +599,7 @@ public final class ImageLoader {
             // Target 2% of the total space.
             size = available / 50;
         } catch (IllegalArgumentException ignored) {
+        } catch (NoSuchMethodError ignored) {
         }
 
         // Bound inside min/max size for disk cache.
