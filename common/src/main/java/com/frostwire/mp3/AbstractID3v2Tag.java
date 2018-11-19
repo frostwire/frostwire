@@ -64,7 +64,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	private final Map<String, ID3v2FrameSet> frameSets;
 
 	public AbstractID3v2Tag() {
-		frameSets = new TreeMap<String, ID3v2FrameSet>();
+		frameSets = new TreeMap<>();
 	}
 
 	public AbstractID3v2Tag(byte[] bytes) throws NoSuchTagException, UnsupportedTagException, InvalidDataException {
@@ -72,7 +72,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	}
 	
 	public AbstractID3v2Tag(byte[] bytes, boolean obseleteFormat) throws NoSuchTagException, UnsupportedTagException, InvalidDataException {
-		frameSets = new TreeMap<String, ID3v2FrameSet>();
+		frameSets = new TreeMap<>();
 		this.obseleteFormat = obseleteFormat;
 		unpackTag(bytes);
 	}
@@ -211,10 +211,10 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	}
 	
 	private int packSpecifiedFrames(byte[] bytes, int offset, String onlyId, String notId) throws NotSupportedException {
-		Iterator<ID3v2FrameSet> setIterator = frameSets.values().iterator();		
+		Iterator<ID3v2FrameSet> setIterator = frameSets.values().iterator();
 		while (setIterator.hasNext()) {
 			ID3v2FrameSet frameSet = setIterator.next();
-			if ((onlyId == null || onlyId.equals(frameSet.getId())) && (notId == null || !notId.equals(frameSet.getId()))) { 			
+			if ((onlyId == null || onlyId.equals(frameSet.getId())) && (notId == null || !notId.equals(frameSet.getId()))) {
 				Iterator<ID3v2Frame> frameIterator = frameSet.getFrames().iterator();
 				while (frameIterator.hasNext()) {
 					ID3v2Frame frame = (ID3v2Frame) frameIterator.next();
@@ -225,7 +225,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 					}
 				}
 			}
-		}	
+		}
 		return offset;
 	}
 	
@@ -638,7 +638,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	private ID3v2TextFrameData extractTextFrameData(String id) {
 		ID3v2FrameSet frameSet = frameSets.get(id);
 		if (frameSet != null) {
-			ID3v2Frame frame = (ID3v2Frame) frameSet.getFrames().get(0);
+			ID3v2Frame frame = frameSet.getFrames().get(0);
 			ID3v2TextFrameData frameData;
 			try {
 				frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), frame.getData());
@@ -653,7 +653,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	private ID3v2UrlFrameData extractUrlFrameData(String id) {
 		ID3v2FrameSet frameSet = frameSets.get(id);
 		if (frameSet != null) {
-			ID3v2Frame frame = (ID3v2Frame) frameSet.getFrames().get(0);
+			ID3v2Frame frame = frameSet.getFrames().get(0);
 			ID3v2UrlFrameData frameData;
 			try {
 				frameData = new ID3v2UrlFrameData(useFrameUnsynchronisation(), frame.getData());
@@ -670,7 +670,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 		if (frameSet != null) {
 			Iterator<ID3v2Frame> iterator = frameSet.getFrames().iterator();
 			while (iterator.hasNext()) {
-				ID3v2Frame frame = (ID3v2Frame) iterator.next();
+				ID3v2Frame frame = iterator.next();
 				ID3v2CommentFrameData frameData;
 				try {
 					frameData = new ID3v2CommentFrameData(useFrameUnsynchronisation(), frame.getData());
@@ -693,7 +693,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 	private ID3v2PictureFrameData createPictureFrameData(String id) {
 		ID3v2FrameSet frameSet = frameSets.get(id);
 		if (frameSet != null) {
-			ID3v2Frame frame = (ID3v2Frame) frameSet.getFrames().get(0);
+			ID3v2Frame frame = frameSet.getFrames().get(0);
 			ID3v2PictureFrameData frameData;
 			try {
 				if (obseleteFormat) frameData = new ID3v2ObseletePictureFrameData(useFrameUnsynchronisation(), frame.getData());
@@ -721,10 +721,9 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 			if (other.version != null) return false;
 		} else if (other.version == null) return false;
 		else if (! version.equals(other.version)) return false;
-		if (frameSets == null) {
-			if (other.frameSets != null) return false;
+		if (frameSets == null && other.frameSets != null) {
+			return false;
 		} else if (other.frameSets == null) return false;
-		else if (! frameSets.equals(other.frameSets)) return false;
-		return true;
-	}
+		else return frameSets.equals(other.frameSets);
+    }
 }
