@@ -211,11 +211,9 @@ public class ByteArrayOutputStream extends OutputStream {
      * this class can be called after the stream has been closed without
      * generating an <tt>IOException</tt>.
      *
-     * @throws IOException never (this method should not declare this exception
-     * but it has to now due to backwards compatability)
      */
     @Override
-    public void close() throws IOException {
+    public void close() {
         //nop
     }
 
