@@ -793,7 +793,7 @@ public final class LollipopFileSystem implements FileSystem {
 
     private static final class AutoSyncOutputStream extends ParcelFileDescriptor.AutoCloseOutputStream {
 
-        public AutoSyncOutputStream(ParcelFileDescriptor fd) throws IOException {
+        public AutoSyncOutputStream(ParcelFileDescriptor fd) {
             super(fd);
         }
 
