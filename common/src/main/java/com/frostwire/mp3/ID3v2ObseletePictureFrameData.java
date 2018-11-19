@@ -15,7 +15,7 @@ public class ID3v2ObseletePictureFrameData extends ID3v2PictureFrameData {
 	}
 
 	@Override
-	protected void unpackFrameData(byte[] bytes) throws InvalidDataException {
+	protected void unpackFrameData(byte[] bytes) {
 		mimeType = "image/" + BufferTools.byteBufferToString(bytes, 1, 3).toLowerCase();
 		pictureType = bytes[4];
 		int marker;
