@@ -164,7 +164,7 @@ public class SearchInputView extends LinearLayout {
         textInput.setListSelection(-1);
         textInput.dismissDropDown();
         adapter.discardLastResult();
-        String query = textInput.getText().toString().trim();
+        String query = textInput.getText().trim();
         if (query.length() > 0) {
             mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
             tabItemFileTypeClick(mediaTypeId);

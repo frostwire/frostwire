@@ -106,7 +106,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
             onClick(null, DialogInterface.BUTTON_NEGATIVE);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setIcon(this.<Drawable>getValue("mDialogIcon"))
+                    .setIcon(this.getValue("mDialogIcon"))
                     .setPositiveButton(get("mPositiveButtonText"), this)
                     .setNegativeButton(get("mNegativeButtonText"), this);
 

@@ -181,11 +181,8 @@ public final class Debug {
         }
 
         // exclude some classes by name due to API level
-        if (clazzName.startsWith("android.os.LocaleList")) {
-            return true;
-        }
+        return clazzName.startsWith("android.os.LocaleList");
 
-        return false;
     }
 
     private static List<Field> getAllFields(Object obj) {

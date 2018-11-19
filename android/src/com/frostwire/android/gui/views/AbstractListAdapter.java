@@ -286,9 +286,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         if (visualList != list) {
             list.remove(item);
         }
-        if (checked.contains(item)) {
-            checked.remove(item);
-        }
+        checked.remove(item);
         if (Looper.myLooper() == Looper.getMainLooper()) {
             notifyDataSetChanged();
         }

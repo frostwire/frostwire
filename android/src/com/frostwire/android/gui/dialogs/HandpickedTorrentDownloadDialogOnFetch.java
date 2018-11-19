@@ -43,7 +43,7 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
     private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
 
     public HandpickedTorrentDownloadDialogOnFetch(Activity activity) {
-        contextRef = Ref.weak((Context) activity);
+        contextRef = Ref.weak(activity);
         fragmentManagerRef = Ref.weak(activity.getFragmentManager());
     }
 
