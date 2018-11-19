@@ -31,11 +31,11 @@ public final class MediaDataBox extends Box {
     }
 
     @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    void read(InputChannel ch, ByteBuffer buf) {
     }
 
     @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    void write(OutputChannel ch, ByteBuffer buf) {
     }
 
     @Override
