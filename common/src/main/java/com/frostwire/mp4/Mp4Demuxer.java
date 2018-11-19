@@ -328,7 +328,7 @@ public final class Mp4Demuxer {
         return (T) b;
     }
 
-    private static int calcMdatOffset(FragmentCtx[] ctxs, Mp4Info inf) throws IOException {
+    private static int calcMdatOffset(FragmentCtx[] ctxs, Mp4Info inf) {
         int len = 0;
 
         for (FragmentCtx ctx : ctxs) {
