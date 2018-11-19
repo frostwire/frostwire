@@ -90,7 +90,7 @@ public class AppMsg {
         View v = inflate.inflate(R.layout.app_msg, null);
         v.setBackgroundResource(style.background);
         
-        TextView tv = (TextView) v.findViewById(android.R.id.message);
+        TextView tv = v.findViewById(android.R.id.message);
         tv.setText(text);
         
         result.mView = v;
@@ -182,7 +182,7 @@ public class AppMsg {
         if (mView == null) {
             throw new RuntimeException("This AppMsg was not created with AppMsg.makeText()");
         }
-        TextView tv = (TextView) mView.findViewById(android.R.id.message);
+        TextView tv = mView.findViewById(android.R.id.message);
         if (tv == null) {
             throw new RuntimeException("This AppMsg was not created with AppMsg.makeText()");
         }
