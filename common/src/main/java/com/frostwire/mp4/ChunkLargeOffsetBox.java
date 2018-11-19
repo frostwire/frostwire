@@ -71,12 +71,12 @@ public final class ChunkLargeOffsetBox extends FullBox {
         public long chunk_offset;
 
         @Override
-        void get(ByteBuffer buf) throws IOException {
+        void get(ByteBuffer buf) {
             chunk_offset = buf.getLong();
         }
 
         @Override
-        void put(ByteBuffer buf) throws IOException {
+        void put(ByteBuffer buf) {
             buf.putLong(chunk_offset);
         }
     }
