@@ -217,7 +217,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         });
     }
 
-    protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) throws Throwable {
+    protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) {
         boolean isChecked = getChecked().contains(item);
         boolean showFileSize = false;
 
