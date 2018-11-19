@@ -188,11 +188,11 @@ public class Box {
     }
 
     public final <T extends Box> LinkedList<T> find(int type) {
-        return boxes != null ? Box.<T>find(boxes, type) : new LinkedList<T>();
+        return boxes != null ? Box.find(boxes, type) : new LinkedList<T>();
     }
 
     public final <T extends Box> T findFirst(int type) {
-        return boxes != null ? Box.<T>findFirst(boxes, type) : null;
+        return boxes != null ? Box.findFirst(boxes, type) : null;
     }
 
     @Override
@@ -244,7 +244,7 @@ public class Box {
         return null;
     }
 
-    static Box empty(int type) throws IOException {
+    static Box empty(int type) {
         BoxLambda p = mapping.get(type);
         if (p != null) {
             return p.empty();
