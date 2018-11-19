@@ -61,7 +61,7 @@ public final class ZipUtils {
         return result;
     }
 
-    private static void unzipEntries(File folder, ZipInputStream zis, int itemCount, long time, ZipListener listener) throws IOException, FileNotFoundException {
+    private static void unzipEntries(File folder, ZipInputStream zis, int itemCount, long time, ZipListener listener) throws IOException {
         ZipEntry ze = null;
 
         int item = 0;
