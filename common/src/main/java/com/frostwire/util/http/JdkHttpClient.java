@@ -218,7 +218,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
         return prefix + ((rangeLength > -1) ? (rangeStart + rangeLength) : "");
     }
 
-    private void checkRangeSupport(long rangeStart, URLConnection conn) throws HttpRangeOutOfBoundsException, RangeNotSupportedException {
+    private void checkRangeSupport(long rangeStart, URLConnection conn) throws RangeNotSupportedException {
 
         boolean hasContentRange = conn.getHeaderField("Content-Range") != null;
         boolean hasAcceptRanges = conn.getHeaderField("Accept-Ranges") != null && conn.getHeaderField("Accept-Ranges").equals("bytes");
