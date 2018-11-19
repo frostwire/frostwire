@@ -73,14 +73,14 @@ public final class SampleToChunkBox extends FullBox {
         public int sample_description_index;
 
         @Override
-        void get(ByteBuffer buf) throws IOException {
+        void get(ByteBuffer buf) {
             first_chunk = buf.getInt();
             samples_per_chunk = buf.getInt();
             sample_description_index = buf.getInt();
         }
 
         @Override
-        void put(ByteBuffer buf) throws IOException {
+        void put(ByteBuffer buf) {
             buf.putInt(first_chunk);
             buf.putInt(samples_per_chunk);
             buf.putInt(sample_description_index);

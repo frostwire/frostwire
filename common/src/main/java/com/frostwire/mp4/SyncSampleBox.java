@@ -71,12 +71,12 @@ public final class SyncSampleBox extends FullBox {
         public int sample_number;
 
         @Override
-        void get(ByteBuffer buf) throws IOException {
+        void get(ByteBuffer buf) {
             sample_number = buf.getInt();
         }
 
         @Override
-        void put(ByteBuffer buf) throws IOException {
+        void put(ByteBuffer buf) {
             buf.putInt(sample_number);
         }
     }

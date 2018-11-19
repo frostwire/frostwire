@@ -72,13 +72,13 @@ public final class TimeToSampleBox extends FullBox {
         public int sample_delta;
 
         @Override
-        void get(ByteBuffer buf) throws IOException {
+        void get(ByteBuffer buf) {
             sample_count = buf.getInt();
             sample_delta = buf.getInt();
         }
 
         @Override
-        void put(ByteBuffer buf) throws IOException {
+        void put(ByteBuffer buf) {
             buf.putInt(sample_count);
             buf.putInt(sample_delta);
         }

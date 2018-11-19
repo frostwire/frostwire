@@ -72,13 +72,13 @@ public final class ShadowSyncSampleBox extends FullBox {
         public int sync_sample_number;
 
         @Override
-        void get(ByteBuffer buf) throws IOException {
+        void get(ByteBuffer buf) {
             shadowed_sample_number = buf.getInt();
             sync_sample_number = buf.getInt();
         }
 
         @Override
-        void put(ByteBuffer buf) throws IOException {
+        void put(ByteBuffer buf) {
             buf.putInt(shadowed_sample_number);
             buf.putInt(sync_sample_number);
         }
