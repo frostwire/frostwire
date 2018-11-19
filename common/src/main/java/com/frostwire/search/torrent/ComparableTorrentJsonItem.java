@@ -24,5 +24,5 @@ package com.frostwire.search.torrent;
  *
  */
 public interface ComparableTorrentJsonItem {
-    public int getSeeds();
+    int getSeeds();
 }

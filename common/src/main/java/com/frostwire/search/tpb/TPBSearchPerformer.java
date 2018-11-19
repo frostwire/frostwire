@@ -61,7 +61,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     }
 
     @Override
-    protected List<? extends SearchResult> crawlResult(TPBSearchResult sr, byte[] data) throws Exception {
+    protected List<? extends SearchResult> crawlResult(TPBSearchResult sr, byte[] data) {
         return PerformersHelper.crawlTorrent(this, sr, data);
     }
 

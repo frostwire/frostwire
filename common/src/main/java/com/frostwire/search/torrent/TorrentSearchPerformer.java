@@ -41,7 +41,7 @@ public abstract class TorrentSearchPerformer extends CrawlPagedWebSearchPerforme
     }
 
     @Override
-    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) throws Exception {
+    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) {
         return PerformersHelper.crawlTorrent(this, sr, data);
     }
 }
