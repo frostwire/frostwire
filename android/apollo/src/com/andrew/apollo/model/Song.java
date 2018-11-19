@@ -105,10 +105,7 @@ public class Song {
         if (mDuration != other.mDuration) {
             return false;
         }
-        if (!TextUtils.equals(mSongName, other.mSongName)) {
-            return false;
-        }
-        return true;
+        return TextUtils.equals(mSongName, other.mSongName);
     }
 
     /**
