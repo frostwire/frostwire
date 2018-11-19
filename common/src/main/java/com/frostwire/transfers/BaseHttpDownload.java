@@ -280,14 +280,14 @@ public abstract class BaseHttpDownload implements Transfer {
         }
     }
 
-    protected void onHttpComplete() throws Throwable {
+    protected void onHttpComplete() {
         finish();
     }
 
-    protected void onFinishing() throws Throwable {
+    protected void onFinishing() {
     }
 
-    protected void onComplete() throws Throwable {
+    protected void onComplete() {
     }
 
     static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
