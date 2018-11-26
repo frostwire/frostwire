@@ -241,7 +241,8 @@ public final class OptionsConstructor {
 
         // filter options
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, FILTERS_KEY, I18n.tr("Filters"));
-        addOption(FILTERS_KEY, IP_FILTER_KEY, I18n.tr("IP Filter"), IPFilterPaneItem.class);
+        //TODO: bring back to build when ready, currently only UI working
+        //addOption(FILTERS_KEY, IP_FILTER_KEY, I18n.tr("IP Filter"), IPFilterPaneItem.class);
         addOption(FILTERS_KEY, RESULTS_KEY, I18n.tr("Keywords"), IgnoreResultsPaneItem.class);
 
         // advanced options
