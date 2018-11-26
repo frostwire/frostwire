@@ -1,5 +1,12 @@
 frostwire (6.7.4) stable; urgency=high
-  * New BitTorrent IP Filter with support for P2P-format block list files (tentative)
+  * Translation updates: Swedish
+  * EZ search fixed
+  * Cleanup and optimizations
+  * com.google.code.gson:gson 2.8.4 -> 2.8.5 update
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 26 Nov 2018 09:02:32 -0600
+
+frostwire (6.7.4) stable; urgency=high
   * New jlibtorrent 1.2.0.18
   * Translation updates: Croatian
   * YT search removed
