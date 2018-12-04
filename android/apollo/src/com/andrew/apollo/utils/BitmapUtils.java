@@ -38,7 +38,7 @@ public final class BitmapUtils {
      * @return A {@link Bitmap} that has been resized and cropped for a launcher
      * shortcut.
      */
-    public static final Bitmap resizeAndCropCenter(final Bitmap bitmap, final int size) {
+    public static Bitmap resizeAndCropCenter(final Bitmap bitmap, final int size) {
         final int w = bitmap.getWidth();
         final int h = bitmap.getHeight();
         if (w == size && h == size) {
@@ -59,7 +59,7 @@ public final class BitmapUtils {
     }
 
 
-    public static final Bitmap stackBlur(final Bitmap inputBitmap, int blurRadius) {
+    public static Bitmap stackBlur(final Bitmap inputBitmap, int blurRadius) {
         // Stack Blur v1.0 from
         // http://www.quasimondo.com/StackBlurForCanvas/StackBlurDemo.html
         //

@@ -41,7 +41,6 @@ import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
-import com.frostwire.util.Logger;
 
 import java.util.List;
 
