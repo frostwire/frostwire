@@ -25,11 +25,9 @@ import android.net.Uri;
 import android.os.SystemClock;
 
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.io.IOUtils;
 
-import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;

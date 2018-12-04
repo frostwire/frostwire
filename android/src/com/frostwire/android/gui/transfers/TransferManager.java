@@ -537,8 +537,7 @@ public final class TransferManager {
      * Stops all HttpDownloads (Cloud and Wi-Fi)
      */
     public void stopHttpTransfers() {
-        List<Transfer> transfers = new ArrayList<>();
-        transfers.addAll(httpDownloads);
+        List<Transfer> transfers = new ArrayList<>(httpDownloads);
         for (Transfer t : transfers) {
             if (t != null && !t.isComplete() && t.isDownloading()) {
                 t.remove(false);

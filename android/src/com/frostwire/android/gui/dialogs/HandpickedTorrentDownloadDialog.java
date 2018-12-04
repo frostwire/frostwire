@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
@@ -259,10 +258,10 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             return MediaType.getFileTypeIconId(FilenameUtils.getExtension(data.getPath()));
         }
 
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-            return super.getView(position, view, parent);
-        }
+//        @Override
+//        public View getView(int position, View view, ViewGroup parent) {
+//            return super.getView(position, view, parent);
+//        }
 
         @Override
         public String getCheckedSum() {

@@ -39,7 +39,7 @@ public class PlaylistItem {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof PlaylistItem)) {
+        if (!(o instanceof PlaylistItem)) {
             return false;
         }
 

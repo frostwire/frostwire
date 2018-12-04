@@ -83,8 +83,8 @@ public final class Offers {
         LOG.info("Offers.initAdNetworks() success");
     }
 
-    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-    }
+//    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//    }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {

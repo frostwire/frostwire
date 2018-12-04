@@ -29,6 +29,7 @@ import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -134,9 +135,7 @@ public final class SystemUtils {
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?>... serviceClasses) {
         final long startTime = System.currentTimeMillis();
         Set<Class<?>> servicesRunning = new HashSet<>();
-        for (Class serviceClass : serviceClasses) {
-            servicesRunning.add(serviceClass);
-        }
+        Collections.addAll(servicesRunning, serviceClasses);
         while (!servicesRunning.isEmpty()) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             long timeLeft = timeout - elapsedTime;

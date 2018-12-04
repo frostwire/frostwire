@@ -53,11 +53,11 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
-import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
@@ -69,10 +69,8 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -269,8 +267,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         if (adapter != null) {
             final Set<FileListAdapter.FileDescriptorItem> checked = adapter.getChecked();
             if (checked != null && !checked.isEmpty()) {
-                Set<FileListAdapter.FileDescriptorItem> checkedCopy = new HashSet<>();
-                checkedCopy.addAll(checked);
+                Set<FileListAdapter.FileDescriptorItem> checkedCopy = new HashSet<>(checked);
                 checkedItemsMap.put(adapter.getFileType(), checkedCopy);
             }
         }

@@ -128,7 +128,7 @@ public class FileDescriptor implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof FileDescriptor)) {
+        if (!(o instanceof FileDescriptor)) {
             return false;
         }
         FileDescriptor fd = (FileDescriptor) o;

@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
@@ -54,11 +53,6 @@ public class SearchProgressView extends LinearLayout {
     public SearchProgressView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.progressEnabled = true;
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Parcelable state) {
-        super.onRestoreInstanceState(state);
     }
 
     public void setDataUp(boolean value) {

@@ -21,7 +21,6 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v14.preference.PreferenceFragment;
@@ -118,7 +117,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
                 builder.setMessage(get("mDialogMessage"));
             }
 
-            onPrepareDialogBuilder(builder);
+            //onPrepareDialogBuilder(builder);
 
             Dialog dialog = builder.create();
             if (needInputMethod()) {
@@ -133,8 +132,8 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         protected final void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
         }
 
-        protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-        }
+//        protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+//        }
 
         @SuppressWarnings("unchecked")
         private <T> T getValue(String name) {

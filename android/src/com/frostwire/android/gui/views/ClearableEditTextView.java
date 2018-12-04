@@ -169,7 +169,7 @@ public class ClearableEditTextView extends RelativeLayout {
                     imageSearch.setVisibility(View.VISIBLE);
                     buttonClear.setVisibility(View.GONE);
                 }
-                ClearableEditTextView.this.onTextChanged(s.toString());
+                //ClearableEditTextView.this.onTextChanged(s.toString());
                 input.setListSelection(-1);
             }
 
@@ -199,11 +199,11 @@ public class ClearableEditTextView extends RelativeLayout {
         });
     }
 
-    private void onTextChanged(String str) {
-        if (listener != null) {
-            listener.onTextChanged(this, str.trim());
-        }
-    }
+//    private void onTextChanged(String str) {
+//        if (listener != null) {
+//            listener.onTextChanged(this, str.trim());
+//        }
+//    }
 
     private void onClear() {
         if (listener != null) {
@@ -213,7 +213,8 @@ public class ClearableEditTextView extends RelativeLayout {
     
     public interface OnActionListener {
 
-        void onTextChanged(View v, String str);
+        // all implementations are empty
+        //void onTextChanged(View v, String str);
 
         void onClear(View v);
     }

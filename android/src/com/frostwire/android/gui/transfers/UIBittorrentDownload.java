@@ -33,7 +33,6 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.BTDownloadListener;
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
@@ -186,7 +185,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     public void remove(WeakReference<Context> contextRef, boolean deleteTorrent, boolean deleteData) {
         manager.remove(this);
 
-        if (contextRef != null && Ref.alive(contextRef) && deleteData && isComplete()) {
+        if (Ref.alive(contextRef) && deleteData && isComplete()) {
             // Let's remove all the file descriptors from the fetchers
             deleteFilesFromContentResolver(contextRef.get(), deleteTorrent);
         }

@@ -795,7 +795,7 @@ public class MainActivity extends AbstractActivity implements
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void performYTSearch(String ytUrl) {
