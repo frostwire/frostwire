@@ -17,8 +17,6 @@
 
 package com.frostwire.mp4;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 /**
@@ -30,16 +28,6 @@ public final class MetaBox extends FullBox {
     MetaBox() {
         super(meta);
         boxes = new LinkedList<>();
-    }
-
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
-    }
-
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
     }
 
     @Override

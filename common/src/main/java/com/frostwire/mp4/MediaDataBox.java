@@ -17,7 +17,6 @@
 
 package com.frostwire.mp4;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**

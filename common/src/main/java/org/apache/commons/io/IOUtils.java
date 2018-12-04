@@ -16,6 +16,9 @@
  */
 package org.apache.commons.io;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.io.output.StringBuilderWriter;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -44,9 +47,6 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.io.output.StringBuilderWriter;
 
 /**
  * General IO stream manipulation utilities.
@@ -2245,7 +2245,7 @@ public class IOUtils {
 
         String line1 = br1.readLine();
         String line2 = br2.readLine();
-        while (line1 != null && line2 != null && line1.equals(line2)) {
+        while (line1 != null && line1.equals(line2)) {
             line1 = br1.readLine();
             line2 = br2.readLine();
         }

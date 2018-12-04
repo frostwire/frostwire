@@ -177,7 +177,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof SoundcloudSearchResult)) {
+        if (!(o instanceof SoundcloudSearchResult)) {
             return false;
         }
         SoundcloudSearchResult other = (SoundcloudSearchResult) o;

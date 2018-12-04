@@ -43,13 +43,13 @@ public class StringUtils {
      *  StringUtils.contains("abcd", "d*a") ==> false
      *  </pre> 
      */
-    public static final boolean contains(String input, String pattern) {
+    public static boolean contains(String input, String pattern) {
         return contains(input, pattern, false);
     }
 
     /** Exactly like contains(input, pattern), but case is ignored if
      *  ignoreCase==true. */
-    public static final boolean contains(String input, String pattern, boolean ignoreCase) {
+    public static boolean contains(String input, String pattern, boolean ignoreCase) {
         //More efficient algorithms are possible, e.g. a modified version of the
         //Rabin-Karp algorithm, but they are unlikely to be faster with such
         //short strings.  Also, some contant time factors could be shaved by
@@ -97,7 +97,7 @@ public class StringUtils {
      *  or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
      *  when comparing characters.
      */
-    private static final int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
+    private static int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
         //Equivalent to
         // return big.indexOf(little.substring(littleStart, littleStop), bigStart);
         //but without an allocation.
@@ -138,7 +138,7 @@ public class StringUtils {
      *  Else returns c.
      *  Note that this is <b>not internationalized</b>; but it is fast.
      */
-    public static final char toOtherCase(char c) {
+    public static char toOtherCase(char c) {
         int i = c;
         final int A = 'A'; //65
         final int Z = 'Z'; //90

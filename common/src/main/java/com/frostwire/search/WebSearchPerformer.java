@@ -114,7 +114,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         }
     }
 
-    public static final boolean isStreamable(String filename) {
+    public static boolean isStreamable(String filename) {
         String ext = FilenameUtils.getExtension(filename);
         for (String s : STREAMABLE_EXTENSIONS) {
             if (s.equals(ext)) {

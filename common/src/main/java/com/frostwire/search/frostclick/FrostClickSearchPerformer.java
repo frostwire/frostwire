@@ -76,8 +76,7 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
     }
 
     private Map<String, String> buildCustomHeaders(UserAgent userAgent) {
-        Map<String, String> map = new HashMap<String, String>();
-        map.putAll(userAgent.getHeadersMap());
+        Map<String, String> map = new HashMap<>(userAgent.getHeadersMap());
         map.put("User-Agent", userAgent.toString());
         map.put("sessionId", userAgent.getUUID());
 

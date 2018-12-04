@@ -17,9 +17,6 @@
 
 package com.frostwire.mp4;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -28,16 +25,6 @@ public final class NullMediaHeaderBox extends FullBox {
 
     NullMediaHeaderBox() {
         super(nmhd);
-    }
-
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        super.read(ch, buf);
-    }
-
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        super.write(ch, buf);
     }
 
     @Override
