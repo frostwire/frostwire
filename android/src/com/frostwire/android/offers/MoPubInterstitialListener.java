@@ -57,8 +57,12 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
 
     @Override
     public boolean show(Activity activity, String placement) {
-//        LOG.info("MoPubInterstitialListener.show(): wasPlayingMusic=" + wasPlayingMusic);
-        return isAdReadyToDisplay() && interstitial.show();
+        LOG.info("MoPubInterstitialListener.show(): wasPlayingMusic=" + wasPlayingMusic);
+        boolean shown = isAdReadyToDisplay() && interstitial.show();
+        if (shown && wasPlayingMusic) {
+            MusicUtils.pause();
+        }
+        return shown;
     }
 
     @Override
