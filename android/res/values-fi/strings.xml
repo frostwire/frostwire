@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">Tallenna. Lataa vain jos Wi-Fi-yhteys on muodostettu. </string>
     <string name="or_enter_url">tai anna URL</string>
     <string name="documents">Dokumentit</string>
-    <string name="help">Auttaa</string>
     <string name="disabled">pois käytöstä</string>
     <string name="cloud_downloads_coming">Valitettavasti: Alkaen pilvi lataukset täältä on saatavilla uusia päivityksiä.</string>
     <string name="download_finished">Lataa Valmiit</string>
@@ -172,7 +171,6 @@
     <string name="dialog_new_transfer_check_text">Näytä tämä seuraavalla kerralla</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Lähetä nimettömiä käyttötilastoja. Ei tietoja, jotka voivat henkilöllisyyttäsi tallennetaan levylle tai lähetetään verkon kautta.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire voi kirjoittaa valitun tallennuspolun</string>
     <string name="clear">Tyhjentää</string>
     <string name="processing_payment">Käsittely maksu, virkistää muutamassa sekunnissa</string>
@@ -302,7 +300,6 @@
     <string name="enable_seeding">Ota Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Ymmärrän, että kaikki ladatut tiedostot SD-kortille FrostWire poistetaan Android hetkellä FrostWire sovellus on poistettu tästä laitteesta ja minä pidä FrostWire LLC mistään tiedostoja menetetty.</string>
     <string name="cant_open_file_does_not_exist">En voi avata %1$s, tiedostoa ei ole olemassa.</string>
-    <string name="anonymous_usage_statistics">Anonyymi Käyttötilastot</string>
     <string name="delete">Poistaa</string>
     <string name="saving_to_sd_card">Tallentaminen SD-kortille.</string>
     <string name="torrent_max_peers_summary">Maksimi Peers</string>
@@ -414,5 +411,4 @@
     <string name="add_tracker">Lisää seuranta</string>
     <string name="play_store_out_of_sync">Google Play Kaupan on synkronoitava, odota muutama minuutti</string>
     <string name="contact_us">Ota meihin yhteyttä</string>
-    <string name="join_frostwire_chat">Liity FrostWire chat</string>
 </resources>

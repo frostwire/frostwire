@@ -176,7 +176,6 @@
     <string name="remove_torrent_and_data">Odstraňte Torrent a Data</string>
     <string name="love_frostwire">Láska FrostWire</string>
     <string name="or_enter_url">nebo zadat URL</string>
-    <string name="help">Pomoc</string>
     <string name="cloud_downloads_coming">Omlouváme: Počínaje stažení cloudových odtud budou k dispozici další aktualizace.</string>
     <string name="confirm_download">Potvrdit stažení</string>
     <string name="sdcard_storage">SD\'s Storage</string>
@@ -216,7 +215,6 @@
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="pausing">Pozastavení</string>
     <string name="dummy_title_bold">[Tučně Název]</string>
-    <string name="anonymous_usage_statistics_summary">Odesílat anonymní statistiky používání. Žádné informace, které mohou vás osobně identifikovat budou uloženy na disk nebo zaslány prostřednictvím sítě.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire nelze zapisovat na zvolené cestě skladování</string>
     <string name="processing_payment">Zpracování plateb, osvěžit během několika sekund</string>
     <string name="my_music">Moje hudba</string>
@@ -299,7 +297,6 @@
     <string name="enable_seeding">Aktivovat Setí</string>
     <string name="storage_setting_confirm_dialog_text">Chápu, že všechny soubory stažené na kartu SD podle FrostWire budou vymazány operačním systémem Android ve chvíli, kdy aplikace FrostWire se odinstaluje z tohoto zařízení a nebudu držet FrostWire LLC odpovědnost za jakékoli soubory ztracené.</string>
     <string name="cant_open_file_does_not_exist">Nemohu otevřít %1$s, soubor neexistuje.</string>
-    <string name="anonymous_usage_statistics">Anonymní statistiky používání</string>
     <string name="saving_to_sd_card">Ukládání na SD kartu.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Levnější než plyn</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Volná 7denní zkušební verze</string>
     <string name="play_store_out_of_sync">Obchod Google Play potřebuje synchronizaci, počkejte několik minut</string>
     <string name="contact_us">Kontaktujte nás</string>
-    <string name="join_frostwire_chat">Připojte se k chatu FrostWire</string>
 </resources>

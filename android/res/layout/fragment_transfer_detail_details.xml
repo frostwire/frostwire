@@ -19,8 +19,7 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_transfer_detail_details_scroll_view"
-    android:layout_width="match_parent"
+            android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -80,7 +79,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -328,7 +326,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_created_on_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -362,7 +359,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_details_comment_label"
                 style="@style/transferDetailTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

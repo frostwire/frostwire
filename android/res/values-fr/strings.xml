@@ -152,8 +152,6 @@
     <string name="clear_search_cache_summary">Effacez les entrées de cache de recherche</string>
     <string name="no_results_feedback">Aucun résultat n\'a été trouvé.\n\nVérifiez votre connexion Internet ou\n faites une autre recherche.</string>
     <string name="use_frostclick">Utilisez FrostClick.com</string>
-    <string name="anonymous_usage_statistics">Statistiques d\'utilisation anonyme</string>
-    <string name="anonymous_usage_statistics_summary">Envoyez des statistiques d\'utilisation anonyme. Aucune information en lien avec vos recherches, vos partages ou lectures ou aucune information permettant votre identification ne seront stockées sur le disque ou envoyées à travers le réseau.</string>
     <string name="cant_open_file_does_not_exist">Vous ne pouvez pas ouvrir %1$s, n\'existe pas le fichier.</string>
     <string name="drawer_close">Fermer navigation tiroir</string>
     <string name="saving_to_internal_memory_description">Vous avez également une carte SD (%1$s disponible)</string>
@@ -197,7 +195,6 @@
     <string name="saving_to_internal_memory">Sauvegarde sur la mémoire interne</string>
     <string name="storage_setting_confirm_dialog_text">Je comprends que tous les fichiers téléchargés dans la carte SD par FrostWire seront supprimés par Android pour le moment l\'application FrostWire est désinstallé de cet appareil et je ne vais pas tenir FrostWire LLC responsable des fichiers perdus.</string>
     <string name="saving_to_sd_card">Enregistrement sur ​​carte SD.</string>
-    <string name="help">Aidez-moi</string>
     <string name="haptic_feedback">Retour Haptique</string>
     <string name="your_installation_is_complete">L\'installation est terminée.</string>
     <string name="error_connection_timed_out">Erreur: connexion a expiré. Réessayer.</string>
@@ -415,5 +412,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Essai gratuit de 7 jours</string>
     <string name="play_store_out_of_sync">Play Store doit se synchroniser, attendre quelques minutes</string>
     <string name="contact_us">Contactez nous</string>
-    <string name="join_frostwire_chat">Rejoignez le chat FrostWire</string>
 </resources>

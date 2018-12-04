@@ -52,7 +52,6 @@
 
         <!-- transfer container -->
         <LinearLayout
-            android:id="@+id/view_permanent_status_transfers_indicators"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

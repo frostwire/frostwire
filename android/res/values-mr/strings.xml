@@ -117,7 +117,6 @@
     <string name="wifi_networks_only_summary">माहितीस जतन करा. केवळ Wi-Fi कनेक्शन स्थापित केले असल्यास डाउनलोड करा </string>
     <string name="or_enter_url">किंवा URL प्रविष्ट करा</string>
     <string name="documents">दस्तऐवज</string>
-    <string name="help">मदत</string>
     <string name="enter_valid_tracker_url_here">येथे वैध ट्रॅकर url प्रविष्ट करा</string>
     <string name="disabled">अक्षम केले</string>
     <string name="cloud_downloads_coming">क्षमस्व: येथून क्लाऊड डाउनलोड प्रारंभ करणे पुढील अद्यतनांवर उपलब्ध असेल.</string>
@@ -219,7 +218,6 @@
     <string name="dialog_new_transfer_check_text">पुढील वेळी हे दर्शवा</string>
     <string name="peers">सहकर्मी</string>
     <string name="dummy_title_bold">[ठळक शीर्षक]</string>
-    <string name="anonymous_usage_statistics_summary">अनामित वापर आकडेवारी पाठवा आपल्याला ओळखू शकणारी कोणतीही माहिती डिस्कवर संचयित केली जाणार नाही किंवा नेटवर्कद्वारे पाठविली जाईल.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire निवडलेल्या स्टोरेज पाथवर लिहिणे शक्य नाही</string>
     <string name="clear">साफ करा</string>
     <string name="processing_payment">देयावर प्रक्रिया करणे, काही सेकंदांमध्ये रीफ्रेश करा</string>
@@ -383,7 +381,6 @@
     <string name="storage_setting_confirm_dialog_text">FrostWire द्वारे SD कार्डवर डाउनलोड केलेल्या सर्व फायली हटविल्या जातील असे मला समजते की या डिव्हाइसवरून फ्रॉस्टवायर अनुप्रयोग विस्थापित करण्यात आला आहे त्या क्षणी Android आणि मी गमावलेली कोणत्याही फाइल्ससाठी फ्रॉस्टवायर एलएलसी जबाबदार ठेवणार नाही.</string>
     <string name="use_magnet_summary">आधारित चुंबक, केवळ Wi-Fi वर कार्य करते</string>
     <string name="cant_open_file_does_not_exist">मी उघडू शकत नाही %1$s, फाईल अस्तित्वात नाही.</string>
-    <string name="anonymous_usage_statistics">अनामित वापर आकडेवारी</string>
     <string name="delete">हटवा</string>
     <string name="vpn_find_out_more">अधिक शोधा</string>
     <string name="saving_to_sd_card">SD कार्डमध्ये जतन करीत आहे.</string>
@@ -415,5 +412,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n विनामूल्य 7-दिवसांची चाचणी</string>
     <string name="play_store_out_of_sync">Google Play Store समक्रमित करण्याची आवश्यकता आहे, काही मिनिटे प्रतीक्षा करा</string>
     <string name="contact_us">आमच्याशी संपर्क साधा</string>
-    <string name="join_frostwire_chat">FrostWire चॅटमध्ये सामील व्हा</string>
 </resources>

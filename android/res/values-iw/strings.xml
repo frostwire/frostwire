@@ -96,7 +96,6 @@
     <string name="wifi_networks_only_summary">לשמור מידע. הורד רק אם חיבור ה- Wi-Fi היא הוקמה. </string>
     <string name="or_enter_url">או זן כתובת האתר</string>
     <string name="documents">מסמכים</string>
-    <string name="help">עֶזרָה</string>
     <string name="disabled">מבוטל מאופשר</string>
     <string name="cloud_downloads_coming">מצטער: החל הורדות ענן מכאן יהיה נגיש עדכונים נוספים.</string>
     <string name="download_finished">הורדה הסתיימה </string>
@@ -174,7 +173,6 @@
     <string name="dialog_new_transfer_check_text">הצג בפעם הבאה זה</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">שלח סטטיסטיקות שימוש אנונימיות. אין מידע שיכול לזהות אותך באופן אישי יאוחסן בדיסק או נשלח באמצעות הרשת.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire לא יכול לכתוב על נתיב האחסון שנבחר</string>
     <string name="clear">ברור</string>
     <string name="processing_payment">תשלום עיבוד, לרענן בעוד כמה שניות</string>
@@ -304,7 +302,6 @@
     <string name="enable_seeding">אפשר מתזמן</string>
     <string name="storage_setting_confirm_dialog_text">אני מבין כי כל הקבצים שהורדו לכרטיס SD ידי FrostWire יימחקו על ידי ANDROID הרגע יישום FrostWire יוסר מהמכשיר הזה ואני לא אקיים FrostWire LLC אחראית לכל קבצים לאיבוד.</string>
     <string name="cant_open_file_does_not_exist">אני לא יכול לפתוח %1$s, הקובץ אינו קיים.</string>
-    <string name="anonymous_usage_statistics">נתוני שימוש אנונימיים</string>
     <string name="delete">לִמְחוֹק</string>
     <string name="saving_to_sd_card">שמירה לכרטיס SD.</string>
     <string name="torrent_max_peers_summary">מקס Peers</string>
@@ -413,5 +410,4 @@
     <string name="piece_size_header">גודל:</string>
     <string name="add_tracker">הוסף גשש</string>
     <string name="contact_us">צור קשר</string>
-    <string name="join_frostwire_chat">הצטרף לצ\'אט FrostWire</string>
 </resources>

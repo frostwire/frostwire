@@ -149,8 +149,6 @@
     <string name="clear_search_cache_summary">حذف مدخلات ذاكرة البحث</string>
     <string name="no_results_feedback">.لم يتم العثور على نتائح.  n/n/ تحقق من اتصال الإنترنت الخاص بك أو/ حاول استخدام مصطلح مختلف للبحث</string>
     <string name="use_frostclick">FrostClick استخدم</string>
-    <string name="anonymous_usage_statistics">إحصائيات الاستخدام بدون هوية</string>
-    <string name="anonymous_usage_statistics_summary">ارسال إحصائيات الاستخدام مجهولة الهوية. لا يوجد معلومات تخص محتوى البحث أو المشاركة أو المشغل ولا يمكن لأي معلومات تحدد من شخصيتك أن تخزن أو ترسل عبر الإنترنت</string>
     <string name="your_installation_is_complete">التثبيت كاملة.</string>
     <string name="error_connection_timed_out">خطأ: انتهت مهلة الاتصال. حاول ثانية.</string>
     <string name="all_free_downloads">كل البرامج المجانية</string>
@@ -186,7 +184,6 @@
     <string name="remove_torrent_and_data">إزالة السيل والبيانات</string>
     <string name="love_frostwire">الحب فروست واير</string>
     <string name="or_enter_url">أو إدخال URL</string>
-    <string name="help">مساعدة</string>
     <string name="cloud_downloads_coming">عذرا: لن ابتداء التنزيلات سحابة من هنا تكون متاحة على مزيد من التحديثات.</string>
     <string name="confirm_download">تأكيد تحميل</string>
     <string name="sdcard_storage">التخزين SD ل</string>
@@ -412,5 +409,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n نسخة تجريبية مجانية لمدة 7 أيام</string>
     <string name="play_store_out_of_sync">يحتاج متجر Google Play إلى المزامنة ، انتظر بضع دقائق</string>
     <string name="contact_us">اتصل بنا</string>
-    <string name="join_frostwire_chat">انضم إلى دردشة FrostWire</string>
 </resources>

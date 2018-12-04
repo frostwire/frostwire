@@ -178,7 +178,6 @@
     <string name="transfers_select_all">全部</string>
     <string name="crawl_cache_size">爬行緩存 %1$.2fMB</string>
     <string name="pausing">暫停</string>
-    <string name="anonymous_usage_statistics_summary">發送匿名使用統計數據。所進行的內容搜索、分享或播放，以及能識別您的所有資料，都不會儲存在磁盤上，亦不會通過網絡傳送。</string>
     <string name="my_music">音樂文件夾</string>
     <string name="error_moving_incomplete">錯誤：移動未完成</string>
     <string name="torrent_url_added">Torrent 鏈接已添加到傳輸。</string>
@@ -209,10 +208,8 @@
     <string name="use_frostclick">使用 FrostClick</string>
     <string name="storage_setting_confirm_dialog_text">我明白，通過 FrostWire 下載到 SD 卡的所有檔案，都會在本裝置卸載 FrostWire 應用程式後被 ANDROID刪除，而我不會就任何的檔案損失要求 FrostWire LLC 負責。</string>
     <string name="cant_open_file_does_not_exist">我無法打開 %1$s。該檔案不存在。</string>
-    <string name="anonymous_usage_statistics">匿名使用統計數據</string>
     <string name="saving_to_sd_card">儲存到 SD 卡中。</string>
     <string name="torrent_max_peers_summary">最大連接數</string>
-    <string name="help">帮帮我</string>
     <string name="your_installation_is_complete">您的安装完成。</string>
     <string name="error_connection_timed_out">错误：连接超时/丢弃。 再试一次。</string>
     <string name="request_again">再次请求</string>
@@ -414,5 +411,4 @@
     <string name="piece_size_header">件大小：</string>
     <string name="add_tracker">添加跟踪器</string>
     <string name="contact_us">联系我们</string>
-    <string name="join_frostwire_chat">加入FrostWire聊天</string>
 </resources>

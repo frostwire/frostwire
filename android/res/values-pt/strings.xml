@@ -149,8 +149,6 @@
     <string name="clear_search_cache_summary">"Apagar a busca das entradas cache"</string>
     <string name="no_results_feedback">"Nenhum resultado foi encontrado.\n\nVerifique sua conexão com a internet ou\ntente termos de pesquisa diferentes".</string>
     <string name="use_frostclick">"Usar FrostClick"</string>
-    <string name="anonymous_usage_statistics">"Estatísticas de utilização anônima"</string>
-    <string name="anonymous_usage_statistics_summary">"Enviar estatísticas de utilização anônima. Nenhuma informação sobre o conteúdo pesquisado, compartilhado ou reproduzido nem qualquer informação que possa identificá-lo pessoalmente será armazenada em disco ou enviada através da rede".</string>
     <string name="drawer_close">Fechar gaveta navegação</string>
     <string name="saving_to_internal_memory_description">Você também tem um cartão SD (%1$s disponível)</string>
     <string name="add_transfer_label">Cole um magnet ou URL do torrent</string>
@@ -217,7 +215,6 @@
     <string name="send_tip_donation">Enviar Gorjeta/Doação</string>
     <string name="try_other_keywords">Tente outras palavras-chave</string>
     <string name="torrent_max_peers_summary">Max Pares</string>
-    <string name="help">Socorro</string>
     <string name="haptic_feedback">Feedback Táctil</string>
     <string name="your_installation_is_complete">A instalação está completa.</string>
     <string name="error_connection_timed_out">Erro: conexão expirou/caiu. Tente novamente.</string>
@@ -412,5 +409,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Julgamento gratuito de 7 dias</string>
     <string name="play_store_out_of_sync">Play Store precisa sincronizar, espere alguns minutos</string>
     <string name="contact_us">Contate-nos</string>
-    <string name="join_frostwire_chat">Junte-se ao chat do FrostWire</string>
 </resources>

@@ -21,7 +21,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_player_view_as"
         android:title="@string/menu_view_as"
         android:icon="@drawable/contextmenu_icon_view_as_detailed"
         app:showAsAction="never">

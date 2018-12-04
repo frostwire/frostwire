@@ -38,37 +38,31 @@
         app:tabMode="fixed">
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_audio"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_audio_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_videos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_ringtone_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_pictures"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_video_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_applications"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_picture_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_documents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_document_icon_tab_selector" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_my_files_tab_torrents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_torrent_icon_tab_selector" />
@@ -125,7 +119,6 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/fragment_my_files_grid_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

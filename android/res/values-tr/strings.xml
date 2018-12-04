@@ -149,8 +149,6 @@
     <string name="clear_search_cache_summary">Arama Önbelleği Girdilerini Temizle</string>
     <string name="no_results_feedback">Hiç sonuç bulunamadı.\n\nİnternet bağlantınızı kontrol edin veya\nfarklı arama terimleri deneyin.</string>
     <string name="use_frostclick">FrostClick\'i Kullanın</string>
-    <string name="anonymous_usage_statistics">Anonim Kullanım İstatistikleri</string>
-    <string name="anonymous_usage_statistics_summary">Anonim kullanım istatistiklerini gönderin. Aranan, paylaşılan, yürütülen içeriğe dair herhangi bir bilgi veya kişisel bilgilerinizi açığa çıkaracak hiçbir bilgi ağ üzerinden gönderilen diskte saklanmayacaktır.</string>
     <string name="your_installation_is_complete">Kurulumunuz tamamlandı.</string>
     <string name="error_connection_timed_out">Hata: bağlantı zaman aşımına uğradı/bırakıldı. Tekrar dene.</string>
     <string name="all_free_downloads">Tüm ücretsiz indirmeler</string>
@@ -186,7 +184,6 @@
     <string name="remove_torrent_and_data">Torrent ve Verileri Kaldır</string>
     <string name="love_frostwire">Aşk FrostWire\'ı Seviyorum</string>
     <string name="or_enter_url">Veya URL\'yi gir</string>
-    <string name="help">Yardım</string>
     <string name="cloud_downloads_coming">Maalesef: Buradan başlayan bulut yüklemeleri, daha sonraki güncellemelerde kullanılabilir olacaktır.</string>
     <string name="confirm_download">İndirmeyi Onayla</string>
     <string name="sdcard_storage">SD\'ler Depolama Alanı</string>
@@ -414,5 +411,4 @@
     <string name="add_tracker">İzleyici ekle</string>
     <string name="play_store_out_of_sync">Google Play Store\'un senkronize edilmesi, birkaç dakika beklemesi gerekiyor</string>
     <string name="contact_us">Bizimle iletişime geçin</string>
-    <string name="join_frostwire_chat">FrostWire sohbetine katıl</string>
 </resources>

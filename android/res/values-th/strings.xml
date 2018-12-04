@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">บันทึกข้อมูล. ดาวน์โหลดเฉพาะหากการเชื่อมต่อ Wi-Fi จะจัดตั้งขึ้น</string>
     <string name="or_enter_url">หรือป้อน URL</string>
     <string name="documents">เอกสาร</string>
-    <string name="help">ช่วยด้วย</string>
     <string name="disabled">พิการ</string>
     <string name="cloud_downloads_coming">ขออภัย: เริ่มต้นการดาวน์โหลดเมฆจากที่นี่จะสามารถใช้ได้ในการปรับปรุงต่อไป</string>
     <string name="download_finished">ดาวน์โหลดสำเร็จรูป</string>
@@ -169,7 +168,6 @@
     <string name="dialog_new_transfer_check_text">แสดงครั้งต่อไปนี้</string>
     <string name="peers">เพื่อนร่วมงาน</string>
     <string name="dummy_title_bold">[ชื่อตัวหนา]</string>
-    <string name="anonymous_usage_statistics_summary">ส่งสถิติการใช้งานที่ไม่ระบุชื่อ ไม่มีข้อมูลที่ระบุตัวคุณจะถูกเก็บไว้ในดิสก์หรือส่งผ่านทางเครือข่าย</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire ไม่สามารถเขียนบนเส้นทางการจัดเก็บที่เลือก</string>
     <string name="clear">ชัดเจน</string>
     <string name="processing_payment">การชำระเงินการประมวลผลการฟื้นฟูในไม่กี่วินาที</string>
@@ -297,7 +295,6 @@
     <string name="enable_seeding">เปิดใช้เมล็ด</string>
     <string name="storage_setting_confirm_dialog_text">ผมเข้าใจว่าทุกไฟล์ที่ดาวน์โหลดไปใน SD Card โดย FrostWire จะถูกลบโดย Android ขณะที่แอปพลิเค FrostWire ยกเลิกการติดตั้งจากอุปกรณ์นี้และฉันจะไม่ถือ FrostWire LLC รับผิดชอบต่อการสูญเสียไฟล์ใด ๆ</string>
     <string name="cant_open_file_does_not_exist">ฉันไม่สามารถเปิด %1$s, ไฟล์ไม่ได้อยู่.</string>
-    <string name="anonymous_usage_statistics">สถิติการใช้งานที่ไม่ระบุชื่อ</string>
     <string name="delete">ลบ</string>
     <string name="saving_to_sd_card">บันทึกไปยังการ์ด SD</string>
     <string name="torrent_max_peers_summary">ทำเนียบแม็กซ์</string>
@@ -378,7 +375,6 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n การทดลองใช้ฟรี 7 วัน</string>
     <string name="play_store_out_of_sync">Google Play สโตร์ต้องซิงโครไนซ์รอสักครู่</string>
     <string name="contact_us">ติดต่อเรา</string>
-    <string name="join_frostwire_chat">เข้าร่วมการแชท FrostWire</string>
     <string name="uploaded">ที่อัปโหลด</string>
     <string name="trackers">ติดตาม</string>
     <string name="source_type">ที่มา: %1$s</string>

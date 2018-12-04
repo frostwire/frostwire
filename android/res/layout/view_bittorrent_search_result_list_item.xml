@@ -48,7 +48,6 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/view_bittorrent_search_result_list_item_download_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"

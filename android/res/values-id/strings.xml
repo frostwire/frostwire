@@ -174,7 +174,6 @@
     <string name="remove_torrent_and_data">Hapus Torrent dan Data</string>
     <string name="love_frostwire">Cinta FrostWire</string>
     <string name="or_enter_url">atau masukkan URL</string>
-    <string name="help">Membantu</string>
     <string name="cloud_downloads_coming">Maaf: Mulai download cloud dari sini akan tersedia pada update lebih lanjut.</string>
     <string name="confirm_download">Konfirmasi Unduh</string>
     <string name="sdcard_storage">SD\'s Storage</string>
@@ -215,7 +214,6 @@
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="pausing">Berhenti</string>
     <string name="dummy_title_bold">[Judul Bold]</string>
-    <string name="anonymous_usage_statistics_summary">Kirim statistik penggunaan anonim. Tidak ada informasi yang secara pribadi dapat mengidentifikasi Anda akan disimpan pada disk atau dikirim melalui jaringan.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire tidak bisa menulis di jalan penyimpanan yang dipilih</string>
     <string name="processing_payment">Pembayaran pengolahan, menyegarkan dalam beberapa detik</string>
     <string name="my_music">Lagu saya</string>
@@ -298,7 +296,6 @@
     <string name="enable_seeding">Aktifkan Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Saya memahami bahwa semua file yang didownload ke SD Card dengan FrostWire akan dihapus BY ANDROID saat aplikasi FrostWire uninstall dari perangkat ini dan saya tidak akan terus FrostWire LLC jawab atas file yang hilang.</string>
     <string name="cant_open_file_does_not_exist">Saya tidak bisa membuka %1$s, file tidak ada.</string>
-    <string name="anonymous_usage_statistics">Statistik Penggunaan Anonim</string>
     <string name="saving_to_sd_card">Menyimpan ke kartu SD.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Lebih murah daripada gas</string>
@@ -375,7 +372,6 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
     <string name="play_store_out_of_sync">Play Store perlu melakukan sinkronisasi, tunggu beberapa menit</string>
     <string name="contact_us">Hubungi kami</string>
-    <string name="join_frostwire_chat">Bergabung FrostWire chatting</string>
     <string name="uploaded">Diunggah</string>
     <string name="trackers">Pelacak</string>
     <string name="source_type">Sumber: %1$s</string>

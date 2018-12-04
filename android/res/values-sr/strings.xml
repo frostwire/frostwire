@@ -167,8 +167,6 @@
     <string name="clear_search_cache_summary">Цлеар Сеарцх кеш уноса</string>
     <string name="no_results_feedback">Но ресултс вере фоунд.</string>
     <string name="use_frostclick">Користе FrostClick</string>
-    <string name="anonymous_usage_statistics">Анонимни Статистика приступа</string>
-    <string name="anonymous_usage_statistics_summary">Пошаљи анонимну статистику коришћења. Нема информација да лично не идентификује ће се чувати на диску или послати преко мреже.</string>
     <string name="use_torlock">Користе TorLock</string>
     <string name="use_torrentdownloads">Користе TorrentDownloads</string>
     <string name="use_limetorrents">Користе Limetorrents</string>
@@ -251,7 +249,6 @@
     <string name="keep_in_touch">Останимо у контакту!</string>
     <string name="why_we_need_storage_permissions">Зашто нам је потребна дозвола за складиштење.</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire је апликација Филе Бровсер и Довнлоадер, тако да мора да буде у стању да приступи диску.\n\nБез своје дозволе FrostWire не може да функционише.\n\nЖелим да покушам поново?</string>
-    <string name="help">Помоћ</string>
     <string name="request_again">Рекуест Опет</string>
     <string name="frostwire_is_running">FrostWire ради</string>
     <string name="connection_header_title">ВПН статус везе:</string>
@@ -416,5 +413,4 @@
     <string name="add_tracker">Додај траку</string>
     <string name="play_store_out_of_sync">Гоогле Плаи продавница мора да се синхронизује, сачекајте неколико минута</string>
     <string name="contact_us">Контактирајте нас</string>
-    <string name="join_frostwire_chat">Придружите FrostWire цхат</string>
 </resources>

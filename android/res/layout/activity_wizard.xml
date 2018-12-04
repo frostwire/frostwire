@@ -40,7 +40,6 @@
     </com.frostwire.android.gui.views.ViewFlipper>
 
     <LinearLayout
-        android:id="@+id/activity_wizard_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

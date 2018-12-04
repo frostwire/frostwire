@@ -29,7 +29,6 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/dialog_file_information_title"
         style="@style/DefaultDialogTheme.TitleBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,7 +47,6 @@
             android:padding="15dp">
 
             <TextView
-                android:id="@+id/dialog_file_information_title_file_name"
                 style="@style/DefaultDialogTheme.SmallTextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -63,7 +61,6 @@
                 android:text="@string/dummy_title" />
 
             <LinearLayout
-                android:id="@+id/dialog_file_information_size_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -77,7 +74,6 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/dialog_file_information_title_file_size"
                         style="@style/DefaultDialogTheme.SmallTextMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -99,7 +95,6 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/dialog_file_information_title_file_date"
                         style="@style/DefaultDialogTheme.SmallTextMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -116,7 +111,6 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/dialog_file_information_title_file_storage_path"
                 style="@style/DefaultDialogTheme.SmallTextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

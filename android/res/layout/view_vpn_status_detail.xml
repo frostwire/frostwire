@@ -51,7 +51,6 @@
 
             <!-- header title -->
             <TextView
-                android:id="@+id/view_vpn_status_header_title"
                 style="@style/VPNTitle"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

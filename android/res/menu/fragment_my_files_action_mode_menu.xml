@@ -27,7 +27,7 @@
         android:icon="@drawable/action_bar_delete"
         android:orderInCategory="1"
         android:title="@string/delete"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/fragment_my_files_action_mode_menu_seed"
         android:icon="@drawable/contextmenu_icon_seed"

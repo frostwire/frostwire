@@ -37,7 +37,6 @@
 
         <!-- Dummy item to prevent EditText from receiving focus at startup -->
         <LinearLayout
-            android:id="@+id/fragment_transfers_input_linearlayout_dummy"
             android:layout_width="0px"
             android:layout_height="0px"
             android:focusable="true"
@@ -67,25 +66,21 @@
         app:tabMode="scrollable">
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_transfers_tab_all"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_all" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_transfers_tab_downloading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_downloading" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_transfers_tab_seeding"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_seeding" />
 
         <android.support.design.widget.TabItem
-            android:id="@+id/fragment_transfers_tab_completed"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_completed" />
@@ -160,13 +155,11 @@
     </RelativeLayout>
 
     <View
-        android:id="@+id/fragment_transfers_indicators_top_border"
         style="@style/divider_line_dark"
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
     <LinearLayout
-        android:id="@+id/fragment_transfers_indicators"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@drawable/transfers_indicators_background">

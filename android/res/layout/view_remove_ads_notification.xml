@@ -19,8 +19,7 @@
  */
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_remove_ads_notification"
-    android:layout_width="match_parent"
+                android:layout_width="match_parent"
     android:layout_height="200dp"
     android:background="@drawable/view_remove_ads_notification_background"
     android:gravity="center_vertical|center_horizontal"
@@ -52,7 +51,6 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/view_remove_ads_notification_image"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view_remove_ads_notification_subtitle"
@@ -62,7 +60,6 @@
         android:src="@drawable/ad_remove_speaker_white" />
 
     <TextView
-        android:id="@+id/view_remove_ads_notification_image_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/view_remove_ads_notification_subtitle"
@@ -78,7 +75,6 @@
         android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/view_remove_ads_notification_close"
         android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

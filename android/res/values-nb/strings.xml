@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">Lagre data. Last ned bare hvis Wi-Fi-forbindelse er etablert. </string>
     <string name="or_enter_url">eller skriv inn URL</string>
     <string name="documents">Dokumenter</string>
-    <string name="help">Hjelp</string>
     <string name="disabled">deaktivert</string>
     <string name="cloud_downloads_coming">Beklager: Starter cloud nedlastinger herfra vil være tilgjengelig på ytterligere oppdateringer.</string>
     <string name="download_finished">Last Ferdig</string>
@@ -172,7 +171,6 @@
     <string name="dialog_new_transfer_check_text">Vis dette neste gang</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Send anonym bruksstatistikk . Ingen informasjon som kan identifisere deg vil bli lagret på disk eller sendes gjennom nettverket.</string>
     <string name="storage_picker_treeuri_cant_write">Frostwire kan ikke skrive på den valgte lagringsbanen</string>
     <string name="clear">Klar</string>
     <string name="processing_payment">Behandlingstid betaling, oppdatere i noen få sekunder</string>
@@ -302,7 +300,6 @@
     <string name="enable_seeding">Aktiver Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Jeg forstår at alle filene er lastet ned til SD-kort med Frostwire vil bli slettet av Android øyeblikket Frostwire programmet er avinstallert fra denne enheten, og jeg vil ikke holde Frostwire LLC ansvarlig for eventuelle filer tapt.</string>
     <string name="cant_open_file_does_not_exist">Jeg kan ikke åpne %1$s, filen eksisterer ikke.</string>
-    <string name="anonymous_usage_statistics">Anonym brukerstatistikk</string>
     <string name="delete">Slett</string>
     <string name="saving_to_sd_card">Lagrer til SD-kort.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
@@ -414,5 +411,4 @@
     <string name="add_tracker">Legg til tracker</string>
     <string name="play_store_out_of_sync">Google Play Butikk må synkroniseres, vent noen minutter</string>
     <string name="contact_us">Kontakt oss</string>
-    <string name="join_frostwire_chat">Bli med på FrostWire chat</string>
 </resources>

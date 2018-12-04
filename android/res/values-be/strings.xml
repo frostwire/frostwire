@@ -93,7 +93,6 @@
     <string name="love_frostwire">Каханне FrostWire</string>
     <string name="or_enter_url">або ўвядзіце URL</string>
     <string name="documents">Дакументы</string>
-    <string name="help">Дапамогу</string>
     <string name="disabled">інвалід</string>
     <string name="cloud_downloads_coming">На жаль: Пачатак загрузкі аблокі тут будуць даступныя на далейшых абнаўленняў.</string>
     <string name="download_finished">Спампаваць Закончанае</string>
@@ -167,7 +166,6 @@
     <string name="dialog_new_transfer_check_text">Паказаць гэта ў наступны раз</string>
     <string name="peers">Аднагодкі</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Адправіць ананімную статыстыку выкарыстання. Ніякая інфармацыя, якая можа ідэнтыфікаваць вас асабіста не будзе захоўвацца на дыску або адпраўленыя праз сетку.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire не можа пісаць на абраным шляху захоўвання</string>
     <string name="clear">Ясна</string>
     <string name="processing_payment">Апрацоўка плацяжоў, абнавіць на працягу некалькіх секунд</string>
@@ -292,7 +290,6 @@
     <string name="enable_seeding">Ўключыць затраўкі</string>
     <string name="storage_setting_confirm_dialog_text">Я разумею, што ўсе файлы, загружаныя на карту памяці SD з дапамогай FrostWire будуць выдалены ANDROID момант прыкладанне FrostWire выдаляецца з гэтай прылады, і я не буду трымаць FrostWire LLC нясе адказнасць за якія-небудзь файлы страчаныя.</string>
     <string name="cant_open_file_does_not_exist">Я не магу адкрыць %1$s, файл не існуе.</string>
-    <string name="anonymous_usage_statistics">Ананімныя Статыстыка выкарыстання</string>
     <string name="delete">Выдаліць</string>
     <string name="saving_to_sd_card">Захаванне на SD-карце.</string>
     <string name="torrent_max_peers_summary">максімум аднагодкаў</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Бясплатная 7-дзённая пробная версія</string>
     <string name="play_store_out_of_sync">Google Play Маркета неабходна сінхранізаваць, пачакайце некалькі хвілін</string>
     <string name="contact_us">Звяжыцеся з намі</string>
-    <string name="join_frostwire_chat">Далучайцеся да чату FrostWire</string>
 </resources>

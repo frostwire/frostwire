@@ -51,7 +51,6 @@
 
 
     <ImageView
-        android:id="@+id/view_remove_ads_notification_image"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -76,7 +75,6 @@
         android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/view_remove_ads_notification_close"
         android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

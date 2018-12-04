@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">Запазване на данни. Свали само ако се установи, Wi-Fi връзка. </string>
     <string name="or_enter_url">или въведете URL</string>
     <string name="documents">Документи</string>
-    <string name="help">Помогне</string>
     <string name="disabled">хора с увреждания</string>
     <string name="cloud_downloads_coming">Съжаляваме: Стартиране на облачните сваляне от тук ще бъде на разположение за по-нататъшни актуализации.</string>
     <string name="download_finished">Свали Завършен</string>
@@ -169,7 +168,6 @@
     <string name="dialog_new_transfer_check_text">Покажете следващия път</string>
     <string name="peers">Връстниците</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Изпращане на анонимни статистически данни за употребата. Няма информация, че лично може да ви идентифицира ще се съхраняват на диск или изпратени чрез мрежата.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire не може да пише на избрания път за съхранение</string>
     <string name="clear">Ясно</string>
     <string name="processing_payment">Подготовка плащане, опресняване на няколко секунди.</string>
@@ -297,7 +295,6 @@
     <string name="enable_seeding">Активиране на посевния</string>
     <string name="storage_setting_confirm_dialog_text">Разбирам, че всички файлове, свалени на SD карта с FrostWire ще бъде изтрит от ANDROID момента на прилагането FrostWire е деинсталиран от това устройство и аз не ще проведе FrostWire LLC носи отговорност за всички файлове изгубени.</string>
     <string name="cant_open_file_does_not_exist">Не мога да отворя %1$s, файлът не съществува.</string>
-    <string name="anonymous_usage_statistics">Анонимни ползване Статистика</string>
     <string name="delete">Изтрий</string>
     <string name="saving_to_sd_card">Спасяването на SD карта.</string>
     <string name="torrent_max_peers_summary">Макс Връстници</string>
@@ -413,6 +410,5 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Безплатен 7-дневен пробен период</string>
     <string name="play_store_out_of_sync">Google Play Магазин трябва да се синхронизира, изчакайте няколко минути</string>
     <string name="contact_us">Свържете се с нас</string>
-    <string name="join_frostwire_chat">Присъединете се към FrostWire чата</string>
     <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
 </resources>

@@ -158,8 +158,6 @@
     <string name="clear_search_cache_summary">検索キャッシュのエントリをクリアします</string>
     <string name="no_results_feedback">結果が見つかりませんでした。\n\nインターネット接続を確認するか\n別の検索条件を試してください。</string>
     <string name="use_frostclick">FrostClickを使用する</string>
-    <string name="anonymous_usage_statistics">Anonymous使用状況</string>
-    <string name="anonymous_usage_statistics_summary">anonymous使用状況を送信します。検索、共有、再生した内容、その他のいかなる個人を識別する情報もディスクに保存したりネットワークに送信したりしません。</string>
     <string name="use_torlock">TorLockを使用する</string>
     <string name="use_eztv">Eztvを使用する</string>
     <string name="transfer_status_demuxing">分離中</string>
@@ -236,7 +234,6 @@
     <string name="keep_in_touch">Keep in touch!</string>
     <string name="why_we_need_storage_permissions">ストレージのアクセス許可が必要な理由。</string>
     <string name="why_we_need_storage_permissions_summary">FrostWireはファイルブラウザーで、ダウンローダーアプリです。そのためディスクにアクセスできる必要があります。\n\nアクセス許可がないとFrostWireは動作できません。\n\n再度実行しますか？</string>
-    <string name="help">ヘルプ</string>
     <string name="request_again">再度リクエスト</string>
     <string name="frostwire_is_running">FrostWireは実行中です</string>
     <string name="unprotected_connection">保護されない接続</string>
@@ -415,5 +412,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 無料の7日間のトライアル</string>
     <string name="play_store_out_of_sync">Google Playストアが同期する必要があり、数分待ってください</string>
     <string name="contact_us">お問い合わせ</string>
-    <string name="join_frostwire_chat">FrostWireチャットに参加</string>
 </resources>

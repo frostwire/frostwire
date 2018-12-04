@@ -28,42 +28,36 @@
     app:tabMode="fixed">
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_audio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_audio_icon_tab_selector"
         android:layout="@layout/view_searchinput_tablayout_custom_tab" />
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_videos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_video_icon_tab_selector"
         android:layout="@layout/view_searchinput_tablayout_custom_tab" />
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_pictures"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_picture_icon_tab_selector"
         android:layout="@layout/view_searchinput_tablayout_custom_tab" />
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_applications"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_application_icon_tab_selector"
         android:layout="@layout/view_searchinput_tablayout_custom_tab" />
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_documents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_document_icon_tab_selector"
         android:layout="@layout/view_searchinput_tablayout_custom_tab" />
 
     <android.support.design.widget.TabItem
-        android:id="@+id/view_search_input_tab_torrents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_torrent_icon_tab_selector"

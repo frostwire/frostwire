@@ -27,14 +27,12 @@
     <include layout="@layout/view_transfer_detail_progress"/>
 
     <ImageView
-        android:id="@+id/fragment_transfer_detail_divider_line_1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/divider_line"
         android:contentDescription="@null"/>
 
     <RelativeLayout
-        android:id="@+id/fragment_transfer_detail_pieces_summary_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/transfers_detail_page_padding_vertical"
@@ -82,7 +80,6 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/fragment_transfer_detail_pieces_pre_hexhive_divider_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@drawable/divider_line"
@@ -95,7 +92,6 @@
         android:orientation="vertical">
 
         <ProgressBar
-            android:id="@+id/fragment_transfer_detail_pieces_indeterminate_progress_bar"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

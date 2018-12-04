@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">Simpan data. Turun hanya jika sambungan Wi-Fi ditubuhkan. </string>
     <string name="or_enter_url">atau masukkan URL</string>
     <string name="documents">Dokumen</string>
-    <string name="help">Bantu</string>
     <string name="disabled">Kurang upaya</string>
     <string name="cloud_downloads_coming">Maaf: Bermula muat turun awan dari sini boleh didapati di kemas kini lagi.</string>
     <string name="download_finished">Muat turun selesai</string>
@@ -169,7 +168,6 @@
     <string name="dialog_new_transfer_check_text">Menunjukkan masa ini akan datang</string>
     <string name="peers">Rakan-rakan</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Menghantar statistik penggunaan tanpa nama. Tidak ada maklumat yang secara peribadi boleh mengenal pasti anda akan disimpan pada cakera atau dihantar melalui rangkaian.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire tidak boleh menulis di atas jalan penyimpanan yang dipilih</string>
     <string name="clear">Membersihkan</string>
     <string name="processing_payment">Bayaran pemprosesan, menyegarkan dalam beberapa saat</string>
@@ -297,7 +295,6 @@
     <string name="enable_seeding">Membolehkan Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Saya faham bahawa semua fail yang dimuat turun ke kad SD dengan FrostWire akan dipadam OLEH ANDROID masa ini permohonan FrostWire itu dipadam daripada peranti ini dan saya tidak akan mengadakan FrostWire LLC bertanggungjawab ke atas mana-mana fail hilang.</string>
     <string name="cant_open_file_does_not_exist">Saya tidak boleh membuka %1$s, fail tidak wujud.</string>
-    <string name="anonymous_usage_statistics">Anonymous Statistik Penggunaan</string>
     <string name="delete">Padam</string>
     <string name="saving_to_sd_card">Menyimpan ke kad SD.</string>
     <string name="torrent_max_peers_summary">Peers maksimum</string>
@@ -415,5 +412,4 @@
     <string name="piece_size_header">Saiz potongan:</string>
     <string name="add_tracker">Tambah tracker</string>
     <string name="contact_us">Hubungi Kami</string>
-    <string name="join_frostwire_chat">Sertai sembang FrostWire</string>
 </resources>

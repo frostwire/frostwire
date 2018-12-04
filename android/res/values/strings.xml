@@ -195,8 +195,6 @@
     <string name="clear_search_cache_summary">Clear search cache entries</string>
     <string name="no_results_feedback">No results were found.</string>
     <string name="use_frostclick">Use FrostClick</string>
-    <string name="anonymous_usage_statistics">Anonymous Usage Statistics</string>
-    <string name="anonymous_usage_statistics_summary">Send anonymous usage statistics. No information that can personally identify you will be stored on disk or sent through the network.</string>
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
@@ -291,7 +289,6 @@
     <string name="keep_in_touch">Keep in touch!</string>
     <string name="why_we_need_storage_permissions">Why we need storage permissions.</string>
     <string name="why_we_need_storage_permissions_summary">FrostWire is a file browser and downloader app, therefore it needs to be able to access your disk.\n\nWithout your permissions FrostWire cannot work.\n\nWant to try again?</string>
-    <string name="help">Help</string>
     <string name="request_again">Request Again</string>
     <string name="frostwire_is_running">FrostWire is running</string>
     <string name="connection_header_title">VPN Connection status:</string>
@@ -474,6 +471,5 @@
     <string name="vpn_find_out_more">Find out more</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="play_store_out_of_sync">Play Store needs to synchronize, wait a few minutes</string>
-    <string name="join_frostwire_chat">Join FrostWire Chat</string>
     <string name="contact_us">Contact Us</string>
 </resources>

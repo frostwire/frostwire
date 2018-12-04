@@ -28,7 +28,6 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/view_intent_wizard_page_text"
             style="@style/WizardSubTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

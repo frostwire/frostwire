@@ -176,7 +176,6 @@
     <string name="remove_torrent_and_data">Verwijder Torrent en data</string>
     <string name="love_frostwire">Liefde FrostWire</string>
     <string name="or_enter_url">of voer URL</string>
-    <string name="help">Hulp</string>
     <string name="cloud_downloads_coming">Sorry: vanaf wolk downloads vanaf hier zal beschikbaar zijn op verdere updates zijn.</string>
     <string name="confirm_download">Bevestig downloaden</string>
     <string name="sdcard_storage">SD-opslag</string>
@@ -215,7 +214,6 @@
     <string name="crawl_cache_size">Crawl cachegeheugen %1$.2fMB</string>
     <string name="pausing">Pauzeren</string>
     <string name="dummy_title_bold">[Bold Titel]</string>
-    <string name="anonymous_usage_statistics_summary">Anonieme gebruiksstatistieken. Er is geen informatie die u persoonlijk kan identificeren zal worden opgeslagen op de harde schijf of verzonden via het netwerk.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire kan niet schrijven op de geselecteerde opslagpad</string>
     <string name="processing_payment">Verwerking van betaling, te vernieuwen in een paar seconden</string>
     <string name="my_music">Mijn muziek</string>
@@ -296,7 +294,6 @@
     <string name="enable_seeding">Inschakelen Zaaien</string>
     <string name="storage_setting_confirm_dialog_text">Ik begrijp dat alle bestanden op de SD-kaart gedownload door FrostWire wordt verwijderd door Android het moment dat de FrostWire aanvraag wordt verwijderd van dit apparaat en ik zal niet in het bezit FrostWire LLC aansprakelijk voor alle bestanden verloren gaan.</string>
     <string name="cant_open_file_does_not_exist">Ik kan niet openen %1$s, het bestand bestaat niet.</string>
-    <string name="anonymous_usage_statistics">Anonieme gebruiksstatistieken</string>
     <string name="saving_to_sd_card">Opslaan op SD-kaart.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Goedkoper dan gas</string>
@@ -378,7 +375,6 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis proefperiode van 7 dagen</string>
     <string name="play_store_out_of_sync">Play Store moet worden gesynchroniseerd, wacht een paar minuten</string>
     <string name="contact_us">Neem contact op</string>
-    <string name="join_frostwire_chat">Doe mee met FrostWire-chat</string>
     <string name="uploaded">Geüpload</string>
     <string name="trackers">Trackers</string>
     <string name="source_type">Bron: %1$s</string>

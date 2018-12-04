@@ -156,8 +156,6 @@
     <string name="clear_search_cache_summary">Limpiar entradas en cache de búsquedas</string>
     <string name="no_results_feedback">No se encontraron resultados.\n\nRevisa tu conexión a Internet o\nprueba otra búsqueda.</string>
     <string name="use_frostclick">Usa FrostClick.com</string>
-    <string name="anonymous_usage_statistics">Estadísticas de uso anónimo</string>
-    <string name="anonymous_usage_statistics_summary">Envía estadísticas de uso anónimo. Ninguna información sobre contenido buscado, compartido o reproducido será almacenada en disco ni enviada a través de la red así como ninguna información que pueda identificarte personalmente.</string>
     <string name="use_torlock">Usar TorLock</string>
     <string name="use_torrentdownloads">Usar TorrentDownloads</string>
     <string name="use_limetorrents">Usar Limetorrents</string>
@@ -241,7 +239,6 @@
     <string name="torrent_transfer_aborted_on_mobile_data">Las transferencias de torrent no empezarán hasta que te conectes a una red Wi-Fi. (Verifica tus preferencias de Redes con respecto al uso de datos 3G/4G)</string>
     <string name="transfers_context_menu_copy_magnet">Copiar Magnet</string>
     <string name="transfers_context_menu_copy_infohash">Copiar InfoHash</string>
-    <string name="help">Ayuda</string>
     <string name="request_again">Intenta nuevamente</string>
     <string name="ringtone_not_set">El Ringtone no pudo ser cambiado</string>
     <string name="protected_connection">Conexión Protegida</string>
@@ -416,5 +413,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prueba gratuita de 7 días</string>
     <string name="play_store_out_of_sync">Play Store necesita sincronizarse, espera unos minutos</string>
     <string name="contact_us">Contáctanos</string>
-    <string name="join_frostwire_chat">Únete al chat de FrostWire</string>
 </resources>

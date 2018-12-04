@@ -34,7 +34,6 @@
         android:paddingTop="5dp">
 
         <TextView
-            android:id="@+id/view_search_header_banner_advertisement_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

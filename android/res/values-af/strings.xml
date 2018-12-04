@@ -110,7 +110,6 @@
     <string name="wifi_networks_only_summary">Stoor data. Laai slegs af indien Wi-Fi-verbinding ingestel is. </string>
     <string name="or_enter_url">of voer URL in</string>
     <string name="documents">Dokumente</string>
-    <string name="help">Hulp</string>
     <string name="disabled">gestremde</string>
     <string name="cloud_downloads_coming">Jammer: Begin wolk aflaai van hier sal beskikbaar wees op verdere updates.</string>
     <string name="download_finished">Aflaai klaar</string>
@@ -196,7 +195,6 @@
     <string name="dialog_new_transfer_check_text">Wys hierdie volgende keer</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Stuur anonieme gebruikstatistieke. Geen inligting wat u persoonlik kan identifiseer nie, sal op die skyf gestoor word of deur die netwerk gestuur word.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire kan nie op die geselekteerde bergingspad skryf nie</string>
     <string name="clear">Duidelik</string>
     <string name="processing_payment">Verwerking van betaling, verfris oor \'n paar sekondes</string>
@@ -347,7 +345,6 @@
     <string name="storage_setting_confirm_dialog_text">Ek verstaan dat alle lêers wat deur FrostWire na die SD-kaart afgelaai word, deur ANDROID verwyder sal word sodra die FrostWire-toepassing van hierdie toestel verwyder is en ek sal nie FrostWire LLC aanspreeklik hou vir enige verlore lêers nie.</string>
     <string name="use_magnet_summary">Magneet gebaseer, werk net op Wifi</string>
     <string name="cant_open_file_does_not_exist">Ek kan nie oopmaak nie %1$s, die lêer bestaan nie.</string>
-    <string name="anonymous_usage_statistics">Anonieme Gebruikstatistiek</string>
     <string name="delete">Skrap</string>
     <string name="saving_to_sd_card">Stoor na SD kaart.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
@@ -378,7 +375,6 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dag verhoor</string>
     <string name="play_store_out_of_sync">Google Play Winkel moet sinkroniseer, wag \'n paar minutes</string>
     <string name="contact_us">Kontak Ons</string>
-    <string name="join_frostwire_chat">Sluit aan by FrostWire Chat</string>
     <string name="uploaded">Gelaai</string>
     <string name="trackers">Spoorsnyers</string>
     <string name="source_type">Bron: %1$s</string>

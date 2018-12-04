@@ -93,7 +93,6 @@
     <string name="love_frostwire">Любов FrostWire</string>
     <string name="or_enter_url">або введіть URL</string>
     <string name="documents">Документи</string>
-    <string name="help">Допомога</string>
     <string name="disabled">немає активованого</string>
     <string name="cloud_downloads_coming">На жаль: Початок завантаження хмари тут будуть доступні на подальших оновлень.</string>
     <string name="download_finished">Завантажити Закінчено</string>
@@ -167,7 +166,6 @@
     <string name="dialog_new_transfer_check_text">Показати це наступного разу</string>
     <string name="peers">Однолітки</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Надіслати анонімну статистику використання. Ніяка інформація, яка може ідентифікувати вас особисто не буде зберігатися на диску або відправлені через мережу.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire не може писати на обраному шляху зберігання</string>
     <string name="clear">Ясно</string>
     <string name="processing_payment">Обробка платежів, оновити протягом декількох секунд</string>
@@ -290,7 +288,6 @@
     <string name="enable_seeding">включити посів</string>
     <string name="storage_setting_confirm_dialog_text">Я розумію, що всі файли, завантажені на карту пам\'яті SD за допомогою FrostWire будуть видалені ANDROID момент додаток FrostWire видаляється з цього пристрою, і я не буду тримати FrostWire LLC несе відповідальність за будь-які файли втрачені.</string>
     <string name="cant_open_file_does_not_exist">Я не можу відкрити %1$s, файл не існує.</string>
-    <string name="anonymous_usage_statistics">Анонімні Статистика використання</string>
     <string name="delete">Видалити</string>
     <string name="saving_to_sd_card">Збереження на SD-карті.</string>
     <string name="torrent_max_peers_summary">Макс Однолітки</string>
@@ -414,5 +411,4 @@
     <string name="add_tracker">Додати трекер</string>
     <string name="play_store_out_of_sync">Google Play Маркет потрібно синхронізувати, зачекайте декілька хвилин</string>
     <string name="contact_us">Зв\'яжіться з нами</string>
-    <string name="join_frostwire_chat">Приєднуйтесь до чату FrostWire</string>
 </resources>

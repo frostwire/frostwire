@@ -19,8 +19,7 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_transfer_detail_details_scroll_view"
-    android:layout_width="match_parent"
+            android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -48,7 +47,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_completion_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -70,7 +68,6 @@
             android:contentDescription="@null" />
 
         <LinearLayout
-            android:id="@+id/fragment_transfer_detail_status_time_left_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -82,7 +79,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_time_left_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -98,7 +94,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/fragment_transfer_detail_status_time_left_divider_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
@@ -116,7 +111,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_downloaded_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -149,7 +143,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_uploaded_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -182,7 +175,6 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical">
 
             <TextView
-                android:id="@+id/fragment_transfer_detail_status_share_ratio_label"
                 style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

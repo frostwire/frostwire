@@ -94,7 +94,6 @@
     <string name="wifi_networks_only_summary">Uloženie dát. Stiahnuť iba vtedy, ak sa zistí Wi-Fi pripojenie. </string>
     <string name="or_enter_url">alebo zadať URL</string>
     <string name="documents">Dokumenty</string>
-    <string name="help">Pomoc</string>
     <string name="disabled">invalidný</string>
     <string name="cloud_downloads_coming">Ospravedlňujeme: Počnúc stiahnutie cloudových odtiaľ budú k dispozícii ďalšie aktualizácie.</string>
     <string name="download_finished">Sťahovanie dokončené</string>
@@ -169,7 +168,6 @@
     <string name="dialog_new_transfer_check_text">Zobraziť túto nabudúce</string>
     <string name="peers">Rovesníkmi</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Odosielať anonymné štatistiky používania. Žiadne informácie, ktoré môžu vás osobne identifikovať budú uložené na disk alebo zaslané prostredníctvom siete.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire nemožno zapisovať na zvolenej ceste batožín</string>
     <string name="clear">Jasný</string>
     <string name="processing_payment">Processing payment, refresh in a few seconds</string>
@@ -297,7 +295,6 @@
     <string name="enable_seeding">Aktivovať siatie</string>
     <string name="storage_setting_confirm_dialog_text">Chápem, že všetky súbory stiahnuté na kartu SD podľa FrostWire budú vymazané operačným systémom Android vo chvíli, keď aplikácia FrostWire sa odinštaluje z tohto zariadenia a nebudem držať FrostWire LLC zodpovednosť za akékoľvek súbory stratené.</string>
     <string name="cant_open_file_does_not_exist">Nemôžem otvoriť %1$s, súbor neexistuje.</string>
-    <string name="anonymous_usage_statistics">Anonymné štatistiky používania</string>
     <string name="delete">Zmazať</string>
     <string name="saving_to_sd_card">Ukladanie na SD kartu.</string>
     <string name="torrent_max_peers_summary">Maximálna rovesníkmi</string>
@@ -414,5 +411,4 @@
     <string name="piece_size_header">Veľkosť kusu:</string>
     <string name="add_tracker">Pridať sledovač</string>
     <string name="contact_us">Kontaktuj nás</string>
-    <string name="join_frostwire_chat">Zapojte sa do chatu FrostWire</string>
 </resources>

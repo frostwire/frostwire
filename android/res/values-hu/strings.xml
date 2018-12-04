@@ -93,7 +93,6 @@
     <string name="love_frostwire">Szerelem FrostWire</string>
     <string name="or_enter_url">Vagy adja meg az URL-t</string>
     <string name="documents">Dokumentumok</string>
-    <string name="help">Segítség</string>
     <string name="disabled">tiltva</string>
     <string name="cloud_downloads_coming">Sorry: Kezdő felhő letöltések innen elérhető lesz a további frissítéseket.</string>
     <string name="download_finished">Letöltés kész</string>
@@ -167,7 +166,6 @@
     <string name="dialog_new_transfer_check_text">Itt található az ezt a következő alkalommal</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Névtelen használati statisztikák küldése. Nincs információ, hogy személyesen azonosítja akkor a lemezen tárolt vagy hálózaton keresztül küldött.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire nem tud írni a kiválasztott tárolási útvonalat</string>
     <string name="clear">Tiszta</string>
     <string name="processing_payment">Feldolgozás fizetés, frissítse néhány másodperc</string>
@@ -290,7 +288,6 @@
     <string name="enable_seeding">Engedélyezze Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Tudomásul veszem, hogy az összes letöltött fájlokat az SD kártya által FrostWire törlésre kerül az Android a pillanatban a FrostWire alkalmazás eltávolítja az eszközről, és azt nem fogja FrostWire LLC felelőssé semmilyen fájl elveszett.</string>
     <string name="cant_open_file_does_not_exist">Nem tudom megnyitni %1$s, a fájl nem létezik.</string>
-    <string name="anonymous_usage_statistics">Névtelen statisztikai</string>
     <string name="delete">Töröl</string>
     <string name="saving_to_sd_card">Mentése az SD-kártyára.</string>
     <string name="torrent_max_peers_summary">Maximális Peer</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Ingyenes 7 napos próba</string>
     <string name="play_store_out_of_sync">Szinkronizálnia kell a Google Play Áruházat, várjon néhány percet</string>
     <string name="contact_us">Lépjen kapcsolatba velünk</string>
-    <string name="join_frostwire_chat">Csatlakozzon a FrostWire chathez</string>
 </resources>

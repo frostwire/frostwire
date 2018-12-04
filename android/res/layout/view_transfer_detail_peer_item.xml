@@ -86,7 +86,6 @@
                 android:text="@string/transfer_detail_speed_dummy" />
 
             <ImageView
-                android:id="@+id/view_transfer_detail_peer_items_arrow_up"
                 android:layout_width="wrap_content"
                 android:layout_height="15dp"
                 android:contentDescription="@null"

@@ -121,7 +121,6 @@
     <string name="love_frostwire">FrostWire محبت</string>
     <string name="wifi_networks_only_summary">ڈیٹا کو محفوظ کریں. لوڈ صرف وائی فائی کنکشن قائم ہے تو.</string>
     <string name="or_enter_url">یا یو آر ایل درج کریں</string>
-    <string name="help">مدد</string>
     <string name="disabled">معذور افراد</string>
     <string name="cloud_downloads_coming">معذرت: یہاں سے ڈاؤن لوڈ کی بادل شروع میں مزید اپ ڈیٹ پر دستیاب ہو جائے گا.</string>
     <string name="download_finished">لوڈ فارغ</string>
@@ -185,7 +184,6 @@
     <string name="dialog_new_transfer_check_text">اس اگلی بار دکھائیں</string>
     <string name="peers">ہم عمر</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">نامعلوم استعمال کے اعدادوشمار بھیجیں. کوئی معلومات ہے کہ آپ کو ذاتی طور پر شناخت کر سکتے ڈسک پر محفوظ یا نیٹ ورک کے ذریعے بھیجا جائے گا.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire منتخب شدہ اسٹوریج راہ پر نہیں لکھ سکتا</string>
     <string name="clear">صاف</string>
     <string name="processing_payment">پروسیسنگ ادائیگی، چند سیکنڈ میں ریفریش</string>
@@ -298,7 +296,6 @@
     <string name="enable_seeding">بوائ فعال</string>
     <string name="storage_setting_confirm_dialog_text">میں تمام فائلوں FrostWire طرف ایسڈی کارڈ پر ڈاؤن لوڈ Android سے خارج کر دیا جائے گا اس لمحے FrostWire درخواست اس آلہ سے ان انسٹال ہے اور میں کھو کسی بھی فائلوں کے لئے FrostWire LLC ذمہ دار نہیں ہوں گے سمجھنے.</string>
     <string name="cant_open_file_does_not_exist">I %1$s نہیں کھول سکتے، فائل موجود نہیں ہے.</string>
-    <string name="anonymous_usage_statistics">نامعلوم استعمال کے اعدادوشمار</string>
     <string name="delete">حذف کریں</string>
     <string name="saving_to_sd_card">ایسڈی کارڈ میں محفوظ کرنا.</string>
     <string name="cheaper_than_gas">گیس کے مقابلے میں سستی</string>
@@ -412,5 +409,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n مفت 7 دن کی آزمائش</string>
     <string name="play_store_out_of_sync">Google Play Store کو مطابقت پذیر کرنے کی ضرورت ہے، چند منٹ انتظار کریں</string>
     <string name="contact_us">ہم سے رابطہ کریں</string>
-    <string name="join_frostwire_chat">FrostWire چیٹ شامل کریں</string>
 </resources>

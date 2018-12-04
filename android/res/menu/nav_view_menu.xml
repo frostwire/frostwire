@@ -50,7 +50,6 @@
             android:title="@string/exit"/>
 
         <item
-            android:id="@+id/menu_main_footer_spacer_1"
             android:checkable="false"
             android:enabled="false"
             android:orderInCategory="200"

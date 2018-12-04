@@ -160,7 +160,6 @@
     <string name="pausing">Pauziram</string>
     <string name="yes_no_cancel_transfer_question">Jeste li sigurni da želite zaustaviti i obrisati ovo preuzimanje sa liste (podatci neće biti obrisani)?</string>
     <string name="dialog_new_transfer_check_text">Pokaži ovo sljedeći put</string>
-    <string name="anonymous_usage_statistics_summary">Šalji anonimne statistike korištenja. Informacije o traženim, djeljenim ili sviranim sadržajima i infomacije koje vas mogu osobno identificirati neće biti spremljene na disk ili poslane kroz mrežu.</string>
     <string name="my_music">Moja glazba</string>
     <string name="torrent_max_downloads">Maksimalni broj preuzimanja</string>
     <string name="error_moving_incomplete">Greška: premještaj neuspješan</string>
@@ -204,12 +203,10 @@
     <string name="download_type_not_supported">Tip preuzimanja nije podržan</string>
     <string name="storage_setting_confirm_dialog_text">Razumijem da će ANDROID obrisati sve datoteke koje FrostWire preuzme na SD karticu kada se FrostWire aplikacija deinstalirasa ovog uređaja I da neću teretiti FrostWire LLC za bilo koje izgubljene datoteke.</string>
     <string name="cant_open_file_does_not_exist">Ne mogu otvoriti %1$s, datoteka ne postiji.</string>
-    <string name="anonymous_usage_statistics">Anonimne statistike korištenja</string>
     <string name="saving_to_sd_card">Spremam na SD karticu.</string>
     <string name="torrent_max_peers_summary">Maksimalni broj preuzimatelja</string>
     <string name="torrent_max_downloads_summary">Maksimalni broj preuzimanja</string>
     <string name="media_player_failed">Media player failed</string>
-    <string name="help">Pomoć</string>
     <string name="your_installation_is_complete">Vaša instalacija je završena.</string>
     <string name="request_again">Zatraži opet</string>
     <string name="send_feedback">Pošalji povratne informacije</string>
@@ -414,5 +411,4 @@
     <string name="piece_size_header">Veličina komada:</string>
     <string name="add_tracker">Dodaj tracker</string>
     <string name="contact_us">Kontaktirajte nas</string>
-    <string name="join_frostwire_chat">Pridružite se FrostWire chatu</string>
 </resources>

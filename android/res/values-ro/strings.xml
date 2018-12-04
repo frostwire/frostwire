@@ -91,7 +91,6 @@
     <string name="love_frostwire">Iubesc FrostWire</string>
     <string name="or_enter_url">sau introduceți URL-ul</string>
     <string name="documents">Documente</string>
-    <string name="help">Ajutor</string>
     <string name="disabled">invalid</string>
     <string name="cloud_downloads_coming">Ne pare rău: Pornind de descărcări de nor de aici vor fi disponibile pe actualizări suplimentare.</string>
     <string name="download_finished">Descărcare terminată</string>
@@ -165,7 +164,6 @@
     <string name="dialog_new_transfer_check_text">Afișați acest data viitoare</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Din titlu cu caractere aldine]</string>
-    <string name="anonymous_usage_statistics_summary">Trimiteți statistici anonime privind utilizarea. Nu sunt informații pe care le puteți identifica în mod personal vor fi stocate pe disc sau trimise prin intermediul rețelei.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire nu se poate scrie pe calea de stocare selectată</string>
     <string name="clear">Limpezi</string>
     <string name="processing_payment">Plată de procesare, de reîmprospătare în câteva secunde</string>
@@ -288,7 +286,6 @@
     <string name="enable_seeding">Activați însămânțarea</string>
     <string name="storage_setting_confirm_dialog_text">Am înțeles că toate fișierele descărcate pe cardul SD de FrostWire va fi șters de către ANDROID momentul în care aplicația FrostWire este dezinstalat de pe acest dispozitiv și nu va deține FrostWire LLC răspunzătoare pentru fișierele pierdute.</string>
     <string name="cant_open_file_does_not_exist">Nu pot deschide %1$s, fișierul nu există.</string>
-    <string name="anonymous_usage_statistics">Anonim de utilizare Statistici</string>
     <string name="delete">Șterge</string>
     <string name="saving_to_sd_card">Se salvează pe un card SD.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
@@ -414,5 +411,4 @@
     <string name="add_tracker">Adaugă tracker</string>
     <string name="play_store_out_of_sync">Magazinul Google Play trebuie sincronizat, așteptați câteva minute</string>
     <string name="contact_us">Contacteaza-ne</string>
-    <string name="join_frostwire_chat">Participă la chat FrostWire</string>
 </resources>

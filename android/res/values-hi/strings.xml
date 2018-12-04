@@ -172,7 +172,6 @@
     <string name="remove_torrent_and_data">धार और डेटा निकालें</string>
     <string name="love_frostwire">प्यार FrostWire</string>
     <string name="or_enter_url">या URL दर्ज</string>
-    <string name="help">मदद</string>
     <string name="cloud_downloads_coming">क्षमा करें: यहाँ से बादल डाउनलोड शुरू आगे अद्यतन पर उपलब्ध हो जाएगा।</string>
     <string name="confirm_download">डाउनलोड की पुष्टि</string>
     <string name="sdcard_storage">एसडीएस संग्रहण</string>
@@ -213,7 +212,6 @@
     <string name="crawl_cache_size">क्रॉल कैश %1$.2fMB</string>
     <string name="pausing">रोकना</string>
     <string name="dummy_title_bold">[बोल्ड शीर्षक]</string>
-    <string name="anonymous_usage_statistics_summary">अनाम उपयोग आंकड़े भेजें। कोई सूचना नहीं है कि व्यक्तिगत रूप से आप की पहचान कर सकते हैं डिस्क पर संग्रहीत या नेटवर्क के माध्यम से भेजा जाएगा।</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire से चयनित भंडारण के रास्ते पर नहीं लिख सकते हैं</string>
     <string name="processing_payment">प्रसंस्करण भुगतान, कुछ ही सेकंड में ताज़ा</string>
     <string name="my_music">मेरा संगीत</string>
@@ -296,7 +294,6 @@
     <string name="enable_seeding">सीडिंग सक्षम करें</string>
     <string name="storage_setting_confirm_dialog_text">मैं समझता हूँ कि FrostWire द्वारा एसडी कार्ड डाउनलोड सभी फाइलों एंड्रॉयड द्वारा पल FrostWire आवेदन इस डिवाइस से रद्द की है हटा दिया जाएगा और मैं पकड़ FrostWire LLC खो किसी भी फाइल के लिए उत्तरदायी नहीं होगा।</string>
     <string name="cant_open_file_does_not_exist">मुझसे नहीं खुल रहा %1$s, फ़ाइल मौजूद नहीं है।</string>
-    <string name="anonymous_usage_statistics">अनाम उपयोग आंकड़े</string>
     <string name="saving_to_sd_card">एसडी कार्ड के लिए सहेजा जा रहा है।</string>
     <string name="torrent_max_peers_summary">मैक्स साथियों</string>
     <string name="cheaper_than_gas">गैस से सस्ता</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n नि: शुल्क 7-दिन का परीक्षण</string>
     <string name="play_store_out_of_sync">Play Store को सिंक्रनाइज़ करने की आवश्यकता है, कुछ मिनट प्रतीक्षा करें</string>
     <string name="contact_us">हमसे संपर्क करें</string>
-    <string name="join_frostwire_chat">फ्रॉस्टवायर चैट में शामिल हों</string>
 </resources>

@@ -96,7 +96,6 @@
     <string name="wifi_networks_only_summary">Spara data. Hämta endast om Wi-Fi-anslutning har upprättats. </string>
     <string name="or_enter_url">eller ange URL</string>
     <string name="documents">Dokument</string>
-    <string name="help">Hjälp</string>
     <string name="disabled">inaktiverad</string>
     <string name="cloud_downloads_coming">Tyvärr: Starta nedladdningar moln härifrån kommer att finnas tillgänglig på ytterligare uppdateringar.</string>
     <string name="download_finished">Hämta Färdig</string>
@@ -174,7 +173,6 @@
     <string name="dialog_new_transfer_check_text">Visa detta nästa gång</string>
     <string name="peers">Peers</string>
     <string name="dummy_title_bold">[Bold Title]</string>
-    <string name="anonymous_usage_statistics_summary">Skicka anonym användningsstatistik . Ingen information som personligen kan identifiera dig kommer att lagras på disk eller skickas via nätverket.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire kan inte skriva på det valda lagringsbanan</string>
     <string name="clear">Klar</string>
     <string name="processing_payment">Bearbetning betalning, uppdatera i några sekunder</string>
@@ -304,7 +302,6 @@
     <string name="enable_seeding">Aktivera sådd</string>
     <string name="storage_setting_confirm_dialog_text">Jag förstår att alla filer som hämtats till SD-kortet från Frostwire kommer att tas bort av Android det ögonblick FrostWire programmet avinstalleras från enheten och jag kommer inte att hålla FrostWire LLC ansvarig för eventuella filer förlorade.</string>
     <string name="cant_open_file_does_not_exist">Jag kan inte öppna %1$s, filen finns inte.</string>
-    <string name="anonymous_usage_statistics">Anonym Användnings Statistik</string>
     <string name="delete">Radera</string>
     <string name="saving_to_sd_card">Spara till SD-kort.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dagars prov</string>
     <string name="play_store_out_of_sync">Google Play Butik behöver synkronisera, vänta några minuter</string>
     <string name="contact_us">Kontakta oss</string>
-    <string name="join_frostwire_chat">Gå med i FrostWire-chatten</string>
 </resources>

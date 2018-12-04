@@ -20,7 +20,6 @@
 -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/view_transfer_detail_progress_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/app_background_body_light"
@@ -40,7 +39,6 @@
         android:layout_alignParentStart="true" />
 
     <RelativeLayout
-        android:id="@+id/view_transfer_detail_progress_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/view_transfer_detail_progress_folder_icon">
@@ -72,7 +70,6 @@
             android:text="@string/transfer_detail_status_dummy" />
 
         <LinearLayout
-            android:id="@+id/view_transfer_detail_progress_download_speed_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -82,7 +79,6 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/view_transfer_detail_progress_arrow_down"
                 android:layout_width="wrap_content"
                 android:layout_height="15dp"
                 android:contentDescription="@null"
@@ -98,7 +94,6 @@
                 android:text="@string/transfer_detail_speed_dummy" />
 
             <ImageView
-                android:id="@+id/view_transfer_detail_progress_arrow_up"
                 android:layout_width="wrap_content"
                 android:layout_height="15dp"
                 android:contentDescription="@null"

@@ -177,7 +177,6 @@
     <string name="remove_torrent_and_data">Di Torrent và dữ liệu</string>
     <string name="love_frostwire">Tình yêu FrostWire</string>
     <string name="or_enter_url">hoặc nhập URL</string>
-    <string name="help">Cứu giúp</string>
     <string name="cloud_downloads_coming">Xin lỗi: Bắt đầu tải đám mây từ đây sẽ có sẵn trên bản cập nhật tiếp theo.</string>
     <string name="confirm_download">Xác nhận Tải về</string>
     <string name="sdcard_storage">Lưu trữ SD</string>
@@ -217,7 +216,6 @@
     <string name="crawl_cache_size">Thu thập thông tin bộ nhớ cache %1$.2fMB</string>
     <string name="pausing">Tạm dừng</string>
     <string name="dummy_title_bold">[tiêu đề đậm]</string>
-    <string name="anonymous_usage_statistics_summary">Gửi thống kê sử dụng ẩn danh. Không có thông tin cá nhân có thể xác định bạn sẽ được lưu trữ trên đĩa hoặc gửi qua mạng.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire không thể viết trên con đường lưu trữ được chọn</string>
     <string name="processing_payment">Thanh toán chế biến, làm mới trong một vài giây</string>
     <string name="my_music">Nhạc của tôi</string>
@@ -300,7 +298,6 @@
     <string name="enable_seeding">Kích hoạt tính Seeding</string>
     <string name="storage_setting_confirm_dialog_text">Tôi hiểu rằng tất cả các file tải về vào thẻ SD của FrostWire sẽ bị xóa BẰNG ANDROID thời điểm áp dụng FrostWire được gỡ bỏ cài đặt từ thiết bị này và tôi sẽ không giữ FrostWire LLC chịu trách nhiệm cho bất kỳ tập tin bị mất.</string>
     <string name="cant_open_file_does_not_exist">Tôi không thể mở %1$s, các tập tin không tồn tại.</string>
-    <string name="anonymous_usage_statistics">Anonymous kê Cách sử dụng</string>
     <string name="saving_to_sd_card">Tiết kiệm đến thẻ SD.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Rẻ hơn so với khí</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Dùng thử 7 ngày miễn phí</string>
     <string name="play_store_out_of_sync">Cửa hàng Google Play cần đồng bộ hóa, đợi một vài phút</string>
     <string name="contact_us">Liên hệ chúng tôi</string>
-    <string name="join_frostwire_chat">Tham gia trò chuyện FrostWire</string>
 </resources>

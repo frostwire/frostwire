@@ -115,7 +115,6 @@
     <string name="wifi_networks_only_summary">డేటాను సేవ్ చేయండి. Wi-Fi కనెక్షన్ స్థాపించబడినప్పుడు మాత్రమే డౌన్లోడ్ చేయండి. </string>
     <string name="or_enter_url">లేదా URL ను నమోదు చేయండి</string>
     <string name="documents">పత్రాలు</string>
-    <string name="help">సహాయం</string>
     <string name="enter_valid_tracker_url_here">ఇక్కడ చెల్లుబాటు అయ్యే ట్రాకర్ url ను నమోదు చేయండి</string>
     <string name="disabled">వికలాంగ</string>
     <string name="cloud_downloads_coming">క్షమించండి: ఇక్కడ నుండి క్లౌడ్ డౌన్లోడ్లు ప్రారంభించడం మరింత నవీకరణలలో అందుబాటులో ఉంటుంది.</string>
@@ -216,7 +215,6 @@
     <string name="dialog_new_transfer_check_text">ఈ తదుపరిసారి చూపించు</string>
     <string name="peers">తోటివారి</string>
     <string name="dummy_title_bold">[బోల్డ్ శీర్షిక]</string>
-    <string name="anonymous_usage_statistics_summary">అనామక వాడుక గణాంకాలను పంపండి. వ్యక్తిగతంగా మిమ్మల్ని గుర్తించే సమాచారం డిస్క్లో నిల్వ చేయబడదు లేదా నెట్వర్క్ ద్వారా పంపబడుతుంది.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire ఎంపిక నిల్వ మార్గంలో రాయలేదు</string>
     <string name="clear">ప్రశాంతంగా</string>
     <string name="processing_payment">కొన్ని సెకన్లలో చెల్లింపును ప్రాసెస్ చేయండి, రిఫ్రెష్ చేయండి</string>
@@ -380,7 +378,6 @@
     <string name="storage_setting_confirm_dialog_text">FrostWire ద్వారా SD కార్డుకి డౌన్లోడ్ చేసిన అన్ని ఫైల్లు తొలగించబడతాయి మరియు ANDROID ఈ ఫ్రొస్ట్వైర్ అనువర్తనం ఈ పరికరం నుండి అన్ఇన్స్టాల్ చేయబడిన క్షణం నుండి తొలగించబడుతుంది మరియు కోల్పోయిన ఫైళ్ళకు నేను FrostWire LLC బాధ్యతను కలిగి ఉండదు.</string>
     <string name="use_magnet_summary">మాగ్నెట్ ఆధారిత, Wi-Fi లో మాత్రమే పనిచేస్తుంది</string>
     <string name="cant_open_file_does_not_exist">నేను తెరవలేను %1$s, ఫైల్ ఉనికిలో లేదు.</string>
-    <string name="anonymous_usage_statistics">అజ్ఞాత వాడుక గణాంకాలు</string>
     <string name="delete">తొలగించు</string>
     <string name="vpn_find_out_more">మరింత తెలుసుకోవడానికి</string>
     <string name="saving_to_sd_card">SD కార్డుకు సేవ్ చేస్తోంది.</string>
@@ -412,5 +409,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ఉచిత 7 రోజుల ట్రయల్</string>
     <string name="play_store_out_of_sync">Play Store సమకాలీకరించాల్సిన అవసరం ఉంది, కొన్ని నిమిషాలు వేచి ఉండండి</string>
     <string name="contact_us">మమ్మల్ని సంప్రదించండి</string>
-    <string name="join_frostwire_chat">ఫ్రోస్ట్వైర్ చాట్లో చేరండి</string>
 </resources>

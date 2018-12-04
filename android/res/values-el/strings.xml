@@ -153,8 +153,6 @@
     <string name="clear_search_cache_summary">Διαγραφή στοιχείων cache αναζήτησης</string>
     <string name="no_results_feedback">Δεν βρέθηκαν αποτελέσματα.\n\nΈλεγξε τη σύνδεση στο internet ή\nδοκίμασε διαφορετικούς όρους.</string>
     <string name="use_frostclick">Χρήση FrostClick</string>
-    <string name="anonymous_usage_statistics">Ανώνυμα Στατιστικά Χρήστης</string>
-    <string name="anonymous_usage_statistics_summary">Στείλε ανώνυμα στατιστικά χρήσης. Καμία πληροφορία που να περιλαμβάνει το περιεχόμενο που αναζητάς, μοιράζεσαι ή παίζεις και καμία πληροφορία που να μπορεί να σε ταυτοποιήσει προσωπικά δεν θα αποθηκευτεί στο δίσκο ούτε θα σταλεί στο δίκτυο.</string>
     <string name="use_torlock">Χρήση TorLock</string>
     <string name="use_eztv">Χρήση Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -220,7 +218,6 @@
     <string name="the_file_could_not_be_seeded_enable_seeding">Το αρχείο δεν θα μπορούσε να σπαρθεί. Ενεργοποίηση σπορά σχετικά με τις ρυθμίσεις.</string>
     <string name="remove_torrent_and_data">Αφαιρέστε Torrent και Δεδομένων</string>
     <string name="love_frostwire">H αγάπη FrostWire</string>
-    <string name="help">Help</string>
     <string name="one_time_purchase">Αγορασε τωρα!</string>
     <string name="activity_VPN">Σύνδεση</string>
     <string name="one_year">1 χρόνος</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Δωρεάν δοκιμή 7 ημερών</string>
     <string name="play_store_out_of_sync">Το Google Play Store χρειάζεται συγχρονισμό, περιμένετε μερικά λεπτά</string>
     <string name="contact_us">Επικοινωνήστε μαζί μας</string>
-    <string name="join_frostwire_chat">Συμμετοχή σε συζήτηση FrostWire</string>
 </resources>

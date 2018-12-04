@@ -176,7 +176,6 @@
     <string name="remove_torrent_and_data">Rimuovere Torrent e dati</string>
     <string name="love_frostwire">Amare FrostWire</string>
     <string name="or_enter_url">oppure inserire l\'URL</string>
-    <string name="help">Aiuto</string>
     <string name="cloud_downloads_coming">Scusate!: Partendo download nube da qui sarà disponibile su ulteriori aggiornamenti.</string>
     <string name="confirm_download">Conferma download</string>
     <string name="sdcard_storage">Memoria SD</string>
@@ -215,7 +214,6 @@
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="pausing">Pausa</string>
     <string name="dummy_title_bold">[titolo in grassetto]</string>
-    <string name="anonymous_usage_statistics_summary">Invia statistiche di utilizzo anonime. Nessuna informazione che possa identificare personalmente l\'utente verrà memorizzato su disco o inviati attraverso la rete.</string>
     <string name="storage_picker_treeuri_cant_write">FrostWire non può scrivere nel percorso di memorizzazione selezionato</string>
     <string name="processing_payment">Pagamento in corso, aggiornare in pochi secondi</string>
     <string name="my_music">La mia musica</string>
@@ -296,7 +294,6 @@
     <string name="enable_seeding">Abilita Semina</string>
     <string name="storage_setting_confirm_dialog_text">Mi rendo conto che tutti i file scaricati alla scheda SD da FrostWire verranno cancellati da Android il momento l\'applicazione FrostWire è disinstallato da questo dispositivo e non voglio tenere FrostWire LLC responsabile di eventuali file persi.</string>
     <string name="cant_open_file_does_not_exist">Non posso aprire %1$s, il file non esiste.</string>
-    <string name="anonymous_usage_statistics">Statistiche di utilizzo anonimi</string>
     <string name="saving_to_sd_card">Salvataggio su scheda SD.</string>
     <string name="torrent_max_peers_summary">Max Peers</string>
     <string name="cheaper_than_gas">Più economico di gas</string>
@@ -414,5 +411,4 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prova gratuita di 7 giorni</string>
     <string name="play_store_out_of_sync">Google Play Store deve essere sincronizzato, attendere alcuni minuti</string>
     <string name="contact_us">Contattaci</string>
-    <string name="join_frostwire_chat">Unisciti alla chat di FrostWire</string>
 </resources>

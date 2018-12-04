@@ -151,8 +151,6 @@
     <string name="clear_search_cache_summary">Wyczyść Pamięć Podręczną Wyszukiwania</string>
     <string name="no_results_feedback">Nie znaleziono żadnych rezultatów.\n\nSprawdź swoje połączenie z internetem lub użyj innych słów kluczowych.</string>
     <string name="use_frostclick">Używaj FrostClick</string>
-    <string name="anonymous_usage_statistics">Anonimowe Statystyki Użytkowania</string>
-    <string name="anonymous_usage_statistics_summary">Wysyłaj anonimowe statystyki użytkowania. Żadna informacja dotycząca treści wyszukiwania, udostępniania, odtwarzania lub jakakolwiek informacja która mogłaby ciebie zidentyfikować, nie będzie zapisana na dysku lub przesłana przez sieć.</string>
     <string name="drawer_close">Zamknij menu nawigacji</string>
     <string name="add_transfer_label">Wklej magnet lub URL torrentu</string>
     <string name="drawer_open">Otwórz menu nawigacji</string>
@@ -226,7 +224,6 @@
     <string name="choose_email_app">Wybież Apkę Emailową…</string>
     <string name="remove_torrent_and_data">Usuń Torrent i Dane</string>
     <string name="love_frostwire">Lubisz FrostWire?</string>
-    <string name="help">Pomoc</string>
     <string name="ringtone_not_set">Dzwonek nie został zmieniony, nie wystarczające pozwolenia.</string>
     <string name="transfers_context_menu_copy_infohash_copied">Infohash skopiowany do schowka</string>
     <string name="transfers_context_menu_copy_infohash">Skopiuj InfoHash</string>
@@ -403,7 +400,6 @@
     <string name="add">Dodaj</string>
     <string name="transfers_context_seed_all_transfers">Seeduj wszystkie zakonczone transfery</string>
     <string name="time_left">Pozostały czas</string>
-    <string name="join_frostwire_chat">Dołącz do czatu FrostWire</string>
     <string name="n_files">%1$d PLIKI</string>
     <string name="total_size">Całkowity rozmiar</string>
     <string name="show_torrent_details">Pokaż szczegóły torrentu</string>
