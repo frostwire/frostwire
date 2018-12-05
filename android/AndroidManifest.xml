@@ -18,10 +18,11 @@
  */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.frostwire.android"
-    android:installLocation="auto"
-    android:versionCode="569"
-    android:versionName="2.1.0">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.frostwire.android"
+          android:installLocation="auto"
+          android:versionCode="569"
+          android:versionName="2.1.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -59,7 +60,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
-        android:theme="@style/Theme.FrostWire">
+        android:theme="@style/Theme.FrostWire"
+        tools:replace="android:label">
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -204,7 +206,7 @@
                 <data android:mimeType="application/x-ogg" />
                 <data android:mimeType="application/itunes" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:scheme="http">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />

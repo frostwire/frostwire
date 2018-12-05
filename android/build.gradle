@@ -43,6 +43,9 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+
+    // for Vungle
+    maven { url 'https://jitpack.io' }
 }
 
 def manifestVersionCode() {
@@ -96,6 +99,7 @@ android {
         versionName project.ext.versionName
         minSdkVersion 16
         targetSdkVersion 26
+        multiDexEnabled true
     }
 
     compileOptions {
@@ -144,12 +148,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             signingConfig signingConfigs.release
+            multiDexKeepFile file('multidex-config.txt')
+            //multiDexKeepProguard file('proguard-rules.pro')
         }
         debug {
             minifyEnabled true
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
+            multiDexKeepFile file('multidex-config.txt')
+            //multiDexKeepProguard file('proguard-rules.pro')
         }
     }
 
@@ -173,6 +181,8 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
+
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:animated-vector-drawable:27.1.1'
     implementation 'com.android.support:customtabs:27.1.1'
@@ -187,6 +197,8 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18'
     implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18'
     implementation 'com.google.android:flexbox:1.0.0'
+    implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
+    implementation 'com.mopub.mediation:vungle:6.3.24.0'
 }
 
 class DeployRelease extends DefaultTask {

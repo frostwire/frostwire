@@ -4,6 +4,28 @@
 -keep class org.conscrypt.Conscrypt { *; }
 -keep class android.net.http.AndroidHttpClient { *; }
 
+#  VUNGLE
+-dontwarn com.vungle.**
+-dontnote com.vungle.**
+-keep class com.vungle.** { *; }
+-keep class javax.inject.*
+-dontwarn de.greenrobot.event.util.**
+-dontwarn rx.internal.util.unsafe.**
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+-keep class rx.schedulers.Schedulers { public static <methods>; }
+-keep class rx.schedulers.ImmediateScheduler { public <methods>; }
+-keep class rx.schedulers.TestScheduler { public <methods>; }
+-keep class rx.schedulers.Schedulers { public static ** test(); }
+# EOVUNGLE
 
 # MoPub
 -keep class com.mopub.mobileads.WebViewCacheService { *; }

@@ -17,8 +17,8 @@
 
 package com.frostwire.android.gui;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -54,7 +54,7 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * @author gubatron
  * @author aldenml
  */
-public class MainApplication extends Application {
+public class MainApplication extends MultiDexApplication {
 
     private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
