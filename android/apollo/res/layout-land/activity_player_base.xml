@@ -75,7 +75,6 @@
                     android:visibility="gone" />
 
                 <ImageButton
-                    android:id="@+id/audio_player_dismiss_mopubview_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignRight="@+id/audio_player_advertisement_text"
@@ -87,13 +86,11 @@
             </LinearLayout>
 
             <com.mopub.mobileads.MoPubView
-                android:id="@+id/audio_player_mopubview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
             <ImageView
-                android:id="@+id/audio_player_fallback_imageview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"/>
@@ -187,7 +184,6 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/activity_audio_player_div3"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_alignBottom="@+id/audio_player_header"
@@ -250,7 +246,6 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/audio_player_footer"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
@@ -260,7 +255,6 @@
             android:layout_marginRight="36dp" />
 
         <TextView
-            android:id="@+id/audio_player_remove_ads_text_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"

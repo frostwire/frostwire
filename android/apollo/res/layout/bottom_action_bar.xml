@@ -45,7 +45,6 @@
             android:background="@drawable/default_artwork" />
 
         <RelativeLayout
-            android:id="@+id/bottom_action_bar_info_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

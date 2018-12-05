@@ -47,14 +47,12 @@
             android:visibility="gone" />
 
         <View
-            android:id="@+id/profile_tab_photo_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
 
         <View
-            android:id="@+id/profile_tab_label_background"
             android:layout_width="match_parent"
             android:layout_height="@dimen/profile_carousel_label_height"
             android:layout_alignParentBottom="true"

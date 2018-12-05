@@ -32,7 +32,6 @@
         android:paddingRight="@dimen/list_simple_horizontal_padding" >
 
         <TextView
-            android:id="@+id/new_playlist_list_item_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toRightOf="@+id/new_playlist_list_item_icon"

@@ -33,7 +33,6 @@
         android:scaleType="fitXY" />
 
     <LinearLayout
-        android:id="@+id/notification_expanded_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

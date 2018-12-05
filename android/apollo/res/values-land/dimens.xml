@@ -15,5 +15,4 @@
  -->
 <resources>
     <!-- WRAP_CONTENT=-2, MATCH_PARENT=-1 -->
-    <dimen name="profile_carousel_view_height">110.0dp</dimen>
 </resources>
