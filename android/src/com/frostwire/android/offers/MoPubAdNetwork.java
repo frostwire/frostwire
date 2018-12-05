@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -213,9 +214,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private static void loadMoPubInterstitialAsync(final MoPubInterstitial moPubInterstitial) {
         try {
+            Looper.prepare();
             moPubInterstitial.load();
         } catch (Throwable e) {
-            LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): Mopub Interstitial couldn't be loaded");
+            LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): Mopub Interstitial couldn't be loaded", e);
         }
     }
 
