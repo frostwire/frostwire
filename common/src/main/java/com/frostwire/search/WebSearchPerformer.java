@@ -47,7 +47,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     private final int timeout;
     private final HttpClient client;
 
-    public WebSearchPerformer(String domainName, long token, String keywords, int timeout) {
+    WebSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(token);
 
         if (domainName == null) {

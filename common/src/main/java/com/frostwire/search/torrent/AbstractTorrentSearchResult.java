@@ -50,15 +50,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     }
 
     @Override
-    public int uid() {
-        if (uid == -1) {
-            String key = getDisplayName() + getDetailsUrl() + getSource() + getHash();
-            uid = key.hashCode();
-        }
-        return uid;
-    }
-
-    @Override
     public String getReferrerUrl() {
         return getDetailsUrl();
     }

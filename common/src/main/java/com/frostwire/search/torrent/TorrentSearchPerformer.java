@@ -31,7 +31,7 @@ import java.util.List;
  */
 public abstract class TorrentSearchPerformer extends CrawlPagedWebSearchPerformer<TorrentCrawlableSearchResult> {
 
-    TorrentSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+    protected TorrentSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages, numCrawls);
     }
 

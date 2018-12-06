@@ -39,5 +39,4 @@ public interface SearchResult {
     
     String getThumbnailUrl();
 
-    int uid();
 }

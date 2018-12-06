@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         return fetch(url);
     }
 
+    /** The Search URL */
     protected abstract String getUrl(int page, String encodedKeywords);
 
     protected abstract List<? extends SearchResult> searchPage(String page);

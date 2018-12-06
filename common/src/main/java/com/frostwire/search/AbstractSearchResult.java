@@ -48,12 +48,4 @@ public abstract class AbstractSearchResult implements SearchResult {
         return null;
     }
 
-    @Override
-    public int uid() {
-        if (uid == -1) {
-            String key = getDisplayName() + getDetailsUrl() + getSource();
-            uid = key.hashCode();
-        }
-        return uid;
-    }
 }

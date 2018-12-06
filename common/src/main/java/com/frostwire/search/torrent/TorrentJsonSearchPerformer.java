@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.frostwire.search.torrent;
 
 import com.frostwire.search.SearchResult;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,12 +38,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
     private TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages, numCrawls);
         
-        this.itemComparator = new Comparator<T>() {
-            @Override
-            public int compare(T a, T b) {
-                return b.getSeeds() - a.getSeeds();
-            }
-        };
+        this.itemComparator = (a, b) -> b.getSeeds() - a.getSeeds();
     }
 
     public TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
@@ -58,7 +52,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
         List<T> items = parseJson(page);
 
         if (items != null) {
-            Collections.sort(items, itemComparator);
+            items.sort(itemComparator);
 
             for (T item : items) {
                 if (!isStopped()) {
@@ -71,7 +65,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
         return result;
     }
 
-    protected abstract List<T> parseJson(String json);
+    abstract List<T> parseJson(String json);
 
-    protected abstract R fromItem(T item);
+    abstract R fromItem(T item);
 }
