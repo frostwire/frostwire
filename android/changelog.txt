@@ -1,6 +1,7 @@
 FrostWire 2.1.1 build 569 - DEC/04/2018
- - Library updates mopub 5.4.1
  - Memory freed by removed hundreds of resource ids and resources
+ - Library updates mopub 5.4.1, applovin 9.1.0
+
 
 FrostWire 2.1.0 build 568 - NOV/18/2018
  - Android Oreo/Pie compatibility updates
