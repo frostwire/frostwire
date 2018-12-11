@@ -31,6 +31,7 @@ import java.util.Map;
 public class NyaaSearchResult implements TorrentCrawlableSearchResult {
 
     private final String detailsUrl;
+    private final String thumbnailUrl;
     private final String displayName;
     private final String hash;
     private final long creationTime;
@@ -52,15 +53,16 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         UNIT_TO_BYTES.put("PiB", 1024 * 1024 * 1024 * 1024 * 1024);
     }
 
-    public NyaaSearchResult(String detailsUrl_, SearchMatcher matcher) {
-        detailsUrl = detailsUrl_;
-        displayName = null;
-        hash = null;
-        creationTime = 0;
-        fileName = null;
-        torrentUrl = null;
-        seeds = 0;
-        fileSize = 0;
+    NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {
+        detailsUrl = urlPrefix + matcher.group("detailsurl");
+        thumbnailUrl = urlPrefix + matcher.group("thumbnailurl");
+        displayName = matcher.group("displayname");
+        hash = parseHash(matcher.group("magneturl"));
+        creationTime = Long.valueOf(matcher.group("timestamp"));
+        fileName = matcher.group("displayname");
+        torrentUrl = urlPrefix + matcher.group("torrenturl");
+        seeds = Integer.parseInt(matcher.group("seeds"));
+        fileSize = parseSize(matcher.group("filesize"));
     }
 
     @Override
@@ -95,7 +97,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
 
     @Override
     public String getThumbnailUrl() {
-        return null;
+        return thumbnailUrl;
     }
 
     @Override
@@ -128,14 +130,50 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         return fileSize;
     }
 
-    private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
-        try {
-            //dateString = dateString.replaceAll("(st|nd|rd|th)", "");
-            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString).getTime();
-        } catch (Throwable ignored) {
+    private String parseHash(String magneturl) {
+        if (magneturl.startsWith("magnet:?xt=urn:btih:")) {
+            return magneturl.substring(20, 52);
         }
-        return result;
+        return "";
     }
+
+    private long parseSize(String size) {
+        String[] sizearr = size.trim().split(" ");
+        String amount = sizearr[0].trim();
+        String unit = sizearr[1].trim();
+        return calculateSize(amount, unit);
+    }
+
+    private long calculateSize(String amount, String unit) {
+        if (amount == null || unit == null) {
+            return -1;
+        }
+
+        Integer unitMultiplier = UNIT_TO_BYTES.get(unit);
+        if (unitMultiplier != null) {
+            unitMultiplier = UNIT_TO_BYTES.get("bytes");
+        }
+
+        //fractional size
+        if (amount.indexOf(".") > 0) {
+            float floatAmount = Float.parseFloat(amount);
+            return (long) (floatAmount * unitMultiplier);
+        }
+        //integer based size
+        else {
+            int intAmount = Integer.parseInt(amount);
+            return intAmount * unitMultiplier;
+        }
+    }
+
+//    private long parseCreationTime(String dateString) {
+//        long result = System.currentTimeMillis();
+//        try {
+//            //dateString = dateString.replaceAll("(st|nd|rd|th)", "");
+//            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+//            result = myFormat.parse(dateString).getTime();
+//        } catch (Throwable ignored) {
+//        }
+//        return result;
+//    }
 }

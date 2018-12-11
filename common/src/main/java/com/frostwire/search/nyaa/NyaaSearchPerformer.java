@@ -17,21 +17,33 @@
 
 package com.frostwire.search.nyaa;
 
-import com.frostwire.search.SearchError;
-import com.frostwire.search.SearchListener;
-import com.frostwire.search.SearchResult;
+import com.frostwire.regex.Pattern;
+import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentSearchPerformer;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.UrlUtils;
-import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.Logger;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NyaaSearchPerformer extends TorrentSearchPerformer {
     private final int MAX_RESULTS = 75;
+    private final Pattern pattern;
+    private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
 
     public NyaaSearchPerformer(String domainName, long token, String keywords, int timeout) {
        super(domainName, token, keywords, timeout, 1, 1);
+       pattern = Pattern.compile(
+               "(?is)<tr class=\"default\">.*?" +
+               "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
+               "<a href=\".*?\" class=\"comments\" title=\".*?\">.*?<i class=\"fa fa-comments-o\"></i>.*?" +
+               "<a href=\"(?<detailsurl>.*?)\" title=\"(?<displayname>.*?)\">.*?<td class=\"text-center\" style=\"white-space: nowrap;\">.*?" +
+               "<a href=\"(?<torrenturl>.*?)\"><i class=\"fa fa-fw fa-download\"></i></a>.*?" +
+               "<a href=\"(?<magneturl>.*?)\"><i class=\"fa fa-fw fa-magnet\"></i></a>.*?" +
+               "<td class=\"text-center\">(?<filesize>.*?)</td>.*?" +
+               "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
+               "<td class=\"text-center\" style=\"color: green;\">(?<seeds>.*?)</td>");
+
     }
 
     @Override
@@ -41,40 +53,32 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
 
     @Override
     protected List<? extends NyaaSearchResult> searchPage(String page) {
-        return null;
-    }
-
-    private static class NyaaSearchPerformerTest {
-        public static void main(String[] args) {
-            String TEST_SEARCH_TERM = UrlUtils.encode("dragon ball");
-            HttpClient httpClient = HttpClientFactory.newInstance();
-            String fileStr;
-
-            NyaaSearchPerformer nyaa = new NyaaSearchPerformer("nyaa.si",1,"dragon ball",5000);
-            nyaa.setListener(new SearchListener() {
-                @Override
-                public void onResults(long token, List<? extends SearchResult> results) {
-                    
-                }
-
-                @Override
-                public void onError(long token, SearchError error) {
-
-                }
-
-                @Override
-                public void onStopped(long token) {
-
-                }
-            });
-
-            try {
-                fileStr = httpClient.get("https://nyaa.si/?f=0&c=0_0&q=" + TEST_SEARCH_TERM);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                System.out.println("Aborting test.");
-                return;
-            }
+        if (null == page || page.isEmpty()) {
+            return Collections.emptyList();
         }
+        int offset = page.indexOf("</thead>");
+        if (offset < 0) {
+            offset = 0;
+        }
+
+        ArrayList<NyaaSearchResult> results = new ArrayList<>(0);
+        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page)));
+        boolean matcherFound;
+        do {
+            try {
+                matcherFound = matcher.find();
+            } catch (Throwable t) {
+                matcherFound = false;
+                LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
+            }
+
+            if (matcherFound) {
+                NyaaSearchResult sr = new NyaaSearchResult("https://" + getDomainName(),matcher);
+                if (sr != null) {
+                    results.add(sr);
+                }
+            }
+        } while (matcherFound && !isStopped());
+        return results;
     }
 }
