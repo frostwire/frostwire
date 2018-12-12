@@ -159,6 +159,7 @@
     <string name="use_torlock">Usar TorLock</string>
     <string name="use_torrentdownloads">Usar TorrentDownloads</string>
     <string name="use_limetorrents">Usar Limetorrents</string>
+    <string name="use_nyaa">Usar Nyaa</string>
     <string name="use_eztv">Usar Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">Necesitas un app de Bitcoin instalado para enviar donaciones en BTC.</string>

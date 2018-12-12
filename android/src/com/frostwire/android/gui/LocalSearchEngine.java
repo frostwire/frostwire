@@ -28,6 +28,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
 
 import java.text.Normalizer;
@@ -109,7 +110,9 @@ public final class LocalSearchEngine {
         currentSearchTokens = tokenize(query);
         searchFinished = false;
 
-        for (SearchEngine se : SearchEngine.getEngines()) {
+        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines());
+        Collections.shuffle(shuffledEngines);
+        for (SearchEngine se : shuffledEngines) {
             if (se.isEnabled()) {
                 SearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
@@ -141,14 +144,14 @@ public final class LocalSearchEngine {
     }
 
     public void markOpened(SearchResult sr, AbstractListAdapter adapter) {
-        opened.add(sr.uid());
+        opened.add(getSearchResultUID(sr));
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
     }
 
     public boolean hasBeenOpened(SearchResult sr) {
-        return sr != null && opened.contains(sr.uid());
+        return sr != null && opened.contains(getSearchResultUID(sr));
     }
 
     private void onResults(long token, List<? extends SearchResult> results) {
@@ -234,6 +237,7 @@ public final class LocalSearchEngine {
 
     private String sanitize(String str) {
         str = Html.fromHtml(str).toString();
+        //noinspection RegExpRedundantEscape
         str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
         str = StringUtils.removeDoubleSpaces(str);
 
@@ -265,5 +269,22 @@ public final class LocalSearchEngine {
         Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
 
         return new ArrayList<>(normalizeTokens(tokens));
+    }
+
+    private int getSearchResultUID(SearchResult sr) {
+        StringBuilder seed = new StringBuilder();
+        if (sr.getDisplayName() != null) {
+            seed.append(sr.getDisplayName());
+        }
+        if (sr.getDetailsUrl() != null) {
+            seed.append(sr.getDetailsUrl());
+        }
+        if (sr.getSource() != null) {
+            seed.append(sr.getSource());
+        }
+        if (sr instanceof TorrentSearchResult && ((TorrentSearchResult) sr).getHash() != null) {
+            seed.append(((TorrentSearchResult) sr).getHash());
+        }
+        return StringUtils.quickHash(seed.toString());
     }
 }

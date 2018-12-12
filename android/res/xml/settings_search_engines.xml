@@ -60,6 +60,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_limetorrents" />
     <android.support.v7.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_nyaa"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_nyaa" />
+    <android.support.v7.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
         android:layout="@layout/view_preference_search_engine"
         android:summary="@string/use_magnet_summary"

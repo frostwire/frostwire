@@ -411,4 +411,5 @@
     <string name="title_activity_transfer_detail">Oordragdetail</string>
     <string name="piece_size_header">Stuk Grootte:</string>
     <string name="add_tracker">Voeg spoorsnyer by</string>
+    <string name="use_nyaa">Gebruik Pixabay</string>
 </resources>

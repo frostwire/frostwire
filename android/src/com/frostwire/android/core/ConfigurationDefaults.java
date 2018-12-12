@@ -103,6 +103,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORLOCK, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_NYAA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_APPIA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);

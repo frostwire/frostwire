@@ -411,4 +411,5 @@
     <string name="title_activity_transfer_detail">Detail transfer</string>
     <string name="piece_size_header">Ukuran potongan:</string>
     <string name="add_tracker">Tambahkan pelacak</string>
+    <string name="use_nyaa">Gunakan Nyaa</string>
 </resources>

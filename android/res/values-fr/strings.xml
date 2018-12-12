@@ -412,4 +412,5 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Essai gratuit de 7 jours</string>
     <string name="play_store_out_of_sync">Play Store doit se synchroniser, attendre quelques minutes</string>
     <string name="contact_us">Contactez nous</string>
+    <string name="use_nyaa">Utilisez Nyaa</string>
 </resources>

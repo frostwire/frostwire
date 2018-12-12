@@ -411,4 +411,5 @@
     <string name="title_activity_transfer_detail">รายละเอียดการโอนเงิน</string>
     <string name="piece_size_header">ชิ้นขนาด:</string>
     <string name="add_tracker">เพิ่มตัวติดตาม</string>
+    <string name="use_nyaa">ใช้ Nyaa</string>
 </resources>

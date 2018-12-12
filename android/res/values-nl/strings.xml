@@ -411,4 +411,5 @@
     <string name="title_activity_transfer_detail">Gegevens overdragen</string>
     <string name="piece_size_header">Stuk maat:</string>
     <string name="add_tracker">Voeg tracker toe</string>
+    <string name="use_nyaa">Gebruik Nyaa</string>
 </resources>

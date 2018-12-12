@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -167,6 +168,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine NYAA = new SearchEngine("Nyaa", Constants.PREF_KEY_SEARCH_USE_NYAA) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public static final SearchEngine EZTV = new SearchEngine("Eztv", Constants.PREF_KEY_SEARCH_USE_EZTV) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -206,5 +214,6 @@ public abstract class SearchEngine {
             TORLOCK,
             TORRENTDOWNLOADS,
             LIMETORRENTS,
+            NYAA,
             EZTV);
 }
