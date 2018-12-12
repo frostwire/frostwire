@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,6 @@ public final class SearchManager {
     }
 
     public void perform(final SearchPerformer performer) {
-//        if (performer == null) {
-//            throw new IllegalArgumentException("Search performer argument can't be null");
-//        }
         if (performer != null) {
             if (performer.getToken() < 0) {
                 throw new IllegalArgumentException("Search token id must be >= 0");
