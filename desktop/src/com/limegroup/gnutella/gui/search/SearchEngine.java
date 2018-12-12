@@ -23,6 +23,7 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -65,6 +66,8 @@ public abstract class SearchEngine {
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
     private static final int PIXABAY_ID = 22;
+
+    private static final int NYAA_ID = 23;
 
     private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.org") {
         @Override
@@ -114,6 +117,13 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
+    private static final SearchEngine NYAA = new SearchEngine(NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -188,6 +198,7 @@ public abstract class SearchEngine {
                 FROSTCLICK,
                 ARCHIVEORG,
                 TORLOCK,
+                NYAA,
                 YIFY,
                 EZTV,
                 TORRENTDOWNLOADS,
