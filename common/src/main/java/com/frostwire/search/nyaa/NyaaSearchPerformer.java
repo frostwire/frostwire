@@ -57,7 +57,7 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
             return Collections.emptyList();
         }
         int offset = page.indexOf("</thead>");
-        if (offset < 0) {
+        if (offset == -1) {
             offset = 0;
         }
 
@@ -78,7 +78,7 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
                     results.add(sr);
                 }
             }
-        } while (matcherFound && !isStopped());
+        } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
         return results;
     }
 }

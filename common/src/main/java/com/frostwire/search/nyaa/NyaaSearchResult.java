@@ -150,7 +150,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         }
 
         Integer unitMultiplier = UNIT_TO_BYTES.get(unit);
-        if (unitMultiplier != null) {
+        if (unitMultiplier == null) {
             unitMultiplier = UNIT_TO_BYTES.get("bytes");
         }
 
