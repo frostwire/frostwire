@@ -1,3 +1,9 @@
+frostwire (6.7.6) stable; urgency=high
+  * Search: New Nyaa search
+  * Performance upgrades and fixes
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 12 Dec 2018 07:06:45 -0600
+
 frostwire (6.7.5) stable; urgency=high
   * Translation updates: Swedish
   * EZ search fixed
