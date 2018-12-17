@@ -414,6 +414,9 @@ public class InstallerUpdater implements Runnable {
                 String fileMD5 = DigestUtils.getMD5(file);
                 if (!DigestUtils.compareMD5(currentMD5, fileMD5)) {
                     System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> removed " + file.getName() + " (file size: " + file.length() + " bytes)");
+                    if (updateMessage.getInstallerUrl() != null && updateMessage.getInstallerUrl() != "") {
+                        System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> downloaded from " + updateMessage.getInstallerUrl());
+                    }
                     System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> expected MD5=" + currentMD5.toLowerCase() + " vs " + file.getName() + " MD5=" + fileMD5 + "\n");
                     file.delete();
                 }
