@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
@@ -18,11 +17,11 @@
  */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.frostwire.android"
-          android:installLocation="auto"
-          android:versionCode="571"
-          android:versionName="2.1.1">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.frostwire.android"
+    android:installLocation="auto"
+    android:versionCode="571"
+    android:versionName="2.1.1">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -68,7 +67,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-0657224435269327~1839292928"/>
+            android:value="ca-app-pub-0657224435269327~1839292928" />
 
         <!-- activities -->
 
@@ -318,8 +317,9 @@
         <activity
             android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.mopub.common.privacy.ConsentDialogActivity"
-                  android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name="com.mopub.common.privacy.ConsentDialogActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <!--
         <activity
             android:name="com.mopub.mobileads.RewardedMraidActivity"

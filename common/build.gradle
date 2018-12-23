@@ -2,15 +2,17 @@ group 'com.frostwire'
 version '1.0.0'
 
 apply plugin: 'java'
-apply from: "$rootDir/dependencies.gradle"
+apply from: "${rootDir}/dependencies.gradle"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'com.frostwire:jlibtorrent:1.2.0.17'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.frostwire:jlibtorrent:1.2.0.18'
+
+    testImplementation 'junit:junit:4.12'
 }
