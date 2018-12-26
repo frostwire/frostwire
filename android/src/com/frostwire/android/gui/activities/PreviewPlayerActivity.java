@@ -58,6 +58,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
@@ -210,7 +211,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
         if (mopubBannerView != null) {
             mopubBannerView.setOnBannerDismissedListener(this::hideAd);
-            mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
+            Asyncs.async(() -> mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL));
         }
     }
 

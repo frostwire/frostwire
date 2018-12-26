@@ -22,6 +22,8 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -156,31 +158,25 @@ public class MopubBannerView extends LinearLayout {
     public void loadMoPubBanner(final String adUnitId) {
         isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
-
         if (timeSinceLastBannerInit < 5000) {
             LOG.info("initAlbumArtBanner() aborted, too soon to attempt another banner load");
             return;
         }
-
         if (Offers.disabledAds()) {
             return;
         }
-
         lastInitAlbumArtBanner = System.currentTimeMillis();
-
         if (moPubView != null && dismissBannerButton != null) {
             if (!Offers.MOPUB.started()) {
                 LOG.warn("MopubBannerView.loadMoPubBanner() abort moPubView loading, MOPUB not started. Loading fallback");
                 loadFallbackBanner(adUnitId);
                 return;
             }
-
             loadFallbackBanner(adUnitId);
             moPubView.setTesting(false);
             moPubView.setAutorefreshEnabled(true);
             moPubView.setAdUnitId(adUnitId);
             moPubView.setBannerAdListener(moPubBannerListener);
-
             try {
                 moPubView.loadAd();
             } catch (Throwable e) {
@@ -193,29 +189,33 @@ public class MopubBannerView extends LinearLayout {
     }
 
     private void loadFallbackBanner(final String adUnitId) {
-        InHouseBannerFactory.AdFormat adFormat;
-        if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
-            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
-            MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
-            adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
-        } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
-                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
-            adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
-        } else {
-            throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId  + ">");
-        }
-        InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
-        setVisible(Visibility.FALLBACK, false);
-        setVisibility(View.INVISIBLE);
-        dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
-
-        if (onFallbackBannerLoadedListener != null) {
-            try {
-                onFallbackBannerLoadedListener.dispatch();
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        }
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(() ->
+                {
+                    InHouseBannerFactory.AdFormat adFormat;
+                    if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
+                            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
+                            MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
+                        adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
+                    } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
+                            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
+                        adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
+                    } else {
+                        throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
+                    }
+                    InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
+                    setVisible(Visibility.FALLBACK, false);
+                    setVisibility(View.INVISIBLE);
+                    dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
+                    if (onFallbackBannerLoadedListener != null) {
+                        try {
+                            onFallbackBannerLoadedListener.dispatch();
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                        }
+                    }
+                }
+        );
     }
 
     public void setVisible(Visibility visibility, boolean visible) {
@@ -306,7 +306,7 @@ public class MopubBannerView extends LinearLayout {
 
         @Override
         public void onBannerExpanded(MoPubView banner) {
-           LOG.info("onBannerExpanded(): " + banner);
+            LOG.info("onBannerExpanded(): " + banner);
         }
 
         @Override

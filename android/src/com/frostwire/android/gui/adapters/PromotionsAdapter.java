@@ -40,6 +40,7 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
@@ -202,12 +203,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                         }
                     }
                 } else {
-                    if (mopubBannerView == null) {
-                        mopubBannerView = new MopubBannerView(getContext(), null, true, false);
-                        mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-                        mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
-                    }
-                    return mopubBannerView;
+                    return getMopubBannerView();
                 }
                 //this line below should be impossible, but we could have some other special offer layout
                 //return View.inflate(getContext(), specialOfferLayout, null);
@@ -224,6 +220,15 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             }
         }
         return super.getView(position - 1, null, parent);
+    }
+
+    private View getMopubBannerView() {
+        if (mopubBannerView == null) {
+            mopubBannerView = new MopubBannerView(getContext(), null, true, false);
+            mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
+            Asyncs.async(() -> mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME));
+        }
+        return mopubBannerView;
     }
 
     private View getLandscapeView(int position, View convertView, ViewGroup parent) {
