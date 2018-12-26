@@ -22,7 +22,6 @@ apply plugin: 'com.android.application'
 apply from: '../common/dependencies.gradle'
 
 buildscript {
-
     repositories {
         google()
         jcenter()
@@ -34,18 +33,12 @@ buildscript {
 
 repositories {
     google()
-    mavenCentral()
     jcenter()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    flatDir {
-        dirs 'libs'
-    }
-
-    // for Vungle
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://jitpack.io' } // for Vungle
+    flatDir { dirs 'libs' }
 }
 
 def manifestVersionCode() {
