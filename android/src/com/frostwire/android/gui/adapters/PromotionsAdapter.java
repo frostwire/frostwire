@@ -226,7 +226,9 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         if (mopubBannerView == null) {
             mopubBannerView = new MopubBannerView(getContext(), null, true, false);
             mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-            Asyncs.async(() -> mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME));
+            // will ANR sometimes, tried putting it on a background thread, but then when the ad
+            // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
+            mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
         }
         return mopubBannerView;
     }
