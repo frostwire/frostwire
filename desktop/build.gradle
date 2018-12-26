@@ -25,14 +25,12 @@ compileJava {
 repositories {
     mavenCentral()
 
-    maven {
-        url  "http://dl.bintray.com/ijabz/maven"
-    }
+    maven { url  "http://dl.bintray.com/ijabz/maven" }
 }
 
 dependencies {
     compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    compile "com.h2database:h2:1.4.193"
+    compile "com.h2database:h2:1.4.197"
     compile 'org.apache.lucene:lucene-core:3.6.2'
     compile 'net.jthink:jaudiotagger:2.2.5'
     compile "com.frostwire:jlibtorrent:1.2.0.18"
