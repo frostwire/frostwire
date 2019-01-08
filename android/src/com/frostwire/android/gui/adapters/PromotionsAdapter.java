@@ -40,7 +40,6 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
@@ -226,9 +225,10 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         if (mopubBannerView == null) {
             mopubBannerView = new MopubBannerView(getContext(), null, true, false);
             mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-            // will ANR sometimes, tried putting it on a background thread, but then when the ad
+            // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
             // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
-            mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
+            // temp fix placed in MoPubAdNetwork.java#126
+           mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
         }
         return mopubBannerView;
     }
