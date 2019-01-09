@@ -1,7 +1,8 @@
-FrostWire 2.1.1 build 573 - DEC/26/2018
+FrostWire 2.1.1 build 574 - JAN/09/2019
  - Memory freed by removing hundreds of unused resource ids and resources
  - Library updates mopub 5.4.1, applovin 9.1.3, okhttp 3.12.0, com.h2database 1.4.197
  - Search: New Nyaa engine
+ - Fix ANR introduced by mopub 5.4.1
 
 FrostWire 2.1.0 build 568 - NOV/18/2018
  - Android Oreo/Pie compatibility updates
