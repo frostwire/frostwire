@@ -157,7 +157,7 @@ public final class BTEngine extends SessionManager {
 
         // NOTE: generate_fingerprint needs a tag number between 0 and 19, otherwise it returns an
         // invalid character that makes the app crash on android
-        String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 20);
+        String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 10);
         sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
 
         String userAgent = String.format(Locale.ENGLISH,
