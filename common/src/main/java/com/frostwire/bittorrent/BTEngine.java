@@ -155,7 +155,9 @@ public final class BTEngine extends SessionManager {
             sp.set_bool(settings_pack.bool_types.enable_ip_notifier.swigValue(), false);
         }
 
-        String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3]);
+        // NOTE: generate_fingerprint needs a tag number between 0 and 19, otherwise it returns an
+        // invalid character that makes the app crash on android
+        String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 20);
         sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
 
         String userAgent = String.format(Locale.ENGLISH,

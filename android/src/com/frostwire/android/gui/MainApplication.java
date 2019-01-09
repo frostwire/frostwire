@@ -155,7 +155,7 @@ public class MainApplication extends MultiDexApplication {
             ctx.version[0] = Integer.valueOf(vStrArray[0]);
             ctx.version[1] = Integer.valueOf(vStrArray[1]);
             ctx.version[2] = Integer.valueOf(vStrArray[2]);
-            ctx.version[3] = BuildConfig.VERSION_CODE % 100;
+            ctx.version[3] = BuildConfig.VERSION_CODE;
 
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
