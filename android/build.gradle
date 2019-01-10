@@ -91,7 +91,7 @@ android {
     defaultConfig {
         versionName project.ext.versionName
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 28
         multiDexEnabled true
     }
 
@@ -176,12 +176,12 @@ android {
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:animated-vector-drawable:27.1.1'
-    implementation 'com.android.support:customtabs:27.1.1'
-    implementation 'com.android.support:exifinterface:27.1.1'
-    implementation 'com.android.support:preference-v7:27.1.1'
-    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:animated-vector-drawable:28.0.0'
+    implementation 'com.android.support:customtabs:28.0.0'
+    implementation 'com.android.support:exifinterface:28.0.0'
+    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'com.android.billingclient:billing:1.2'
     implementation 'com.google.android.gms:play-services-ads:17.1.1'
     implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
