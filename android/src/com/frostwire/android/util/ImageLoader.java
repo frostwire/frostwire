@@ -431,13 +431,13 @@ public final class ImageLoader {
     private static final class RetryCallback implements Callback {
 
         // ImageLoader is a singleton already
-        private final ImageLoader loader;
+        private final WeakReference<ImageLoader> loader;
         private final Uri uri;
         private final WeakReference<ImageView> target;
         private final Params params;
 
         RetryCallback(ImageLoader loader, Uri uri, ImageView target, Params params) {
-            this.loader = loader;
+            this.loader = Ref.weak(loader);
             this.uri = uri;
             this.target = Ref.weak(target);
             this.params = params;
@@ -449,9 +449,9 @@ public final class ImageLoader {
 
         @Override
         public void onError(Exception e) {
-            if (Ref.alive(target)) {
+            if (Ref.alive(target) && Ref.alive(loader)) {
                 params.callback = null; // avoid recursion
-                loader.load(uri, target.get(), params);
+                loader.get().load(uri, target.get(), params);
             }
         }
     }
