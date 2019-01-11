@@ -90,7 +90,7 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
     }
@@ -181,6 +181,7 @@ dependencies {
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'com.android.support:exifinterface:28.0.0'
     implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'com.android.support:preference-v14:28.0.0'
     implementation 'com.android.billingclient:billing:1.2'
     implementation 'com.google.android.gms:play-services-ads:17.1.2'
     implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }

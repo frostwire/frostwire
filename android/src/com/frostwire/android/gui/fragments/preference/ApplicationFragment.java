@@ -23,7 +23,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
-import android.support.v7.preference.SwitchPreferenceCompat;
+import android.support.v14.preference.SwitchPreference;
 import android.widget.Toast;
 
 import com.frostwire.android.AndroidPlatform;
@@ -80,7 +80,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     }
 
     private void setupDataSaving() {
-        SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+        SwitchPreference preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (Boolean) newValue;
             if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
@@ -133,7 +133,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     }
 
     private void setupVPNRequirementOption() {
-        SwitchPreferenceCompat preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+        SwitchPreference preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (boolean) newValue;
             if (newVal && !NetworkManager.instance().isTunnelUp()) {
@@ -146,7 +146,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     }
 
     private void setupConnectSwitch() {
-        SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
+        SwitchPreference preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newStatus = (boolean) newValue;
             Engine e = Engine.instance();
@@ -203,7 +203,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
     }
 
     private void updateConnectSwitchStatus() {
-        SwitchPreferenceCompat preference = findPreference("frostwire.prefs.internal.connect_disconnect");
+        SwitchPreference preference = findPreference("frostwire.prefs.internal.connect_disconnect");
         Engine e = Engine.instance();
         if (e.isStarted()) {
             setChecked(preference, true, false);
