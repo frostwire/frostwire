@@ -1,8 +1,9 @@
 frostwire (6.7.7) stable; urgency=high
+  * New jlibtorrent 1.2.0.19 with latest libtorrent release
   * Updated okhttp3 3.11.0 -> 3.12.0
   * Updated com.h2database 1.4.193 -> 1.4.197
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 25 Dec 2018 22:26:23 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Jan 2019 10:57:17 -0600
 
 frostwire (6.7.6) stable; urgency=high
   * Search: New Nyaa search
