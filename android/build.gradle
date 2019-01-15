@@ -19,7 +19,6 @@ import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
-apply from: '../common/dependencies.gradle'
 
 buildscript {
     repositories {
@@ -174,8 +173,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.re2j:re2j:1.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.android.support:multidex:1.0.3'
-
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:animated-vector-drawable:28.0.0'
     implementation 'com.android.support:customtabs:28.0.0'
@@ -188,11 +189,12 @@ dependencies {
     implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
     implementation 'com.applovin:applovin-sdk:9.1.3'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18'
-    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
     implementation 'com.mopub.mediation:vungle:6.3.24.0'
+    implementation files('libs/jlibtorrent-1.2.0.19.jar')
+    implementation files('libs/jlibtorrent-android-arm-1.2.0.19.jar')
+    implementation files('libs/jlibtorrent-android-x86-1.2.0.19.jar')
 }
 
 class DeployRelease extends DefaultTask {
