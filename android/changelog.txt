@@ -1,5 +1,5 @@
-FrostWire 2.1.1 build 578 - JAN/10/2019
- - New jlibtorrent 1.2.0.19
+FrostWire 2.1.1 build 578 - JAN/16/2019
+ - New jlibtorrent 1.2.0.19 with libtorrent 1.2.0
  - Memory freed by removing hundreds of unused resource ids and resources
  - Library updates mopub 5.4.1, applovin 9.1.3, okhttp 3.12.0, com.h2database 1.4.197,
    com.android.support 28.0.0, play-services-ads:17.1.2
