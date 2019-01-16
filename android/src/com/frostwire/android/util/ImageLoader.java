@@ -295,11 +295,12 @@ public final class ImageLoader {
                 return;
             }
             if (!Ref.alive(picasso)) {
-                LOG.info("ImageLoader.load() main thread update cancelled, picasso target reference lost.");
+                LOG.info("AsyncLoader.run() main thread update cancelled, picasso target reference lost.");
                 return;
             }
             if (targetRef.get() == null) {
-                throw new IllegalArgumentException("Target image view can't be null");
+                LOG.warn("AsyncLoader.run() aborted: Target image view can't be null");
+                return;
             }
             if (p == null) {
                 throw new IllegalArgumentException("Params to load image can't be null");
