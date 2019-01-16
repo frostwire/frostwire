@@ -30,6 +30,8 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
+import com.vungle.warren.InitCallback;
+import com.vungle.warren.Vungle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,13 +47,14 @@ public final class Offers {
     static final boolean DEBUG_MODE = false;
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
-    private static Map<String,AdNetwork> AD_NETWORKS;
+    private static Map<String, AdNetwork> AD_NETWORKS;
     public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdnetworksInvocationTimestamp = 0;
     private static boolean FORCED_DISABLED = false;
+    private static boolean VUNGLE_STARTED = false;
 
     private Offers() {
     }
@@ -80,9 +83,32 @@ public final class Offers {
                 }
             }
         }
+
+        if (!VUNGLE_STARTED) {
+            try {
+                Vungle.init("5c00206d78a5900016b79134", activity.getApplicationContext(), new InitCallback() {
+                    @Override
+                    public void onSuccess() {
+                        VUNGLE_STARTED = true;
+                        LOG.info("Offers.initAdNetworks() - Vungle.init() success");
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        VUNGLE_STARTED = false;
+                        LOG.error("Offers.initAdNetworks() - Vungle.init() error", throwable);
+                    }
+
+                    @Override
+                    public void onAutoCacheAdAvailable(String s) {
+                    }
+                });
+            } catch (Throwable throwable) {
+                LOG.error("Unexpected error thrown by Vungle.init()", throwable);
+            }
+        }
         LOG.info("Offers.initAdNetworks() success");
     }
-
 //    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 //    }
 
@@ -105,19 +131,21 @@ public final class Offers {
             if (adNetwork != null && adNetwork.started()) {
                 try {
                     adNetwork.stop(context);
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
         }
         LOG.info("Ad networks stopped");
     }
 
-    /** DO NOT CALL THIS DIRECTLY, DO SO ONLY FOR TESTING OR IF YOU REALLY
+    /**
+     * DO NOT CALL THIS DIRECTLY, DO SO ONLY FOR TESTING OR IF YOU REALLY
      * KNOW WHAT YOU ARE DOING. This method runs on the UI Thread entirely.
-     *
+     * <p>
      * You should be calling instead Offers.showInterstitialOfferIfNecessary
      * it will perform all the logic checks necessary in the background and then invoke
      * showInterstitial() if the time is right.
-     *
+     * <p>
      * Why is it `public` then?
      * This method has been kept public since we use it as an easter egg
      * when touching the SearchFragment title 5 times to trigger an interstitial
@@ -149,7 +177,6 @@ public final class Offers {
                 }
             }
         }
-
         if (dismissAfterwards) {
             activity.finish();
         }
@@ -174,6 +201,7 @@ public final class Offers {
         final boolean shutdownAfterwards;
         final boolean dismissAfterwards;
         final boolean ignoreStartedTransfers;
+
         InterstitialLogicParams(String p, boolean s, boolean d, boolean i) {
             placement = p;
             shutdownAfterwards = s;
@@ -214,7 +242,9 @@ public final class Offers {
         boolean startedEnoughTransfers = ignoreStartedTransfers || TM.startedTransfers() >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
         boolean shouldDisplayFirstOne = lastInterstitialShownTimestamp == -1 && startedEnoughTransfers;
         boolean readyForInterstitial = shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers);
-        if (readyForInterstitial && !ignoreStartedTransfers) { TM.resetStartedTransfers(); }
+        if (readyForInterstitial && !ignoreStartedTransfers) {
+            TM.resetStartedTransfers();
+        }
         return readyForInterstitial;
     }
 
@@ -266,7 +296,6 @@ public final class Offers {
         if (!REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;
         }
-
         if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD)) {
             REMOVE_ADS.showInterstitial(activity, null, false, false);
         }
@@ -289,19 +318,17 @@ public final class Offers {
     /**
      * Also checks the preference values under Constants.PREF_KEY_GUI_OFFERS_WATERFALL and deactivates
      * the networks that have not been specified there.
+     *
      * @return The Array of Active AdNetworks.
      */
     private static AdNetwork[] getActiveAdNetworks() {
         final ConfigurationManager CM = ConfigurationManager.instance();
         final Map<String, AdNetwork> allAdNetworks = getAllAdNetworks();
         final String[] waterfallShortcodes = CM.getStringArray(Constants.PREF_KEY_GUI_OFFERS_WATERFALL);
-
         if (waterfallShortcodes == null) {
-            return new AdNetwork[] {};
+            return new AdNetwork[]{};
         }
-
         final List<AdNetwork> activeAdNetworksList = new ArrayList<>(waterfallShortcodes.length);
-
         for (String shortCode : waterfallShortcodes) {
             if (allAdNetworks.containsKey(shortCode)) {
                 final AdNetwork adNetwork = allAdNetworks.get(shortCode);
@@ -311,7 +338,6 @@ public final class Offers {
                 LOG.warn("unknown ad network shortcode '" + shortCode + "'");
             }
         }
-
         // turn off all the networks not on activeAdNetworks if any.
         for (String shortCode : allAdNetworks.keySet()) {
             int shortCodeOffsetInWaterfall = getKeyOffset(shortCode, waterfallShortcodes);
@@ -326,7 +352,7 @@ public final class Offers {
     }
 
     private static int getKeyOffset(String key, String[] keys) {
-        int i=0;
+        int i = 0;
         for (String k : keys) {
             if (k.equals(key)) {
                 return i;
@@ -344,7 +370,6 @@ public final class Offers {
             if (network.isDebugOn()) {
                 return true;
             }
-
             ConfigurationManager config;
             boolean enabled = false;
             try {
@@ -377,12 +402,10 @@ public final class Offers {
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
             Engine.instance().hapticFeedback();
-
             // dismissAndOrShutdownIfNecessary is invoked on adNetwork listeners when interstitials are dismissed
             // if a user leaves an ad displayed without interacting with it for too long a second
             // ad could be displayed on MainActivity's onResume back to back.
             ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
-
             if (activity != null) {
                 if (shutdownAfter) {
                     if (activity instanceof MainActivity) {
@@ -394,7 +417,6 @@ public final class Offers {
                     }
                     return;
                 }
-
                 if (finishAfterDismiss) {
                     if (activity instanceof MainActivity) {
                         activity.finish();
@@ -403,7 +425,6 @@ public final class Offers {
                         UIUtils.sendGoHomeIntent(activity);
                     }
                 }
-
                 if (!finishAfterDismiss && tryBack2BackRemoveAdsOffer) {
                     LOG.info("dismissAndOrShutdownIfNecessary: Offers.tryBackToBackInterstitial(activityRef);");
                     Offers.tryBackToBackInterstitial(activity);
