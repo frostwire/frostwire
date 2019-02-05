@@ -1,3 +1,8 @@
+frostwire (6.7.8) stable; urgency=high
+  * Updated okhttp3 3.12.0 -> 3.12.1
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 04 Feb 2019 17:41:54 -0600
+
 frostwire (6.7.7) stable; urgency=high
   * New jlibtorrent 1.2.0.19 with latest libtorrent release
   * Updated okhttp3 3.11.0 -> 3.12.0
