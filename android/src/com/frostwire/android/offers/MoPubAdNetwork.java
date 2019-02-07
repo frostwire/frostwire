@@ -87,8 +87,13 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         }
         starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER)
-                .build();
+        SdkConfiguration.Builder builder = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER);
+//        if (BuildConfig.DEBUG) {
+//            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
+//        } else {
+//            builder.withLogLevel(MoPubLog.LogLevel.INFO);
+//        }
+        SdkConfiguration sdkConfiguration = builder.build();
         fixExecutor(true);
 
         // TEMP HACK: quick sleep to avoid ANR from MoPub

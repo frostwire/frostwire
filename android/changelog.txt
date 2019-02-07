@@ -1,5 +1,5 @@
-FrostWire 2.1.2 build 580 - FEB/04/2019
- - Library okhttp 3.12.1, updates mopub 5.5.0, applovin 9.2.1
+FrostWire 2.1.2 build 581 - FEB/07/2019
+ - Library okhttp 3.12.1,  applovin 9.2.1, play-services-ads 17.1.3
 
 FrostWire 2.1.1 build 579 - JAN/16/2019
  - New jlibtorrent 1.2.0.19 with libtorrent 1.2.0

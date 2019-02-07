@@ -55,6 +55,7 @@ public final class Offers {
     private static long lastInitAdnetworksInvocationTimestamp = 0;
     private static boolean FORCED_DISABLED = false;
     private static boolean VUNGLE_STARTED = false;
+    private static final Object VUNGLE_LOCK = new Object();
 
     private Offers() {
     }
@@ -84,33 +85,38 @@ public final class Offers {
             }
         }
 
-        if (!VUNGLE_STARTED) {
-            try {
-                Vungle.init("5c00206d78a5900016b79134", activity.getApplicationContext(), new InitCallback() {
-                    @Override
-                    public void onSuccess() {
-                        VUNGLE_STARTED = true;
-                        LOG.info("Offers.initAdNetworks() - Vungle.init() success");
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        VUNGLE_STARTED = false;
-                        LOG.error("Offers.initAdNetworks() - Vungle.init() error", throwable);
-                    }
-
-                    @Override
-                    public void onAutoCacheAdAvailable(String s) {
-                    }
-                });
-            } catch (Throwable throwable) {
-                LOG.error("Unexpected error thrown by Vungle.init()", throwable);
-            }
-        }
+        initVungleNetwork(activity);
         LOG.info("Offers.initAdNetworks() success");
     }
-//    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//    }
+
+    private static void initVungleNetwork(Activity activity) {
+        synchronized (VUNGLE_LOCK) {
+            if (!VUNGLE_STARTED && activity != null && activity.getApplicationContext() != null) {
+                try {
+                    VUNGLE_STARTED = true;
+                    Vungle.init("5c00206d78a5900016b79134", activity.getApplicationContext(), new InitCallback() {
+                        @Override
+                        public void onSuccess() {
+                            VUNGLE_STARTED = true;
+                            LOG.info("Offers.initAdNetworks() - Vungle.init() success");
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            VUNGLE_STARTED = false;
+                            LOG.error("Offers.initAdNetworks() - Vungle.init() error", throwable);
+                        }
+
+                        @Override
+                        public void onAutoCacheAdAvailable(String s) {
+                        }
+                    });
+                } catch (Throwable throwable) {
+                    LOG.error("Unexpected error thrown by Vungle.init()", throwable);
+                }
+            }
+        }
+    }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
