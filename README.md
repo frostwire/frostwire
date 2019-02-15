@@ -119,7 +119,6 @@ Frostwire Desktop and Frostwire Android are offered under the [GNU General Publi
 ### Official FrostWire sites
 
 [Main Website Frostwire.com](http://www.frostwire.com) |
-[Frostwire Forum](http://forum.frostwire.com) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
 [Twitter @frostwire](https://twitter.com/frostwire) |
 [Tumblr](http://tumblr.frostwire.com)
