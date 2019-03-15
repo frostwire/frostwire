@@ -175,7 +175,7 @@ android {
 dependencies {
     implementation 'com.google.re2j:re2j:1.2'
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1' /** 3.13.1 dex repeated symbol issues */
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:animated-vector-drawable:28.0.0'
@@ -184,10 +184,10 @@ dependencies {
     implementation 'com.android.support:preference-v7:28.0.0'
     implementation 'com.android.support:preference-v14:28.0.0'
     implementation 'com.android.billingclient:billing:1.2'
-    implementation 'com.google.android.gms:play-services-ads:17.1.3'
+    implementation 'com.google.android.gms:play-services-ads:17.2.0'
     implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
-    implementation 'com.applovin:applovin-sdk:9.2.1'
+    implementation 'com.applovin:applovin-sdk:9.2.1' /** 9.3.0 causes issues with Manifest.permission.WRITE_EXTERNAL_STORAGE*/
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
