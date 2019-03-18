@@ -30,7 +30,7 @@ repositories {
 dependencies {
     compile 'com.google.re2j:re2j:1.2'
     compile 'com.google.code.gson:gson:2.8.5'
-    compile 'com.squareup.okhttp3:okhttp:3.12.1'
+    compile 'com.squareup.okhttp3:okhttp:3.13.1'
     compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     compile "com.h2database:h2:1.4.197"
     compile 'org.apache.lucene:lucene-core:3.6.2'
