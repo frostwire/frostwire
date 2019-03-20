@@ -20,7 +20,6 @@ package com.frostwire.gui.library;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
-import com.frostwire.alexandria.db.PlaylistItemDB;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.searchfield.JXSearchField.SearchMode;
 import com.frostwire.gui.searchfield.SearchField;
@@ -43,14 +42,12 @@ import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.text.Normalizer;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class LibrarySearch extends JPanel {
 
@@ -62,38 +59,34 @@ public class LibrarySearch extends JPanel {
     private int resultsCount;
     private String status;
 
-    public LibrarySearch() {
+    LibrarySearch() {
         setupUI();
     }
 
     public void searchFor(final String query, final boolean displayTextOnSearchBox) {
-        GUIMediator.safeInvokeLater(new Runnable() {
+        GUIMediator.safeInvokeLater(() -> {
+            GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+            LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
 
-            @Override
-            public void run() {
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-                LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
+            if (searchField != null) {
+                SearchLibraryAction searchAction = new SearchLibraryAction();
 
-                if (searchField != null) {
-                    SearchLibraryAction searchAction = new SearchLibraryAction();
-
-                    if (displayTextOnSearchBox) {
-                        if (query.length() < 50) {
-                            searchField.setText(query);
-                        } else {
-                            searchField.setText(query.substring(0, 49));
-                        }
-                        searchAction.actionPerformed(null);
+                if (displayTextOnSearchBox) {
+                    if (query.length() < 50) {
+                        searchField.setText(query);
                     } else {
-                        searchAction.actionPerformed(null, query);
+                        searchField.setText(query.substring(0, 49));
                     }
-
+                    searchAction.actionPerformed(null);
+                } else {
+                    searchAction.actionPerformed(null, query);
                 }
+
             }
         });
     }
 
-    public void addResults(int n) {
+    void addResults(int n) {
         if (n < 0) {
             return;
         }
@@ -109,19 +102,11 @@ public class LibrarySearch extends JPanel {
     }
 
     void pushStatus(final String newStatus) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                statusLabel.setText(newStatus);
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> statusLabel.setText(newStatus));
     }
 
     void revertStatus() {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                statusLabel.setText(status);
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> statusLabel.setText(status));
     }
 
     public void setStatus(String status) {
@@ -182,19 +167,19 @@ public class LibrarySearch extends JPanel {
 
         private static final long serialVersionUID = -2182314529781104010L;
 
-        public SearchLibraryAction() {
+        SearchLibraryAction() {
             putValue(Action.NAME, I18n.tr("Search"));
         }
 
         public boolean validate(SearchInformation info) {
             switch (SearchMediator.validateInfo(info)) {
-            case SearchMediator.QUERY_EMPTY:
-                return false;
-            case SearchMediator.QUERY_XML_TOO_LONG:
-                // cannot happen
-            case SearchMediator.QUERY_VALID:
-            default:
-                return true;
+                case SearchMediator.QUERY_EMPTY:
+                    return false;
+                case SearchMediator.QUERY_XML_TOO_LONG:
+                    // cannot happen
+                case SearchMediator.QUERY_VALID:
+                default:
+                    return true;
             }
         }
 
@@ -221,7 +206,7 @@ public class LibrarySearch extends JPanel {
                 BackgroundExecutorService.schedule(currentSearchRunnable);
             }
 
-            Playlist playlist = null;
+            Playlist playlist;
 
             if (directoryHolder instanceof StarredDirectoryHolder) {
                 playlist = LibraryMediator.getLibrary().getStarredPlaylist();
@@ -235,6 +220,7 @@ public class LibrarySearch extends JPanel {
             }
         }
 
+        @SuppressWarnings("unused")
         public void actionPerformed(ActionEvent e, String query) {
             perform(query);
         }
@@ -257,15 +243,12 @@ public class LibrarySearch extends JPanel {
         private final String _query;
         private final DirectoryHolder directoryHolder;
 
-        public SearchFilesRunnable(String query) {
+        SearchFilesRunnable(String query) {
             _query = query;
             directoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
-            canceled = false;
 
             // weird case
-            if (directoryHolder == null) {
-                canceled = true;
-            }
+            canceled = directoryHolder == null;
         }
 
         public void run() {
@@ -275,32 +258,28 @@ public class LibrarySearch extends JPanel {
                 }
                 // special case for Finished Downloads
                 if (_query.equals(".") && directoryHolder instanceof SavedFilesDirectoryHolder) {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            LibraryMediator.instance().updateTableFiles(directoryHolder);
-                            setStatus("");
-                            resultsCount = 0;
-                        }
+                    GUIMediator.safeInvokeLater(() -> {
+                        LibraryMediator.instance().updateTableFiles(directoryHolder);
+                        setStatus("");
+                        resultsCount = 0;
                     });
                     return;
                 }
 
-                GUIMediator.safeInvokeAndWait(new Runnable() {
-                    public void run() {
-                        LibraryFilesTableMediator.instance().clearTable();
-                        statusLabel.setText("");
-                        resultsCount = 0;
-                    }
+                GUIMediator.safeInvokeAndWait(() -> {
+                    LibraryFilesTableMediator.instance().clearTable();
+                    statusLabel.setText("");
+                    resultsCount = 0;
                 });
 
                 if (directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder) {
-                    List<File> cache = new ArrayList<File>(((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getCache());
+                    List<File> cache = new ArrayList<>(((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getCache());
                     if (cache.size() > 0) {
                         search(cache);
                         return;
                     }
                 } else if (directoryHolder instanceof SavedFilesDirectoryHolder) {
-                    List<File> cache = new ArrayList<File>(((SavedFilesDirectoryHolder) directoryHolder).getCache());
+                    List<File> cache = new ArrayList<>(((SavedFilesDirectoryHolder) directoryHolder).getCache());
                     if (cache.size() > 0) {
                         search(cache);
                         return;
@@ -310,26 +289,24 @@ public class LibrarySearch extends JPanel {
                 Set<File> ignore = TorrentUtil.getIgnorableFiles();
 
                 if (directoryHolder instanceof TorrentDirectoryHolder) {
-                    search(((TorrentDirectoryHolder) directoryHolder).getDirectory(), ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                    search(directoryHolder.getDirectory(), ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                     return;
                 }
 
                 if (directoryHolder instanceof SavedFilesDirectoryHolder) {
-                    search(((SavedFilesDirectoryHolder) directoryHolder).getDirectory(), ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                    search(directoryHolder.getDirectory(), ignore, LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                     return;
                 }
 
-                Set<File> directories = new HashSet<File>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+                Set<File> directories = new HashSet<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
                 directories.removeAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                 for (File dir : directories) {
                     if (dir == null) {
                         continue;
                     }
 
-                    if (dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) && directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder && !((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getMediaType().equals(MediaType.getAudioMediaType())) {
-                        continue;
-                    } else {
-                        search(dir, new HashSet<File>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+                    if (!dir.equals(LibrarySettings.USER_MUSIC_FOLDER.getValue()) || !(directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder) || ((MediaTypeSavedFilesDirectoryHolder) directoryHolder).getMediaType().equals(MediaType.getAudioMediaType())) {
+                        search(dir, new HashSet<>(), LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
                     }
                 }
             } catch (Throwable e) {
@@ -340,7 +317,7 @@ public class LibrarySearch extends JPanel {
 
         /**
          * It searches _query in haystackDir.
-         * 
+         *
          * @param haystackDir
          * @param excludeFiles - Usually a list of incomplete files.
          */
@@ -353,8 +330,8 @@ public class LibrarySearch extends JPanel {
                 return;
             }
 
-            final List<File> directories = new ArrayList<File>();
-            final List<File> results = new ArrayList<File>();
+            final List<File> directories = new ArrayList<>();
+            final List<File> results = new ArrayList<>();
             SearchFileFilter searchFilter = new SearchFileFilter(_query);
 
             for (File child : FileUtils.listFiles(haystackDir)) { //haystackDir.listFiles(searchFilter)) {
@@ -391,13 +368,11 @@ public class LibrarySearch extends JPanel {
                 }
             }
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    LibraryMediator.instance().addFilesToLibraryTable(results);
+            Runnable r = () -> {
+                LibraryMediator.instance().addFilesToLibraryTable(results);
 
-                    if (directoryHolder instanceof SavedFilesDirectoryHolder) {
-                        LibraryFilesTableMediator.instance().resetAudioPlayerFileView();
-                    }
+                if (directoryHolder instanceof SavedFilesDirectoryHolder) {
+                    LibraryFilesTableMediator.instance().resetAudioPlayerFileView();
                 }
             };
             GUIMediator.safeInvokeLater(r);
@@ -412,7 +387,7 @@ public class LibrarySearch extends JPanel {
                 return;
             }
 
-            final List<File> results = new ArrayList<File>();
+            final List<File> results = new ArrayList<>();
             SearchFileFilter searchFilter = new SearchFileFilter(_query);
 
             for (File file : cache) {
@@ -437,12 +412,7 @@ public class LibrarySearch extends JPanel {
                 }
             }
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    LibraryMediator.instance().addFilesToLibraryTable(results);
-                }
-            };
-            GUIMediator.safeInvokeLater(r);
+            GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addFilesToLibraryTable(results));
         }
     }
 
@@ -450,7 +420,7 @@ public class LibrarySearch extends JPanel {
 
         private final String[] _tokens;
 
-        public SearchFileFilter(String query) {
+        SearchFileFilter(String query) {
             _tokens = StringUtils.removeDoubleSpaces(normalize(query)).split(" ");
         }
 
@@ -459,7 +429,6 @@ public class LibrarySearch extends JPanel {
         }
 
         /**
-         * 
          * @param pathname
          * @param includeAllDirectories - if true, it will say TRUE to any directory
          * @return
@@ -498,15 +467,12 @@ public class LibrarySearch extends JPanel {
         private final String query;
         private final Playlist playlist;
 
-        public SearchPlaylistItemsRunnable(String query, Playlist playlist) {
+        SearchPlaylistItemsRunnable(String query, Playlist playlist) {
             this.query = query;
             this.playlist = playlist;
-            canceled = false;
 
             // weird case
-            if (playlist == null) {
-                canceled = true;
-            }
+            canceled = playlist == null;
         }
 
         public void run() {
@@ -515,13 +481,11 @@ public class LibrarySearch extends JPanel {
                     return;
                 }
 
-                GUIMediator.safeInvokeAndWait(new Runnable() {
-                    public void run() {
-                        LibraryPlaylistsTableMediator.instance().clearTable();
-                        setStatus("");
-                        statusLabel.setText("");
-                        resultsCount = 0;
-                    }
+                GUIMediator.safeInvokeAndWait(() -> {
+                    LibraryPlaylistsTableMediator.instance().clearTable();
+                    setStatus("");
+                    statusLabel.setText("");
+                    resultsCount = 0;
                 });
 
                 search();
@@ -535,8 +499,7 @@ public class LibrarySearch extends JPanel {
                 return;
             }
 
-            String sql = null;
-            List<List<Object>> rows = null;
+            final List<PlaylistItem> results = new ArrayList<>();
 
             //Show everything
             if (StringUtils.isNullOrEmpty(query, true) || query.equals(".")) {
@@ -547,56 +510,33 @@ public class LibrarySearch extends JPanel {
                 }
                 return;
             } else {
-                String luceneQuery = com.frostwire.alexandria.LibraryUtils.wildcardLuceneQuery(query);
-                //Full text search
-                if (!playlist.isStarred()) {
-                    sql = "SELECT T.playlistItemId, T.filePath, T.fileName, T.fileSize, T.fileExtension, T.trackTitle, T.trackDurationInSecs, T.trackArtist, T.trackAlbum, T.coverArtPath, T.trackBitrate, T.trackComment, T.trackGenre, T.trackNumber, T.trackYear, T.starred, T.sortIndex FROM FTL_SEARCH_DATA(?, 0, 0) FT, PLAYLISTITEMS T WHERE FT.TABLE='PLAYLISTITEMS' AND T.playlistItemId = FT.KEYS[0] AND T.playlistId = ?";
-                    rows = LibraryMediator.getLibrary().getLibraryDatabase().query(sql, luceneQuery, playlist.getId());
-                }
-                //Starred playlist search
-                else {
-                    sql = "SELECT T.playlistItemId, T.filePath, T.fileName, T.fileSize, T.fileExtension, T.trackTitle, T.trackDurationInSecs, T.trackArtist, T.trackAlbum, T.coverArtPath, T.trackBitrate, T.trackComment, T.trackGenre, T.trackNumber, T.trackYear, T.starred FROM FTL_SEARCH_DATA(?, 1000, 0) FT, PLAYLISTITEMS T WHERE FT.TABLE='PLAYLISTITEMS' AND T.playlistItemId = FT.KEYS[0] AND T.starred = TRUE";
-                    rows = LibraryMediator.getLibrary().getLibraryDatabase().query(sql, luceneQuery);
-                }
+                List<PlaylistItem> items = playlist.getItems();
+                for (PlaylistItem item : items) {
+                    String haystack = item.getTrackArtist().toLowerCase() + " " +
+                            item.getTrackTitle().toLowerCase() + " " +
+                            item.getTrackAlbum().toLowerCase() + " " +
+                            item.getTrackYear().toLowerCase();
 
-            }
+                    if (haystack.contains(query)) {
+                        results.add(item);
+                    }
 
-            final List<PlaylistItem> results = new ArrayList<PlaylistItem>();
-
-            for (List<Object> row : rows) {
-                if (canceled) {
-                    return;
-                }
-
-                /////
-                //Stop search if the user selected another item in the playlist list
-                Playlist currentPlaylist = LibraryMediator.instance().getLibraryPlaylists().getSelectedPlaylist();
-                if (!playlist.isStarred() && !playlist.equals(currentPlaylist)) {
-                    return;
-                }
-                /////
-
-                PlaylistItem item = new PlaylistItem(currentPlaylist);
-                PlaylistItemDB.fill(row, item);
-                results.add(item);
-
-                if (results.size() > 100) {
-                    Runnable r = new Runnable() {
-                        public void run() {
+                    if (results.size() > 100) {
+                        Runnable r = () -> {
                             LibraryMediator.instance().addItemsToLibraryTable(results);
                             results.clear();
-                        }
-                    };
-                    GUIMediator.safeInvokeLater(r);
+                        };
+                        GUIMediator.safeInvokeLater(r);
+                    }
                 }
+                Runnable r = () -> {
+                    LibraryMediator.instance().addItemsToLibraryTable(results);
+                    results.clear();
+                };
+                GUIMediator.safeInvokeLater(r);
             }
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    LibraryMediator.instance().addItemsToLibraryTable(results);
-                }
-            };
-            GUIMediator.safeInvokeLater(r);
+            GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addItemsToLibraryTable(results));
         }
     }
 
@@ -604,7 +544,7 @@ public class LibrarySearch extends JPanel {
         return searchField;
     }
 
-    public void setSearchPrompt(String string) {
+    void setSearchPrompt(String string) {
         searchField.setPrompt(string);
     }
 }
