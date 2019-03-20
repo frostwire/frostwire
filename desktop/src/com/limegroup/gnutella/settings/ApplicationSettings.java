@@ -140,8 +140,6 @@ public class ApplicationSettings extends LimeProps {
 
     public static final IntSetting GUI_TABLES_FONT_SIZE = (IntSetting) FACTORY.createIntSetting("GUI_TABLES_FONT_SIZE", 0).setAlwaysSave(true);
 
-    public static final BooleanSetting UX_STATS_ENABLED = FACTORY.createBooleanSetting("UX_STATS_ENABLED", true);
-
     public static final StringSetting OPTIONS_LAST_SELECTED_KEY = FACTORY.createStringSetting("OPTIONS_LAST_SELECTED_KEY", OptionsConstructor.BITTORRENT_BASIC_KEY);
 
     /**
