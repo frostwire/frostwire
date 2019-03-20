@@ -304,7 +304,6 @@ public class OKHTTPClient extends AbstractHttpClient {
         if (spec.isTls()) {
             b = b.allEnabledCipherSuites();
             b = b.allEnabledTlsVersions();
-            b = b.supportsTlsExtensions(true);
         }
         return b.build();
     }

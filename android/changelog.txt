@@ -1,5 +1,5 @@
-FrostWire 2.1.3 build 582 - MAR/18/2019
- - play-services-ads 17.2.0, applovin 9.3.0, okhttp 3.13.1
+FrostWire 2.1.3 build 582 - MAR/20/2019
+ - play-services-ads 17.2.0, applovin 9.3.0, okhttp 3.14.0
 
 FrostWire 2.1.2 build 581 - FEB/07/2019
  - Library okhttp 3.12.1,  applovin 9.2.1, play-services-ads 17.1.3
