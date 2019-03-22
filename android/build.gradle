@@ -192,9 +192,9 @@ dependencies {
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
     implementation 'com.mopub.mediation:vungle:6.3.24.0'
-    implementation files('libs/jlibtorrent-1.2.0.19.jar')
-    implementation files('libs/jlibtorrent-android-arm-1.2.0.19.jar')
-    implementation files('libs/jlibtorrent-android-x86-1.2.0.19.jar')
+    implementation files('libs/jlibtorrent-1.2.0.20.jar')
+    implementation files('libs/jlibtorrent-android-arm-1.2.0.20.jar')
+    implementation files('libs/jlibtorrent-android-x86-1.2.0.20.jar')
 }
 
 class DeployRelease extends DefaultTask {
