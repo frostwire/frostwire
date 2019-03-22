@@ -1,11 +1,12 @@
 frostwire (6.7.8) stable; urgency=high
+ * New jlibtorrent 1.2.0.20 with latest libtorrent release
  * Updated okhttp3 3.12.0 -> 3.14.0
  * Updated com.h2database 1.4.197 -> 1.4.199
  * Removed lucene-core dependency
  * Library code cleanup
  * Library playlist search update
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 20 Mar 2019 02:48:43 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 22 Mar 2019 02:48:43 -0600
 
 frostwire (6.7.7) stable; urgency=high
   * New jlibtorrent 1.2.0.19 with latest libtorrent release
