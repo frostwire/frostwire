@@ -5,8 +5,9 @@ frostwire (6.7.8) stable; urgency=high
  * Removed lucene-core dependency
  * Library code cleanup
  * Library playlist search update
+ * Fixes issue detecting the new version of PIA VPN in Windows
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 22 Mar 2019 02:48:43 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 22 Mar 2019 11:30:47 -0600
 
 frostwire (6.7.7) stable; urgency=high
   * New jlibtorrent 1.2.0.19 with latest libtorrent release
