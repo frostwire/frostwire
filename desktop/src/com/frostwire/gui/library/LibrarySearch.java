@@ -511,14 +511,26 @@ public class LibrarySearch extends JPanel {
                 return;
             } else {
                 List<PlaylistItem> items = playlist.getItems();
+                String[] needles = query.split("\\s");
                 for (PlaylistItem item : items) {
                     String haystack = item.getTrackArtist().toLowerCase() + " " +
                             item.getTrackTitle().toLowerCase() + " " +
                             item.getTrackAlbum().toLowerCase() + " " +
                             item.getTrackYear().toLowerCase();
 
-                    if (haystack.contains(query)) {
+                    if (needles.length==1 && haystack.contains(query)) {
                         results.add(item);
+                    } else {
+                        boolean matchesAll = true;
+                        for (String needle : needles) {
+                            if (!haystack.contains(needle)) {
+                                matchesAll = false;
+                                break;
+                            }
+                        }
+                        if (matchesAll) {
+                            results.add(item);
+                        }
                     }
 
                     if (results.size() > 100) {
