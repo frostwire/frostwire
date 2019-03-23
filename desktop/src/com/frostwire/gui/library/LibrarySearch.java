@@ -511,7 +511,7 @@ public class LibrarySearch extends JPanel {
                 return;
             } else {
                 List<PlaylistItem> items = playlist.getItems();
-                String[] needles = query.split("\\s");
+                String[] needles = query.toLowerCase().split("\\s");
                 for (PlaylistItem item : items) {
                     String haystack = item.getTrackArtist().toLowerCase() + " " +
                             item.getTrackTitle().toLowerCase() + " " +
