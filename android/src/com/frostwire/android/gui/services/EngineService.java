@@ -83,6 +83,7 @@ public class EngineService extends JobIntentService implements IEngineService {
     public void onCreate() {
         notifiedStorage = new NotifiedStorage(this);
         super.onCreate();
+        async(this, EngineService::cancelAllNotificationsTask); // maybe?
         Engine.foregroundServiceStartForAndroidO(this);
 
     }
