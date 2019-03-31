@@ -1,5 +1,5 @@
 frostwire (6.7.9) stable; urgency=high
-  * Debian/Ubuntu is now Java 10+ ready (min. jre bumped to openjdk-11-jre)
+  * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
 
  -- FrostWire Team <contact@frostwire.com>  Sun, 31 Mar 2019 10:09:00 -0600
 
