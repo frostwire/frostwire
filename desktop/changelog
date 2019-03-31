@@ -1,3 +1,8 @@
+frostwire (6.7.9) stable; urgency=high
+  * Debian/Ubuntu is now Java 10+ ready (min. jre bumped to openjdk-11-jre)
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 31 Mar 2019 10:09:00 -0600
+
 frostwire (6.7.8) stable; urgency=high
   * New jlibtorrent 1.2.0.20 with latest libtorrent release
   * Updated okhttp3 3.12.0 -> 3.14.0
