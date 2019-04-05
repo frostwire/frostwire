@@ -27,6 +27,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
+        //classpath 'com.android.tools.build:gradle:3.3.2'
         // (3.2.1 last working) don't upgrade to 3.3.0 yet, R8 issues ensue, Keystore tampered error comes out
         // even after deleting the ~/.gradle folder
     }
@@ -188,8 +189,12 @@ dependencies {
     implementation 'com.android.support:preference-v14:28.0.0'
     implementation 'com.android.billingclient:billing:1.2'
     implementation 'com.google.android.gms:play-services-ads:17.2.0'
+// last version working
     implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
+//    implementation('com.mopub:mopub-sdk-banner:5.6.0@aar') { transitive = true }
+//    implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') { transitive = true }
+
     implementation 'com.applovin:applovin-sdk:9.4.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android:flexbox:1.0.0'

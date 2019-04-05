@@ -164,7 +164,7 @@ public final class Constants {
      * URL where FrostWire checks for software updates
      */
     private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION && !IS_BASIC_AND_DEBUG ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
-    public static final String SERVER_UPDATE_URL = "http://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
+    public static final String SERVER_UPDATE_URL = "https://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
     public static final String FROSTWIRE_MORE_RESULTS = "http://www.frostwire.com/more.results";
     public static final String SERVER_PROMOTIONS_URL = "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
     public static final String SUPPORT_URL = "http://support.frostwire.com/hc/en-us/categories/200014385-FrostWire-for-Android";
