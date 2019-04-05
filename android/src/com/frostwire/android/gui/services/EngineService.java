@@ -114,7 +114,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         LOG.info("FrostWire:" + intent.toString());
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
         async(this, EngineService::startPermanentNotificationUpdatesTask);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override

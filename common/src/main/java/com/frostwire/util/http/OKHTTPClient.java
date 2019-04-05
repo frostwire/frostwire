@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,21 +21,33 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
-import okhttp3.*;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.GzipSink;
-import okio.Okio;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
+import okhttp3.Dispatcher;
+import okhttp3.Headers;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
 
 /**
  * An OkHttpClient based HTTP Client.
@@ -77,7 +89,9 @@ public class OKHTTPClient extends AbstractHttpClient {
         ResponseBody responseBody = null;
         try {
             responseBody = getSyncResponse(okHttpClient, builder).body();
-            result = responseBody.bytes();
+            if (responseBody != null) {
+                result = responseBody.bytes();
+            }
         } catch (Throwable e) {
             LOG.error("Error getting bytes from http body response: " + e.getMessage());
         } finally {
@@ -97,7 +111,9 @@ public class OKHTTPClient extends AbstractHttpClient {
         ResponseBody responseBody = null;
         try {
             responseBody = getSyncResponse(okHttpClient, builder).body();
-            result = responseBody.string();
+            if (responseBody != null) {
+                result = responseBody.string();
+            }
         } catch (IOException ioe) {
             //ioe.printStackTrace();
             throw ioe;
@@ -166,7 +182,7 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
-        return post(url, timeout, userAgent, postContentType, content.getBytes("UTF-8"), gzip);
+        return post(url, timeout, userAgent, postContentType, content.getBytes(StandardCharsets.UTF_8), gzip);
     }
 
     private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
