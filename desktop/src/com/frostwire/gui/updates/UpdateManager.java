@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.updates;
@@ -71,26 +73,19 @@ public final class UpdateManager implements Serializable {
     /**
      * Starts an Update Task in <secondsAfter> seconds after.
      */
-    private static void scheduleUpdateCheckTask(final int secondsAfter, final String updateURL, final boolean force) {
-
-        Runnable checkForUpdatesTask = new Runnable() {
-
-            // Uses the UpdateManager to check for updates. Then kills the
-            // timer.
-            public void run() {
-                //System.out.println("UpdateManager.scheduleUpdateCheckTask() - about to check for update in " + secondsAfter + " seconds");
-
-                try {
-                    Thread.sleep(secondsAfter * 1000);
-                } catch (InterruptedException ignored) {
-                }
-
-                //System.out.println("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
-                UpdateManager um = UpdateManager.getInstance();
-                um.checkForUpdates(updateURL, force);
+    static void scheduleUpdateCheckTask(final int secondsAfter, final boolean force) {
+        // Uses the UpdateManager to check for updates. Then kills the timer
+        Runnable checkForUpdatesTask = () -> {
+            //System.out.println("UpdateManager.scheduleUpdateCheckTask() - about to check for update in " + secondsAfter + " seconds");
+            try {
+                Thread.sleep(secondsAfter * 1000);
+            } catch (InterruptedException ignored) {
             }
-        };
 
+            //System.out.println("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
+            UpdateManager um = UpdateManager.getInstance();
+            um.checkForUpdates(force);
+        };
         new Thread(checkForUpdatesTask).start();
     }
 
@@ -100,14 +95,6 @@ public final class UpdateManager implements Serializable {
      */
     public static void scheduleUpdateCheckTask(int secondsAfter) {
         scheduleUpdateCheckTask(secondsAfter, false);
-    }
-
-    /**
-     * Starts an Update Task in <secondsAfter> seconds after at a custom update
-     * URL
-     */
-    static void scheduleUpdateCheckTask(int secondsAfter, boolean force) {
-        scheduleUpdateCheckTask(secondsAfter, null, force);
     }
 
     /**
@@ -147,14 +134,13 @@ public final class UpdateManager implements Serializable {
     /**
      * Checks for updates, and shows message dialogs if needed.
      */
-    private void checkForUpdates(String updateURL, boolean force) {
+    private void checkForUpdates(boolean force) {
         // We start the XML Reader/Parser. It will connect to
         // frostwire.com/update.xml
         // and parse the given XML.
         //System.out.println("UpdateManager.checkForUpdates() - Invoked");
 
         UpdateMessageReader umr = new UpdateMessageReader();
-        umr.setUpdateURL(updateURL); // if null goes to default url
         umr.readUpdateFile();
         // if it fails to read an update, we just go on, might be that the
         // website is down, or the XML is malformed.
@@ -260,17 +246,15 @@ public final class UpdateManager implements Serializable {
         final int finalOptionType = optionType;
         final String[] finalOptions = options;
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                int result = JOptionPane.showOptionDialog(null, msg.getMessage(), title, finalOptionType, JOptionPane.INFORMATION_MESSAGE, null, // Icon
-                        finalOptions, // Options[]
-                        null); // Initial value (Object)
+        SwingUtilities.invokeLater(() -> {
+            int result = JOptionPane.showOptionDialog(null, msg.getMessage(), title, finalOptionType, JOptionPane.INFORMATION_MESSAGE, null, // Icon
+                    finalOptions, // Options[]
+                    null); // Initial value (Object)
 
-                if (result == OPTION_OPEN_URL) {
-                    GUIMediator.openURL(msg.getUrl());
-                } else if (result == OPTION_DOWNLOAD_TORRENT) {
-                    openTorrent(msg.getTorrent());
-                }
+            if (result == OPTION_OPEN_URL) {
+                GUIMediator.openURL(msg.getUrl());
+            } else if (result == OPTION_DOWNLOAD_TORRENT) {
+                openTorrent(msg.getTorrent());
             }
         });
     }

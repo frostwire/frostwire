@@ -1,21 +1,22 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.updates;
 
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -39,7 +40,7 @@ import java.util.List;
 final class UpdateMessageReader implements ContentHandler {
 
     //private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
-    private static final String DEFAULT_UPDATE_URL = "http://update.frostwire.com";
+    private static final String DEFAULT_UPDATE_URL = "https://update.frostwire.com";
 
     private HashSet<UpdateMessage> _announcements = null;
 
@@ -48,8 +49,6 @@ final class UpdateMessageReader implements ContentHandler {
     private LinkedList<UpdateMessage> _overlays = null;
 
     private UpdateMessage _updateMessage = null;
-
-    private String _updateURL = DEFAULT_UPDATE_URL;
 
     /**
      * Only ads Announcements that have not expired
@@ -169,10 +168,6 @@ final class UpdateMessageReader implements ContentHandler {
         return _updateMessage;
     }
 
-    private String getUpdateURL() {
-        return _updateURL;
-    }
-
     boolean hasAnnouncements() {
         return _announcements != null && _announcements.size() > 0;
     }
@@ -195,24 +190,24 @@ final class UpdateMessageReader implements ContentHandler {
      * 
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {
-        String langinmsg = msg.getLanguage(); // current language in message
+        String langInMsg = msg.getLanguage(); // current language in message
 
-        if (langinmsg == null || langinmsg.equals("*"))
+        if (langInMsg == null || langInMsg.equals("*"))
             return true;
 
         String langinapp = ApplicationSettings.getLanguage().toLowerCase();
 
-        if (langinmsg.length() == 2)
-            return langinapp.toLowerCase().startsWith(langinmsg.toLowerCase());
+        if (langInMsg.length() == 2)
+            return langinapp.toLowerCase().startsWith(langInMsg.toLowerCase());
 
-        if (langinmsg.endsWith("*")) {
+        if (langInMsg.endsWith("*")) {
             langinapp = ApplicationSettings.getLanguage().substring(0, 2);
-            langinmsg = langinmsg.substring(0, langinmsg.indexOf("*")); // removes
+            langInMsg = langInMsg.substring(0, langInMsg.indexOf("*")); // removes
                                                                         // last
                                                                         // char
         }
 
-        return langinmsg.equalsIgnoreCase(langinapp);
+        return langInMsg.equalsIgnoreCase(langinapp);
     }
 
     /**
@@ -287,7 +282,7 @@ final class UpdateMessageReader implements ContentHandler {
 
         try {
             String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
-            connection = (HttpURLConnection) (new URL(getUpdateURL())).openConnection();
+            connection = (HttpURLConnection) (new URL(DEFAULT_UPDATE_URL)).openConnection();
             //String url = getUpdateURL();
             //LOG.info("Reading update file from " + url);
             connection.setRequestProperty("User-Agent", userAgent);
@@ -335,13 +330,6 @@ final class UpdateMessageReader implements ContentHandler {
         if (_updateMessage == null && msg != null && msg.getMessageType().equals("update")) {
             _updateMessage = msg;
         }
-    }
-
-    void setUpdateURL(String updateURL) {
-        if (updateURL == null)
-            _updateURL = DEFAULT_UPDATE_URL;
-        else
-            _updateURL = updateURL;
     }
 
     public void skippedEntity(String arg0) throws SAXException {
