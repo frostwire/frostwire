@@ -1,3 +1,26 @@
+frostwire (6.7.9) stable; urgency=high
+  * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 31 Mar 2019 10:09:00 -0600
+
+frostwire (6.7.8) stable; urgency=high
+  * New jlibtorrent 1.2.0.20 with latest libtorrent release
+  * Updated okhttp3 3.12.0 -> 3.14.0
+  * Updated com.h2database 1.4.197 -> 1.4.199
+  * Removed lucene-core dependency
+  * Library code cleanup
+  * Library playlist search update
+  * Fixes issue detecting the new version of PIA VPN in Windows
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 22 Mar 2019 21:57:25 -0600
+
+frostwire (6.7.7) stable; urgency=high
+  * New jlibtorrent 1.2.0.19 with latest libtorrent release
+  * Updated okhttp3 3.11.0 to 3.12.0
+  * Updated com.h2database 1.4.193 to 1.4.197
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Jan 2019 10:57:17 -0600
+
 frostwire (6.7.6) stable; urgency=high
   * Search: New Nyaa search
   * Performance upgrades and fixes

@@ -31,7 +31,7 @@ public class LibraryDatabaseEntity {
         this.db = db;
     }
 
-    public void setLibraryDatabase(LibraryDatabase db) {
+    protected void setLibraryDatabase(LibraryDatabase db) {
         this.db = db;
     }
 

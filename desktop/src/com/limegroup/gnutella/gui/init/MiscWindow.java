@@ -19,7 +19,6 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.WindowsUtils;
-import com.limegroup.gnutella.gui.options.panes.UXStatsPaneItem;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
@@ -82,35 +81,6 @@ final class MiscWindow extends SetupWindow {
             startupPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
         }
 
-        // UX Stats
-        {
-            JPanel panelUXStats = new JPanel(new GridLayout(2, 0));
-
-            panelUXStats.setBorder(ThemeMediator.createTitledBorder(UXStatsPaneItem.TITLE));
-
-            checkBoxUXStats = new JCheckBox(UXStatsPaneItem.CHECK_BOX_LABEL);
-            checkBoxUXStats.setSelected(ApplicationSettings.UX_STATS_ENABLED.getValue());
-
-            JLabel desc = new JLabel("<html>" + UXStatsPaneItem.LABEL + "</html>");
-            desc.setBorder(BorderFactory.createEmptyBorder(0, 10, 2, 5));
-            desc.setForeground(Color.BLACK);
-            desc.setFont(desc.getFont().deriveFont(Font.PLAIN));
-
-            panelUXStats.add(desc);
-            panelUXStats.add(checkBoxUXStats);
-
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridwidth = GridBagConstraints.REMAINDER;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.gridy = GridBagConstraints.RELATIVE;
-            gbc.weightx = 1.0;
-
-            mainPanel.add(panelUXStats, gbc);
-
-            panelUXStats.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
-            panelUXStats.updateUI();
-        }
-
         // Vertical Filler
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.VERTICAL;
@@ -134,12 +104,6 @@ final class MiscWindow extends SetupWindow {
             else if (WindowsUtils.isLoginStatusAvailable())
                 WindowsUtils.setLoginStatus(allow);
             StartupSettings.RUN_ON_STARTUP.setValue(allow);
-        }
-        ApplicationSettings.UX_STATS_ENABLED.setValue(checkBoxUXStats.isSelected());
-        if (ApplicationSettings.UX_STATS_ENABLED.getValue()) {
-            BugSettings.IGNORE_ALL_BUGS.setValue(false);
-            BugSettings.SEND_DEADLOCK_BUGS.setValue(true);
-            BugSettings.USE_AUTOMATIC_BUG.setValue(true);
         }
     }
 }

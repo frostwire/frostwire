@@ -27,6 +27,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
@@ -259,49 +261,89 @@ public final class ImageLoader {
     }
 
     private void load(int resourceId, Uri uri, ImageView target, Params p) {
-        if (shutdown) {
-            return;
-        }
-        if (target == null) {
-            throw new IllegalArgumentException("Target image view can't be null");
-        }
-        if (p == null) {
-            throw new IllegalArgumentException("Params to load image can't be null");
-        }
-        if (!(p.callback instanceof RetryCallback) && // don't ask this recursively
-                Debug.hasContext(p.callback)) {
-            throw new RuntimeException("Possible context leak");
-        }
-        if (Debug.hasContext(p.filter)) {
-            throw new RuntimeException("Possible context leak");
+        AsyncLoader asyncLoader = new AsyncLoader(
+                resourceId,
+                uri,
+                Ref.weak(target),
+                p,
+                shutdown,
+                Ref.weak(picasso));
+        Asyncs.async(asyncLoader::run);
+    }
+
+    private static class AsyncLoader implements Runnable {
+
+        private final int resourceId;
+        private final Uri uri;
+        private final WeakReference<ImageView> targetRef;
+        private final Params p;
+        private final boolean shutdown;
+        private final WeakReference<Picasso> picasso;
+
+        public <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
+            this.resourceId = resourceId;
+            this.uri = uri;
+            this.targetRef = targetRef;
+            this.p = p;
+            this.shutdown = shutdown;
+            this.picasso = picassoRef;
         }
 
-        RequestCreator rc;
-        if (uri != null) {
-            rc = picasso.load(uri);
-        } else if (resourceId != -1) {
-            rc = picasso.load(resourceId);
-        } else {
-            throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
-        }
-
-        if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
-        if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
-        if (p.fit) rc.fit();
-        if (p.centerInside) rc.centerInside();
-        if (p.noFade) rc.noFade();
-
-        if (p.noCache) {
-            rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
-            rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
-        }
-        if (p.filter != null) {
-            rc.transform(new FilterWrapper(p.filter));
-        }
-        if (p.callback != null) {
-            rc.into(target, new CallbackWrapper(p.callback));
-        } else {
-            rc.into(target);
+        @Override
+        public void run() {
+            if (shutdown) {
+                return;
+            }
+            if (!Ref.alive(picasso)) {
+                LOG.info("AsyncLoader.run() main thread update cancelled, picasso target reference lost.");
+                return;
+            }
+            if (targetRef.get() == null) {
+                LOG.warn("AsyncLoader.run() aborted: Target image view can't be null");
+                return;
+            }
+            if (p == null) {
+                throw new IllegalArgumentException("Params to load image can't be null");
+            }
+            if (!(p.callback instanceof RetryCallback) && // don't ask this recursively
+                    Debug.hasContext(p.callback)) {
+                throw new RuntimeException("Possible context leak");
+            }
+            if (Debug.hasContext(p.filter)) {
+                throw new RuntimeException("Possible context leak");
+            }
+            RequestCreator rc;
+            if (uri != null) {
+                rc = picasso.get().load(uri);
+            } else if (resourceId != -1) {
+                rc = picasso.get().load(resourceId);
+            } else {
+                throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
+            }
+            if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
+            if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
+            if (p.fit) rc.fit();
+            if (p.centerInside) rc.centerInside();
+            if (p.noFade) rc.noFade();
+            if (p.noCache) {
+                rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+                rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+            }
+            if (p.filter != null) {
+                rc.transform(new FilterWrapper(p.filter));
+            }
+            new Handler(Looper.getMainLooper()).post(
+                    () -> {
+                        if (!Ref.alive(targetRef)) {
+                            LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
+                            return;
+                        }
+                        if (p.callback != null) {
+                            rc.into(targetRef.get(), new CallbackWrapper(p.callback));
+                        } else {
+                            rc.into(targetRef.get());
+                        }
+                    });
         }
     }
 
@@ -390,13 +432,13 @@ public final class ImageLoader {
     private static final class RetryCallback implements Callback {
 
         // ImageLoader is a singleton already
-        private final ImageLoader loader;
+        private final WeakReference<ImageLoader> loader;
         private final Uri uri;
         private final WeakReference<ImageView> target;
         private final Params params;
 
         RetryCallback(ImageLoader loader, Uri uri, ImageView target, Params params) {
-            this.loader = loader;
+            this.loader = Ref.weak(loader);
             this.uri = uri;
             this.target = Ref.weak(target);
             this.params = params;
@@ -408,9 +450,9 @@ public final class ImageLoader {
 
         @Override
         public void onError(Exception e) {
-            if (Ref.alive(target)) {
+            if (Ref.alive(target) && Ref.alive(loader)) {
                 params.callback = null; // avoid recursion
-                loader.load(uri, target.get(), params);
+                loader.get().load(uri, target.get(), params);
             }
         }
     }

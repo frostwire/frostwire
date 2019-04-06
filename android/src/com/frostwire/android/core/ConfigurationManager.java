@@ -25,7 +25,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
@@ -54,12 +53,16 @@ public final class ConfigurationManager {
         if (instance != null) {
             throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
-        Engine.instance().getThreadPool().execute(() -> {
+
+        Thread creatorThread = new Thread(() -> {
             instance = new ConfigurationManager(context.getApplicationContext());
             synchronized (creationLock) {
                 creationLock.notifyAll();
             }
         });
+        creatorThread.setName("ConfigurationManager::creator");
+        creatorThread.setPriority(Thread.MAX_PRIORITY);
+        creatorThread.start();
     }
 
     public static ConfigurationManager instance() {

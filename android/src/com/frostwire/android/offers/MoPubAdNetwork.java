@@ -39,6 +39,7 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.network.Networking;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -86,9 +87,50 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         }
         starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
-        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER)
-                .build();
+        SdkConfiguration.Builder builder = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER);
+//        if (BuildConfig.DEBUG) {
+//            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
+//        } else {
+//            builder.withLogLevel(MoPubLog.LogLevel.INFO);
+//        }
+        SdkConfiguration sdkConfiguration = builder.build();
         fixExecutor(true);
+
+        // TEMP HACK: quick sleep to avoid ANR from MoPub
+        // https://twittercommunity.com/t/android-mopub-5-4-0-anr/115804/17
+        /*
+         * "main" prio=5 tid=1 Blocked
+         *   | group="main" sCount=1 dsCount=0 obj=0x7664e4b8 self=0xb727b0b8
+         *   | sysTid=12543 nice=0 cgrp=default sched=0/0 handle=0xb6f4cb34
+         *   | state=S schedstat=( 0 0 0 ) utm=117 stm=24 core=2 HZ=100
+         *   | stack=0xbe41f000-0xbe421000 stackSize=8MB
+         *   | held mutexes=
+         *
+         *   at com.mopub.network.Networking.getRequestQueue (Networking.java:69)
+         * - waiting to lock <0x02e88a82> (a java.lang.Class<com.mopub.network.Networking>) held by thread 25 (tid=25)
+         *
+         *   at com.mopub.network.AdLoader.fetchAd (AdLoader.java:255)
+         *
+         *   at com.mopub.network.AdLoader.loadNextAd (AdLoader.java:154)
+         * - locked <0x09c2c593> (a java.lang.Object)
+         *
+         *   at com.mopub.mobileads.AdViewController.fetchAd (AdViewController.java:519)
+         *
+         *   at com.mopub.mobileads.AdViewController.loadNonJavascript (AdViewController.java:270)
+         *
+         *   at com.mopub.mobileads.AdViewController.internalLoadAd (AdViewController.java:250)
+         *
+         *   at com.mopub.mobileads.AdViewController.loadAd (AdViewController.java:232)
+         *
+         *   at com.mopub.mobileads.MoPubView.loadAd (MoPubView.java:108)
+         *
+         *   at com.frostwire.android.offers.MopubBannerView.loadMoPubBanner (MopubBannerView.java:181)
+         *
+         *   at com.frostwire.android.gui.adapters.PromotionsAdapter.getMopubBannerView (PromotionsAdapter.java:231)
+         */
+        Networking.getRequestQueue(activity);
+        // END OF TEMP HACK BEFORE MoPub 5.4.1 is released
+
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
             fixExecutor(false);
             LOG.info("MoPub initialization finished");

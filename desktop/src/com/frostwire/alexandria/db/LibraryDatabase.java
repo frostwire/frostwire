@@ -31,7 +31,7 @@ public class LibraryDatabase {
     public static final int OBJECT_NOT_SAVED_ID = -1;
     public static final int OBJECT_INVALID_ID = -2;
     public static final int STARRED_PLAYLIST_ID = -3;
-    private static final int LIBRARY_DATABASE_VERSION = 4;
+    private static final int LIBRARY_DATABASE_VERSION = 5;
 
     static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
     
@@ -68,6 +68,10 @@ public class LibraryDatabase {
         return _name;
     }
 
+    public Connection getConnection() {
+        return _connection;
+    }
+
     public boolean isClosed() {
         return _closed;
     }
@@ -76,7 +80,6 @@ public class LibraryDatabase {
         if (isClosed()) {
             return new ArrayList<>();
         }
-
         return query(_connection, statementSql, arguments);
     }
 
@@ -141,17 +144,10 @@ public class LibraryDatabase {
 //    }
 
     private void onUpdateDatabase(Connection connection, int oldVersion) {
-        if (oldVersion == 1 && LIBRARY_DATABASE_VERSION > 2) {
-            setupLuceneIndex(connection);
+        if (oldVersion == 3 && LIBRARY_DATABASE_VERSION == 4) {
+            addSortIndexColumnToPlaylistItemsTable(connection);
         }
 
-        if (oldVersion == 2 && LIBRARY_DATABASE_VERSION == 3) {
-            setupLuceneIndex(connection);
-        }
-        
-        if (oldVersion == 3 && LIBRARY_DATABASE_VERSION == 4) {
-            setupPlaylistIndexes(connection);
-        }
 
         update(connection, "UPDATE Library SET version = ?", LIBRARY_DATABASE_VERSION);
     }
@@ -189,13 +185,12 @@ public class LibraryDatabase {
         update(connection, "CREATE INDEX idx_PlaylistItems_filePath ON PlaylistItems (filePath)");
         update(connection, "CREATE INDEX idx_PlaylistItems_starred ON PlaylistItems (starred)");
 
-        setupLuceneIndex(connection);
-
         // INITIAL DATA
         update(connection, "INSERT INTO Library (name , version) VALUES (?, ?)", name, LIBRARY_DATABASE_VERSION);
 
         return connection;
     }
+
 
     private Connection openOrCreateDatabase(File path, String name) {
         Connection connection = openConnection(path, name, false);
@@ -261,7 +256,7 @@ public class LibraryDatabase {
 
         try (PreparedStatement statement = connection.prepareStatement(statementSql)) {
 
-            if (arguments != null) {
+            if (arguments != null && arguments.length > 0) {
                 for (int i = 0; i < arguments.length; i++) {
                     statement.setObject(i + 1, arguments[i]);
                 }
@@ -300,16 +295,10 @@ public class LibraryDatabase {
         return query.size() > 0 ? (Integer) query.get(0).get(0) : -1;
     }
 
-    private void setupLuceneIndex(final Connection connection) {
-        update(connection, "CREATE ALIAS IF NOT EXISTS FTL_INIT FOR \"org.h2.fulltext.FullTextLucene.init\"");
-        update(connection, "CALL FTL_INIT()");
-        update(connection, "CALL FTL_CREATE_INDEX('PUBLIC', 'PLAYLISTITEMS', 'FILEPATH, TRACKTITLE, TRACKARTIST, TRACKALBUM, TRACKGENRE, TRACKYEAR')");
-    }
-
-    private void setupPlaylistIndexes(final Connection connection) {
+    private void addSortIndexColumnToPlaylistItemsTable(final Connection connection) {
         
         // add new column
-        update(connection, "ALTER TABLE PlaylistItems ADD sortIndex INTEGER");
+        update(connection, "ALTER TABLE PlayListItems ADD sortIndex INTEGER");
         
         // set initial playlist indexes
         List<Playlist> playlists = PlaylistDB.getPlaylists(this);

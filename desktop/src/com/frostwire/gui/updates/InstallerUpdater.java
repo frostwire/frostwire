@@ -144,7 +144,7 @@ public class InstallerUpdater implements Runnable {
 
                 @Override
                 public void onError(HttpClient client, Throwable e) {
-
+                    e.printStackTrace();
                 }
 
                 @Override
@@ -175,6 +175,7 @@ public class InstallerUpdater implements Runnable {
                 // recovery in case the server does not support resume
                 httpClient.save(updateMessage.getInstallerUrl(), installerFileLocation, false);
             } catch (IOException e2) {
+                e2.printStackTrace();
                 if (e2.getMessage().contains("416")) {
                     // HTTP Request Range error came through IOException.
                     httpClient.save(updateMessage.getInstallerUrl(), installerFileLocation, false);
@@ -412,7 +413,11 @@ public class InstallerUpdater implements Runnable {
             try {
                 String fileMD5 = DigestUtils.getMD5(file);
                 if (!DigestUtils.compareMD5(currentMD5, fileMD5)) {
-                    System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> removed " + file.getName());
+                    System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> removed " + file.getName() + " (file size: " + file.length() + " bytes)");
+                    if (updateMessage.getInstallerUrl() != null && updateMessage.getInstallerUrl() != "") {
+                        System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> downloaded from " + updateMessage.getInstallerUrl());
+                    }
+                    System.out.println("InstallerUpdater.cleanupInvalidUpdates() -> expected MD5=" + currentMD5.toLowerCase() + " vs " + file.getName() + " MD5=" + fileMD5 + "\n");
                     file.delete();
                 }
             } catch (Throwable t) {
@@ -428,12 +433,17 @@ public class InstallerUpdater implements Runnable {
         }
         File f = new File(UpdateSettings.UPDATES_DIR, installerFilename);
         if (!f.exists()) {
+            System.out.println("InstallerUpdater.checkIfDownloaded() - File <" + installerFilename + "> does not exist");
             return false;
         }
         executableFile = f;
         try {
             lastMD5 = DigestUtils.getMD5(f);
-            return DigestUtils.compareMD5(lastMD5, updateMessage.getRemoteMD5());
+            boolean result = DigestUtils.compareMD5(lastMD5, updateMessage.getRemoteMD5());
+            if (!result) {
+                System.out.println("InstallerUpdater.checkIfDownloaded() - MD5 check failed. expected MD5=" + updateMessage.getRemoteMD5().toLowerCase() + " vs " + f.getName() + " MD5=" + lastMD5.toLowerCase() + " (file size: " + f.length() + " bytes)");
+            }
+            return result;
         } catch (Throwable e) {
             LOG.error("Error checking update MD5", e);
             return false;

@@ -68,31 +68,29 @@ public final class GUIUtils {
     /**
      * Localizable constants
      */
-    public static String GENERAL_UNIT_KILOBYTES;
-    public static String GENERAL_UNIT_MEGABYTES;
-    public static String GENERAL_UNIT_GIGABYTES;
-    public static String GENERAL_UNIT_TERABYTES;
+    private static String GENERAL_UNIT_KILOBYTES;
+    private static String GENERAL_UNIT_MEGABYTES;
+    private static String GENERAL_UNIT_GIGABYTES;
+    private static String GENERAL_UNIT_TERABYTES;
     /* ambiguous name: means kilobytes/second, not kilobits/second! */
-    public static String GENERAL_UNIT_KBPSEC;
+    private static String GENERAL_UNIT_KBPSEC;
     
-    public static final HyperlinkListener HYPER_LISTENER;
+    private static final HyperlinkListener HYPER_LISTENER;
     
     /**
      * An action that disposes the parent window.
      * Constructed lazily.
      */
-    public static Action ACTION_DISPOSE;
+    private static Action ACTION_DISPOSE;
 
     static {
-        HYPER_LISTENER = new HyperlinkListener() {
-			public void hyperlinkUpdate(HyperlinkEvent he) {
-				if(he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-				    URL url = he.getURL();
-				    if(url != null)
-    				    GUIMediator.openURL(url.toExternalForm());
-                }
-			}
-		};
+        HYPER_LISTENER = he -> {
+            if(he.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                URL url = he.getURL();
+                if(url != null)
+                    GUIMediator.openURL(url.toExternalForm());
+}
+        };
         resetLocale();
     }
     
@@ -121,43 +119,8 @@ public final class GUIUtils {
         GENERAL_UNIT_KBPSEC =
             I18n.tr("KB/s");
     }
-    
-    /**
-     * This static method converts the passed in number
-     * into a localizable representation of an integer, with
-     * digit grouping using locale dependant separators.
-     *
-     * @param value the number to convert to a numeric String.
-     *
-     * @return a localized String representing the integer value
-     */
-    public static String toLocalizedInteger(long value) {
-        return NUMBER_FORMAT0.format(value);
-    }
-    
-    /**
-     * This static method converts the passed in number of bytes into a
-     * kilobyte string grouping digits with locale-dependant thousand separator
-     * and with "KB" locale-dependant unit at the end.
-     *
-     * @param bytes the number of bytes to convert to a kilobyte String.
-     *
-     * @return a String representing the number of kilobytes that the
-     *         <code>bytes</code> argument evaluates to, with "KB" appended
-     *         at the end.  If the input value is negative, the string
-     *         returned will be "? KB".
-     */
-    public static String toKilobytes(long bytes) {
-        if (bytes < 0)
-            return "? " + GENERAL_UNIT_KILOBYTES;
-        long kbytes = bytes / 1024;
-         // round to nearest multiple, or round up if size below 1024
-        if ((bytes & 512) != 0 || (bytes > 0 && bytes < 1024)) kbytes++;
-        // result formating, according to the current locale
-        return NUMBER_FORMAT0.format(kbytes) + GENERAL_UNIT_KILOBYTES;
-    }
-    
-    /**
+
+     /**
      * Converts the passed in number of bytes into a byte-size string.
      * Group digits with locale-dependant thousand separator if needed, but
      * with "KB", or "MB" or "GB" or "TB" locale-dependant unit at the end,
@@ -169,7 +132,7 @@ public final class GUIUtils {
      *         "KB"/"MB"/"GB"/TB" appended at the end. If the input value is
      *         negative, the string returned will be "? KB".
      * @see GUIUtils::rate2speed() if you want to deal with download speeds
-     */
+//     */
     public static String getBytesInHuman(long bytes) {
         if (bytes < 0) {
             return "? " + GENERAL_UNIT_KILOBYTES;
@@ -203,26 +166,7 @@ public final class GUIUtils {
             // internal java error, just return 0.
         }
     }
-    
-    /**
-     * Returns a label with multiple lines that is sized according to
-     * the string parameter.
-     *
-     * @param msg the string that will be contained in the label.
-     *
-     * @return a MultiLineLabel sized according to the passed
-     *  in string.
-     */
-    public static MultiLineLabel getSizedLabel(String msg) {
-        Dimension dim = new Dimension();
-        MultiLineLabel label = new MultiLineLabel(msg);
-        FontMetrics fm = label.getFontMetrics(label.getFont());
-        int width = fm.stringWidth(msg);
-        dim.setSize(Integer.MAX_VALUE, width / 9); //what's this magic?
-        label.setPreferredSize(dim);
-        return label;
-    }
-    
+
     /**
      * Converts an rate into a human readable and localized KB/s speed.
      */
@@ -242,10 +186,10 @@ public final class GUIUtils {
     public static void setOpaque(boolean op, JComponent c) {
         c.setOpaque(op);
         Component[] cs = c.getComponents();
-        for (int i = 0; i < cs.length; i++) {
-            if (cs[i] instanceof JComponent && !(cs[i] instanceof JTextField) && (!(cs[i] instanceof JButton))) {
-                ((JComponent) cs[i]).setOpaque(op);
-                setOpaque(op, (JComponent) cs[i]);
+        for (Component component : cs) {
+            if (component instanceof JComponent && !(component instanceof JTextField) && (!(component instanceof JButton))) {
+                ((JComponent) component).setOpaque(op);
+                setOpaque(op, (JComponent) component);
             }
         }
     }
@@ -281,12 +225,9 @@ public final class GUIUtils {
      *
      * Returns -1 if it can display the whole string.
      */
-    public static boolean canDisplay(Font f, String s) {
+    static boolean canDisplay(Font f, String s) {
         int upTo = f.canDisplayUpTo(s);
-        if(upTo >= s.length() || upTo == -1)
-            return true;
-        else
-            return false;
+        return upTo >= s.length() || upTo == -1;
     }
     
     /**
@@ -311,7 +252,7 @@ public final class GUIUtils {
     /**
      * Gets the keystroke for hiding a window according to the platform.
      */
-    public static KeyStroke getHideKeystroke() {
+    private static KeyStroke getHideKeystroke() {
         if(OSUtils.isMacOSX())
             return KeyStroke.getKeyStroke(KeyEvent.VK_W,
                             Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
@@ -328,8 +269,8 @@ public final class GUIUtils {
      * @param key the key that triggers the action
      * @param a the action
      */
-    public static void bindKeyToAction(JComponent c, KeyStroke key, Action a,
-    		int focusScope) {
+    private static void bindKeyToAction(JComponent c, KeyStroke key, Action a,
+                                        int focusScope) {
     	InputMap inputMap = c.getInputMap(focusScope);
         ActionMap actionMap = c.getActionMap();
         if (inputMap != null && actionMap != null) {
@@ -342,7 +283,7 @@ public final class GUIUtils {
      * Convenience wrapper for {@link #bindKeyToAction(JComponent, KeyStroke,
      * Action, int) bindKeyToAction(c, key, a, JComponentn.WHEN_FOCUSED)}.
      */
-    public static void bindKeyToAction(JComponent c, KeyStroke key, Action a) {
+    static void bindKeyToAction(JComponent c, KeyStroke key, Action a) {
     	bindKeyToAction(c, key, a, JComponent.WHEN_FOCUSED);
     }
     
@@ -412,7 +353,7 @@ public final class GUIUtils {
 	/**
 	 * Returns the sole hyperlink listener.
 	 */
-	public static HyperlinkListener getHyperlinkListener() {
+	static HyperlinkListener getHyperlinkListener() {
 	    return HYPER_LISTENER;
     }
 	
@@ -420,7 +361,7 @@ public final class GUIUtils {
 	 * Returns a <code>MouseListener</code> that changes the cursor and
 	 * notifies <code>actionListener</code> on click.
 	 */
-	public static MouseListener getURLInputListener(final ActionListener actionListener) {
+	static MouseListener getURLInputListener(final ActionListener actionListener) {
 	    return new MouseAdapter() {
 	        public void mouseEntered(MouseEvent e) {
 	            JComponent comp = (JComponent)e.getComponent();
@@ -440,12 +381,8 @@ public final class GUIUtils {
      * Returns a <code>MouseListener</code> that changes the cursor and opens
      * <code>url</code> on click.
      */
-    public static MouseListener getURLInputListener(final String url) {
-        return getURLInputListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.openURL(url);
-            }            
-        });
+    static MouseListener getURLInputListener(final String url) {
+        return getURLInputListener(e -> GUIMediator.openURL(url));
     }
     
     /**
@@ -455,24 +392,11 @@ public final class GUIUtils {
 	//System.out.println("********START UP DEBUG: GUIUtils is going to verify mac or windows");
         return !CommonUtils.isPortable() && (OSUtils.isMacOSX() || WindowsUtils.isLoginStatusAvailable());
     }
-    
-    /**
-     * Converts all spaces in the string to non-breaking spaces.
-     *
-     * Adds 'preSpaces' number of non-breaking spaces prior to the string.
-     */
-    public static String convertToNonBreakingSpaces(int preSpaces, String s) {
-        StringBuilder b = new StringBuilder(preSpaces + s.length());
-        for(int i = 0; i < preSpaces; i++)
-            b.append('\u00a0');
-        b.append(s.replace(' ', '\u00a0'));
-        return b.toString();
-    }
-    
+
     /**
      * Convert a color object to a hex string
      **/
-    public static String colorToHex(Color colorCode){
+    static String colorToHex(Color colorCode){
         int r = colorCode.getRed();
         int g = colorCode.getGreen();
         int b = colorCode.getBlue();
@@ -504,31 +428,18 @@ public final class GUIUtils {
      * Launches file or enqueues it.
      * If <code>audioLaunched</code> is true and the playlist is visible the 
      * file is enqueued instead of played.
-     * @param file	
-     * @param audioLaunched
      * @return if audio has been launched in limewire's player
      */
     public static boolean launchOrEnqueueFile(final File file, boolean audioLaunched) {
-        return launchFile(file, false, audioLaunched);
+        return launchFile(file, audioLaunched);
     }
-    
+
     /**
-     * Launches a file to be played once and only once. If the playlist is currently playing and/or
-     * set to continous this will preemept the current song and stop the player after completion
-     */
-    public static boolean launchOneTimeFile(final File file) {       
-        return launchFile(file, true, false);
-    }
-    
-    /**
-     * Internal launch of a song to play. 
+     * Internal launch of a song to play.
      * @param file - song to play
-     * @param playOneTime - if true, begin playing song immediately even if other songs are currently playing
-     *          after completing the song stops the player regardless of the continous setting
      * @param isPlaying - if true and playOneTime != true, will enqueue the song to the playlist rather
-     *          than immediately playing it, otherwise will play immediately
      */
-    private static boolean launchFile(final File file, boolean playOneTime, boolean isPlaying ) {
+    private static boolean launchFile(final File file, boolean isPlaying) {
         String extension = FilenameUtils.getExtension(file.getName());
         if(extension != null && extension.toLowerCase().contains("torrent")) {
             GUIMediator.instance().openTorrentFile(file, true);
@@ -536,34 +447,12 @@ public final class GUIUtils {
         }
         
         if (GUIMediator.isPlaylistVisible()) {
-//            if (PlaylistMediator.getInstance().openIfPlaylist(file))
-//                return false;
-            
             if(MediaPlayer.isPlayableFile(file)) {
-                if( playOneTime ) {
-                    BackgroundExecutorService.schedule(new Runnable() {
-                        public void run(){
-                            GUIMediator.safeInvokeAndWait(new Runnable() {
-                                public void run() {
-                                    GUIMediator.instance().launchMedia(new MediaSource(file), false);
-                                }
-                            });
-                        }
-                    });
+                if(false) {
+                    BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
                 }
-                else if (!isPlaying) { 
-                    BackgroundExecutorService.schedule(new Runnable() {
-                        public void run(){
-                            GUIMediator.safeInvokeAndWait(new Runnable() {
-                                public void run() {
-                                    GUIMediator.instance().launchMedia(new MediaSource(file), false);
-                                }
-                            });
-                        }
-                    });
-                }
-                else {
-                    //PlaylistMediator.getInstance().addFileToPlaylist(file);
+                else if (!isPlaying) {
+                    BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
                 }
                 return true;
             }
@@ -573,34 +462,6 @@ public final class GUIUtils {
         return false;
     }
 
- /**
-     * Launches an audio file.
-     * If the FrostWire media player is enabled it will enqueue the song on the
-     * playlist. It won't take into consideration if the song is complete or not.
-     * If the frostwire player isn't enabled it will just use whatever is configured
-     * as an external player to launch the file.
-     * 
-     * Note, this wont take in consideration if the song is being played or not.
-     * It will launch it no matter what (maybe this causes problems)
-     * 
-     * @param file
-     * @param audioLaunched
-     * @return True if the song was launched with frostplayer
-     */        
-    public static boolean launchAndEnqueueFile(File file, boolean audioLaunched) {        
-    	if (MediaPlayer.isPlayableFile(file) && GUIMediator.isPlaylistVisible()) {
-    		GUIMediator.instance().attemptStopAudio();
-			GUIMediator.instance().launchMedia(new MediaSource(file), false);
-			return true;
-    	}
-    	else {
-    		//use external player to launch file
-    		return launchFile(file, false, audioLaunched);
-    	}    	
-    	//return false;
-    }
-
-    
 	/**
 	 * Sets the location of <tt>dialog</tt> so it appears centered regarding
 	 * the main application or centered on the screen if the main application is
@@ -615,51 +476,33 @@ public final class GUIUtils {
     }
     
     /**
-     * Returns <code>text</code> wrapped by an HTML table tag that is set to a
-     * fixed width.
-     * <p>
-     * Note: It seems to be a possible to trigger a NullPointerException in
-     * Swing when this is used in a JLabel: GUI-239.
-     */
-    public static String restrictWidth(String text, int width) {
-        return "<html><table width=\"" + width + "\"><tr><td>" + text
-                + "</td></tr></table></html>";
-    }
-
-    /**
-     * Restricts the size of a component by setting its minimum size and 
+     * Restricts the size of a component by setting its minimum size and
      * maximum size to the value of its preferred size.
      *
      */
     public static void restrictSize(JComponent component, SizePolicy sizePolicy) {
-        restrictSize(component, sizePolicy, false);
-    }
-    
-    public static void restrictSize(JComponent component, SizePolicy sizePolicy, boolean addClientProperty) {
 		switch (sizePolicy) {
 		case RESTRICT_HEIGHT:
 			int height = component.getPreferredSize().height;
 			int width = component.getPreferredSize().width;
 			component.setMinimumSize(new Dimension(width, height));
-			//component.setPreferredSize(new Dimension(width, height));
 			component.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
 			break;
 		case RESTRICT_BOTH:
 			height = component.getPreferredSize().height;
 			width = component.getPreferredSize().width;
 			component.setMinimumSize(new Dimension(width, height));
-			//component.setPreferredSize(STANDARD_DIMENSION);
 			component.setMaximumSize(new Dimension(width, height));
 			break;
 		case RESTRICT_NONE:
 		    component.setMinimumSize(null);
 		    component.setMaximumSize(null);
 		}
-		if (addClientProperty) {
+		if (false) {
 		    component.putClientProperty(SizePolicy.class, sizePolicy);
 		}
     }
-    
+
     public static class EmptyIcon implements Icon {
 	    private final String name;
 	    private final int width;
@@ -691,18 +534,14 @@ public final class GUIUtils {
      *  <tt>java.awt.event.KeyEvent</tt>, or -1 if no key code
      *  could be found
      */
-    public static int getCodeForCharKey(String str) {
+    private static int getCodeForCharKey(String str) {
         int charCode = -1;
         String charStr = str.toUpperCase(Locale.US);
         if(charStr.length()>1) return -1;
         try {
             Field charField = KeyEvent.class.getField("VK_"+charStr);
             charCode = charField.getInt(KeyEvent.class);
-        } catch (NoSuchFieldException e) {
-            LOG.error("can't get key for: " + charStr, e);
-        } catch (SecurityException e) {
-            LOG.error("can't get key for: " + charStr, e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
             LOG.error("can't get key for: " + charStr, e);
         }
         return charCode;
@@ -738,10 +577,6 @@ public final class GUIUtils {
     /**
      * It will adjust the column width to match the widest element.
      * (You might not want to use this for every column, consider some columns might be really long)
-     * @param model
-     * @param columnIndex
-     * @param table
-     * @return
      */
     public static void adjustColumnWidth(TableModel model, int columnIndex, int maxWidth, int rightPadding, JTable table) {
         if (columnIndex > model.getColumnCount() - 1) {

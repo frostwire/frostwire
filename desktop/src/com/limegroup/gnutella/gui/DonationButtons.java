@@ -48,7 +48,6 @@ public class DonationButtons extends JPanel {
         add(new DonationButton("DASH", "http://www.frostwire.com/dash", I18n.tr("Support FrostWire development with a Dash donation")), "w "+bitcoinWidth+"px!, h 18px!");
         add(new DonationButton("LTC", "http://www.frostwire.com/litecoin", I18n.tr("Support FrostWire development with a Litecoin donation")), "w "+bitcoinWidth+"px!, h 18px!");
         add(new DonationButton("ZEC", "http://www.frostwire.com/zcash", I18n.tr("Support FrostWire development with a ZCash donation")), "w "+bitcoinWidth+"px!, h 18px!");
-        add(new DonationButton("BTG", "http://www.frostwire.com/bitcoin-gold", I18n.tr("Support FrostWire development with a Bitcoin Gold donation")), "w "+bitcoinWidth+"px!, h 18px!");
         add(new DonationButton("PayPal", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XNBZ6GMVTDWQQ", I18n.tr("Support FrostWire development with a Paypal donation")), "w "+ paypalWidth +"px!, h 18px!");
     }
 

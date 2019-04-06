@@ -280,12 +280,17 @@ public final class Engine implements IEngineService {
      */
     public static void foregroundServiceStartForAndroidO(Service service) {
         if (Build.VERSION.SDK_INT >= 26) {
+            NotificationManager notificationService = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+
             NotificationChannel channel = new NotificationChannel(
                     Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
                     "FrostWire",
-                    NotificationManager.IMPORTANCE_LOW);
-            ((NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE)).
-                    createNotificationChannel(channel);
+                    NotificationManager.IMPORTANCE_NONE);
+
+            if (notificationService != null) {
+                notificationService.createNotificationChannel(channel);
+            }
+
             Notification notification = new NotificationCompat.Builder(
                     service,
                     Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).

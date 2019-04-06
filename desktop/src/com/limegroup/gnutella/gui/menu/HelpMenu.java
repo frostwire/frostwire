@@ -43,13 +43,11 @@ final class HelpMenu extends AbstractMenu {
     HelpMenu() {
         super(I18n.tr("&Help"));
 
-        addMenuItem(new OpenLinkAction("https://support.frostwire.com/hc/en-us/categories/200015110-FAQs", I18n.tr("&FAQ"), I18n.tr("Frequently Asked Questions for FrostWire")));
-
         addMenuItem(new OpenLinkAction("http://www.frostwire-preview.com/?type=yt&displayName=How%20to%20search%20and%20download%20files%20with%20FrostWire%20Wynwood%20(5.6)%20-%20YouTube&source=YouTube+-+FrostWireVideos&detailsUrl=http://www.youtube.com/watch?v=A0p_DpOjpO8", I18n.tr("How to use FrostWire (Video)"), I18n.tr("How to use FrostWire (Video)")));
 
         addMenuItem(new OpenLinkAction("http://www.frostwire.com/android", I18n.tr("FrostWire for Android"),I18n.tr("Get FrostWire on your Android phone, tablet or google tv, all free.")));
 
-        addMenuItem(new OpenLinkAction("http://support.frostwire.com/hc/en-us/articles/200302295-What-is-seeding-", I18n.tr("What is \"Seeding\"?"), I18n.tr("Learn about BitTorrent Seeding")));
+        addMenuItem(new OpenLinkAction("https://www.quora.com/What-is-seeding-on-FrostWire", I18n.tr("What is \"Seeding\"?"), I18n.tr("Learn about BitTorrent Seeding")));
 
         addMenuItem(new OpenLinkAction("http://www.frostwire.com/vpn", I18n.tr("What is a VPN?"), I18n.tr("Learn about how to protect your internet connection and your privacy online")));
 
@@ -64,7 +62,6 @@ final class HelpMenu extends AbstractMenu {
         cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/dash", I18n.tr("Dash")));
         cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/litecoin", I18n.tr("LiteCoin")));
         cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/zcash", I18n.tr("ZCash")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin-gold", I18n.tr("Bitcoin Gold")));
         getMenu().add(cryptoCurrenciesMenu);
 
         addMenuItem(new OpenLinkAction("http://www.frostclick.com/wp/?from=frostwire" + com.limegroup.gnutella.util.FrostWireUtils.getFrostWireVersion(),

@@ -82,6 +82,7 @@ public final class VPNs {
             List<EnumNet.IpInterface> interfaces = EnumNet.enumInterfaces(BTEngine.getInstance());
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
             return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter") || // PIA
+                    isWindowsVPNAdapterActive(interfaces, routes, "Private Internet Access Network Adapter") ||
                     isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN Tap Adapter") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||

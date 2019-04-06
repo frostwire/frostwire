@@ -97,7 +97,9 @@ public final class UpdateMediator {
 
     static String getInstallerFilename(UpdateMessage message) {
         String installerFilename = null;
-        if (message.getTorrent() != null) {
+        if (message.getSaveAs() != null && message.getSaveAs() != "") {
+            installerFilename = message.getSaveAs();
+        } else if (message.getTorrent() != null) {
             int index1 = message.getTorrent().lastIndexOf('/') + 1;
             int index2 = message.getTorrent().lastIndexOf(".torrent");
             installerFilename = message.getTorrent().substring(index1, index2);

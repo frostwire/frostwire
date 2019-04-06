@@ -202,12 +202,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                         }
                     }
                 } else {
-                    if (mopubBannerView == null) {
-                        mopubBannerView = new MopubBannerView(getContext(), null, true, false);
-                        mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-                        mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
-                    }
-                    return mopubBannerView;
+                    return getMopubBannerView();
                 }
                 //this line below should be impossible, but we could have some other special offer layout
                 //return View.inflate(getContext(), specialOfferLayout, null);
@@ -224,6 +219,18 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             }
         }
         return super.getView(position - 1, null, parent);
+    }
+
+    private View getMopubBannerView() {
+        if (mopubBannerView == null) {
+            mopubBannerView = new MopubBannerView(getContext(), null, true, false);
+            mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
+            // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
+            // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
+            // temp fix placed in MoPubAdNetwork.java#126
+           mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
+        }
+        return mopubBannerView;
     }
 
     private View getLandscapeView(int position, View convertView, ViewGroup parent) {

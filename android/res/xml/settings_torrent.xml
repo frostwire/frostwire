@@ -18,47 +18,47 @@
  */
 -->
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:frostwire="http://schemas.android.com/apk/res-auto">
+                                                xmlns:frostwire="http://schemas.android.com/apk/res-auto">
     <android.support.v7.preference.PreferenceCategory android:title="@string/sharing_privacy_settings">
         <android.support.v7.preference.CheckBoxPreference
             android:key="frostwire.prefs.torrent.seed_finished_torrents"
             android:summary="@string/seed_finished_torrents_summary"
-            android:title="@string/seed_finished_torrents" />
+            android:title="@string/seed_finished_torrents"/>
         <android.support.v7.preference.CheckBoxPreference
             android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
-            android:summary="@string/seed_finished_torrents_wifi_only_summary"
             android:layout="@layout/view_preference_checkbox_seeding"
-            android:title="@string/seed_finished_torrents_wifi_only" />
+            android:summary="@string/seed_finished_torrents_wifi_only_summary"
+            android:title="@string/seed_finished_torrents_wifi_only"/>
         <android.support.v7.preference.CheckBoxPreference
             android:key="frostwire.prefs.torrent.delete_started_torrent_files"
             android:summary="@string/delete_started_torrents_summary"
-            android:title="@string/delete_started_torrents" />
+            android:title="@string/delete_started_torrents"/>
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory android:title="@string/bandwidth_usage_settings">
-        <android.support.v7.preference.SwitchPreferenceCompat
+        <SwitchPreference
             android:key="froswire.prefs.network.enable_dht"
             android:summary="@string/enable_dht_summary"
-            android:title="@string/enable_dht" />
+            android:title="@string/enable_dht"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_download_speed"
             android:summary="@string/torrent_max_download_speed_summary"
             android:title="@string/torrent_max_download_speed"
-            frostwire:seekbar_startRange="1024"
-            frostwire:seekbar_endRange="5242880"
-            frostwire:seekbar_isByteRate="true"
-            frostwire:seekbar_hasUnlimited="true"
             frostwire:seekbar_defaultValue="0"
+            frostwire:seekbar_endRange="5242880"
+            frostwire:seekbar_hasUnlimited="true"
+            frostwire:seekbar_isByteRate="true"
+            frostwire:seekbar_startRange="1024"
             frostwire:seekbar_unlimitedValue="0"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_upload_speed"
             android:summary="@string/torrent_max_upload_speed_summary"
             android:title="@string/torrent_max_upload_speed"
-            frostwire:seekbar_startRange="1024"
-            frostwire:seekbar_endRange="5242880"
-            frostwire:seekbar_isByteRate="true"
-            frostwire:seekbar_hasUnlimited="true"
             frostwire:seekbar_defaultValue="0"
+            frostwire:seekbar_endRange="5242880"
+            frostwire:seekbar_hasUnlimited="true"
+            frostwire:seekbar_isByteRate="true"
+            frostwire:seekbar_startRange="1024"
             frostwire:seekbar_unlimitedValue="0"/>
 
         <!-- end of byte rate settings with unlimited values -->
@@ -68,32 +68,32 @@
             android:summary="@string/torrent_max_downloads_summary"
             android:title="@string/torrent_max_downloads"
             frostwire:seekbar_defaultValue="4"
-            frostwire:seekbar_startRange="1"
             frostwire:seekbar_endRange="10"
-            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_downloads"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_downloads"
+            frostwire:seekbar_startRange="1"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_uploads"
             android:summary="@string/torrent_max_uploads_summary"
             android:title="@string/torrent_max_uploads"
             frostwire:seekbar_defaultValue="4"
-            frostwire:seekbar_startRange="1"
             frostwire:seekbar_endRange="10"
-            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_uploads"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_uploads"
+            frostwire:seekbar_startRange="1"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_total_connections"
             android:summary="@string/torrent_max_total_connections_summary"
             android:title="@string/torrent_max_total_connections"
             frostwire:seekbar_defaultValue="200"
-            frostwire:seekbar_startRange="10"
             frostwire:seekbar_endRange="200"
-            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_connections"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_connections"
+            frostwire:seekbar_startRange="10"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_peers"
             android:summary="@string/torrent_max_peers_summary"
             android:title="@string/torrent_max_peers"
             frostwire:seekbar_defaultValue="200"
-            frostwire:seekbar_startRange="10"
             frostwire:seekbar_endRange="200"
-            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_peers"/>
+            frostwire:seekbar_pluralUnitResourceId="@plurals/unit_peers"
+            frostwire:seekbar_startRange="10"/>
     </android.support.v7.preference.PreferenceCategory>
 </android.support.v7.preference.PreferenceScreen>

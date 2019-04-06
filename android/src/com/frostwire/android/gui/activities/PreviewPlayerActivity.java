@@ -58,6 +58,7 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;

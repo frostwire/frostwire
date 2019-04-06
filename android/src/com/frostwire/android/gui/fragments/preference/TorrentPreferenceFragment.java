@@ -19,9 +19,9 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.DialogFragment;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.SwitchPreferenceCompat;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -82,7 +82,7 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     }
 
     private void setupTorrentOptions() {
-        SwitchPreferenceCompat pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+        SwitchPreference pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
         pref.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean newStatus = (boolean) newValue;
             if (newStatus) {

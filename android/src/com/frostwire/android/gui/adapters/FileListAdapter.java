@@ -434,11 +434,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         fileThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-        MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode() ?
+        boolean inGridMode = inGridMode();
+
+        MediaPlaybackStatusOverlayView mediaOverlayView = findView(view, inGridMode ?
                 R.id.view_my_files_thumbnail_grid_item_playback_overlay_view :
                 R.id.view_my_files_thumbnail_list_item_playback_overlay_view);
 
-        boolean inGridMode = inGridMode();
         final int thumbnailDimensions = inGridMode ?
                 256 : 96;
 

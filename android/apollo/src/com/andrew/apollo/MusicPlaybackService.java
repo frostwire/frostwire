@@ -726,8 +726,13 @@ public class MusicPlaybackService extends JobIntentService {
                 | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
 
         flags |= RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE;
-        mRemoteControlClient.setOnGetPlaybackPositionListener(this::position);
-        mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
+        try {
+            mRemoteControlClient.setOnGetPlaybackPositionListener(this::position);
+            mRemoteControlClient.setPlaybackPositionUpdateListener(this::seek);
+        } catch (Throwable t) {
+            // temporary fix for Android 4.1, these methods don't exist, we require a
+            // MediaSession refactor
+        }
 
         mRemoteControlClient.setTransportControlFlags(flags);
     }
@@ -1596,7 +1601,12 @@ public class MusicPlaybackService extends JobIntentService {
             } catch (Throwable t) {
                 // possible NPE on android.media.RemoteControlClient$MetadataEditor.apply()
             }
-            musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
+
+            try {
+                musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
+            } catch (Throwable t) {
+                // temporary fix for Android 4.1, we need MediaSessoin refactor
+            }
         };
         musicPlaybackService.mPlayerHandler.post(postExecute);
     }

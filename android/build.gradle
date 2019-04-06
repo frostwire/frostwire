@@ -19,33 +19,29 @@ import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
-apply from: '../common/dependencies.gradle'
 
 buildscript {
-
     repositories {
         google()
         jcenter()
     }
     dependencies {
+        //classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.android.tools.build:gradle:3.2.1'
+        //classpath 'com.android.tools.build:gradle:3.3.2'
+        // (3.2.1 last working) don't upgrade to 3.3.0 yet, R8 issues ensue, Keystore tampered error comes out
+        // even after deleting the ~/.gradle folder
     }
 }
 
 repositories {
     google()
-    mavenCentral()
     jcenter()
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    flatDir {
-        dirs 'libs'
-    }
-
-    // for Vungle
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://jitpack.io' } // for Vungle
+    flatDir { dirs 'libs' }
 }
 
 def manifestVersionCode() {
@@ -97,8 +93,8 @@ android {
 
     defaultConfig {
         versionName project.ext.versionName
-        minSdkVersion 16
-        targetSdkVersion 26
+        minSdkVersion 19
+        targetSdkVersion 28
         multiDexEnabled true
     }
 
@@ -181,24 +177,34 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.re2j:re2j:1.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // last compatible one for android 4.4
     implementation 'com.android.support:multidex:1.0.3'
-
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:animated-vector-drawable:27.1.1'
-    implementation 'com.android.support:customtabs:27.1.1'
-    implementation 'com.android.support:exifinterface:27.1.1'
-    implementation 'com.android.support:preference-v7:27.1.1'
-    implementation 'com.android.billingclient:billing:1.1'
-    implementation 'com.google.android.gms:play-services-ads:17.1.1'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:animated-vector-drawable:28.0.0'
+    implementation 'com.android.support:customtabs:28.0.0'
+    implementation 'com.android.support:exifinterface:28.0.0'
+    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'com.android.support:preference-v14:28.0.0'
+    implementation 'com.android.billingclient:billing:1.2'
+    implementation 'com.google.android.gms:play-services-ads:17.2.0'
+// last version working
     implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
-    implementation 'com.applovin:applovin-sdk:9.1.3'
+// mopub 5.5.0, 5.6.0 won't display banners
+//    implementation('com.mopub:mopub-sdk-banner:5.6.0@aar') { transitive = true }
+//    implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') { transitive = true }
+
+    implementation 'com.applovin:applovin-sdk:9.4.2'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.frostwire:jlibtorrent-android-arm:1.2.0.18'
-    implementation 'com.frostwire:jlibtorrent-android-x86:1.2.0.18'
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
     implementation 'com.mopub.mediation:vungle:6.3.24.0'
+    implementation files('libs/jlibtorrent-1.2.0.20.jar')
+    implementation files('libs/jlibtorrent-android-arm-1.2.0.20.jar')
+    implementation files('libs/jlibtorrent-android-x86-1.2.0.20.jar')
 }
 
 class DeployRelease extends DefaultTask {

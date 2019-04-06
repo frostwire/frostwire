@@ -32,11 +32,9 @@ import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * 
@@ -97,17 +95,15 @@ public class LibraryMediator {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getLibraryLeftPanel(), getLibraryRightPanel());
         splitPane.setContinuousLayout(true);
         splitPane.setResizeWeight(0.5);
-        splitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                JSplitPane splitPane = (JSplitPane) evt.getSource();
-                int current = splitPane.getDividerLocation();
-                if (current > LibraryLeftPanel.MAX_WIDTH) {
-                    splitPane.setDividerLocation(LibraryLeftPanel.MAX_WIDTH);
-                } else if (current < LibraryLeftPanel.MIN_WIDTH) {
-                    splitPane.setDividerLocation(LibraryLeftPanel.MIN_WIDTH);
-                }
-
+        splitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
+            JSplitPane splitPane1 = (JSplitPane) evt.getSource();
+            int current = splitPane1.getDividerLocation();
+            if (current > LibraryLeftPanel.MAX_WIDTH) {
+                splitPane1.setDividerLocation(LibraryLeftPanel.MAX_WIDTH);
+            } else if (current < LibraryLeftPanel.MIN_WIDTH) {
+                splitPane1.setDividerLocation(LibraryLeftPanel.MIN_WIDTH);
             }
+
         });
 
         DividerLocationSettingUpdater.install(splitPane, UISettings.UI_LIBRARY_MAIN_DIVIDER_LOCATION);
@@ -172,13 +168,9 @@ public class LibraryMediator {
     }
 
     private void showView(final String key) {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-
-            @Override
-            public void run() {
-                rememberScrollbarsOnMediators(key);
-                _tablesViewLayout.show(_tablesPanel, key);
-            }
+        GUIMediator.safeInvokeAndWait(() -> {
+            rememberScrollbarsOnMediators(key);
+            _tablesViewLayout.show(_tablesPanel, key);
         });
 
         switch (key) {
@@ -222,7 +214,7 @@ public class LibraryMediator {
         lastSelectedKey = getSelectedKey();
 
         if (listPanel.getPendingRunnables().size() == 0) {
-            int lastScrollValue = scrollbarValues.containsKey(lastSelectedKey) ? scrollbarValues.get(lastSelectedKey) : 0;
+            int lastScrollValue = scrollbarValues.getOrDefault(lastSelectedKey, 0);
 
             tableMediator.scrollTo(lastScrollValue);
         }
@@ -302,15 +294,7 @@ public class LibraryMediator {
             if (currentPlaylist.getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
 
                 //select the song once it's available on the right hand side
-                getLibraryPlaylists().enqueueRunnable(new Runnable() {
-                    public void run() {
-                        GUIMediator.safeInvokeLater(new Runnable() {
-                            public void run() {
-                                LibraryPlaylistsTableMediator.instance().setItemSelected(currentMedia.getPlaylistItem());
-                            }
-                        });
-                    }
-                });
+                getLibraryPlaylists().enqueueRunnable(() -> GUIMediator.safeInvokeLater(() -> LibraryPlaylistsTableMediator.instance().setItemSelected(currentMedia.getPlaylistItem())));
 
                 //select the playlist
                 getLibraryPlaylists().selectPlaylist(currentPlaylist);
@@ -318,15 +302,7 @@ public class LibraryMediator {
                 LibraryExplorer libraryFiles = getLibraryExplorer();
 
                 //select the song once it's available on the right hand side
-                libraryFiles.enqueueRunnable(new Runnable() {
-                    public void run() {
-                        GUIMediator.safeInvokeLater(new Runnable() {
-                            public void run() {
-                                LibraryPlaylistsTableMediator.instance().setItemSelected(currentMedia.getPlaylistItem());
-                            }
-                        });
-                    }
-                });
+                libraryFiles.enqueueRunnable(() -> GUIMediator.safeInvokeLater(() -> LibraryPlaylistsTableMediator.instance().setItemSelected(currentMedia.getPlaylistItem())));
 
                 libraryFiles.selectStarred();
             }
@@ -336,15 +312,7 @@ public class LibraryMediator {
             LibraryExplorer libraryFiles = getLibraryExplorer();
 
             //select the song once it's available on the right hand side
-            libraryFiles.enqueueRunnable(new Runnable() {
-                public void run() {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            LibraryFilesTableMediator.instance().setFileSelected(currentMedia.getFile());
-                        }
-                    });
-                }
-            });
+            libraryFiles.enqueueRunnable(() -> GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setFileSelected(currentMedia.getFile())));
 
             libraryFiles.selectAudio();
         }

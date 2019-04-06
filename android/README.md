@@ -4,9 +4,11 @@
 
 FrostWire for Android lets you search and download files from the BitTorrent network and several popular cloud services.
 
-All the BitTorrent functionality is done using FrostWire's [jlibtorrent](https://github.com/frostwire/frostwire-jlibtorrent) library, a set of high level [libtorrent](https://github.com/arvidn/libtorrent) wrappers. The FrostWire team is an active contributor to libtorrent and jlibtorrent always tries to stay on par with the latest libtorrent release.
+All the BitTorrent functionality is done using FrostWire's [jlibtorrent](https://github.com/frostwire/frostwire-jlibtorrent) library, a set of high level [libtorrent](https://github.com/arvidn/libtorrent) wrappers.
 
-![](http://i.imgur.com/U20h8cL.png)
+The FrostWire team is an active contributor to libtorrent and jlibtorrent always tries to stay on par with the latest libtorrent release.
+
+![](https://i.imgur.com/U20h8cL.png)
 - - -
 # Coding guidelines
 
@@ -55,7 +57,7 @@ git rebase master
 
 # Tip4Commit
 
-You can donate for development, thereby encouraging some developers or you can participate and get a tip for commits approved us.
+You can donate for development, thereby encouraging some developers or you can participate and get a tip for commits we approve of.
 
 [![tip for next commit](https://tip4commit.com/projects/200.svg)](https://tip4commit.com/github/frostwire/frostwire-android)
 
@@ -63,7 +65,7 @@ You can donate for development, thereby encouraging some developers or you can p
 
 ## Android Studio
 
-1. Make sure you have [Android Studio](https://developer.android.com/studio/index.html) properly installed.
+1. Make sure you have [Android Studio](https://developer.android.com/studio/) properly installed.
 2. Open the project in Android Studio.
 3. Wait for gradle sync and indices to update.
 4. Should work out of the box.
@@ -72,7 +74,7 @@ Happy coding.
 
 # Download
 
-[Latest binaries](http://www.frostwire.com/android) | [Previous versions (SourceForge)](https://sourceforge.net/projects/frostwire-android/files/)
+[Latest binaries](https://www.frostwire.com/android) | [Previous versions (SourceForge)](https://sourceforge.net/projects/frostwire/files/)
 
 **Downloading FrostWire does not constitute permission or a license for obtaining or distributing unauthorized files. It is illegal for you to distribute copyrighted files without permission.**
 

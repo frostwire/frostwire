@@ -17,6 +17,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
 
+import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -140,6 +141,9 @@ public class MacEventHandler {
             }
             if (versionStr.startsWith("10")) {
                 return 10;
+            }
+            if (versionStr.startsWith("12")) {
+                return 12;
             }
             throw new RuntimeException("Java version " + versionStr + " not supported");
         }
