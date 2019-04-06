@@ -136,8 +136,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
             return GUIMediator.getThemeImage("downloading");
         }
 
-
-
         String ext = FilenameUtils.getExtension(getFilename());
 
         return IconManager.instance().getIconForExtension(ext);
