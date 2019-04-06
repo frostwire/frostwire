@@ -1,7 +1,8 @@
 frostwire (6.7.9) stable; urgency=high
   * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
+  * Limetorrent search results now have a distinct icon, thanks trollmad3
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 31 Mar 2019 10:09:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 6 Apr 2019 09:07:00 -0600
 
 frostwire (6.7.8) stable; urgency=high
   * New jlibtorrent 1.2.0.20 with latest libtorrent release
