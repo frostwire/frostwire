@@ -48,6 +48,7 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
+        //TODO once server is ready
         return "http://api.frostclick.com/q?page=" + page + "&q=" + encodedKeywords;
     }
 
