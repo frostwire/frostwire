@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,9 @@
 
 package com.frostwire.search.frostclick;
 
-import com.frostwire.util.Logger;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
+import com.frostwire.util.Logger;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -48,8 +48,7 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        //TODO once server is ready
-        return "http://api.frostclick.com/q?page=" + page + "&q=" + encodedKeywords;
+        return "https://api.frostclick.com/q?page=" + page + "&q=" + encodedKeywords;
     }
 
     @Override
