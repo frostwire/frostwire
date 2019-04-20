@@ -37,7 +37,7 @@ import java.util.List;
  */
 class BitTorrentSettingsWindow extends SetupWindow {
 
-    private static final String LEARN_MORE_URL = "http://support.frostwire.com/hc/en-us/articles/200302295-What-is-seeding-";
+    private static final String LEARN_MORE_URL = "https://pastebin.com/pk4KhyR1";
 
     private TorrentSaveFolderComponent _torrentSaveFolderComponent;
     private TorrentSeedingSettingComponent _torrentSeedingSettingComponent;
@@ -105,7 +105,7 @@ class BitTorrentSettingsWindow extends SetupWindow {
     private void applyTorrentSeedingSettings(List<String> errors) {
         if (!_torrentSeedingSettingComponent.hasOneBeenSelected()) {
             errors.add("<html><p>" + I18n.tr("You forgot to select your finished downloads \"Seeding\" setting.") + "</p>\n" +
-                    "<p></p><p align=\"right\"><a href=\"http://support.frostwire.com/hc/en-us/articles/200302295-What-is-seeding-\">" +
+                    "<p></p><p align=\"right\"><a href=\"https://pastebin.com/pk4KhyR1\">" +
                     I18n.tr("What is \"Seeding\"?") +
                     "</a></p></html>");
             return;
