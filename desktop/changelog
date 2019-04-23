@@ -1,3 +1,9 @@
+frostwire (6.8.0) stable; urgency=high
+  * Soundcloud search and downloads fixed
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 22 Apr 2019 18:00:00 -0600
+
+
 frostwire (6.7.9) stable; urgency=high
   * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
   * Limetorrent search results now have a distinct icon, thanks trollmad3
