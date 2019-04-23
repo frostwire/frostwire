@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
-    private static final String SOUNDCLOUD_CLIENTID = "KBuk0RhNCHjjzHf0m6wVb8So4pCQg5jW";
+    private static final String SOUNDCLOUD_CLIENTID = "FweeGBOOEOYJWLJN3oEyToGLKhmSz0I7";
     private static final String SOUNDCLOUD_APP_VERSION = "1516627364";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
