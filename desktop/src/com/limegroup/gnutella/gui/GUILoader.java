@@ -19,12 +19,9 @@ import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.platform.Platforms;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.limewire.util.VersionUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Properties;
 
@@ -44,16 +41,11 @@ public class GUILoader {
      * @param args  the array of command line arguments
      * @param frame the splash screen; null, if no splash is displayed
      */
-    public static void load(String args[], Frame frame) {
+    public static void load(String[] args, Frame frame) {
         try {
             Platforms.set(new DesktopPlatform());
-
-            if (JavaVersionNotice.upgradeRequired(VersionUtils.getJavaVersion())) {
-                hideSplash(frame);
-                JavaVersionNotice.showUpgradeRequiredDialog();
-            }
-            //sanityCheck();
             System.out.println("FrostWire version " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
+            System.out.println(System.getProperty("java.vm.name") + " " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("java.specification.vendor"));
             Initializer initializer = new Initializer();
             initializer.initialize(args, frame);
         } catch (Throwable err) {
@@ -87,12 +79,10 @@ public class GUILoader {
     /**
      * Display a standardly formatted internal error message
      * coming from the backend.
-     *
-     * @param message the message to display to the user
      * @param err     the <tt>Throwable</tt> object containing information
      *                about the error
      */
-    private static final void showCorruptionError(Throwable err) {
+    private static void showCorruptionError(Throwable err) {
         err.printStackTrace();
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -126,8 +116,7 @@ public class GUILoader {
             fis.close();
             // list the properties in the PrintWriter.
             props.list(pw);
-        } catch (FileNotFoundException fnfe) {
-        } catch (IOException ioe) {
+        } catch (IOException ignored) {
         }
 
         pw.flush();
@@ -150,7 +139,7 @@ public class GUILoader {
     /**
      * Displays an internal error with specialized formatting.
      */
-    private static final void displayError(String error) {
+    private static void displayError(String error) {
         System.out.println("Error: " + error);
         final JDialog DIALOG = new JDialog();
         DIALOG.setModal(true);
@@ -211,18 +200,12 @@ public class GUILoader {
 
         JPanel buttonPanel = new JPanel();
         JButton copyButton = new JButton("Copy Report");
-        copyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                textArea.selectAll();
-                textArea.copy();
-            }
+        copyButton.addActionListener(e -> {
+            textArea.selectAll();
+            textArea.copy();
         });
         JButton quitButton = new JButton("Ok");
-        quitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DIALOG.dispose();
-            }
-        });
+        quitButton.addActionListener(e -> DIALOG.dispose());
         buttonPanel.add(copyButton);
         buttonPanel.add(quitButton);
 

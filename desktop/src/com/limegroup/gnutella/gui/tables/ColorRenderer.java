@@ -18,8 +18,8 @@ package com.limegroup.gnutella.gui.tables;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -74,7 +74,7 @@ class ColorRenderer extends DefaultTableBevelledCellRenderer {
      * Map is from TableCellRenderer to TableCellRenderer.
      * Every instance of a renderer will have a mirrored instance as its value.
      */
-    private static final Map<TableCellRenderer, TableCellRenderer> otherRenderers = new HashMap<TableCellRenderer, TableCellRenderer>();
+    private static final Map<TableCellRenderer, TableCellRenderer> otherRenderers = new HashMap<>();
 
     public ColorRenderer() {
     }
@@ -106,8 +106,7 @@ class ColorRenderer extends DefaultTableBevelledCellRenderer {
     }
 
     public void updateUI() {
-        for (Iterator<?> i = otherRenderers.values().iterator(); i.hasNext();) {
-            Object o = i.next();
+        for (Object o : otherRenderers.values()) {
             if (o instanceof JComponent) {
                 ((JComponent) o).updateUI();
             }
@@ -122,13 +121,11 @@ class ColorRenderer extends DefaultTableBevelledCellRenderer {
         if (renderer == null) {
             Class<? extends TableCellRenderer> rendererClass = tcr.getClass();
             try {
-                renderer = rendererClass.newInstance();
-            } catch (IllegalAccessException e) {
+                renderer = rendererClass.getDeclaredConstructor().newInstance();
+            } catch (IllegalAccessException | InstantiationException | ClassCastException | NoSuchMethodException e) {
                 throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (ClassCastException e) {
-                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
             }
             otherRenderers.put(tcr, renderer);
         }

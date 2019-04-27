@@ -6129,7 +6129,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final int current = array[i];
-            if(new Integer(previous).compareTo(current) > 0) {
+            if(previous > current) {
                 return false;
             }
 
@@ -6154,7 +6154,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final long current = array[i];
-            if(new Long(previous).compareTo(current) > 0) {
+            if(previous > current) {
                 return false;
             }
 
@@ -6179,7 +6179,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final short current = array[i];
-            if(new Short(previous).compareTo(current) > 0) {
+            if(previous > current) {
                 return false;
             }
 
@@ -6254,7 +6254,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final byte current = array[i];
-            if(new Byte(previous).compareTo(current) > 0) {
+            if(previous > current) {
                 return false;
             }
 
@@ -6287,30 +6287,4 @@ public class ArrayUtils {
         }
         return true;
     }
-
-    /**
-     * <p>This method checks whether the provided array is sorted according to natural ordering
-     * ({@code false} before {@code true}).</p>
-     *
-     * @param array the array to check
-     * @return whether the array is sorted according to natural ordering
-     * @since 3.4
-     */
-//    public static boolean isSorted(boolean[] array) {
-//        if(array == null || array.length < 2) {
-//            return true;
-//        }
-//
-//        boolean previous = array[0];
-//        final int n = array.length;
-//        for(int i = 1; i < n; i++) {
-//            final boolean current = array[i];
-//            if(BooleanUtils.compare(previous, current) > 0) {
-//                return false;
-//            }
-//
-//            previous = current;
-//        }
-//        return true;
-//    }
 }

@@ -71,12 +71,12 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
                             component_mousePressed(e);
                         } else {
                             if (e.getClickCount() >= 2) {
-                                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, MouseEvent.MOUSE_CLICKED, e.getWhen(), e.getModifiers(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), false));
+                                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, MouseEvent.MOUSE_CLICKED, e.getWhen(), e.getModifiersEx(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), false));
                             }
                         }
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, e.getID(), e.getWhen(), e.getModifiers(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), true));
+                    Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, e.getID(), e.getWhen(), e.getModifiersEx(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), true));
                 }
             }
         });

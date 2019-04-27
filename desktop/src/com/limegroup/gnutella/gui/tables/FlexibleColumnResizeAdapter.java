@@ -70,13 +70,13 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
      */
     public void mousePressed(MouseEvent e) {
         JTableHeader hdr = (JTableHeader) e.getSource();
-        int mask = e.getModifiers();
+        int mask = e.getModifiersEx();
         JTable tbl = hdr.getTable();
-        if ((mask & MouseEvent.SHIFT_MASK) != 0)
+        if ((mask & MouseEvent.SHIFT_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(sMode);
-        else if ((mask & MouseEvent.CTRL_MASK) != 0)
+        else if ((mask & MouseEvent.CTRL_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(cMode);
-        else if ((mask & MouseEvent.ALT_MASK) != 0)
+        else if ((mask & MouseEvent.ALT_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(aMode);
         else
             tbl.setAutoResizeMode(dMode);

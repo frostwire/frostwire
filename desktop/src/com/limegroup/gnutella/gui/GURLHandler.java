@@ -49,17 +49,6 @@ public final class GURLHandler {
         }
     }
 
-    /**
-     * We're nice guys and remove the GetURL AppleEvent handler although
-     * this never happens
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        if (registered) {
-            RemoveEventHandler();
-        }
-    }
-
     private synchronized final native int InstallEventHandler();
 
     private synchronized final native int RemoveEventHandler();

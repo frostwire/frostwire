@@ -24,6 +24,7 @@ import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -74,13 +75,17 @@ public final class ResourceManager {
      */
     private final boolean BRUSHED_METAL;
 
-    /** Cache of theme images (name as String -> image as ImageIcon) */
+    /**
+     * Cache of theme images (name as String -> image as ImageIcon)
+     */
     private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<String, ImageIcon>();
 
-    
-    /** Marked true in the event of an error in the load/save of any settings file */ 
-    private static boolean loadFailureEncountered = false;   
-    
+
+    /**
+     * Marked true in the event of an error in the load/save of any settings file
+     */
+    private static boolean loadFailureEncountered = false;
+
     /**
      * Statically initialize necessary resources.
      */
@@ -97,7 +102,7 @@ public final class ResourceManager {
         if (!_localeOptionsSet) {
             if (ApplicationSettings.LANGUAGE.getValue().equals(""))
                 ApplicationSettings.LANGUAGE.setValue("en");
-            
+
             _locale = new Locale(ApplicationSettings.LANGUAGE.getValue(),
                     ApplicationSettings.COUNTRY.getValue(),
                     ApplicationSettings.LOCALE_VARIANT.getValue());
@@ -109,23 +114,23 @@ public final class ResourceManager {
 
     /**
      * Returns the <tt>Locale</tt> instance currently in use.
-     * 
+     *
      * @return the <tt>Locale</tt> instance currently in use
      */
     static Locale getLocale() {
         return _locale;
     }
 
-    
+
     /**
-     * Indicated if a failure has occurred for delayed reporting 
+     * Indicated if a failure has occurred for delayed reporting
      */
     public static boolean hasLoadFailure() {
         return loadFailureEncountered;
     }
-    
+
     /**
-     * Resets the failure flag 
+     * Resets the failure flag
      */
     public static void resetLoadFailure() {
         loadFailureEncountered = false;
@@ -134,10 +139,10 @@ public final class ResourceManager {
     /**
      * Serves as a single point of access for any icons that should be accessed
      * directly from the file system for themes.
-     * 
+     *
      * @param name The name of the image (excluding the extension) to locate.
      * @return a new <tt>ImageIcon</tt> instance for the specified file, or
-     *         <tt>null</tt> if the resource could not be loaded
+     * <tt>null</tt> if the resource could not be loaded
      */
     static final ImageIcon getThemeImage(final String name) {
         if (name == null)
@@ -172,10 +177,10 @@ public final class ResourceManager {
 
     /**
      * Retrieves an icon from a URL-style path.
-     * 
+     * <p>
      * If 'file' is true, location is treated as a file, otherwise it is treated
      * as a resource.
-     * 
+     * <p>
      * This tries, in order, the exact location, the location as a png, and the
      * location as a gif.
      */
@@ -221,10 +226,10 @@ public final class ResourceManager {
     /**
      * Returns a new <tt>URL</tt> instance for the specified file in the
      * "resources" directory.
-     * 
+     *
      * @param FILE_NAME the name of the resource file
      * @return a new <tt>URL</tt> instance for the desired file, or
-     *         <tt>null</tt> if the <tt>URL</tt> could not be loaded
+     * <tt>null</tt> if the <tt>URL</tt> could not be loaded
      */
     public static URL getURLResource(final String FILE_NAME) {
         return ResourceManager.getURL(RESOURCES_PATH + FILE_NAME);
@@ -235,13 +240,13 @@ public final class ResourceManager {
      * local path. The path should be the full path within the jar file, such
      * as:
      * <p>
-     * 
+     * <p>
      * org/limewire/gui/images/searching.gif
      * <p>
-     * 
+     *
      * @param PATH the path to the resource file within the jar
      * @return a new <tt>URL</tt> instance for the desired file, or
-     *         <tt>null</tt> if the <tt>URL</tt> could not be loaded
+     * <tt>null</tt> if the <tt>URL</tt> could not be loaded
      */
     private static URL getURL(final String PATH) {
         ClassLoader cl = ResourceManager.class.getClassLoader();
@@ -283,7 +288,7 @@ public final class ResourceManager {
      * Validates the locale, determining if the current locale's resources can
      * be displayed using the current fonts. If not, then the locale is reset to
      * English.
-     * 
+     * <p>
      * This prevents the UI from appearing as all boxes.
      */
     public static void validateLocaleAndFonts(Locale locale) {
@@ -322,7 +327,7 @@ public final class ResourceManager {
      */
     @SuppressWarnings("unused")
     private static boolean checkUIFonts(String newFont, String testString) {
-        String[] comps = new String[] { "TextField.font", "PasswordField.font",
+        String[] comps = new String[]{"TextField.font", "PasswordField.font",
                 "TextArea.font", "TextPane.font", "EditorPane.font",
                 "FormattedTextField.font", "Button.font", "CheckBox.font",
                 "RadioButton.font", "ToggleButton.font", "ProgressBar.font",
@@ -335,7 +340,7 @@ public final class ResourceManager {
                 "RadioButtonMenuItem.font",
                 "RadioButtonMenuItem.acceleratorFont", "Spinner.font",
                 "Tree.font", "ToolBar.font", "OptionPane.messageFont",
-                "OptionPane.buttonFont", "ToolTip.font", };
+                "OptionPane.buttonFont", "ToolTip.font",};
 
         boolean displayable = false;
         for (int i = 0; i < comps.length; i++)
@@ -367,7 +372,7 @@ public final class ResourceManager {
      * Updates the font of a given fontName to be newName.
      */
     private static boolean checkFont(String fontName, String newName,
-            String testString, boolean force) {
+                                     String testString, boolean force) {
         boolean displayable = true;
         Font f = UIManager.getFont(fontName);
         if (f != null && !newName.equalsIgnoreCase(f.getName())) {
@@ -385,8 +390,10 @@ public final class ResourceManager {
         }
         return displayable;
     }
-    
-    /** Determines if a system tray icon is available. */
+
+    /**
+     * Determines if a system tray icon is available.
+     */
     public boolean isTrayIconAvailable() {
         return (OSUtils.isWindows() || OSUtils.isLinux()) && NotifyUserProxy.instance().supportsSystemTray();
     }
@@ -407,17 +414,12 @@ public final class ResourceManager {
         if (name != null) {
             try {
                 Class<?> clazz = Class.forName(name);
-                LookAndFeel lf = (LookAndFeel) clazz.newInstance();
+                LookAndFeel lf = (LookAndFeel) clazz.getDeclaredConstructor().newInstance();
                 lf.initialize();
                 UIDefaults def = lf.getDefaults();
                 ret = def.getUI(c);
-            } catch (ExceptionInInitializerError e) {
-            } catch (ClassNotFoundException e) {
-            } catch (LinkageError e) {
-            } catch (IllegalAccessException e) {
-            } catch (InstantiationException e) {
-            } catch (SecurityException e) {
-            } catch (ClassCastException e) {
+            } catch (NoSuchMethodException | ClassCastException | SecurityException | InstantiationException | IllegalAccessException | LinkageError | ClassNotFoundException | InvocationTargetException e) {
+                e.printStackTrace();
             }
         }
 
@@ -427,16 +429,4 @@ public final class ResourceManager {
 
         return ret;
     }
-
-//    /**
-//     * Reduces the size of a font in UIManager.
-//     */
-//    private static void reduceFont(String name) {
-//        Font oldFont = UIManager.getFont(name);
-//        FontUIResource newFont = new FontUIResource(oldFont.getName(), oldFont
-//                .getStyle(), oldFont.getSize() - 2);
-//        UIManager.put(name, newFont);
-//    }
-
-    
 }

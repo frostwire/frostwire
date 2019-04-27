@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui;
@@ -51,7 +50,6 @@ import org.limewire.service.Switch;
 import org.limewire.setting.IntSetting;
 import org.limewire.util.OSUtils;
 import org.limewire.util.StringUtils;
-import org.limewire.util.VersionUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -286,60 +284,56 @@ public final class GUIMediator {
      *                visible or not
      */
     static void setAppVisible(final boolean visible) {
-        safeInvokeLater(new Runnable() {
-            public void run() {
-                try {
-                    if (visible)
-                        getAppFrame().toFront();
-                    getAppFrame().setVisible(visible);
-                } catch (NullPointerException npe) {
-                    System.out.println("GUIMediator - NULL POINTER EXCEPTION HAPPENED");
+        safeInvokeLater(() -> {
+            try {
+                if (visible)
+                    getAppFrame().toFront();
+                getAppFrame().setVisible(visible);
+            } catch (NullPointerException npe) {
+                System.out.println("GUIMediator - NULL POINTER EXCEPTION HAPPENED");
 
-                    if (OSUtils.isNativeThemeWindows()) {
-                        try {
-                            GUIMediator
-                                    .showError(I18n
-                                            .tr("FrostWire has encountered a problem during startup and cannot proceed. You may be able to fix this problem by changing FrostWire\'s Windows Compatibility. Right-click on the FrostWire icon on your Desktop and select \'Properties\' from the popup menu. Click the \'Compatibility\' tab at the top, then click the \'Run this program in compatibility mode for\' check box, and then select \'Windows 2000\' in the box below the check box. Then click the \'OK\' button at the bottom and restart FrostWire."));
-                            System.exit(0);
-                        } catch (Throwable t) {
-                            if (visible)
-                                FatalBugManager.handleFatalBug(npe);
-                            else
-                                ErrorService.error(npe);
-                        }
-                    } else {
+                if (OSUtils.isNativeThemeWindows()) {
+                    try {
+                        GUIMediator
+                                .showError(I18n
+                                        .tr("FrostWire has encountered a problem during startup and cannot proceed. You may be able to fix this problem by changing FrostWire\'s Windows Compatibility. Right-click on the FrostWire icon on your Desktop and select \'Properties\' from the popup menu. Click the \'Compatibility\' tab at the top, then click the \'Run this program in compatibility mode for\' check box, and then select \'Windows 2000\' in the box below the check box. Then click the \'OK\' button at the bottom and restart FrostWire."));
+                        System.exit(0);
+                    } catch (Throwable t) {
                         if (visible)
                             FatalBugManager.handleFatalBug(npe);
                         else
                             ErrorService.error(npe);
                     }
-                } catch (Throwable t) {
+                } else {
                     if (visible)
-                        FatalBugManager.handleFatalBug(t);
+                        FatalBugManager.handleFatalBug(npe);
                     else
-                        ErrorService.error(t);
+                        ErrorService.error(npe);
                 }
-                if (visible) {
-                    SearchMediator.requestSearchFocus();
-                    // forcibly revalidate the FRAME
-                    // after making it visible.
-                    // on Java 1.5, it does not validate correctly.
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            getAppFrame().getContentPane().invalidate();
-                            getAppFrame().getContentPane().validate();
-                        }
-                    });
-                }
-                // If the app has already been made visible, don't display extra
-                // dialogs. We could display the pro dialog here, but it causes
-                // some odd issues when LimeWire is brought back up from the
-                // tray
-                if (visible && !_visibleOnce) {
-                    // Show the startup dialogs in the swing thread.
-                    showDialogsForFirstVisibility();
-                    _visibleOnce = true;
-                }
+            } catch (Throwable t) {
+                if (visible)
+                    FatalBugManager.handleFatalBug(t);
+                else
+                    ErrorService.error(t);
+            }
+            if (visible) {
+                SearchMediator.requestSearchFocus();
+                // forcibly revalidate the FRAME
+                // after making it visible.
+                // on Java 1.5, it does not validate correctly.
+                SwingUtilities.invokeLater(() -> {
+                    getAppFrame().getContentPane().invalidate();
+                    getAppFrame().getContentPane().validate();
+                });
+            }
+            // If the app has already been made visible, don't display extra
+            // dialogs. We could display the pro dialog here, but it causes
+            // some odd issues when LimeWire is brought back up from the
+            // tray
+            if (visible && !_visibleOnce) {
+                // Show the startup dialogs in the swing thread.
+                showDialogsForFirstVisibility();
+                _visibleOnce = true;
             }
         });
     }
@@ -359,38 +353,15 @@ public final class GUIMediator {
             // Construct it first...
             TipOfTheDayMediator.instance();
 
-            ThreadExecutor.startThread(new Runnable() {
-                public void run() {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ignored) {
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            TipOfTheDayMediator.instance().displayTipWindow();
-                        }
-                    });
+            ThreadExecutor.startThread(() -> {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {
                 }
+                SwingUtilities.invokeLater(() -> TipOfTheDayMediator.instance().displayTipWindow());
             }, "TOTD");
         }
-
-        JDialog dialog = JavaVersionNotice.getUpgradeRecommendedDialog(VersionUtils.getJavaVersion());
-        if (dialog != null) {
-            dialog.setVisible(true);
-        }
     }
-
-    /**
-     * Displays a dialog the first time a user performs a download. Returns true
-     * iff the user selects 'Yes'; returns false otherwise.
-     */
-    /*
-     * public static boolean showFirstDownloadDialog() { if (DialogOption.YES ==
-     * showYesNoCancelMessage(I18n.tr(
-     * "FrostWire is unable to find a license for this file. Download the file anyway?\n\nPlease note: FrostWire cannot monitor or control the content of the Gnutella network. Please respect your local copyright laws."
-     * ), QuestionsHandler.SKIP_FIRST_DOWNLOAD_WARNING)) return true; return
-     * false; }
-     */
 
     /**
      * Closes any dialogues that are displayed at startup and sets the flag to
@@ -487,24 +458,18 @@ public final class GUIMediator {
         updateConnectionQualityAsync();
     }
 
-    private static ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), true);
+    private static ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
 
     private void updateConnectionQualityAsync() {
-        pool.execute(new Runnable() {
-            @Override
-            public void run() {
-                final int quality = getConnectionQuality();
-                safeInvokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (quality != StatusLine.STATUS_DISCONNECTED) {
-                            hideDisposableMessage(DISCONNECTED_MESSAGE);
-                        }
+        pool.execute(() -> {
+            final int quality = getConnectionQuality();
+            safeInvokeLater(() -> {
+                if (quality != StatusLine.STATUS_DISCONNECTED) {
+                    hideDisposableMessage(DISCONNECTED_MESSAGE);
+                }
 
-                        updateConnectionUI(quality);
-                    }
-                });
-            }
+                updateConnectionUI(quality);
+            });
         });
     }
 
@@ -709,12 +674,10 @@ public final class GUIMediator {
      * the AWT thread priority.
      */
     void loadFinished() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Thread awt = Thread.currentThread();
-                awt.setPriority(awt.getPriority() + 1);
-                getStatusLine().loadFinished();
-            }
+        SwingUtilities.invokeLater(() -> {
+            Thread awt = Thread.currentThread();
+            awt.setPriority(awt.getPriority() + 1);
+            getStatusLine().loadFinished();
         });
     }
 
@@ -1213,16 +1176,6 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns a <tt>Component</tt> standardly sized for vertical separators.
-     *
-     * @return the constant <tt>Component</tt> used as a standard vertical
-     * separator
-     */
-    static Component getVerticalSeparator() {
-        return Box.createRigidArea(new Dimension(0, 6));
-    }
-
-    /**
      * Notifies the user that LimeWire is disconnected
      */
     @SuppressWarnings("unused")
@@ -1318,15 +1271,6 @@ public final class GUIMediator {
     }
 
     /**
-     * Attempts to stop a song if playing on the frost player.
-     */
-    boolean attemptStopAudio() {
-        MediaPlayer mediaPlayer = MediaPlayer.instance();
-        mediaPlayer.stop();
-        return true;
-    }
-
-    /**
      * Notification that the button state has changed.
      */
     public void buttonViewChanged() {
@@ -1393,16 +1337,13 @@ public final class GUIMediator {
 
     public static void openURL(final String link, final long delay) {
         if (delay > 0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(delay);
-                    } catch (Throwable e) {
-                        // ignore
-                    }
-                    openURL(link);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(delay);
+                } catch (Throwable e) {
+                    // ignore
                 }
+                openURL(link);
             }).start();
         } else {
             openURL(link);
