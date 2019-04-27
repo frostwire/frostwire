@@ -16,6 +16,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 import javax.swing.table.AbstractTableModel;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -212,13 +213,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public T createDataLine() {
         try {
-            T dl = _dataLineClass.newInstance();
-            return dl;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (ClassCastException e) {
+            return (T) _dataLineClass.getDeclaredConstructors()[0].newInstance();
+        } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
