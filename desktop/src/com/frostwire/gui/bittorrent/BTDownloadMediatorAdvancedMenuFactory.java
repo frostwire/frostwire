@@ -264,7 +264,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         itemsDownSpeed[1] = new SkinMenuItem();
         itemsDownSpeed[1].setText(I18n.tr("No limit"));
-        itemsDownSpeed[1].putClientProperty("maxdl", new Integer(0));
+        itemsDownSpeed[1].putClientProperty("maxdl", 0);
         itemsDownSpeed[1].addActionListener(itemsDownSpeedListener);
         menuDownSpeed.add(itemsDownSpeed[1]);
 
@@ -285,23 +285,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
                 // dms.length has to be > 0 when hasSelection
                 int limit = (int) (maxDownload / (10 * num_entries) * (12 - i));
-                StringBuffer speed = new StringBuffer();
-                speed.append(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
-                //                if (num_entries > 1) {
-                //                    speed.append(" ");
-                //                    speed.append(MessageText
-                //                            .getString("MyTorrentsView.menu.setSpeed.in"));
-                //                    speed.append(" ");
-                //                    speed.append(num_entries);
-                //                    speed.append(" ");
-                //                    speed.append(MessageText
-                //                            .getString("MyTorrentsView.menu.setSpeed.slots"));
-                //                    speed.append(" ");
-                //                    speed
-                //                            .append(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit));
-                //                }
-                itemsDownSpeed[i].setText(speed.toString());
-                itemsDownSpeed[i].putClientProperty("maxdl", new Integer(limit));
+                itemsDownSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
+                itemsDownSpeed[i].putClientProperty("maxdl", limit);
                 menuDownSpeed.add(itemsDownSpeed[i]);
             }
         }
@@ -372,7 +357,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         itemsUpSpeed[1] = new SkinMenuItem();
         itemsUpSpeed[1].setText(I18n.tr("No limit"));
-        itemsUpSpeed[1].putClientProperty("maxul", new Integer(0));
+        itemsUpSpeed[1].putClientProperty("maxul", 0);
         itemsUpSpeed[1].addActionListener(itemsUpSpeedListener);
         menuUpSpeed.add(itemsUpSpeed[1]);
 
@@ -392,24 +377,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
                 itemsUpSpeed[i].addActionListener(itemsUpSpeedListener);
 
                 int limit = (int) (maxUpload / (10 * num_entries) * (12 - i));
-                StringBuffer speed = new StringBuffer();
-                speed.append(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
-                //                if (num_entries > 1) {
-                //                    speed.append(" ");
-                //                    speed.append(MessageText
-                //                            .getString("MyTorrentsView.menu.setSpeed.in"));
-                //                    speed.append(" ");
-                //                    speed.append(num_entries);
-                //                    speed.append(" ");
-                //                    speed.append(MessageText
-                //                            .getString("MyTorrentsView.menu.setSpeed.slots"));
-                //                    speed.append(" ");
-                //                    speed
-                //                            .append(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit));
-                //                }
-
-                itemsUpSpeed[i].setText(speed.toString());
-                itemsUpSpeed[i].putClientProperty("maxul", new Integer(limit));
+                itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
+                itemsUpSpeed[i].putClientProperty("maxul", limit);
                 menuUpSpeed.add(itemsUpSpeed[i]);
             }
         }
@@ -440,9 +409,9 @@ final class BTDownloadMediatorAdvancedMenuFactory {
     }
 
     public interface SpeedAdapter {
-        public void setUpSpeed(int val);
+        void setUpSpeed(int val);
 
-        public void setDownSpeed(int val);
+        void setDownSpeed(int val);
     }
 
     public static class EditTrackersAction extends AbstractAction {
@@ -473,12 +442,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    dm.requestTrackerAnnounce();
-                }
-            }).start();
+            new Thread(dm::requestTrackerAnnounce).start();
         }
     }
 
@@ -494,12 +458,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    dm.requestTrackerScrape();
-                }
-            }).start();
+            new Thread(dm::requestTrackerScrape).start();
         }
     }
 
@@ -543,21 +502,11 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             panel.add(scrollPane, "cell 0 1, growx, growy");
 
             JButton buttonAccept = new JButton(I18n.tr("Accept"));
-            buttonAccept.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    changeTrackers(textTrackers.getText());
-                }
-            });
+            buttonAccept.addActionListener(e -> changeTrackers(textTrackers.getText()));
             panel.add(buttonAccept, "cell 0 2, split 2, right");
 
             JButton buttonCancel = new JButton(I18n.tr("Cancel"));
-            buttonCancel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    EditTrackerDialog.this.dispose();
-                }
-            });
+            buttonCancel.addActionListener(e -> EditTrackerDialog.this.dispose());
             panel.add(buttonCancel);
 
             setContentPane(panel);

@@ -61,7 +61,7 @@ public class Constants {
 
     private static final boolean FORCE_NON_CVS = System.getProperty("az.force.noncvs", "0").equals("1");
 
-    static final boolean IS_CVS_VERSION = isCVSVersion(AZUREUS_VERSION) && !FORCE_NON_CVS;
+    static final boolean IS_CVS_VERSION = isCVSVersion() && !FORCE_NON_CVS;
 
     private static final String OSName = System.getProperty("os.name");
 
@@ -76,7 +76,7 @@ public class Constants {
         if (isWindows) {
             Float ver = null;
             try {
-                ver = new Float(System.getProperty("os.version"));
+                ver = Float.valueOf(System.getProperty("os.version"));
             } catch (Throwable ignored) {
             }
 
@@ -162,7 +162,7 @@ public class Constants {
 
                     java_version = "1.5";
                 }
-            } catch (Throwable e) {
+            } catch (Throwable ignored) {
             }
         }
 
@@ -171,9 +171,8 @@ public class Constants {
 
 
     private static boolean
-    isCVSVersion(
-            String version) {
-        return (version.indexOf("_") != -1);
+    isCVSVersion() {
+        return (Constants.AZUREUS_VERSION.indexOf("_") != -1);
     }
 
     /**

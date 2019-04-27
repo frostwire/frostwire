@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.bugs;
@@ -42,6 +44,8 @@ import java.util.*;
  * access to that data in url-encoded form.
  */
 public final class LocalClientInfo extends LocalAbstractInfo {
+
+    final SettingsFactory sf = LimeProps.instance().getFactory();
 
     /**
      * Creates information about this bug from the bug, thread, and detail.
@@ -84,51 +88,22 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         Properties props = new Properties();
         // Load the properties from SettingsFactory, excluding
         // FileSettings and FileArraySettings.
-        SettingsFactory sf = LimeProps.instance().getFactory();
+
         synchronized (sf) {
             for (Setting set : sf) {
                 if (!set.isPrivate() && !set.isDefault())
                     props.put(set.getKey(), set.getValueAsString());
             }
         }
-//		sf = MojitoProps.instance().getFactory();
-//		synchronized(sf) {
-//		    for(Setting set : sf) {
-//		        if(!set.isPrivate() && !set.isDefault())
-//		            props.put(set.getKey(), set.getValueAsString());
-//
-//		    }
-//		}
         // list the properties in the PrintWriter.
         props.list(pw);
         pw.flush();
         _props = sw.toString();
 
         //Store extra debugging information.
-        if (GUIMediator.isConstructed() && LimeWireCore.instance() != null && LimeWireCore.instance().getLifecycleManager().isLoaded()) {
-//            _upTime = CommonUtils.seconds2time(
-//                (int)(sessionInfo.getCurrentUptime()/1000));
-//            _upToUp = ""+sessionInfo.getNumUltrapeerToUltrapeerConnections();
-//            _upToLeaf = "" + sessionInfo.getNumUltrapeerToLeafConnections();
-//            _leafToUp = "" + sessionInfo.getNumLeafToUltrapeerConnections();
-//            _oldConnections = "" + sessionInfo.getNumOldConnections();
-//            _httpDownloaders = "" +sessionInfo.getNumIndividualDownloaders();
-//            _waitingDownloaders = "" + sessionInfo.getNumWaitingDownloads();
-//            _acceptedIncoming = "" +sessionInfo.acceptedIncomingConnection();
-//            _guessCapable = "" + sessionInfo.isGUESSCapable();
-//            _solicitedCapable= ""+sessionInfo.canReceiveSolicited();
-//            _externalPort = ""+sessionInfo.getPort();
-//            _responseSize = "" + sessionInfo.getContentResponsesSize();
-//            _creationCacheSize = "" + sessionInfo.getCreationCacheSize();
-//            _vfByteSize = "" + sessionInfo.getDiskControllerByteCacheSize();
-//            _vfVerifyingSize = "" + sessionInfo.getDiskControllerVerifyingCacheSize();
-//            _bbSize = "" + sessionInfo.getByteBufferCacheSize();
-//            _vfQueueSize = "" + sessionInfo.getDiskControllerQueueSize();
-//            _waitingSockets = "" + sessionInfo.getNumberOfWaitingSockets();
-//            _pendingTimeouts = "" + sessionInfo.getNumberOfPendingTimeouts();
-
+        if (GUIMediator.isConstructed() && LimeWireCore.instance() != null) {
+            LimeWireCore.instance().getLifecycleManager().isLoaded();
         }
-
 
         //Store the detail, thread counts, and other information.
         _detail = detail;
@@ -141,10 +116,10 @@ public final class LocalClientInfo extends LocalAbstractInfo {
             String name = allThreads[i].getName();
             Integer val = threads.get(name);
             if (val == null)
-                threads.put(name, new Integer(1));
+                threads.put(name, 1);
             else {
-                int num = val.intValue() + 1;
-                threads.put(name, new Integer(num));
+                int num = val + 1;
+                threads.put(name, num);
             }
         }
         sw = new StringWriter();
@@ -210,7 +185,7 @@ public final class LocalClientInfo extends LocalAbstractInfo {
      * Returns the System property with the given name, or
      * "?" if it is unknown.
      */
-    private final String prop(String name) {
+    private String prop(String name) {
         String value = System.getProperty(name);
         if (value == null) return "?";
         else return value;
@@ -222,8 +197,8 @@ public final class LocalClientInfo extends LocalAbstractInfo {
      * @return an array of the name/value pairs of this info.
      */
     //public final NameValuePair[] getPostRequestParams() {
-    public final List<NameValuePair> getPostRequestParams() {
-        List<NameValuePair> params = new LinkedList<NameValuePair>();
+    private List<NameValuePair> getPostRequestParams() {
+        List<NameValuePair> params = new LinkedList<>();
         append(params, LIMEWIRE_VERSION, _limewireVersion);
         append(params, JAVA_VERSION, _javaVersion);
         append(params, OS, _os);

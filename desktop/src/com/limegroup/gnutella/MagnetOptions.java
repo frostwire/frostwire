@@ -112,12 +112,8 @@ public class MagnetOptions implements Serializable {
                 index = 0;
             }
             // Add to any existing options
-            iIndex = new Integer(index);
-            curOptions = options.get(iIndex);
-            if (curOptions == null) {
-                curOptions = new HashMap<Option, List<String>>();
-                options.put(iIndex, curOptions);
-            }
+            iIndex = index;
+            curOptions = options.computeIfAbsent(iIndex, k -> new HashMap<>());
 
             Option option = Option.valueFor(keystr);
             if (option != null)
@@ -133,11 +129,7 @@ public class MagnetOptions implements Serializable {
 
 
     private static void addAppend(Map<Option, List<String>> map, Option key, String value) {
-        List<String> l = map.get(key);
-        if (l == null) {
-            l = new ArrayList<String>(1);
-            map.put(key, l);
-        }
+        List<String> l = map.computeIfAbsent(key, k -> new ArrayList<>(1));
         l.add(value);
     }
 
@@ -156,7 +148,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public String toExternalForm() {
+    private String toExternalForm() {
         StringBuilder ret = new StringBuilder(MAGNET);
 
         for (String xt : getExactTopics())
@@ -218,7 +210,7 @@ public class MagnetOptions implements Serializable {
     }
 
     private List<String> getPotentialURLs() {
-        List<String> urls = new ArrayList<String>();
+        List<String> urls = new ArrayList<>();
         urls.addAll(getPotentialURLs(getExactTopics()));
         urls.addAll(getPotentialURLs(getXS()));
         urls.addAll(getPotentialURLs(getAS()));
@@ -226,7 +218,7 @@ public class MagnetOptions implements Serializable {
     }
 
     private List<String> getPotentialURLs(List<String> strings) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         for (String str : strings) {
             if (str.toLowerCase(Locale.US).startsWith(HTTP))
                 ret.add(str);
@@ -239,7 +231,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public String[] getDefaultURLs() {
+    private String[] getDefaultURLs() {
         if (defaultURLs == null) {
             List<String> urls = getPotentialURLs();
             for (Iterator<String> it = urls.iterator(); it.hasNext(); ) {
@@ -250,7 +242,7 @@ public class MagnetOptions implements Serializable {
                     it.remove(); // if not, remove it from the list.
                 }
             }
-            defaultURLs = urls.toArray(new String[urls.size()]);
+            defaultURLs = urls.toArray(new String[0]);
         }
         return defaultURLs;
     }
@@ -286,7 +278,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public List<String> getExactTopics() {
+    private List<String> getExactTopics() {
         return getList(Option.XT);
     }
 
@@ -295,7 +287,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public List<String> getXS() {
+    private List<String> getXS() {
         return getList(Option.XS);
     }
 
@@ -308,7 +300,7 @@ public class MagnetOptions implements Serializable {
         return getList(Option.AS);
     }
 
-    public List<String> getTR() {
+    private List<String> getTR() {
         return getList(Option.TR);
     }
 

@@ -98,7 +98,7 @@ public class Average {
   private synchronized Object[]
   getCloneDetails()
   {
-	  return( new Object[]{ values, new Long( lastUpdate )} );
+	  return( new Object[]{ values, lastUpdate} );
   }
   
   /**
@@ -136,7 +136,7 @@ public class Average {
    * the time it is added is the time this method is called.
    * @param value the value to be added to the Average
    */
-  public synchronized void addValue(long value) {
+  synchronized void addValue(long value) {
     if(values == null && value != 0)
     	values = new long[nbElements];
     if(values != null)
@@ -155,11 +155,11 @@ public class Average {
    * This method can be called to get the current average value.
    * @return the current Average computed.
    */
-  public long getAverage() {
+  long getAverage() {
 	  return( getSum() / period );
   }
   
-  public double getDoubleAverage() {
+  double getDoubleAverage() {
 	  return( (double)getSum() / period );
   }
   
@@ -184,13 +184,11 @@ public class Average {
 		 
 		  return( getPointValue());
 	  }
-	  
-	  long res = getSum(slots) / ( period * slots / ( nbElements - 2 ));
-	  
-	  return( res );
+
+      return(getSum(slots) / ( period * slots / ( nbElements - 2 )));
   }
   
-  public synchronized long
+  private synchronized long
   getPointValue()
   {
 	  long timeFactor = getEffectiveTime() / refreshRate;
@@ -223,7 +221,7 @@ public class Average {
     return(sum);
   }
   
-  protected synchronized final long getSum(int slots) {
+  private synchronized final long getSum(int slots) {
 	    //We get the current timeFactor
 	    long timeFactor = getEffectiveTime() / refreshRate;
 	    //We first update the buffer
@@ -257,7 +255,7 @@ public class Average {
 	    return(sum);
 	  }
   
-  protected long
+  private long
   getEffectiveTime()
   {
 	  return( SystemTime.getSteppedMonotonousTime());

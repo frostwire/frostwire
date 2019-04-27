@@ -82,7 +82,7 @@ class SlidePanel extends JPanel {
         overlayControls.setVisible(false);
 
         if (controller.getSlide().method != Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL) {
-            layeredPane.add(overlayControls, new Integer(1));
+            layeredPane.add(overlayControls, Integer.valueOf(1));
         } else {
             imageLabel.addMouseListener(new MouseAdapter() {
                 @Override
@@ -96,7 +96,7 @@ class SlidePanel extends JPanel {
             });
         }
 
-        layeredPane.add(imageLabel, new Integer(0));
+        layeredPane.add(imageLabel, Integer.valueOf(0));
 
         add(layeredPane, BorderLayout.CENTER);
 

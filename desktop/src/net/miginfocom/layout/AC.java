@@ -427,7 +427,7 @@ public final class AC implements Externalizable
 	 */
 	public final AC grow(float w, int... indexes)
 	{
-		Float gw = new Float(w);
+		Float gw = w;
 		for (int i = indexes.length - 1; i >= 0; i--) {
 			int ix = indexes[i];
 			makeSize(ix);
@@ -499,7 +499,7 @@ public final class AC implements Externalizable
 	 */
 	public final AC shrink(float w, int... indexes)
 	{
-		Float sw = new Float(w);
+		Float sw = w;
 		for (int i = indexes.length - 1; i >= 0; i--) {
 			int ix = indexes[i];
 			makeSize(ix);

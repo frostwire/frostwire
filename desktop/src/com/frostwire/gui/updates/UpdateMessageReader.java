@@ -22,8 +22,9 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.OSUtils;
 import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -297,7 +298,7 @@ final class UpdateMessageReader implements ContentHandler {
 
             src = new InputSource(connection.getInputStream());
 
-            XMLReader rdr = XMLReaderFactory.createXMLReader("com.sun.org.apache.xerces.internal.parsers.SAXParser");
+            XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
             rdr.setContentHandler(this);
             rdr.parse(src);
         } catch (java.net.SocketTimeoutException e3) {
@@ -306,6 +307,9 @@ final class UpdateMessageReader implements ContentHandler {
             System.err.println("UpdateMessageReader.readUpdateFile() IO exception " + e.toString());
         } catch (SAXException e2) {
             System.err.println("UpdateMessageReader.readUpdateFile() SAX exception " + e2.toString());
+        } catch (ParserConfigurationException e4) {
+            System.err.println("UpdateMessageReader.readUpdateFile() ParserConfigurationException " + e4.toString());
+            e4.printStackTrace();
         } finally {
             if (connection != null) {
                 try {

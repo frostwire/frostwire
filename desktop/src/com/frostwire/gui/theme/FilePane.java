@@ -1846,7 +1846,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
                     // click in the corresponding list cell.
                     Rectangle r = list.getCellBounds(index, index);
                     evt = new MouseEvent(list, evt.getID(),
-                                         evt.getWhen(), evt.getModifiers(),
+                                         evt.getWhen(), evt.getModifiersEx(),
                                          r.x + 1, r.y + r.height/2,
                                          evt.getXOnScreen(),
                                          evt.getYOnScreen(),

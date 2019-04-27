@@ -173,7 +173,7 @@ public class JXSearchField extends JXTextField {
 		// then the ClearAction will never be called.
 		addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if (CANCEL_KEY.equals(KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiers()))) {
+				if (CANCEL_KEY.equals(KeyStroke.getKeyStroke(e.getKeyCode(), e.getModifiersEx()))) {
 					getCancelAction().actionPerformed(
 							new ActionEvent(JXSearchField.this, e.getID(), KeyEvent.getKeyText(e.getKeyCode())));
 				}

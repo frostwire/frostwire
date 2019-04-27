@@ -255,7 +255,7 @@ public final class GUIUtils {
     private static KeyStroke getHideKeystroke() {
         if(OSUtils.isMacOSX())
             return KeyStroke.getKeyStroke(KeyEvent.VK_W,
-                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+                            Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
         else
             return KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     }

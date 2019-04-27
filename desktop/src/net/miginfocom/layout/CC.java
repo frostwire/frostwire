@@ -277,7 +277,7 @@ public final class CC implements Externalizable
 	 */
 	public final CC growX(float w)
 	{
-		hor.setGrow(new Float(w));
+		hor.setGrow(w);
 		return this;
 	}
 
@@ -341,7 +341,7 @@ public final class CC implements Externalizable
 	 */
 	public final CC shrinkX(float w)
 	{
-		hor.setShrink(new Float(w));
+		hor.setShrink(w);
 		return this;
 	}
 
@@ -553,7 +553,7 @@ public final class CC implements Externalizable
 	 */
 	public final CC shrinkY(float w)
 	{
-		ver.setShrink(new Float(w));
+		ver.setShrink(w);
 		return this;
 	}
 

@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui.tables;
 
 import java.util.HashMap;
@@ -9,7 +26,6 @@ import java.util.HashMap;
  * initializing object should use this as the underlying TableModel.
  */
 
-//2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataLineModel<T, E> {
     
     /**
@@ -36,7 +52,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      * that override add(DataLine, row).
      */
     protected int forceAdd(T dl, int row) {
-        _indexes.put(dl.getInitializeObject(), new Integer(row));
+        _indexes.put(dl.getInitializeObject(), row);
         int addedAt = super.add(dl, row);
         remapIndexes(addedAt + 1);
         return addedAt;
@@ -54,7 +70,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
         }
         //otherwise, add it to the indexes list
         else {
-            _indexes.put(init, new Integer(row));
+            _indexes.put(init, row);
             int addedAt = super.add(dl, row);
             remapIndexes(addedAt + 1);
             return addedAt;
@@ -87,7 +103,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
         if (idx == null) 
             return -1;
         else
-            return idx.intValue();
+            return idx;
     }
     
     /** 
@@ -125,10 +141,10 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      * the list.  This is needed for when rows are added to the middle of
      * the list to maintain the correct rows per objects.
      */
-    public void remapIndexes(int start) {
+    private void remapIndexes(int start) {
         int end = getRowCount();
         for (int i = start; i < end; i++) {
-            _indexes.put(get(i).getInitializeObject(), new Integer(i));
+            _indexes.put(get(i).getInitializeObject(), i);
         }
     }
     

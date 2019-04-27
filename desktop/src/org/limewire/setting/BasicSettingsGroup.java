@@ -21,7 +21,7 @@ public class BasicSettingsGroup extends AbstractSettingsGroup {
 	 * Constant for the <tt>SettingsFactory</tt> that subclasses can use
 	 * to create new settings which will be stored in the properties file.
 	 */
-	private final SettingsFactory FACTORY;
+	public final SettingsFactory FACTORY;
     
     /**
      * Basic constructor that creates the FACTORY and PROPS_FILE.
