@@ -57,14 +57,14 @@ public class Slide {
     /**
      * 
      * @param imgSrc - slide overlay image url
-     * @param clickURL - url where to take user on click (optional)
+     * @param clickUrl - url where to take user on click (optional)
      * @param durationInMilliseconds - for how long to show the overlay before autoswitching
      * @param torrentURL - .torrent file (optional)
-     * @param httpDownloadURL - an http url where to download the file from (check downloadMethod on how to procede)
+     * @param httpDownloadUrl - an http url where to download the file from (check downloadMethod on how to procede)
      * @param lang - language code in case you want to filter slides by language
      * @param OS - comma separated os names (windows,mac,linux,android)
      * @param theTitle - the title of this download (useful for download manager and human presentation)
-     * @param author - content creator(s) name(s)
+     * @param theAuthor - content creator(s) name(s)
      * @param theSize - size in bytes of this download
      * @param downloadMethod - what to do with the slide.
      * @param md5hash - optional, string with md5 hash of the finished http download
@@ -75,13 +75,12 @@ public class Slide {
      * @param videoPreviewURL - HTTP URL of video file (youtube maybe) so user can preview promo.
      * @param facebookURL - optional, related Facebook page url
      * @param twitterURL - optional, related Twitter page url
-     * @param gPlusURL - optional, related Google Plus page url
      * @param youtubeURL - optional, youtube channel
      * @param instagramURL - optional, instagram feed
-     * @param flags - these determine how the slide will behave
+     * @param slideFlags - these determine how the slide will behave
      */
     public Slide(String imgSrc, String clickUrl, long durationInMilliseconds, String torrentURL, String httpDownloadUrl, String lang, String OS, String theTitle, String theAuthor, long theSize, int downloadMethod, String md5hash, String saveAs, String executionParameters,
-            String includeTheseVersions, String audioPreviewURL, String videoPreviewURL, String facebookURL, String twitterURL, String gPlusURL, String youtubeURL, String instagramURL, int slideFlags) {
+            String includeTheseVersions, String audioPreviewURL, String videoPreviewURL, String facebookURL, String twitterURL, String youtubeURL, String instagramURL, int slideFlags) {
         imageSrc = imgSrc;
         clickURL = clickUrl;
         duration = durationInMilliseconds;
@@ -101,7 +100,6 @@ public class Slide {
         videoURL = videoPreviewURL;
         facebook = facebookURL;
         twitter = twitterURL;
-        gplus = gPlusURL;
         youtube = youtubeURL;
         instagram = instagramURL;
         flags = slideFlags;
@@ -194,9 +192,6 @@ public class Slide {
 
     /** Twitter page associated with slide */
     public String twitter;
-
-    /** Google Plus page associated with slide */
-    public String gplus;
 
     /** Youtube channel */
     public String youtube;

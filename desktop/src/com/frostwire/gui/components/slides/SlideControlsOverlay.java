@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,10 +153,6 @@ final class SlideControlsOverlay extends JPanel {
 
         if (slide.twitter != null) {
             container.add(new OverlayIconButton(new SocialAction("Twitter", slide.twitter)), "");
-        }
-
-        if (slide.gplus != null) {
-            container.add(new OverlayIconButton(new SocialAction("Google Plus", slide.gplus, "GPLUS")), "");
         }
 
         if (slide.youtube != null) {

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,9 +154,9 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     private List<Slide> getDefaultSlides() {
-        Slide s1 = new Slide("http://static.frostwire.com/images/overlays/default_now_on_android.png", "http://www.frostwire.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null, null, null,
+        Slide s1 = new Slide("http://static.frostwire.com/images/overlays/default_now_on_android.png", "http://www.frostwire.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null, null,
                 null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
-        Slide s2 = new Slide("http://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "http://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null, null, null,
+        Slide s2 = new Slide("http://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "http://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null, null,
                 null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
 
         return Arrays.asList(s1, s2);
@@ -413,16 +413,13 @@ public final class SearchResultDisplayer implements RefreshListener {
         }
     }
 
-    boolean closeTabAt(int i) {
-        boolean closed = false;
+    void closeTabAt(int i) {
         try {
             SearchResultMediator searchResultMediator = entries.get(i);
             if (searchResultMediator != null) {
                 killSearchAtIndex(i);
-                closed = true;
             }
         } catch (Throwable ignored) { }
-        return closed;
     }
 
     void closeAllTabs() {
@@ -611,7 +608,7 @@ public final class SearchResultDisplayer implements RefreshListener {
             int idx = getIndexForPoint(x, y);
             if (idx != -1) {
                 Icon icon = tabbedPane.getIconAt(idx);
-                if (icon != null && icon instanceof CancelSearchIconProxy)
+                if (icon instanceof CancelSearchIconProxy)
                     if (((CancelSearchIconProxy) icon).shouldKill(x, y))
                         return idx;
             }

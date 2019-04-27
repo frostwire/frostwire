@@ -76,7 +76,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private IconButton twitterButton;
     private IconButton facebookButton;
     private IconButton instagramButton;
-    private IconButton googlePlusButton;
 
     private IconButton seedingStatusButton;
 
@@ -148,8 +147,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Twitter..."));
         createTwitterButton();
         createInstagramButton();
-        GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on G+..."));
-        createGooglePlusButton();
 
         // male Seeding status label
         GUIMediator.setSplashScreenString(I18n.tr("Painting seeding sign..."));
@@ -200,12 +197,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private void createFacebookButton() {
         facebookButton = new IconButton("FACEBOOK");
         initSocialButton(facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
-    }
-
-    private void createGooglePlusButton() {
-        googlePlusButton = new IconButton("GOOGLEPLUS");
-        googlePlusButton.setPreferredSize(new Dimension(22, 16));
-        initSocialButton(googlePlusButton, I18n.tr("Circle FrostWire on G+"), GUIConstants.GPLUS_FROSTWIRE_URL);
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -309,7 +300,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
             BAR.add(facebookButton, gbc);
             BAR.add(twitterButton, gbc);
-            BAR.add(googlePlusButton, gbc);
             BAR.add(instagramButton, gbc);
 
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);

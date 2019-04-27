@@ -71,8 +71,6 @@ final class HelpMenu extends AbstractMenu {
 
         addMenuItem(new OpenLinkAction("http://www.facebook.com/pages/FrostWire/110265295669948",I18n.tr("Follow us on Facebook"),I18n.tr("Come and say hi to the community on Facebook")));
 
-        addMenuItem(new OpenLinkAction("https://plus.google.com/+frostwire/posts", I18n.tr("Follow us on G+"), I18n.tr("Follow us on G+")));
-
         addMenuItem(new OpenLinkAction("https://instagram.com/frostwire", I18n.tr("Follow us on Instagram"), I18n.tr("Follow us on Instagram")));
 
         addMenuItem(new OpenLinkAction("http://twitter.com/#!/frostwire", I18n.tr("Follow us on Twitter"), I18n.tr("Follow us on Twitter")));

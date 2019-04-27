@@ -46,7 +46,6 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-
         SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
 
         // can't use fromJson here due to the isStopped call
