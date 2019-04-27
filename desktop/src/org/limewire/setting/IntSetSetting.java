@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package org.limewire.setting;
 
 import java.util.*;
@@ -14,7 +32,7 @@ public class IntSetSetting extends AbstractSetting {
      * @param defaultValue the default value to use for the setting
      */
     IntSetSetting(Properties defaultProps, Properties props, String key, Integer[] defaultValue) {
-        super(defaultProps, props, key, decode(new HashSet<Integer>(Arrays.asList(defaultValue))));
+        super(defaultProps, props, key, decode(new HashSet<>(Arrays.asList(defaultValue))));
         setPrivate(true);
     }
 
@@ -85,20 +103,20 @@ public class IntSetSetting extends AbstractSetting {
     }
 
     /** Splits the string into a Set    */
-    private static final Set<Integer> encode(String src) {
+    private static Set<Integer> encode(String src) {
         if (src == null || src.length() == 0)
-            return new HashSet<Integer>();
+            return new HashSet<>();
 
         StringTokenizer tokenizer = new StringTokenizer(src, ";");
         int size = tokenizer.countTokens();
-        Set<Integer> set = new HashSet<Integer>();
+        Set<Integer> set = new HashSet<>();
         for (int i = 0; i < size; i++)
-            set.add(new Integer(tokenizer.nextToken()));
+            set.add(Integer.valueOf(tokenizer.nextToken()));
         return set;
     }
 
     /** Separates each field of the array by a semicolon     */
-    private static final String decode(Set<? extends Integer> src) {
+    private static String decode(Set<? extends Integer> src) {
         if (src == null || src.isEmpty())
             return "";
 

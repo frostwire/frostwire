@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.limewire.setting;
 
 import java.util.Properties;
@@ -18,7 +35,7 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
 	 * Creates a new <tt>FloatSetting</tt> instance with the specified
 	 * key and default value.
 	 *
-     * @param defaultProps
+     * @param defaultProps Default properties
 	 * @param key the constant key to use for the setting
 	 * @param defaultFloat the default value to use for the setting
 	 */
@@ -31,7 +48,7 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
     FloatSetting(Properties defaultProps, Properties props, String key, 
                  float defaultFloat, float min, float max) {
 		super(defaultProps, props, key, String.valueOf(defaultFloat), 
-              true, new Float(min), new Float(max) );
+              true, min, max);
 	}
         
 	/**
@@ -58,14 +75,14 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
      */
     protected void loadValue(String sValue) {
         try {
-            value = Float.valueOf(sValue.trim()).floatValue();
+            value = Float.valueOf(sValue.trim());
         } catch(NumberFormatException nfe) {
             revertToDefault();
         }
     }
 
     protected Comparable<Float> convertToComparable(String value) {
-        return new Float(value);
+        return Float.valueOf(value);
     }
 
 }

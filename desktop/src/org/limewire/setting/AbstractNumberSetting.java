@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package org.limewire.setting;
 
 import java.util.Properties;
@@ -25,14 +43,14 @@ public abstract class AbstractNumberSetting<T extends Number & Comparable<T>> ex
      * Adds a safeguard against remote making a setting take a value below the
      * reasonable min
      */
-    protected final T MIN_VALUE;
+    private final T MIN_VALUE;
     
     /** Whether or not this is a remote setting. */
     private final boolean remote;
     
-    protected AbstractNumberSetting(Properties defaultProps, Properties props,
-                                    String key, String defaultValue, 
-                                    boolean remote, T min, T max) {
+    AbstractNumberSetting(Properties defaultProps, Properties props,
+                          String key, String defaultValue,
+                          boolean remote, T min, T max) {
         super(defaultProps, props, key, defaultValue);
         this.remote = remote;
         if(max != null && min != null) {//do we need to check max, min?
@@ -62,7 +80,7 @@ public abstract class AbstractNumberSetting<T extends Number & Comparable<T>> ex
     /**
      * Normalizes a value to an acceptable value for this setting.
      */
-    protected String normalizeValue(String value) {
+    private String normalizeValue(String value) {
         Comparable<T> comparableValue = null;
         try {
             comparableValue = convertToComparable(value);
