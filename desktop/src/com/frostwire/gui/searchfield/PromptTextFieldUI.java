@@ -62,12 +62,6 @@ public class PromptTextFieldUI extends PromptTextUI {
 		
 		//here we need to copy the border again for Mac OS X, because the above calls may have replaced it.
 		lbl.setBorder(txtField.getBorder());
-
-		// buddy support: not needed, because BuddyLayoutAndBorder queries original text field
-//		BuddySupport.setOuterMargin(lbl, BuddySupport.getOuterMargin(txtField));
-//		BuddySupport.setLeft(lbl, BuddySupport.getLeft(txtField));
-//		BuddySupport.setRight(lbl, BuddySupport.getRight(txtField));
-
 		return lbl;
 	}
 

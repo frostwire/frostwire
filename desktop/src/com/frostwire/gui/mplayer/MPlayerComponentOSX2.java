@@ -96,12 +96,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
-    @Override
     public boolean toggleFullScreen() {
         sendMsg(JMPlayer_toggleFS);
         return true;

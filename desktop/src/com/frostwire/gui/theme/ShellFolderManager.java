@@ -197,7 +197,7 @@ class ShellFolderManager {
                 return file;
 
             case 1: // size
-                return file.isDirectory() ? null : new Long(file.length());
+                return file.isDirectory() ? null : file.length();
 
             case 2: // date
                 if (isFileSystemRoot(file)) {

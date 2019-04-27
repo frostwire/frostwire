@@ -40,6 +40,8 @@ public abstract class PromptTextUI extends TextUI  {
 	 */
 	protected final TextUI delegate;
 
+	private final Bias[] discardBias = new Bias[1];
+
 	/**
 	 * This component ist painted when rendering the prompt text.
 	 */
@@ -212,9 +214,13 @@ public abstract class PromptTextUI extends TextUI  {
 	 */
 	public Rectangle modelToView(JTextComponent t, int pos, Bias bias) throws BadLocationException {
 		if (shouldPaintPrompt(t)) {
-			return getPromptComponent(t).getUI().modelToView(t, pos, bias);
+			return getPromptComponent(t).getUI().modelToView2D(t, pos, bias).getBounds();
 		} else {
-			return delegate.modelToView(t, pos, bias);
+			try {
+				return delegate.modelToView2D(t, pos, bias).getBounds();
+			} catch (Throwable npe) {
+				return delegate.modelToView(t, pos, bias);
+			}
 		}
 	}
 
@@ -274,8 +280,13 @@ public abstract class PromptTextUI extends TextUI  {
 		return delegate.getRootView(t);
 	}
 
+
 	public String getToolTipText(JTextComponent t, Point pt) {
-		return delegate.getToolTipText(t, pt);
+		return delegate.getToolTipText2D(t, pt);
+	}
+
+	public String getToolTipText2D(JTextComponent t, Point pt) {
+		return delegate.getToolTipText2D(t, pt);
 	}
 
 	public int hashCode() {
@@ -287,11 +298,11 @@ public abstract class PromptTextUI extends TextUI  {
 	}
 
 	public int viewToModel(JTextComponent t, Point pt, Bias[] biasReturn) {
-		return delegate.viewToModel(t, pt, biasReturn);
+		return delegate.viewToModel2D(t, pt, biasReturn);
 	}
 
 	public int viewToModel(JTextComponent t, Point pt) {
-		return delegate.viewToModel(t, pt);
+		return delegate.viewToModel2D(t, pt, discardBias);
 	}
 
 	/**

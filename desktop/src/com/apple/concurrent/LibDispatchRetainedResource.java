@@ -36,8 +36,4 @@ class LibDispatchRetainedResource {
                 if (ptr != 0) LibDispatchNative.nativeReleaseQueue(ptr);
                 ptr = 0;
         }
-
-        protected void finalize() throws Throwable {
-                dispose();
-        }
 }

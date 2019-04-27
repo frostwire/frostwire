@@ -997,7 +997,7 @@ public final class ConstraintParser
 
 	private static Float parseFloat(String s, Float nullVal)
 	{
-		return s.length() > 0 ? new Float(Float.parseFloat(s)) : nullVal;
+		return s.length() > 0 ? Float.parseFloat(s) : nullVal;
 	}
 
 	/** Parses a single "min:pref:max" value. May look something like <code>"10px:20lp:30%"</code> or <code>"pref!"</code>.

@@ -75,19 +75,6 @@ public class Library extends LibraryDatabaseEntity {
         return new Playlist(db, LibraryDatabase.OBJECT_NOT_SAVED_ID, name, description);
     }
 
-//    public void dump() {
-//        db.dump();
-//    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            close();
-        } finally {
-            super.finalize();
-        }
-    }
-
     public Playlist getStarredPlaylist() {
         return PlaylistDB.getStarredPlaylist(db);
     }

@@ -29,6 +29,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Vector;
 
@@ -205,13 +206,15 @@ abstract class ShellFolder extends File {
     	Class<?> managerClass = ShellFolderManager.class;
         try {
             shellFolderManager =
-                (ShellFolderManager)managerClass.newInstance();
+                (ShellFolderManager)managerClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException e) {
             throw new Error("Could not instantiate Shell Folder Manager: "
             + managerClass.getName());
         } catch (IllegalAccessException e) {
             throw new Error ("Could not access Shell Folder Manager: "
             + managerClass.getName());
+        } catch (NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 

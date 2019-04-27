@@ -1324,14 +1324,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * Invokes <tt>shutdown</tt> when this executor is no longer
-     * referenced and there are no threads.
-     */
-    protected void finalize() {
-        shutdown();
-    }
-
-    /**
      * Sets the thread factory used to create new threads.
      *
      * @param threadFactory the new thread factory
