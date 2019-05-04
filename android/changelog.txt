@@ -1,7 +1,12 @@
-FrostWire 2.1.3 build 587 - APR/22/2019
+FrostWire 2.1.3 build 590 - MAY/04/2019
  - New jlibtorrent 1.2.0.20 with latest libtorrent release
- - play-services-ads 17.2.0, applovin 9.4.2, okhttp 3.12.2
- - Plus: Soundcloud search/downloads fixed 
+ - play-services-ads 17.2.0, applovin 9.6.0, okhttp 3.12.2
+ - Plus: Soundcloud search/downloads fixed
+ - TorLock search fixes
+ - Archive.org search fixes
+ - gradle 4.10.1 -> 5.1.1 update (dev)
+ - com.android.tools.build:gradle 3.2.1 -> 3.4.0 (dev)
+ - More efficient build with D8
 
 FrostWire 2.1.2 build 581 - FEB/07/2019
  - Library okhttp 3.12.1,  applovin 9.2.1, play-services-ads 17.1.3
