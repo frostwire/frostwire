@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+
 import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
 
@@ -26,11 +27,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        //classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        //classpath 'com.android.tools.build:gradle:3.3.2'
-        // (3.2.1 last working) don't upgrade to 3.3.0 yet, R8 issues ensue, Keystore tampered error comes out
-        // even after deleting the ~/.gradle folder
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -130,10 +127,44 @@ android {
 
     signingConfigs {
         release {
+            def myKeyAlias = ""
+            def myKeyPassword = ""
+
+            System.setProperty('java.awt.headless', 'false')
+            if (System.console() == null) { // this is always the case on macOS at least
+                new SwingBuilder().edt {
+                    dialog(modal: true,
+                            title: 'Enter keystore data',
+                            alwaysOnTop: true,
+                            resizable: true,
+                            locationRelativeTo: null,
+                            show: true,
+                            size: [215, 147]
+                    ) {
+                        vbox {
+                            label(text: "Key Alias:")
+                            inputAlias = textField()
+                            label(text: "Key Password:")
+                            inputPassword = passwordField()
+                            button(defaultButton: true, text: 'OK', actionPerformed: {
+                                myKeyAlias = inputAlias.text
+                                myKeyPassword = new String(inputPassword.password)
+                                dispose()
+                            })
+                        }
+                    }
+                }
+            } else {
+                myKeyAlias = System.console().readPassword("\nKey Alias: ")
+                myKeyAlias = new String(myKeyAlias)
+                myKeyPassword = System.console().readPassword("\nKey Password: ")
+                myKeyPassword = new String(myKeyPassword)
+            }
+
             storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
-            storePassword ""
-            keyAlias ""
-            keyPassword ""
+            storePassword myKeyPassword
+            keyAlias myKeyAlias
+            keyPassword myKeyPassword
         }
     }
 
@@ -145,7 +176,6 @@ android {
                     'proguard-rules.pro'
             signingConfig signingConfigs.release
             multiDexKeepFile file('multidex-config.txt')
-            //multiDexKeepProguard file('proguard-rules.pro')
         }
         debug {
             minifyEnabled true
@@ -153,10 +183,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             multiDexKeepFile file('multidex-config.txt')
-            //multiDexKeepProguard file('proguard-rules.pro')
         }
     }
-
 
     flavorDimensions "classicApp"
 
@@ -249,46 +277,4 @@ task deployBasic(type: DeployRelease) {
 
 task deployPlus(type: DeployRelease) {
     flavor = 'plus'
-}
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':assembleRelease')) {
-
-        def myKeyAlias = ""
-        def myKeyPassword = ""
-        System.setProperty('java.awt.headless', 'false')
-        if (System.console() == null) {
-            new SwingBuilder().edt {
-                dialog(modal: true,
-                        title: 'Enter keystore data',
-                        alwaysOnTop: true,
-                        resizable: true,
-                        locationRelativeTo: null,
-                        show: true,
-                        size: [215, 147]
-                ) {
-                    vbox {
-                        label(text: "Key Alias:")
-                        inputAlias = textField()
-                        label(text: "Key Password:")
-                        inputPassword = passwordField()
-                        button(defaultButton: true, text: 'OK', actionPerformed: {
-                            myKeyAlias = inputAlias.text
-                            myKeyPassword = new String(inputPassword.password)
-                            dispose()
-                        })
-                    }
-                }
-            }
-        } else {
-            myKeyAlias = System.console().readPassword("\nKey Alias: ")
-            myKeyAlias = new String(myKeyAlias)
-            myKeyPassword = System.console().readPassword("\nKey Password: ")
-            myKeyPassword = new String(myKeyPassword)
-        }
-
-        android.signingConfigs.release.keyAlias = myKeyAlias
-        android.signingConfigs.release.storePassword = myKeyPassword
-        android.signingConfigs.release.keyPassword = myKeyPassword
-    }
 }
