@@ -1,6 +1,8 @@
 # okhttp3
 -dontwarn okhttp3.**
 -dontwarn okio.**
+#D8: Type `org.conscrypt.Conscrypt` was not found
+-dontwarn okhttp3.internal.platform.ConscryptPlatform
 -dontwarn javax.annotation.**
 -keep class okhttp3.Headers { *; }
 -keep class org.apache.http.client.utils.URLEncodedUtils { *; }
@@ -55,6 +57,10 @@
     <init>(...);
 }
 
+-keep public class * implements androidx.versionedparcelable.VersionedParcelable {
+  <init>();
+}
+
 # to keep all the names and avoid code mangling
 -keepnames class ** {*;}
 -keepclassmembers enum * {
@@ -62,4 +68,4 @@
     public static ** valueOf(java.lang.String);
 }
 -dontobfuscate
--optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!code/allocation/variable
+#-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*,!code/allocation/variable
