@@ -50,7 +50,7 @@ public final class TorLockSearchResult extends AbstractTorrentSearchResult {
         this.size = parseSize(matcher.group("filesize"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "http://" + domainName + "/tor/" + matcher.group("torrentid") + ".torrent";
+        this.torrentUrl = "https://" + domainName + "/tor/" + matcher.group("torrentid") + ".torrent";
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
