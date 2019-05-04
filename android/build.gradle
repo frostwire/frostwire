@@ -83,6 +83,8 @@ def changeApkOutput(variant) {
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
+boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease")
+
 android {
 
     compileSdkVersion 28
@@ -127,44 +129,18 @@ android {
 
     signingConfigs {
         release {
-            def myKeyAlias = ""
-            def myKeyPassword = ""
-
-            System.setProperty('java.awt.headless', 'false')
-            if (System.console() == null) { // this is always the case on macOS at least
-                new SwingBuilder().edt {
-                    dialog(modal: true,
-                            title: 'Enter keystore data',
-                            alwaysOnTop: true,
-                            resizable: true,
-                            locationRelativeTo: null,
-                            show: true,
-                            size: [215, 147]
-                    ) {
-                        vbox {
-                            label(text: "Key Alias:")
-                            inputAlias = textField()
-                            label(text: "Key Password:")
-                            inputPassword = passwordField()
-                            button(defaultButton: true, text: 'OK', actionPerformed: {
-                                myKeyAlias = inputAlias.text
-                                myKeyPassword = new String(inputPassword.password)
-                                dispose()
-                            })
-                        }
-                    }
-                }
+            if (isAssembleRelease) {
+                storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
+                def sigRequester = new SignatureRequester()
+                sigRequester.ask()
+                storePassword sigRequester.keyPassword()
+                keyAlias sigRequester.keyAlias()
+                keyPassword sigRequester.keyPassword()
             } else {
-                myKeyAlias = System.console().readPassword("\nKey Alias: ")
-                myKeyAlias = new String(myKeyAlias)
-                myKeyPassword = System.console().readPassword("\nKey Password: ")
-                myKeyPassword = new String(myKeyPassword)
+                storePassword ''
+                keyAlias ''
+                keyPassword ''
             }
-
-            storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
-            storePassword myKeyPassword
-            keyAlias myKeyAlias
-            keyPassword myKeyPassword
         }
     }
 
@@ -268,6 +244,52 @@ class DeployRelease extends DefaultTask {
         runCmd("adb uninstall com.frostwire.android")
         runCmd("./gradlew clean assembleRelease")
         runCmd("adb install $filename")
+    }
+}
+
+class SignatureRequester {
+    String myKeyAlias = ""
+    String myKeyPassword = ""
+
+    void ask() {
+        System.setProperty('java.awt.headless', 'false')
+        if (System.console() == null) { // this is always the case on macOS at least
+            new SwingBuilder().edt {
+                dialog(modal: true,
+                        title: 'Enter keystore data',
+                        alwaysOnTop: true,
+                        resizable: true,
+                        locationRelativeTo: null,
+                        show: true,
+                        size: [215, 147]
+                ) {
+                    vbox {
+                        label(text: "Key Alias:")
+                        inputAlias = textField()
+                        label(text: "Key Password:")
+                        inputPassword = passwordField()
+                        button(defaultButton: true, text: 'OK', actionPerformed: {
+                            this.myKeyAlias = inputAlias.text
+                            this.myKeyPassword = new String(inputPassword.password)
+                            dispose()
+                        })
+                    }
+                }
+            }
+        } else {
+            this.myKeyAlias = System.console().readPassword("\nKey Alias: ")
+            this.myKeyAlias = new String(myKeyAlias)
+            this.myKeyPassword = System.console().readPassword("\nKey Password: ")
+            this.myKeyPassword = new String(myKeyPassword)
+        }
+    }
+
+    String keyAlias() {
+        this.myKeyAlias
+    }
+
+    String keyPassword() {
+        this.myKeyPassword
     }
 }
 
