@@ -37,7 +37,7 @@ import java.util.List;
  */
 class BitTorrentSettingsWindow extends SetupWindow {
 
-    private static final String LEARN_MORE_URL = "https://github.com/frostwire/frostwire/wiki/What-is-Seeding";
+    private static final String LEARN_MORE_URL = "https://www.quora.com/What-is-seeding-on-FrostWire";
 
     private TorrentSaveFolderComponent _torrentSaveFolderComponent;
     private TorrentSeedingSettingComponent _torrentSeedingSettingComponent;
