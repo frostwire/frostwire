@@ -3,8 +3,9 @@ frostwire (6.8.0) stable; urgency=high
   * OpenJDK 12 runtime (windows)
   * G+ cleanup
   * Hundreds of cleanups and fixes to modernize the codebase for Java 12
+  * jlibtorrent 1.2.1.0
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 1 May 2019 01:21:55 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 7 May 2019 03:29:40 -0600
 
 
 frostwire (6.7.9) stable; urgency=high
