@@ -248,7 +248,7 @@ public final class UIUtils {
      * Opens the given file with the default Android activity for that File and
      * mime type.
      */
-    public static void openFile(Context context, String filePath, String mime, boolean useFileProvider) {
+    public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             if (filePath != null && !openAudioInternal(context, filePath)) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
@@ -261,9 +261,11 @@ public final class UIUtils {
                 }
                 context.startActivity(i);
             }
+            return true;
         } catch (Throwable e) {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
             LOG.error("Failed to open file: " + filePath, e);
+            return false;
         }
     }
 

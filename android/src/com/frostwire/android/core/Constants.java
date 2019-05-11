@@ -165,12 +165,13 @@ public final class Constants {
      */
     private static final String FROM_URL_PARAMETERS = "from=android&basic=" + (IS_GOOGLE_PLAY_DISTRIBUTION && !IS_BASIC_AND_DEBUG ? "1" : "0") + "&version=" + FROSTWIRE_VERSION_STRING + "&build=" + FROSTWIRE_BUILD;
     public static final String SERVER_UPDATE_URL = "https://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
-    public static final String FROSTWIRE_MORE_RESULTS = "http://www.frostwire.com/more.results";
+    public static final String FROSTWIRE_MORE_RESULTS = "https://www.frostwire.com/more.results";
     public static final String SERVER_PROMOTIONS_URL = "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
     public static final String SUPPORT_URL = "http://support.frostwire.com/hc/en-us/categories/200014385-FrostWire-for-Android";
-    public static final String TERMS_OF_USE_URL = "http://www.frostwire.com/terms";
-    public static final String ALL_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/";
-    public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "http://www.frostwire-preview.com/";
+    public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
+    public static final String ALL_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/";
+    public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
+    public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL = "https://www.frostwire.com/download/?os=android&from=failed_android_update";
 
     public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus") + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
 
@@ -183,10 +184,10 @@ public final class Constants {
     public static final String SOCIAL_URL_GITHUB_PAGE = "https://github.com/frostwire/frostwire";
     public static final String SOCIAL_URL_SLACK_PAGE = "http://www.frostwire.com/chat";
 
-    public static final String FROSTWIRE_GIVE_URL = "http://www.frostwire.com/give/?from=";
-    public static final String STICKERS_SHOP_URL = "http://www.frostwire.com/stickers";
-    public static final String CONTACT_US_URL = "http://www.frostwire.com/contact";
-    public static final String TRANSLATE_HELP_URL = "http://forum.frostwire.com/viewtopic.php?f=9&t=4922";
+    public static final String FROSTWIRE_GIVE_URL = "https://www.frostwire.com/give/?from=";
+    public static final String STICKERS_SHOP_URL = "https://www.frostwire.com/stickers";
+    public static final String CONTACT_US_URL = "https://www.frostwire.com/contact";
+    public static final String TRANSLATE_HELP_URL = "https://github.com/frostwire/frostwire";
     public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
 
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
