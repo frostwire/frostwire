@@ -4,8 +4,21 @@ frostwire (6.8.0) stable; urgency=high
   * G+ cleanup
   * Hundreds of cleanups and fixes to modernize the codebase for Java 12
   * jlibtorrent 1.2.1.0
+  * updated to boost 1.70.0
+  * libtorrent: make sure session cleanup releases all its references to torrents
+  * libtorrent: track the mapped port for each NAT mapping transport
+  * libtorrent: optimize resolve_duplicate_filenames_slow()
+  * libtorrent: use a more restrictive limit on number of pieces allowed in a torrent
+  * libtorrent: improve disk I/O logging
+  * libtorrent: always flush disk I/O job queue before shutdown
+  * libtorrent: fix typo in validation of reject messages. Make on_choke a bit more defensive
+  * libtorrent: tighten up validation of dont-have messages
+  * libtorrent: tighten up validation of reject messages, to ensure consistency of stats counters
+  * libtorrent: tighten up message size checks
+  * libtorrent: update symlinks to conform to BEP 47
+  * libtorrent: source code cleanup, performance and stability
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 7 May 2019 03:29:40 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 14 May 2019 22:10:36 -0600
 
 
 frostwire (6.7.9) stable; urgency=high
