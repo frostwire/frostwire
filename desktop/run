@@ -10,7 +10,7 @@ fi
 CLASSPATH=build/libs/frostwire.jar
 PS=":"
 
-OPTS="-Xms64m -Xmx512m -Djava.library.path=lib/native"
+OPTS="-Xms64m -Xmx512m -Xss256k -Djava.library.path=lib/native"
 
 OPTS="${OPTS} -Dcom.sun.management.jmxremote.port=9595"
 OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false"
