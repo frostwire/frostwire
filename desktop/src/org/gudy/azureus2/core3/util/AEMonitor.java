@@ -37,10 +37,6 @@ AEMonitor
 
     public void
     enter() {
-        if (DEBUG) {
-
-            debugEntry();
-        }
 
         Thread current_thread = Thread.currentThread();
 
@@ -78,8 +74,6 @@ AEMonitor
 
                                     waiting--;
 
-                                    Debug.out("AEMonitor: spurious wakeup limit exceeded");
-
                                     throw (new Throwable("die die die"));
 
                                 }
@@ -99,8 +93,6 @@ AEMonitor
                         waiting--;
 
                         owner = current_thread;
-
-                        Debug.out("**** monitor interrupted ****");
 
                         throw (new RuntimeException("AEMonitor:interrupted"));
 
@@ -123,52 +115,32 @@ AEMonitor
 
     public void
     exit() {
-        try {
-            synchronized (this) {
+        synchronized (this) {
 
-                if (nests > 0) {
+            if (nests > 0) {
 
-                    if (DEBUG) {
+                nests--;
 
-                        if (owner != Thread.currentThread()) {
+            } else {
 
-                            Debug.out("nested exit but current thread not owner");
-                        }
-                    }
+                owner = null;
 
-                    nests--;
+                total_release++;
+
+                if (waiting != 0) {
+
+                    waiting--;
+
+                    notify();
 
                 } else {
 
-                    owner = null;
+                    dont_wait++;
 
-                    total_release++;
-
-                    if (waiting != 0) {
-
-                        waiting--;
-
-                        notify();
-
-                    } else {
-
-                        dont_wait++;
-
-                        if (dont_wait > 1) {
-
-                            Debug.out("**** AEMonitor '" + name + "': multiple exit detected");
-                        }
-                    }
                 }
             }
-
-        } finally {
-
-            if (DEBUG) {
-
-                debugExit();
-            }
         }
+
     }
 
 }

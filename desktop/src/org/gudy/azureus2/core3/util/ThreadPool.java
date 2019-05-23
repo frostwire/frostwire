@@ -258,7 +258,7 @@ ThreadPool {
                 }
             } catch (Throwable ignored) {
             }
-            Debug.out("Thread pool '" + getName() + "' is full (busy=" + task_names + ")");
+            System.out.println("Thread pool '" + getName() + "' is full (busy=" + task_names + ")");
             warn_when_full = false;
         }
     }
@@ -273,7 +273,7 @@ ThreadPool {
             int max) {
         if (max > max_size) {
 
-            Debug.out("should support this sometime...");
+            System.out.println("should support this sometime...");
 
             return;
         }
@@ -349,14 +349,14 @@ ThreadPool {
 
                     if (LOG_WARNINGS) {
 
-                        DebugLight.out(x.getWorkerName() + ": running, elapsed = " + elapsed + ", state = " + x.state);
+                        System.out.println(x.getWorkerName() + ": running, elapsed = " + elapsed + ", state = " + x.state);
                     }
 
                     if (execution_limit > 0 && elapsed > execution_limit) {
 
                         if (LOG_WARNINGS) {
 
-                            DebugLight.out(x.getWorkerName() + ": interrupting");
+                            System.out.println(x.getWorkerName() + ": interrupting");
                         }
 
                         AERunnable r = x.runnable;
@@ -369,7 +369,7 @@ ThreadPool {
                                 }
                             } catch (Throwable e) {
 
-                                DebugLight.printStackTrace(e);
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -391,7 +391,7 @@ ThreadPool {
 
             long elapsed = SystemTime.getMonotonousTime() - toRelease.worker.run_start_time;
             if (elapsed > WARN_TIME && LOG_WARNINGS)
-                DebugLight.out(toRelease.worker.getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + toRelease.worker.state);
+                System.out.println(toRelease.worker.getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + toRelease.worker.state);
 
             if (!busy.remove(toRelease.worker)) {
 
@@ -509,13 +509,13 @@ ThreadPool {
                             runIt(runnable);
 
                     } catch (Throwable e) {
-                        DebugLight.printStackTrace(e);
+                        e.printStackTrace();
                     } finally {
                         if (autoRelease) {
                             synchronized (ThreadPool.this) {
                                 long elapsed = SystemTime.getMonotonousTime() - run_start_time;
                                 if (elapsed > WARN_TIME && LOG_WARNINGS)
-                                    DebugLight.out(getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + state);
+                                    System.out.println(getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + state);
 
                                 busy.remove(threadPoolWorker.this);
 
@@ -530,7 +530,7 @@ ThreadPool {
                     }
                 } while (runnable != null);
             } catch (Throwable e) {
-                DebugLight.printStackTrace(e);
+                e.printStackTrace();
             } finally {
                 if (autoRelease) {
 

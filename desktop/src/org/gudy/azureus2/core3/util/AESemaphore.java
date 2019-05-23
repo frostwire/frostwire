@@ -19,6 +19,8 @@
 
 package org.gudy.azureus2.core3.util;
 
+import com.frostwire.util.Logger;
+
 /**
  * @author parg
  */
@@ -26,6 +28,8 @@ public class
 AESemaphore
         extends AEMonSem {
     private int dont_wait;
+    
+    private static Logger LOG = Logger.getLogger(AEMonSem.class);
 
     private int total_reserve = 0;
     private int total_release;
@@ -51,8 +55,7 @@ AESemaphore
     public void
     reserve() {
         if (!reserve(0)) {
-
-            Debug.out("AESemaphore: reserve completed without acquire [" + getString() + "]");
+            LOG.error("AESemaphore: reserve completed without acquire [" + getString() + "]");
         }
     }
 
@@ -83,11 +86,6 @@ AESemaphore
     reserveSupport(
             long millis,
             int max_to_reserve) {
-        if (DEBUG) {
-
-            super.debugEntry();
-        }
-
         synchronized (this) {
 
             entry_count++;
@@ -123,7 +121,7 @@ AESemaphore
 
                                 if (spurious_count > 1024) {
 
-                                    Debug.out("AESemaphore: spurious wakeup limit exceeded");
+                                    LOG.error("AESemaphore: spurious wakeup limit exceeded");
 
                                     throw (new Throwable("die die die"));
 
@@ -158,7 +156,7 @@ AESemaphore
 
                     waiting--;
 
-                    Debug.out("**** semaphore operation interrupted ****");
+                    LOG.error("**** semaphore operation interrupted ****");
 
                     throw (new RuntimeException("Semaphore: operation interrupted", e));
 
@@ -180,28 +178,20 @@ AESemaphore
 
     public void
     release() {
-        try {
-            synchronized (this) {
+        synchronized (this) {
 
-                //System.out.println( name + "::release");
+            //System.out.println( name + "::release");
 
-                total_release++;
+            total_release++;
 
-                if (waiting != 0) {
+            if (waiting != 0) {
 
-                    waiting--;
+                waiting--;
 
-                    notify();
+                notify();
 
-                } else {
-                    dont_wait++;
-                }
-            }
-        } finally {
-
-            if (DEBUG) {
-
-                debugExit();
+            } else {
+                dont_wait++;
             }
         }
     }

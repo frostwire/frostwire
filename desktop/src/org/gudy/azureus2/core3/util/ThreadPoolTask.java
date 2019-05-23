@@ -68,7 +68,7 @@ ThreadPoolTask
 				wait();
 			} catch (Exception e)
 			{
-				Debug.printStackTrace(e);
+				e.printStackTrace();
 			}
 		}
 	}
@@ -106,7 +106,7 @@ ThreadPoolTask
 			worker.getOwner().releaseManual(this);
 			manualRelease = RELEASE_AUTO;
 		} else if(manualRelease == RELEASE_AUTO)
-			Debug.out("this should not happen");
+			System.out.println("this should not happen");
 		
 		notifyAll();
 	}

@@ -39,8 +39,6 @@ public class Timer
     private long unique_id_next = 0;
 
     private long current_when;
-    private volatile boolean destroyed;
-    private boolean indestructable;
 
     private boolean log;
     private int max_events_logged;
@@ -86,34 +84,15 @@ public class Timer
         t.start();
     }
 
-    public void
-    setIndestructable() {
-        indestructable = true;
-    }
-
     private synchronized List<TimerEvent>
     getEvents() {
         return (new ArrayList<>(events));
     }
 
-    public void
-    setLogging(
-            boolean _log) {
-        log = _log;
-    }
 
-    public boolean getLogging() {
-        return log;
-    }
-
-    public void
+    void
     setWarnWhenFull() {
         thread_pool.setWarnWhenFull();
-    }
-
-    public void
-    setLogCPU() {
-        thread_pool.setLogCPU();
     }
 
     public void
@@ -125,10 +104,7 @@ public class Timer
 
                 synchronized (this) {
 
-                    if (destroyed) {
 
-                        break;
-                    }
 
                     if (events.isEmpty()) {
 
@@ -169,10 +145,6 @@ public class Timer
                         }
                     }
 
-                    if (destroyed) {
-
-                        break;
-                    }
 
                     if (events.isEmpty()) {
 
@@ -216,8 +188,7 @@ public class Timer
                 }
 
             } catch (Throwable e) {
-
-                Debug.printStackTrace(e);
+                e.printStackTrace();
             }
         }
     }
@@ -352,59 +323,7 @@ public class Timer
         }
     }
 
-    public void
-    adjustAllBy(
-            long offset) {
-        // fix up the timers
-
-        synchronized (this) {
-
-            // as we're adjusting all events by the same amount the ordering remains valid
-
-            Iterator<TimerEvent> it = events.iterator();
-
-            boolean resort = false;
-
-            while (it.hasNext()) {
-
-                TimerEvent event = it.next();
-
-                long old_when = event.getWhen();
-                long new_when = old_when + offset;
-
-                // don't wrap around by accident
-
-                if (old_when > 0 && new_when < 0 && offset > 0) {
-
-                    // Debug.out( "Ignoring wrap around for " + event.getName());
-
-                    resort = true;
-
-                } else {
-
-                    // System.out.println( "    adjusted: " + old_when + " -> " + new_when );
-
-                    event.setWhen(new_when);
-                }
-            }
-
-            if (resort) {
-
-                events = new TreeSet<>(new ArrayList<>(events));
-            }
-
-            notify();
-        }
-    }
-
-    public synchronized TimerEvent
-    addEvent(
-            long when,
-            TimerEventPerformer performer) {
-        return (addEvent(SystemTime.getCurrentTime(), when, performer));
-    }
-
-    public synchronized TimerEvent
+    synchronized TimerEvent
     addEvent(
             String name,
             long when,
@@ -412,7 +331,7 @@ public class Timer
         return (addEvent(name, SystemTime.getCurrentTime(), when, performer));
     }
 
-    public synchronized TimerEvent
+    synchronized TimerEvent
     addEvent(
             String name,
             long when,
@@ -421,15 +340,7 @@ public class Timer
         return (addEvent(name, SystemTime.getCurrentTime(), when, absolute, performer));
     }
 
-    private synchronized TimerEvent
-    addEvent(
-            long creation_time,
-            long when,
-            TimerEventPerformer performer) {
-        return (addEvent(null, creation_time, when, performer));
-    }
-
-    public synchronized TimerEvent
+    synchronized TimerEvent
     addEvent(
             long creation_time,
             long when,
@@ -447,7 +358,7 @@ public class Timer
         return (addEvent(name, creation_time, when, false, performer));
     }
 
-    public synchronized TimerEvent
+    synchronized TimerEvent
     addEvent(
             String name,
             long creation_time,
@@ -483,14 +394,14 @@ public class Timer
         return (event);
     }
 
-    public synchronized TimerEventPeriodic
+    synchronized TimerEventPeriodic
     addPeriodicEvent(
             long frequency,
             TimerEventPerformer performer) {
         return (addPeriodicEvent(null, frequency, performer));
     }
 
-    public synchronized TimerEventPeriodic
+    synchronized TimerEventPeriodic
     addPeriodicEvent(
             String name,
             long frequency,
@@ -498,7 +409,7 @@ public class Timer
         return (addPeriodicEvent(name, frequency, false, performer));
     }
 
-    public synchronized TimerEventPeriodic
+    synchronized TimerEventPeriodic
     addPeriodicEvent(
             String name,
             long frequency,
@@ -529,53 +440,6 @@ public class Timer
             // System.out.println( "event cancelled (" + event.getWhen() + ") - queue = " + events.size());
 
             notify();
-        }
-    }
-
-    public synchronized void
-    destroy() {
-        if (indestructable) {
-
-            Debug.out("Attempt to destroy indestructable timer '" + getName() + "'");
-
-        } else {
-
-            destroyed = true;
-
-            notify();
-
-            SystemTime.unregisterClockChangeListener(this);
-        }
-
-        if (DEBUG_TIMERS) {
-            try {
-                timers_mon.enter();
-                // crappy
-                for (Iterator iter = timers.iterator(); iter.hasNext(); ) {
-                    WeakReference timerRef = (WeakReference) iter.next();
-                    Object timer = timerRef.get();
-                    if (timer == null || timer == this) {
-                        iter.remove();
-                    }
-                }
-            } finally {
-                timers_mon.exit();
-            }
-        }
-    }
-
-    private String
-    getName() {
-        return (thread_pool.getName());
-    }
-
-    public synchronized void
-    dump() {
-        System.out.println("Timer '" + thread_pool.getName() + "': dump");
-
-        for (TimerEvent ev : events) {
-
-            System.out.println("\t" + ev.getString());
         }
     }
 

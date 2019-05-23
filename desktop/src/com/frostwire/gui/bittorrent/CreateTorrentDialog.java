@@ -23,12 +23,12 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import net.miginfocom.swing.MigLayout;
-import org.gudy.azureus2.core3.util.Debug;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("serial")
 public class CreateTorrentDialog extends JDialog {
+    private static Logger LOG = Logger.getLogger(CreateTorrentDialog.class);
     private boolean create_from_dir;
     private String singlePath = null;
     private String directoryPath = null;
@@ -621,7 +622,7 @@ public class CreateTorrentDialog extends JDialog {
         } catch (Throwable e) {
             result = false;
             revertSaveCloseButtons();
-            Debug.printStackTrace(e);
+            LOG.error(e.getMessage(), e);
             reportCurrentTask(I18n.tr("Operation failed."));
         }
 

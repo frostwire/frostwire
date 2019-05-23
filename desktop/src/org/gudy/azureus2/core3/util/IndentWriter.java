@@ -21,83 +21,25 @@ package org.gudy.azureus2.core3.util;
 
 import java.io.PrintWriter;
 
-class
-IndentWriter 
-{
-	private static final String	INDENT_STRING		= "    ";
-	private static final String	INDENT_STRING_HTML	= "&nbsp;&nbsp;&nbsp;&nbsp;";
-	
-	private final PrintWriter		pw;
-	private String			indent	= "";
-	
-	private boolean			html;
-	
-	private boolean			force;
-	
-	public
-	IndentWriter(
-		PrintWriter	_pw )
-	{
-		pw	= _pw;
-	}
-	
-	public void
-	setHTML(
-		boolean	_html )
-	{
-		html = _html;
-	}
-	
-	public void
-	println(
-		String	str )
-	{
-		if ( html ){
-			
-			pw.print( indent + str + "<br>" );
+class IndentWriter {
+    private static final String INDENT_STRING = "    ";
 
-		}else{
-			
-			pw.println( indent + str );
-		}
-		
-		if ( force ){
-			
-			pw.flush();
-		}
-	}
-	
-	public void
-	indent()
-	{
-		indent += html?INDENT_STRING_HTML:INDENT_STRING;
-	}
-	
-	public void
-	exdent()
-	{
-		if ( indent.length() > 0 ){
-			
-			indent = indent.substring((html?INDENT_STRING_HTML:INDENT_STRING).length());
-		}
-	}
-	
-	public String
-	getTab()
-	{
-		return( html?INDENT_STRING_HTML:INDENT_STRING );
-	}
-	
-	public void
-	setForce(
-		boolean	b )
-	{
-		force	= b;
-	}
-	
-	public void
-	close()
-	{
-		pw.close();
-	}
+    private final PrintWriter pw;
+    private String indent = "";
+
+    public IndentWriter(PrintWriter _pw) {
+        pw = _pw;
+    }
+
+    public void println(String str) {
+        pw.println(indent + str);
+    }
+
+    void indent() {
+        indent += INDENT_STRING;
+    }
+
+    void exdent() {
+        if (indent.length() > 0) indent = indent.substring((INDENT_STRING).length());
+    }
 }

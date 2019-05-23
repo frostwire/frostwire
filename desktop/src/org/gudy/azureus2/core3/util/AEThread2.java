@@ -24,287 +24,272 @@ import java.util.LinkedList;
 
 
 abstract class AEThread2 {
-	private static final int MIN_RETAINED	= Math.max(Runtime.getRuntime().availableProcessors(),2);
-	private static final int MAX_RETAINED	= Math.max(MIN_RETAINED*4, 16);
-	
-	private static final int THREAD_TIMEOUT_CHECK_PERIOD	= 10*1000;
-	private static final int THREAD_TIMEOUT					= 60*1000;
-	
-	private static final LinkedList	daemon_threads = new LinkedList();
-	
-	private static final class JoinLock {
-		volatile boolean released = false;
-	}
-	
-	private static long	last_timeout_check;
-	
-	
-	private threadWrapper	wrapper;
-	
-	private String				name;
-	private final boolean				daemon;
-	private int					priority	= Thread.NORM_PRIORITY;
-	private volatile JoinLock	lock		= new JoinLock();
+    private static final int MIN_RETAINED = Math.max(Runtime.getRuntime().availableProcessors(), 2);
+    private static final int MAX_RETAINED = Math.max(MIN_RETAINED * 4, 16);
 
-	AEThread2(String _name, boolean _daemon) {
-		name		= _name;
-		daemon		= _daemon;
-	}
+    private static final int THREAD_TIMEOUT_CHECK_PERIOD = 10 * 1000;
+    private static final int THREAD_TIMEOUT = 60 * 1000;
 
-	
-	/**
-	 * multiple invocations of start() are possible, but discouraged if combined
-	 * with other thread operations such as interrupt() or join()
-	 */
+    private static final LinkedList daemon_threads = new LinkedList();
+
+    private static final class JoinLock {
+        volatile boolean released = false;
+    }
+
+    private static long last_timeout_check;
+
+
+    private threadWrapper wrapper;
+
+    private String name;
+    private final boolean daemon;
+    private int priority = Thread.NORM_PRIORITY;
+    private volatile JoinLock lock = new JoinLock();
+
+    AEThread2(String _name, boolean _daemon) {
+        name = _name;
+        daemon = _daemon;
+    }
+
+
+    /**
+     * multiple invocations of start() are possible, but discouraged if combined
+     * with other thread operations such as interrupt() or join()
+     */
     void
-	start()
-	{
-		JoinLock currentLock = lock;
-		JoinLock newLock;
-		
-		synchronized (currentLock)
-		{
-			// create new lock in case this is a restart, all old .join()s will be locked on the old thread and thus released by the old thread
-			if(currentLock.released)
-				newLock = lock = new JoinLock();
-			else
-				newLock = currentLock;
-		}
-		
-		if ( daemon ){
-			
-			synchronized( daemon_threads ){
+    start() {
+        JoinLock currentLock = lock;
+        JoinLock newLock;
 
-				if ( daemon_threads.isEmpty()){
-				
-					wrapper = new threadWrapper( name, true );
-					
-				}else{
-					
-					wrapper = (threadWrapper)daemon_threads.removeLast();
-					
-					wrapper.setName( name );
-				}
-			}
-		}else{
-		
-			wrapper = new threadWrapper( name, false );
-		}
-		
-		if ( priority != wrapper.getPriority() ){
-			
-			wrapper.setPriority( priority );
-		}
-		
-		wrapper.currentLock = newLock;
-		
-		wrapper.start( this, name );
-	}
-	
-	void
-	setPriority(
-            int _priority)
-	{
-		priority	= _priority;
-			
-		if ( wrapper != null ){
-			wrapper.setPriority( priority );
-		}
-	}
-	
-	void
-	setName(
-            String s)
-	{
-		name	= s;
-		
-		if ( wrapper != null ){
-			
-			wrapper.setName( name );
-		}
-	}
-	
-	String
-	getName()
-	{
-		return( name );
-	}
-	
-	void
-	interrupt()
-	{
-		if ( wrapper == null ){
-			
-			throw new IllegalStateException( "Interrupted before started!" );
-			
-		}else{
-			
-			wrapper.interrupt();
-		}
-	}
+        synchronized (currentLock) {
+            // create new lock in case this is a restart, all old .join()s will be locked on the old thread and thus released by the old thread
+            if (currentLock.released)
+                newLock = lock = new JoinLock();
+            else
+                newLock = currentLock;
+        }
 
-	public boolean isCurrentThread()
-	{
-		return( wrapper == Thread.currentThread());
-	}
-	
-	public String
-	toString()
-	{
-		if ( wrapper == null ){
-			
-			return( name + " [daemon=" + daemon + ",priority=" + priority + "]" );
-			
-		}else{
-				
-			return( wrapper.toString());
-		}
-	}
-	
-	protected abstract void
-	run();
-	
-	static class
-	threadWrapper
-		extends Thread
-	{
-		private AESemaphore2	sem;
-		private AEThread2		target;
-		private JoinLock		currentLock;
-		
-		private long		last_active_time;
-		
-		private Object[]		debug;
-		
-		threadWrapper(
+        if (daemon) {
+
+            synchronized (daemon_threads) {
+
+                if (daemon_threads.isEmpty()) {
+
+                    wrapper = new threadWrapper(name, true);
+
+                } else {
+
+                    wrapper = (threadWrapper) daemon_threads.removeLast();
+
+                    wrapper.setName(name);
+                }
+            }
+        } else {
+
+            wrapper = new threadWrapper(name, false);
+        }
+
+        if (priority != wrapper.getPriority()) {
+
+            wrapper.setPriority(priority);
+        }
+
+        wrapper.currentLock = newLock;
+
+        wrapper.start(this, name);
+    }
+
+    void
+    setPriority(
+            int _priority) {
+        priority = _priority;
+
+        if (wrapper != null) {
+            wrapper.setPriority(priority);
+        }
+    }
+
+    void
+    setName(
+            String s) {
+        name = s;
+
+        if (wrapper != null) {
+
+            wrapper.setName(name);
+        }
+    }
+
+    String
+    getName() {
+        return (name);
+    }
+
+    void
+    interrupt() {
+        if (wrapper == null) {
+
+            throw new IllegalStateException("Interrupted before started!");
+
+        } else {
+
+            wrapper.interrupt();
+        }
+    }
+
+    public boolean isCurrentThread() {
+        return (wrapper == Thread.currentThread());
+    }
+
+    public String
+    toString() {
+        if (wrapper == null) {
+
+            return (name + " [daemon=" + daemon + ",priority=" + priority + "]");
+
+        } else {
+
+            return (wrapper.toString());
+        }
+    }
+
+    protected abstract void
+    run();
+
+    static class
+    threadWrapper
+            extends Thread {
+        private AESemaphore2 sem;
+        private AEThread2 target;
+        private JoinLock currentLock;
+
+        private long last_active_time;
+
+        private Object[] debug;
+
+        threadWrapper(
                 String name,
-                boolean daemon)
-		{
-			super( name );
-			
-			setDaemon( daemon );
-		}
-		
-		public void
-		run()
-		{
-			while( true ){
-				
-				synchronized( currentLock ){
-					try{
-						target.run();
-												
-					}catch( Throwable e ){
-						
-						DebugLight.printStackTrace(e);
-						
-					}finally{
-						
-						target = null;
+                boolean daemon) {
+            super(name);
 
-						debug	= null;
-						
-						currentLock.released = true;
-						
-						currentLock.notifyAll();						
-					}
-				}
-								
-				if ( isInterrupted() || !Thread.currentThread().isDaemon()){
-					
-					break;
-					
-				}else{
-					
-					synchronized( daemon_threads ){
-						
-						last_active_time	= SystemTime.getCurrentTime();
-						
-						if ( 	last_active_time < last_timeout_check ||
-								last_active_time - last_timeout_check > THREAD_TIMEOUT_CHECK_PERIOD ){
-							
-							last_timeout_check	= last_active_time;
-							
-							while( daemon_threads.size() > 0 && daemon_threads.size() > MIN_RETAINED ){
-								
-								threadWrapper thread = (threadWrapper)daemon_threads.getFirst();
-								
-								long	thread_time = thread.last_active_time;
-								
-								if ( 	last_active_time < thread_time ||
-										last_active_time - thread_time > THREAD_TIMEOUT ){
-									
-									daemon_threads.removeFirst();
-									
-									thread.retire();
-									
-								}else{
-									
-									break;
-								}
-							}
-						}
-						
-						if ( daemon_threads.size() >= MAX_RETAINED ){
-							
-							return;
-						}
+            setDaemon(daemon);
+        }
 
-						daemon_threads.addLast( this );
+        public void
+        run() {
+            while (true) {
 
-						setName( "AEThread2:parked[" + daemon_threads.size() + "]" );
-						
-						// System.out.println( "AEThread2: queue=" + daemon_threads.size() + ",creates=" + total_creates + ",starts=" + total_starts );
-					}
-					
-					sem.reserve();
-					
-					if ( target == null ){
-						
-						break;
-					}
-				}
-			}
-		}
-		
-		void
-		start(
+                synchronized (currentLock) {
+                    try {
+                        target.run();
+
+                    } catch (Throwable e) {
+
+                        e.printStackTrace();
+
+                    } finally {
+
+                        target = null;
+
+                        debug = null;
+
+                        currentLock.released = true;
+
+                        currentLock.notifyAll();
+                    }
+                }
+
+                if (isInterrupted() || !Thread.currentThread().isDaemon()) {
+
+                    break;
+
+                } else {
+
+                    synchronized (daemon_threads) {
+
+                        last_active_time = SystemTime.getCurrentTime();
+
+                        if (last_active_time < last_timeout_check ||
+                                last_active_time - last_timeout_check > THREAD_TIMEOUT_CHECK_PERIOD) {
+
+                            last_timeout_check = last_active_time;
+
+                            while (daemon_threads.size() > 0 && daemon_threads.size() > MIN_RETAINED) {
+
+                                threadWrapper thread = (threadWrapper) daemon_threads.getFirst();
+
+                                long thread_time = thread.last_active_time;
+
+                                if (last_active_time < thread_time ||
+                                        last_active_time - thread_time > THREAD_TIMEOUT) {
+
+                                    daemon_threads.removeFirst();
+
+                                    thread.retire();
+
+                                } else {
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (daemon_threads.size() >= MAX_RETAINED) {
+
+                            return;
+                        }
+
+                        daemon_threads.addLast(this);
+
+                        setName("AEThread2:parked[" + daemon_threads.size() + "]");
+
+                        // System.out.println( "AEThread2: queue=" + daemon_threads.size() + ",creates=" + total_creates + ",starts=" + total_starts );
+                    }
+
+                    sem.reserve();
+
+                    if (target == null) {
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        void
+        start(
                 AEThread2 _target,
-                String _name)
-		{
-			target	= _target;
-			
-			setName( _name );
-			
-			if ( sem == null ){
-				
-				 sem = new AESemaphore2();
-				 
-				 super.start();
-				 
-			}else{
-				
-				sem.release();
-			}
-		}
-		
-		void
-		retire()
-		{			
-			sem.release();
-		}
-		
-		void
-		setDebug(
-                Object d)
-		{
-			debug	= new Object[]{ d, SystemTime.getMonotonousTime() };
-		}
-		
-		Object[]
-		getDebug()
-		{
-			return( debug );
-		}
-	}
+                String _name) {
+            target = _target;
+
+            setName(_name);
+
+            if (sem == null) {
+
+                sem = new AESemaphore2();
+
+                super.start();
+
+            } else {
+
+                sem.release();
+            }
+        }
+
+        void
+        retire() {
+            sem.release();
+        }
+
+        void
+        setDebug(
+                Object d) {
+            debug = new Object[]{d, SystemTime.getMonotonousTime()};
+        }
+
+        Object[]
+        getDebug() {
+            return (debug);
+        }
+    }
 }

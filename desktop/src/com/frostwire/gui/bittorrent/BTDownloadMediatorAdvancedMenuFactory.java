@@ -35,12 +35,12 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
-import org.gudy.azureus2.core3.util.Debug;
 import org.gudy.azureus2.core3.util.DisplayFormatters;
 
 import javax.swing.*;
@@ -48,14 +48,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 final class BTDownloadMediatorAdvancedMenuFactory {
 
-    public static SkinMenu createAdvancedSubMenu() {
+    private static Logger LOG = Logger.getLogger(BTDownloadMediatorAdvancedMenuFactory.class);
+
+    static SkinMenu createAdvancedSubMenu() {
 
         final com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();
         if (dms == null) {
@@ -72,8 +74,8 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         boolean downSpeedUnlimited = false;
         long downSpeedSetMax = 0;
 
-        for (int i = 0; i < dms.length; i++) {
-            com.frostwire.bittorrent.BTDownload dm = (com.frostwire.bittorrent.BTDownload) dms[i];
+        for (com.frostwire.bittorrent.BTDownload btDownload : dms) {
+            com.frostwire.bittorrent.BTDownload dm = btDownload;
 
             try {
                 int maxul = dm.getUploadRateLimit();
@@ -105,7 +107,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
                 totalDownSpeed += maxdl;
 
             } catch (Exception ex) {
-                Debug.printStackTrace(ex);
+                LOG.error(ex.getMessage(), ex);
             }
         }
 
@@ -120,14 +122,14 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         addSpeedMenu(menuAdvanced, true, true, downSpeedDisabled, downSpeedUnlimited, totalDownSpeed, downSpeedSetMax, maxDownload, upSpeedDisabled, upSpeedUnlimited, totalUpSpeed, upSpeedSetMax,
                 maxUpload, dms.length, new SpeedAdapter() {
                     public void setDownSpeed(final int speed) {
-                        for (int i = 0; i < dms.length; i++) {
-                            dms[i].setDownloadRateLimit(speed);
+                        for (com.frostwire.bittorrent.BTDownload dm : dms) {
+                            dm.setDownloadRateLimit(speed);
                         }
                     }
 
                     public void setUpSpeed(final int speed) {
-                        for (int i = 0; i < dms.length; i++) {
-                            dms[i].setUploadRateLimit(speed);
+                        for (com.frostwire.bittorrent.BTDownload dm : dms) {
+                            dm.setUploadRateLimit(speed);
                         }
                     }
                 });
@@ -140,7 +142,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         return menuAdvanced;
     }
 
-    public static SkinMenu createAddToPlaylistSubMenu() {
+    static SkinMenu createAddToPlaylistSubMenu() {
         BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
         if (downloaders.length == 0) {
             return null;
@@ -181,7 +183,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         return menu;
     }
 
-    public static SkinMenu createTrackerMenu() {
+    private static SkinMenu createTrackerMenu() {
         com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();
         if (dms == null) {
             return null;
@@ -203,7 +205,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             return null;
         }
 
-        ArrayList<com.frostwire.bittorrent.BTDownload> list = new ArrayList<com.frostwire.bittorrent.BTDownload>(downloaders.length);
+        ArrayList<com.frostwire.bittorrent.BTDownload> list = new ArrayList<>(downloaders.length);
         for (BTDownload downloader : downloaders) {
             if (downloader instanceof BittorrentDownload) {
                 com.frostwire.bittorrent.BTDownload dm = ((BittorrentDownload) downloader).getDl();
@@ -251,14 +253,12 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         menuDownSpeed.addSeparator();
 
-        final SkinMenuItem itemsDownSpeed[] = new SkinMenuItem[12];
-        ActionListener itemsDownSpeedListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
-                    SkinMenuItem item = (SkinMenuItem) e.getSource();
-                    int speed = item.getClientProperty("maxdl") == null ? 0 : ((Integer) item.getClientProperty("maxdl")).intValue();
-                    adapter.setDownSpeed(speed);
-                }
+        final SkinMenuItem[] itemsDownSpeed = new SkinMenuItem[12];
+        ActionListener itemsDownSpeedListener = e -> {
+            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
+                SkinMenuItem item = (SkinMenuItem) e.getSource();
+                int speed = item.getClientProperty("maxdl") == null ? 0 : (Integer) item.getClientProperty("maxdl");
+                adapter.setDownSpeed(speed);
             }
         };
 
@@ -344,14 +344,12 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         // ---
         menuUpSpeed.addSeparator();
 
-        final SkinMenuItem itemsUpSpeed[] = new SkinMenuItem[12];
-        ActionListener itemsUpSpeedListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
-                    SkinMenuItem item = (SkinMenuItem) e.getSource();
-                    int speed = item.getClientProperty("maxul") == null ? 0 : ((Integer) item.getClientProperty("maxul")).intValue();
-                    adapter.setUpSpeed(speed);
-                }
+        final SkinMenuItem[] itemsUpSpeed = new SkinMenuItem[12];
+        ActionListener itemsUpSpeedListener = e -> {
+            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
+                SkinMenuItem item = (SkinMenuItem) e.getSource();
+                int speed = item.getClientProperty("maxul") == null ? 0 : ((Integer) item.getClientProperty("maxul")).intValue();
+                adapter.setUpSpeed(speed);
             }
         };
 
@@ -418,7 +416,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         private final com.frostwire.bittorrent.BTDownload dm;
 
-        public EditTrackersAction(com.frostwire.bittorrent.BTDownload dm) {
+        EditTrackersAction(com.frostwire.bittorrent.BTDownload dm) {
             this.dm = dm;
 
             putValue(Action.NAME, I18n.tr("Edit Trackers"));
@@ -434,7 +432,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         private final com.frostwire.bittorrent.BTDownload dm;
 
-        public UpdateTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
+        UpdateTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
             this.dm = dm;
 
             putValue(Action.NAME, I18n.tr("Update Tracker"));
@@ -450,7 +448,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         private final com.frostwire.bittorrent.BTDownload dm;
 
-        public ScrapeTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
+        ScrapeTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
             this.dm = dm;
 
             putValue(Action.NAME, I18n.tr("Scrape Tracker"));
@@ -466,7 +464,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         private final com.frostwire.bittorrent.BTDownload dm;
 
-        public EditTrackerDialog(JFrame frame, com.frostwire.bittorrent.BTDownload dm) {
+        EditTrackerDialog(JFrame frame, com.frostwire.bittorrent.BTDownload dm) {
             super(frame);
             this.dm = dm;
             setupUI();

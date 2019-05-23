@@ -21,127 +21,77 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
 
-public class 
-SimpleTimer 
-{
-		/**
-		 * A simple timer class for use by application components that want to schedule 
-		 * low-overhead events (i.e. when fired the event shouldn't take significant processing
-		 * time as there is a limited thread pool to service it 
-		 */
-	
-	private static final Timer	timer;
-	
-	private static final CopyOnWriteList<TimerTickReceiver>		tick_receivers = new CopyOnWriteList<>(true);
-	
-	static{
-		timer = new Timer("Simple Timer",32);
-		
-		timer.setIndestructable();
-		
-		timer.setWarnWhenFull();
-		
-		// timer.setLogCPU();
-		
-		// timer.setLogging(true);
-		
-		addPeriodicEvent(
-			"SimpleTimer:ticker",
-			1000,
-			new TimerEventPerformer()
-			{
-				private int tick_count;
-				
-				public void 
-				perform(
-					TimerEvent event ) 
-				{
-					tick_count++;
-					
-					if ( tick_receivers.size() > 0 ){
-						
-						long mono_now = SystemTime.getMonotonousTime();
-						
-						for ( TimerTickReceiver ttr: tick_receivers ){
-							
-							try{
-								ttr.tick( mono_now, tick_count );
-								
-							}catch( Throwable e ){
-								
-								Debug.out( e );
-							}
-						}
-					}
-				}
-			});
-	}
-	
-	public static TimerEvent
-	addEvent(
-		String				name,
-		long				when,
-		TimerEventPerformer	performer )
-	{
+public class
+SimpleTimer {
+    /**
+     * A simple timer class for use by application components that want to schedule
+     * low-overhead events (i.e. when fired the event shouldn't take significant processing
+     * time as there is a limited thread pool to service it
+     */
 
-		return(timer.addEvent( name, when, performer ));
-	}
-	
-	public static TimerEvent
-	addEvent(
-		String				name,
-		long				when,
-		boolean				absolute,
-		TimerEventPerformer	performer )
-	{
+    private static final Timer timer;
 
-		return(timer.addEvent( name, when, absolute, performer ));
-	}
-	
-	public static TimerEventPeriodic
-	addPeriodicEvent(
-		String				name,
-		long				frequency,
-		TimerEventPerformer	performer )
-	{
+    private static final CopyOnWriteList<TimerTickReceiver> tick_receivers = new CopyOnWriteList<>(true);
 
-		return(timer.addPeriodicEvent( name, frequency, performer ));
-	}
-	
-	public static TimerEventPeriodic
-	addPeriodicEvent(
-		String				name,
-		long				frequency,
-		boolean				absolute,
-		TimerEventPerformer	performer )
-	{
+    static {
+        timer = new Timer("Simple Timer", 32);
+        timer.setWarnWhenFull();
 
-		return(timer.addPeriodicEvent( name, frequency, absolute, performer ));
-	}
-	
-	public static void
-	addTickReceiver(
-		TimerTickReceiver	receiver )
-	{
-		tick_receivers.add( receiver );
-	}
-	
-	public static void
-	removeTickReceiver(
-		TimerTickReceiver	receiver )
-	{
-		tick_receivers.remove( receiver );
-	}
-	
-	interface
-	TimerTickReceiver
-	{
-		void
-		tick(
+        addPeriodicEvent(
+                "SimpleTimer:ticker",
+                1000,
+                new TimerEventPerformer() {
+                    private int tick_count;
+
+                    public void
+                    perform(
+                            TimerEvent event) {
+                        tick_count++;
+
+                        if (tick_receivers.size() > 0) {
+
+                            long mono_now = SystemTime.getMonotonousTime();
+
+                            for (TimerTickReceiver ttr : tick_receivers) {
+
+                                try {
+                                    ttr.tick(mono_now, tick_count);
+
+                                } catch (Throwable e) {
+
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    public static void
+    addEvent(
+            String name,
+            long when,
+            TimerEventPerformer performer) {
+
+        timer.addEvent(name, when, performer);
+    }
+
+    static TimerEventPeriodic
+    addPeriodicEvent(
+            String name,
+            long frequency,
+            TimerEventPerformer performer) {
+
+        return (timer.addPeriodicEvent(name, frequency, performer));
+    }
+
+    interface
+    TimerTickReceiver {
+        void
+        tick(
                 long mono_now,
                 int tick_ount);
-	}
+    }
 }

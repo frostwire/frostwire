@@ -152,18 +152,12 @@ TimerEvent
 		has_run	= true;
 	}
 	
-	public boolean
+	boolean
 	hasRun()
 	{
 		return( has_run );
 	}
-	
-	protected long
-	getUniqueId()
-	{
-		return( unique_id );
-	}
-	
+
 	public int
 	compareTo(
 		TimerEvent		other )
