@@ -47,20 +47,6 @@ TimerEvent
         when = _when;
         absolute = _absolute;
         performer = _performer;
-
-        if (Constants.IS_CVS_VERSION) {
-
-            // sanity check - seems we sometimes use 0 to denote 'now'
-
-            if (when != 0 && when <= 7 * 24 * 60 * 60 * 1000L) {
-
-                new Exception("You sure you want to schedule an event in the past? Time should be absolute!").printStackTrace();
-
-            } else if (when > 3000L * 365 * 24 * 60 * 60 * 1000) {
-
-                new Exception("You sure you want to schedule an event so far in the future?! (" + when + ")").printStackTrace();
-            }
-        }
     }
 
     public void

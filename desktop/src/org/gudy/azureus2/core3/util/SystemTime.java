@@ -56,14 +56,6 @@ public class SystemTime {
         }
     }
 
-    public static void useRawProvider() {
-        if (!(instance instanceof RawProvider)) {
-            System.out.println("SystemTime::useRawProvider: Whoa, someone already created a non-raw provider!");
-
-            instance = new RawProvider();
-        }
-    }
-
     interface SystemTimeProvider {
         long getTime();
 
@@ -438,7 +430,7 @@ public class SystemTime {
      * As such it is likely to be cheaper to obtain
      */
 
-    public static long getSteppedMonotonousTime() {
+    static long getSteppedMonotonousTime() {
         return instance.getSteppedMonoTime();
     }
 
@@ -447,50 +439,10 @@ public class SystemTime {
         return instance.getTime() + offsetMS;
     }
 
-    public static void registerConsumer(TickConsumer c) {
-        synchronized (instance) {
-            List new_list = new ArrayList(systemTimeConsumers);
-            new_list.add(c);
-            systemTimeConsumers = new_list;
-        }
-    }
-
-    public static void unregisterConsumer(TickConsumer c) {
-        synchronized (instance) {
-            List new_list = new ArrayList(systemTimeConsumers);
-            new_list.remove(c);
-            systemTimeConsumers = new_list;
-        }
-    }
-
-    public static void registerMonotonousConsumer(TickConsumer c) {
-        synchronized (instance) {
-            List new_list = new ArrayList(monotoneTimeConsumers);
-            new_list.add(c);
-            monotoneTimeConsumers = new_list;
-        }
-    }
-
-    public static void unregisterMonotonousConsumer(TickConsumer c) {
-        synchronized (instance) {
-            List new_list = new ArrayList(monotoneTimeConsumers);
-            new_list.remove(c);
-            monotoneTimeConsumers = new_list;
-        }
-    }
-
-    public static void registerClockChangeListener(ChangeListener c) {
+    static void registerClockChangeListener(ChangeListener c) {
         synchronized (instance) {
             List new_list = new ArrayList(clock_change_list);
             new_list.add(c);
-            clock_change_list = new_list;
-        }
-    }
-
-    public static void unregisterClockChangeListener(ChangeListener c) {
-        synchronized (instance) {
-            List new_list = new ArrayList(clock_change_list);
-            new_list.remove(c);
             clock_change_list = new_list;
         }
     }

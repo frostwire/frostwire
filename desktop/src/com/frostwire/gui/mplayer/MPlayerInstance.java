@@ -74,12 +74,12 @@ MPlayerInstance
 	private boolean	stop_pending;
 	private boolean	stopped;
 
-	private AESemaphore	stop_sem = new AESemaphore( "EMP:S" );
+	private AESemaphore	stop_sem = new AESemaphore();
 
 	private boolean	paused;
 
 	private List<String> 	commands 	= new LinkedList<String>();
-	private AESemaphore		command_sem = new AESemaphore( "EMP:C" );
+	private AESemaphore		command_sem = new AESemaphore();
 
 	private boolean 		isSeeking;
 	private int				seekingTo;

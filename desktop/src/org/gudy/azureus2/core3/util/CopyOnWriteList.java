@@ -21,9 +21,7 @@ package org.gudy.azureus2.core3.util;
 
 import java.util.*;
 
-public class
-CopyOnWriteList<T>
-        implements Iterable<T> {
+public class CopyOnWriteList<T> implements Iterable<T> {
 
     private List list = Collections.EMPTY_LIST;
 
@@ -31,40 +29,16 @@ CopyOnWriteList<T>
 
     private boolean visible = false;
 
-    private int initialCapacity;
-
     CopyOnWriteList(boolean _use_linked_list) {
-        this.initialCapacity = 1;
         use_linked_list = _use_linked_list;
     }
-
-    public void
-    add(
-            T obj) {
-        synchronized (this) {
-            if (visible) {
-                List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-                new_list.add(obj);
-                list = new_list;
-                visible = false;
-            } else {
-                if (list == Collections.EMPTY_LIST) {
-                    list = use_linked_list ? new LinkedList<>() : new ArrayList<>(initialCapacity);
-                }
-
-                list.add(obj);
-            }
-        }
-    }
-
 
     public void
     remove(
             T obj) {
         synchronized (this) {
             if (visible) {
-                List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-                list = new_list;
+                list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
                 visible = false;
             } else {
                 list.remove(obj);

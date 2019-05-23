@@ -51,11 +51,6 @@ public class Constants {
     //      2.0.8.3_CVS
     //      2.0.8.3_Bnn       // incremental build
 
-    static final String AZUREUS_VERSION = "5.4.0.1_CVS";
-
-    private static final boolean FORCE_NON_CVS = System.getProperty("az.force.noncvs", "0").equals("1");
-
-    static final boolean IS_CVS_VERSION = isCVSVersion() && !FORCE_NON_CVS;
 
     private static final String OSName = System.getProperty("os.name");
     private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
@@ -125,18 +120,6 @@ public class Constants {
 
             isWindowsVista = false;
         }
-    }
-
-    private static final boolean isAndroid;
-
-    static {
-        String vm_name = System.getProperty("java.vm.name", "");
-        isAndroid = vm_name.equalsIgnoreCase("Dalvik");
-    }
-
-    private static boolean
-    isCVSVersion() {
-        return (Constants.AZUREUS_VERSION.contains("_"));
     }
 
     private static int

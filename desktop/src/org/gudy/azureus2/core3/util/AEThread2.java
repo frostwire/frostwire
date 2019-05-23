@@ -58,15 +58,10 @@ abstract class AEThread2 {
      */
     void
     start() {
-        JoinLock currentLock = lock;
-        JoinLock newLock;
 
-        synchronized (currentLock) {
-            // create new lock in case this is a restart, all old .join()s will be locked on the old thread and thus released by the old thread
-            if (currentLock.released)
-                newLock = lock = new JoinLock();
-            else
-                newLock = currentLock;
+        synchronized (lock) {
+            if (lock.released)
+                lock = new JoinLock();
         }
 
         if (daemon) {
@@ -94,7 +89,7 @@ abstract class AEThread2 {
             wrapper.setPriority(priority);
         }
 
-        wrapper.currentLock = newLock;
+        wrapper.currentLock = lock;
 
         wrapper.start(this, name);
     }
@@ -125,19 +120,6 @@ abstract class AEThread2 {
         return (name);
     }
 
-    void
-    interrupt() {
-        if (wrapper == null) {
-
-            throw new IllegalStateException("Interrupted before started!");
-
-        } else {
-
-            wrapper.interrupt();
-        }
-    }
-
-
     public String
     toString() {
         if (wrapper == null) {
@@ -162,8 +144,6 @@ abstract class AEThread2 {
 
         private long last_active_time;
 
-        private Object[] debug;
-
         threadWrapper(
                 String name,
                 boolean daemon) {
@@ -187,8 +167,6 @@ abstract class AEThread2 {
                     } finally {
 
                         target = null;
-
-                        debug = null;
 
                         currentLock.released = true;
 

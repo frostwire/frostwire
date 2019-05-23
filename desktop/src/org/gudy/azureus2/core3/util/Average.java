@@ -137,10 +137,6 @@ public class Average {
         return (getSum() / period);
     }
 
-    double getDoubleAverage() {
-        return ((double) getSum() / period);
-    }
-
     private synchronized long getSum() {
         //The sum of all elements used for the average.
         long sum = 0;

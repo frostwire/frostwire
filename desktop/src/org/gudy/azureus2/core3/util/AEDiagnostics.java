@@ -19,9 +19,6 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class
 AEDiagnostics {
     // these can not be set true and have a usable AZ!
@@ -30,7 +27,7 @@ AEDiagnostics {
     private static final boolean CHECK_DUMMY_FILE_DATA = false;
 
     // these can safely be set true, things will work just slower
-    static final boolean DEBUG_MONITOR_SEM_USAGE = false;
+    private static final boolean DEBUG_MONITOR_SEM_USAGE = false;
 
     private static final boolean TRACE_DIRECT_BYTE_BUFFERS = false;
     private static final boolean TRACE_DBB_POOL_USAGE = false;
@@ -63,14 +60,6 @@ AEDiagnostics {
         }
         if (TRACE_TCP_TRANSPORT_STATS) {
             System.out.println("**** TCP_TRANSPORT_STATS tracing on ****");
-        }
-    }
-
-    private static final List<AEDiagnosticsEvidenceGenerator> evidence_generators = new ArrayList<>();
-
-    static void addEvidenceGenerator(AEDiagnosticsEvidenceGenerator gen) {
-        synchronized (evidence_generators) {
-            evidence_generators.add(gen);
         }
     }
 }

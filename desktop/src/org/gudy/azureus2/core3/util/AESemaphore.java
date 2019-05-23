@@ -36,8 +36,7 @@ AESemaphore
 
     private boolean released_forever = false;
 
-    public AESemaphore(
-            String _name) {
+    public AESemaphore() {
         this(0);
     }
 

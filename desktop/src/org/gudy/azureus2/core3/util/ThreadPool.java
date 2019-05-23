@@ -31,42 +31,12 @@ import java.util.List;
 
 public class
 ThreadPool {
-    private static final boolean NAME_THREADS = Constants.IS_CVS_VERSION && System.getProperty("az.thread.pool.naming.enable", "true").equals("true");
-
+    private static final boolean NAME_THREADS = false;
     private static final boolean LOG_WARNINGS = false;
     private static final int WARN_TIME = 10000;
 
     private static final List busy_pools = new ArrayList();
     private static boolean busy_pool_timer_set = false;
-
-    static {
-        if (System.getProperty("transitory.startup", "0").equals("0")) {
-
-            AEDiagnostics.addEvidenceGenerator(
-                    writer -> {
-                        writer.println("Thread Pools");
-
-                        try {
-                            writer.indent();
-
-                            List pools;
-
-                            synchronized (busy_pools) {
-
-                                pools = new ArrayList(busy_pools);
-                            }
-
-                            for (Object pool : pools) {
-
-                                ((ThreadPool) pool).generateEvidence(writer);
-                            }
-                        } finally {
-
-                            writer.exdent();
-                        }
-                    });
-        }
-    }
 
     private static final ThreadLocal tls =
             ThreadLocal.withInitial(() -> (null));
@@ -94,8 +64,6 @@ ThreadPool {
     private int max_size;
     private int thread_name_index = 1;
 
-    private long execution_limit;
-
     private List busy;
     private boolean queue_when_full;
     private final List task_queue = new ArrayList();
@@ -104,14 +72,11 @@ ThreadPool {
     private int reserved_target;
     private int reserved_actual;
 
-    private int thread_priority = Thread.NORM_PRIORITY;
     private boolean warn_when_full;
 
     private long task_total;
     private long task_total_last;
     private final Average task_average = Average.getInstance(WARN_TIME, 120);
-
-    private boolean log_cpu = false;
 
     public ThreadPool(
             String _name,
@@ -132,20 +97,9 @@ ThreadPool {
         busy = new ArrayList(_max_size);
     }
 
-    private void
-    generateEvidence(
-            IndentWriter writer) {
-        writer.println(name + ": max=" + max_size + ",qwf=" + queue_when_full + ",queue=" + task_queue.size() + ",busy=" + busy.size() + ",total=" + task_total + ":" + DisplayFormatters.formatDecimal(task_average.getDoubleAverage(), 2) + "/sec");
-    }
-
     void
     setWarnWhenFull() {
         warn_when_full = true;
-    }
-
-    void
-    setLogCPU() {
-        log_cpu = true;
     }
 
     public void run(AERunnable runnable) {
@@ -228,14 +182,8 @@ ThreadPool {
         return (allocated_worker);
     }
 
-    private void
-    runIt(
-            AERunnable runnable) {
-        if (log_cpu) {
-            runnable.run();
-        } else {
-            runnable.run();
-        }
+    private void runIt(AERunnable runnable) {
+        runnable.run();
     }
 
     private void checkWarning() {
@@ -263,66 +211,6 @@ ThreadPool {
         }
     }
 
-    public boolean
-    isFull() {
-        return (thread_sem.getValue() == 0);
-    }
-
-    public void
-    setMaxThreads(
-            int max) {
-        if (max > max_size) {
-
-            System.out.println("should support this sometime...");
-
-            return;
-        }
-
-        setReservedThreadCount(max_size - max);
-    }
-
-    private void
-    setReservedThreadCount(
-            int res) {
-        synchronized (this) {
-
-            if (res < 0) {
-
-                res = 0;
-
-            } else if (res > max_size) {
-
-                res = max_size;
-            }
-
-            int diff = res - reserved_actual;
-
-            while (diff < 0) {
-
-                thread_sem.release();
-
-                reserved_actual--;
-
-                diff++;
-            }
-
-            while (diff > 0) {
-
-                if (thread_sem.reserveIfAvailable()) {
-
-                    reserved_actual++;
-
-                    diff--;
-
-                } else {
-
-                    break;
-                }
-            }
-
-            reserved_target = res;
-        }
-    }
 
     private void
     checkTimeouts() {
@@ -344,35 +232,8 @@ ThreadPool {
                 long elapsed = now - x.run_start_time;
 
                 if (elapsed > ((long) WARN_TIME * (x.warn_count + 1))) {
-
                     x.warn_count++;
 
-                    if (LOG_WARNINGS) {
-
-                        System.out.println(x.getWorkerName() + ": running, elapsed = " + elapsed + ", state = " + x.state);
-                    }
-
-                    if (execution_limit > 0 && elapsed > execution_limit) {
-
-                        if (LOG_WARNINGS) {
-
-                            System.out.println(x.getWorkerName() + ": interrupting");
-                        }
-
-                        AERunnable r = x.runnable;
-
-                        if (r != null) {
-
-                            try {
-                                if (!(r instanceof ThreadPoolTask)) {
-                                    x.interrupt();
-                                }
-                            } catch (Throwable e) {
-
-                                e.printStackTrace();
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -438,6 +299,7 @@ ThreadPool {
         threadPoolWorker() {
             super(NAME_THREADS ? (name + " " + (thread_name_index)) : name, true);
             thread_name_index++;
+            int thread_priority = Thread.NORM_PRIORITY;
             setPriority(thread_priority);
             worker_name = this.getName();
             start();
@@ -566,10 +428,6 @@ ThreadPool {
 
         ThreadPool getOwner() {
             return (ThreadPool.this);
-        }
-
-        AERunnable getRunnable() {
-            return (runnable);
         }
     }
 }
