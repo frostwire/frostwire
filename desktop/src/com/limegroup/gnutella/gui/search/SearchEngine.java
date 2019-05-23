@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
-import com.frostwire.search.pixabay.PixabaySearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -65,7 +64,6 @@ public abstract class SearchEngine {
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
-    private static final int PIXABAY_ID = 22;
 
     private static final int NYAA_ID = 23;
 
@@ -148,13 +146,6 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine PIXABAY = new SearchEngine(PIXABAY_ID, "Pixabay", SearchEnginesSettings.PIXABAY_SEARCH_ENABLED, "pixabay.com") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new PixabaySearchPerformer(token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -194,7 +185,6 @@ public abstract class SearchEngine {
                 ZOOQLE,
                 TPB,
                 SOUNDCLOUD,
-                PIXABAY,
                 FROSTCLICK,
                 ARCHIVEORG,
                 TORLOCK,

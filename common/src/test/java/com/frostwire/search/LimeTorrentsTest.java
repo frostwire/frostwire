@@ -32,7 +32,7 @@ public class LimeTorrentsTest {
     @Test
     public void testDetailsRegex() throws IOException {
         /*
-        LimeTorrentsSearchPerformer p = (LimeTorrentsSearchPerformer) SearchManager.LIMETORRENTS.newPerformer(0, "<keyword>");
+        Torrentz2SearchPerformer p = (Torrentz2SearchPerformer) SearchManager.LIMETORRENTS.newPerformer(0, "<keyword>");
 
         String url = "<url>";
         String page = p.fetch(url);
