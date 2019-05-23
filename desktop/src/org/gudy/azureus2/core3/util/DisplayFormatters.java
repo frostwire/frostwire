@@ -49,8 +49,6 @@ public class DisplayFormatters {
     private static String[] units_rate;
     private static final int unitsStopAt = UNIT_TB;
 
-    private static String[] units_base10;
-
     private static boolean use_si_units;
     private static boolean force_si_values;
     private static boolean use_units_rate_bits;
@@ -126,13 +124,12 @@ public class DisplayFormatters {
 
         String per_sec = "/s";
 
-        units_base10 =
-                new String[]{
-                        getUnit(use_units_rate_bits ? "bit" : "B"),
-                        getUnit(use_units_rate_bits ? "kbit" : "KB"),
-                        getUnit(use_units_rate_bits ? "Mbit" : "MB"),
-                        getUnit(use_units_rate_bits ? "Gbit" : "GB"),
-                        getUnit(use_units_rate_bits ? "Tbit" : "TB")};
+        String[] units_base10 = new String[]{
+                getUnit(use_units_rate_bits ? "bit" : "B"),
+                getUnit(use_units_rate_bits ? "kbit" : "KB"),
+                getUnit(use_units_rate_bits ? "Mbit" : "MB"),
+                getUnit(use_units_rate_bits ? "Gbit" : "GB"),
+                getUnit(use_units_rate_bits ? "Tbit" : "TB")};
 
         for (int i = 0; i <= unitsStopAt; i++) {
             units[i] = units[i];
