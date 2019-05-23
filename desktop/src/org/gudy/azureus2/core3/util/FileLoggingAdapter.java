@@ -16,8 +16,6 @@
  */
 package org.gudy.azureus2.core3.util;
 
-import org.gudy.azureus2.core3.util.LogEvent;
-
 /**
  * Listeners for FileLogging
  * 

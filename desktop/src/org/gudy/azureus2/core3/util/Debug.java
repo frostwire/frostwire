@@ -18,10 +18,13 @@
  */
 package org.gudy.azureus2.core3.util;
 
-import java.io.*;
-import java.net.UnknownHostException;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ConnectException;
-import java.util.*;
+import java.net.UnknownHostException;
+import java.util.Date;
 
 /**
  * Debug-assisting class.
