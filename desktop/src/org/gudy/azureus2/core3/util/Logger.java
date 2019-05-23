@@ -30,13 +30,12 @@ import java.io.PrintStream;
 class Logger {
 	private static final LogIDs LOGID = LogIDs.LOGGER;
 
-	private static final LoggerImpl loggerImpl = null;
+	private static final LoggerImpl loggerImpl = new LoggerImpl();;
 
 	private static final FileLogging fileLogging = new FileLogging();
 
 	static {
 		try {
-			loggerImpl = new LoggerImpl();
 			loggerImpl.init();
 
 			fileLogging.initialize();

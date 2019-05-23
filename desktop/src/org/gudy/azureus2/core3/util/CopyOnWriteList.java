@@ -38,13 +38,12 @@ implements Iterable<T>
 	
 	private int initialCapacity;
 	
-	private static final CopyOnWriteList stats;
+	private static final CopyOnWriteList stats = new CopyOnWriteList(10);;
 	
 	private int	mutation_count;
 	
 	static {
 		if (LOG_STATS) {
-			stats = new CopyOnWriteList(10);
 			AEDiagnostics.addEvidenceGenerator(new AEDiagnosticsEvidenceGenerator() {
 				public void generate(IndentWriter writer) {
 					writer.println("COWList Info");
