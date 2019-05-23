@@ -27,7 +27,7 @@ CopyOnWriteList<T>
         implements Iterable<T> {
     private static final boolean LOG_STATS = false;
 
-    private List<T> list = Collections.EMPTY_LIST;
+    private List list = Collections.EMPTY_LIST;
 
     private final boolean use_linked_list;
 
@@ -111,76 +111,6 @@ CopyOnWriteList<T>
         }
     }
 
-    public void
-    add(
-            int index,
-            T obj) {
-        if (Constants.IS_CVS_VERSION && use_linked_list) {
-            Debug.out("hmm");
-        }
-        synchronized (this) {
-
-            if (visible) {
-
-                List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-
-                //mutated();
-
-                new_list.add(index, obj);
-
-                list = new_list;
-
-                visible = false;
-
-            } else {
-                if (list == Collections.EMPTY_LIST) {
-                    list = use_linked_list ? new LinkedList<>() : new ArrayList<>(initialCapacity);
-                }
-
-                list.add(index, obj);
-            }
-        }
-    }
-
-    public void
-    addAll(
-            Collection<T> c) {
-        synchronized (this) {
-
-            if (visible) {
-
-                List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-
-                //mutated();
-
-                new_list.addAll(c);
-
-                list = new_list;
-
-                visible = false;
-
-            } else {
-                if (list == Collections.EMPTY_LIST) {
-                    list = use_linked_list ? new LinkedList<>() : new ArrayList<>(initialCapacity);
-                }
-
-                list.addAll(c);
-            }
-        }
-    }
-
-    public T
-    get(
-            int index) {
-        if (Constants.IS_CVS_VERSION && use_linked_list) {
-            Debug.out("hmm");
-        }
-
-        synchronized (this) {
-
-            return (list.get(index));
-        }
-    }
 
     public boolean
     remove(
@@ -208,24 +138,6 @@ CopyOnWriteList<T>
         }
     }
 
-    public void
-    clear() {
-        synchronized (this) {
-
-            list = Collections.EMPTY_LIST;
-
-            visible = false;
-        }
-    }
-
-    public boolean
-    contains(
-            T obj) {
-        synchronized (this) {
-
-            return (list.contains(obj));
-        }
-    }
 
     public Iterator<T>
     iterator() {
@@ -237,25 +149,6 @@ CopyOnWriteList<T>
         }
     }
 
-    public List<T>
-    getList() {
-        // TODO: we need to either make this a read-only-list or obey the copy-on-write semantics correctly...
-
-        synchronized (this) {
-
-            visible = true;
-
-            if (Constants.IS_CVS_VERSION) {
-
-                return (Collections.unmodifiableList(list));
-
-            } else {
-
-                return (list);
-            }
-        }
-    }
-
     public int
     size() {
         synchronized (this) {
@@ -263,44 +156,6 @@ CopyOnWriteList<T>
             return (list.size());
         }
     }
-
-    public boolean
-    isEmpty() {
-        synchronized (this) {
-
-            return list.isEmpty();
-        }
-    }
-
-    public Object[]
-    toArray() {
-        synchronized (this) {
-
-            return (list.toArray());
-        }
-    }
-
-    public T[]
-    toArray(
-            T[] x) {
-        synchronized (this) {
-
-            return (list.toArray(x));
-        }
-    }
-	
-	/*
-	private void
-	mutated()
-	{
-		mutation_count++;
-		
-		if ( mutation_count%10 == 0 ){
-			
-			System.out.println( this + ": mut=" + mutation_count );
-		}
-	}
-	*/
 
     private class
     CopyOnWriteListIterator

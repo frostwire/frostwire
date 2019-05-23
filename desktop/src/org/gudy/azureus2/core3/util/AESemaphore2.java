@@ -23,25 +23,15 @@ package org.gudy.azureus2.core3.util;
 
 import java.util.concurrent.Semaphore;
 
-class
-AESemaphore2 
-{
+class AESemaphore2 {
 	private final Semaphore		sem = new Semaphore(0);
 	
-	public 
-	AESemaphore2(
-		String		name )
-	{
-	}
-	
-	public void
-	reserve()
+	void reserve()
 	{
 		sem.acquireUninterruptibly();
 	}
 	
-	public void
-	release()
+	public void release()
 	{
 		sem.release();
 	}

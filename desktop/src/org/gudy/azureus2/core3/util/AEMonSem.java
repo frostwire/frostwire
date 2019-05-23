@@ -62,7 +62,7 @@ AEMonSem {
                     try {
                         Thread.sleep(DEBUG_TIMER);
 
-                    } catch (Throwable e) {
+                    } catch (Throwable ignored) {
                     }
 
                     TimerEventPerformer performer =
@@ -621,7 +621,7 @@ AEMonSem {
             try {
                 Debug.printStackTrace(e);
 
-            } catch (Throwable f) {
+            } catch (Throwable ignored) {
 
             }
         }
@@ -662,78 +662,10 @@ AEMonSem {
             try {
                 Debug.printStackTrace(e);
 
-            } catch (Throwable f) {
+            } catch (Throwable ignored) {
 
             }
         }
-    }
-	
-	/*
-	protected boolean			trace;
-	protected static Map		trace_map = new HashMap();
-	
-	public void
-	trace(
-		boolean	_on )
-	{
-		trace	= _on;
-	}
-	
-	protected void
-	traceEntry()
-	{
-		String str = Debug.getCompressedStackTrace();
-		
-		synchronized( trace_map ){
-			Map map = (Map)trace_map.get( name );
-			if ( map == null ){
-				map = new HashMap();
-				trace_map.put( name, map );
-			}
-			Long l = (Long)map.get(str);
-			
-			if ( l == null ){
-				l = new Long(1);
-			}else{
-				l = new Long(l.longValue()+1);
-			}
-			map.put(str,l);
-		}
-	}
-	
-	protected static void 
-	dumpTrace()
-	{		
-		synchronized( trace_map ){
-						
-			Iterator it = trace_map.entrySet().iterator();
-			
-			while( it.hasNext()){
-				
-				Map.Entry entry = (Map.Entry)it.next();
-				
-				System.out.println( entry.getKey());
-				
-				Map map = (Map)entry.getValue();
-				
-				Iterator it2 = map.entrySet().iterator();
-				
-				while( it2.hasNext()){
-					
-					Map.Entry entry2 = (Map.Entry)it2.next();
-				
-					System.out.println( "    " + entry2.getValue() + " -> " + entry2.getKey());
-				}
-			}
-			
-			trace_map.clear();
-		}
-	}
-	*/
-
-    public String
-    getName() {
-        return (name);
     }
 
     static class

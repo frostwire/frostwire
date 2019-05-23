@@ -21,273 +21,226 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
-public class 
-AESemaphore 
-	extends AEMonSem
-{
-	private int		dont_wait	= 0;
+public class
+AESemaphore
+        extends AEMonSem {
+    private int dont_wait;
 
-	private int		total_reserve	= 0;
-	private int		total_release	= 0;
+    private int total_reserve = 0;
+    private int total_release;
 
-	private boolean	released_forever	= false;
+    private boolean released_forever = false;
 
-	Thread	latest_waiter;
-	
-	public
-	AESemaphore(
-		String		_name )
-	{
-		this( _name, 0 );
-	}
+    Thread latest_waiter;
 
-	public
-	AESemaphore(
-		String		_name,
-		int			count )
-	{
-		super( _name, false );
-		
-		dont_wait		= count;
-		total_release	= count;
-	}
+    public AESemaphore(
+            String _name) {
+        this(_name, 0);
+    }
 
-	public void
-	reserve()
-	{
-		if ( !reserve(0)){
-			
-			Debug.out( "AESemaphore: reserve completed without acquire [" + getString() + "]" );
-		}
-	}
-	
-	private boolean
-	reserve(
-			long millis)
-	{
-		return( reserveSupport( millis, 1 ) == 1 );
-	}
-	
-	public boolean
-	reserveIfAvailable()
-	{
-		synchronized(this){
+    AESemaphore(
+            String _name,
+            int count) {
+        super(_name, false);
 
-			if ( released_forever || dont_wait > 0 ){
+        dont_wait = count;
+        total_release = count;
+    }
 
-				reserve();
-				
-				return( true );
-				
-			}else{
-				
-				return( false );
-			}
-		}
-	}
-	
-	public int
-	reserveSet(
-		int		max_to_reserve,
-		long	millis )
-	{
-		return( reserveSupport( millis, max_to_reserve));
-	}
-	
-	public int
-	reserveSet(
-		int	max_to_reserve )
-	{
-		return( reserveSupport( 0, max_to_reserve));
-	}
-	
-	private int
-	reserveSupport(
-			long millis,
-			int max_to_reserve)
-	{
-		if ( DEBUG ){
-			
-			super.debugEntry();
-		}
-		
-		synchronized(this){
+    public void
+    reserve() {
+        if (!reserve(0)) {
 
-			entry_count++;
-			
-			//System.out.println( name + "::reserve");
-			
-			if ( released_forever ){
+            Debug.out("AESemaphore: reserve completed without acquire [" + getString() + "]");
+        }
+    }
 
-				return(1);
-			}
+    private boolean
+    reserve(
+            long millis) {
+        return (reserveSupport(millis, 1) == 1);
+    }
 
-			if ( dont_wait == 0 ){
+    boolean
+    reserveIfAvailable() {
+        synchronized (this) {
 
-				try{
-					waiting++;
+            if (released_forever || dont_wait > 0) {
 
-					latest_waiter	= Thread.currentThread();
-					
-					if ( waiting > 1 ){
-						
-						// System.out.println( "AESemaphore: " + name + " contended" );
-					}
+                reserve();
 
-					if ( millis == 0 ){
-						
-							// we can get spurious wakeups (see Object javadoc) so we need to guard against
-							// their possibility
-						
-						int	spurious_count	= 0;
-						
-						while( true ){
-							
-							wait();
-							
-							if ( total_reserve == total_release ){
-								
-								spurious_count++;
+                return (true);
 
-								if ( spurious_count > 1024 ){
-								
-									Debug.out( "AESemaphore: spurious wakeup limit exceeded" );
-									
-									throw( new Throwable( "die die die" ));
-									
-								}else{
-								
-									// Debug.out("AESemaphore: spurious wakeup, ignoring" );
-								}					
-							}else{
-								
-								break;
-							}
-						}
-					}else{
-						
-							// we don't hugely care about spurious wakeups here, it'll just appear
-							// as a failed reservation a bit early
-						
-						wait(millis);
-					}
-					
-					if ( total_reserve == total_release ){
-							
-							// here we have timed out on the wait without acquiring
-						
-						waiting--;
-						
-						return( 0 );
-					}
-						
-					total_reserve++;
+            } else {
 
-					return( 1 );
+                return (false);
+            }
+        }
+    }
 
-				}catch( Throwable e ){
+    private int
+    reserveSupport(
+            long millis,
+            int max_to_reserve) {
+        if (DEBUG) {
 
-					waiting--;
+            super.debugEntry();
+        }
 
-					Debug.out( "**** semaphore operation interrupted ****" );
+        synchronized (this) {
 
-					throw( new RuntimeException("Semaphore: operation interrupted", e ));
-					
-				}finally{
-					
-					latest_waiter = null;
-				}
-			}else{
-				int	num_to_get = max_to_reserve>dont_wait?dont_wait:max_to_reserve;
-				
-				dont_wait -= num_to_get;
+            entry_count++;
 
-				total_reserve += num_to_get;
-				
-				return( num_to_get );
-			}
-		}
-	}
-	
-	public void
-	release()
-	{
-		try{
-			synchronized(this){
-				
-				//System.out.println( name + "::release");
-	
-				total_release++;
-	
-				if ( waiting != 0 ){
-	
-					waiting--;
-	
-					notify();
-	
-				}else{
-					dont_wait++;
-				}
-			}
-		}finally{
-			
-			if ( DEBUG ){
-				
-				debugExit();
-			}
-		}
-	}
+            //System.out.println( name + "::reserve");
 
-	private void
-	releaseAllWaiters()
-	{
-		synchronized(this){
+            if (released_forever) {
 
-			int	x	= waiting;
+                return (1);
+            }
 
-			for ( int i=0;i<x;i++ ){
-				release();
-			}
-		}
-	}
+            if (dont_wait == 0) {
 
-	public void
-	releaseForever()
-	{
-		synchronized(this){
+                try {
+                    waiting++;
 
-			releaseAllWaiters();
+                    latest_waiter = Thread.currentThread();
 
-			released_forever	= true;
-		}
-	}
-	
-	public boolean
-	isReleasedForever()
-	{
-		synchronized(this){
+                    if (millis == 0) {
 
-			return( released_forever );
-		}
-	}
-	
-	public int
-	getValue()
-	{
-		synchronized(this){
+                        // we can get spurious wakeups (see Object javadoc) so we need to guard against
+                        // their possibility
 
-			return( dont_wait - waiting );
-		}
-	}
-	
-	public String
-	getString()
-	{
-		synchronized(this){
+                        int spurious_count = 0;
 
-			return( "value=" + dont_wait + ",waiting=" + waiting + ",res=" + total_reserve + ",rel=" + total_release );
-		}
-	}
+                        while (true) {
+
+                            wait();
+
+                            if (total_reserve == total_release) {
+
+                                spurious_count++;
+
+                                if (spurious_count > 1024) {
+
+                                    Debug.out("AESemaphore: spurious wakeup limit exceeded");
+
+                                    throw (new Throwable("die die die"));
+
+                                }
+                            } else {
+
+                                break;
+                            }
+                        }
+                    } else {
+
+                        // we don't hugely care about spurious wakeups here, it'll just appear
+                        // as a failed reservation a bit early
+
+                        wait(millis);
+                    }
+
+                    if (total_reserve == total_release) {
+
+                        // here we have timed out on the wait without acquiring
+
+                        waiting--;
+
+                        return (0);
+                    }
+
+                    total_reserve++;
+
+                    return (1);
+
+                } catch (Throwable e) {
+
+                    waiting--;
+
+                    Debug.out("**** semaphore operation interrupted ****");
+
+                    throw (new RuntimeException("Semaphore: operation interrupted", e));
+
+                } finally {
+
+                    latest_waiter = null;
+                }
+            } else {
+                int num_to_get = max_to_reserve > dont_wait ? dont_wait : max_to_reserve;
+
+                dont_wait -= num_to_get;
+
+                total_reserve += num_to_get;
+
+                return (num_to_get);
+            }
+        }
+    }
+
+    public void
+    release() {
+        try {
+            synchronized (this) {
+
+                //System.out.println( name + "::release");
+
+                total_release++;
+
+                if (waiting != 0) {
+
+                    waiting--;
+
+                    notify();
+
+                } else {
+                    dont_wait++;
+                }
+            }
+        } finally {
+
+            if (DEBUG) {
+
+                debugExit();
+            }
+        }
+    }
+
+    private void
+    releaseAllWaiters() {
+        synchronized (this) {
+
+            int x = waiting;
+
+            for (int i = 0; i < x; i++) {
+                release();
+            }
+        }
+    }
+
+    public void
+    releaseForever() {
+        synchronized (this) {
+
+            releaseAllWaiters();
+
+            released_forever = true;
+        }
+    }
+
+    public int
+    getValue() {
+        synchronized (this) {
+
+            return (dont_wait - waiting);
+        }
+    }
+
+    public String
+    getString() {
+        synchronized (this) {
+
+            return ("value=" + dont_wait + ",waiting=" + waiting + ",res=" + total_reserve + ",rel=" + total_release);
+        }
+    }
 }

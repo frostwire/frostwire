@@ -20,7 +20,6 @@ package org.gudy.azureus2.core3.util;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.security.AccessControlException;
-import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -30,8 +29,6 @@ import java.util.TimeZone;
  * @author gubatron
  */
 public class Constants {
-    public static final String DEFAULT_ENCODING = "UTF8";
-    static final Locale LOCALE_ENGLISH = new Locale("en", "");
 
     static {
         try {
@@ -63,7 +60,6 @@ public class Constants {
 
     private static final String OSName = System.getProperty("os.name");
 
-    public static final boolean isOSX = OSName.toLowerCase().startsWith("mac os");
     public static final boolean isLinux = OSName.equalsIgnoreCase("Linux");
     private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
     // If it isn't windows or osx, it's most likely an unix flavor
@@ -172,14 +168,6 @@ public class Constants {
     isCVSVersion() {
         return (Constants.AZUREUS_VERSION.contains("_"));
     }
-
-    /**
-     * compare two version strings of form n.n.n.n (e.g. 1.2.3.4)
-     *
-     * @param version_1
-     * @param version_2
-     * @return -ve -> version_1 lower, 0 = same, +ve -> version_1 higher
-     */
 
     private static int
     compareVersions(
