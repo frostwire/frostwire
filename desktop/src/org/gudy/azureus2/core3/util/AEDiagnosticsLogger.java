@@ -100,33 +100,13 @@ AEDiagnosticsLogger
 	{
 		force = _force;
 	}
-	
-	public boolean
-	isForced()
-	{
-		return( force );
-	}
-	
+
 	protected String
 	getName()
 	{
 		return( name );
 	}
-		
-	public void
-	setMaxFileSize(
-		int		_max_size )
-	{
-		max_size	= _max_size;
-	}
-	
-	public void
-	enableTimeStamp(
-		boolean	enable )
-	{
-		timestamp_enable	= enable;
-	}
-	
+
 	public void
 	log(
 		Throwable				e )
@@ -146,14 +126,7 @@ AEDiagnosticsLogger
 			
 		}
 	}
-	
-	public void
-	logAndOut(
-		String		str )
-	{
-		logAndOut( str, false );
-	}
-	
+
 	public void
 	logAndOut(
 		String		str,
@@ -270,8 +243,6 @@ AEDiagnosticsLogger
 			if ( first_write ){
 				
 				first_write = false;
-				
-				Calendar now = GregorianCalendar.getInstance();
 
 				str.append( "\r\n[" );
 				str.append( start_date );
