@@ -426,9 +426,6 @@ public final class SoftwareUpdater {
             if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
                 SearchEngine scSE = SearchEngine.SOUNCLOUD;
                 scSE.setActive(false);
-
-                SearchEngine pixabaySE = SearchEngine.PIXABAY;
-                pixabaySE.setActive(false);
             }
         }
     }
