@@ -26,8 +26,7 @@ import com.frostwire.util.Logger;
  */
 public class AESemaphore {
     private static final Logger LOG = Logger.getLogger(AESemaphore.class);
-    long entry_count;
-    int waiting = 0;
+    private int waiting = 0;
     private int dont_wait;
     private int total_reserve = 0;
     private int total_release;
@@ -43,43 +42,25 @@ public class AESemaphore {
         total_release = count;
     }
 
-    public void
-    reserve() {
-        if (!reserve(0)) {
-            LOG.error("AESemaphore: reserve completed without acquire [" + getString() + "]");
-        }
+    public void reserve() {
+        reserveSupport();
     }
 
-    private boolean
-    reserve(
-            long millis) {
-        return (reserveSupport(millis) == 1);
-    }
-
-    boolean
-    reserveIfAvailable() {
+    boolean reserveIfAvailable() {
         synchronized (this) {
             if (released_forever || dont_wait > 0) {
                 reserve();
-                return (true);
+                return true;
             } else {
-                return (false);
+                return false;
             }
         }
     }
 
-    private int
-    reserveSupport(
-            long millis) {
+    private void reserveSupport() {
         synchronized (this) {
-
-            entry_count++;
-
-            //System.out.println( name + "::reserve");
-
             if (released_forever) {
-
-                return (1);
+                return;
             }
 
             if (dont_wait == 0) {
@@ -87,7 +68,7 @@ public class AESemaphore {
                 try {
                     waiting++;
 
-                    if (millis == 0) {
+                    if ((long) 0 == 0) {
 
                         // we can get spurious wakeups (see Object javadoc) so we need to guard against
                         // their possibility
@@ -118,7 +99,7 @@ public class AESemaphore {
 
                         // we don't hugely care about spurious wakeups here, it'll just appear
                         // as a failed reservation a bit early
-                        wait(millis);
+                        wait((long) 0);
                     }
 
                     if (total_reserve == total_release) {
@@ -127,12 +108,10 @@ public class AESemaphore {
 
                         waiting--;
 
-                        return (0);
+                        return;
                     }
 
                     total_reserve++;
-
-                    return (1);
 
                 } catch (Throwable e) {
 
@@ -150,7 +129,6 @@ public class AESemaphore {
 
                 total_reserve += num_to_get;
 
-                return (num_to_get);
             }
         }
     }

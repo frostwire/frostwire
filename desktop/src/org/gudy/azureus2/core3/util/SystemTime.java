@@ -38,9 +38,6 @@ public class SystemTime {
     private static final List<TickConsumer> systemTimeConsumers = new ArrayList<>();
     private static final List<TickConsumer> monotoneTimeConsumers = new ArrayList<>();
     private static volatile List<ChangeListener> clock_change_list = new ArrayList<>();
-    //private static long					hpc_base_time;
-    //private static long					hpc_last_time;
-    //private static boolean				no_hcp_logged;
 
     static {
         try {

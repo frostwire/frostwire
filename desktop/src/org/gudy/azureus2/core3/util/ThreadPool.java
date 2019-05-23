@@ -39,17 +39,14 @@ public class ThreadPool {
     private static void
     checkAllTimeouts() {
         List pools;
-
         // copy the busy pools to avoid potential deadlock due to synchronization
         // nestings
 
         synchronized (busy_pools) {
-
             pools = new ArrayList(busy_pools);
         }
 
         for (Object pool : pools) {
-
             ((ThreadPool) pool).checkTimeouts();
         }
     }
@@ -160,15 +157,7 @@ public class ThreadPool {
             // reserve if available is non-blocking
 
             if (queue_when_full && !thread_sem.reserveIfAvailable()) {
-
-                allocated_worker = null;
-
                 checkWarning();
-
-            } else {
-
-                allocated_worker = new threadPoolWorker();
-
             }
         }
 
@@ -234,52 +223,6 @@ public class ThreadPool {
     public String getName() {
         return (name);
     }
-
-    void releaseManual(ThreadPoolTask toRelease) {
-        if (!toRelease.canManualRelease()) {
-            throw new IllegalStateException("task not manually releasable");
-        }
-
-        synchronized (this) {
-
-            long elapsed = SystemTime.getMonotonousTime() - toRelease.worker.run_start_time;
-            if (elapsed > WARN_TIME && LOG_WARNINGS)
-                System.out.println(toRelease.worker.getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + toRelease.worker.state);
-
-            if (!busy.remove(toRelease.worker)) {
-
-                throw new IllegalStateException("task already released");
-            }
-
-            // if debug is on we leave the pool registered so that we
-            // can trace on the timeout events
-
-            if (busy.size() == 0) {
-
-                synchronized (busy_pools) {
-
-                    busy_pools.remove(this);
-                }
-            }
-
-            if (busy.size() == 0) {
-
-                if (reserved_target > reserved_actual) {
-
-                    reserved_actual++;
-
-                } else {
-
-                    thread_sem.release();
-                }
-            } else {
-
-                new threadPoolWorker();
-            }
-        }
-
-    }
-
 
     class threadPoolWorker extends AEThread2 {
         private final String worker_name;

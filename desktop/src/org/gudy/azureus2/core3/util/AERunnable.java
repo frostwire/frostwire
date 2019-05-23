@@ -23,7 +23,7 @@ package org.gudy.azureus2.core3.util;
  * @author parg
  */
 
-public abstract class AERunnable implements Runnable {
+abstract class AERunnable implements Runnable {
     public void
     run() {
         try {

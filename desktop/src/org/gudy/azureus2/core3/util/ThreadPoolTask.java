@@ -36,19 +36,7 @@ ThreadPoolTask
 	
 	ThreadPool.threadPoolWorker		worker;
 	
-	public void
-	setTaskState(
-		String		state )
-	{
-		worker.setState( state );
-	}
-	
-	public String
-	getTaskState()
-	{
-		return( worker == null ? "" : worker.getState());
-	}
-	
+
 	public String
 	getName()
 	{
@@ -56,7 +44,7 @@ ThreadPoolTask
 	}
 
 	/**
-	 * only invoke this method after the first run of the threadpooltask as it is only meant to join
+	 * only invoke this method after the first run of the thread pool task as it is only meant to join
 	 * on a task when it has child tasks and thus is running in manual release mode
 	 */
 	synchronized final void join()
@@ -86,7 +74,7 @@ ThreadPoolTask
 	}
 	
 	/**
-	 * only invoke this method after the first run of the threadpooltask as it is only meant to
+	 * only invoke this method after the first run of the thread pool task as it is only meant to
 	 * update the state of a task when it has child tasks and thus is running in manual release mode
 	 */
 	synchronized final boolean isAutoReleaseAndAllowManual()
@@ -94,20 +82,5 @@ ThreadPoolTask
 		if(manualRelease == RELEASE_MANUAL)
 			manualRelease = RELEASE_MANUAL_ALLOWED;
 		return manualRelease == RELEASE_AUTO;
-	}
-	
-	public final synchronized void releaseToPool()
-	{
-		// releasing before the initial run finished, so just let the runner do the cleanup
-		if(manualRelease == RELEASE_MANUAL)
-			manualRelease = RELEASE_AUTO;
-		else if(manualRelease == RELEASE_MANUAL_ALLOWED)
-		{
-			worker.getOwner().releaseManual(this);
-			manualRelease = RELEASE_AUTO;
-		} else if(manualRelease == RELEASE_AUTO)
-			System.out.println("this should not happen");
-		
-		notifyAll();
 	}
 }

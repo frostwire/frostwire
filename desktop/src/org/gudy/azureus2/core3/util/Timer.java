@@ -37,11 +37,6 @@ public class Timer
     private long current_when;
 
     public Timer(
-            String name) {
-        this(name, 1);
-    }
-
-    public Timer(
             String name,
             int thread_pool_size) {
         this(name, thread_pool_size, Thread.NORM_PRIORITY);
