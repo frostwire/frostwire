@@ -28,7 +28,7 @@ public class
 AESemaphore
         extends AEMonSem {
     private int dont_wait;
-    
+
     private static Logger LOG = Logger.getLogger(AEMonSem.class);
 
     private int total_reserve = 0;
@@ -36,18 +36,14 @@ AESemaphore
 
     private boolean released_forever = false;
 
-    Thread latest_waiter;
+    private Thread latest_waiter;
 
     public AESemaphore(
             String _name) {
-        this(_name, 0);
+        this(0);
     }
 
-    AESemaphore(
-            String _name,
-            int count) {
-        super(_name, false);
-
+    AESemaphore(int count) {
         dont_wait = count;
         total_release = count;
     }

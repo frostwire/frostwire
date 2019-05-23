@@ -19,29 +19,11 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.util.*;
-import java.util.function.Supplier;
-
 /**
  * @author parg
  */
 
 abstract class AEMonSem {
-
-    private static final ThreadLocal tls =
-            ThreadLocal.withInitial((Supplier<Stack>) Stack::new);
-
     long entry_count;
-    String name;
-    private boolean is_monitor;
     int waiting = 0;
-
-    AEMonSem(String _name, boolean _monitor) {
-        is_monitor = _monitor;
-        if (is_monitor) {
-            name = _name;
-        } else {
-            name = "(S)" + _name;
-        }
-    }
 }

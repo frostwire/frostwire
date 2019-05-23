@@ -78,13 +78,13 @@ SimpleTimer {
         timer.addEvent(name, when, performer);
     }
 
-    static TimerEventPeriodic
+    static void
     addPeriodicEvent(
             String name,
             long frequency,
             TimerEventPerformer performer) {
 
-        return (timer.addPeriodicEvent(name, frequency, performer));
+        timer.addPeriodicEvent(name, frequency, performer);
     }
 
     interface

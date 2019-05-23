@@ -27,13 +27,7 @@ AEMonitor
     private int total_reserve = 0;
     private int total_release = 1;
 
-    Thread owner;
-    Thread last_waiter;
-
-    AEMonitor(
-            String _name) {
-        super(_name, true);
-    }
+    private Thread owner;
 
     public void
     enter() {
@@ -55,9 +49,8 @@ AEMonitor
                     try {
                         waiting++;
 
-                        last_waiter = current_thread;
 
-                        // we can get spurious wakeups (see Object javadoc) so we need to guard against
+                        // we can get spurious wake-ups (see Object javadoc) so we need to guard against
                         // their possibility
 
                         int spurious_count = 0;
@@ -96,9 +89,6 @@ AEMonitor
 
                         throw (new RuntimeException("AEMonitor:interrupted"));
 
-                    } finally {
-
-                        last_waiter = null;
                     }
                 } else {
 

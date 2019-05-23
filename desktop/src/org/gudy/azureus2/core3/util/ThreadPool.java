@@ -127,7 +127,7 @@ ThreadPool {
         max_size = _max_size;
         queue_when_full = _queue_when_full;
 
-        thread_sem = new AESemaphore("ThreadPool::" + name, _max_size);
+        thread_sem = new AESemaphore(_max_size);
 
         busy = new ArrayList(_max_size);
     }
@@ -148,8 +148,8 @@ ThreadPool {
         log_cpu = true;
     }
 
-    public threadPoolWorker run(AERunnable runnable) {
-        return (run(runnable, false, false));
+    public void run(AERunnable runnable) {
+        run(runnable, false, false);
     }
 
 

@@ -112,7 +112,7 @@ CopyOnWriteList<T>
     }
 
 
-    public boolean
+    public void
     remove(
             T obj) {
         synchronized (this) {
@@ -129,11 +129,9 @@ CopyOnWriteList<T>
 
                 visible = false;
 
-                return (result);
-
             } else {
 
-                return (list.remove(obj));
+                list.remove(obj);
             }
         }
     }

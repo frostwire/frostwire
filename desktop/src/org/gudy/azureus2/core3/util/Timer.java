@@ -30,7 +30,7 @@ public class Timer
         implements SystemTime.ChangeListener {
     private static final boolean DEBUG_TIMERS = true;
     private static ArrayList<WeakReference<Timer>> timers = null;
-    private static final AEMonitor timers_mon = new AEMonitor("timers list");
+    private static final AEMonitor timers_mon = new AEMonitor();
 
     private ThreadPool thread_pool;
 
@@ -323,12 +323,12 @@ public class Timer
         }
     }
 
-    synchronized TimerEvent
+    synchronized void
     addEvent(
             String name,
             long when,
             TimerEventPerformer performer) {
-        return (addEvent(name, SystemTime.getCurrentTime(), when, performer));
+        addEvent(name, SystemTime.getCurrentTime(), when, performer);
     }
 
     synchronized TimerEvent
