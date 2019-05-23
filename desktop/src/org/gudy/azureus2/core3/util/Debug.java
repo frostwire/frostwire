@@ -291,11 +291,6 @@ public class Debug {
         return (last_message.toString());
     }
 
-    public static String
-    getCompressedStackTrace() {
-        return (getCompressedStackTrace(new Throwable(), 1, 200, false));
-    }
-
     public static void printStackTrace(Throwable e) {
         printStackTrace(e, null);
     }

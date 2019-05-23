@@ -49,13 +49,6 @@ public class DisplayFormatters {
     private static String[] units_rate;
     private static final int unitsStopAt = UNIT_TB;
 
-    private static boolean use_si_units;
-    private static boolean force_si_values;
-    private static boolean use_units_rate_bits;
-    private static boolean not_use_GB_TB;
-
-    private static int message_text_state = 0;
-
     static {
         setUnits();
     }
@@ -68,68 +61,33 @@ public class DisplayFormatters {
         String[] units_bits = new String[unitsStopAt + 1];
         units_rate = new String[unitsStopAt + 1];
 
-        if (use_si_units) {
-            // fall through intentional
-            switch (unitsStopAt) {
-                case UNIT_TB:
-                    units[UNIT_TB] = getUnit("TiB");
-                    units_bits[UNIT_TB] = getUnit("Tibit");
-                    units_rate[UNIT_TB] = (use_units_rate_bits) ? getUnit("Tibit") : getUnit("TiB");
-                case UNIT_GB:
-                    units[UNIT_GB] = getUnit("GiB");
-                    units_bits[UNIT_GB] = getUnit("Gibit");
-                    units_rate[UNIT_GB] = (use_units_rate_bits) ? getUnit("Gibit") : getUnit("GiB");
-                case UNIT_MB:
-                    units[UNIT_MB] = getUnit("MiB");
-                    units_bits[UNIT_MB] = getUnit("Mibit");
-                    units_rate[UNIT_MB] = (use_units_rate_bits) ? getUnit("Mibit") : getUnit("MiB");
-                case UNIT_KB:
-                    // can be upper or lower case k
-                    units[UNIT_KB] = getUnit("KiB");
-                    units_bits[UNIT_KB] = getUnit("Kibit");
 
-                    // can be upper or lower case k, upper more consistent
-                    units_rate[UNIT_KB] = (use_units_rate_bits) ? getUnit("Kibit") : getUnit("KiB");
-                case UNIT_B:
-                    units[UNIT_B] = getUnit("B");
-                    units_bits[UNIT_B] = getUnit("bit");
-                    units_rate[UNIT_B] = (use_units_rate_bits) ? getUnit("bit") : getUnit("B");
-            }
-        } else {
-            switch (unitsStopAt) {
-                case UNIT_TB:
-                    units[UNIT_TB] = getUnit("TB");
-                    units_bits[UNIT_TB] = getUnit("Tbit");
-                    units_rate[UNIT_TB] = (use_units_rate_bits) ? getUnit("Tbit") : getUnit("TB");
-                case UNIT_GB:
-                    units[UNIT_GB] = getUnit("GB");
-                    units_bits[UNIT_GB] = getUnit("Gbit");
-                    units_rate[UNIT_GB] = (use_units_rate_bits) ? getUnit("Gbit") : getUnit("GB");
-                case UNIT_MB:
-                    units[UNIT_MB] = getUnit("MB");
-                    units_bits[UNIT_MB] = getUnit("Mbit");
-                    units_rate[UNIT_MB] = (use_units_rate_bits) ? getUnit("Mbit") : getUnit("MB");
-                case UNIT_KB:
-                    // yes, the k should be lower case
-                    units[UNIT_KB] = getUnit("kB");
-                    units_bits[UNIT_KB] = getUnit("kbit");
-                    units_rate[UNIT_KB] = (use_units_rate_bits) ? getUnit("kbit") : getUnit("kB");
-                case UNIT_B:
-                    units[UNIT_B] = getUnit("B");
-                    units_bits[UNIT_B] = getUnit("bit");
-                    units_rate[UNIT_B] = (use_units_rate_bits) ? getUnit("bit") : getUnit("B");
-            }
+        switch (unitsStopAt) {
+            case UNIT_TB:
+                units[UNIT_TB] = getUnit("TB");
+                units_bits[UNIT_TB] = getUnit("Tbit");
+                units_rate[UNIT_TB] = getUnit("TB");
+            case UNIT_GB:
+                units[UNIT_GB] = getUnit("GB");
+                units_bits[UNIT_GB] = getUnit("Gbit");
+                units_rate[UNIT_GB] = getUnit("GB");
+            case UNIT_MB:
+                units[UNIT_MB] = getUnit("MB");
+                units_bits[UNIT_MB] = getUnit("Mbit");
+                units_rate[UNIT_MB] = getUnit("MB");
+            case UNIT_KB:
+                // yes, the k should be lower case
+                units[UNIT_KB] = getUnit("kB");
+                units_bits[UNIT_KB] = getUnit("kbit");
+                units_rate[UNIT_KB] = getUnit("kB");
+            case UNIT_B:
+                units[UNIT_B] = getUnit("B");
+                units_bits[UNIT_B] = getUnit("bit");
+                units_rate[UNIT_B] = getUnit("B");
         }
 
 
         String per_sec = "/s";
-
-        String[] units_base10 = new String[]{
-                getUnit(use_units_rate_bits ? "bit" : "B"),
-                getUnit(use_units_rate_bits ? "kbit" : "KB"),
-                getUnit(use_units_rate_bits ? "Mbit" : "MB"),
-                getUnit(use_units_rate_bits ? "Gbit" : "GB"),
-                getUnit(use_units_rate_bits ? "Tbit" : "TB")};
 
         for (int i = 0; i <= unitsStopAt; i++) {
             units[i] = units[i];
@@ -147,25 +105,6 @@ public class DisplayFormatters {
         return " " + key;
     }
 
-    private static String getResourceString(String key, String def) {
-        if (message_text_state == 0) {
-            // this fooling around is to permit the use of this class in the absence of the (large) overhead
-            // of resource bundles
-            try {
-                MessageText.class.getName();
-                message_text_state = 1;
-            } catch (Throwable e) {
-                message_text_state = 2;
-            }
-        }
-
-        if (message_text_state == 1) {
-            return (MessageText.getString(key));
-        } else {
-            return (def);
-        }
-    }
-
     private static String formatByteCountToKiBEtc(
             long n) {
         return formatByteCountToKiBEtc(n, true, DisplayFormatters.TRUNCZEROS_NO, -1);
@@ -176,11 +115,11 @@ public class DisplayFormatters {
             boolean rate,
             boolean bTruncateZeros,
             int precision) {
-        double dbl = (rate && use_units_rate_bits) ? n * 8 : n;
+        double dbl = n;
 
         int unitIndex = UNIT_B;
 
-        long div = force_si_values ? 1024 : (use_si_units ? 1024 : 1000);
+        long div = 1000;
 
         while (dbl >= div && unitIndex < unitsStopAt) {
 

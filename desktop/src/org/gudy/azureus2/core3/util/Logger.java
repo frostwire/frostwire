@@ -30,15 +30,12 @@ import java.io.PrintStream;
 class Logger {
 	private static final LogIDs LOGID = LogIDs.LOGGER;
 
-	private static final LoggerImpl loggerImpl = new LoggerImpl();;
+	private static final LoggerImpl loggerImpl = new LoggerImpl();
 
-	private static final FileLogging fileLogging = new FileLogging();
 
 	static {
 		try {
 			loggerImpl.init();
-
-			fileLogging.initialize();
 
 			if (loggerImpl.isEnabled()) {
 				log(new LogEvent(LOGID, "**** Logging starts: " +
@@ -61,9 +58,9 @@ class Logger {
 			t.printStackTrace();
 			Debug.out("Error initializing Logger", t);
 			// loggerImpl will always be set, except for cases where there wasn't
-			// enough memory. In that case, app will blork with null pointer exception
+			// enough memory. In that case, app will block with null pointer exception
 			// on first Logger.* call.  However, since there's not enough memory,
-			// application will probably blork somewhere else in the code first. 
+			// application will probably block somewhere else in the code first.
 		}
 	}
 
@@ -91,93 +88,13 @@ class Logger {
 	}
 
 	/**
-	 * Log an event, loading text from out messagebundle. Fill event.text with
-	 * resource id.
-	 * 
-	 * @param event
-	 *            event to log
-	 */
-	public static void logTextResource(LogEvent event) {
-		loggerImpl.logTextResource(event);
-	}
-
-    // dead
-	public static void logTextResource(LogEvent event, String[] params) {
-		loggerImpl.logTextResource(event, params);
-	}
-
-    // dead
-	public static void logTextResource(LogAlert alert) {
-		loggerImpl.logTextResource(alert);
-	}
-
-	public static void logTextResource(LogAlert alert, String[] params) {
-		loggerImpl.logTextResource(alert, params);
-	}
-
-	/**
-	 * Redirect stdout and stderr to Logger.
-	 */
-	public static void doRedirects() {
-		loggerImpl.doRedirects();
-	}
-
-	/**
-	 * Add a listener that's triggered when an event is logged.
-	 * 
-	 * @param aListener
-	 *            Listener to call when an event is logged
-	 */
-	public static void addListener(ILogEventListener aListener) {
-		loggerImpl.addListener(aListener);
-	}
-
-	/**
-	 * Add a listener that's triggered when an alert is logged.
-	 * 
-	 * @param aListener
-	 *            Listener to call when an alert is logged
-	 */
-	public static void addListener(ILogAlertListener aListener) {
-		loggerImpl.addListener(aListener);
-	}
-
-	/**
-	 * Remove a previously added log listener
-	 * 
-	 * @param aListener
-	 *            Listener to remove
-	 */
-	public static void removeListener(ILogEventListener aListener) {
-		loggerImpl.removeListener(aListener);
-	}
-
-	/**
-	 * Remove a previously added log listener
-	 * 
-	 * @param aListener
-	 *            Listener to remove
-	 */
-	public static void removeListener(ILogAlertListener aListener) {
-		loggerImpl.removeListener(aListener);
-	}
-
-	/**
 	 * Retrieve the original stderr output before we hooked it.  Handy for
 	 * printing out critical errors that need to bypass the logger capture.
 	 * 
 	 * @return stderr
 	 */
-	public static PrintStream getOldStdErr() {
+	static PrintStream getOldStdErr() {
 		return loggerImpl.getOldStdErr();
 	}
-	
-	public static FileLogging getFileLoggingInstance() {
-		return fileLogging;
-	}
-	
-	public static void allowLoggingToStdErr(boolean allowed) {
-		loggerImpl.allowLoggingToStdErr(allowed);
-	}
-	
+
 }
