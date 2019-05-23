@@ -27,7 +27,6 @@ import java.util.*;
 public class Timer
         extends AERunnable
         implements SystemTime.ChangeListener {
-    private static final AEMonitor timers_mon = new AEMonitor();
 
     private final ThreadPool thread_pool;
 
@@ -36,9 +35,6 @@ public class Timer
     private long unique_id_next = 0;
 
     private long current_when;
-
-    private boolean log;
-    private int max_events_logged;
 
     public Timer(
             String name) {
@@ -56,26 +52,14 @@ public class Timer
             int thread_pool_size,
             int thread_priority) {
         thread_pool = new ThreadPool(name, thread_pool_size);
-
         SystemTime.registerClockChangeListener(this);
-
         Thread t = new Thread(this, "Timer:" + name);
-
         t.setDaemon(true);
-
         t.setPriority(thread_priority);
-
         t.start();
     }
 
-    private synchronized List<TimerEvent>
-    getEvents() {
-        return (new ArrayList<>(events));
-    }
-
-
-    void
-    setWarnWhenFull() {
+    void setWarnWhenFull() {
         thread_pool.setWarnWhenFull();
     }
 
@@ -87,7 +71,6 @@ public class Timer
                 TimerEvent event_to_run = null;
 
                 synchronized (this) {
-
 
 
                     if (events.isEmpty()) {
@@ -114,9 +97,6 @@ public class Timer
                         long delay = when - now;
 
                         if (delay > 0) {
-
-                            // System.out.println( "waiting for " + delay );
-
                             try {
                                 current_when = when;
 
@@ -148,16 +128,7 @@ public class Timer
                         event_to_run = next_event;
 
                         it.remove();
-						
-						/*
-						if ( rem < -100 ){
-							
-							System.out.println( "Late scheduling [" + (-rem) + "] of " + event_to_run.getString());
-						}
-						*/
                     }
-
-                    // System.out.println( getName() +": events=" + events.size() + ", to_run=" +  (event_to_run==null?"null":event_to_run.getString()));
                 }
 
                 if (event_to_run != null) {
@@ -176,13 +147,9 @@ public class Timer
             long current_time,
             long offset) {
         if (Math.abs(offset) >= 60 * 1000) {
-
             // fix up the timers
-
             synchronized (this) {
-
                 Iterator<TimerEvent> it = events.iterator();
-
                 List<TimerEvent> updated_events = new ArrayList<>(events.size());
 
                 while (it.hasNext()) {
@@ -210,21 +177,8 @@ public class Timer
                                 new_when = current_time + freq;
                             }
                         }
-
-                        // don't wrap around by accident although this really shouldn't happen
-
-//						if (old_when > 0 && new_when < 0 && offset > 0) {
-//
-//							// Debug.out( "Ignoring wrap around for " + event.getName());
-//
-//						} else {
-
-                        // System.out.println( "    adjusted: " + old_when + " -> " + new_when );
-
                         event.setWhen(new_when);
-//						}
                     }
-
                     updated_events.add(event);
                 }
 
@@ -327,16 +281,16 @@ public class Timer
         return (addEvent(null, creation_time, when, absolute, performer));
     }
 
-    private synchronized TimerEvent
+    private synchronized void
     addEvent(
             String name,
             long creation_time,
             long when,
             TimerEventPerformer performer) {
-        return (addEvent(name, creation_time, when, false, performer));
+        addEvent(name, creation_time, when, false, performer);
     }
 
-    synchronized TimerEvent
+    private synchronized TimerEvent
     addEvent(
             String name,
             long creation_time,
@@ -346,48 +300,27 @@ public class Timer
         TimerEvent event = new TimerEvent(unique_id_next++, when, absolute, performer);
 
         if (name != null) {
-
             event.setName(name);
         }
 
         events.add(event);
 
-        if (log) {
-
-            if (events.size() > max_events_logged) {
-
-                max_events_logged = events.size();
-
-                System.out.println("Timer '" + thread_pool.getName() + "' - events = " + max_events_logged);
-            }
-        }
-
-        // System.out.println( "event added (" + when + ") - queue = " + events.size());
-
         if (current_when == Integer.MAX_VALUE || when < current_when) {
-
             notify();
         }
 
         return (event);
     }
 
-    synchronized TimerEventPeriodic
-    addPeriodicEvent(
-            long frequency,
-            TimerEventPerformer performer) {
-        return (addPeriodicEvent(null, frequency, performer));
-    }
-
-    synchronized TimerEventPeriodic
+    synchronized void
     addPeriodicEvent(
             String name,
             long frequency,
             TimerEventPerformer performer) {
-        return (addPeriodicEvent(name, frequency, false, performer));
+        addPeriodicEvent(name, frequency, false, performer);
     }
 
-    synchronized TimerEventPeriodic
+    private synchronized void
     addPeriodicEvent(
             String name,
             long frequency,
@@ -396,23 +329,8 @@ public class Timer
         TimerEventPeriodic periodic_performer = new TimerEventPeriodic(this, frequency, absolute, performer);
 
         if (name != null) {
-
             periodic_performer.setName(name);
         }
 
-        return (periodic_performer);
-    }
-
-    synchronized void
-    cancelEvent(
-            TimerEvent event) {
-        if (events.contains(event)) {
-
-            events.remove(event);
-
-            // System.out.println( "event cancelled (" + event.getWhen() + ") - queue = " + events.size());
-
-            notify();
-        }
     }
 }

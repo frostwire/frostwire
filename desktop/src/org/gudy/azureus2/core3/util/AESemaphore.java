@@ -24,13 +24,11 @@ import com.frostwire.util.Logger;
 /**
  * @author parg
  */
-public class
-AESemaphore
-        extends AEMonSem {
+public class AESemaphore {
+    private static final Logger LOG = Logger.getLogger(AESemaphore.class);
+    long entry_count;
+    int waiting = 0;
     private int dont_wait;
-
-    private static final Logger LOG = Logger.getLogger(AEMonSem.class);
-
     private int total_reserve = 0;
     private int total_release;
 
@@ -55,21 +53,16 @@ AESemaphore
     private boolean
     reserve(
             long millis) {
-        return (reserveSupport(millis, 1) == 1);
+        return (reserveSupport(millis) == 1);
     }
 
     boolean
     reserveIfAvailable() {
         synchronized (this) {
-
             if (released_forever || dont_wait > 0) {
-
                 reserve();
-
                 return (true);
-
             } else {
-
                 return (false);
             }
         }
@@ -77,8 +70,7 @@ AESemaphore
 
     private int
     reserveSupport(
-            long millis,
-            int max_to_reserve) {
+            long millis) {
         synchronized (this) {
 
             entry_count++;
@@ -126,7 +118,6 @@ AESemaphore
 
                         // we don't hugely care about spurious wakeups here, it'll just appear
                         // as a failed reservation a bit early
-
                         wait(millis);
                     }
 
@@ -153,7 +144,7 @@ AESemaphore
 
                 }
             } else {
-                int num_to_get = max_to_reserve > dont_wait ? dont_wait : max_to_reserve;
+                int num_to_get = 1 > dont_wait ? dont_wait : 1;
 
                 dont_wait -= num_to_get;
 
@@ -203,14 +194,6 @@ AESemaphore
             releaseAllWaiters();
 
             released_forever = true;
-        }
-    }
-
-    public int
-    getValue() {
-        synchronized (this) {
-
-            return (dont_wait - waiting);
         }
     }
 

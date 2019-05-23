@@ -25,12 +25,7 @@ package org.gudy.azureus2.core3.util;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.gudy.azureus2.core3.config.COConfigurationManager;
-//import org.gudy.azureus2.core3.config.ParameterListener;
-
-
-public class
-ThreadPool {
+public class ThreadPool {
     private static final boolean NAME_THREADS = false;
     private static final boolean LOG_WARNINGS = false;
     private static final int WARN_TIME = 10000;
@@ -61,7 +56,6 @@ ThreadPool {
 
 
     private final String name;
-    private final int max_size;
     private int thread_name_index = 1;
 
     private final List busy;
@@ -69,7 +63,7 @@ ThreadPool {
     private final List task_queue = new ArrayList();
 
     private final AESemaphore thread_sem;
-    private int reserved_target;
+    private final int reserved_target = 0;
     private int reserved_actual;
 
     private boolean warn_when_full;
@@ -89,7 +83,6 @@ ThreadPool {
             int _max_size,
             boolean _queue_when_full) {
         name = _name;
-        max_size = _max_size;
         queue_when_full = _queue_when_full;
 
         thread_sem = new AESemaphore(_max_size);
@@ -103,11 +96,11 @@ ThreadPool {
     }
 
     public void run(AERunnable runnable) {
-        run(runnable, false, false);
+        run(runnable, false);
     }
 
 
-    private threadPoolWorker run(AERunnable runnable, boolean high_priority, boolean manualRelease) {
+    private void run(AERunnable runnable, boolean manualRelease) {
 
         if (manualRelease && !(runnable instanceof ThreadPoolTask))
             throw new IllegalArgumentException("manual release only allowed for ThreadPoolTasks");
@@ -150,7 +143,7 @@ ThreadPool {
                         runIt(runnable);
                     }
 
-                    return (recursive_worker);
+                    return;
                 }
             }
         }
@@ -159,7 +152,7 @@ ThreadPool {
 
         synchronized (this) {
 
-            if (high_priority)
+            if (false)
                 task_queue.add(0, runnable);
             else
                 task_queue.add(runnable);
@@ -179,7 +172,6 @@ ThreadPool {
             }
         }
 
-        return (allocated_worker);
     }
 
     private void runIt(AERunnable runnable) {
@@ -330,17 +322,6 @@ ThreadPool {
                                     if (!busy_pools.contains(ThreadPool.this)) {
                                         busy_pools.add(ThreadPool.this);
                                         if (!busy_pool_timer_set) {
-                                            // we have to defer this action rather
-                                            // than running as a static initialiser
-                                            // due to the dependency between
-                                            // ThreadPool, Timer and ThreadPool again
-//											COConfigurationManager.addAndFireParameterListeners(new String[] { "debug.threadpool.log.enable", "debug.threadpool.debug.trace" }, new ParameterListener()
-//											{
-//												public void parameterChanged(String name) {
-//													debug_thread_pool = COConfigurationManager.getBooleanParameter("debug.threadpool.log.enable", false);
-//													debug_thread_pool_log_on = COConfigurationManager.getBooleanParameter("debug.threadpool.debug.trace", false);
-//												}
-//											});
                                             busy_pool_timer_set = true;
                                             SimpleTimer.addPeriodicEvent("ThreadPool:timeout", WARN_TIME, event -> checkAllTimeouts());
                                         }
