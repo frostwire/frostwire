@@ -112,11 +112,7 @@ public class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ 
 	}
 
 	/**
-	 * @param downloadManagerImpl
-	 * @param b
-	 * @param string
-	 * @param e
-	 */
+     */
 	public LogAlert(Object relatedTo, boolean repeatable,
 			String text, Throwable err) {
 		this(repeatable, text, err);

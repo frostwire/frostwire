@@ -22,10 +22,6 @@
 
 package org.gudy.azureus2.core3.util;
 
-/**
- * @author parg
- */
-
 import java.lang.ref.WeakReference;
 import java.util.*;
 

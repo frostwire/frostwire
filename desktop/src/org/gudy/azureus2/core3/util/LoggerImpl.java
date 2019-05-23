@@ -172,11 +172,7 @@ public class LoggerImpl {
 	 *            event to log
 	 */
 	public void log(LogEvent event) {
-		
-		/**
-		 * This highlights bits of code which log, but don't bother
-		 * to check whether logging is enabled or not.
-		 */ 
+
 		//if (!bEventLoggingEnabled) {
 		//	new Exception("No logging check done!").printStackTrace(psOldErr);
 		//}

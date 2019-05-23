@@ -46,7 +46,6 @@ public class LogRelation {
 	/**
 	 * Query this class for a reference to another class that it may hold
 	 * 
-	 * @param c Class desired
 	 * @return If found, the class desired.  Otherwise, null.
 	 */
 	public Object[] getQueryableInterfaces() {

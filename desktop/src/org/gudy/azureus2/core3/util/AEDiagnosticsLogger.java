@@ -318,12 +318,7 @@ AEDiagnosticsLogger
 	{
 		try{	
 			File	log_file	= getLogFile();
-			
-				/**
-				 *  log_file.length will return 0 if the file doesn't exist, so we don't need
-				 *  to explicitly check for its existence.
-				 */
-			
+
 			if ( log_file.length() >= max_size ){
 				
 				if ( current_writer != null ){
@@ -378,12 +373,7 @@ AEDiagnosticsLogger
 						
 			try{	
 				File	log_file	= getLogFile();
-				
-					/**
-					 *  log_file.length will return 0 if the file doesn't exist, so we don't need
-					 *  to explicitly check for its existence.
-					 */
-				
+
 				if ( log_file.length() >= max_size ){
 					
 					if ( current_writer != null ){

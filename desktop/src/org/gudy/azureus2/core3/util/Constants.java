@@ -48,8 +48,6 @@ public class Constants {
     }
 
     static final String INFINITY_STRING = "\u221E"; // "oo";pa
-    static final int CRAPPY_INFINITY_AS_INT = 365 * 24 * 3600; // seconds (365days)
-    static final long CRAPPY_INFINITE_AS_LONG = 10000 * 365 * 24 * 3600; // seconds (10k years)
 
     // keep the CVS style constant coz version checkers depend on it!
     // e.g. 2.0.8.3

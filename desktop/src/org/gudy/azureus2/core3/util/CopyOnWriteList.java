@@ -74,8 +74,7 @@ implements Iterable<T>
 	}
 	
 	/**
-	 * @param i
-	 */
+     */
 	public CopyOnWriteList(int initialCapacity) {
 		this.initialCapacity = initialCapacity;
 		use_linked_list = false;
