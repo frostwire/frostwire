@@ -132,7 +132,7 @@ public class Debug {
   }
 
   private static String getStackTrace(int endNumToSkip) {
-		String sStackTrace = "";
+		StringBuilder sStackTrace = new StringBuilder();
     try {
       throw new Exception();
     }
@@ -140,12 +140,12 @@ public class Debug {
       StackTraceElement st[] = e.getStackTrace();
       for (int i = 1; i < st.length - endNumToSkip; i++) {
         if (!st[i].getMethodName().endsWith("StackTrace"))
-        	sStackTrace += st[i].toString() + "\n";
+        	sStackTrace.append(st[i].toString()).append("\n");
       }
       if (e.getCause() != null)
-      	sStackTrace += "\tCaused By: " + getStackTrace(e.getCause()) + "\n";
+      	sStackTrace.append("\tCaused By: ").append(getStackTrace(e.getCause())).append("\n");
     }
-    return sStackTrace;
+    return sStackTrace.toString();
   }
 
 	private static String 
@@ -257,7 +257,7 @@ public class Debug {
 	getNestedExceptionMessage(
 		Throwable 		e )
 	{
-		String	last_message	= "";
+		StringBuilder last_message	= new StringBuilder();
 		
 		while( e != null ){
 			
@@ -291,13 +291,13 @@ public class Debug {
 						
 			if ( this_message.length() > 0 && last_message.indexOf( this_message ) == -1 ){
 				
-				last_message	+= (last_message.length()==0?"":", " ) + this_message;
+				last_message.append(last_message.length() == 0 ? "" : ", ").append(this_message);
 			}
 			
 			e	= e.getCause();
 		}
 		
-		return( last_message );
+		return(last_message.toString());
 	}
 	
 	public static String

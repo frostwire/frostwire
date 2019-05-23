@@ -196,42 +196,13 @@ AEDiagnostics
 	{
 		getLogger( logger_name ).log( str );
 	}
-	
-	public static void
-	markDirty()
-	{
-		try{
-
-			//COConfigurationManager.setParameter( CONFIG_KEY, false );
-		
-			//COConfigurationManager.save();
-			
-		}catch( Throwable e ){
-			
-			Debug.printStackTrace( e );
-		}
-	}
 
 	public static boolean
 	isDirty()
 	{
 		return false;//return( !COConfigurationManager.getBooleanParameter( CONFIG_KEY ));
 	}
-	
-	public static void
-	markClean()
-	{
-		try{
-			//COConfigurationManager.setParameter( CONFIG_KEY, true );
-			
-			//COConfigurationManager.save();
-			
-		}catch( Throwable e ){
-			
-			Debug.printStackTrace( e );
-		}
-	}
-	
+
 	private static final String[][]
 	   	bad_dlls = { 
 			{	"niphk", 			"y", },

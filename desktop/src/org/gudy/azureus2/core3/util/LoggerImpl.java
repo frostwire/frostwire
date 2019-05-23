@@ -77,14 +77,13 @@ public class LoggerImpl {
 		// Shorten from COConfigurationManager To make code more readable
 		//final ConfigurationManager config = ConfigurationManager.getInstance();
 
-		boolean overrideLog = System.getProperty("azureus.overridelog") != null;
-        //config.getBooleanParameter("Logger.Enabled");
+		//config.getBooleanParameter("Logger.Enabled");
 //			config.addParameterListener("Logger.Enabled", new ParameterListener() {
 //				public void parameterChanged(String parameterName) {
 //					bEventLoggingEnabled = config.getBooleanParameter("Logger.Enabled");
 //				}
 //			});
-        bEventLoggingEnabled = overrideLog;
+        bEventLoggingEnabled = System.getProperty("azureus.overridelog") != null;
 	}
 
 	/**

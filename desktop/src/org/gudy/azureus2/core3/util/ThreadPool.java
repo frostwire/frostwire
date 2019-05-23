@@ -298,7 +298,7 @@ ThreadPool {
 
     protected void checkWarning() {
         if (warn_when_full) {
-            String task_names = "";
+            StringBuilder task_names = new StringBuilder();
             try {
                 synchronized (ThreadPool.this) {
                     for (int i = 0; i < busy.size(); i++) {
@@ -310,7 +310,7 @@ ThreadPool {
                                 name = ((ThreadPoolTask) r).getName();
                             else
                                 name = r.getClass().getName();
-                            task_names += (task_names.length() == 0 ? "" : ",") + name;
+                            task_names.append(task_names.length() == 0 ? "" : ",").append(name);
                         }
                     }
                 }

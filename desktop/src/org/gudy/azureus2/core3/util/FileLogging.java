@@ -91,7 +91,7 @@ public class FileLogging implements ILogEventListener {
 	 */
 	protected void reloadLogToFileParam() {
 		//final ConfigurationManager config = ConfigurationManager.getInstance();
-		boolean bNewLogToFile = System.getProperty("azureus.overridelog") != null || false;//config.getBooleanParameter(CFG_ENABLELOGTOFILE);
+		boolean bNewLogToFile = System.getProperty("azureus.overridelog") != null;//config.getBooleanParameter(CFG_ENABLELOGTOFILE);
 		if (bNewLogToFile != bLogToFile) {
 			bLogToFile = bNewLogToFile;
 			if (bLogToFile)

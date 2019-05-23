@@ -262,17 +262,17 @@ AEMonSem {
                 });
 
 
-        String top_act_str = "    top activity: ";
+        StringBuilder top_act_str = new StringBuilder("    top activity: ");
 
         for (int i = 0; i < Math.min(10, total_x.length); i++) {
 
             if (total_x[i] != null) {
 
-                top_act_str += (i == 0 ? "" : ", ") + total_x[i][0] + " = " + (total_x[i][1]);
+                top_act_str.append(i == 0 ? "" : ", ").append(total_x[i][0]).append(" = ").append(total_x[i][1]);
             }
         }
 
-        diag_logger.log(top_act_str);
+        diag_logger.log(top_act_str.toString());
 
         if (waiting_monitors.size() > 0) {
 
@@ -411,14 +411,11 @@ AEMonSem {
             Stack stack = (Stack) tls.get();
 
             if (stack.size() > 64) {
+                StringBuilder sb = new StringBuilder(1024);
+                for (Object o : stack) {
+                    AEMonSem mon = (AEMonSem) o;
 
-                StringBuffer sb = new StringBuffer(1024);
-
-                for (int i = 0; i < stack.size(); i++) {
-
-                    AEMonSem mon = (AEMonSem) stack.get(i);
-
-                    sb.append("$" + mon.name);
+                    sb.append("$").append(mon.name);
                 }
 
                 Debug.out("**** Whoaaaaaa, AEMonSem debug stack is getting too large!!!! **** " + sb);
@@ -426,7 +423,7 @@ AEMonSem {
 
             if (!stack.isEmpty()) {
 
-                String recursion_trace = "";
+                StringBuilder recursion_trace = new StringBuilder();
 				
 				/* not very useful 
 				if (	(!is_monitor) &&
@@ -459,9 +456,7 @@ AEMonSem {
                         if (mon.name.equals(name) &&
                                 mon != this) {
 
-                            recursion_trace +=
-                                    (recursion_trace.length() == 0 ? "" : "\r\n") +
-                                            "Recursive locks on different instances: " + name;
+                            recursion_trace.append(recursion_trace.length() == 0 ? "" : "\r\n").append("Recursive locks on different instances: ").append(name);
 
                             debug_recursions.add(name);
                         }
@@ -469,7 +464,7 @@ AEMonSem {
 
                     // remove consecutive duplicates
 
-                    if (prev_name == null || !mon.name.equals(prev_name)) {
+                    if (!mon.name.equals(prev_name)) {
 
                         sb.append("$");
                         sb.append(mon.name);
