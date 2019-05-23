@@ -30,7 +30,7 @@ import com.frostwire.util.Logger;
 public class
 TimerEventPeriodic
         implements TimerEventPerformer {
-    private static Logger LOG = Logger.getLogger(TimerEventPeriodic.class);
+    private static final Logger LOG = Logger.getLogger(TimerEventPeriodic.class);
     private final Timer timer;
     private final long frequency;
     private final boolean absolute;

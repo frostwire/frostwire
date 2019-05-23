@@ -29,7 +29,7 @@ AESemaphore
         extends AEMonSem {
     private int dont_wait;
 
-    private static Logger LOG = Logger.getLogger(AEMonSem.class);
+    private static final Logger LOG = Logger.getLogger(AEMonSem.class);
 
     private int total_reserve = 0;
     private int total_release;

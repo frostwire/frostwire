@@ -29,7 +29,7 @@ public class Timer
         implements SystemTime.ChangeListener {
     private static final AEMonitor timers_mon = new AEMonitor();
 
-    private ThreadPool thread_pool;
+    private final ThreadPool thread_pool;
 
     private Set<TimerEvent> events = new TreeSet<>();
 

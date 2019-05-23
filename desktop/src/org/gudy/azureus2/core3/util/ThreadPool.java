@@ -60,15 +60,15 @@ ThreadPool {
     }
 
 
-    private String name;
-    private int max_size;
+    private final String name;
+    private final int max_size;
     private int thread_name_index = 1;
 
-    private List busy;
-    private boolean queue_when_full;
+    private final List busy;
+    private final boolean queue_when_full;
     private final List task_queue = new ArrayList();
 
-    private AESemaphore thread_sem;
+    private final AESemaphore thread_sem;
     private int reserved_target;
     private int reserved_actual;
 
