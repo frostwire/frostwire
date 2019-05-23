@@ -69,12 +69,7 @@ ThreadPool {
     }
 
     private static final ThreadLocal tls =
-            new ThreadLocal() {
-                public Object
-                initialValue() {
-                    return (null);
-                }
-            };
+            ThreadLocal.withInitial(() -> (null));
 
     private static void
     checkAllTimeouts() {

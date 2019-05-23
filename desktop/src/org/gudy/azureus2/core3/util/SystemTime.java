@@ -16,7 +16,6 @@
 package org.gudy.azureus2.core3.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -542,62 +541,58 @@ public class SystemTime {
 		for (int i = 0; i < 1; i++)
 		{
 			//final int f_i = i;
-			new Thread()
-			{
-				public void run() {
-					/*
-					 * Average access_average = Average.getInstance( 1000, 10 );
-					 * 
-					 * long last = SystemTime.getCurrentTime();
-					 * 
-					 * int count = 0;
-					 * 
-					 * while( true ){
-					 * 
-					 * long now = SystemTime.getCurrentTime();
-					 * 
-					 * long diff = now - last;
-					 * 
-					 * System.out.println( "diff=" + diff );
-					 * 
-					 * last = now;
-					 * 
-					 * access_average.addValue( diff );
-					 * 
-					 * count++;
-					 * 
-					 * if ( count == 33 ){
-					 * 
-					 * System.out.println( "AVERAGE " + f_i + " = " +
-					 * access_average.getAverage());
-					 * 
-					 * count = 0; }
-					 * 
-					 * try{ Thread.sleep( 3 );
-					 * 
-					 * }catch( Throwable e ){ } }
-					 */
-					long cstart = SystemTime.getCurrentTime();
-					long mstart = SystemTime.getMonotonousTime();
-					System.out.println("alter system clock to see differences between monotonous and current time");
-					long cLastRound = cstart;
-					long mLastRound = mstart;
-					while (true)
+			new Thread(() -> {
+				/*
+				 * Average access_average = Average.getInstance( 1000, 10 );
+				 *
+				 * long last = SystemTime.getCurrentTime();
+				 *
+				 * int count = 0;
+				 *
+				 * while( true ){
+				 *
+				 * long now = SystemTime.getCurrentTime();
+				 *
+				 * long diff = now - last;
+				 *
+				 * System.out.println( "diff=" + diff );
+				 *
+				 * last = now;
+				 *
+				 * access_average.addValue( diff );
+				 *
+				 * count++;
+				 *
+				 * if ( count == 33 ){
+				 *
+				 * System.out.println( "AVERAGE " + f_i + " = " +
+				 * access_average.getAverage());
+				 *
+				 * count = 0; }
+				 *
+				 * try{ Thread.sleep( 3 );
+				 *
+				 * }catch( Throwable e ){ } }
+				 */
+				long cstart = SystemTime.getCurrentTime();
+				long mstart = SystemTime.getMonotonousTime();
+				System.out.println("alter system clock to see differences between monotonous and current time");
+				long cLastRound = cstart;
+				long mLastRound = mstart;
+				while (true)
+				{
+					long mnow = SystemTime.getMonotonousTime();
+					long cnow = SystemTime.getCurrentTime();
+					System.out.println("current: " + (cnow - cstart) + " monotonous:" + (mnow - mstart) + " delta current:" + (cnow - cLastRound) + " delta monotonous:" + (mnow - mLastRound));
+					cLastRound = cnow;
+					mLastRound = mnow;
+					try
 					{
-						long mnow = SystemTime.getMonotonousTime();
-						long cnow = SystemTime.getCurrentTime();
-						//if(mLastRound > mnow)
-						System.out.println("current: " + (cnow - cstart) + " monotonous:" + (mnow - mstart) + " delta current:" + (cnow - cLastRound) + " delta monotonous:" + (mnow - mLastRound));
-						cLastRound = cnow;
-						mLastRound = mnow;
-						try
-						{
-							Thread.sleep(15);
-						} catch (Throwable e)
-						{}
-					}
+						Thread.sleep(15);
+					} catch (Throwable e)
+					{}
 				}
-			}.start();
+			}).start();
 		}
 	}
 }

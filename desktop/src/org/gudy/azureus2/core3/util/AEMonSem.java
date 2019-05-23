@@ -20,6 +20,7 @@
 package org.gudy.azureus2.core3.util;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @author parg
@@ -33,22 +34,13 @@ AEMonSem {
     private static final long DEBUG_TIMER = 30000;
 
     private static final ThreadLocal tls =
-            new ThreadLocal() {
-                public Object
-                initialValue() {
-                    return (new Stack());
-                }
-            };
+            ThreadLocal.withInitial((Supplier<Stack>) Stack::new);
 
     private static long monitor_id_next;
     private static long semaphore_id_next;
-
     private static final Map debug_traces = new HashMap();
     private static final List debug_recursions = new ArrayList();
     private static final List debug_reciprocals = new ArrayList();
-    //private static List	debug_sem_in_mon	= new ArrayList();
-
-
     private static final Map debug_name_mapping = new WeakHashMap();
     private static final Map debug_monitors = new WeakHashMap();
     private static final Map debug_semaphores = new WeakHashMap();
@@ -186,17 +178,11 @@ AEMonSem {
 
         Arrays.sort(
                 x,
-                new Comparator() {
-                    public int
-                    compare(
-                            Object o1,
-                            Object o2) {
-                        AEMonSem a1 = (AEMonSem) o1;
-                        AEMonSem a2 = (AEMonSem) o2;
+                (Comparator) (o1, o2) -> {
+                    AEMonSem a1 = (AEMonSem) o1;
+                    AEMonSem a2 = (AEMonSem) o2;
 
-                        return (a1.name.compareTo(a2.name));
-                    }
-
+                    return (a1.name.compareTo(a2.name));
                 });
 
         AEMonSem current = null;
