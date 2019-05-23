@@ -22,7 +22,7 @@ package org.gudy.azureus2.core3.util;
 import java.util.Collections;
 import java.util.Map;
 
-public class 
+class
 AEMonitor 
 	extends AEMonSem
 {
@@ -31,8 +31,8 @@ AEMonitor
 	private int			total_reserve	= 0;
 	private int			total_release	= 1;
 
-	protected Thread		owner;
-	protected Thread		last_waiter;
+	Thread		owner;
+	Thread		last_waiter;
 	
 	public
 	AEMonitor(

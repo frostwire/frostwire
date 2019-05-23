@@ -45,14 +45,13 @@ TimerEvent
 	
 	private long			unique_id	= 1;
 	
-	protected
 	TimerEvent(
-		Timer					_timer,
-		long					_unique_id,
-		long					_created,
-		long					_when,
-		boolean					_absolute,
-		TimerEventPerformer		_performer )
+			Timer _timer,
+			long _unique_id,
+			long _created,
+			long _when,
+			boolean _absolute,
+			TimerEventPerformer _performer)
 	{
 		timer		= _timer;
 		unique_id	= _unique_id;
@@ -102,26 +101,26 @@ TimerEvent
 		return( when );
 	}
 	
-	protected void
+	void
 	setWhen(
-		long	new_when )
+			long new_when)
 	{
 		when	= new_when;
 	}
 	
-	protected AERunnable
+	AERunnable
 	getRunnable()
 	{
 		return( this );
 	}
 	
-	protected TimerEventPerformer
+	TimerEventPerformer
 	getPerformer()
 	{
 		return( performer );
 	}
 	
-	protected boolean
+	boolean
 	isAbsolute()
 	{
 		return( absolute );
@@ -147,7 +146,7 @@ TimerEvent
 		return( cancelled );
 	}
 	
-	protected void
+	void
 	setHasRun()
 	{
 		has_run	= true;
@@ -183,12 +182,7 @@ TimerEvent
 			
 		return res < 0 ? -1 : 1;
 	}
-	
-	public void 
-	interruptTask() 
-	{
-	}
-	
+
 	public String
 	getString()
 	{

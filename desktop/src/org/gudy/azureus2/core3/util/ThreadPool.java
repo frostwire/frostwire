@@ -84,7 +84,7 @@ ThreadPool {
                 }
             };
 
-    protected static void
+    private static void
     checkAllTimeouts() {
         List pools;
 
@@ -132,7 +132,7 @@ ThreadPool {
         this(_name, _max_size, false);
     }
 
-    public ThreadPool(
+    private ThreadPool(
             String _name,
             int _max_size,
             boolean _queue_when_full) {
@@ -187,12 +187,10 @@ ThreadPool {
 
 
     /**
-     *
      * @param runnable
-     * @param high_priority
-     *            inserts at front if tasks queueing
+     * @param high_priority inserts at front if tasks queueing
      */
-    public threadPoolWorker run(AERunnable runnable, boolean high_priority, boolean manualRelease) {
+    private threadPoolWorker run(AERunnable runnable, boolean high_priority, boolean manualRelease) {
 
         if (manualRelease && !(runnable instanceof ThreadPoolTask))
             throw new IllegalArgumentException("manual release only allowed for ThreadPoolTasks");
@@ -228,17 +226,8 @@ ThreadPool {
 
                         task.worker = recursive_worker;
 
-                        try {
-                            task.taskStarted();
-
-                            runIt(runnable);
-
-                            task.join();
-
-                        } finally {
-
-                            task.taskCompleted();
-                        }
+                        runIt(runnable);
+                        task.join();
                     } else {
 
                         runIt(runnable);
@@ -276,7 +265,7 @@ ThreadPool {
         return (allocated_worker);
     }
 
-    protected void
+    private void
     runIt(
             AERunnable runnable) {
         if (log_cpu) {
@@ -292,7 +281,7 @@ ThreadPool {
         }
     }
 
-    protected void checkWarning() {
+    private void checkWarning() {
         if (warn_when_full) {
             StringBuilder task_names = new StringBuilder();
             try {
@@ -407,7 +396,7 @@ ThreadPool {
         setReservedThreadCount(max_size - max);
     }
 
-    public void
+    private void
     setReservedThreadCount(
             int res) {
         synchronized (this) {
@@ -450,7 +439,7 @@ ThreadPool {
         }
     }
 
-    protected void
+    private void
     checkTimeouts() {
         synchronized (this) {
 
@@ -494,12 +483,7 @@ ThreadPool {
                         if (r != null) {
 
                             try {
-                                if (r instanceof ThreadPoolTask) {
-
-                                    ((ThreadPoolTask) r).interruptTask();
-
-                                } else {
-
+                                if (!(r instanceof ThreadPoolTask)) {
                                     x.interrupt();
                                 }
                             } catch (Throwable e) {
@@ -584,7 +568,7 @@ ThreadPool {
         private int warn_count;
         private String state = "<none>";
 
-        protected threadPoolWorker() {
+        threadPoolWorker() {
             super(NAME_THREADS ? (name + " " + (thread_name_index)) : name, true);
             thread_name_index++;
             setPriority(thread_priority);
@@ -647,19 +631,16 @@ ThreadPool {
                             try {
                                 if (task_name != null)
                                     setName(worker_name + "{" + task_name + "}");
-                                tpt.taskStarted();
+
                                 runIt(runnable);
                             } finally {
                                 if (task_name != null)
                                     setName(worker_name);
 
-                                if (tpt.isAutoReleaseAndAllowManual())
-                                    tpt.taskCompleted();
-                                else {
+                                if (!tpt.isAutoReleaseAndAllowManual()) {
                                     autoRelease = false;
                                     break;
                                 }
-
                             }
                         } else
                             runIt(runnable);
@@ -716,15 +697,15 @@ ThreadPool {
             return (state);
         }
 
-        protected String getWorkerName() {
+        String getWorkerName() {
             return (worker_name);
         }
 
-        protected ThreadPool getOwner() {
+        ThreadPool getOwner() {
             return (ThreadPool.this);
         }
 
-        protected AERunnable getRunnable() {
+        AERunnable getRunnable() {
             return (runnable);
         }
     }

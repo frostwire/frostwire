@@ -23,7 +23,7 @@ package org.gudy.azureus2.core3.util;
  * @created Feb 28, 2006
  *
  */
-public class FileLoggingAdapter {
+class FileLoggingAdapter {
 	/**
 	 * Called when we are about to log an event to file.
 	 * 

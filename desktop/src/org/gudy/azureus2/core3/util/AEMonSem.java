@@ -25,12 +25,12 @@ import java.util.*;
  * @author parg
  */
 
-public abstract class
+abstract class
 AEMonSem {
-    protected static boolean DEBUG = AEDiagnostics.DEBUG_MONITOR_SEM_USAGE;
-    protected static boolean DEBUG_CHECK_DUPLICATES = false;
+    static boolean DEBUG = AEDiagnostics.DEBUG_MONITOR_SEM_USAGE;
+    private static boolean DEBUG_CHECK_DUPLICATES = false;
 
-    protected static long DEBUG_TIMER = 30000;
+    private static long DEBUG_TIMER = 30000;
 
     private static ThreadLocal tls =
             new ThreadLocal() {
@@ -101,7 +101,7 @@ AEMonSem {
         }
     }
 
-    protected static void
+    private static void
     check(
             AEDiagnosticsLogger diag_logger) {
         List active = new ArrayList();
@@ -325,16 +325,16 @@ AEMonSem {
     }
 
 
-    protected long entry_count;
-    protected long last_entry_count;
-    protected String last_trace_key;
+    long entry_count;
+    long last_entry_count;
+    private String last_trace_key;
 
 
-    protected String name;
-    protected boolean is_monitor;
-    protected int waiting = 0;
+    String name;
+    private boolean is_monitor;
+    int waiting = 0;
 
-    protected AEMonSem(
+    AEMonSem(
             String _name,
             boolean _monitor) {
         is_monitor = _monitor;
@@ -394,7 +394,7 @@ AEMonSem {
         }
     }
 
-    protected void
+    void
     debugEntry() {
 		/*
 		if ( trace ){
@@ -647,7 +647,7 @@ AEMonSem {
         }
     }
 
-    protected void
+    void
     debugExit() {
         try {
             Stack stack = (Stack) tls.get();
@@ -756,13 +756,13 @@ AEMonSem {
         return (name);
     }
 
-    protected static class
+    static class
     monSemData {
-        protected String class_name;
-        protected int line_number;
+        String class_name;
+        int line_number;
 
 
-        protected monSemData(
+        monSemData(
                 String _class_name,
                 int _line_number) {
             class_name = _class_name;

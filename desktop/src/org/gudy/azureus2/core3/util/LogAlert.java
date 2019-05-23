@@ -21,29 +21,29 @@ import java.util.ArrayList;
 /**
  * @author TuxPaper
  */
-public class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ {
+class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ {
 
 	/**
 	 * Log Type: Information
 	 */
-	public static final int LT_INFORMATION = 1;
+	private static final int LT_INFORMATION = 1;
 
 	/**
 	 * Log Type: Warning
 	 */
-	public static final int LT_WARNING = 2;
+	private static final int LT_WARNING = 2;
 
 	/**
 	 * Log Type: Error
 	 */
-	public static final int LT_ERROR = 3;
+	private static final int LT_ERROR = 3;
 
 	// log types
-	public static final int AT_INFORMATION = LogEvent.LT_INFORMATION;
+	private static final int AT_INFORMATION = LogEvent.LT_INFORMATION;
 
-	public static final int AT_WARNING = LogEvent.LT_WARNING;
+	private static final int AT_WARNING = LogEvent.LT_WARNING;
 
-	public static final int AT_ERROR = LogEvent.LT_ERROR;
+	private static final int AT_ERROR = LogEvent.LT_ERROR;
 
 	public static final boolean REPEATABLE = true;
 
@@ -53,15 +53,15 @@ public class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ 
 
 	public Throwable err = null;
 
-	public boolean repeatable;
+	private boolean repeatable;
 
 	public String text;
 
 	/** A list of events that this entry is related to */
-	public Object[] relatedTo;
+	private Object[] relatedTo;
 
 		// -1 -> default
-	public int	timeoutSecs	= -1;
+		private int	timeoutSecs	= -1;
 	
 	public String details;
 	
@@ -72,7 +72,7 @@ public class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ 
 	 * @param text
 	 * @param repeatable
 	 */
-	public LogAlert(boolean repeatable, int type, String text) {
+	private LogAlert(boolean repeatable, int type, String text) {
 		entryType = type;
 		this.text = text;
 		this.repeatable = repeatable;
@@ -101,7 +101,7 @@ public class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ 
 		this.relatedTo = new Object[] { relatedTo };
 	}
 
-	public LogAlert(boolean repeatable, String text, Throwable err) {
+	private LogAlert(boolean repeatable, String text, Throwable err) {
 		this(repeatable, AT_ERROR, text);
 		this.err = err;
 	}

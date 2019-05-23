@@ -75,7 +75,7 @@ implements Iterable<T>
 	
 	/**
      */
-	public CopyOnWriteList(int initialCapacity) {
+	private CopyOnWriteList(int initialCapacity) {
 		this.initialCapacity = initialCapacity;
 		use_linked_list = false;
 		if (LOG_STATS) {
@@ -385,9 +385,8 @@ implements Iterable<T>
 		private Iterator<T>	it;
 		private T			last;
 		
-		protected
 		CopyOnWriteListIterator(
-			Iterator<T>		_it )
+				Iterator<T> _it)
 		{
 			it		= _it;
 		}

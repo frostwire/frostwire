@@ -24,17 +24,17 @@ package org.gudy.azureus2.core3.util;
  *
  */
 
-public abstract class 
+abstract class
 ThreadPoolTask
 	extends AERunnable
 {
-	static final int RELEASE_AUTO = 0x00;
-	static final int RELEASE_MANUAL = 0x01;
-	static final int RELEASE_MANUAL_ALLOWED = 0x02;
+	private static final int RELEASE_AUTO = 0x00;
+	private static final int RELEASE_MANUAL = 0x01;
+	private static final int RELEASE_MANUAL_ALLOWED = 0x02;
 	
 	private int manualRelease;
 	
-	protected ThreadPool.threadPoolWorker		worker;
+	ThreadPool.threadPoolWorker		worker;
 	
 	public void
 	setTaskState(
@@ -54,20 +54,7 @@ ThreadPoolTask
 	{
 		return( null );
 	}
-	
-	public abstract void
-	interruptTask();
-	
-	public void
-	taskStarted()
-	{
-	}
-	
-	public void
-	taskCompleted()
-	{
-	}
-	
+
 	/**
 	 * only invoke this method after the first run of the threadpooltask as it is only meant to join
 	 * on a task when it has child tasks and thus is running in manual release mode
@@ -116,7 +103,6 @@ ThreadPoolTask
 			manualRelease = RELEASE_AUTO;
 		else if(manualRelease == RELEASE_MANUAL_ALLOWED)
 		{
-			taskCompleted();
 			worker.getOwner().releaseManual(this);
 			manualRelease = RELEASE_AUTO;
 		} else if(manualRelease == RELEASE_AUTO)

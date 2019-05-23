@@ -23,7 +23,7 @@ package org.gudy.azureus2.core3.util;
 import java.util.LinkedList;
 
 
-public abstract class 
+abstract class
 AEThread2 
 {
 	private static final int MIN_RETAINED	= Math.max(Runtime.getRuntime().availableProcessors(),2);
@@ -55,10 +55,9 @@ AEThread2
 		this( _name, true );
 	}
 	
-	public
 	AEThread2(
-		String		_name,
-		boolean		_daemon )
+            String _name,
+            boolean _daemon)
 	{
 		name		= _name;
 		daemon		= _daemon;
@@ -69,7 +68,7 @@ AEThread2
 	 * multiple invocations of start() are possible, but discouraged if combined
 	 * with other thread operations such as interrupt() or join()
 	 */
-	public void
+    void
 	start()
 	{
 		JoinLock currentLock = lock;
@@ -114,9 +113,9 @@ AEThread2
 		wrapper.start( this, name );
 	}
 	
-	public void
+	void
 	setPriority(
-		int		_priority )
+            int _priority)
 	{
 		priority	= _priority;
 			
@@ -125,9 +124,9 @@ AEThread2
 		}
 	}
 	
-	public void
+	void
 	setName(
-		String	s )
+            String s)
 	{
 		name	= s;
 		
@@ -137,7 +136,7 @@ AEThread2
 		}
 	}
 	
-	public String
+	String
 	getName()
 	{
 		return( name );
@@ -180,7 +179,7 @@ AEThread2
 		}
 	}
 	
-	public abstract void
+	protected abstract void
 	run();
 	
 	public static void
@@ -213,7 +212,7 @@ AEThread2
 		return( null );
 	}
 	
-	protected static class
+	static class
 	threadWrapper
 		extends Thread
 	{
@@ -225,10 +224,9 @@ AEThread2
 		
 		private Object[]		debug;
 		
-		protected
 		threadWrapper(
-			String		name,
-			boolean		daemon )
+                String name,
+                boolean daemon)
 		{
 			super( name );
 			
@@ -317,10 +315,10 @@ AEThread2
 			}
 		}
 		
-		protected void
+		void
 		start(
-			AEThread2	_target,
-			String		_name )
+                AEThread2 _target,
+                String _name)
 		{
 			target	= _target;
 			
@@ -338,20 +336,20 @@ AEThread2
 			}
 		}
 		
-		protected void
+		void
 		retire()
 		{			
 			sem.release();
 		}
 		
-		protected void
+		void
 		setDebug(
-			Object	d )
+                Object d)
 		{
 			debug	= new Object[]{ d, SystemTime.getMonotonousTime() };
 		}
 		
-		protected Object[]
+		Object[]
 		getDebug()
 		{
 			return( debug );

@@ -33,7 +33,7 @@ SimpleTimer
 		 * time as there is a limited thread pool to service it 
 		 */
 	
-	protected static final Timer	timer;
+	private static final Timer	timer;
 	
 	private static CopyOnWriteList<TimerTickReceiver>		tick_receivers = new CopyOnWriteList<TimerTickReceiver>( true );
 	
@@ -136,7 +136,7 @@ SimpleTimer
 		tick_receivers.remove( receiver );
 	}
 	
-	public interface
+	interface
 	TimerTickReceiver
 	{
 		void

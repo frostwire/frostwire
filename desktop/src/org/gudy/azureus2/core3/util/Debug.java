@@ -72,10 +72,10 @@ public class Debug {
   	outNoStack( str, false );
   }
   
-  public static void
+  private static void
   outNoStack(
-  	String		str,
-	boolean		stderr)
+		  String str,
+		  boolean stderr)
   {
     diagLoggerLogAndOut("DEBUG::"+ new Date(SystemTime.getCurrentTime()).toString() + "  " + str, stderr );
   }
@@ -140,7 +140,7 @@ public class Debug {
       throw new Exception();
     }
     catch (Exception e) {
-      StackTraceElement st[] = e.getStackTrace();
+		StackTraceElement[] st = e.getStackTrace();
       for (int i = 1; i < st.length - endNumToSkip; i++) {
         if (!st[i].getMethodName().endsWith("StackTrace"))
         	sStackTrace.append(st[i].toString()).append("\n");
@@ -160,22 +160,22 @@ public class Debug {
 	}
 
 
-	public static String 
+	private static String
 	getCompressedStackTrace(
-		Throwable t,
-		int frames_to_skip, 
-		int iMaxLines) 
+			Throwable t,
+			int frames_to_skip,
+			int iMaxLines)
 	{
 		return getCompressedStackTrace(t, frames_to_skip, iMaxLines, true);
 	}
 
 	
-	public static String 
+	private static String
 	getCompressedStackTrace(
-		Throwable t,
-		int frames_to_skip, 
-		int iMaxLines,
-		boolean showErrString) 
+			Throwable t,
+			int frames_to_skip,
+			int iMaxLines,
+			boolean showErrString)
 	{
 		StringBuffer sbStackTrace = new StringBuffer(showErrString ? (t.toString() + "; ") : "");
 		StackTraceElement[]	st = t.getStackTrace();
@@ -233,8 +233,8 @@ public class Debug {
 		return getStackTrace(bCompressed, bIncludeSelf, bIncludeSelf ? 0 : 1, 200);
 	}
 
-	public static String getStackTrace(boolean bCompressed, boolean bIncludeSelf,
-			int iNumLinesToSkip, int iMaxLines) {
+	private static String getStackTrace(boolean bCompressed, boolean bIncludeSelf,
+										int iNumLinesToSkip, int iMaxLines) {
 		if (bCompressed)
 			return getCompressedStackTrace(bIncludeSelf ? 2 + iNumLinesToSkip
 					: 3 + iNumLinesToSkip, iMaxLines);
@@ -314,10 +314,10 @@ public class Debug {
 	}
 
 	
-	public static void
+	private static void
 	printStackTrace(
-		Throwable e,
-		Object context)
+			Throwable e,
+			Object context)
 	{
   	if ((e instanceof ConnectException) && e.getMessage().startsWith("No route to host")) {
   		diagLoggerLog(e.toString());
@@ -378,7 +378,7 @@ public class Debug {
 		}
 	}
 
-	public static String getStackTrace(Throwable e) {
+	private static String getStackTrace(Throwable e) {
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

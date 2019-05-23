@@ -38,9 +38,9 @@ import java.util.List;
  */
 // TODO: Filter
 public class FileLogging implements ILogEventListener {
-	public static final String LOG_FILE_NAME = "az.log";
+	private static final String LOG_FILE_NAME = "az.log";
 
-	public static final String BAK_FILE_NAME = "az.log.bak";
+	private static final String BAK_FILE_NAME = "az.log.bak";
 
 	public static LogIDs[] configurableLOGIDs = {LogIDs.STDOUT, LogIDs.ALERT, LogIDs.CORE,
 			LogIDs.DISK, LogIDs.GUI, LogIDs.NET, LogIDs.NWMAN, LogIDs.PEER,
@@ -51,11 +51,7 @@ public class FileLogging implements ILogEventListener {
 	private boolean bLogToFile = false;
 	private boolean bLogToFileErrorPrinted = false;
 
-	private String sLogDir = "";
-
-	private int iLogFileMaxMB = 1;
-
-	// List of components we don't log.  
+	// List of components we don't log.
 	// Array represents LogTypes (info, warning, error)
 	private ArrayList[] ignoredComponents = new ArrayList[3];
 	
@@ -69,21 +65,6 @@ public class FileLogging implements ILogEventListener {
 		for (int i = 0; i < ignoredComponents.length; i++) {
 			ignoredComponents[i] = new ArrayList();
 		}
-
-		if (!overrideLog) {
-//			config.addListener(new COConfigurationListener() {
-//				public void configurationSaved() {
-//					checkLoggingConfig();
-//				}
-//			});
-		}
-
-		checkLoggingConfig();
-//		config.addParameterListener(CFG_ENABLELOGTOFILE, new ParameterListener() {
-//			public void parameterChanged(String parameterName) {
-//				FileLogging.this.reloadLogToFileParam();
-//			}
-//		});
 	}
 
 	/**
@@ -107,9 +88,6 @@ public class FileLogging implements ILogEventListener {
 				}
 			}
 		}
-	}
-
-	private void checkLoggingConfig() {
 	}
 
 	private void logToFile(String str) {
@@ -146,9 +124,11 @@ public class FileLogging implements ILogEventListener {
 			}
 			return;
 		}
-			
-		
+
+
+		int iLogFileMaxMB = 1;
 		long lMaxBytes = (iLogFileMaxMB * 1024L * 1024L) / 2;
+		String sLogDir = "";
 		File logFile = new File(sLogDir + File.separator + LOG_FILE_NAME);
 		
 		if (logFile.length() > lMaxBytes && logFilePrinter != null)

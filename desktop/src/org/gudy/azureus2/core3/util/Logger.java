@@ -27,7 +27,7 @@ import java.io.PrintStream;
  * @author TuxPaper
  * @since 2.3.0.7
  */
-public class Logger {
+class Logger {
 	private static final LogIDs LOGID = LogIDs.LOGGER;
 
 	private static LoggerImpl loggerImpl = null;
@@ -103,7 +103,7 @@ public class Logger {
 	}
 
     // dead
-	public static void logTextResource(LogEvent event, String params[]) {
+	public static void logTextResource(LogEvent event, String[] params) {
 		loggerImpl.logTextResource(event, params);
 	}
 
@@ -112,7 +112,7 @@ public class Logger {
 		loggerImpl.logTextResource(alert);
 	}
 
-	public static void logTextResource(LogAlert alert, String params[]) {
+	public static void logTextResource(LogAlert alert, String[] params) {
 		loggerImpl.logTextResource(alert, params);
 	}
 

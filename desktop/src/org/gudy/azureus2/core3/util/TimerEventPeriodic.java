@@ -39,12 +39,11 @@ TimerEventPeriodic
 	private TimerEvent			current_event;
 	private boolean				cancelled;
 	
-	protected
 	TimerEventPeriodic(
-		Timer				_timer,
-		long				_frequency,
-		boolean				_absolute,
-		TimerEventPerformer	_performer )
+            Timer _timer,
+            long _frequency,
+            boolean _absolute,
+            TimerEventPerformer _performer)
 	{
 		timer		= _timer;
 		frequency	= _frequency;
@@ -77,7 +76,7 @@ TimerEventPeriodic
 		return( name );
 	}
 	
-	protected TimerEventPerformer
+	TimerEventPerformer
 	getPerformer()
 	{
 		return( performer );
@@ -132,7 +131,7 @@ TimerEventPeriodic
 		}
 	}
 	
-	protected String
+	String
 	getString()
 	{
 		TimerEvent ce = current_event;

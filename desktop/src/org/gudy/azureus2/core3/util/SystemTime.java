@@ -71,7 +71,7 @@ public class SystemTime {
 		}
 	}
 
-	protected interface SystemTimeProvider {
+	interface SystemTimeProvider {
 		long getTime();
 
 		long getMonoTime();
@@ -82,8 +82,7 @@ public class SystemTime {
 
 	private static class SteppedProvider implements SystemTimeProvider {
 		private static final long	HPC_START = getHighPrecisionCounter()/1000000L;
-		
-		private final Thread		updater;
+
 		private volatile long		stepped_time;
 		private volatile long		currentTimeOffset = System.currentTimeMillis();
 		private AtomicLong 			last_approximate_time = new AtomicLong(); 
@@ -100,9 +99,35 @@ public class SystemTime {
 			// System.out.println("SystemTime: using stepped time provider");
 			
 			stepped_time = 0;
-			
-			updater = new Thread("SystemTime")
-			{
+
+			// these averages rely on monotone time, thus won't be affected by system time changes
+			/*
+			 * keep the monotone time in sync with the raw system
+			 * time, for this we need to know the offset of the
+			 * current time to the system time
+			 */
+			/*
+			 * unless the system time jumps, then we just guess the
+			 * time that has passed and adjust the update, so that
+			 * the next round can be in sync with the system time
+			 * again
+			 */
+			/*
+			 * jump occured, update monotone time offset, but
+			 * not the current time one, that only happens every
+			 * second
+			 */
+			// time is good, keep it
+			//Debug.outNoStack("Clock change of " + change + " ms detected, raw=" + rawTime );
+			// averaging magic to estimate the amount of time that passes between each getTime invocation
+			//System.out.println( "access count = " + access_count + ", average = " + access_average.getAverage() + ", per slice = " + access_average_per_slice + ", drift = " + drift +", average = " + drift_average.getAverage() + ", dag =" + drift_adjusted_granularity );
+			//Debug.outNoStack("Clock change of " + change + " ms completed, curr=" + adjustedTime );
+			// copy reference since we use unsynced COW semantics
+			/*
+			 * notify consumers with the external offset, internal
+			 * offset is only meant for updates
+			 */
+			Thread updater = new Thread("SystemTime") {
 				public void run() {
 					long adjustedTimeOffset = currentTimeOffset;
 					// these averages rely on monotone time, thus won't be affected by system time changes
@@ -111,8 +136,7 @@ public class SystemTime {
 					long lastOffset = adjustedTimeOffset;
 					long lastSecond = -1000;
 					int tick_count = 0;
-					while (true)
-					{
+					while (true) {
 						final long rawTime = System.currentTimeMillis();
 						/*
 						 * keep the monotone time in sync with the raw system
@@ -127,39 +151,37 @@ public class SystemTime {
 						 * the next round can be in sync with the system time
 						 * again
 						 */
-						if (delta < 0 || delta > 1000)
-						{
+						if (delta < 0 || delta > 1000) {
 							/*
 							 * jump occured, update monotone time offset, but
 							 * not the current time one, that only happens every
 							 * second
-							 */ 
+							 */
 							stepped_time += TIME_GRANULARITY_MILLIS;
 							adjustedTimeOffset = rawTime - stepped_time;
-						} else
-						{ // time is good, keep it
+						} else { // time is good, keep it
 							stepped_time = newMonotoneTime;
 						}
 						tick_count++;
-						
+
 						long change;
-						
-						if ( tick_count == STEPS_PER_SECOND ){
-						
+
+						if (tick_count == STEPS_PER_SECOND) {
+
 							change = adjustedTimeOffset - lastOffset;
 
-							if ( change != 0 ){
-							
+							if (change != 0) {
+
 								Iterator<ChangeListener> it = clock_change_list.iterator();
 								//Debug.outNoStack("Clock change of " + change + " ms detected, raw=" + rawTime );
-								while (it.hasNext()){
-								
-									try{
-										it.next().clockChangeDetected( rawTime, change );
-										
-									}catch( Throwable e ){
-										
-										Debug.out( e );
+								while (it.hasNext()) {
+
+									try {
+										it.next().clockChangeDetected(rawTime, change);
+
+									} catch (Throwable e) {
+
+										Debug.out(e);
 									}
 								}
 								lastOffset = adjustedTimeOffset;
@@ -176,68 +198,60 @@ public class SystemTime {
 							//System.out.println( "access count = " + access_count + ", average = " + access_average.getAverage() + ", per slice = " + access_average_per_slice + ", drift = " + drift +", average = " + drift_average.getAverage() + ", dag =" + drift_adjusted_granularity );
 							access_count = 0;
 							tick_count = 0;
-						}else{
+						} else {
 							change = 0;
 						}
-						
+
 						slice_access_count = 0;
-						
+
 						stepped_mono_time = stepped_time;
-						
+
 						long adjustedTime = stepped_time + currentTimeOffset;
 
-						if ( change != 0 ){
+						if (change != 0) {
 							Iterator<ChangeListener> it = clock_change_list.iterator();
 							//Debug.outNoStack("Clock change of " + change + " ms completed, curr=" + adjustedTime );
-							while (it.hasNext()){
-							
-								try{
-									it.next().clockChangeCompleted( adjustedTime, change );
-									
-								}catch( Throwable e ){
-									
-									Debug.out( e );
+							while (it.hasNext()) {
+
+								try {
+									it.next().clockChangeCompleted(adjustedTime, change);
+
+								} catch (Throwable e) {
+
+									Debug.out(e);
 								}
 							}
 						}
-						
+
 						// copy reference since we use unsynced COW semantics
 						List<TickConsumer> consumersRef = monotoneTimeConsumers;
-						for (int i = 0; i < consumersRef.size(); i++)
-						{
+						for (int i = 0; i < consumersRef.size(); i++) {
 							TickConsumer cons = consumersRef.get(i);
-							try
-							{
+							try {
 								cons.consume(stepped_time);
-							} catch (Throwable e)
-							{
+							} catch (Throwable e) {
 								Debug.printStackTrace(e);
 							}
 						}
-						
+
 						/*
 						 * notify consumers with the external offset, internal
 						 * offset is only meant for updates
 						 */
 						consumersRef = systemTimeConsumers;
-						
-						for (int i = 0; i < consumersRef.size(); i++)
-						{
+
+						for (int i = 0; i < consumersRef.size(); i++) {
 							TickConsumer cons = consumersRef.get(i);
-							try
-							{
+							try {
 								cons.consume(adjustedTime);
-							} catch (Throwable e)
-							{
+							} catch (Throwable e) {
 								Debug.printStackTrace(e);
 							}
 						}
-						
-						try
-						{
+
+						try {
 							Thread.sleep(TIME_GRANULARITY_MILLIS);
-						} catch (Exception e)
-						{
+						} catch (Exception e) {
 							Debug.printStackTrace(e);
 						}
 					}
@@ -299,101 +313,91 @@ public class SystemTime {
 	}
 	
 	private static class RawProvider implements SystemTimeProvider {
-		//private static final int	STEPS_PER_SECOND	= (int) (1000 / TIME_GRANULARITY_MILLIS);
-		private final Thread		updater;
 
 		private RawProvider()
 		{
 			System.out.println("SystemTime: using raw time provider");
-			
-			updater = new Thread("SystemTime")
-			{
-				long	last_time;
+
+			// clock's changed
+			//private static final int	STEPS_PER_SECOND	= (int) (1000 / TIME_GRANULARITY_MILLIS);
+			Thread updater = new Thread("SystemTime") {
+				long last_time;
 
 				public void run() {
-					while (true)
-					{
+					while (true) {
 						long current_time = getTime();
 						long change;
-						
-						if ( last_time != 0 ){
-						
+
+						if (last_time != 0) {
+
 							long offset = current_time - last_time;
-							
-							if (offset < 0 || offset > 5000){
-							
+
+							if (offset < 0 || offset > 5000) {
+
 								change = offset;
-								
-									// clock's changed
-								
+
+								// clock's changed
+
 								Iterator<ChangeListener> it = clock_change_list.iterator();
-								
-								while (it.hasNext()){									
-									
-									try{
+
+								while (it.hasNext()) {
+
+									try {
 										it.next().clockChangeDetected(current_time, change);
-									}catch( Throwable e ){
-										
-										Debug.out( e );
+									} catch (Throwable e) {
+
+										Debug.out(e);
 									}
 								}
-							}else{
+							} else {
 								change = 0;
 							}
-						}else{
+						} else {
 							change = 0;
 						}
-						
+
 						last_time = current_time;
-						
-						if ( change != 0 ){
+
+						if (change != 0) {
 							Iterator<ChangeListener> it = clock_change_list.iterator();
-							while (it.hasNext()){									
-								
-								try{
+							while (it.hasNext()) {
+
+								try {
 									it.next().clockChangeCompleted(current_time, change);
-									
-								}catch( Throwable e ){
-									
-									Debug.out( e );
+
+								} catch (Throwable e) {
+
+									Debug.out(e);
 								}
 							}
 						}
-						
+
 						List consumer_list_ref = systemTimeConsumers;
-						
-						for (int i = 0; i < consumer_list_ref.size(); i++)
-						{
+
+						for (int i = 0; i < consumer_list_ref.size(); i++) {
 							TickConsumer cons = (TickConsumer) consumer_list_ref.get(i);
-							try
-							{
+							try {
 								cons.consume(current_time);
-							} catch (Throwable e)
-							{
+							} catch (Throwable e) {
 								Debug.printStackTrace(e);
 							}
 						}
 						consumer_list_ref = monotoneTimeConsumers;
-						
-						long	mono_time = getMonoTime();
-						
-						for (int i = 0; i < consumer_list_ref.size(); i++)
-						{
+
+						long mono_time = getMonoTime();
+
+						for (int i = 0; i < consumer_list_ref.size(); i++) {
 							TickConsumer cons = (TickConsumer) consumer_list_ref.get(i);
-							try
-							{
+							try {
 								cons.consume(mono_time);
-							} catch (Throwable e)
-							{
+							} catch (Throwable e) {
 								Debug.printStackTrace(e);
 							}
 						}
-						
-						try
-						{
+
+						try {
 							Thread.sleep(TIME_GRANULARITY_MILLIS);
-						} catch (Exception e)
-						{
+						} catch (Exception e) {
 							Debug.printStackTrace(e);
 						}
 					}
@@ -516,7 +520,7 @@ public class SystemTime {
 		}
 	}
 
-	public interface TickConsumer {
+	interface TickConsumer {
 		void consume(long current_time);
 	}
 

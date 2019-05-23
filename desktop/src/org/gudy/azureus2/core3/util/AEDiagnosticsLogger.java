@@ -35,7 +35,6 @@ AEDiagnosticsLogger
 	private String 			name;
 	private int				max_size;
 	private File			debug_dir;
-	private boolean			timestamp_enable				= true;
 	private boolean			force;
 	
 	private boolean			first_file				= true;
@@ -59,12 +58,11 @@ AEDiagnosticsLogger
 		timezone_offset = TimeZone.getDefault().getOffset(now);
 	}
 	
-	protected
 	AEDiagnosticsLogger(
-		File		_debug_dir,
-		String		_name,
-		int			_max_size,
-		boolean		_direct_writes )
+			File _debug_dir,
+			String _name,
+			int _max_size,
+			boolean _direct_writes)
 	{
 		debug_dir		= _debug_dir;
 		name			= _name;
@@ -101,15 +99,15 @@ AEDiagnosticsLogger
 		force = _force;
 	}
 
-	protected String
+	private String
 	getName()
 	{
 		return( name );
 	}
 
-	public void
+	private void
 	log(
-		Throwable				e )
+			Throwable e)
 	{
 		try{
 			ByteArrayOutputStream	baos = new ByteArrayOutputStream();
@@ -171,7 +169,7 @@ AEDiagnosticsLogger
 	}
 	*/
 	
-	public static String
+	private static String
 	getTimestamp()
 	{
 		long time = SystemTime.getCurrentTime();
@@ -198,7 +196,7 @@ AEDiagnosticsLogger
 		return( new String( chars ));
 	}
 	
-	private static final void
+	private static void
 	format(
 		int		num,
 		char[]	chars,
@@ -228,8 +226,9 @@ AEDiagnosticsLogger
 		StringBuilder str = new StringBuilder( _str.length() + 20 );
 		
 		final String timeStamp;
-		
-		if ( timestamp_enable ){	
+
+		boolean timestamp_enable = true;
+		if (timestamp_enable){
 			
 			timeStamp = getTimestamp();
 			
@@ -330,7 +329,7 @@ AEDiagnosticsLogger
 		}
 	}
 	
-	protected void
+	private void
 	writePending()
 	{
 		synchronized( this ){

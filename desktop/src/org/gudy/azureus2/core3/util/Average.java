@@ -45,15 +45,15 @@ public class Average {
   //The time the average was last updated (divided by the refreshRate).
   private long lastUpdate;
 
-  //The values
-  private long values[];
+    //The values
+    private long[] values;
 
   /**
    * Private constructor for an Average
    * @param _refreshRate the refresh rate in ms
    * @param _period the period in s
    */
-  protected Average(int _refreshRate, int _period) {
+  private Average(int _refreshRate, int _period) {
     this.refreshRate = _refreshRate;
     this.period = _period;
 
@@ -198,7 +198,7 @@ public class Average {
 	  return(values != null ? values[(int)((timeFactor-1)% nbElements)] : 0);
   }
   
-  protected synchronized final long getSum() {
+  private synchronized long getSum() {
     //The sum of all elements used for the average.
     long sum = 0;
     
@@ -221,7 +221,7 @@ public class Average {
     return(sum);
   }
   
-  private synchronized final long getSum(int slots) {
+  private synchronized long getSum(int slots) {
 	    //We get the current timeFactor
 	    long timeFactor = getEffectiveTime() / refreshRate;
 	    //We first update the buffer

@@ -34,7 +34,7 @@ AESemaphore
 
 	private boolean	released_forever	= false;
 
-	protected Thread	latest_waiter;
+	Thread	latest_waiter;
 	
 	public
 	AESemaphore(
@@ -63,9 +63,9 @@ AESemaphore
 		}
 	}
 	
-	public boolean
+	private boolean
 	reserve(
-		long	millis )
+			long millis)
 	{
 		return( reserveSupport( millis, 1 ) == 1 );
 	}
@@ -103,10 +103,10 @@ AESemaphore
 		return( reserveSupport( 0, max_to_reserve));
 	}
 	
-	protected int
+	private int
 	reserveSupport(
-		long	millis,
-		int		max_to_reserve )
+			long millis,
+			int max_to_reserve)
 	{
 		if ( DEBUG ){
 			
@@ -240,7 +240,7 @@ AESemaphore
 		}
 	}
 
-	public void
+	private void
 	releaseAllWaiters()
 	{
 		synchronized(this){

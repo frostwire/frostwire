@@ -23,7 +23,7 @@ package org.gudy.azureus2.core3.util;
 
 import java.util.concurrent.Semaphore;
 
-public class 
+class
 AESemaphore2 
 {
 	private Semaphore		sem = new Semaphore(0);

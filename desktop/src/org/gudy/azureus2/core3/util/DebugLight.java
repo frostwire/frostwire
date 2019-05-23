@@ -19,7 +19,7 @@
 
 package org.gudy.azureus2.core3.util;
 
-public class 
+class
 DebugLight 
 {
 	/**

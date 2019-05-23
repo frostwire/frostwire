@@ -20,7 +20,7 @@
 package org.gudy.azureus2.core3.util;
 
 
-public interface 
+interface
 AEDiagnosticsEvidenceGenerator 
 {
 	void

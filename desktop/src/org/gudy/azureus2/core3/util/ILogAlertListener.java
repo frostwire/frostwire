@@ -20,7 +20,7 @@ package org.gudy.azureus2.core3.util;
  * @author TuxPaper
  * @since 2.3.0.7
  */
-public interface ILogAlertListener
+interface ILogAlertListener
 {
   /** An alert has been generated
    * 

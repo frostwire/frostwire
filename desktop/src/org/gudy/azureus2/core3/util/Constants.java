@@ -65,7 +65,7 @@ public class Constants {
 
     public static final boolean isOSX = OSName.toLowerCase().startsWith("mac os");
     public static final boolean isLinux = OSName.equalsIgnoreCase("Linux");
-    public static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
+    private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
     // If it isn't windows or osx, it's most likely an unix flavor
 
     private static final boolean isWindowsVista;

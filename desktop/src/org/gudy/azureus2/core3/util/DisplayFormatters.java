@@ -36,7 +36,7 @@ public class DisplayFormatters {
     private final static int UNIT_GB = 3;
     private final static int UNIT_TB = 4;
 
-    final private static int UNITS_PRECISION[] = {0, // B
+    final private static int[] UNITS_PRECISION = {0, // B
             1, //KB
             2, //MB
             2, //GB

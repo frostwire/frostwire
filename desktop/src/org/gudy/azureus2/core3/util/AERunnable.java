@@ -40,6 +40,6 @@ AERunnable
 		}
 	}
 	
-	public abstract void
+	protected abstract void
 	runSupport();
 }

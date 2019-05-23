@@ -26,7 +26,7 @@ package org.gudy.azureus2.core3.util;
  * @author TuxPaper
  *
  */
-public class LogRelation {
+class LogRelation {
 	/**
 	 * A short description of what your class holds that can be printed by the logger
 	 * 
@@ -48,7 +48,7 @@ public class LogRelation {
 	 * 
 	 * @return If found, the class desired.  Otherwise, null.
 	 */
-	public Object[] getQueryableInterfaces() {
+	private Object[] getQueryableInterfaces() {
 		return null;
 	}
 
@@ -58,7 +58,7 @@ public class LogRelation {
 	
 	private boolean running = false;
 
-	protected final Object queryForClass(Class c, Object[] queryObjects) {
+	private Object queryForClass(Class c, Object[] queryObjects) {
 		if (running || queryObjects == null)
 			return null;
 

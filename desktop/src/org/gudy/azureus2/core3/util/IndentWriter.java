@@ -21,7 +21,7 @@ package org.gudy.azureus2.core3.util;
 
 import java.io.PrintWriter;
 
-public class 
+class
 IndentWriter 
 {
 	private static final String	INDENT_STRING		= "    ";

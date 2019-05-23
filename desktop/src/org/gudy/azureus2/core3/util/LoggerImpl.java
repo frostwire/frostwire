@@ -32,7 +32,7 @@ import java.util.List;
  * @since 2.3.0.7
  */
 
-public class LoggerImpl {
+class LoggerImpl {
 	private static final int MAXHISTORY = 256;
 
 	private static final boolean bLogToStdOut = System.getProperty("azureus.log.stdout") != null;
@@ -124,15 +124,15 @@ public class LoggerImpl {
 	 * Redirects any incoming text to the logger
 	 */
 	private class RedirectorStream extends OutputStream {
-		protected PrintStream ps;
+		PrintStream ps;
 
-		protected StringBuffer buffer = new StringBuffer(1024);
+		StringBuffer buffer = new StringBuffer(1024);
 
-		protected LogIDs logID;
+		LogIDs logID;
 
-		protected int logType;
+		int logType;
 
-		protected RedirectorStream(PrintStream _ps, LogIDs _logID, int _logType) {
+		RedirectorStream(PrintStream _ps, LogIDs _logID, int _logType) {
 			ps = _ps;
 			logType = _logType;
 			logID = _logID;
@@ -152,7 +152,7 @@ public class LoggerImpl {
 			}
 		}
 
-		public void write(byte b[], int off, int len) {
+		public void write(byte[] b, int off, int len) {
 			for (int i = off; i < off + len; i++) {
 				int d = b[i];
 				if (d < 0)
@@ -223,7 +223,7 @@ public class LoggerImpl {
 		log(event);
 	}
 
-	public void logTextResource(LogEvent event, String params[]) {
+	public void logTextResource(LogEvent event, String[] params) {
 		event.text = MessageText.getString(event.text, params);
 		log(event);
 	}
@@ -287,7 +287,7 @@ public class LoggerImpl {
 		log(alert);
 	}
 
-	public void logTextResource(LogAlert alert, String params[]) {
+	public void logTextResource(LogAlert alert, String[] params) {
 		alert.text = MessageText.getString(alert.text, params);
 		log(alert);
 	}

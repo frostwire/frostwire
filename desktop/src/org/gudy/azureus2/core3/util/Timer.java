@@ -56,7 +56,7 @@ public class Timer
         this(name, thread_pool_size, Thread.NORM_PRIORITY);
     }
 
-    public Timer(
+    private Timer(
             String name,
             int thread_pool_size,
             int thread_priority) {
@@ -91,7 +91,7 @@ public class Timer
         indestructable = true;
     }
 
-    public synchronized List<TimerEvent>
+    private synchronized List<TimerEvent>
     getEvents() {
         return (new ArrayList<TimerEvent>(events));
     }
@@ -421,7 +421,7 @@ public class Timer
         return (addEvent(name, SystemTime.getCurrentTime(), when, absolute, performer));
     }
 
-    public synchronized TimerEvent
+    private synchronized TimerEvent
     addEvent(
             long creation_time,
             long when,
@@ -438,7 +438,7 @@ public class Timer
         return (addEvent(null, creation_time, when, absolute, performer));
     }
 
-    public synchronized TimerEvent
+    private synchronized TimerEvent
     addEvent(
             String name,
             long creation_time,
@@ -519,7 +519,7 @@ public class Timer
         return (periodic_performer);
     }
 
-    protected synchronized void
+    synchronized void
     cancelEvent(
             TimerEvent event) {
         if (events.contains(event)) {
@@ -564,7 +564,7 @@ public class Timer
         }
     }
 
-    public String
+    private String
     getName() {
         return (thread_pool.getName());
     }

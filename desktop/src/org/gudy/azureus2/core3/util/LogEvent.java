@@ -26,7 +26,7 @@ import java.util.Date;
  * @author TuxPaper
  */
 
-public class LogEvent {
+class LogEvent {
 	// log types
 	public static final int LT_INFORMATION = 0;
 
@@ -52,7 +52,7 @@ public class LogEvent {
 	/** Error related to event */
 	public Throwable err = null;
 
-	public LogEvent(Object[] relatedTo, LogIDs logID, int entryType, String text) {
+	private LogEvent(Object[] relatedTo, LogIDs logID, int entryType, String text) {
 		this.logID = logID;
 		this.entryType = entryType;
 		this.text = text;
@@ -82,11 +82,11 @@ public class LogEvent {
 
 	// Throwables
 
-	public LogEvent(Object[] relatedTo, LogIDs logID, int entryType, String text, Throwable e) {
+	private LogEvent(Object[] relatedTo, LogIDs logID, int entryType, String text, Throwable e) {
 		this(relatedTo, logID, entryType, text);
 		this.err = e;
 	}
-	public LogEvent(Object[] relatedTo, LogIDs logID, String text, Throwable e) {
+	private LogEvent(Object[] relatedTo, LogIDs logID, String text, Throwable e) {
 		this(relatedTo, logID, LT_ERROR, text, e);
 	}
 	

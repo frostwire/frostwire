@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class
+class
 AEDiagnostics {
     // these can not be set true and have a usable AZ!
     private static final boolean ALWAYS_PASS_HASH_CHECKS = false;
@@ -104,7 +104,7 @@ AEDiagnostics {
     private static Map<String, AEDiagnosticsLogger> loggers = new HashMap<>();
 
     protected static boolean logging_enabled;
-    protected static boolean loggers_enabled;
+    static boolean loggers_enabled;
 
     private static List<AEDiagnosticsEvidenceGenerator> evidence_generators = new ArrayList<>();
 
