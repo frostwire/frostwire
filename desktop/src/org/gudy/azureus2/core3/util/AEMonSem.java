@@ -27,12 +27,12 @@ import java.util.*;
 
 abstract class
 AEMonSem {
-    static boolean DEBUG = AEDiagnostics.DEBUG_MONITOR_SEM_USAGE;
-    private static boolean DEBUG_CHECK_DUPLICATES = false;
+    static final boolean DEBUG = AEDiagnostics.DEBUG_MONITOR_SEM_USAGE;
+    private static final boolean DEBUG_CHECK_DUPLICATES = false;
 
-    private static long DEBUG_TIMER = 30000;
+    private static final long DEBUG_TIMER = 30000;
 
-    private static ThreadLocal tls =
+    private static final ThreadLocal tls =
             new ThreadLocal() {
                 public Object
                 initialValue() {
@@ -43,15 +43,15 @@ AEMonSem {
     private static long monitor_id_next;
     private static long semaphore_id_next;
 
-    private static Map debug_traces = new HashMap();
-    private static List debug_recursions = new ArrayList();
-    private static List debug_reciprocals = new ArrayList();
+    private static final Map debug_traces = new HashMap();
+    private static final List debug_recursions = new ArrayList();
+    private static final List debug_reciprocals = new ArrayList();
     //private static List	debug_sem_in_mon	= new ArrayList();
 
 
-    private static Map debug_name_mapping = new WeakHashMap();
-    private static Map debug_monitors = new WeakHashMap();
-    private static Map debug_semaphores = new WeakHashMap();
+    private static final Map debug_name_mapping = new WeakHashMap();
+    private static final Map debug_monitors = new WeakHashMap();
+    private static final Map debug_semaphores = new WeakHashMap();
 
     static {
         if (DEBUG) {
@@ -758,8 +758,8 @@ AEMonSem {
 
     static class
     monSemData {
-        String class_name;
-        int line_number;
+        final String class_name;
+        final int line_number;
 
 
         monSemData(

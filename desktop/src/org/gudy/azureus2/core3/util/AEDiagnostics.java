@@ -101,12 +101,12 @@ AEDiagnostics {
     private static volatile boolean startup_complete;
     private static boolean enable_pending_writes;
 
-    private static Map<String, AEDiagnosticsLogger> loggers = new HashMap<>();
+    private static final Map<String, AEDiagnosticsLogger> loggers = new HashMap<>();
 
     protected static boolean logging_enabled;
     static boolean loggers_enabled;
 
-    private static List<AEDiagnosticsEvidenceGenerator> evidence_generators = new ArrayList<>();
+    private static final List<AEDiagnosticsEvidenceGenerator> evidence_generators = new ArrayList<>();
 
     public static boolean
     isStartupComplete() {

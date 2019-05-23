@@ -53,9 +53,9 @@ public class FileLogging implements ILogEventListener {
 
 	// List of components we don't log.
 	// Array represents LogTypes (info, warning, error)
-	private ArrayList[] ignoredComponents = new ArrayList[3];
+	private final ArrayList[] ignoredComponents = new ArrayList[3];
 	
-	private ArrayList listeners = new ArrayList();
+	private final ArrayList listeners = new ArrayList();
 
 	public void initialize() {
 		// Shorten from COConfigurationManager To make code more readable

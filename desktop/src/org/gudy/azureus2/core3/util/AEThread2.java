@@ -44,7 +44,7 @@ AEThread2
 	private threadWrapper	wrapper;
 	
 	private String				name;
-	private boolean				daemon;
+	private final boolean				daemon;
 	private int					priority	= Thread.NORM_PRIORITY;
 	private volatile JoinLock	lock		= new JoinLock();
 

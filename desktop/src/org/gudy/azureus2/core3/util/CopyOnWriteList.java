@@ -38,7 +38,7 @@ implements Iterable<T>
 	
 	private int initialCapacity;
 	
-	private static CopyOnWriteList stats;
+	private static final CopyOnWriteList stats;
 	
 	private int	mutation_count;
 	
@@ -382,7 +382,7 @@ implements Iterable<T>
 	CopyOnWriteListIterator
 		implements Iterator<T>
 	{
-		private Iterator<T>	it;
+		private final Iterator<T>	it;
 		private T			last;
 		
 		CopyOnWriteListIterator(

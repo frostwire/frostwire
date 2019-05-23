@@ -38,13 +38,13 @@ class LogEvent {
 	public Date timeStamp = new Date();
 
 	/** A list of events that this entry is related to */
-	public Object[] relatedTo;
+	public final Object[] relatedTo;
 
 	/** Log ID, categorizing the event */
-	public LogIDs logID;
+	public final LogIDs logID;
 
 	/** Type of entry, usually one of Event.LT_* constants */
-	public int entryType;
+	public final int entryType;
 
 	/** Text of the event */
 	public String text;

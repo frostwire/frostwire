@@ -47,13 +47,13 @@ class LoggerImpl {
 
 	private PrintStream psErr;
 
-	private List logListeners = new ArrayList();
+	private final List logListeners = new ArrayList();
 
 	private AEDiagnosticsLogger alertLogger;
 
-	private List alertListeners = new ArrayList();
+	private final List alertListeners = new ArrayList();
 
-	private List alertHistory = new ArrayList();
+	private final List alertHistory = new ArrayList();
 	
 	private boolean logToStdErrAllowed = true;
 
@@ -124,13 +124,13 @@ class LoggerImpl {
 	 * Redirects any incoming text to the logger
 	 */
 	private class RedirectorStream extends OutputStream {
-		PrintStream ps;
+		final PrintStream ps;
 
-		StringBuffer buffer = new StringBuffer(1024);
+		final StringBuffer buffer = new StringBuffer(1024);
 
-		LogIDs logID;
+		final LogIDs logID;
 
-		int logType;
+		final int logType;
 
 		RedirectorStream(PrintStream _ps, LogIDs _logID, int _logType) {
 			ps = _ps;

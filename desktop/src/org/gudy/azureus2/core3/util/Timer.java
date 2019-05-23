@@ -28,9 +28,9 @@ import java.util.*;
 public class Timer
         extends AERunnable
         implements SystemTime.ChangeListener {
-    private static boolean DEBUG_TIMERS = true;
+    private static final boolean DEBUG_TIMERS = true;
     private static ArrayList<WeakReference<Timer>> timers = null;
-    private static AEMonitor timers_mon = new AEMonitor("timers list");
+    private static final AEMonitor timers_mon = new AEMonitor("timers list");
 
     private ThreadPool thread_pool;
 

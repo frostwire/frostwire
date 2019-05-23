@@ -26,7 +26,7 @@ import java.util.concurrent.Semaphore;
 class
 AESemaphore2 
 {
-	private Semaphore		sem = new Semaphore(0);
+	private final Semaphore		sem = new Semaphore(0);
 	
 	public 
 	AESemaphore2(

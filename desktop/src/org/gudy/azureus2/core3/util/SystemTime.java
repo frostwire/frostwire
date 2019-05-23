@@ -85,7 +85,7 @@ public class SystemTime {
 
 		private volatile long		stepped_time;
 		private volatile long		currentTimeOffset = System.currentTimeMillis();
-		private AtomicLong 			last_approximate_time = new AtomicLong(); 
+		private final AtomicLong 			last_approximate_time = new AtomicLong();
 		//private volatile long		last_approximate_time;
 		private volatile int		access_count;
 		private volatile int		slice_access_count;

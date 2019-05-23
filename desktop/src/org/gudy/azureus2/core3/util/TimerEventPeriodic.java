@@ -30,10 +30,10 @@ public class
 TimerEventPeriodic
 	implements TimerEventPerformer
 {
-	private Timer					timer;
-	private long					frequency;
-	private boolean					absolute;
-	private TimerEventPerformer		performer;
+	private final Timer					timer;
+	private final long					frequency;
+	private final boolean					absolute;
+	private final TimerEventPerformer		performer;
 	
 	private String				name;
 	private TimerEvent			current_event;

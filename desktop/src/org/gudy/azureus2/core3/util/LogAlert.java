@@ -49,11 +49,11 @@ class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ {
 
 	public static final boolean UNREPEATABLE = false;
 
-	public int entryType;
+	public final int entryType;
 
 	public Throwable err = null;
 
-	private boolean repeatable;
+	private final boolean repeatable;
 
 	public String text;
 

@@ -54,7 +54,7 @@ public class Constants {
     //      2.0.8.3_CVS
     //      2.0.8.3_Bnn       // incremental build
 
-    static String APP_NAME = "Vuze";
+    static final String APP_NAME = "Vuze";
     static final String AZUREUS_VERSION = "5.4.0.1_CVS";
 
     private static final boolean FORCE_NON_CVS = System.getProperty("az.force.noncvs", "0").equals("1");

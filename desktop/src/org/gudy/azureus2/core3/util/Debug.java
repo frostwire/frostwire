@@ -31,9 +31,9 @@ import java.util.Date;
  */
 public class Debug {
   
-	private static boolean STOP_AT_INITIALIZER = System.getProperty("debug.stacktrace.full", "0").equals("0");
+	private static final boolean STOP_AT_INITIALIZER = System.getProperty("debug.stacktrace.full", "0").equals("0");
 
-	private static AEDiagnosticsLogger	diag_logger;
+	private static final AEDiagnosticsLogger	diag_logger;
 	
 	static{
 		try{

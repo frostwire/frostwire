@@ -37,7 +37,7 @@ ThreadPool {
     private static final boolean LOG_WARNINGS = false;
     private static final int WARN_TIME = 10000;
 
-    private static List busy_pools = new ArrayList();
+    private static final List busy_pools = new ArrayList();
     private static boolean busy_pool_timer_set = false;
 
     private static boolean debug_thread_pool;
@@ -76,7 +76,7 @@ ThreadPool {
         }
     }
 
-    private static ThreadLocal tls =
+    private static final ThreadLocal tls =
             new ThreadLocal() {
                 public Object
                 initialValue() {
@@ -111,7 +111,7 @@ ThreadPool {
 
     private List busy;
     private boolean queue_when_full;
-    private List task_queue = new ArrayList();
+    private final List task_queue = new ArrayList();
 
     private AESemaphore thread_sem;
     private int reserved_target;
@@ -122,7 +122,7 @@ ThreadPool {
 
     private long task_total;
     private long task_total_last;
-    private Average task_average = Average.getInstance(WARN_TIME, 120);
+    private final Average task_average = Average.getInstance(WARN_TIME, 120);
 
     private boolean log_cpu = false;
 

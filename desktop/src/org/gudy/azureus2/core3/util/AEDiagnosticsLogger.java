@@ -45,7 +45,7 @@ AEDiagnosticsLogger
 	private int							pending_size;
 	private boolean						direct_writes;
 	
-	private boolean		close_pws = false;
+	private final boolean		close_pws = false;
 	
 	private static final String	start_date;
 	private static final long	timezone_offset;

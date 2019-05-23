@@ -27,7 +27,7 @@ IndentWriter
 	private static final String	INDENT_STRING		= "    ";
 	private static final String	INDENT_STRING_HTML	= "&nbsp;&nbsp;&nbsp;&nbsp;";
 	
-	private PrintWriter		pw;
+	private final PrintWriter		pw;
 	private String			indent	= "";
 	
 	private boolean			html;

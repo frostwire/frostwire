@@ -34,12 +34,12 @@ TimerEvent
 {
 	private String					name;
 	
-	private Timer					timer;
-	private long					created;
+	private final Timer					timer;
+	private final long					created;
 	private long					when;
-	private TimerEventPerformer	performer;
+	private final TimerEventPerformer	performer;
 	
-	private boolean		absolute;
+	private final boolean		absolute;
 	private boolean		cancelled;
 	private boolean		has_run;
 	
