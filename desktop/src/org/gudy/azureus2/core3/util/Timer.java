@@ -64,7 +64,7 @@ public class Timer
             try {
                 timers_mon.enter();
                 if (timers == null) {
-                    timers = new ArrayList<WeakReference<Timer>>();
+                    timers = new ArrayList<>();
                     AEDiagnostics.addEvidenceGenerator(new evidenceGenerator());
                 }
                 timers.add(new WeakReference<Timer>(this));

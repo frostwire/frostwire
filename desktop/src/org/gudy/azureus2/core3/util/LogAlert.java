@@ -125,12 +125,11 @@ class LogAlert /*implements org.gudy.azureus2.plugins.logging.LogAlert*/ {
 	public Throwable getError() {return err;}
 	public int getType() {
 		switch (entryType) {
-			case AT_INFORMATION:
-				return LT_INFORMATION;
 			case AT_ERROR:
 				return LT_ERROR;
 			case AT_WARNING:
 				return LT_WARNING;
+			case AT_INFORMATION:
 			default:
 				return LT_INFORMATION;
 		}

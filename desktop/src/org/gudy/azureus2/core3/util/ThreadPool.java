@@ -23,7 +23,6 @@
 package org.gudy.azureus2.core3.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 //import org.gudy.azureus2.core3.config.COConfigurationManager;
@@ -40,37 +39,30 @@ ThreadPool {
     private static final List busy_pools = new ArrayList();
     private static boolean busy_pool_timer_set = false;
 
-    private static boolean debug_thread_pool;
-    private static boolean debug_thread_pool_log_on;
-
     static {
         if (System.getProperty("transitory.startup", "0").equals("0")) {
 
             AEDiagnostics.addEvidenceGenerator(
-                    new AEDiagnosticsEvidenceGenerator() {
-                        public void
-                        generate(
-                                IndentWriter writer) {
-                            writer.println("Thread Pools");
+                    writer -> {
+                        writer.println("Thread Pools");
 
-                            try {
-                                writer.indent();
+                        try {
+                            writer.indent();
 
-                                List pools;
+                            List pools;
 
-                                synchronized (busy_pools) {
+                            synchronized (busy_pools) {
 
-                                    pools = new ArrayList(busy_pools);
-                                }
-
-                                for (int i = 0; i < pools.size(); i++) {
-
-                                    ((ThreadPool) pools.get(i)).generateEvidence(writer);
-                                }
-                            } finally {
-
-                                writer.exdent();
+                                pools = new ArrayList(busy_pools);
                             }
+
+                            for (Object pool : pools) {
+
+                                ((ThreadPool) pool).generateEvidence(writer);
+                            }
+                        } finally {
+
+                            writer.exdent();
                         }
                     });
         }
@@ -96,9 +88,9 @@ ThreadPool {
             pools = new ArrayList(busy_pools);
         }
 
-        for (int i = 0; i < pools.size(); i++) {
+        for (Object pool : pools) {
 
-            ((ThreadPool) pools.get(i)).checkTimeouts();
+            ((ThreadPool) pool).checkTimeouts();
         }
     }
 
@@ -151,34 +143,14 @@ ThreadPool {
         writer.println(name + ": max=" + max_size + ",qwf=" + queue_when_full + ",queue=" + task_queue.size() + ",busy=" + busy.size() + ",total=" + task_total + ":" + DisplayFormatters.formatDecimal(task_average.getDoubleAverage(), 2) + "/sec");
     }
 
-    public void
+    void
     setWarnWhenFull() {
         warn_when_full = true;
     }
 
-    public void
+    void
     setLogCPU() {
         log_cpu = true;
-    }
-
-    public int
-    getMaxThreads() {
-        return (max_size);
-    }
-
-    public void
-    setThreadPriority(
-            int _priority) {
-        thread_priority = _priority;
-    }
-
-    public void
-    setExecutionLimit(
-            long millis) {
-        synchronized (this) {
-
-            execution_limit = millis;
-        }
     }
 
     public threadPoolWorker run(AERunnable runnable) {
@@ -186,10 +158,6 @@ ThreadPool {
     }
 
 
-    /**
-     * @param runnable
-     * @param high_priority inserts at front if tasks queueing
-     */
     private threadPoolWorker run(AERunnable runnable, boolean high_priority, boolean manualRelease) {
 
         if (manualRelease && !(runnable instanceof ThreadPoolTask))
@@ -269,14 +237,8 @@ ThreadPool {
     runIt(
             AERunnable runnable) {
         if (log_cpu) {
-
-            long start_cpu = 0;
-            long start_time = SystemTime.getHighPrecisionCounter();
-
             runnable.run();
-
         } else {
-
             runnable.run();
         }
     }
@@ -286,8 +248,8 @@ ThreadPool {
             StringBuilder task_names = new StringBuilder();
             try {
                 synchronized (ThreadPool.this) {
-                    for (int i = 0; i < busy.size(); i++) {
-                        threadPoolWorker x = (threadPoolWorker) busy.get(i);
+                    for (Object o : busy) {
+                        threadPoolWorker x = (threadPoolWorker) o;
                         AERunnable r = x.runnable;
                         if (r != null) {
                             String name;
@@ -299,83 +261,11 @@ ThreadPool {
                         }
                     }
                 }
-            } catch (Throwable e) {
+            } catch (Throwable ignored) {
             }
             Debug.out("Thread pool '" + getName() + "' is full (busy=" + task_names + ")");
             warn_when_full = false;
         }
-    }
-
-    public AERunnable[] getQueuedTasks() {
-        synchronized (this) {
-            AERunnable[] res = new AERunnable[task_queue.size()];
-            task_queue.toArray(res);
-            return (res);
-        }
-    }
-
-    public int getQueueSize() {
-        synchronized (this) {
-            return task_queue.size();
-        }
-    }
-
-    public boolean isQueued(AERunnable task) {
-        synchronized (this) {
-            return task_queue.contains(task);
-        }
-    }
-
-    public AERunnable[]
-    getRunningTasks() {
-        List runnables = new ArrayList();
-
-        synchronized (this) {
-
-            Iterator it = busy.iterator();
-
-            while (it.hasNext()) {
-
-                threadPoolWorker worker = (threadPoolWorker) it.next();
-
-                AERunnable runnable = worker.getRunnable();
-
-                if (runnable != null) {
-
-                    runnables.add(runnable);
-                }
-            }
-        }
-
-        AERunnable[] res = new AERunnable[runnables.size()];
-
-        runnables.toArray(res);
-
-        return (res);
-    }
-
-    public int
-    getRunningCount() {
-        int res = 0;
-
-        synchronized (this) {
-
-            Iterator it = busy.iterator();
-
-            while (it.hasNext()) {
-
-                threadPoolWorker worker = (threadPoolWorker) it.next();
-
-                AERunnable runnable = worker.getRunnable();
-
-                if (runnable != null) {
-
-                    res++;
-                }
-            }
-        }
-
-        return (res);
     }
 
     public boolean
@@ -449,16 +339,12 @@ ThreadPool {
 
             task_total_last = task_total;
 
-            if (debug_thread_pool_log_on) {
-
-                System.out.println("ThreadPool '" + getName() + "'/" + thread_name_index + ": max=" + max_size + ",sem=[" + thread_sem.getString() + "],busy=" + busy.size() + ",queue=" + task_queue.size());
-            }
 
             long now = SystemTime.getMonotonousTime();
 
-            for (int i = 0; i < busy.size(); i++) {
+            for (Object o : busy) {
 
-                threadPoolWorker x = (threadPoolWorker) busy.get(i);
+                threadPoolWorker x = (threadPoolWorker) o;
 
                 long elapsed = now - x.run_start_time;
 
@@ -520,7 +406,7 @@ ThreadPool {
             // if debug is on we leave the pool registered so that we
             // can trace on the timeout events
 
-            if (busy.size() == 0 && !debug_thread_pool) {
+            if (busy.size() == 0) {
 
                 synchronized (busy_pools) {
 
@@ -544,20 +430,6 @@ ThreadPool {
             }
         }
 
-    }
-
-    public void registerThreadAsChild(threadPoolWorker parent) {
-        if (tls.get() == null || tls.get() == parent)
-            tls.set(parent);
-        else
-            throw new IllegalStateException("another parent is already set for this thread");
-    }
-
-    public void deregisterThreadAsChild(threadPoolWorker parent) {
-        if (tls.get() == parent)
-            tls.set(null);
-        else
-            throw new IllegalStateException("tls is not set to parent");
     }
 
 
@@ -613,11 +485,7 @@ ThreadPool {
 //												}
 //											});
                                             busy_pool_timer_set = true;
-                                            SimpleTimer.addPeriodicEvent("ThreadPool:timeout", WARN_TIME, new TimerEventPerformer() {
-                                                public void perform(TimerEvent event) {
-                                                    checkAllTimeouts();
-                                                }
-                                            });
+                                            SimpleTimer.addPeriodicEvent("ThreadPool:timeout", WARN_TIME, event -> checkAllTimeouts());
                                         }
                                     }
                                 }
@@ -658,7 +526,7 @@ ThreadPool {
 
                                 // if debug is on we leave the pool registered so that we
                                 // can trace on the timeout events
-                                if (busy.size() == 0 && !debug_thread_pool)
+                                if (busy.size() == 0)
                                     synchronized (busy_pools) {
                                         busy_pools.remove(ThreadPool.this);
                                     }
