@@ -22,14 +22,11 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class Timer
         extends AERunnable
         implements SystemTime.ChangeListener {
-    private static final boolean DEBUG_TIMERS = true;
-    private static ArrayList<WeakReference<Timer>> timers = null;
     private static final AEMonitor timers_mon = new AEMonitor();
 
     private ThreadPool thread_pool;
@@ -58,19 +55,6 @@ public class Timer
             String name,
             int thread_pool_size,
             int thread_priority) {
-        if (DEBUG_TIMERS) {
-            try {
-                timers_mon.enter();
-                if (timers == null) {
-                    timers = new ArrayList<>();
-                    AEDiagnostics.addEvidenceGenerator(new evidenceGenerator());
-                }
-                timers.add(new WeakReference<>(this));
-            } finally {
-                timers_mon.exit();
-            }
-        }
-
         thread_pool = new ThreadPool(name, thread_pool_size);
 
         SystemTime.registerClockChangeListener(this);
@@ -177,13 +161,7 @@ public class Timer
                 }
 
                 if (event_to_run != null) {
-
                     event_to_run.setHasRun();
-
-                    if (log) {
-                        System.out.println("running: " + event_to_run.getString());
-                    }
-
                     thread_pool.run(event_to_run.getRunnable());
                 }
 
@@ -365,7 +343,7 @@ public class Timer
             long when,
             boolean absolute,
             TimerEventPerformer performer) {
-        TimerEvent event = new TimerEvent(this, unique_id_next++, creation_time, when, absolute, performer);
+        TimerEvent event = new TimerEvent(unique_id_next++, when, absolute, performer);
 
         if (name != null) {
 
@@ -422,11 +400,6 @@ public class Timer
             periodic_performer.setName(name);
         }
 
-        if (log) {
-
-            System.out.println("Timer '" + thread_pool.getName() + "' - added " + periodic_performer.getString());
-        }
-
         return (periodic_performer);
     }
 
@@ -440,56 +413,6 @@ public class Timer
             // System.out.println( "event cancelled (" + event.getWhen() + ") - queue = " + events.size());
 
             notify();
-        }
-    }
-
-    private class
-    evidenceGenerator implements AEDiagnosticsEvidenceGenerator {
-        public void generate(IndentWriter writer) {
-            if (!DEBUG_TIMERS) {
-                return;
-            }
-
-            ArrayList lines = new ArrayList();
-            int count = 0;
-            try {
-                try {
-                    timers_mon.enter();
-                    // crappy
-                    for (Iterator iter = timers.iterator(); iter.hasNext(); ) {
-                        WeakReference timerRef = (WeakReference) iter.next();
-                        Timer timer = (Timer) timerRef.get();
-                        if (timer == null) {
-                            iter.remove();
-                        } else {
-                            count++;
-
-                            List events = timer.getEvents();
-
-                            lines.add(timer.thread_pool.getName() + ", "
-                                    + events.size() + " events:");
-
-                            for (Object event : events) {
-                                TimerEvent ev = (TimerEvent) event;
-
-                                lines.add("  " + ev.getString());
-                            }
-                        }
-                    }
-                } finally {
-                    timers_mon.exit();
-                }
-
-                writer.println("Timers: " + count + " (time=" + SystemTime.getCurrentTime() + "/" + SystemTime.getMonotonousTime() + ")");
-                writer.indent();
-                for (Object o : lines) {
-                    String line = (String) o;
-                    writer.println(line);
-                }
-                writer.exdent();
-            } catch (Throwable e) {
-                writer.println(e.toString());
-            }
         }
     }
 }

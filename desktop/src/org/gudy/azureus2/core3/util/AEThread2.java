@@ -137,9 +137,6 @@ abstract class AEThread2 {
         }
     }
 
-    public boolean isCurrentThread() {
-        return (wrapper == Thread.currentThread());
-    }
 
     public String
     toString() {
@@ -281,15 +278,5 @@ abstract class AEThread2 {
             sem.release();
         }
 
-        void
-        setDebug(
-                Object d) {
-            debug = new Object[]{d, SystemTime.getMonotonousTime()};
-        }
-
-        Object[]
-        getDebug() {
-            return (debug);
-        }
     }
 }

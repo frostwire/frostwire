@@ -39,111 +39,114 @@ import java.util.concurrent.TimeUnit;
 
 
 public class
-MPlayerInstance {
-    private static com.frostwire.util.Logger LOGGER = com.frostwire.util.Logger.getLogger(MPlayerInstance.class);
-    private static final boolean LOG = true;
+MPlayerInstance
+{
+	private static com.frostwire.util.Logger LOGGER = com.frostwire.util.Logger.getLogger(MPlayerInstance.class);
+	private static final boolean LOG	= true;
 
-    private static File BINARY_PATH;
+	private static File BINARY_PATH;
 
-    public static void
-    initialise(
-            File binary_path) {
-        BINARY_PATH = binary_path;
+	public static void
+	initialise(
+		File		binary_path )
+	{
+		BINARY_PATH	= binary_path;
 
-        killProcesses(false);
-    }
+		killProcesses( false );
+	}
 
-    // indicates how commands should handle pause
-    // see http://www.mplayerhq.hu/DOCS/tech/slave.txt for details
-    public enum CommandPauseMode {
-        NONE,         // pass no pause prefix with the command
-        KEEP,         // pass the pausing_keep prefix
-        KEEP_FORCE    // pass the pausing_keep_force prefix
-    }
+	// indicates how commands should handle pause
+	// see http://www.mplayerhq.hu/DOCS/tech/slave.txt for details
+	public enum CommandPauseMode {
+		NONE,         // pass no pause prefix with the command
+		KEEP,         // pass the pausing_keep prefix
+		KEEP_FORCE    // pass the pausing_keep_force prefix
+	};
 
-    ;
+	public MPlayerInstance() {
+	}
 
-    public MPlayerInstance() {
-    }
+	private volatile Process	mPlayerProcess;
 
-    private volatile Process mPlayerProcess;
+	private boolean	starting;
+	private boolean	started;
 
-    private boolean starting;
-    private boolean started;
+	private boolean	stop_pending;
+	private boolean	stopped;
 
-    private boolean stop_pending;
-    private boolean stopped;
+	private AESemaphore	stop_sem = new AESemaphore( "EMP:S" );
 
-    private AESemaphore stop_sem = new AESemaphore("EMP:S");
+	private boolean	paused;
 
-    private boolean paused;
+	private List<String> 	commands 	= new LinkedList<String>();
+	private AESemaphore		command_sem = new AESemaphore( "EMP:C" );
 
-    private List<String> commands = new LinkedList<String>();
-    private AESemaphore command_sem = new AESemaphore("EMP:C");
+	private boolean 		isSeeking;
+	private int				seekingTo;
+	private volatile long	seekingSendTime;
+	private float 			nextSeek	= -1;
 
-    private boolean isSeeking;
-    private int seekingTo;
-    private volatile long seekingSendTime;
-    private float nextSeek = -1;
+	private int					pause_change_id_next;
+	private boolean				pause_reported;
+	private long 				pause_reported_time = -1;
 
-    private int pause_change_id_next;
-    private boolean pause_reported;
-    private long pause_reported_time = -1;
+	private int	pending_sleeps;
+	private int	mute_count;
 
-    private int pending_sleeps;
-    private int mute_count;
+	//private String fileOpened;
 
-    //private String fileOpened;
+	public void
+	doOpen(
+		String 					fileOrUrl,
+		int                     initialVolume,
+		final OutputConsumer	_outputConsumer )
+	{
+		synchronized( this ){
 
-    public void
-    doOpen(
-            String fileOrUrl,
-            int initialVolume,
-            final OutputConsumer _outputConsumer) {
-        synchronized (this) {
+			if ( starting || started ){
 
-            if (starting || started) {
+				throw( new RuntimeException( "no can do" ));
+			}
 
-                throw (new RuntimeException("no can do"));
-            }
+			starting = true;
+		}
 
-            starting = true;
-        }
+		final OutputConsumer output_consumer =
+			new OutputConsumer()
+			{
+				boolean	latest = false;
 
-        final OutputConsumer output_consumer =
-                new OutputConsumer() {
-                    boolean latest = false;
+				public void
+				consume(
+					String output )
+				{
+					// System.out.println( output );
 
-                    public void
-                    consume(
-                            String output) {
-                        // System.out.println( output );
+					boolean is_paused = output.startsWith( "ID_PAUSED" );
 
-                        boolean is_paused = output.startsWith("ID_PAUSED");
+					if ( is_paused != latest ){
 
-                        if (is_paused != latest) {
+						updateObservedPaused( is_paused );
 
-                            updateObservedPaused(is_paused);
+						latest = is_paused;
+					}
 
-                            latest = is_paused;
-                        }
+					_outputConsumer.consume( output );
+				}
+			};
 
-                        _outputConsumer.consume(output);
-                    }
-                };
+		try{
 
-        try {
+			//fileOpened = fileOrUrl;
 
-            //fileOpened = fileOrUrl;
+			List<String> cmdList = new ArrayList<String>();
 
-            List<String> cmdList = new ArrayList<String>();
+			cmdList.add( BINARY_PATH.getAbsolutePath());
 
-            cmdList.add(BINARY_PATH.getAbsolutePath());
+			cmdList.add("-slave");
 
-            cmdList.add("-slave");
-
-            //cache tunning for http streaming, without this some
-            //songs might not play.
+			//cache tunning for http streaming, without this some
+			//songs might not play.
             if (fileOrUrl.toLowerCase().startsWith("http")) {
                 //64Kb
                 cmdList.add("-cache");
@@ -154,31 +157,31 @@ MPlayerInstance {
                 cmdList.add("50");
             }
 
-            if (fileOrUrl.startsWith("https://")) {
-                fileOrUrl = fileOrUrl.replace("https://", "ffmpeg://https://");
-            }
+			if (fileOrUrl.startsWith("https://")) {
+				fileOrUrl = fileOrUrl.replace("https://", "ffmpeg://https://");
+			}
 
-            //cmdList.add("-quiet");
+			//cmdList.add("-quiet");
 
-            cmdList.add("-identify");
+			cmdList.add("-identify");
 
-            cmdList.add("-prefer-ipv4");
+			cmdList.add("-prefer-ipv4");
 
-            cmdList.add("-osdlevel");
-            cmdList.add("0");
+			cmdList.add("-osdlevel");
+			cmdList.add("0");
 
-            cmdList.add("-noautosub");
+			cmdList.add("-noautosub");
 
-            cmdList.add("-vo");
+			cmdList.add("-vo");
             if (OSUtils.isMacOSX()) {
                 cmdList.add("corevideo:buffer_name=fwmplayer");
             } else if (OSUtils.isWindows()) {
-                cmdList.add("direct3d,gl,directx,sdl");
-            } else if (OSUtils.isLinux()) {
-                cmdList.add("x11,gl,sdl");
+            	cmdList.add("direct3d,gl,directx,sdl");
+            }else if (OSUtils.isLinux()) {
+            	cmdList.add("x11,gl,sdl");
             }
 
-            if (OSUtils.isWindows()) {
+            if(OSUtils.isWindows()) {
 
                 // setting video output driver mode.
                 // NOTE:
@@ -196,7 +199,7 @@ MPlayerInstance {
                 cmdList.add("-framedrop");
 
                 cmdList.add("-wid");
-                cmdList.add(String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
+                cmdList.add( String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
 
                 //workaround for mplayer on windows not being able to decode wma correctly with the wma demuxer.
                 //by passing lavf it'll force mplayer to use ffmpeg's demuxer (libavformat).
@@ -208,11 +211,11 @@ MPlayerInstance {
 
             if (OSUtils.isLinux()) {
 
-                cmdList.add("-double");
-                cmdList.add("-framedrop");
+            	cmdList.add("-double");
+            	cmdList.add("-framedrop");
 
-                cmdList.add("-wid");
-                cmdList.add(String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
+				cmdList.add("-wid");
+            	cmdList.add( String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
             }
 
 
@@ -260,7 +263,7 @@ MPlayerInstance {
             } else if (OSUtils.isWindows()) {
 
                 if (fileOrUrl.length() > 250 && !fileOrUrl.toLowerCase().startsWith("http://")
-                        && !fileOrUrl.toLowerCase().startsWith("ffmpeg://")) {
+						&& !fileOrUrl.toLowerCase().startsWith("ffmpeg://")) {
                     String shortFileName = SystemUtils.getShortFileName(fileOrUrl);
 
                     if (shortFileName == null) {
@@ -277,661 +280,685 @@ MPlayerInstance {
             }
 
 
-            String[] cmd = cmdList.toArray(new String[0]);
-            String cmdString = Arrays.toString(cmd).replace(", ", " ");
-            System.out.println(String.format("starting mplayer: %s", cmdString));
+			String[] cmd = cmdList.toArray(new String[0]);
+			String cmdString = Arrays.toString(cmd).replace(", ", " ");
+			System.out.println(String.format("starting mplayer: %s", cmdString));
 
-            try {
-                System.out.println("File Path: [" + cmdList.get(cmdList.size() - 1) + "]");
-            } catch (Exception e9) {
-            }
+			try {
+			    System.out.println("File Path: [" + cmdList.get(cmdList.size() - 1) + "]");
+			} catch (Exception e9) { }
 
-            try {
-                ProcessBuilder pb = new ProcessBuilder(cmd);
-                mPlayerProcess = pb.start();
+			try {
+				ProcessBuilder pb = new ProcessBuilder(cmd);
+				mPlayerProcess = pb.start();
 
-                InputStream stdOut = mPlayerProcess.getInputStream();
-                InputStream stdErr = mPlayerProcess.getErrorStream();
-                OutputStream stdIn = mPlayerProcess.getOutputStream();
+				InputStream stdOut = mPlayerProcess.getInputStream();
+				InputStream stdErr = mPlayerProcess.getErrorStream();
+				OutputStream stdIn = mPlayerProcess.getOutputStream();
 
-                final BufferedReader brStdOut = new BufferedReader(new InputStreamReader(stdOut));
-                final BufferedReader brStdErr = new BufferedReader(new InputStreamReader(stdErr));
-                final PrintWriter pwStdIn = new PrintWriter(new OutputStreamWriter(stdIn));
+				final BufferedReader brStdOut = new BufferedReader(new InputStreamReader(stdOut));
+				final BufferedReader brStdErr = new BufferedReader(new InputStreamReader(stdErr));
+				final PrintWriter pwStdIn = new PrintWriter(new OutputStreamWriter(stdIn));
 
-                Thread stdOutReader = new Thread("Player Console Out Reader") {
-                    public void run() {
-                        try {
-                            String line;
-                            while ((line = brStdOut.readLine()) != null) {
+				Thread stdOutReader = new Thread("Player Console Out Reader") {
+					public void run() {
+						try {
+							String line;
+							while( (line = brStdOut.readLine()) != null) {
 //								if ( LOG && !line.startsWith( "A:" )){
 //									System.out.println( "STDOUT<- " + line );
 //								}
-                                output_consumer.consume(line);
-                            }
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                        }
-                    }
-                };
-                stdOutReader.setDaemon(true);
-                stdOutReader.start();
+								output_consumer.consume( line );
+							}
+						} catch (Exception e) {
+							//e.printStackTrace();
+						}
+					}
+				};
+				stdOutReader.setDaemon(true);
+				stdOutReader.start();
 
-                Thread stdErrReader = new Thread("Player Console Err Reader") {
-                    public void run() {
-                        try {
-                            String line;
-                            while ((line = brStdErr.readLine()) != null) {
+				Thread stdErrReader = new Thread("Player Console Err Reader") {
+					public void run() {
+						try {
+							String line;
+							while( (line = brStdErr.readLine()) != null) {
 
 //								if ( LOG && !line.startsWith( "A:" )){
 //									System.out.println( "STDERR<- " + line );
 //								}
 
-                                output_consumer.consume(line);
-                            }
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                        }
-                    }
-                };
-                stdErrReader.setDaemon(true);
-                stdErrReader.start();
+								output_consumer.consume( line );
+							}
+						} catch (Exception e) {
+							//e.printStackTrace();
+						}
+					}
+				};
+				stdErrReader.setDaemon(true);
+				stdErrReader.start();
 
-                Thread stdInWriter = new Thread("Player Console In Writer") {
-                    public void
-                    run() {
-                        try {
-                            while (true) {
+				Thread stdInWriter = new Thread("Player Console In Writer") {
+					public void
+					run()
+					{
+						try {
+							while( true ){
 
-                                command_sem.reserve();
+								command_sem.reserve();
 
-                                String toBeSent;
+								String toBeSent;
 
-                                synchronized (MPlayerInstance.this) {
+								synchronized( MPlayerInstance.this ){
 
-                                    if (commands.isEmpty()) {
+									if ( commands.isEmpty()){
 
-                                        break;
-                                    }
+										break;
+									}
 
-                                    toBeSent = commands.remove(0);
-                                }
+									toBeSent = commands.remove(0);
+								}
 
-                                if (LOG) {
-                                    System.out.println("-> " + toBeSent);
-                                }
+								if ( LOG ){
+									System.out.println( "-> " + toBeSent );
+								}
 
-                                if (toBeSent.startsWith("sleep ") || toBeSent.startsWith("pausing_keep_force sleep ")) {
+								if ( toBeSent.startsWith( "sleep " ) || toBeSent.startsWith( "pausing_keep_force sleep " )){
 
-                                    int millis = Integer.parseInt(toBeSent.substring(toBeSent.startsWith("p") ? 25 : 6));
+									int	millis = Integer.parseInt( toBeSent.substring( toBeSent.startsWith( "p" )?25:6 ));
 
-                                    try {
-                                        Thread.sleep(millis);
+									try{
+										Thread.sleep( millis );
 
-                                    } catch (Throwable e) {
+									}catch( Throwable e ){
 
-                                    }
+									}
 
-                                    synchronized (MPlayerInstance.this) {
+									synchronized( MPlayerInstance.this ){
 
-                                        pending_sleeps -= millis;
-                                    }
-                                } else if (toBeSent.startsWith("seek") || toBeSent.startsWith("pausing_keep_force seek")) {
+										pending_sleeps -= millis;
+									}
+								}else if ( toBeSent.startsWith( "seek" ) || toBeSent.startsWith( "pausing_keep_force seek" )){
 
-                                    seekingSendTime = SystemTime.getMonotonousTime();
-                                }
+									seekingSendTime	= SystemTime.getMonotonousTime();
+								}
 
-                                toBeSent = toBeSent.replaceAll("\\\\", "\\\\\\\\");
+								toBeSent = toBeSent.replaceAll("\\\\", "\\\\\\\\");
 
-                                pwStdIn.write(toBeSent + "\n");
+								pwStdIn.write(toBeSent + "\n");
 
-                                pwStdIn.flush();
+								pwStdIn.flush();
 
-                            }
-                        } catch (Throwable e) {
+							}
+						}catch ( Throwable e ){
 
-                            e.printStackTrace();
+							e.printStackTrace();
 
-                        } finally {
+						}finally{
 
-                            stop_sem.releaseForever();
-                        }
-                    }
-                };
-                stdInWriter.setDaemon(true);
-                stdInWriter.start();
+							stop_sem.releaseForever();
+						}
+					}
+				};
+				stdInWriter.setDaemon(true);
+				stdInWriter.start();
 
 
-            } catch (Throwable e) {
+			}catch( Throwable e ){
 
-                e.printStackTrace();
+				e.printStackTrace();
 
-                stop_sem.releaseForever();
-            }
-        } finally {
+				stop_sem.releaseForever();
+			}
+		}finally{
 
-            synchronized (this) {
+			synchronized( this ){
 
-                starting = false;
-                started = true;
+				starting 	= false;
+				started		= true;
 
-                if (stop_pending) {
+				if ( stop_pending  ){
 
-                    doStop();
-                }
-            }
-        }
-    }
+					doStop();
+				}
+			}
+		}
+	}
 
-    protected void
-    sendCommand(
-            String cmd,
-            CommandPauseMode pauseMode) {
-        synchronized (this) {
+	protected void
+	sendCommand(
+		String 	cmd,
+		CommandPauseMode pauseMode)
+	{
+		synchronized( this ){
 
-            if (stopped) {
+			if ( stopped ){
 
-                return;
-            }
+				return;
+			}
 
-            String prefix = "";
+			String prefix = "";
 
-            if (CommandPauseMode.KEEP_FORCE == pauseMode) {
-                prefix = "pausing_keep_force ";
-            } else if (CommandPauseMode.KEEP == pauseMode) {
-                prefix = "pausing_keep ";
-            }
+			if (CommandPauseMode.KEEP_FORCE == pauseMode) {
+				prefix = "pausing_keep_force ";
+			} else if (CommandPauseMode.KEEP == pauseMode) {
+				prefix = "pausing_keep ";
+			}
 
-            commands.add(prefix + cmd);
+			commands.add(prefix + cmd);
 
-            command_sem.release();
-        }
-    }
+			command_sem.release();
+		}
+	}
 
-    protected void
-    sendCommand(
-            String cmd) {
-        sendCommand(cmd, CommandPauseMode.NONE);
-    }
+	protected void
+	sendCommand(
+		String cmd )
+	{
+		sendCommand( cmd, CommandPauseMode.NONE );
+	}
 
-    protected void
-    initialised() {
-        synchronized (this) {
+	protected void
+	initialised()
+	{
+		synchronized( this ){
 
-            //sendCommand("pause");
+			//sendCommand("pause");
 
-            sendCommand("get_property LENGTH");
+			sendCommand("get_property LENGTH");
 
-            sendCommand("get_property SUB");
+			sendCommand("get_property SUB");
 
-            sendCommand("get_property ASPECT");
+			sendCommand("get_property ASPECT");
 
-            sendCommand("get_property WIDTH");
+			sendCommand("get_property WIDTH");
 
-            sendCommand("get_property HEIGHT");
+			sendCommand("get_property HEIGHT");
 
-            sendCommand("get_property VOLUME");
+			sendCommand("get_property VOLUME");
 
 
-        }
-    }
 
-    protected void
-    updateObservedPaused(
-            boolean r_paused) {
-        synchronized (this) {
+		}
+	}
 
-            pause_reported = r_paused;
-            pause_reported_time = SystemTime.getMonotonousTime();
-        }
-    }
+	protected void
+	updateObservedPaused(
+		boolean	r_paused )
+	{
+		synchronized( this ){
 
-    private void
-    pausedStateChanging() {
-        final int delay = 333;
+			pause_reported 		= r_paused;
+			pause_reported_time	= SystemTime.getMonotonousTime();
+		}
+	}
 
-        pause_reported_time = -1;
+	private void
+	pausedStateChanging()
+	{
+		final int delay = 333;
 
-        final int pause_change_id = ++pause_change_id_next;
+		pause_reported_time = -1;
 
-        SimpleTimer.addEvent(
-                "MP:PO",
-                SystemTime.getOffsetTime(delay + pending_sleeps),
-                new TimerEventPerformer() {
-                    int level = 0;
+		final int pause_change_id = ++pause_change_id_next;
 
-                    public void
-                    perform(
-                            TimerEvent event) {
-                        synchronized (MPlayerInstance.this) {
+		SimpleTimer.addEvent(
+			"MP:PO",
+			SystemTime.getOffsetTime( delay + pending_sleeps ),
+			new TimerEventPerformer()
+			{
+				int	level = 0;
 
-                            if (!stopped &&
-                                    pause_change_id == pause_change_id_next &&
-                                    level < 20) {
+				public void
+				perform(
+					TimerEvent event )
+				{
+					synchronized( MPlayerInstance.this ){
 
-                                level++;
+						if ( 	!stopped &&
+								pause_change_id == pause_change_id_next &&
+								level < 20){
 
-                                if (pause_reported_time >= 0 && pause_reported == paused) {
+							level++;
 
-                                    return;
-                                }
+							if ( pause_reported_time >= 0 && pause_reported == paused ){
 
-                                //System.out.println("pausedStateChanging() sending pause");
+								return;
+							}
 
-                                sendCommand("pause", CommandPauseMode.NONE);
+							//System.out.println("pausedStateChanging() sending pause");
 
-                                SimpleTimer.addEvent(
-                                        "MP:PO2",
-                                        SystemTime.getOffsetTime(delay + pending_sleeps),
-                                        this);
-                            }
-                        }
-                    }
-                });
-    }
+							sendCommand( "pause", CommandPauseMode.NONE );
 
-    protected boolean
-    doPause() {
-        synchronized (this) {
+							SimpleTimer.addEvent(
+									"MP:PO2",
+									SystemTime.getOffsetTime( delay + pending_sleeps ),
+									this );
+						}
+					}
+				}
+			});
+	}
 
-            if (paused) {
+	protected boolean
+	doPause()
+	{
+		synchronized( this ){
 
-                return (false);
-            }
+			if ( paused ){
 
-            paused = true;
+				return( false );
+			}
 
-            pausedStateChanging();
+			paused = true;
 
-            sendCommand("pause", CommandPauseMode.NONE);
+			pausedStateChanging();
 
-            return (true);
-        }
-    }
+			sendCommand( "pause", CommandPauseMode.NONE );
 
+			return( true );
+		}
+	}
 
-    protected boolean
-    doResume() {
-        synchronized (this) {
 
-            if (!paused) {
+	protected boolean
+	doResume()
+	{
+		synchronized( this ){
 
-                return (false);
-            }
+			if ( !paused ){
 
-            paused = false;
+				return( false );
+			}
 
-            pausedStateChanging();
+			paused = false;
 
-            sendCommand("pause", CommandPauseMode.NONE);
+			pausedStateChanging();
 
-            return (true);
-        }
-    }
+			sendCommand( "pause", CommandPauseMode.NONE );
 
+			return( true );
+		}
+	}
 
-    protected void
-    doSeek(
-            float timeInSecs) {
-        synchronized (this) {
 
+	protected void
+	doSeek(
+		float timeInSecs )
+	{
+		synchronized( this ){
 
-            if (isSeeking) {
 
-                nextSeek = timeInSecs;
+			if( isSeeking ){
 
-            } else {
+				nextSeek = timeInSecs;
 
-                isSeeking = true;
+			}else{
 
-                nextSeek = -1;
+				isSeeking = true;
 
-                int value = (int) timeInSecs;
+				nextSeek = -1;
 
-                seekingTo = value;
+				int value = (int)timeInSecs;
 
-                seekingSendTime = -1;
+				seekingTo 		= value;
 
-                sendCommand("seek " + value + " 2", CommandPauseMode.KEEP);
+				seekingSendTime	= -1;
 
-                sendCommand("get_time_pos", CommandPauseMode.KEEP);
-            }
-        }
-    }
+				sendCommand("seek " + value + " 2", CommandPauseMode.KEEP);
 
-    /**
-     * this is called for every poisition received, not just after a seek
-     *
-     * @param time
-     */
+				sendCommand("get_time_pos", CommandPauseMode.KEEP);
+			}
+		}
+	}
 
-    protected void
-    positioned(
-            float time) {
-        long now = SystemTime.getMonotonousTime();
+		/**
+		 * this is called for every poisition received, not just after a seek
+		 * @param time
+		 */
 
-        synchronized (this) {
+	protected void
+	positioned(
+		float		time )
+	{
+		long	now = SystemTime.getMonotonousTime();
 
-            if (seekingSendTime == -1) {
+		synchronized( this ){
 
-                return;
-            }
+			if ( seekingSendTime == -1 ){
 
-            if (isSeeking) {
+				return;
+			}
 
-                if (time >= seekingTo) {
+			if( isSeeking ){
 
-                    if (now - seekingSendTime > 1000 ||
-                            time - seekingTo <= 2) {
+				if ( time >= seekingTo ){
 
-                        positioned();
-                    }
-                }
-            }
-        }
-    }
+					if ( 	now - seekingSendTime > 1000 ||
+							time - seekingTo <= 2 ){
 
-    /**
-     * called to a specific position report
-     */
+						positioned();
+					}
+				}
+			}
+		}
+	}
 
-    protected void
-    positioned() {
-        synchronized (this) {
+		/**
+		 * called to a specific position report
+		 */
 
-            if (isSeeking) {
+	protected void
+	positioned()
+	{
+		synchronized( this ){
 
-                isSeeking = false;
-                seekingSendTime = -1;
+			if( isSeeking ){
 
-                if (nextSeek != -1) {
+				isSeeking 		= false;
+				seekingSendTime = -1;
 
-                    doSeek(nextSeek);
-                }
-            }
-        }
-    }
+				if ( nextSeek != -1 ){
 
-    protected void doSetVolume(int volume) {
-        synchronized (this) {
-            CommandPauseMode pauseMode = paused ? CommandPauseMode.KEEP_FORCE : CommandPauseMode.NONE;
-            sendCommand("volume " + volume + " 1", pauseMode);
-        }
-    }
+					doSeek( nextSeek );
+				}
+			}
+		}
+	}
 
-    protected void
-    doMute(
-            boolean on) {
-        synchronized (this) {
+	protected void doSetVolume(int volume)
+	{
+		synchronized( this ){
+			CommandPauseMode pauseMode = paused ? CommandPauseMode.KEEP_FORCE : CommandPauseMode.NONE;
+			sendCommand("volume " + volume + " 1", pauseMode);
+		}
+	}
 
-            if (on) {
+	protected void
+	doMute(
+		boolean		on )
+	{
+		synchronized( this ){
 
-                mute_count++;
+			if ( on ){
 
-                if (mute_count == 1) {
+				mute_count++;
 
-                    sendCommand("mute 1");
-                }
-            } else {
+				if ( mute_count == 1 ){
 
-                mute_count--;
+					sendCommand( "mute 1" );
+				}
+			}else{
 
-                if (mute_count == 0) {
+				mute_count--;
 
-                    if (paused) {
+				if ( mute_count == 0 ){
 
-                        // slight hack : assume any queued seeks aren't required as if actioned
-                        // they will cause audio crap
+					if ( paused ){
 
-                        nextSeek = -1;
+							// slight hack : assume any queued seeks aren't required as if actioned
+							// they will cause audio crap
 
-                        pending_sleeps += 100;
+						nextSeek = -1;
 
-                        sendCommand("sleep 100");
-                    }
+						pending_sleeps += 100;
 
-                    sendCommand("mute 0");
-                }
-            }
-        }
-    }
+						sendCommand( "sleep 100" );
+					}
 
-    protected void
-    setAudioTrack(
-            Language language) {
-        synchronized (this) {
+					sendCommand( "mute 0" );
+				}
+			}
+		}
+	}
 
-            if (language != null) {
+	protected void
+	setAudioTrack(
+		Language language)
+	{
+		synchronized( this ){
 
-                sendCommand("switch_audio " + language.getId());
-            }
-        }
-    }
+			if ( language != null ){
 
-    private boolean redrawing;
-    private long redraw_completion;
-    private long redraw_last_frame;
+				sendCommand("switch_audio " + language.getId());
+			}
+		}
+	}
 
-    protected void
-    doRedraw() {
-        synchronized (this) {
+	private boolean redrawing;
+	private long	redraw_completion;
+	private long	redraw_last_frame;
 
-            final int delay = 250;
+	protected void
+	doRedraw()
+	{
+		synchronized( this ){
 
-            long now = SystemTime.getMonotonousTime();
+			final int delay = 250;
 
-            redraw_completion = now + delay;
+			long	now = SystemTime.getMonotonousTime();
 
-            if (redrawing) {
+			redraw_completion = now + delay;
 
-                if (now - redraw_last_frame > delay) {
+			if ( redrawing ){
 
-                    redraw_last_frame = now;
+				if ( now - redraw_last_frame > delay ){
 
-                    sendCommand("frame_step", CommandPauseMode.NONE);
-                }
-            } else {
+					redraw_last_frame = now;
 
-                doMute(true);
+					sendCommand( "frame_step", CommandPauseMode.NONE);
+				}
+			}else{
 
-                redraw_last_frame = now;
+				doMute( true );
 
-                sendCommand("frame_step", CommandPauseMode.NONE);
+				redraw_last_frame = now;
 
-                redrawing = true;
+				sendCommand( "frame_step", CommandPauseMode.NONE);
 
-                SimpleTimer.addEvent(
-                        "MP:RD",
-                        SystemTime.getOffsetTime(delay),
-                        new TimerEventPerformer() {
-                            public void
-                            perform(
-                                    TimerEvent event) {
-                                synchronized (MPlayerInstance.this) {
+				redrawing = true;
 
-                                    long now = SystemTime.getMonotonousTime();
+				SimpleTimer.addEvent(
+					"MP:RD",
+					SystemTime.getOffsetTime( delay ),
+					new TimerEventPerformer()
+					{
+						public void
+						perform(
+							TimerEvent event )
+						{
+							synchronized( MPlayerInstance.this ){
 
-                                    long diff = redraw_completion - now;
+								long	now = SystemTime.getMonotonousTime();
 
-                                    if (diff < 0 || Math.abs(diff) <= 25) {
+								long	diff = redraw_completion - now;
 
-                                        redrawing = false;
+								if ( diff < 0 || Math.abs( diff ) <= 25 ){
 
-                                        doMute(false);
+									redrawing = false;
 
-                                    } else {
+									doMute( false );
 
-                                        SimpleTimer.addEvent(
-                                                "MP:RD",
-                                                SystemTime.getOffsetTime(diff),
-                                                this);
-                                    }
-                                }
-                            }
-                        });
-            }
-        }
-    }
+								}else{
 
-    protected String
-    setSubtitles(
-            Language language) {
-        synchronized (this) {
+									SimpleTimer.addEvent(
+										"MP:RD",
+										SystemTime.getOffsetTime( diff ),
+										this );
+								}
+							}
+						}
+					});
+			}
+		}
+	}
 
-            String langId;
-            String commandName = "sub_demux ";
-            if (language != null) {
-                langId = language.getId();
-                if (language.getSource() == LanguageSource.FILE) {
-                    commandName = "sub_file ";
-                }
-                sendCommand("set_property sub_visibility 1");
-            } else {
-                sendCommand("set_property sub_visibility 0");
-                return (null);
-            }
+	protected String
+	setSubtitles(
+		Language language)
+	{
+		synchronized( this ){
 
+			String langId;
+			String commandName = "sub_demux ";
+			if(language != null) {
+				langId = language.getId();
+				if(language.getSource() == LanguageSource.FILE) {
+					commandName = "sub_file ";
+				}
+				sendCommand("set_property sub_visibility 1");
+			} else {
+				sendCommand("set_property sub_visibility 0");
+				return(null);
+			}
 
-            sendCommand(commandName + langId);
-            return (langId);
-        }
-    }
 
-    public volatile boolean activateNextSubtitleLoaded = false;
+			sendCommand(commandName + langId);
+			return(langId);
+		}
+	}
 
-    protected void doLoadSubtitlesFile(String file, boolean autoPlay) {
-        synchronized (this) {
-            activateNextSubtitleLoaded = autoPlay;
-            sendCommand("sub_load \"" + file + "\"");
-        }
-    }
+	public volatile boolean activateNextSubtitleLoaded = false;
 
-    public void
-    doStop() {
-        synchronized (this) {
+	protected void doLoadSubtitlesFile(String file, boolean autoPlay) {
+		synchronized( this ){
+			activateNextSubtitleLoaded = autoPlay;
+			sendCommand("sub_load \"" + file + "\"");
+		}
+	}
 
-            if (starting) {
+	public void
+	doStop()
+	{
+		synchronized( this ){
 
-                stop_pending = true;
+			if ( starting ){
 
-                return;
-            }
+				stop_pending = true;
 
-            if (stopped) {
+				return;
+			}
 
-                return;
-            }
+			if ( stopped ){
 
-            sendCommand("stop");
+				return;
+			}
 
-            sendCommand("quit 0");
+			sendCommand("stop");
 
-            stopped = true;
+			sendCommand("quit 0");
 
-        }
+			stopped = true;
 
-        command_sem.release();
+		}
 
-        if (mPlayerProcess != null) {
+		command_sem.release();
 
-            mPlayerProcess.destroy();
-        }
+		if ( mPlayerProcess != null ){
 
-        killProcesses(true);
+			mPlayerProcess.destroy();
+		}
 
-        stop_sem.reserve();
-    }
+		killProcesses( true );
 
-    private static void killProcesses(boolean delay) {
-        if (OSUtils.isAnyMac()) {
-            String process_name = BINARY_PATH.getName();
-            if (delay) {
-                try {
-                    Thread.sleep(250);
-                } catch (Throwable e) {
-                }
-            }
+		stop_sem.reserve();
+	}
 
-            runCommand(
-                    new String[]{
-                            "killall",
-                            "-9",
-                            process_name
-                    });
+	private static void killProcesses(boolean delay) {
+		if ( OSUtils.isAnyMac() ){
+			String	process_name = BINARY_PATH.getName();
+			if (delay) {
+				try {
+					Thread.sleep(250);
+				} catch (Throwable e) {
+				}
+			}
 
-        } else if (OSUtils.isWindows()) {
+			runCommand(
+					new String[]{
+						"killall",
+						"-9",
+						process_name
+					});
 
-            String process_name = BINARY_PATH.getName();
+		}else if ( OSUtils.isWindows() ){
 
-            int pos = process_name.lastIndexOf(".");
+			String	process_name = BINARY_PATH.getName();
 
-            if (pos != -1) {
+			int	pos = process_name.lastIndexOf( "." );
 
-                process_name = process_name.substring(0, pos);
-            }
+			if ( pos != -1 ){
 
-            if (LOG) {
-                System.out.println("running tskill " + process_name);
-            }
+				process_name = process_name.substring( 0, pos );
+			}
 
-            if (delay) {
+			if ( LOG ){
+				System.out.println( "running tskill " + process_name );
+			}
 
-                try {
-                    Thread.sleep(250);
+			if ( delay ){
 
-                } catch (Throwable e) {
-                }
-            }
+				try{
+					Thread.sleep(250);
 
-            runCommand(
-                    new String[]{
-                            "cmd",
-                            "/C",
-                            "tskill",
-                            process_name
-                    });
-        }
-    }
+				}catch( Throwable e ){
+				}
+			}
 
-    private static void
-    runCommand(
-            String[] command) {
-        try {
-            if (!OSUtils.isWindows()) {
+			runCommand(
+					new String[]{
+						"cmd",
+						"/C",
+						"tskill",
+						process_name
+					});
+		}
+	}
 
-                command[0] = findCommand(command[0]);
-            }
+	private static void
+	runCommand(
+		String[]	command )
+	{
+		try{
+			if ( !OSUtils.isWindows() ){
 
-            Runtime.getRuntime().exec(command).waitFor();
+				command[0] = findCommand( command[0] );
+			}
 
-        } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
+			Runtime.getRuntime().exec( command ).waitFor();
 
-    private static String
-    findCommand(
-            String name) {
-        final String[] locations = {"/bin", "/usr/bin"};
+		}catch( Throwable e ){
 
-        for (String s : locations) {
+			LOGGER.error(e.getMessage(), e);
+		}
+	}
 
-            File f = new File(s, name);
+	private static String
+	findCommand(
+		String	name )
+	{
+		final String[]  locations = { "/bin", "/usr/bin" };
 
-            if (f.exists() && f.canRead()) {
+		for ( String s: locations ){
 
-                return (f.getAbsolutePath());
-            }
-        }
+			File f = new File( s, name );
 
-        return (name);
-    }
+			if ( f.exists() && f.canRead()){
 
-    protected interface
-    OutputConsumer {
-        public void
-        consume(
-                String output);
-    }
+				return( f.getAbsolutePath());
+			}
+		}
+
+		return( name );
+	}
+
+	protected interface
+	OutputConsumer
+	{
+		public void
+		consume(
+			String		output );
+	}
 
     public void doGetProperties(String fileOrUrl, final OutputConsumer _outputConsumer) {
         final OutputConsumer output_consumer = new OutputConsumer() {

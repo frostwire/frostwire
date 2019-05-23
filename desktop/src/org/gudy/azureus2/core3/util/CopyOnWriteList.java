@@ -19,13 +19,11 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class
 CopyOnWriteList<T>
         implements Iterable<T> {
-    private static final boolean LOG_STATS = false;
 
     private List list = Collections.EMPTY_LIST;
 
@@ -35,72 +33,20 @@ CopyOnWriteList<T>
 
     private int initialCapacity;
 
-    private static final CopyOnWriteList stats = new CopyOnWriteList(10);
-
-    static {
-        if (LOG_STATS) {
-            AEDiagnostics.addEvidenceGenerator(writer -> {
-                writer.println("COWList Info");
-                writer.indent();
-                try {
-                    long count = 0;
-                    long size = 0;
-                    for (Object stat : stats) {
-                        WeakReference wf = (WeakReference) stat;
-                        CopyOnWriteList cowList = (CopyOnWriteList) wf.get();
-                        if (cowList != null) {
-                            count++;
-                            size += cowList.size();
-                        }
-                    }
-                    writer.println(count + " lists with " + size + " total entries");
-                    if (count > 0) {
-                        writer.println((size / count) + " avg size");
-                    }
-                } catch (Throwable ignored) {
-                } finally {
-                    writer.exdent();
-                }
-            });
-        }
-    }
-
-    /**
-     *
-     */
-    private CopyOnWriteList(int initialCapacity) {
-        this.initialCapacity = initialCapacity;
-        use_linked_list = false;
-        if (LOG_STATS) {
-            stats.add(new WeakReference(this));
-        }
-    }
-
     CopyOnWriteList(boolean _use_linked_list) {
         this.initialCapacity = 1;
         use_linked_list = _use_linked_list;
-        if (LOG_STATS) {
-            stats.add(new WeakReference(this));
-        }
     }
 
     public void
     add(
             T obj) {
         synchronized (this) {
-
             if (visible) {
-
                 List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-
-                //mutated();
-
                 new_list.add(obj);
-
                 list = new_list;
-
                 visible = false;
-
             } else {
                 if (list == Collections.EMPTY_LIST) {
                     list = use_linked_list ? new LinkedList<>() : new ArrayList<>(initialCapacity);
@@ -116,21 +62,11 @@ CopyOnWriteList<T>
     remove(
             T obj) {
         synchronized (this) {
-
             if (visible) {
-
                 List<T> new_list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
-
-                //mutated();
-
-                boolean result = new_list.remove(obj);
-
                 list = new_list;
-
                 visible = false;
-
             } else {
-
                 list.remove(obj);
             }
         }
@@ -140,9 +76,7 @@ CopyOnWriteList<T>
     public Iterator<T>
     iterator() {
         synchronized (this) {
-
             visible = true;
-
             return (new CopyOnWriteListIterator(list.iterator()));
         }
     }
@@ -150,7 +84,6 @@ CopyOnWriteList<T>
     public int
     size() {
         synchronized (this) {
-
             return (list.size());
         }
     }
@@ -180,9 +113,6 @@ CopyOnWriteList<T>
 
         public void
         remove() {
-            // don't actually remove it from the iterator. can't go backwards with this iterator so this is
-            // not a problem
-
             if (last == null) {
 
                 throw (new IllegalStateException("next has not been called!"));

@@ -38,7 +38,6 @@ TimerEventPeriodic
 
     private String name;
     private TimerEvent current_event;
-    private boolean cancelled;
 
     TimerEventPeriodic(
             Timer _timer,
@@ -49,9 +48,7 @@ TimerEventPeriodic
         frequency = _frequency;
         absolute = _absolute;
         performer = _performer;
-
         long now = SystemTime.getCurrentTime();
-
         current_event = timer.addEvent(now, now + frequency, absolute, this);
     }
 
@@ -69,60 +66,25 @@ TimerEventPeriodic
         }
     }
 
-    TimerEventPerformer
-    getPerformer() {
-        return (performer);
-    }
-
     long
     getFrequency() {
         return (frequency);
     }
 
-    public boolean
-    isCancelled() {
-        return (cancelled);
-    }
-
     public void
     perform(
             TimerEvent event) {
-        if (!cancelled) {
 
-            try {
-                performer.perform(event);
-
-            } catch (Throwable e) {
-
-                LOG.error(e.getMessage(), e);
-            }
-
-            synchronized (this) {
-
-                if (!cancelled) {
-
-                    long now = SystemTime.getCurrentTime();
-
-                    current_event = timer.addEvent(name, now, now + frequency, absolute, this);
-                }
-            }
-        }
-    }
-
-    String
-    getString() {
-        TimerEvent ce = current_event;
-
-        String ev_data;
-
-        if (ce == null) {
-
-            ev_data = "?";
-        } else {
-
-            ev_data = "when=" + ce.getWhen() + ",run=" + ce.hasRun() + ", can=" + ce.isCancelled();
+        try {
+            performer.perform(event);
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
         }
 
-        return (ev_data + ",freq=" + getFrequency() + ",target=" + getPerformer() + (name == null ? "" : (",name=" + name)));
+        synchronized (this) {
+            long now = SystemTime.getCurrentTime();
+            current_event = timer.addEvent(name, now + frequency, absolute, this);
+        }
+
     }
 }

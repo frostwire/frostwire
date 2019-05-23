@@ -36,8 +36,6 @@ AESemaphore
 
     private boolean released_forever = false;
 
-    private Thread latest_waiter;
-
     public AESemaphore(
             String _name) {
         this(0);
@@ -98,8 +96,6 @@ AESemaphore
                 try {
                     waiting++;
 
-                    latest_waiter = Thread.currentThread();
-
                     if (millis == 0) {
 
                         // we can get spurious wakeups (see Object javadoc) so we need to guard against
@@ -156,9 +152,6 @@ AESemaphore
 
                     throw (new RuntimeException("Semaphore: operation interrupted", e));
 
-                } finally {
-
-                    latest_waiter = null;
                 }
             } else {
                 int num_to_get = max_to_reserve > dont_wait ? dont_wait : max_to_reserve;

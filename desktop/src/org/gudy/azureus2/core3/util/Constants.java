@@ -51,7 +51,6 @@ public class Constants {
     //      2.0.8.3_CVS
     //      2.0.8.3_Bnn       // incremental build
 
-    static final String APP_NAME = "Vuze";
     static final String AZUREUS_VERSION = "5.4.0.1_CVS";
 
     private static final boolean FORCE_NON_CVS = System.getProperty("az.force.noncvs", "0").equals("1");
@@ -59,8 +58,6 @@ public class Constants {
     static final boolean IS_CVS_VERSION = isCVSVersion() && !FORCE_NON_CVS;
 
     private static final String OSName = System.getProperty("os.name");
-
-    public static final boolean isLinux = OSName.equalsIgnoreCase("Linux");
     private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
     // If it isn't windows or osx, it's most likely an unix flavor
 
@@ -136,33 +133,6 @@ public class Constants {
         String vm_name = System.getProperty("java.vm.name", "");
         isAndroid = vm_name.equalsIgnoreCase("Dalvik");
     }
-
-    // Android is roughly 1.6 (reports as 0 for java.version)
-
-    static final String JAVA_VERSION;
-
-    static {
-        String java_version = isAndroid ? "1.6" : System.getProperty("java.version");
-        int api_level;
-
-        if (isAndroid) {
-
-            String sdk_int = System.getProperty("android.os.build.version.sdk_int", "0");
-
-            try {
-                api_level = Integer.parseInt(sdk_int);
-
-                if (api_level > 0 && api_level <= 8) {
-
-                    java_version = "1.5";
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-
-        JAVA_VERSION = java_version;
-    }
-
 
     private static boolean
     isCVSVersion() {
