@@ -263,7 +263,7 @@ AEDiagnosticsLogger
 				
 				if ( pending == null ){
 					
-					pending = new LinkedList<StringBuilder>();
+					pending = new LinkedList<>();
 				}
 				
 				pending.add( str );

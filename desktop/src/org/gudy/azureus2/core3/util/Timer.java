@@ -34,7 +34,7 @@ public class Timer
 
     private ThreadPool thread_pool;
 
-    private Set<TimerEvent> events = new TreeSet<TimerEvent>();
+    private Set<TimerEvent> events = new TreeSet<>();
 
     private long unique_id_next = 0;
 
@@ -67,7 +67,7 @@ public class Timer
                     timers = new ArrayList<>();
                     AEDiagnostics.addEvidenceGenerator(new evidenceGenerator());
                 }
-                timers.add(new WeakReference<Timer>(this));
+                timers.add(new WeakReference<>(this));
             } finally {
                 timers_mon.exit();
             }
@@ -93,7 +93,7 @@ public class Timer
 
     private synchronized List<TimerEvent>
     getEvents() {
-        return (new ArrayList<TimerEvent>(events));
+        return (new ArrayList<>(events));
     }
 
     public void
@@ -234,7 +234,7 @@ public class Timer
 
                 Iterator<TimerEvent> it = events.iterator();
 
-                List<TimerEvent> updated_events = new ArrayList<TimerEvent>(events.size());
+                List<TimerEvent> updated_events = new ArrayList<>(events.size());
 
                 while (it.hasNext()) {
 
@@ -283,7 +283,7 @@ public class Timer
                 // treeset in the constructor optimises things under the assumption that the original set
                 // was correctly sorted...
 
-                events = new TreeSet<TimerEvent>(updated_events);
+                events = new TreeSet<>(updated_events);
             }
         }
     }
@@ -341,7 +341,7 @@ public class Timer
 
                 if (updated) {
 
-                    events = new TreeSet<TimerEvent>(new ArrayList<TimerEvent>(events));
+                    events = new TreeSet<>(new ArrayList<>(events));
                 }
 
                 // must have this notify here as the scheduling code uses the current time to calculate
@@ -390,7 +390,7 @@ public class Timer
 
             if (resort) {
 
-                events = new TreeSet<TimerEvent>(new ArrayList<TimerEvent>(events));
+                events = new TreeSet<>(new ArrayList<>(events));
             }
 
             notify();

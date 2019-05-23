@@ -35,7 +35,7 @@ SimpleTimer
 	
 	private static final Timer	timer;
 	
-	private static final CopyOnWriteList<TimerTickReceiver>		tick_receivers = new CopyOnWriteList<TimerTickReceiver>( true );
+	private static final CopyOnWriteList<TimerTickReceiver>		tick_receivers = new CopyOnWriteList<>(true);
 	
 	static{
 		timer = new Timer("Simple Timer",32);
