@@ -206,9 +206,7 @@ AEMonSem {
 
         int total_pos = 0;
 
-        for (int i = 0; i < x.length; i++) {
-
-            AEMonSem ms = x[i];
+        for (AEMonSem ms : x) {
 
             long diff = ms.entry_count - ms.last_entry_count;
 
@@ -223,7 +221,7 @@ AEMonSem {
                     current_total += diff;
 
                 } else {
-                    total_x[total_pos++] = new Object[]{current.name, Long.valueOf(current_total)};
+                    total_x[total_pos++] = new Object[]{current.name, current_total};
 
                     current = ms;
                     current_total = diff;
@@ -233,7 +231,7 @@ AEMonSem {
 
         if (current != null) {
 
-            total_x[total_pos++] = new Object[]{current.name, Long.valueOf(current_total)};
+            total_x[total_pos++] = new Object[]{current.name, current_total};
         }
 
         Arrays.sort(
@@ -255,8 +253,8 @@ AEMonSem {
                         return (-1);
                     }
 
-                    long a1_count = ((Long) a1[1]).longValue();
-                    long a2_count = ((Long) a2[1]).longValue();
+                    long a1_count = (Long) a1[1];
+                    long a2_count = (Long) a2[1];
 
                     return ((int) (a2_count - a1_count));
                 });
@@ -292,9 +290,9 @@ AEMonSem {
 
             diag_logger.log("    busy monitors");
 
-            for (int i = 0; i < busy_monitors.size(); i++) {
+            for (Object busy_monitor : busy_monitors) {
 
-                AEMonSem ms = (AEMonSem) busy_monitors.get(i);
+                AEMonSem ms = (AEMonSem) busy_monitor;
 
                 Thread owner = ((AEMonitor) ms).owner;
 
@@ -306,9 +304,9 @@ AEMonSem {
 
             diag_logger.log("    waiting semaphores");
 
-            for (int i = 0; i < waiting_semaphores.size(); i++) {
+            for (Object waiting_semaphore : waiting_semaphores) {
 
-                AEMonSem ms = (AEMonSem) waiting_semaphores.get(i);
+                AEMonSem ms = (AEMonSem) waiting_semaphore;
 
                 Thread last_waiter = ((AESemaphore) ms).latest_waiter;
 
@@ -316,9 +314,7 @@ AEMonSem {
             }
         }
 
-        for (int i = 0; i < x.length; i++) {
-
-            AEMonSem ms = x[i];
+        for (AEMonSem ms : x) {
 
             ms.last_entry_count = ms.entry_count;
         }
@@ -439,7 +435,7 @@ AEMonSem {
 				}
 				*/
 
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
 
                 // not very interesting for semaphores as these tend to get left on stack traces when
                 // asymetric usage (which is often)
@@ -448,9 +444,9 @@ AEMonSem {
 
                 String prev_name = null;
 
-                for (int i = 0; i < stack.size(); i++) {
+                for (Object value : stack) {
 
-                    AEMonSem mon = (AEMonSem) stack.get(i);
+                    AEMonSem mon = (AEMonSem) value;
 
                     if (check_recursion) {
                         if (mon.name.equals(name) &&
@@ -494,9 +490,9 @@ AEMonSem {
 
                     boolean match = false;
 
-                    for (int i = 0; i < stack.size(); i++) {
+                    for (Object o : stack) {
 
-                        AEMonSem ms = (AEMonSem) stack.get(i);
+                        AEMonSem ms = (AEMonSem) o;
 
                         if (ms.name.equals(name)) {
 
@@ -525,11 +521,9 @@ AEMonSem {
 
                         String stack_trace = Debug.getStackTrace(true, false);
 
-                        Iterator it = debug_traces.keySet().iterator();
+                        for (Object o : debug_traces.keySet()) {
 
-                        while (it.hasNext()) {
-
-                            String old_key = (String) it.next();
+                            String old_key = (String) o;
 
                             String[] data = (String[]) debug_traces.get(old_key);
 

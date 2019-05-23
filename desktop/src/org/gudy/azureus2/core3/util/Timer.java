@@ -573,11 +573,7 @@ public class Timer
     dump() {
         System.out.println("Timer '" + thread_pool.getName() + "': dump");
 
-        Iterator it = events.iterator();
-
-        while (it.hasNext()) {
-
-            TimerEvent ev = (TimerEvent) it.next();
+        for (TimerEvent ev : events) {
 
             System.out.println("\t" + ev.getString());
         }
@@ -609,9 +605,8 @@ public class Timer
                             lines.add(timer.thread_pool.getName() + ", "
                                     + events.size() + " events:");
 
-                            Iterator it = events.iterator();
-                            while (it.hasNext()) {
-                                TimerEvent ev = (TimerEvent) it.next();
+                            for (Object event : events) {
+                                TimerEvent ev = (TimerEvent) event;
 
                                 lines.add("  " + ev.getString());
                             }
@@ -623,8 +618,8 @@ public class Timer
 
                 writer.println("Timers: " + count + " (time=" + SystemTime.getCurrentTime() + "/" + SystemTime.getMonotonousTime() + ")");
                 writer.indent();
-                for (Iterator iter = lines.iterator(); iter.hasNext(); ) {
-                    String line = (String) iter.next();
+                for (Object o : lines) {
+                    String line = (String) o;
                     writer.println(line);
                 }
                 writer.exdent();

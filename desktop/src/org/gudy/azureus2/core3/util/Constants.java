@@ -170,7 +170,7 @@ public class Constants {
 
     private static boolean
     isCVSVersion() {
-        return (Constants.AZUREUS_VERSION.indexOf("_") != -1);
+        return (Constants.AZUREUS_VERSION.contains("_"));
     }
 
     /**

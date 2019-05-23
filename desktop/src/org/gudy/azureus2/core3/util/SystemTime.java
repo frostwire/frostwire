@@ -172,12 +172,11 @@ public class SystemTime {
 
 							if (change != 0) {
 
-								Iterator<ChangeListener> it = clock_change_list.iterator();
 								//Debug.outNoStack("Clock change of " + change + " ms detected, raw=" + rawTime );
-								while (it.hasNext()) {
+								for (ChangeListener changeListener : clock_change_list) {
 
 									try {
-										it.next().clockChangeDetected(rawTime, change);
+										changeListener.clockChangeDetected(rawTime, change);
 
 									} catch (Throwable e) {
 
@@ -209,12 +208,11 @@ public class SystemTime {
 						long adjustedTime = stepped_time + currentTimeOffset;
 
 						if (change != 0) {
-							Iterator<ChangeListener> it = clock_change_list.iterator();
 							//Debug.outNoStack("Clock change of " + change + " ms completed, curr=" + adjustedTime );
-							while (it.hasNext()) {
+							for (ChangeListener changeListener : clock_change_list) {
 
 								try {
-									it.next().clockChangeCompleted(adjustedTime, change);
+									changeListener.clockChangeCompleted(adjustedTime, change);
 
 								} catch (Throwable e) {
 
@@ -225,8 +223,7 @@ public class SystemTime {
 
 						// copy reference since we use unsynced COW semantics
 						List<TickConsumer> consumersRef = monotoneTimeConsumers;
-						for (int i = 0; i < consumersRef.size(); i++) {
-							TickConsumer cons = consumersRef.get(i);
+						for (TickConsumer cons : consumersRef) {
 							try {
 								cons.consume(stepped_time);
 							} catch (Throwable e) {
@@ -240,8 +237,7 @@ public class SystemTime {
 						 */
 						consumersRef = systemTimeConsumers;
 
-						for (int i = 0; i < consumersRef.size(); i++) {
-							TickConsumer cons = consumersRef.get(i);
+						for (TickConsumer cons : consumersRef) {
 							try {
 								cons.consume(adjustedTime);
 							} catch (Throwable e) {
@@ -338,12 +334,10 @@ public class SystemTime {
 
 								// clock's changed
 
-								Iterator<ChangeListener> it = clock_change_list.iterator();
-
-								while (it.hasNext()) {
+								for (ChangeListener changeListener : clock_change_list) {
 
 									try {
-										it.next().clockChangeDetected(current_time, change);
+										changeListener.clockChangeDetected(current_time, change);
 									} catch (Throwable e) {
 
 										Debug.out(e);
@@ -359,11 +353,10 @@ public class SystemTime {
 						last_time = current_time;
 
 						if (change != 0) {
-							Iterator<ChangeListener> it = clock_change_list.iterator();
-							while (it.hasNext()) {
+							for (ChangeListener changeListener : clock_change_list) {
 
 								try {
-									it.next().clockChangeCompleted(current_time, change);
+									changeListener.clockChangeCompleted(current_time, change);
 
 								} catch (Throwable e) {
 
@@ -374,8 +367,8 @@ public class SystemTime {
 
 						List consumer_list_ref = systemTimeConsumers;
 
-						for (int i = 0; i < consumer_list_ref.size(); i++) {
-							TickConsumer cons = (TickConsumer) consumer_list_ref.get(i);
+						for (Object value : consumer_list_ref) {
+							TickConsumer cons = (TickConsumer) value;
 							try {
 								cons.consume(current_time);
 							} catch (Throwable e) {
@@ -386,8 +379,8 @@ public class SystemTime {
 
 						long mono_time = getMonoTime();
 
-						for (int i = 0; i < consumer_list_ref.size(); i++) {
-							TickConsumer cons = (TickConsumer) consumer_list_ref.get(i);
+						for (Object o : consumer_list_ref) {
+							TickConsumer cons = (TickConsumer) o;
 							try {
 								cons.consume(mono_time);
 							} catch (Throwable e) {

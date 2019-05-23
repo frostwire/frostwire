@@ -92,7 +92,7 @@ public class Average {
 	  Object[] details = other.getCloneDetails();
   		
   	  values		= (long[])details[0];
-  	  lastUpdate	= ((Long)details[1]).longValue();
+  	  lastUpdate	= (Long) details[1];
   }
   
   private synchronized Object[]
