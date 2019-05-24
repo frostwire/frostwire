@@ -63,15 +63,6 @@ final class KeywordMediaType implements Serializable {
      */
     private static final KeywordMediaType TYPE_APPLICATIONS = new KeywordMediaType(
             2, SCHEMA_PROGRAMS, new String[] {"apk"});
-    /**
-     * desktop world
-     "zip", "jar", "cab", "msi", "msp", "arj", "rar", "ace",
-    "lzh", "lha", "bin", "nrg", "cue", "iso", "jnlp", "bin",
-    "mdb", "sh", "csh", "awk", "pl", "rpm", "deb", "gz",
-    "gzip", "z", "bz2", "zoo", "tar", "tgz", "taz", "shar",
-    "hqx", "sit", "dmg", "7z", "jar", "zip"
-
-     */
 
     /**
      * Type for 'audio'

@@ -1425,7 +1425,7 @@ public final class GUIMediator {
         showTransfers(TransfersTab.FilterMode.ALL);
     }
 
-    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final long fileSize) {
+    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize) {
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openHttp(httpUrl, title, saveFileAs, fileSize);
     }

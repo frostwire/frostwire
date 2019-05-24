@@ -146,33 +146,12 @@ public class ArrayUtils {
 
     // Basic methods handling multi-dimensional arrays
     //-----------------------------------------------------------------------
-    /**
-     * <p>Outputs an array as a String, treating {@code null} as an empty array.</p>
-     *
-     * <p>Multi-dimensional arrays are handled correctly, including
-     * multi-dimensional primitive arrays.</p>
-     *
-     * <p>The format is that of Java source code, for example <code>{a,b}</code>.</p>
-     *
-     * @param array  the array to get a toString for, may be {@code null}
-     * @return a String representation of the array, '{}' if null array input
-     *//*
+    /*
     public static String toString(final Object array) {
         return toString(array, "{}");
     }*/
 
-    /**
-     * <p>Outputs an array as a String handling {@code null}s.</p>
-     *
-     * <p>Multi-dimensional arrays are handled correctly, including
-     * multi-dimensional primitive arrays.</p>
-     *
-     * <p>The format is that of Java source code, for example <code>{a,b}</code>.</p>
-     *
-     * @param array  the array to get a toString for, may be {@code null}
-     * @param stringIfNull  the String to return if the array is {@code null}
-     * @return a String representation of the array
-     *//*
+    /*
     public static String toString(final Object array, final String stringIfNull) {
         if (array == null) {
             return stringIfNull;
@@ -180,30 +159,12 @@ public class ArrayUtils {
         return new ToStringBuilder(array, ToStringStyle.SIMPLE_STYLE).append(array).toString();
     }*/
 
-    /**
-     * <p>Get a hash code for an array handling multi-dimensional arrays correctly.</p>
-     *
-     * <p>Multi-dimensional primitive arrays are also handled correctly by this method.</p>
-     *
-     * @param array  the array to get a hash code for, {@code null} returns zero
-     * @return a hash code for the array
-     *//*
+    /*
     public static int hashCode(final Object array) {
         return new HashCodeBuilder().append(array).toHashCode();
     }*/
 
-    /**
-     * <p>Compares two arrays, using equals(), handling multi-dimensional arrays
-     * correctly.</p>
-     *
-     * <p>Multi-dimensional primitive arrays are also handled correctly by this method.</p>
-     *
-     * @param array1  the left hand array to compare, may be {@code null}
-     * @param array2  the right hand array to compare, may be {@code null}
-     * @return {@code true} if the arrays are equal
-     * @deprecated this method has been replaced by {@code java.util.Objects.deepEquals(Object, Object)} and will be
-     * removed from future releases.
-     *//*
+    /*
     @Deprecated
     public static boolean isEquals(final Object array1, final Object array2) {
         return new EqualsBuilder().append(array1, array2).isEquals();
@@ -5208,34 +5169,6 @@ public class ArrayUtils {
         return (T[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, "a", "b")            = null
-     * ArrayUtils.removeElements([], "a", "b")              = []
-     * ArrayUtils.removeElements(["a"], "b", "c")           = ["a"]
-     * ArrayUtils.removeElements(["a", "b"], "a", "c")      = ["b"]
-     * ArrayUtils.removeElements(["a", "b", "a"], "a")      = ["b", "a"]
-     * ArrayUtils.removeElements(["a", "b", "a"], "a", "a") = ["b"]
-     * </pre>
-     *
-     * @param <T> the component type of the array
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static <T> T[] removeElements(final T[] array, final T... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5300,33 +5233,6 @@ public class ArrayUtils {
         return (byte[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static byte[] removeElements(final byte[] array, final byte... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5389,33 +5295,6 @@ public class ArrayUtils {
         return (short[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static short[] removeElements(final short[] array, final short... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5478,33 +5357,6 @@ public class ArrayUtils {
         return (int[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static int[] removeElements(final int[] array, final int... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5567,33 +5419,6 @@ public class ArrayUtils {
         return (char[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static char[] removeElements(final char[] array, final char... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5656,33 +5481,6 @@ public class ArrayUtils {
         return (long[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static long[] removeElements(final long[] array, final long... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5745,33 +5543,6 @@ public class ArrayUtils {
         return (float[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static float[] removeElements(final float[] array, final float... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5834,33 +5605,6 @@ public class ArrayUtils {
         return (double[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, 1, 2)      = null
-     * ArrayUtils.removeElements([], 1, 2)        = []
-     * ArrayUtils.removeElements([1], 2, 3)       = [1]
-     * ArrayUtils.removeElements([1, 3], 1, 2)    = [3]
-     * ArrayUtils.removeElements([1, 3, 1], 1)    = [3, 1]
-     * ArrayUtils.removeElements([1, 3, 1], 1, 1) = [3]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static double[] removeElements(final double[] array, final double... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
@@ -5919,33 +5663,6 @@ public class ArrayUtils {
         return (boolean[]) removeAll((Object) array, clone(indices));
     }
 
-    /**
-     * <p>Removes occurrences of specified elements, in specified quantities,
-     * from the specified array. All subsequent elements are shifted left.
-     * For any element-to-be-removed specified in greater quantities than
-     * contained in the original array, no change occurs beyond the
-     * removal of the existing matching items.</p>
-     *
-     * <p>This method returns a new array with the same elements of the input
-     * array except for the earliest-encountered occurrences of the specified
-     * elements. The component type of the returned array is always the same
-     * as that of the input array.</p>
-     *
-     * <pre>
-     * ArrayUtils.removeElements(null, true, false)               = null
-     * ArrayUtils.removeElements([], true, false)                 = []
-     * ArrayUtils.removeElements([true], false, false)            = [true]
-     * ArrayUtils.removeElements([true, false], true, true)       = [false]
-     * ArrayUtils.removeElements([true, false, true], true)       = [false, true]
-     * ArrayUtils.removeElements([true, false, true], true, true) = [false]
-     * </pre>
-     *
-     * @param array  the array to remove the element from, may be {@code null}
-     * @param values the elements to be removed
-     * @return A new array containing the existing elements except the
-     *         earliest-encountered occurrences of the specified elements.
-     * @since 3.0.1
-     */
     /*public static boolean[] removeElements(final boolean[] array, final boolean... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);

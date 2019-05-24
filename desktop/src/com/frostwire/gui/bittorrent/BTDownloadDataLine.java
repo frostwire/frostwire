@@ -56,7 +56,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Variable for the size of the download.
      */
-    private long size = -1;
+    private double size = -1;
 
     /**
      * Variable for the speed of the download.
@@ -67,7 +67,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Variable for how much time is left.
      */
-    private long timeLeft;
+    private double timeLeft;
     private String seeds;
     private String peers;
     private String shareRatio;

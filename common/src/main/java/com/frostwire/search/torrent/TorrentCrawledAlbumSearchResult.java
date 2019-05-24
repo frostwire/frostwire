@@ -33,7 +33,7 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
     private final String album;
     private final List<TorrentItemSearchResult> items;
     private final String displayName;
-    private final long size;
+    private final double size;
 
     public TorrentCrawledAlbumSearchResult(TorrentCrawlableSearchResult sr, String artist, String album, List<TorrentItemSearchResult> items) {
         super(sr);
@@ -67,7 +67,7 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

@@ -32,14 +32,14 @@ final class SpeedStat {
     private long speedMarkTimestamp;
     private long lastTotalBytes;
 
-    public SpeedStat() {
+    SpeedStat() {
     }
 
-    public long totalBytes() {
+    long totalBytes() {
         return totalBytes;
     }
 
-    public long averageSpeed() {
+    long averageSpeed() {
         return averageSpeed;
     }
 
@@ -55,30 +55,29 @@ final class SpeedStat {
         }
     }
 
-    public long eta(long size) {
+    double eta(double size) {
         return eta(size, totalBytes, averageSpeed);
     }
 
-    public int progress(long size) {
+    public int progress(double size) {
         return progress(size, totalBytes);
     }
 
-    static long eta(long size, long total, long speed) {
-        long left = size - total;
-        long rate = speed;
+    private static double eta(double size, double total, double speed) {
+        double left = size - total;
 
         if (left <= 0) {
             return 0;
         }
 
-        if (rate <= 0) {
+        if (speed <= 0) {
             return -1;
         }
 
-        return left / rate;
+        return left / speed;
     }
 
-    static int progress(long size, long total) {
+    private static int progress(double size, double total) {
         return size > 0 ? (int) ((total * 100) / size) : 0;
     }
 }

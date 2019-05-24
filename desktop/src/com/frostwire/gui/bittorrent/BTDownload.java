@@ -31,7 +31,7 @@ import java.util.Date;
  */
 public interface BTDownload {
 
-    long getSize();
+    double getSize();
 
     String getName();
 
@@ -63,7 +63,7 @@ public interface BTDownload {
 
     double getUploadSpeed();
 
-    long getETA();
+    double getETA();
 
     String getPeersString();
 

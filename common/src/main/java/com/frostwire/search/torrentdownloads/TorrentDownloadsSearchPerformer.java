@@ -75,35 +75,5 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
     }
 
 
-/**
- public static void main(String[] args) throws Exception {
- //SEARCH_RESULTS_REGEX TEST CODE
-
- //         String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/torrentdownloads-results.html"));
- //         final Pattern resultsPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
- //
- //         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
- //         while (matcher.find()) {
- //         System.out.println(matcher.group(1));
- //         }
-
-
- String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
- final Pattern detailPattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
- final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
-
- if (detailMatcher.find()) {
- System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
- System.out.println("File name: " + detailMatcher.group("filename"));
- System.out.println("Size: " + detailMatcher.group("filesize"));
- System.out.println("Unit: " + detailMatcher.group("unit"));
- System.out.println("Date: " + detailMatcher.group("time"));
- System.out.println("Seeds: " + detailMatcher.group("seeds"));
- } else {
- System.out.println("No detail matched.");
- }
-
- }
- */
 }
 

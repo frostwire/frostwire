@@ -133,7 +133,7 @@ public final class GUIUtils {
      *         negative, the string returned will be "? KB".
      * @see GUIUtils::rate2speed() if you want to deal with download speeds
 //     */
-    public static String getBytesInHuman(long bytes) {
+    public static String getBytesInHuman(double bytes) {
         if (bytes < 0) {
             return "? " + GENERAL_UNIT_KILOBYTES;
         }

@@ -247,45 +247,14 @@ public class ByteArrayOutputStream extends OutputStream {
         }
     }
 
-    /**
-     * Fetches entire contents of an <code>InputStream</code> and represent
-     * same data as result InputStream.
-     * <p>
-     * This method is useful where,
-     * <ul>
-     * <li>Source InputStream is slow.</li>
-     * <li>It has network resources associated, so we cannot keep it open for
-     * long time.</li>
-     * <li>It has network timeout associated.</li>
-     * </ul>
-     * It can be used in favor of {@link #toByteArray()}, since it
-     * avoids unnecessary allocation and copy of byte[].<br>
-     * This method buffers the input internally, so there is no need to use a
-     * <code>BufferedInputStream</code>.
-     * 
-     * @param input Stream to be fully buffered.
-     * @return A fully buffered stream.
-     * @throws IOException if an I/O error occurs
-     * @since 2.0
-     */
-//    public static InputStream toBufferedInputStream(InputStream input)
+    //    public static InputStream toBufferedInputStream(InputStream input)
 //            throws IOException {
 //        ByteArrayOutputStream output = new ByteArrayOutputStream();
 //        output.write(input);
 //        return output.toBufferedInputStream();
 //    }
 
-    /**
-     * Gets the current contents of this byte stream as a Input Stream. The
-     * returned stream is backed by buffers of <code>this</code> stream,
-     * avoiding memory allocation and copy, thus saving space and time.<br>
-     * 
-     * @return the current contents of this output stream.
-     * @see java.io.ByteArrayOutputStream#toByteArray()
-     * @see #reset()
-     * @since 2.0
-     */
-//    private InputStream toBufferedInputStream() {
+    //    private InputStream toBufferedInputStream() {
 //        int remaining = count;
 //        if (remaining == 0) {
 //            return new ClosedInputStream();

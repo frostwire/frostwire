@@ -27,5 +27,5 @@ public interface FileSearchResult extends SearchResult {
 
     String getFilename();
 
-    long getSize();
+    double getSize();
 }

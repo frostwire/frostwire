@@ -95,7 +95,7 @@ class TPBSearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

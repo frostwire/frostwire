@@ -145,7 +145,7 @@ final class LibraryPlaylistsTableModel extends HashBasedDataLineModel<LibraryPla
 	 *
 	 * @return  An <code>int</code> containing the size of the file
 	 */
-	long getSize(int row) {
+	double getSize(int row) {
 	    return ((SizeHolder)(
 	        (ColoredCellImpl)get(row).getValueAt(
                 LibraryPlaylistsTableDataLine.SIZE_IDX)).getValue()).getSize();

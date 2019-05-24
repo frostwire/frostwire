@@ -164,7 +164,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     /**
      * Gets the size of this TableLine.
      */
-    public long getSize() {
+    public double getSize() {
         return RESULT.getSize();
     }
 

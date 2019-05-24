@@ -55,7 +55,7 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

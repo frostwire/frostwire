@@ -108,7 +108,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return info.size();
     }
 
@@ -148,7 +148,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
-    public long getETA() {
+    public double getETA() {
         return !complete ? stat.eta(info.size()) : 0;
     }
 
@@ -375,9 +375,9 @@ public abstract class BaseHttpDownload implements Transfer {
         private final String url;
         private final String filename;
         private final String displayName;
-        private final long size;
+        private final double size;
 
-        public Info(String url, String filename, String displayName, long size) {
+        public Info(String url, String filename, String displayName, double size) {
             this.url = url;
             this.filename = filename;
             this.displayName = displayName;
@@ -396,7 +396,7 @@ public abstract class BaseHttpDownload implements Transfer {
             return displayName;
         }
 
-        public long size() {
+        public double size() {
             return size;
         }
 

@@ -40,7 +40,7 @@ public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult i
 
     private final String displayName;
     private final String downloadUrl;
-    private final long size;
+    private final double size;
 
     public ArchiveorgCrawledSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file) {
         super(sr);
@@ -61,7 +61,7 @@ public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult i
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

@@ -58,7 +58,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return sr.getSize();
     }
 

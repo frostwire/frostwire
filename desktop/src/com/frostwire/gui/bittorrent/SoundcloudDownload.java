@@ -63,7 +63,7 @@ public class SoundcloudDownload extends HttpBTDownload {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         if (isCompleted() && getSaveLocation().exists()) {
             return getSaveLocation().length();
         }

@@ -23,9 +23,7 @@ import com.frostwire.licenses.Licenses;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class NyaaSearchResult implements TorrentCrawlableSearchResult {
@@ -38,19 +36,19 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     private final String torrentUrl;
     private final String fileName;
     private final int seeds;
-    private final long fileSize;
+    private final double fileSize;
 
-    private static final Map<String, Integer> UNIT_TO_BYTES;
+    private static final Map<String, Double> UNIT_TO_BYTES;
 
     static {
         UNIT_TO_BYTES = new HashMap<>();
-        UNIT_TO_BYTES.put("bytes", 1);
-        UNIT_TO_BYTES.put("B", 1);
-        UNIT_TO_BYTES.put("KiB", 1024);
-        UNIT_TO_BYTES.put("MiB", 1024 * 1024);
-        UNIT_TO_BYTES.put("GiB", 1024 * 1024 * 1024);
-        UNIT_TO_BYTES.put("TiB", 1024 * 1024 * 1024 * 1024);
-        UNIT_TO_BYTES.put("PiB", 1024 * 1024 * 1024 * 1024 * 1024);
+        UNIT_TO_BYTES.put("bytes", (double) 1);
+        UNIT_TO_BYTES.put("B", (double) 1);
+        UNIT_TO_BYTES.put("KiB", (double) 1024);
+        UNIT_TO_BYTES.put("MiB", (double) (1024 * 1024));
+        UNIT_TO_BYTES.put("GiB", (double) (1024 * 1024 * 1024));
+        UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024));
+        UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024 * 1024));
     }
 
     NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {
@@ -126,7 +124,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return fileSize;
     }
 
@@ -137,19 +135,19 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         return "";
     }
 
-    private long parseSize(String size) {
+    private double parseSize(String size) {
         String[] sizearr = size.trim().split(" ");
         String amount = sizearr[0].trim();
         String unit = sizearr[1].trim();
         return calculateSize(amount, unit);
     }
 
-    private long calculateSize(String amount, String unit) {
+    private double calculateSize(String amount, String unit) {
         if (amount == null || unit == null) {
             return -1;
         }
 
-        Integer unitMultiplier = UNIT_TO_BYTES.get(unit);
+        Double unitMultiplier = UNIT_TO_BYTES.get(unit);
         if (unitMultiplier == null) {
             unitMultiplier = UNIT_TO_BYTES.get("bytes");
         }

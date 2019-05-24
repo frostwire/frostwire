@@ -17,45 +17,19 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.FileStorage;
-import com.frostwire.jlibtorrent.PiecesTracker;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionHandle;
-import com.frostwire.jlibtorrent.TorrentFlags;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.TorrentStatus;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.PieceFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.swig.add_torrent_params;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.string_entry_map;
-import com.frostwire.jlibtorrent.swig.string_vector;
-import com.frostwire.jlibtorrent.swig.torrent_flags_t;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -140,7 +114,8 @@ public final class BTDownload implements BittorrentDownload {
         return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
-    public long getSize() {
+    public double getSize() {
+        // TODO: jlibtorrent's TorrentInfo is returning a long, should be a double (int_64)
         TorrentInfo ti = th.torrentFile();
         return ti != null ? ti.totalSize() : 0;
     }
@@ -342,7 +317,7 @@ public final class BTDownload implements BittorrentDownload {
         return created;
     }
 
-    public long getETA() {
+    public double getETA() {
         if (!th.isValid()) {
             return 0;
         }

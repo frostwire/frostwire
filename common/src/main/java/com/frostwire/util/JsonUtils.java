@@ -24,7 +24,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Simple JSON utility class based on google-gson.
  * <p/>
- * Visit google-gson: {@link http://code.google.com/p/google-gson/} for more information.
+ * Visit google-gson: {@link https://code.google.com/p/google-gson/} for more information.
  *
  * @author gubatron
  * @author aldenml

@@ -141,22 +141,7 @@ final class ByteArrayBuffer implements Serializable {
         this.len = newlen;
     }
 
-    /**
-     * Appends <code>len</code> chars to this buffer from the given source
-     * char array buffer starting at index <code>off</code>. The capacity
-     * of the buffer is increased if necessary to accommodate all
-     * <code>len</code> chars.
-     * <p>
-     * The chars are converted to bytes using simple cast.
-     *
-     * @param   b        the chars to be appended.
-     * @param   off      the index of the first char to append.
-     * @param   len      the number of bytes to append.
-     * @throws IndexOutOfBoundsException if <code>off</code> if out of
-     * range, <code>len</code> is negative, or
-     * <code>off</code> + <code>len</code> is out of range.
-     */
-//    public void append(final CharArrayBuffer b, final int off, final int len) {
+    //    public void append(final CharArrayBuffer b, final int off, final int len) {
 //        if (b == null) {
 //            return;
 //        }

@@ -33,7 +33,7 @@ public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResul
     private final String filePath;
     private final String displayName;
     private final String filename;
-    private final long size;
+    private final double size;
 
     public TorrentCrawledSearchResult(TorrentCrawlableSearchResult sr, TorrentInfo ti, int fileIndex, String filePath, long fileSize) {
         super(sr);
@@ -69,7 +69,7 @@ public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResul
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

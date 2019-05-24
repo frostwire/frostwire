@@ -40,7 +40,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final String thumbnailUrl;
     private final long date;
     private final String downloadUrl;
-    private final long size;
+    private final double size;
 
     SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
@@ -66,7 +66,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

@@ -43,7 +43,7 @@ abstract class HttpBTDownload implements BTDownload {
     final File completeFile;
     private final Date dateCreated;
 
-    long size;
+    double size;
     TransferState state;
     private long averageSpeed; // in bytes
     long bytesReceived;
@@ -55,7 +55,7 @@ abstract class HttpBTDownload implements BTDownload {
     final HttpClient httpClient;
     HttpClient.HttpClientListener httpClientListener;
 
-    HttpBTDownload(String filename, long size) {
+    HttpBTDownload(String filename, double size) {
         completeFile = org.limewire.util.FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
         this.size = size;
         dateCreated = new Date();
@@ -100,7 +100,7 @@ abstract class HttpBTDownload implements BTDownload {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -202,7 +202,7 @@ abstract class HttpBTDownload implements BTDownload {
     }
 
     @Override
-    public long getETA() {
+    public double getETA() {
         if (size > 0) {
             long speed = averageSpeed;
             return speed > 0 ? (size - getBytesReceived()) / speed : -1;

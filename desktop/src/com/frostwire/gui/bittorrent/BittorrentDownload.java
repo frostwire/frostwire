@@ -49,7 +49,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     private final BTDownload dl;
 
     private String displayName;
-    private long size;
+    private double size;
     private List<TransferItem> items;
     private boolean partial;
 
@@ -85,7 +85,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -173,7 +173,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     @Override
-    public long getETA() {
+    public double getETA() {
         return dl.getETA();
     }
 
@@ -431,8 +431,8 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         return canDelete && directory.delete();
     }
 
-    private long calculateSize(BTDownload dl) {
-        long size = dl.getSize();
+    private double calculateSize(BTDownload dl) {
+        double size = dl.getSize();
 
         boolean partial = dl.isPartial();
         if (partial) {
@@ -449,7 +449,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 size = totalSize;
             }
         }
-
         return size;
     }
 

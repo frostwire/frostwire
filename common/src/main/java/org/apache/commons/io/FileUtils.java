@@ -460,16 +460,7 @@ public class FileUtils {
     }
 
     //-----------------------------------------------------------------------
-    /**
-     * Finds files within a given directory (and optionally its
-     * subdirectories). All files found are filtered by an IOFileFilter.
-     *
-     * @param files the collection of files found.
-     * @param directory the directory to search in.
-     * @param filter the filter to apply to files and directories.
-     * @param includeSubDirectories indicates if will include the subdirectories themselves
-     */
-//    private static void innerListFiles(Collection<File> files, File directory,
+    //    private static void innerListFiles(Collection<File> files, File directory,
 //            IOFileFilter filter, boolean includeSubDirectories) {
 //        File[] found = directory.listFiles((FileFilter) filter);
 //
@@ -487,32 +478,7 @@ public class FileUtils {
 //        }
 //    }
 
-    /**
-     * Finds files within a given directory (and optionally its
-     * subdirectories). All files found are filtered by an IOFileFilter.
-     * <p>
-     * If your search should recurse into subdirectories you can pass in
-     * an IOFileFilter for directories. You don't need to bind a
-     * DirectoryFileFilter (via logical AND) to this filter. This method does
-     * that for you.
-     * <p>
-     * An example: If you want to search through all directories called
-     * "temp" you pass in <code>FileFilterUtils.NameFileFilter("temp")</code>
-     * <p>
-     * Another common usage of this method is find files in a directory
-     * tree but ignoring the directories generated CVS. You can simply pass
-     * in <code>FileFilterUtils.makeCVSAware(null)</code>.
-     *
-     * @param directory  the directory to search in
-     * @param fileFilter  filter to apply when finding files.
-     * @param dirFilter  optional filter to apply when finding subdirectories.
-     * If this parameter is {@code null}, subdirectories will not be included in the
-     * search. Use TrueFileFilter.INSTANCE to match all directories.
-     * @return an collection of java.io.File with the matching files
-     * @see org.apache.commons.io.filefilter.FileFilterUtils
-     * @see org.apache.commons.io.filefilter.NameFileFilter
-     */
-//    public static Collection<File> listFiles(
+    //    public static Collection<File> listFiles(
 //            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
 //        validateListFilesParameters(directory, fileFilter);
 //
@@ -526,17 +492,7 @@ public class FileUtils {
 //        return files;
 //    }
 
-    /**
-     * Validates the given arguments.
-     * <ul>
-     * <li>Throws {@link IllegalArgumentException} if {@code directory} is not a directory</li>
-     * <li>Throws {@link NullPointerException} if {@code fileFilter} is null</li>
-     * </ul>
-     * 
-     * @param directory The File to test
-     * @param fileFilter The IOFileFilter to test
-     */
-//    private static void validateListFilesParameters(File directory, IOFileFilter fileFilter) {
+    //    private static void validateListFilesParameters(File directory, IOFileFilter fileFilter) {
 //        if (!directory.isDirectory()) {
 //            throw new IllegalArgumentException("Parameter 'directory' is not a directory");
 //        }
@@ -545,46 +501,16 @@ public class FileUtils {
 //        }
 //    }
 
-    /**
-     * Returns a filter that accepts files in addition to the {@link File} objects accepted by the given filter.
-     * 
-     * @param fileFilter a base filter to add to
-     * @return a filter that accepts files 
-     */
-//    private static IOFileFilter setUpEffectiveFileFilter(IOFileFilter fileFilter) {
+    //    private static IOFileFilter setUpEffectiveFileFilter(IOFileFilter fileFilter) {
 //        return FileFilterUtils.and(fileFilter, FileFilterUtils.notFileFilter(DirectoryFileFilter.INSTANCE));
 //    }
 
-    /**
-     * Returns a filter that accepts directories in addition to the {@link File} objects accepted by the given filter.
-     * 
-     * @param dirFilter a base filter to add to
-     * @return a filter that accepts directories 
-     */
-//    private static IOFileFilter setUpEffectiveDirFilter(IOFileFilter dirFilter) {
+    //    private static IOFileFilter setUpEffectiveDirFilter(IOFileFilter dirFilter) {
 //        return dirFilter == null ? FalseFileFilter.INSTANCE : FileFilterUtils.and(dirFilter,
 //                DirectoryFileFilter.INSTANCE);
 //    }
 
-    /**
-     * Finds files within a given directory (and optionally its
-     * subdirectories). All files found are filtered by an IOFileFilter.
-     * <p>
-     * The resulting collection includes the subdirectories themselves.
-     * <p>
-     * @see org.apache.commons.io.FileUtils#listFiles  
-     *
-     * @param directory  the directory to search in
-     * @param fileFilter  filter to apply when finding files.
-     * @param dirFilter  optional filter to apply when finding subdirectories.
-     * If this parameter is {@code null}, subdirectories will not be included in the
-     * search. Use TrueFileFilter.INSTANCE to match all directories.
-     * @return an collection of java.io.File with the matching files
-     * @see org.apache.commons.io.filefilter.FileFilterUtils
-     * @see org.apache.commons.io.filefilter.NameFileFilter
-     * @since 2.2
-     */
-//    public static Collection<File> listFilesAndDirs(
+    //    public static Collection<File> listFilesAndDirs(
 //            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
 //        validateListFilesParameters(directory, fileFilter);
 //
@@ -601,50 +527,12 @@ public class FileUtils {
 //        return files;
 //    }
 
-    /**
-     * Allows iteration over the files in given directory (and optionally
-     * its subdirectories).
-     * <p>
-     * All files found are filtered by an IOFileFilter. This method is
-     * based on {@link #listFiles(File, IOFileFilter, IOFileFilter)},
-     * which supports Iterable ('foreach' loop).
-     * <p>
-     * @param directory  the directory to search in
-     * @param fileFilter  filter to apply when finding files.
-     * @param dirFilter  optional filter to apply when finding subdirectories.
-     * If this parameter is {@code null}, subdirectories will not be included in the
-     * search. Use TrueFileFilter.INSTANCE to match all directories.
-     * @return an iterator of java.io.File for the matching files
-     * @see org.apache.commons.io.filefilter.FileFilterUtils
-     * @see org.apache.commons.io.filefilter.NameFileFilter
-     * @since 1.2
-     */
-//    public static Iterator<File> iterateFiles(
+    //    public static Iterator<File> iterateFiles(
 //            File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
 //        return listFiles(directory, fileFilter, dirFilter).iterator();
 //    }
 
-    /**
-     * Allows iteration over the files in given directory (and optionally
-     * its subdirectories).
-     * <p>
-     * All files found are filtered by an IOFileFilter. This method is
-     * based on {@link #listFilesAndDirs(File, IOFileFilter, IOFileFilter)},
-     * which supports Iterable ('foreach' loop).
-     * <p>
-     * The resulting iterator includes the subdirectories themselves.
-     * 
-     * @param directory  the directory to search in
-     * @param fileFilter  filter to apply when finding files.
-     * @param dirFilter  optional filter to apply when finding subdirectories.
-     * If this parameter is {@code null}, subdirectories will not be included in the
-     * search. Use TrueFileFilter.INSTANCE to match all directories.
-     * @return an iterator of java.io.File for the matching files
-     * @see org.apache.commons.io.filefilter.FileFilterUtils
-     * @see org.apache.commons.io.filefilter.NameFileFilter
-     * @since 2.2
-     */
-//    public static Iterator<File> iterateFilesAndDirs(File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+    //    public static Iterator<File> iterateFilesAndDirs(File directory, IOFileFilter fileFilter, IOFileFilter dirFilter) {
 //        return listFilesAndDirs(directory, fileFilter, dirFilter).iterator();
 //    }
 
@@ -665,17 +553,7 @@ public class FileUtils {
     }
 
 
-    /**
-     * Finds files within a given directory (and optionally its subdirectories)
-     * which match an array of extensions.
-     *
-     * @param directory  the directory to search in
-     * @param extensions  an array of extensions, ex. {"java","xml"}. If this
-     * parameter is {@code null}, all files are returned.
-     * @param recursive  if true all subdirectories are searched as well
-     * @return an collection of java.io.File with the matching files
-     */
-//    public static Collection<File> listFiles(
+    //    public static Collection<File> listFiles(
 //            File directory, String[] extensions, boolean recursive) {
 //        IOFileFilter filter;
 //        if (extensions == null) {
@@ -688,20 +566,7 @@ public class FileUtils {
 //            recursive ? TrueFileFilter.INSTANCE : FalseFileFilter.INSTANCE);
 //    }
 
-    /**
-     * Allows iteration over the files in a given directory (and optionally
-     * its subdirectories) which match an array of extensions. This method
-     * is based on {@link #listFiles(File, String[], boolean)},
-     * which supports Iterable ('foreach' loop).
-     *
-     * @param directory  the directory to search in
-     * @param extensions  an array of extensions, ex. {"java","xml"}. If this
-     * parameter is {@code null}, all files are returned.
-     * @param recursive  if true all subdirectories are searched as well
-     * @return an iterator of java.io.File with the matching files
-     * @since 1.2
-     */
-//    public static Iterator<File> iterateFiles(
+    //    public static Iterator<File> iterateFiles(
 //            File directory, String[] extensions, boolean recursive) {
 //        return listFiles(directory, extensions, recursive).iterator();
 //    }
@@ -2666,41 +2531,13 @@ public class FileUtils {
     }
 
     //-----------------------------------------------------------------------
-    /**
-     * Computes the checksum of a file using the CRC32 checksum routine.
-     * The value of the checksum is returned.
-     *
-     * @param file  the file to checksum, must not be {@code null}
-     * @return the checksum value
-     * @throws NullPointerException if the file or checksum is {@code null}
-     * @throws IllegalArgumentException if the file is a directory
-     * @throws IOException if an IO error occurs reading the file
-     * @since 1.3
-     */
-//    public static long checksumCRC32(File file) throws IOException {
+    //    public static long checksumCRC32(File file) throws IOException {
 //        CRC32 crc = new CRC32();
 //        checksum(file, crc);
 //        return crc.getValue();
 //    }
 
-    /**
-     * Computes the checksum of a file using the specified checksum object.
-     * Multiple files may be checked using one <code>Checksum</code> instance
-     * if desired simply by reusing the same checksum object.
-     * For example:
-     * <pre>
-     *   long csum = FileUtils.checksum(file, new CRC32()).getValue();
-     * </pre>
-     *
-     * @param file  the file to checksum, must not be {@code null}
-     * @param checksum  the checksum object to be used, must not be {@code null}
-     * @return the checksum specified, updated with the content of the file
-     * @throws NullPointerException if the file or checksum is {@code null}
-     * @throws IllegalArgumentException if the file is a directory
-     * @throws IOException if an IO error occurs reading the file
-     * @since 1.3
-     */
-//    public static Checksum checksum(File file, Checksum checksum) throws IOException {
+    //    public static Checksum checksum(File file, Checksum checksum) throws IOException {
 //        if (file.isDirectory()) {
 //            throw new IllegalArgumentException("Checksums can't be computed on directories");
 //        }

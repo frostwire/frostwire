@@ -296,35 +296,35 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
      * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
      * "m:ss" where m=minutes<60, ss=seconds
      */
-    private String seconds2time(long seconds) {
+    private String seconds2time(double seconds) {
         if (seconds == -1) {
             return "∞";
         }
-        long minutes = seconds / 60;
+        double minutes = seconds / 60;
         seconds = seconds - minutes * 60;
-        long hours = minutes / 60;
+        double hours = minutes / 60;
         minutes = minutes - hours * 60;
-        long days = hours / 24;
+        double days = hours / 24;
         hours = hours - days * 24;
         // build the numbers into a string
         StringBuilder time = new StringBuilder();
         if (days != 0) {
-            time.append(Long.toString(days));
+            time.append(days);
             time.append(":");
             if (hours < 10)
                 time.append("0");
         }
         if (days != 0 || hours != 0) {
-            time.append(Long.toString(hours));
+            time.append(hours);
             time.append(":");
             if (minutes < 10)
                 time.append("0");
         }
-        time.append(Long.toString(minutes));
+        time.append(minutes);
         time.append(":");
         if (seconds < 10)
             time.append("0");
-        time.append(Long.toString(seconds));
+        time.append(seconds);
         return time.toString();
     }
 

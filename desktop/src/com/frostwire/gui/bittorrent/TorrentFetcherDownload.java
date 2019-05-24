@@ -108,7 +108,7 @@ public class TorrentFetcherDownload implements BTDownload {
         return uri;
     }
 
-    public long getSize() {
+    public double getSize() {
         return -1;
     }
 
@@ -171,7 +171,7 @@ public class TorrentFetcherDownload implements BTDownload {
         return 0;
     }
 
-    public long getETA() {
+    public double getETA() {
         return 0;
     }
 
@@ -243,11 +243,7 @@ public class TorrentFetcherDownload implements BTDownload {
 
     private void cancel() {
         state = TransferState.CANCELED;
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                BTDownloadMediator.instance().remove(TorrentFetcherDownload.this);
-            }
-        });
+        GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().remove(TorrentFetcherDownload.this));
     }
 
     private void downloadTorrent(final byte[] data, final List<TcpEndpoint> peers) {
@@ -261,26 +257,24 @@ public class TorrentFetcherDownload implements BTDownload {
                     LOG.error("Error downloading torrent", e);
                 }
             } else {
-                GUIMediator.safeInvokeLater(new Runnable() {
-                    public void run() {
-                        try {
+                GUIMediator.safeInvokeLater(() -> {
+                    try {
 
-                            boolean[] selection = null;
+                        boolean[] selection = null;
 
-                            if (partial) {
-                                PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), data, displayName);
-                                dlg.setVisible(true);
-                                selection = dlg.getFilesSelection();
-                                if (selection == null) {
-                                    return;
-                                }
+                        if (partial) {
+                            PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), data, displayName);
+                            dlg.setVisible(true);
+                            selection = dlg.getFilesSelection();
+                            if (selection == null) {
+                                return;
                             }
-                            TorrentInfo ti = TorrentInfo.bdecode(data);
-                            BTEngine.getInstance().download(ti, null, selection, peers);
-                            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-                        } catch (Throwable e) {
-                            LOG.error("Error downloading torrent", e);
                         }
+                        TorrentInfo ti = TorrentInfo.bdecode(data);
+                        BTEngine.getInstance().download(ti, null, selection, peers);
+                        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+                    } catch (Throwable e) {
+                        LOG.error("Error downloading torrent", e);
                     }
                 });
             }

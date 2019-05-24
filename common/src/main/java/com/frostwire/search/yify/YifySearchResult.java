@@ -54,7 +54,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     private final String displayName;
     private final String detailsUrl;
     private final String infoHash;
-    private final long size;
+    private final double size;
     private final long creationTime;
     private final int seeds;
     private final String magnetUrl;
@@ -73,7 +73,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

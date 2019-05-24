@@ -35,8 +35,8 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
 
     private int _minResultsSeeds;
     private int _maxResultsSeeds;
-    private long _minResultsSize;
-    private long _maxResultsSize;
+    private double _minResultsSize;
+    private double _maxResultsSize;
 
     private int _minSeeds;
     private int _maxSeeds;
@@ -73,7 +73,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             seedsNeedUpdate = true;
         }
         boolean sizeNeedUpdate = false;
-        long size = node.getSize();
+        double size = node.getSize();
         if (size < _minResultsSize) {
             _minResultsSize = size >= 0 ? size : 0;
             sizeNeedUpdate = true;
@@ -115,7 +115,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         boolean inSizeRange = false;
 
         if (_maxResultsSize > _minResultsSize) {
-            long sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
+            double sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
 
             if (_minSize == 0 && _maxSize == 1000) {
                 inSizeRange = true;
@@ -178,11 +178,11 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         return _maxResultsSeeds;
     }
 
-    public long getMinResultsSize() {
+    public double getMinResultsSize() {
         return _minResultsSize;
     }
 
-    public long getMaxResultsSize() {
+    public double getMaxResultsSize() {
         return _maxResultsSize;
     }
 
@@ -202,20 +202,20 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         return _maxSize;
     }
 
-    public void setRangeSeeds(int min, int max) {
+    void setRangeSeeds(int min, int max) {
         _minSeeds = min;
         _maxSeeds = max;
         _rp.filterChanged(this, 1);
     }
 
-    public void setRangeSize(int min, int max) {
+    void setRangeSize(int min, int max) {
         _minSize = min;
         _maxSize = max;
         _rp.filterChanged(this, 1);
     }
 
-    public void updateKeywordFiltering(String text) {
-        _keywords = new String(text);
+    void updateKeywordFiltering(String text) {
+        _keywords = text;
         _rp.filterChanged(this, 1);
     }
 

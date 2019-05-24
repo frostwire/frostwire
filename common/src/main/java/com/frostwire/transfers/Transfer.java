@@ -36,7 +36,7 @@ public interface Transfer {
 
     File previewFile();
 
-    long getSize();
+    double getSize();
 
     Date getCreated();
 
@@ -51,11 +51,8 @@ public interface Transfer {
     long getUploadSpeed();
 
     boolean isDownloading();
-
-    // TODO: add this method in the future
-    //boolean isUploading();
-
-    long getETA();
+    
+    double getETA();
 
     /**
      * [0..100]
