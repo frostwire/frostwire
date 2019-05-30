@@ -515,6 +515,7 @@ public final class AC implements Externalizable
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
 	 * @deprecated in 3.7.2. Use {@link #shrink(float)} instead.
 	 */
+	@Deprecated
 	public final AC shrinkWeight(float w)
 	{
 		return shrink(w);
@@ -528,6 +529,7 @@ public final class AC implements Externalizable
 	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
 	 * @deprecated in 3.7.2. Use {@link #shrink(float, int...)} instead.
 	 */
+	@Deprecated
 	public final AC shrinkWeight(float w, int... indexes)
 	{
 		return shrink(w, indexes);

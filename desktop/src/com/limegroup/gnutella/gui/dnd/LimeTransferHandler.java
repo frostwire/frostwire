@@ -83,6 +83,7 @@ public class LimeTransferHandler extends TransferHandler {
      * Use getImageRepresentation instead.
      * @deprecated
      */
+	@Deprecated
     public final Icon getVisualRepresentation(Transferable t) {
         throw new IllegalStateException("USE getImageRepresentation INSTEAD");
     }

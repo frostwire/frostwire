@@ -578,6 +578,7 @@ public final class UnitValue implements Serializable
 	 * @see #LPX
 	 * @deprecated Use {@link PlatformDefaults#getDefaultHorizontalUnit()} and {@link PlatformDefaults#getDefaultVerticalUnit()} instead.
 	 */
+	@Deprecated
 	public static int getDefaultUnit()
 	{
 		return PlatformDefaults.getDefaultHorizontalUnit();
@@ -589,6 +590,7 @@ public final class UnitValue implements Serializable
 	 * @see #LPX
 	 * @deprecated Use {@link PlatformDefaults#setDefaultHorizontalUnit(int)} and {@link PlatformDefaults#setDefaultVerticalUnit(int)} instead.
 	 */
+	@Deprecated
 	public static void setDefaultUnit(int unit)
 	{
 		PlatformDefaults.setDefaultHorizontalUnit(unit);
