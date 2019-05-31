@@ -62,7 +62,7 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
     }
 
-    private long calculateSize(String sizedata) {
+    private double calculateSize(String sizedata) {
         if (sizedata.contains("Filesize yet unknown")) {
             return -1;
         }

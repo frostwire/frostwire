@@ -1,38 +1,30 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package com.frostwire.search.torrentdownloads;
+package com.frostwire.search.torrentz2;
 
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
-import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-/**
- * @author alejandroarturom
- */
-public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
+public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
 
     private final String filename;
     private final String displayName;
@@ -43,14 +35,15 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
     private final long creationTime;
     private final int seeds;
 
-    TorrentDownloadsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
+
+    public Torrentz2SearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = null;
-        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
+        this.infoHash = matcher.group("infohash");
+        this.filename = parseFileName(matcher.group("filename"));
         this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = matcher.group("magnet");
+        this.torrentUrl = "magnet:" + matcher.group("magnet_part");
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
@@ -66,7 +59,7 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
 
     @Override
     public String getSource() {
-        return "TorrentDownloads";
+        return "LimeTorrents";
     }
 
     @Override
@@ -99,16 +92,8 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
         return torrentUrl;
     }
 
-    private String parseFileName(String urlEncodedFileName, String fallbackName) {
-        String decodedFileName = fallbackName;
-        try {
-            if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
-                decodedFileName.replace("&amp;", "and");
-            }
-        } catch (UnsupportedEncodingException e) {
-        }
-        return decodedFileName + ".torrent";
+    private String parseFileName(String decodedFileName) {
+        return HtmlManipulator.replaceHtmlEntities(decodedFileName.trim()) + ".torrent";
     }
 
     private int parseSeeds(String group) {
@@ -122,8 +107,21 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
     private long parseCreationTime(String dateString) {
         long result = System.currentTimeMillis();
         try {
+            if (dateString.contains("1 Year+")) {
+                return result - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
+            }
+
+            if (dateString.contains("Last Month")) {
+                return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
+            }
+
+            if (dateString.contains("Yesterday")) {
+                return result - 1L * 24L * 60L * 60L * 1000L; // one day in milliseconds
+            }
+
+            // this format seems to be not used anymore
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString).getTime();
+            result = myFormat.parse(dateString.trim()).getTime();
         } catch (Throwable t) {
         }
         return result;

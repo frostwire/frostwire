@@ -59,7 +59,7 @@ class TPBSearchResult extends AbstractTorrentSearchResult {
     private final String torrentUrl;
     private final String infoHash;
     private final String domainName;
-    private final long size;
+    private final double size;
     private final long creationTime;
     private final int seeds;
 
@@ -134,7 +134,7 @@ class TPBSearchResult extends AbstractTorrentSearchResult {
         return displayName;
     }
 
-    protected long parseSize(String group) {
+    protected double parseSize(String group) {
         String[] size = group.split("&nbsp;");
         String amount = size[0].trim();
         String unit = UNIT_MAPPER.get(size[1].trim());
