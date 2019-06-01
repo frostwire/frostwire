@@ -22,6 +22,7 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.*;
 import com.frostwire.util.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
         } else {
-            String unreducedHtml = new String(data, "UTF-8");
+            String unreducedHtml = new String(data, StandardCharsets.UTF_8);
             if (!isValidHtml(unreducedHtml)) {
                 LOG.warn("invalid html from " + sr.getClass().getSimpleName());
                 return list;

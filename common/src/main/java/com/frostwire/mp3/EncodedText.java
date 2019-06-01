@@ -3,10 +3,7 @@ package com.frostwire.mp3;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
+import java.nio.charset.*;
 import java.util.Arrays;
 
 public class EncodedText {
@@ -104,10 +101,6 @@ public class EncodedText {
 	}
 	
 	private static byte[] stringToUTF8Bytes(String s) {
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-            return s.getBytes();
-        }
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 }

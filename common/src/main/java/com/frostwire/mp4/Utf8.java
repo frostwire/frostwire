@@ -18,6 +18,7 @@
 package com.frostwire.mp4;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 final class Utf8 {
 
@@ -25,26 +26,18 @@ final class Utf8 {
     }
 
     public static byte[] convert(String s) {
-        try {
-            if (s != null) {
-                return s.getBytes("UTF-8");
-            } else {
-                return null;
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        if (s != null) {
+            return s.getBytes(StandardCharsets.UTF_8);
+        } else {
+            return null;
         }
     }
 
     public static String convert(byte[] b) {
-        try {
-            if (b != null) {
-                return new String(b, "UTF-8");
-            } else {
-                return null;
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        if (b != null) {
+            return new String(b, StandardCharsets.UTF_8);
+        } else {
+            return null;
         }
     }
 }

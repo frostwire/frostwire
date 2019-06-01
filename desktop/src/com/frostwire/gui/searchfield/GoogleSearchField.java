@@ -33,6 +33,7 @@ import org.limewire.util.StringUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -146,7 +147,7 @@ public class GoogleSearchField extends SearchField {
 
         public void run() {
             try {
-                String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint, "UTF-8"));
+                String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint, StandardCharsets.UTF_8));
 
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
 

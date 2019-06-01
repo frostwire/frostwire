@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -112,11 +113,8 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
 
     private String parseFileName(String urlEncodedFileName) {
         String decodedFileName = null;
-        try {
-            if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
-            }
-        } catch (UnsupportedEncodingException ignored) {
+        if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
+            decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8);
         }
         return decodedFileName;
     }

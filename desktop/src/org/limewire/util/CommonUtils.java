@@ -21,10 +21,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
+import java.nio.charset.*;
 import java.util.Properties;
 
 /**
@@ -345,7 +342,7 @@ public class CommonUtils {
 
             if (clazz != null) {
                 path = clazz.getProtectionDomain().getCodeSource().getLocation().getPath();
-                decodedPath = URLDecoder.decode(path, "UTF-8");
+                decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8);
                 if (decodedPath != null && decodedPath.toLowerCase().lastIndexOf("frostwire.jar") != -1) {
                     decodedPath = decodedPath.substring(0, decodedPath.toLowerCase().lastIndexOf("frostwire.jar"));
                 }

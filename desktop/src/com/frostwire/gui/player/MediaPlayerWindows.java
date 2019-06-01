@@ -23,6 +23,7 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class MediaPlayerWindows extends MediaPlayer {
 
@@ -42,10 +43,6 @@ public class MediaPlayerWindows extends MediaPlayer {
         if (s == null) {
             return "";
         }
-        try {
-            return (URLDecoder.decode(s, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            return s;
-        }
+        return (URLDecoder.decode(s, StandardCharsets.UTF_8));
     }
 }

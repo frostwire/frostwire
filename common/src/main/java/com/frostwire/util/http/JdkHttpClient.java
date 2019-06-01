@@ -25,6 +25,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,7 +81,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
             baos = new ByteArrayOutputStream();
             get(url, baos, timeout, userAgent, referrer, cookie, -1, -1, customHeaders);
 
-            result = new String(baos.toByteArray(), "UTF-8");
+            result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         } catch (java.net.SocketTimeoutException timeoutException) {
             throw timeoutException;
         } catch (IOException e) {
@@ -124,7 +125,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
         try {
             baos = new ByteArrayOutputStream();
             post(url, baos, timeout, userAgent, formData);
-            result = new String(baos.toByteArray(), "UTF-8");
+            result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         } catch (Throwable e) {
             LOG.error("Error posting data via http: " + e.getMessage(), e);
         } finally {
@@ -151,7 +152,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
 
-        byte[] data = content.getBytes("UTF-8");
+        byte[] data = content.getBytes(StandardCharsets.UTF_8);
 
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", postContentType);

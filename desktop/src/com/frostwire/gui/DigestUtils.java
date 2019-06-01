@@ -2,6 +2,7 @@ package com.frostwire.gui;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class DigestUtils {
@@ -112,14 +113,10 @@ public class DigestUtils {
     }
     
     public static String getMD5(String s) {
-        try {
-            byte[] bytes = s.getBytes("UTF-8");
-            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-            return getMD5(bais,bytes.length,null);
+        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        return getMD5(bais,bytes.length,null);
 
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
     }
 
     public interface DigestProgressListener {

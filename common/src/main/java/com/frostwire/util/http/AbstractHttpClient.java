@@ -24,6 +24,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -188,7 +189,7 @@ public abstract class AbstractHttpClient implements HttpClient {
             }
             sb.deleteCharAt(0);
         }
-        return sb.toString().getBytes("UTF-8");
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     protected static void closeQuietly(Closeable closeable) {

@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -101,12 +102,9 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
 
     private String parseFileName(String urlEncodedFileName, String fallbackName) {
         String decodedFileName = fallbackName;
-        try {
-            if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
-                decodedFileName.replace("&amp;", "and");
-            }
-        } catch (UnsupportedEncodingException e) {
+        if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
+            decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8);
+            decodedFileName.replace("&amp;", "and");
         }
         return decodedFileName + ".torrent";
     }

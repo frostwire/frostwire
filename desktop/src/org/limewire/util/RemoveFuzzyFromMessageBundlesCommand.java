@@ -1,6 +1,7 @@
 package org.limewire.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class RemoveFuzzyFromMessageBundlesCommand {
 
     private static void removeFuzzy(File f) throws IOException {
         
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8));
         String line =null;
         List<String> lines = new LinkedList<String>();
         while ((line = br.readLine())!=null) {
@@ -37,7 +38,7 @@ public class RemoveFuzzyFromMessageBundlesCommand {
         }
         br.close();
         
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8));
         for (String ln : lines) {
             pw.println(ln);
         }
