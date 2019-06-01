@@ -17,7 +17,6 @@
 
 package com.limegroup.gnutella.util;
 
-import com.frostwire.bittorrent.BTContext;
 import org.apache.commons.io.IOUtils;
 import org.limewire.setting.SettingsFactory;
 import org.limewire.util.CommonUtils;
@@ -46,7 +45,7 @@ public final class FrostWireUtils {
     /**
      * Build number for the current version, gets reset to 1 on every version bump
      */
-    private static final int BUILD_NUMBER = 280;
+    private static final int BUILD_NUMBER = 281;
 
     private static final boolean IS_RUNNING_FROM_SOURCE = new File("README.md").exists();
 
