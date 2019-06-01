@@ -27,6 +27,7 @@ import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
@@ -59,13 +60,13 @@ public abstract class SearchEngine {
     private static final int FROSTCLICK_ID = 12;
     private static final int TORLOCK_ID = 14;
     private static final int EZTV_ID = 15;
-
     private static final int YIFI_ID = 17;
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
-
     private static final int NYAA_ID = 23;
+    private static final int TORRENTZ2_ID = 24;
+
 
     private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.org") {
         @Override
@@ -146,6 +147,13 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine TORRENTZ2 = new SearchEngine(TORRENTZ2_ID, "Torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.eu") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
@@ -182,6 +190,7 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine>  list = Arrays.asList(
+                TORRENTZ2,
                 ZOOQLE,
                 TPB,
                 SOUNDCLOUD,
