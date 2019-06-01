@@ -19,13 +19,6 @@ public final class StatusBarConnectionQualityPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can display a measurement of your connection quality in the status bar.");
 
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for whether 
-     * the connection quality status should be displayed in the status bar.
-     */
-    private final String CHECK_BOX_LABEL = 
-        I18n.tr("Show Connection Quality Indicator:");
-
     private final JCheckBox CHECK_BOX = new JCheckBox();
 
     /**
@@ -37,8 +30,13 @@ public final class StatusBarConnectionQualityPaneItem extends AbstractPaneItem {
 	 */
 	public StatusBarConnectionQualityPaneItem() {
 	    super(TITLE, LABEL);
-	    
-		LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for whether
+         * the connection quality status should be displayed in the status bar.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Show Connection Quality Indicator:");
+        LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(comp.getComponent());
 	}

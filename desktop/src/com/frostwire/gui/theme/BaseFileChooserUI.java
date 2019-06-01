@@ -84,8 +84,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     private JPanel buttonPanel;
     private JPanel bottomPanel;
 
-    private JComboBox<Object> filterComboBox;
-
     private static final Dimension hstrut5 = new Dimension(5, 1);
     //private static final Dimension hstrut11 = new Dimension(11, 1);
 
@@ -435,7 +433,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
         filterComboBoxModel = createFilterComboBoxModel();
         fc.addPropertyChangeListener(filterComboBoxModel);
-        filterComboBox = new JComboBox<Object>(filterComboBoxModel);
+        JComboBox<Object> filterComboBox = new JComboBox<Object>(filterComboBoxModel);
         filterComboBox.putClientProperty(AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                                          filesOfTypeLabelText);
         filesOfTypeLabel.setLabelFor(filterComboBox);

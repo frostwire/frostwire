@@ -46,30 +46,6 @@ public final class MenuMediator {
     private final JMenuBar MENU_BAR = new JMenuBar();
 
     /**
-     * Constant handle to the single <tt>FileMenu</tt> instance for
-     * the application.
-     */
-    private final FileMenu FILE_MENU = new FileMenu();
-
-    /**
-     * Constant handle to the single <tt>ToolsMenu</tt> instance for
-     * the application.
-     */
-    private final Menu TOOLS_MENU = new ToolsMenu();
-
-    /**
-     * Constant handle to the single <tt>HelpMenu</tt> instance for
-     * the application.
-     */
-    private final Menu HELP_MENU = new HelpMenu();
-
-    /**
-     * Constant handle to the single <tt>ViewMenu</tt> instance for
-     * the application.
-     */
-    private final Menu VIEW_MENU = new ViewMenu();
-
-    /**
      * Singleton accessor method for obtaining the <tt>MenuMediator</tt>
      * instance.
      *
@@ -90,9 +66,29 @@ public final class MenuMediator {
     private MenuMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
 
+        /**
+         * Constant handle to the single <tt>FileMenu</tt> instance for
+         * the application.
+         */
+        FileMenu FILE_MENU = new FileMenu();
         addMenu(FILE_MENU);
+        /**
+         * Constant handle to the single <tt>ViewMenu</tt> instance for
+         * the application.
+         */
+        Menu VIEW_MENU = new ViewMenu();
         addMenu(VIEW_MENU);
+        /**
+         * Constant handle to the single <tt>ToolsMenu</tt> instance for
+         * the application.
+         */
+        Menu TOOLS_MENU = new ToolsMenu();
         addMenu(TOOLS_MENU);
+        /**
+         * Constant handle to the single <tt>HelpMenu</tt> instance for
+         * the application.
+         */
+        Menu HELP_MENU = new HelpMenu();
         addMenu(HELP_MENU);
     }
 

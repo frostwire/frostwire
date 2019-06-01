@@ -18,15 +18,13 @@ public final class NotificationsPaneItem extends AbstractPaneItem {
 
   public final static String LABEL = I18n.tr("FrostWire can display popups to notify you when certain things happen, such as a download completing.");
 
-  private final String SHOW_NOTIFICATIONS_LABEL =
-    I18n.tr("Show Notifications:");
-
-  private final JCheckBox SHOW_NOTIFICATIONS_CHECK_BOX = new JCheckBox();
+    private final JCheckBox SHOW_NOTIFICATIONS_CHECK_BOX = new JCheckBox();
 
   public NotificationsPaneItem() {
     super(TITLE, LABEL);
 
-    LabeledComponent comp = new LabeledComponent(SHOW_NOTIFICATIONS_LABEL,
+      String SHOW_NOTIFICATIONS_LABEL = I18n.tr("Show Notifications:");
+      LabeledComponent comp = new LabeledComponent(SHOW_NOTIFICATIONS_LABEL,
         SHOW_NOTIFICATIONS_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
     add(comp.getComponent());
   }

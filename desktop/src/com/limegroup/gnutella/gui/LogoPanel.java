@@ -25,8 +25,6 @@ import java.awt.event.MouseEvent;
  */
 final class LogoPanel extends BoxPanel {
 
-    private JLabel labelLogo;
-
     /**
      * Constructs a new panel containing the logo and the search icon.
      */
@@ -36,7 +34,7 @@ final class LogoPanel extends BoxPanel {
     }
 
     private void setupUI() {
-        labelLogo = new JLabel();
+        JLabel labelLogo = new JLabel();
         ImageIcon logoIcon = GUIMediator.getThemeImage("logo_header");
         labelLogo.setIcon(logoIcon);
         labelLogo.setSize(logoIcon.getIconWidth(), logoIcon.getIconHeight());

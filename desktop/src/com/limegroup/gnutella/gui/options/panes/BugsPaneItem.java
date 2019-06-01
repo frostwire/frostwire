@@ -24,12 +24,6 @@ public final class BugsPaneItem extends AbstractPaneItem {
     private final LocalClientInfoFactory localClientInfoFactory;
 
     /**
-     * The 'View Example Bug' string
-     */
-    private final String VIEW_EXAMPLE =
-            I18n.tr("View Example");
-
-    /**
      * Checkbox for deadlock.
      */
     private final JCheckBox DEADLOCK_OPTION = new JCheckBox();
@@ -66,6 +60,10 @@ public final class BugsPaneItem extends AbstractPaneItem {
         localClientInfoFactory = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
 
 
+        /**
+         * The 'View Example Bug' string
+         */
+        String VIEW_EXAMPLE = I18n.tr("View Example");
         JButton example = new JButton(VIEW_EXAMPLE);
         example.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {

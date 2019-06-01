@@ -32,13 +32,6 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
     public final static String LABEL = I18n.tr("You can choose whether or not to automatically share partially downloaded files.");
 
     /**
-     * Constant for the key of the locale-specific <code>String</code> for the
-     * upload pane check box label in the options window.
-     */
-    private final String CHECK_BOX_LABEL =
-            I18n.tr("Allow Partial Sharing:");
-
-    /**
      * Constant for the check box that specifies whether or not partial
      * files should be shared.
      */
@@ -51,6 +44,11 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
     public PartialFileSharingPaneItem() {
         super(TITLE, LABEL);
 
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * upload pane check box label in the options window.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Allow Partial Sharing:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
                 CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(comp.getComponent());

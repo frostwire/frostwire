@@ -9,9 +9,6 @@ import org.limewire.util.SystemUtils;
  */
 public class FirewallUtils {
 
-	/** The name of this program, "LimeWire". */
-	private static String name = "FrostWire";
-
     /**
      * Add ourselves to the firewall exceptions list.
      * This will let code in this process listen on a socket without the firewall showing the user a security warning.
@@ -36,8 +33,10 @@ public class FirewallUtils {
     	// Only add a listing for us if the Windows Firewall Exceptions list doesn't have one yet
     	if (SystemUtils.isProgramListedOnFirewall(path))
             return true;
-      
-		if(SystemUtils.addProgramToFirewall(path, name)) {
+
+        /** The name of this program, "LimeWire". */
+        String name = "FrostWire";
+        if(SystemUtils.addProgramToFirewall(path, name)) {
             scheduleRemovalOnShutdown();
             return true;
         }

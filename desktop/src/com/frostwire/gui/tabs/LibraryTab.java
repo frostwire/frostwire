@@ -34,11 +34,6 @@ import java.awt.*;
  */
 public final class LibraryTab extends AbstractTab {
 
-    /**
-     * Constant for the <tt>Component</tt> instance containing the 
-     * elements of this tab.
-     */
-    private static JComponent COMPONENT;
     private static JPanel PANEL;
 
     private static LibraryMediator LIBRARY_MEDIATOR;
@@ -68,7 +63,11 @@ public final class LibraryTab extends AbstractTab {
 
         JPanel panel = new JPanel(new BorderLayout());
 
-        COMPONENT = LIBRARY_MEDIATOR.getComponent();
+        /**
+         * Constant for the <tt>Component</tt> instance containing the
+         * elements of this tab.
+         */
+        JComponent COMPONENT = LIBRARY_MEDIATOR.getComponent();
 
         panel.add(COMPONENT, BorderLayout.CENTER);
 

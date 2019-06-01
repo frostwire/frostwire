@@ -229,8 +229,6 @@ public class SkinRangeSliderUI extends SynthSliderUI {
 
         private transient boolean isDragging;
 
-        private Rectangle trackRect;
-
         private ChangeHandler changeHandler;
 
         private TrackListener trackListener;
@@ -307,7 +305,7 @@ public class SkinRangeSliderUI extends SynthSliderUI {
                         }
                     }
                 }
-                trackRect = getTrackRect();
+                Rectangle trackRect = getTrackRect();
                 if (mSlider.getOrientation() == JSlider.HORIZONTAL) {
                     int value = mSlider.getValueAt(i);
                     int valuePosition = ui.xPositionForValue(value);

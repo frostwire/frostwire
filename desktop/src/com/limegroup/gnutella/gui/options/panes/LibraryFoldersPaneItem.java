@@ -32,7 +32,6 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can choose the folders for include files when browsing the library.");
 
-    private final JButton buttonAddLibraryDirectory;
     private final JButton buttonRemoveLibraryDirectory;
     
 	private final RecursiveLibraryDirectoryPanel directoryPanel = new RecursiveLibraryDirectoryPanel(true);
@@ -40,14 +39,12 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
 	private Set<File> initialFoldersToInclude;
 	
 	private Set<File> initialFoldersToExclude;
-	
-	private final boolean  isPortable;
-	
-	public LibraryFoldersPaneItem() {
+
+    public LibraryFoldersPaneItem() {
 	    super(TITLE, LABEL);
-	    isPortable = CommonUtils.isPortable();
-	    
-	    buttonAddLibraryDirectory = new JButton(new AddLibraryDirectoryAction(directoryPanel, directoryPanel));
+        boolean isPortable = CommonUtils.isPortable();
+
+        JButton buttonAddLibraryDirectory = new JButton(new AddLibraryDirectoryAction(directoryPanel, directoryPanel));
 	    buttonRemoveLibraryDirectory = new JButton(new RemoveLibraryDirectoryAction(directoryPanel));
 	    
 		directoryPanel.getTree().setRootVisible(false);

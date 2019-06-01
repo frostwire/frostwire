@@ -26,14 +26,7 @@ public class BrowserPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can choose which browser to use.");
 
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Browser");
-    
-    /** 
+    /**
      * Handle to the <tt>JTextField</tt> that displays the browser name
      */    
     private JTextField BROWSER;
@@ -49,7 +42,13 @@ public class BrowserPaneItem extends AbstractPaneItem {
 		super(TITLE, LABEL);
 		
 		BROWSER = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL, BROWSER);
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * label on the component that allows to user to change the setting for
+         * this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Browser");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL, BROWSER);
 		add(comp.getComponent());
 	}
 

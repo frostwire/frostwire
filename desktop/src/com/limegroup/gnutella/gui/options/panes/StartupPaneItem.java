@@ -22,13 +22,6 @@ public final class StartupPaneItem extends AbstractPaneItem {
     public final static String LABEL = I18n.tr("You can choose whether or not to automatically run FrostWire when your computer starts.");
 
     /**
-     * Constant for the key of the locale-specific <code>String</code> for the 
-     * upload pane check box label in the options window.
-     */
-    private final String CHECK_BOX_LABEL = 
-        I18n.tr("Run on System Startup:");
-
-    /**
      * Constant for the check box that specifies whether or not uploads 
      * should be automatically cleared.
      */
@@ -44,8 +37,13 @@ public final class StartupPaneItem extends AbstractPaneItem {
      */
     public StartupPaneItem() {
         super(TITLE, LABEL);
-        
-        LabeledComponent comp = 
+
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * upload pane check box label in the options window.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Run on System Startup:");
+        LabeledComponent comp =
             new LabeledComponent(CHECK_BOX_LABEL, CHECK_BOX,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(comp.getComponent());

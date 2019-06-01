@@ -219,7 +219,6 @@ public final class iTunesMediator {
      */
     private class ExecOSAScriptCommand implements Runnable {
 
-        private final int MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS = 300;
         private final String playlist;
 
         /**
@@ -240,6 +239,7 @@ public final class iTunesMediator {
          */
         public void run() {
             try {
+                int MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS = 300;
                 if (files.length > MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS) {
                     List<File[]> fileArrays = splitArray(files, MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS);
                     for (File[] fileSubset : fileArrays) {
@@ -255,8 +255,6 @@ public final class iTunesMediator {
     }
 
     private class ExecWSHScriptCommand implements Runnable {
-
-        private final int MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS = 100;
 
         private final String playlist;
 
@@ -278,6 +276,7 @@ public final class iTunesMediator {
          */
         public void run() {
             try {
+                int MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS = 100;
                 if (files.length > MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS) {
                     List<File[]> fileArrays = splitArray(files, MAX_SCRIPT_FILE_NUMBER_OF_ARGUMENTS);
                     for (File[] fileSubset : fileArrays) {

@@ -45,11 +45,7 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
 	private final WholeNumberField PORT_0_FIELD = new SizedWholeNumberField();
 	
 	private final WholeNumberField PORT_1_FIELD = new SizedWholeNumberField();
-	
-    /**
-     * Constant handle to the check box that enables or disables this feature.
-     */
-    private final ButtonGroup BUTTONS = new ButtonGroup();
+
     private final JRadioButton RANDOM_PORT = new JRadioButton(I18n.tr("Use random port (Recommended)"));
     private final JRadioButton MANUAL_PORT = new JRadioButton(I18n.tr("Manual port range"));
     
@@ -62,8 +58,12 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
 	 */
 	public RouterConfigurationPaneItem() {
 	    super(TITLE, LABEL);
-		
-		BUTTONS.add(RANDOM_PORT);
+
+        /**
+         * Constant handle to the check box that enables or disables this feature.
+         */
+        ButtonGroup BUTTONS = new ButtonGroup();
+        BUTTONS.add(RANDOM_PORT);
 		BUTTONS.add(MANUAL_PORT);
 		MANUAL_PORT.addItemListener(new LocalPortListener());
 		

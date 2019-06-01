@@ -18,14 +18,7 @@ public final class PopupsPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("Redisplay messages for which you have chosen \'Do not display this message again\' or \'Always use this answer\'.");
 
-	/**
-	 * Constant for the key of the locale-specific <tt>String</tt> for the 
-	 * chat enabled check box label in the options window.
-	 */
-	private final String CHECK_BOX_LABEL = 
-		I18n.tr("Revert to Default:");
-
-	/**
+    /**
 	 * Constant for the check box that specifies whether or not downloads 
 	 * should be automatically cleared.
 	 */
@@ -40,8 +33,13 @@ public final class PopupsPaneItem extends AbstractPaneItem {
 	 */
 	public PopupsPaneItem() {
 	    super(TITLE, LABEL);
-	    
-		LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * chat enabled check box label in the options window.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Revert to Default:");
+        LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(comp.getComponent());
 	}

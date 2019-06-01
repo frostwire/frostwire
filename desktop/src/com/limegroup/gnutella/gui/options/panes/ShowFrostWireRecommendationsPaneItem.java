@@ -34,13 +34,6 @@ public final class ShowFrostWireRecommendationsPaneItem extends AbstractPaneItem
     
     public final static String LABEL = I18n.tr("By enabling this feature you become eligible to receive FrostWire sponsored offers and software recommendations to complement your experience.");
 
-	/**
-	 * Constant for the key of the locale-specific <tt>String</tt> for the 
-	 * frostclick promotions enabled check box label..
-	 */
-    private final String SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL = 
-        I18n.tr("Enable FrostWire Recommendations (highly recommended):");
-    
     /**
 	 * Constant for the check box that specifies whether to enable or 
 	 * disable frostclick promos
@@ -56,8 +49,13 @@ public final class ShowFrostWireRecommendationsPaneItem extends AbstractPaneItem
 	 */
 	public ShowFrostWireRecommendationsPaneItem() {
 		super(TITLE, LABEL);
-		
-		LabeledComponent c = new LabeledComponent(SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * frostclick promotions enabled check box label..
+         */
+        String SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL = I18n.tr("Enable FrostWire Recommendations (highly recommended):");
+        LabeledComponent c = new LabeledComponent(SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(c.getComponent());
 	}

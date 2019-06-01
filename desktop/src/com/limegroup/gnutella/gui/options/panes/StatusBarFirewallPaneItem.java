@@ -19,13 +19,6 @@ public final class StatusBarFirewallPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can display your firewall status in the status bar.");
 
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for whether 
-     * the firewall status should be displayed in the status bar.
-     */
-    private final String CHECK_BOX_LABEL = 
-        I18n.tr("Show Firewall Indicator:");
-
     private final JCheckBox CHECK_BOX = new JCheckBox();
 
     /**
@@ -38,8 +31,13 @@ public final class StatusBarFirewallPaneItem extends AbstractPaneItem {
 	 */
 	public StatusBarFirewallPaneItem() {
 	    super(TITLE, LABEL);
-	    
-		LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for whether
+         * the firewall status should be displayed in the status bar.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Show Firewall Indicator:");
+        LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(comp.getComponent());
 	}

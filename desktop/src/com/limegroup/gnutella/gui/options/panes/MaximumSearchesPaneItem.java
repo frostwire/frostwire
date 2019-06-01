@@ -20,15 +20,8 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");
 
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Maximum Searches:");
 
-
-	/**
+    /**
 	 * Handle to the <tt>WholeNumberField</tt> where the user selects the
 	 * time to live for outgoing searches.
 	 */
@@ -50,7 +43,13 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
 	    super(TITLE, LABEL);
 
 		_maxSearchesField = new SizedWholeNumberField();
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL,
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * label on the component that allows to user to change the setting for
+         * this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Maximum Searches:");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL,
 				_maxSearchesField, LabeledComponent.LEFT_GLUE,
 				LabeledComponent.LEFT);
 

@@ -41,8 +41,7 @@ public class SendFileProgressDialog extends JDialog {
     private static final Logger LOG = Logger.getLogger(SendFileProgressDialog.class);
 
 	private JProgressBar _progressBar;
-	private JButton _cancelButton;
-	
+
     private Container _container;
 	private File _preselectedFile;
     private final TorrentMakerListener torrentMakerListener;
@@ -97,7 +96,7 @@ public class SendFileProgressDialog extends JDialog {
 	}
 
     private void initCancelButton() {
-		_cancelButton = new JButton(I18n.tr("Cancel"));
+        JButton _cancelButton = new JButton(I18n.tr("Cancel"));
 		_cancelButton.addActionListener(new ActionListener() {
 			
 			@Override

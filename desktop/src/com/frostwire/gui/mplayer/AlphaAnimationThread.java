@@ -28,7 +28,6 @@ public class AlphaAnimationThread extends Thread {
     private boolean isHiding;
     private boolean isShowing;
     private int currentAlpha = TARGET_ALPHA;
-    private boolean stopAlphaThread = false;
 
     private AlphaTarget target;
 
@@ -71,6 +70,7 @@ public class AlphaAnimationThread extends Thread {
     }
 
     public void run() {
+        boolean stopAlphaThread = false;
         while (!stopAlphaThread && !disposed) {
             if (isHiding) {
                 if (currentAlpha > 0) {

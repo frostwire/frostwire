@@ -62,12 +62,6 @@ public final class OptionsConstructor {
      */
     private final OptionsTreeManager TREE_MANAGER;
 
-    /**
-     * Stored for convenience to allow using this in helper methods
-     * during construction.
-     */
-    private final OptionsPaneManager PANE_MANAGER;
-
     private final SearchField filterTextField;
 
     static final String SAVE_BASIC_KEY = "OPTIONS_SAVE_BASIC_MAIN_TITLE";
@@ -114,7 +108,10 @@ public final class OptionsConstructor {
      */
     public OptionsConstructor(final OptionsTreeManager treeManager, final OptionsPaneManager paneManager) {
         TREE_MANAGER = treeManager;
-        PANE_MANAGER = paneManager;
+        /**
+         * Stored for convenience to allow using this in helper methods
+         * during construction.
+         */
         keysToNodes = new LinkedHashMap<>();
         final String title = I18n.tr("Options");
         final boolean shouldBeModal = !OSUtils.isMacOSX();
@@ -185,7 +182,7 @@ public final class OptionsConstructor {
         Component treeComponent = TREE_MANAGER.getComponent();
         treePanel.add(treeComponent);
 
-        Component paneComponent = PANE_MANAGER.getComponent();
+        Component paneComponent = paneManager.getComponent();
 
         splitBox.add(treePanel);
         splitBox.add(paneComponent);
@@ -197,7 +194,7 @@ public final class OptionsConstructor {
         DIALOG.getContentPane().add(mainPanel);
 
         OptionsTreeNode node = initializePanels();
-        PANE_MANAGER.show(node);
+        paneManager.show(node);
     }
 
     @SuppressWarnings({ "unchecked" })

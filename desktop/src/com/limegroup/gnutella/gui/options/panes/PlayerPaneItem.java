@@ -36,10 +36,6 @@ public final class PlayerPaneItem extends AbstractPaneItem {
 
     public final static String LABEL = I18n.tr("You can play your media with the native operating system player if the format is supported.");
 
-    private final String CHECK_BOX_LABEL = I18n.tr("Play with the native media player");
-    
-    private final String VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX_LABEL = I18n.tr("Play search result video previews with internal player");
-
     private final JCheckBox CHECK_BOX = new JCheckBox();
     
     private final JCheckBox VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX = new JCheckBox();
@@ -54,9 +50,11 @@ public final class PlayerPaneItem extends AbstractPaneItem {
     public PlayerPaneItem() {
         super(TITLE, LABEL);
 
+        String CHECK_BOX_LABEL = I18n.tr("Play with the native media player");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL, CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(comp.getComponent());
-        
+
+        String VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX_LABEL = I18n.tr("Play search result video previews with internal player");
         add(new LabeledComponent(VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX_LABEL, VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT).getComponent());
     }
 

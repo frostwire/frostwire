@@ -36,7 +36,6 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
 
     private final SlideshowPanel _thePanel;
 
-    private ButtonGroup _buttonGroup;
     private List<JRadioButton> _buttons;
 
     private ItemListener _selectionAdapter;
@@ -80,7 +79,7 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
     private void buildButtons() {
         int numSlides = _thePanel.getNumSlides();
 
-        _buttonGroup = new ButtonGroup();
+        ButtonGroup _buttonGroup = new ButtonGroup();
         _buttons = new ArrayList<JRadioButton>(numSlides);
 
         for (int i = 0; i < numSlides; i++) {

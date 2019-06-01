@@ -35,8 +35,6 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
     public final static String DESCRIPTION_DOWNLOAD_SPEED = I18n.tr("Set the Maximum BitTorrent transfer speeds in KB/s.\nTip: Use your keyboard arrows for more precision");
 
-    private final String LABEL_DOWNLOAD_SPEED = I18n.tr("Download Speed:");
-
     /**
      * Speeds in Kilobytes/sec
      * From 1Kb to 100Mb - 101 == Unlimited.
@@ -45,11 +43,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
     private final JLabel DOWNLOAD_SLIDER_LABEL = new JLabel();
 
-    private int storedDownloadSpeed;
-
     public final static String DESCRIPTION_UPLOAD_SPEED = "<html>"+I18n.tr("Set the Maximum BitTorrent upload speed in KB/s.")+"<p>"+ I18n.tr("Note: Too low upload speeds (leeching) could be penalized by some trackers, resulting in slower downloads.")+"</p></html>";
-
-    private final String LABEL_UPLOAD_SPEED = I18n.tr("Upload Speed:");
 
     /**
      * Speeds in Kilobytes/sec
@@ -58,8 +52,6 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     private JSlider UPLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
 
     private final JLabel UPLOAD_SLIDER_LABEL = new JLabel();
-
-    private int storedUploadSpeed;
 
     private String globalUploadSpeedConfigKey = "Max Upload Speed KBs";
 
@@ -86,6 +78,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
             }
         });
 
+        String LABEL_DOWNLOAD_SPEED = I18n.tr("Download Speed:");
         LabeledComponent comp = new LabeledComponent(LABEL_DOWNLOAD_SPEED, DOWNLOAD_SLIDER_LABEL,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(DOWNLOAD_SLIDER);
@@ -113,6 +106,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
             }
         });
 
+        String LABEL_UPLOAD_SPEED = I18n.tr("Upload Speed:");
         LabeledComponent compUp = new LabeledComponent(LABEL_UPLOAD_SPEED, UPLOAD_SLIDER_LABEL,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 
@@ -143,7 +137,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
     @Override
     public void initOptions() {
-        storedDownloadSpeed = BTEngine.getInstance().downloadRateLimit() / 1024;
+        int storedDownloadSpeed = BTEngine.getInstance().downloadRateLimit() / 1024;
 
         if (storedDownloadSpeed == 0) {
             DOWNLOAD_SLIDER.setValue(101 * 1024);
@@ -154,7 +148,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
         updateSpeedLabel(DOWNLOAD_SLIDER, DOWNLOAD_SLIDER_LABEL);
 
-        storedUploadSpeed = BTEngine.getInstance().uploadRateLimit() / 1024;
+        int storedUploadSpeed = BTEngine.getInstance().uploadRateLimit() / 1024;
 
         if (storedUploadSpeed == 0) {
             UPLOAD_SLIDER.setValue(101 * 1024);

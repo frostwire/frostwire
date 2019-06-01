@@ -60,7 +60,6 @@ public class ThreadPool {
     private final List task_queue = new ArrayList();
 
     private final AESemaphore thread_sem;
-    private final int reserved_target = 0;
     private int reserved_actual;
 
     private boolean warn_when_full;
@@ -322,6 +321,7 @@ public class ThreadPool {
 
                     synchronized (ThreadPool.this) {
 
+                        int reserved_target = 0;
                         if (reserved_target > reserved_actual) {
 
                             reserved_actual++;

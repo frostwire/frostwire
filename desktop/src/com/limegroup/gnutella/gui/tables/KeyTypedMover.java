@@ -18,14 +18,8 @@ public class KeyTypedMover implements KeyListener {
 	private String prefix = "";
 	private String typedString = "";
 	private long lastTime = 0L;
-	
+
     /**
-     * The time factor to treate the series of typed alphanumeric key
-     * as prefix for first letter navigation.
-     */
-    private final long timeFactor = 500L;
-    	
-	/**
 	 * Invoked when a key has been typed.
 	 * 
 	 * Moves the keyboard focus to the first element whose prefix matches the
@@ -51,8 +45,13 @@ public class KeyTypedMover implements KeyListener {
 	    char c = e.getKeyChar();
 	    long time = e.getWhen();
 	    int startIndex = src.getSelectionModel().getLeadSelectionIndex();
-	    
-	    if (time - lastTime < timeFactor) {
+
+        /**
+         * The time factor to treate the series of typed alphanumeric key
+         * as prefix for first letter navigation.
+         */
+        long timeFactor = 500L;
+        if (time - lastTime < timeFactor) {
     		typedString += c;
        		if((prefix.length() == 1) && (c == prefix.charAt(0))) {
        		    // Subsequent same key presses move the keyboard focus to the next 

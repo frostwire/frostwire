@@ -38,10 +38,7 @@ public class HideExitDialog extends JDialog {
     public static final int HIDE = 1;
     public static final int EXIT = 2;
 
-    private JLabel _label;
     private JCheckBox _checkBox;
-    private JButton _buttonHide;
-    private JButton _buttonExit;
 
     private int _result;
 
@@ -61,7 +58,7 @@ public class HideExitDialog extends JDialog {
 
         GridBagConstraints c;
 
-        _label = new JLabel("<html>" + I18n.tr("Closing the FrostWire window will only hide the application") + "<p>" + I18n.tr("This way file transfers may continue in the background.") + "</html>");
+        JLabel _label = new JLabel("<html>" + I18n.tr("Closing the FrostWire window will only hide the application") + "<p>" + I18n.tr("This way file transfers may continue in the background.") + "</html>");
         c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
@@ -77,7 +74,7 @@ public class HideExitDialog extends JDialog {
         getContentPane().add(_checkBox, c);
 
         // hide button
-        _buttonHide = new JButton(I18n.tr("Hide"));
+        JButton _buttonHide = new JButton(I18n.tr("Hide"));
         _buttonHide.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 buttonHide_actionPerformed(e);
@@ -92,7 +89,7 @@ public class HideExitDialog extends JDialog {
         getContentPane().add(_buttonHide, c);
 
         // exit button
-        _buttonExit = new JButton(I18n.tr("Exit"));
+        JButton _buttonExit = new JButton(I18n.tr("Exit"));
         _buttonExit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 buttonExit_actionPerformed(e);

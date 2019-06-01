@@ -44,11 +44,6 @@ public class JFIFOutputStream extends OutputStream {
      * respectively do no have a data segment.
      */
     private final HashSet<Integer> standaloneMarkers = new HashSet<Integer>();
-    /**
-     * This hash set holds the Id's of markers which have a data
-     * segment followed by a entropy-coded data segment.
-     */
-    private final HashSet<Integer> doubleSegMarkers = new HashSet<Integer>();
     /** Start of image */
     public final static int SOI_MARKER = 0xffd8;
     /** End of image */
@@ -136,6 +131,11 @@ public class JFIFOutputStream extends OutputStream {
         // which follows the SOS segment.
         standaloneMarkers.add(0);
 
+        /**
+         * This hash set holds the Id's of markers which have a data
+         * segment followed by a entropy-coded data segment.
+         */
+        HashSet<Integer> doubleSegMarkers = new HashSet<Integer>();
         doubleSegMarkers.add(SOS_MARKER); // SOS_MARKER Start of Scan
 
     }

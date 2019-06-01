@@ -34,13 +34,6 @@ public final class ShowPromoOverlaysPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can enable or disable the FrostClick Promotion on the welcome screen. FrostClick promotions help artists and content creators distribute their content legally and freely to hundreds of thousands of people via FrostWire, BitTorrent and Gnutella. Keep this option on to support file sharing and the future of content distribution.");
 
-	/**
-	 * Constant for the key of the locale-specific <tt>String</tt> for the 
-	 * frostclick promotions enabled check box label..
-	 */
-    private final String SHOW_PROMOTION_OVERLAYS_LABEL = 
-        I18n.tr("Enable FrostClick Promotions (highly recommended):");
-    
     /**
 	 * Constant for the check box that specifies whether to enable or 
 	 * disable frostclick promos
@@ -56,8 +49,13 @@ public final class ShowPromoOverlaysPaneItem extends AbstractPaneItem {
 	 */
 	public ShowPromoOverlaysPaneItem() {
 		super(TITLE, LABEL);
-		
-		LabeledComponent c = new LabeledComponent(SHOW_PROMOTION_OVERLAYS_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * frostclick promotions enabled check box label..
+         */
+        String SHOW_PROMOTION_OVERLAYS_LABEL = I18n.tr("Enable FrostClick Promotions (highly recommended):");
+        LabeledComponent c = new LabeledComponent(SHOW_PROMOTION_OVERLAYS_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(c.getComponent());
 	}

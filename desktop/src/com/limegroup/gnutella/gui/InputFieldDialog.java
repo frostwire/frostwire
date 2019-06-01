@@ -37,12 +37,7 @@ public final class InputFieldDialog {
 	 */
 	private JDialog _dialog;
 
-	/**
-	 * The main panel of the dialog.
-	 */
-	private final PaddedPanel MAIN_PANEL = new PaddedPanel();
-
-	/**
+    /**
 	 * The text field displayed in the dialog.
 	 */
 	private final SizedTextField TEXT_FIELD = new SizedTextField();
@@ -107,7 +102,11 @@ public final class InputFieldDialog {
 		componentPanel.add(component.getComponent());
 		componentPanel.add(Box.createVerticalGlue());
 
-		MAIN_PANEL.add(componentPanel);
+        /**
+         * The main panel of the dialog.
+         */
+        PaddedPanel MAIN_PANEL = new PaddedPanel();
+        MAIN_PANEL.add(componentPanel);
 		MAIN_PANEL.add(Box.createVerticalGlue());
 		MAIN_PANEL.add(buttons);
 		contentPane.add(MAIN_PANEL);

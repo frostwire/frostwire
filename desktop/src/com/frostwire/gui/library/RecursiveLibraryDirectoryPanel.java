@@ -66,12 +66,6 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     private final JPanel mainPanel;
 
     /**
-     * Cell renderer for the tree that uses a check box for rendering of file tree
-     * data. Kept around here so its color configurations can be used.
-     */
-    private final FileTreeCellRenderer fileTreeCellRenderer = new FileTreeCellRenderer();
-
-    /**
      * The checkbox icon that represents the third possible state, a folder whose
      * files are being included but only some of its subfolders. 
      */
@@ -116,6 +110,11 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
 
         directoryTree = new RootNotEditableTree(directoryTreeModel);
         directoryTree.setBorder(new EmptyBorder(4, 4, 4, 4));
+        /**
+         * Cell renderer for the tree that uses a check box for rendering of file tree
+         * data. Kept around here so its color configurations can be used.
+         */
+        FileTreeCellRenderer fileTreeCellRenderer = new FileTreeCellRenderer();
         directoryTree.setCellRenderer(fileTreeCellRenderer);
         directoryTree.setCellEditor(new FileTreeCellEditor());
         directoryTree.setEditable(true);

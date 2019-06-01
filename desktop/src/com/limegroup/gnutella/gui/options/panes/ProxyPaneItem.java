@@ -37,22 +37,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
 
     public final static String LABEL = I18n.tr("Configure Proxy Options for FrostWire.");
 
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for the
-     * label on the proxy host field.
-     */
-    private final String PROXY_HOST_LABEL_KEY = I18n.tr("Proxy:");
-
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for the
-     * label on the port text field.
-     */
-    private final String PROXY_PORT_LABEL_KEY = I18n.tr("Port:");
-
-    /**
-     * Constant handle to the check box that enables or disables this feature.
-     */
-    private final ButtonGroup BUTTONS = new ButtonGroup();
     private final JRadioButton NO_PROXY_BUTTON = new JRadioButton(I18n.tr("No Proxy"));
     private final JRadioButton SOCKS4_PROXY_BUTTON = new JRadioButton("Socks v4");
     private final JRadioButton SOCKS5_PROXY_BUTTON = new JRadioButton("Socks v5");
@@ -79,6 +63,10 @@ public final class ProxyPaneItem extends AbstractPaneItem {
     public ProxyPaneItem() {
         super(TITLE, LABEL);
 
+        /**
+         * Constant handle to the check box that enables or disables this feature.
+         */
+        ButtonGroup BUTTONS = new ButtonGroup();
         BUTTONS.add(NO_PROXY_BUTTON);
         BUTTONS.add(SOCKS4_PROXY_BUTTON);
         BUTTONS.add(SOCKS5_PROXY_BUTTON);
@@ -93,11 +81,21 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         add(getHorizontalSeparator());
 
         BoxPanel panel = new BoxPanel(BoxPanel.X_AXIS);
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * label on the proxy host field.
+         */
+        String PROXY_HOST_LABEL_KEY = I18n.tr("Proxy:");
         LabeledComponent comp = new LabeledComponent(PROXY_HOST_LABEL_KEY,
                 PROXY_HOST_FIELD, LabeledComponent.NO_GLUE,
                 LabeledComponent.LEFT);
         panel.add(comp.getComponent());
         panel.addHorizontalComponentGap();
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * label on the port text field.
+         */
+        String PROXY_PORT_LABEL_KEY = I18n.tr("Port:");
         comp = new LabeledComponent(PROXY_PORT_LABEL_KEY, PROXY_PORT_FIELD,
                 LabeledComponent.NO_GLUE, LabeledComponent.LEFT);
         panel.add(comp.getComponent());

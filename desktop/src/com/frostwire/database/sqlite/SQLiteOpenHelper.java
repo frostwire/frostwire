@@ -35,12 +35,11 @@ public abstract class SQLiteOpenHelper {
 
     private static final Logger LOG = Logger.getLogger(SQLiteOpenHelper.class);
 
-    private final String dbpath;
     private final SQLiteDatabase db;
     private String folderpath;
 
     public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version, String extraArgs) {
-        dbpath = context.getDatabasePath(name).getAbsolutePath();
+        String dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
     }
 

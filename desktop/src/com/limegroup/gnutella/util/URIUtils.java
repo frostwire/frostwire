@@ -12,12 +12,7 @@ import java.util.StringTokenizer;
  * Utilities for URIs
  */
 public class URIUtils {
-    
-    /**
-     * Identifier for ISO-Latin-1 encoding
-     */
-    private static String ASCII_ENCODING = "ISO-8859-1";
-    
+
     private static final String RESERVED = ";/?:@&=+$,";
 
     /**
@@ -72,6 +67,10 @@ public class URIUtils {
                 encodedURL.append(s);
             } else {
                 try {
+                    /**
+                     * Identifier for ISO-Latin-1 encoding
+                     */
+                    String ASCII_ENCODING = "ISO-8859-1";
                     encodedURL.append(URLEncoder.encode(s, ASCII_ENCODING));
                 } catch (UnsupportedEncodingException e1) {
                     // should never happen

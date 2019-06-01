@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class NyaaSearchPerformer extends TorrentSearchPerformer {
-    private final int MAX_RESULTS = 75;
     private final Pattern pattern;
     private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
 
@@ -63,6 +62,7 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
         ArrayList<NyaaSearchResult> results = new ArrayList<>(0);
         SearchMatcher matcher = new SearchMatcher((pattern.matcher(page.substring(offset))));
         boolean matcherFound;
+        int MAX_RESULTS = 75;
         do {
             try {
                 matcherFound = matcher.find();

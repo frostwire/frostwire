@@ -261,7 +261,6 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         }
     };
 
-    private boolean smallIconsView = false;
     private Border  listViewBorder;
     private Color   listViewBackground;
     private boolean listViewWindowsStyle;
@@ -571,6 +570,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 
 
     private void updateListRowCount(JList<Object> list) {
+        boolean smallIconsView = false;
         if (smallIconsView) {
             list.setVisibleRowCount(getModel().getSize() / 3);
         } else {

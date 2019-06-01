@@ -20,14 +20,7 @@ public class AudioPlayerPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can choose which audio player to use.");
 
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Audio Player");
-    
-    /** 
+    /**
      * Handle to the <tt>JTextField</tt> that displays the player name
      */    
     private JTextField _playerField;
@@ -42,7 +35,13 @@ public class AudioPlayerPaneItem extends AbstractPaneItem {
 		super(TITLE, LABEL);
 		
 		_playerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _playerField);
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * label on the component that allows to user to change the setting for
+         * this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Audio Player");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _playerField);
 		add(comp.getComponent());
 	}
     

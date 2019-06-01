@@ -17,13 +17,6 @@ public final class AutoCompletePaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can enable or disable autocompletion of text fields.");
 
-	/**
-	 * Constant for the key of the locale-specific <tt>String</tt> for the 
-	 * autocompletion enabled check box label..
-	 */
-    private final String AUTOCOMPLETE_LABEL = 
-        I18n.tr("Enable Autocompletion of Text Fields:");
-    
     /**
 	 * Constant for the check box that specifies whether to enable or 
 	 * disable autocompletion
@@ -39,8 +32,13 @@ public final class AutoCompletePaneItem extends AbstractPaneItem {
 	 */
 	public AutoCompletePaneItem() {
 		super(TITLE, LABEL);
-		
-		LabeledComponent c = new LabeledComponent(AUTOCOMPLETE_LABEL,
+
+        /**
+         * Constant for the key of the locale-specific <tt>String</tt> for the
+         * autocompletion enabled check box label..
+         */
+        String AUTOCOMPLETE_LABEL = I18n.tr("Enable Autocompletion of Text Fields:");
+        LabeledComponent c = new LabeledComponent(AUTOCOMPLETE_LABEL,
 				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
 		add(c.getComponent());
 	}

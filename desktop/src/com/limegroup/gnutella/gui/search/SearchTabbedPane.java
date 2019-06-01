@@ -73,7 +73,6 @@ final class SearchTabbedPane extends JTabbedPane {
     private final class SearchTabHeader extends JPanel {
 
         private final Component component;
-        private final JButton buttonClose;
         private final JLabel labelText;
 
         SearchTabHeader(Component component, String text) {
@@ -81,7 +80,7 @@ final class SearchTabbedPane extends JTabbedPane {
 
             setLayout(new MigLayout("insets 0, gap 0"));
 
-            buttonClose = new JButton(CancelSearchIconProxy.createSelected());
+            JButton buttonClose = new JButton(CancelSearchIconProxy.createSelected());
             buttonClose.setOpaque(false);
             buttonClose.setContentAreaFilled(false);
             buttonClose.setBorderPainted(false);

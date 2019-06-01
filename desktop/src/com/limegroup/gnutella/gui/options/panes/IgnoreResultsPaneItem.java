@@ -31,14 +31,8 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
      * Handle to the check box for ignoring adult content.
      */
     private JCheckBox IGNORE_ADULT_CHECK_BOX = new JCheckBox();
-    
-    /**
-     * Key for the locale-specifis string for the adult content check box 
-     * label.
-     */
-    private String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
 
-	/**
+    /**
 	 * The constructor constructs all of the elements of this 
 	 * <tt>AbstractPaneItem</tt>.
 	 *
@@ -47,8 +41,13 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
 	 */
 	public IgnoreResultsPaneItem() {
 	    super(TITLE, LABEL);
-	    
-	    IGNORE_ADULT_CHECK_BOX.setText(I18n.tr(ADULT_BOX_LABEL));
+
+        /**
+         * Key for the locale-specifis string for the adult content check box
+         * label.
+         */
+        String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
+        IGNORE_ADULT_CHECK_BOX.setText(I18n.tr(ADULT_BOX_LABEL));
 	    
 		add(RESULTS_LIST);
 		add(IGNORE_ADULT_CHECK_BOX);

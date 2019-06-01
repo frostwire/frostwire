@@ -26,14 +26,7 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
     
     public final static String LABEL = I18n.tr("You can choose which image viewer to use.");
 
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Image Viewer");
-    
-    /** 
+    /**
      * Handle to the <tt>JTextField</tt> that displays the viewer name
      */    
     private JTextField _viewerField;
@@ -48,7 +41,13 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
 	    super(TITLE, LABEL);
 	    
 		_viewerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _viewerField);
+        /**
+         * Constant for the key of the locale-specific <code>String</code> for the
+         * label on the component that allows to user to change the setting for
+         * this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Image Viewer");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _viewerField);
 		add(comp.getComponent());
 	}
     
