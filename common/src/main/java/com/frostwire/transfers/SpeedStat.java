@@ -55,7 +55,7 @@ final class SpeedStat {
         }
     }
 
-    double eta(double size) {
+    long eta(double size) {
         return eta(size, totalBytes, averageSpeed);
     }
 
@@ -63,7 +63,7 @@ final class SpeedStat {
         return progress(size, totalBytes);
     }
 
-    private static double eta(double size, double total, double speed) {
+    private static long eta(double size, double total, double speed) {
         double left = size - total;
 
         if (left <= 0) {
@@ -74,7 +74,7 @@ final class SpeedStat {
             return -1;
         }
 
-        return left / speed;
+        return (long) (left / speed);
     }
 
     private static int progress(double size, double total) {

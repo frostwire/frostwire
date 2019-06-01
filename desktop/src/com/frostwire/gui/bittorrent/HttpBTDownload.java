@@ -202,10 +202,10 @@ abstract class HttpBTDownload implements BTDownload {
     }
 
     @Override
-    public double getETA() {
+    public long getETA() {
         if (size > 0) {
             long speed = averageSpeed;
-            return speed > 0 ? (size - getBytesReceived()) / speed : -1;
+            return speed > 0 ? (long) ((size - getBytesReceived()) / speed) : -1;
         } else {
             return -1;
         }

@@ -33,7 +33,7 @@ interface TorrentDownloadInfo {
 
     String getDisplayName();
 
-    long getSize();
+    double getSize();
 
     String getHash();
 

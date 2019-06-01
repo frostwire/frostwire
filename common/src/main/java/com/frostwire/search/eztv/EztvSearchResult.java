@@ -22,6 +22,7 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.StringUtils;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -114,7 +115,11 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
     private String parseFileName(String urlEncodedFileName) {
         String decodedFileName = null;
         if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-            decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8);
+            try {
+                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
         }
         return decodedFileName;
     }

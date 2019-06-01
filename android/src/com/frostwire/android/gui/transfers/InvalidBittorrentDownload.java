@@ -95,7 +95,7 @@ final class InvalidBittorrentDownload implements BittorrentDownload, InvalidTran
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return 0;
     }
 

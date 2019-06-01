@@ -207,7 +207,7 @@ public final class UIUtils {
                         callback).show(fragmentManager);
     }
 
-    public static String getBytesInHuman(long size) {
+    public static String getBytesInHuman(double size) {
         int i;
         float sizeFloat = (float) size;
         for (i = 0; sizeFloat > 1024; i++) {

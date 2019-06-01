@@ -148,7 +148,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
-    public double getETA() {
+    public long getETA() {
         return !complete ? stat.eta(info.size()) : 0;
     }
 

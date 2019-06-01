@@ -171,7 +171,7 @@ public class TorrentFetcherDownload implements BTDownload {
         return 0;
     }
 
-    public double getETA() {
+    public long getETA() {
         return 0;
     }
 

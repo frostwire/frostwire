@@ -63,7 +63,7 @@ public interface BTDownload {
 
     double getUploadSpeed();
 
-    double getETA();
+    long getETA();
 
     String getPeersString();
 

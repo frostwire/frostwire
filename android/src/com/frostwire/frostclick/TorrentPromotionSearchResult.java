@@ -45,7 +45,7 @@ public class TorrentPromotionSearchResult implements TorrentSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return slide.size;
     }
 

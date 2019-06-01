@@ -296,15 +296,15 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
      * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
      * "m:ss" where m=minutes<60, ss=seconds
      */
-    private String seconds2time(double seconds) {
+    private String seconds2time(long seconds) {
         if (seconds == -1) {
             return "∞";
         }
-        double minutes = seconds / 60;
+        long minutes = seconds / 60;
         seconds = seconds - minutes * 60;
-        double hours = minutes / 60;
+        long hours = minutes / 60;
         minutes = minutes - hours * 60;
-        double days = hours / 24;
+        long days = hours / 24;
         hours = hours - days * 24;
         // build the numbers into a string
         StringBuilder time = new StringBuilder();

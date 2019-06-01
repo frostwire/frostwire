@@ -317,7 +317,8 @@ public final class BTDownload implements BittorrentDownload {
         return created;
     }
 
-    public double getETA() {
+    @Override
+    public long getETA() {
         if (!th.isValid()) {
             return 0;
         }

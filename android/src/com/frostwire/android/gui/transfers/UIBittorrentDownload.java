@@ -61,7 +61,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     private final BTDownload dl;
 
     private String displayName;
-    private long size;
+    private double size;
     private List<TransferItem> items;
 
     private boolean noSpaceAvailableInCurrentMount;
@@ -251,7 +251,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -281,7 +281,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public long getETA() {
+    public double getETA() {
         return dl.getETA();
     }
 
@@ -394,8 +394,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return canDelete && directory.delete();
     }
 
-    private long calculateSize(BTDownload dl) {
-        long size = dl.getSize();
+    private double calculateSize(BTDownload dl) {
+        double size = dl.getSize();
 
         boolean partial = dl.isPartial();
         if (partial) {

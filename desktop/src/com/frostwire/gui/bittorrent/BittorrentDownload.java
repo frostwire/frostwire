@@ -173,7 +173,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     }
 
     @Override
-    public double getETA() {
+    public long getETA() {
         return dl.getETA();
     }
 

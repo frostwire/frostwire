@@ -82,7 +82,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return 0;
     }
 
-    public long getSize() {
+    public double getSize() {
         return info.getSize();
     }
 

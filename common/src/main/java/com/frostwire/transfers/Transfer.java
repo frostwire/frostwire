@@ -52,7 +52,7 @@ public interface Transfer {
 
     boolean isDownloading();
     
-    double getETA();
+    long getETA();
 
     /**
      * [0..100]

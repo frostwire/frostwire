@@ -103,7 +103,11 @@ public final class TorLockSearchResult extends AbstractTorrentSearchResult {
     private String parseFileName(String urlEncodedFileName, String fallbackName) {
         String decodedFileName = fallbackName;
         if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-            decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8);
+            try {
+                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             decodedFileName.replace("&amp;", "and");
         }
         return decodedFileName + ".torrent";
