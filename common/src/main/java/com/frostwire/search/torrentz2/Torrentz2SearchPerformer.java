@@ -31,14 +31,15 @@ import java.util.List;
  */
 public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
-    private static final int MAX_RESULTS = 30;
-    public static final String REGEX =
-            "(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span><span>(?<seeds>\\d+)</span><span>.*?";
-    private String usualTrackers;
-    private final Pattern PATTERN = Pattern.compile(REGEX);
+    private final String usualTrackers;
+    private final Pattern pattern;// = Pattern.compile(REGEX);
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
         super("torrentz2.eu", token, keywords, timeout, 1, 0);
+        pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?" +
+                "&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span>" +
+                "<span>(?<seeds>\\d+)</span><span>.*?");
+
         usualTrackers = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
                 "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
                 "tr=udp://tracker.internetwarriors.net:1337/announce&" +
@@ -84,8 +85,9 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
             return Collections.emptyList();
         }
         ArrayList<Torrentz2SearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((PATTERN.matcher(page)));
+        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page)));
         boolean matcherFound;
+        int MAX_RESULTS = 100;
         do {
             try {
                 matcherFound = matcher.find();
@@ -98,8 +100,10 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
                 Torrentz2SearchResult sr = fromMatcher(matcher);
                 if (sr != null) {
                     results.add(sr);
-                    System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                    //System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
                 }
+            } else {
+                LOG.warn("Torrentz2SearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
         return results;

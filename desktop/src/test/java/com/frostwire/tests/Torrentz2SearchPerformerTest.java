@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,78 +17,55 @@
 
 package com.frostwire.tests;
 
-import com.frostwire.regex.Pattern;
-import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.SearchError;
+import com.frostwire.search.SearchListener;
+import com.frostwire.search.SearchResult;
+import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchResult;
-import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.UrlUtils;
 
-import static com.frostwire.search.torrentz2.Torrentz2SearchPerformer.REGEX;
+import java.util.List;
 
 
-public final class Torrentz2SearchPerformerTest {
-    public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "barack+obama";
-        String trackers = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
-                "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
-                "tr=udp://tracker.internetwarriors.net:1337/announce&" +
-                "tr=udp://retracker.akado-ural.ru:80/announce&" +
-                "tr=udp://tracker.moeking.me:6969/announce&" +
-                "tr=udp://carapax.net:6969/announce&" +
-                "tr=udp://retracker.baikal-telecom.net:2710/announce&" +
-                "tr=udp://bt.dy20188.com:80/announce&" +
-                "tr=udp://tracker.nyaa.uk:6969/announce&" +
-                "tr=udp://carapax.net:6969/announce&" +
-                "tr=udp://amigacity.xyz:6969/announce&" +
-                "tr=udp://tracker.supertracker.net:1337/announce&" +
-                "tr=udp://tracker.cyberia.is:6969/announce&" +
-                "tr=udp://tracker.openbittorrent.com:80/announce&" +
-                "tr=udp://tracker.msm8916.com:6969/announce&" +
-                "tr=udp://tracker.sktorrent.net:6969/announce&";
-        HttpClient httpClient = HttpClientFactory.newInstance();
-        String fileStr;
+public class Torrentz2SearchPerformerTest {
+    public static void main(String[] args) {
+        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
+
+        Torrentz2SearchPerformer nyaa = new Torrentz2SearchPerformer(1, TEST_SEARCH_TERM, 5000);
+        nyaa.setListener(new SearchListener() {
+            @Override
+            public void onResults(long token, List<? extends SearchResult> results) {
+                for (SearchResult result : results) {
+                    Torrentz2SearchResult sr = (Torrentz2SearchResult) result;
+                    System.out.println("Torrentz2SearchPerformer.SearchListener.onResults:");
+                    System.out.println("\t DisplayName: " + sr.getDisplayName());
+                    System.out.println("\t Source: " + sr.getSource());
+                    System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
+                    System.out.println("\t Filename: " + sr.getFilename());
+                    System.out.println("\t Hash: " + sr.getHash());
+                    System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
+                    System.out.println("\t Seeds: " + sr.getSeeds());
+                    System.out.println("\t Size: " + sr.getSize());
+                }
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+
+            }
+
+            @Override
+            public void onStopped(long token) {
+
+            }
+        });
+
         try {
-            fileStr = httpClient.get("https://torrentz2.eu/verified?f=" + TEST_SEARCH_TERM);
+            nyaa.perform();
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Aborting test.");
             return;
         }
-
-        Pattern searchResultsDetailURLPattern = Pattern.compile(REGEX);
-
-        SearchMatcher matcher = new SearchMatcher(searchResultsDetailURLPattern.matcher(fileStr));
-
-        int found = 0;
-        while (matcher.find()) {
-            found++;
-            System.out.println("\nfound " + found);
-
-            String infoHash = matcher.group("infohash");
-            String detailsURL = "https://torrentz2.eu/" + infoHash;
-            String filename = matcher.group("filename");
-            String fileSizeMagnitude = matcher.group("filesize");
-            String fileSizeUnit = matcher.group("unit");
-            String ageString = matcher.group("age");
-            int seeds = 20;
-            try {
-                seeds = Integer.parseInt(matcher.group("seeds"));
-            } catch (Throwable ignored) {
-            }
-
-
-            System.out.println("infohash: [" + matcher.group("infohash") + "]");
-            System.out.println("filename: [" + matcher.group("filename") + "]");
-            System.out.println("filesize: [" + matcher.group("filesize") + "]");
-            System.out.println("unit: [" + matcher.group("unit") + "]");
-            System.out.println("filesize: [" + matcher.group("filesize") + "]");
-            System.out.println("unit: [" + matcher.group("unit") + "]");
-            System.out.println("age: [" + matcher.group("age") + "]");
-            System.out.println("seeds: [" + matcher.group("seeds") + "]");
-            Torrentz2SearchResult sr = new Torrentz2SearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, trackers);
-            System.out.println(sr);
-            System.out.println("===");
-        }
-        System.out.println("-done-");
     }
 }

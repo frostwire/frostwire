@@ -1,6 +1,5 @@
-
 /*
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +58,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         hash = parseHash(matcher.group("magneturl"));
         creationTime = Long.valueOf(matcher.group("timestamp"));
         String extension = FilenameUtils.getExtension(displayName);
-        fileName = displayName + ((extension.isEmpty()) ? ".torrent" : extension);
+        fileName = displayName + "." + ((extension.isEmpty()) ? "torrent" : extension);
         torrentUrl = urlPrefix + matcher.group("torrenturl");
         seeds = Integer.parseInt(matcher.group("seeds"));
         fileSize = parseSize(matcher.group("filesize"));
@@ -165,15 +164,4 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
             return intAmount * unitMultiplier;
         }
     }
-
-//    private long parseCreationTime(String dateString) {
-//        long result = System.currentTimeMillis();
-//        try {
-//            //dateString = dateString.replaceAll("(st|nd|rd|th)", "");
-//            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-//            result = myFormat.parse(dateString).getTime();
-//        } catch (Throwable ignored) {
-//        }
-//        return result;
-//    }
 }

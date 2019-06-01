@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,13 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchResult;
-import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.util.http.HttpClient;
 
 import java.util.List;
 
 public class NyaaSearchPerformerTest {
     public static void main(String[] args) {
         String TEST_SEARCH_TERM = UrlUtils.encode("foo");
-        HttpClient httpClient = HttpClientFactory.newInstance();
-        String fileStr;
 
         NyaaSearchPerformer nyaa = new NyaaSearchPerformer("nyaa.si", 1, TEST_SEARCH_TERM, 5000);
         nyaa.setListener(new SearchListener() {

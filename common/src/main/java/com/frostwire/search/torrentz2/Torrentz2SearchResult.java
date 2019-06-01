@@ -31,22 +31,23 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    public Torrentz2SearchResult(String detailsUrl,
-                                 String infoHash,
-                                 String filename,
-                                 String fileSizeMagnitude,
-                                 String fileSizeUnit,
-                                 String ageString,
-                                 int seeds,
-                                 String trackers) {
+    Torrentz2SearchResult(String detailsUrl,
+                          String infoHash,
+                          String filename,
+                          String fileSizeMagnitude,
+                          String fileSizeUnit,
+                          String ageString,
+                          int seeds,
+                          String trackers) {
         this.detailsUrl = detailsUrl;
         this.infoHash = infoHash;
-        this.filename = filename;
+        this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
+        String extension = FilenameUtils.getExtension(filename);
+        this.filename = filename + "." + (extension.isEmpty() ? "torrent" : extension);
         this.size = parseSize(fileSizeMagnitude + " " + fileSizeUnit);
         this.creationTime = parseCreationTime(ageString);
         this.seeds = seeds;
         this.torrentUrl = "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(filename) + "&" + trackers;
-        this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
     @Override
@@ -61,7 +62,7 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
 
     @Override
     public String getSource() {
-        return "LimeTorrents";
+        return "Torrentz2";
     }
 
     @Override
