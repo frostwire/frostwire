@@ -145,7 +145,7 @@ public class NewTransferDialog extends AbstractDialog {
     private static final class SearchResultData implements Serializable {
 
         private final String displayName;
-        private final long size;
+        private final double size;
 
         public SearchResultData(FileSearchResult sr) {
             this.displayName = sr.getDisplayName();
@@ -156,7 +156,7 @@ public class NewTransferDialog extends AbstractDialog {
             return displayName;
         }
 
-        public long getSize() {
+        public double getSize() {
             return size;
         }
     }

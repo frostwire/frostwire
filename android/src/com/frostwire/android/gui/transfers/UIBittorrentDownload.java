@@ -281,7 +281,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public double getETA() {
+    public long getETA() {
         return dl.getETA();
     }
 
