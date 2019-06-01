@@ -1,5 +1,7 @@
 frostwire (6.8.0) stable; urgency=high
+  * Nyaa search fixed
   * Soundcloud search and downloads fixed
+  * New Torrentz2 search
   * OpenJDK 12 runtime (windows)
   * G+ cleanup
   * Hundreds of cleanups and fixes to modernize the codebase for Java 12
@@ -19,7 +21,7 @@ frostwire (6.8.0) stable; urgency=high
   * libtorrent: source code cleanup, performance and stability
   * Pixabay search removed
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 22 May 2019 22:52:40 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 01 June 2019 09:36:15 -0600
 
 
 frostwire (6.7.9) stable; urgency=high
