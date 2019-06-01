@@ -54,7 +54,7 @@ public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled
     }
 }

@@ -45,7 +45,7 @@ public final class SkinPopupMenuSeparatorPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled
     }
 }

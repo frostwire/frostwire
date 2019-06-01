@@ -62,7 +62,7 @@ public final class SkinScrollBarThumbPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled, MouseOver, Pressed
     }
 }

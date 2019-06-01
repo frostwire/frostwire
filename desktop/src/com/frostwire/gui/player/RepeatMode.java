@@ -24,7 +24,7 @@ public enum RepeatMode {
     private final int value;
     private static final RepeatMode[] vals = RepeatMode.values();
 
-    private RepeatMode(int value) {
+    RepeatMode(int value) {
         this.value = value;
     }
 

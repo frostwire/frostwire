@@ -53,7 +53,7 @@ public final class SkinTabbedPaneTabAreaBackgroundPainter extends AbstractSkinPa
         g.drawLine(0, y, width, y);
     }
 
-    public static enum State {
+    public enum State {
         Disabled, EnableMouseOver, EnablePressed, Enable
     }
 }

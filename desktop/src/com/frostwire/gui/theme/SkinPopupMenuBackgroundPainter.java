@@ -58,7 +58,7 @@ public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled
     }
 }

@@ -11,7 +11,7 @@ public class SettingsGroupManagerEvent {
     /**
      * Various types of events that may occur
      */
-    public static enum EventType {
+    public enum EventType {
         
         /**
          * Fired when Settings were added to the handler

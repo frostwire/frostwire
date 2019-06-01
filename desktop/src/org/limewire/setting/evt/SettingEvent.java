@@ -11,7 +11,7 @@ public class SettingEvent {
     /**
      * Various types of events that may occur
      */
-    public static enum EventType {
+    public enum EventType {
         /**
          * A Setting was reloaded
          */

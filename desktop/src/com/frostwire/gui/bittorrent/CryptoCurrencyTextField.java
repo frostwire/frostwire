@@ -22,14 +22,14 @@ import java.util.Set;
 
 public class CryptoCurrencyTextField extends LimeTextField {
     
-    public static enum CurrencyURIPrefix {
+    public enum CurrencyURIPrefix {
         BITCOIN("bitcoin:"),
         LITECOIN("litecoin:"),
         DOGECOIN("dogecoin:");
 
         private final String prefix;
         
-        private CurrencyURIPrefix(String p) {
+        CurrencyURIPrefix(String p) {
             prefix  = p;
         }
 

@@ -148,7 +148,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
         public SelectStatus select(Map.Entry<? extends K, ? extends V> entry);
      
         /** The mode during selection.      */
-        public static enum SelectStatus {
+        public enum SelectStatus {
             EXIT, CONTINUE, REMOVE, REMOVE_AND_EXIT;
         }
     }

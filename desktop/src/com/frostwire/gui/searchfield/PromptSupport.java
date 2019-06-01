@@ -58,7 +58,7 @@ public class PromptSupport {
 	 * text is present.
 	 * </p>
 	 */
-	public static enum FocusBehavior {
+	public enum FocusBehavior {
 		/**
 		 * Keep the prompt text visible.
 		 */

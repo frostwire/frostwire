@@ -71,7 +71,7 @@ public final class SkinTextFieldBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled, Focused
     }
 }

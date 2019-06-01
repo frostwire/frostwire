@@ -64,7 +64,7 @@ public final class SkinSliderThumbPainter extends AbstractSkinPainter {
         return imageName;
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled, FocusedMouseOver, FocusedPressed, Focused, MouseOver, Pressed
     }
 }

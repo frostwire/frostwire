@@ -54,7 +54,7 @@ public final class SkinMenuItemBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         MouseOver
     }
 }

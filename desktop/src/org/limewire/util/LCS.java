@@ -236,7 +236,7 @@ public class LCS {
             return buf.toString();
         }
 
-        public static enum DiffType {
+        public enum DiffType {
             ADD("+", "add"), REMOVE("-", "remove"), NONE(" ", "none");
 
             private String val;

@@ -91,7 +91,7 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
         return createVerticalGradient(s, colors);
     }
 
-    public static enum State {
+    public enum State {
         Enabled, Disabled, EnabledIndeterminate, DisabledIndeterminate
     }
 }

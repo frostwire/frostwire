@@ -35,7 +35,7 @@ public enum DialogOption {
     private final String text;
     private final int id;
 
-    private DialogOption(String text, int id ) {
+    DialogOption(String text, int id) {
         this.text = text;
         this.id = id;
     }

@@ -45,7 +45,7 @@ public final class SkinSplitPaneDividerBackgroundPainter extends AbstractSkinPai
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled, Focused
     }
 }

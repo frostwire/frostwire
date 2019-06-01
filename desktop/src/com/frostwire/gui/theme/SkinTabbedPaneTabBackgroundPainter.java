@@ -90,7 +90,7 @@ public final class SkinTabbedPaneTabBackgroundPainter extends AbstractSkinPainte
         g.draw(path);
     }
 
-    public static enum State {
+    public enum State {
         DisabledSelected, Disabled, EnabledMouseOver, EnabledPressed, Enabled, FocusedMouseOverSelected, FocusedPressedSelected, FocusedSelected, MouseOverSelected, PressedSelected, Selected
     }
 }

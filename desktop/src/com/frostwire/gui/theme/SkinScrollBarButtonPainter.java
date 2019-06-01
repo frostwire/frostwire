@@ -105,7 +105,7 @@ public final class SkinScrollBarButtonPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled, MouseOver, Pressed
     }
 }

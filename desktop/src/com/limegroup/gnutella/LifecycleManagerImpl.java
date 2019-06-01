@@ -40,7 +40,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
     /** The time when this finished starting. */
     private long startFinishedTime;
     
-    public static enum LifeCycleEvent {
+    public enum LifeCycleEvent {
         STARTING, STARTED, SHUTINGDOWN, SHUTDOWN
     }
 

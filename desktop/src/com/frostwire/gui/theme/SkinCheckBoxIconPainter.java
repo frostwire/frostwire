@@ -73,7 +73,7 @@ public final class SkinCheckBoxIconPainter extends AbstractSkinPainter {
         return imageName;
     }
 
-    public static enum State {
+    public enum State {
         DisabledSelected, Disabled, Enabled, FocusedMouseOverSelected, FocusedMouseOver, FocusedPressedSelected, FocusedPressed, FocusedSelected, Focused, MouseOverSelected, MouseOver, PressedSelected, Pressed, Selected
     }
 }

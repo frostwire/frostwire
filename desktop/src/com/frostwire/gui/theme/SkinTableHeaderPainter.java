@@ -71,7 +71,7 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled, MouseOver, Pressed
     }
 }

@@ -10,7 +10,7 @@ public class SettingsGroupEvent {
     /**
      * Various SettingsEvent that may occur
      */
-    public static enum EventType {
+    public enum EventType {
         /**
          * The Settings were saved
          */
