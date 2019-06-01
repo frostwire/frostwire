@@ -292,7 +292,7 @@ public class LimeJTable extends JTable implements JSortTable {
         int col = columnAtPoint(p);
         if (row == -1 || col == -1)
             return false;
-        int sel[] = getSelectedRows();
+        int[] sel = getSelectedRows();
         for (int aSel : sel)
             if (aSel == row)
                 return true;

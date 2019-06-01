@@ -698,7 +698,7 @@ public class WinRegistryUtil {
         if (clsID!= null) {
             String clsIDKey = getClsIDKey(clsID, regLevel);
             String shellKey = clsIDKey + "\\" + KN_SHELL;
-            String verbs[] = null;
+            String[] verbs = null;
             if (shellKey != null) {
                 verbs = regGetSubKeys(shellKey, regLevel);
             }
@@ -774,7 +774,7 @@ public class WinRegistryUtil {
         //Get application name, e.g. notepad.exe
         String appName = WinRegistryWrapper.WinRegQueryValueEx(hKey, fileExtKey, valueName);
         //Get the corresponding application's shell keys
-        String verbs[] = null;
+        String[] verbs = null;
         String appShellKey = USER_FILE_EXT_APP_PREFIX + "\\" + appName + "\\" + KN_SHELL;
         hKey = WinRegistryWrapper.HKEY_CLASSES_ROOT;
         verbs = WinRegistryWrapper.WinRegGetSubKeys(hKey, appShellKey, 255);

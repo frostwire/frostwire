@@ -372,7 +372,7 @@ public class JFIFInputStream extends FilterInputStream {
      * @see        java.io.FilterInputStream#in
      */
     @Override
-    public int read(byte b[], int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         if (markerFound) {
             return -1;
         }

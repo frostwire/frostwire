@@ -73,7 +73,7 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * @see        java.io.FilterInputStream#in
      */
     @Override
-    public int read(byte b[], int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
 	return iis.read(b, off, len);
     }
 

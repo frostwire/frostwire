@@ -43,7 +43,7 @@ public class Main {
      *
      * @param args the array of command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         ThemeMediator.changeTheme();
 
         System.setProperty("sun.awt.noerasebackground", "true");

@@ -62,7 +62,7 @@ public final class Initializer {
      * If this throws any exceptions, then LimeWire was not able to construct
      * properly and must be shut down.
      */
-    void initialize(String args[], Frame awtSplash) {
+    void initialize(String[] args, Frame awtSplash) {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
         //System.out.println("Initializer.initialize() preinit()");
         preinit();

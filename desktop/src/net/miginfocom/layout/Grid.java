@@ -2201,7 +2201,7 @@ public final class Grid
 		return s > 0 ? (s < LayoutUtil.INF ? s : LayoutUtil.INF) : 0;
 	}
 
-	private static void correctMinMax(int s[])
+	private static void correctMinMax(int[] s)
 	{
 		if (s[LayoutUtil.MIN] > s[LayoutUtil.MAX])
 			s[LayoutUtil.MIN] = s[LayoutUtil.MAX];  // Since MAX is almost always explicitly set use that

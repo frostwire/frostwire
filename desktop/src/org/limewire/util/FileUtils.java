@@ -124,8 +124,8 @@ public class FileUtils {
         } catch(IOException ioe) {
             fName = f.getPath();
         }
-            
-        String cmds[] = null;
+
+        String[] cmds = null;
         if( OSUtils.isWindows() || OSUtils.isMacOSX() )
             SystemUtils.setWriteable(fName);
         else if ( OSUtils.isOS2() )

@@ -219,7 +219,7 @@ public class ExternalControl {
         pw.flush();
     }
 
-    public String preprocessArgs(String args[]) {
+    public String preprocessArgs(String[] args) {
         LOG.info("enter proprocessArgs");
 
         StringBuilder arg = new StringBuilder();
@@ -307,7 +307,7 @@ public class ExternalControl {
         }
 
         //ActivityCallback callback = restoreApplication();
-        MagnetOptions options[] = MagnetOptions.parseMagnet(arg);
+        MagnetOptions[] options = MagnetOptions.parseMagnet(arg);
 
         if (options.length == 0) {
             LOG.warn("Invalid magnet, ignoring: " + arg);
