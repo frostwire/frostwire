@@ -286,7 +286,7 @@ abstract class ShellFolder extends File {
     }
 
     public boolean canRead() {
-        return (isFileSystem() ? super.canRead() : true);       // ((Fix?))
+        return (!isFileSystem() || super.canRead());       // ((Fix?))
     }
 
     /**
@@ -295,7 +295,7 @@ abstract class ShellFolder extends File {
      * folder.
      */
     public boolean canWrite() {
-        return (isFileSystem() ? super.canWrite() : false);     // ((Fix?))
+        return (isFileSystem() && super.canWrite());     // ((Fix?))
     }
 
     public boolean exists() {
@@ -305,7 +305,7 @@ abstract class ShellFolder extends File {
     }
 
     public boolean isDirectory() {
-        return (isFileSystem() ? super.isDirectory() : true);   // ((Fix?))
+        return (!isFileSystem() || super.isDirectory());   // ((Fix?))
     }
 
     public boolean isFile() {
@@ -321,11 +321,11 @@ abstract class ShellFolder extends File {
     }
 
     public boolean createNewFile() throws IOException {
-        return (isFileSystem() ? super.createNewFile() : false);
+        return (isFileSystem() && super.createNewFile());
     }
 
     public boolean delete() {
-        return (isFileSystem() ? super.delete() : false);       // ((Fix?))
+        return (isFileSystem() && super.delete());       // ((Fix?))
     }
 
     public void deleteOnExit() {
@@ -335,23 +335,23 @@ abstract class ShellFolder extends File {
     }
 
     public boolean mkdir() {
-        return (isFileSystem() ? super.mkdir() : false);
+        return (isFileSystem() && super.mkdir());
     }
 
     public boolean mkdirs() {
-        return (isFileSystem() ? super.mkdirs() : false);
+        return (isFileSystem() && super.mkdirs());
     }
 
     public boolean renameTo(File dest) {
-        return (isFileSystem() ? super.renameTo(dest) : false); // ((Fix?))
+        return (isFileSystem() && super.renameTo(dest)); // ((Fix?))
     }
 
     public boolean setLastModified(long time) {
-        return (isFileSystem() ? super.setLastModified(time) : false); // ((Fix?))
+        return (isFileSystem() && super.setLastModified(time)); // ((Fix?))
     }
 
     public boolean setReadOnly() {
-        return (isFileSystem() ? super.setReadOnly() : false); // ((Fix?))
+        return (isFileSystem() && super.setReadOnly()); // ((Fix?))
     }
 
     public String toString() {

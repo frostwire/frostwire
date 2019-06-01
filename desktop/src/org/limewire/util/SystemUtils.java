@@ -184,7 +184,7 @@ public class SystemUtils {
     }
     
     public static boolean toggleFullScreen(long hwnd) {
-        return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) ? toggleFullScreenNative(hwnd) : false;
+        return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) && toggleFullScreenNative(hwnd);
     }
     
     /**
@@ -192,7 +192,7 @@ public class SystemUtils {
      * with the current-most icon.
      */
     public static boolean flushIconCache() {
-        return (isLoaded && OSUtils.isWindows()) ? flushIconCacheNative() : false;
+        return (isLoaded && OSUtils.isWindows()) && flushIconCacheNative();
     }
 
     /**
@@ -220,7 +220,7 @@ public class SystemUtils {
      * @return      False on error
      */
     public static boolean registryWriteNumber(String root, String path, String name, int value) {
-        return (OSUtils.isWindows() && isLoaded) ? registryWriteNumberNative(root, path, name, value) : false;
+        return (OSUtils.isWindows() && isLoaded) && registryWriteNumberNative(root, path, name, value);
     }
 
     /**
@@ -233,7 +233,7 @@ public class SystemUtils {
      * @return      False on error
      */
     public static boolean registryWriteText(String root, String path, String name, String value) {
-        return (OSUtils.isWindows() && isLoaded) ? registryWriteTextNative(root, path, name, value) : false;
+        return (OSUtils.isWindows() && isLoaded) && registryWriteTextNative(root, path, name, value);
     }
 
     /**
@@ -244,7 +244,7 @@ public class SystemUtils {
      * @return     False on error
      */
     public static boolean registryDelete(String root, String path) {
-        return (OSUtils.isWindows() && isLoaded) ? registryDeleteNative(root, path) : false;
+        return (OSUtils.isWindows() && isLoaded) && registryDeleteNative(root, path);
     }
 
     /**
@@ -253,7 +253,7 @@ public class SystemUtils {
      * @return True if it does, false if it does not or there was an error
      */
     public static boolean isFirewallPresent() {
-        return (OSUtils.isWindows() && isLoaded) ? firewallPresentNative() : false;
+        return (OSUtils.isWindows() && isLoaded) && firewallPresentNative();
     }
 
     /**
@@ -264,7 +264,7 @@ public class SystemUtils {
     *         False on error.
      */
     public static boolean isFirewallEnabled() {
-        return (OSUtils.isWindows() && isLoaded) ? firewallEnabledNative() : false;
+        return (OSUtils.isWindows() && isLoaded) && firewallEnabledNative();
     }
 
     /**
@@ -274,7 +274,7 @@ public class SystemUtils {
      * @return     True if it has a listing on the Exceptions list, false if not or on error
      */
     public static boolean isProgramListedOnFirewall(String path) {
-        return (OSUtils.isWindows() && isLoaded) ? firewallIsProgramListedNative(path) : false;
+        return (OSUtils.isWindows() && isLoaded) && firewallIsProgramListedNative(path);
     }
 
     /**
@@ -285,7 +285,7 @@ public class SystemUtils {
      * @return     False if error
      */
     public static boolean addProgramToFirewall(String path, String name) {
-        return (OSUtils.isWindows() && isLoaded) ? firewallAddNative(path, name) : false;
+        return (OSUtils.isWindows() && isLoaded) && firewallAddNative(path, name);
     }
 
     /**
@@ -295,7 +295,7 @@ public class SystemUtils {
      * @return     False if error.
      */
     public static boolean removeProgramFromFirewall(String path) {
-        return (OSUtils.isWindows() && isLoaded) ? firewallRemoveNative(path) : false;
+        return (OSUtils.isWindows() && isLoaded) && firewallRemoveNative(path);
     }
 
     /**
