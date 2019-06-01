@@ -49,19 +49,22 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
      * A blank implementation of setValueAt, because it is not necessary.
      * @implements DataLine interface
      */
-    public void setValueAt(Object o, int col) { ; }
+    public void setValueAt(Object o, int col) {
+    }
 
     /**
      * A blank implementatino of cleanup, because it is not necessary.
      * @implements DataLine interface
      */
-    public void cleanup() { ; }
+    public void cleanup() {
+    }
 
     /**
      * A blank implementation of update, because it is not necessary.
      * @implements DataLine interface
      */
-    public void update() { ; }
+    public void update() {
+    }
 
     /**
      * By default, DataLines will have no tooltip.

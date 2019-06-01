@@ -29,7 +29,7 @@ public class SettingsGroupEvent {
         /**
          * The 'should save' state of the Settings changed
          */
-        SHOULD_SAVE;
+        SHOULD_SAVE
     }
     
     /**

@@ -61,7 +61,7 @@ MPlayerInstance
 		NONE,         // pass no pause prefix with the command
 		KEEP,         // pass the pausing_keep prefix
 		KEEP_FORCE    // pass the pausing_keep_force prefix
-	};
+	}
 
 	public MPlayerInstance() {
 	}

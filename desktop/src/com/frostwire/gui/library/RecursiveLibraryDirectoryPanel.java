@@ -670,5 +670,5 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
 
             return pathname.isDirectory() && !pathname.isHidden();
         }
-    };
+    }
 }

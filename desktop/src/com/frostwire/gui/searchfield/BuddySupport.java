@@ -10,9 +10,9 @@ import java.util.List;
 public class BuddySupport {
 	public enum Position {
 		LEFT, RIGHT
-	};
+	}
 
-	public static final String OUTER_MARGIN = "outerMargin";
+    public static final String OUTER_MARGIN = "outerMargin";
 
 	public static void addLeft(Component c, JTextField textField) {
 		add(c, Position.LEFT, textField);

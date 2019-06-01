@@ -76,9 +76,9 @@ public class JXSearchField extends JXTextField {
 		 * </p>
 		 */
 		MAC
-	};
+	}
 
-	/**
+    /**
 	 * Defines when action events are posted.
 	 */
 	public enum SearchMode {

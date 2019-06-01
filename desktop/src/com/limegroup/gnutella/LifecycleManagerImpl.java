@@ -31,7 +31,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
     
     private final CountDownLatch startLatch = new CountDownLatch(1);
     
-    private enum State { NONE, STARTING, STARTED, STOPPED };
+    private enum State { NONE, STARTING, STARTED, STOPPED }
 
     private final LimeCoreGlue limeCoreGlue;
     

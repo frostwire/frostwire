@@ -323,7 +323,7 @@ public class SortedListModel extends AbstractListModel<Object> {
     public enum SortOrder {
         UNORDERED,
         ASCENDING,
-        DESCENDING;
+        DESCENDING
     }
     
     class SortedListEntry  implements Comparable {

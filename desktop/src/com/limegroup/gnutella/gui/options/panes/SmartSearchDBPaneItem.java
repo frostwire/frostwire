@@ -59,7 +59,7 @@ public final class SmartSearchDBPaneItem extends AbstractPaneItem {
                         initOptions();
                     }
                 });
-            };
+            }
         });
 
         add(smartSearchEnabled);

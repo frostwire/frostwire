@@ -35,7 +35,7 @@ public class SettingEvent {
         /**
          * The value changed
          */
-        VALUE_CHANGED;
+        VALUE_CHANGED
     }
     
     private final EventType type;

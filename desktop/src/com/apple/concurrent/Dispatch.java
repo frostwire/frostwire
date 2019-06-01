@@ -47,9 +47,9 @@ public final class Dispatch {
 
                 final int nativePriority;
                 Priority(final int nativePriority) { this.nativePriority = nativePriority; }
-        };
+        }
 
-        final static Dispatch instance = new Dispatch();
+    final static Dispatch instance = new Dispatch();
 
         /**
          * Factory method returns an instnace of Dispatch if supported by the

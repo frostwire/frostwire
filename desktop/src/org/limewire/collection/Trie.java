@@ -149,7 +149,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      
         /** The mode during selection.      */
         enum SelectStatus {
-            EXIT, CONTINUE, REMOVE, REMOVE_AND_EXIT;
+            EXIT, CONTINUE, REMOVE, REMOVE_AND_EXIT
         }
     }
 }

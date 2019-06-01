@@ -42,7 +42,7 @@ public class SettingsGroupManagerEvent {
         /**
          * Fired when the should save flag was changed
          */
-        SHOULD_SAVE;
+        SHOULD_SAVE
     }
     
     private final EventType type;

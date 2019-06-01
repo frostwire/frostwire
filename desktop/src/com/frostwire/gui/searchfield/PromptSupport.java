@@ -71,9 +71,9 @@ public class PromptSupport {
 		 * Hide the prompt text.
 		 */
 		HIDE_PROMPT
-	};
+	}
 
-	/**
+    /**
 	 * <p>
 	 * Convenience method to set the <code>promptText</code> and
 	 * <code>promptTextColor</code> on a {@link JTextComponent}.
