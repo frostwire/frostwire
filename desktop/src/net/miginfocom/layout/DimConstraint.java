@@ -179,7 +179,7 @@ public final class DimConstraint implements Externalizable
 		if (isCols)
 			return UnitValue.LEADING;
 
-		return fill || PlatformDefaults.getDefaultRowAlignmentBaseline() == false ? UnitValue.CENTER : UnitValue.BASELINE_IDENTITY;
+		return fill || !PlatformDefaults.getDefaultRowAlignmentBaseline() ? UnitValue.CENTER : UnitValue.BASELINE_IDENTITY;
 	}
 
 	/** Returns the alignment used either as a default value for sub-entities or for this entity.
@@ -227,7 +227,7 @@ public final class DimConstraint implements Externalizable
 
 	boolean hasGapAfter()
 	{
-		return gapAfter != null && gapAfter.isUnset() == false;
+		return gapAfter != null && !gapAfter.isUnset();
 	}
 
 	boolean isGapAfterPush()
@@ -260,7 +260,7 @@ public final class DimConstraint implements Externalizable
 
 	boolean hasGapBefore()
 	{
-		return gapBefore != null && gapBefore.isUnset() == false;
+		return gapBefore != null && !gapBefore.isUnset();
 	}
 
 	boolean isGapBeforePush()

@@ -282,7 +282,7 @@ public final class PlatformDefaults
 	 */
 	public static void setHorizontalScaleFactor(Float f)
 	{
-		if (LayoutUtil.equals(horScale, f) == false) {
+		if (!LayoutUtil.equals(horScale, f)) {
 			horScale = f;
 			MOD_COUNT++;
 		}
@@ -309,7 +309,7 @@ public final class PlatformDefaults
 	 */
 	public static void setVerticalScaleFactor(Float f)
 	{
-		if (LayoutUtil.equals(verScale, f) == false) {
+		if (!LayoutUtil.equals(verScale, f)) {
 			verScale = f;
 			MOD_COUNT++;
 		}

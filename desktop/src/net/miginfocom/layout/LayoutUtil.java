@@ -139,7 +139,7 @@ public final class LayoutUtil
 		if (DT_MAP == null)
 			return HAS_BEANS && Beans.isDesignTime();
 
-		if (cw != null && DT_MAP.containsKey(cw.getComponent()) == false)
+		if (cw != null && !DT_MAP.containsKey(cw.getComponent()))
 			cw = null;
 
 		Boolean b = DT_MAP.get(cw != null ? cw.getComponent() : null);

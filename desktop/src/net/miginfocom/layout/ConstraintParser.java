@@ -660,7 +660,7 @@ public final class ConstraintParser
 					if (c2 == ' ' || (c2 == '2' && part.charAt(2) == ' ')) {
 						if (cc.getPos() == null) {
 							cc.setPos(new UnitValue[4]);
-						} else if (cc.isBoundsInGrid() == false) {
+						} else if (!cc.isBoundsInGrid()) {
 							throw new IllegalArgumentException("Cannot combine 'position' with 'x/y/x2/y2' keywords.");
 						}
 
@@ -890,7 +890,7 @@ public final class ConstraintParser
 	public static UnitValue[] parseInsets(String s, boolean acceptPanel)
 	{
 		if (s.length() == 0 || s.equals("dialog") || s.equals("panel")) {
-			if (acceptPanel == false)
+			if (!acceptPanel)
 				throw new IllegalAccessError("Insets now allowed: " + s + "\n");
 
 			boolean isPanel = s.startsWith("p");
@@ -1098,7 +1098,7 @@ public final class ConstraintParser
 		if (oper != UnitValue.STATIC) {  // It is a multi-value
 
 			String[] uvs;
-			if (inline == false) {   // If the format is of type "opr(xxx,yyy)" (compared to in-line "10%+15px")
+			if (!inline) {   // If the format is of type "opr(xxx,yyy)" (compared to in-line "10%+15px")
 				String sub = s.substring(4, s.length() - 1).trim();
 				uvs = toTrimmedTokens(sub, ',');
 				if (uvs.length == 1)

@@ -181,7 +181,7 @@ public final class Grid
 					cell.compWraps.add(cw);
 				}
 
-				if (rootCc.isBoundsInGrid() == false || rootCc.isExternal()) {
+				if (!rootCc.isBoundsInGrid() || rootCc.isExternal()) {
 					setLinkedBounds(comp, rootCc, comp.getX(), comp.getY(), comp.getWidth(), comp.getHeight(), rootCc.isExternal());
 					i++;
 					continue;
@@ -212,8 +212,8 @@ public final class Grid
 			// Move to a free y, x  if no absolute grid specified
 			int cx = rootCc.getCellX();
 			int cy = rootCc.getCellY();
-			if ((cx < 0 || cy < 0) && rowNoGrid == false && rootCc.getSkip() == 0) { // 3.7.2: If skip, don't find an empty cell first.
-				while (isCellFree(cellXY[1], cellXY[0], spannedRects) == false) {
+			if ((cx < 0 || cy < 0) && !rowNoGrid && rootCc.getSkip() == 0) { // 3.7.2: If skip, don't find an empty cell first.
+				while (!isCellFree(cellXY[1], cellXY[0], spannedRects)) {
 					if (Math.abs(increase(cellXY, 1)) >= wrap)
 						wrap(cellXY, null);
 				}
@@ -238,7 +238,7 @@ public final class Grid
 				do {
 					if (Math.abs(increase(cellXY, 1)) >= wrap)
 						wrap(cellXY, null);
-				} while (isCellFree(cellXY[1], cellXY[0], spannedRects) == false);
+				} while (!isCellFree(cellXY[1], cellXY[0], spannedRects));
 			}
 
 			// If cell is not created yet, create it and set it.
@@ -280,7 +280,7 @@ public final class Grid
 				hasPushY |= (visible || hideMode > 1) && (cc.getPushY() != null);
 
 				if (cc != rootCc) { // If not first in a cell
-					if (cc.isNewline() || cc.isBoundsInGrid() == false || cc.getDockSide() != -1)
+					if (cc.isNewline() || !cc.isBoundsInGrid() || cc.getDockSide() != -1)
 						break;
 
 					if (splitLeft > 0 && cc.getSkip() > 0) {
@@ -317,7 +317,7 @@ public final class Grid
 				}
 			}
 
-			if (wrapHandled == false && rowNoGrid == false) {
+			if (!wrapHandled && !rowNoGrid) {
 				int span = lc.isFlowX() ? cell.spanx : cell.spany;
 				if (Math.abs((lc.isFlowX() ? cellXY[0] : cellXY[1])) + span >= wrap) {
 					hitEndOfRow = true;
@@ -492,7 +492,7 @@ public final class Grid
 
 							if (j == 0) {
 								doAgain |= doAbsoluteCorrections(cw, bounds);
-								if (doAgain == false) { // If we are going to do this again, do not bother this time around
+								if (!doAgain) { // If we are going to do this again, do not bother this time around
 									if (cw.cc.getHorizontal().getEndGroup() != null)
 										endGrpXMap = addToEndGroup(endGrpXMap, cw.cc.getHorizontal().getEndGroup(), cw.x + cw.w);
 									if (cw.cc.getVertical().getEndGroup() != null)
@@ -557,7 +557,7 @@ public final class Grid
 			ArrayList<int[]> painted = new ArrayList<int[]>();
 			for (int i = 0, iSz = debugRects.size(); i < iSz; i++) {
 				int[] r = debugRects.get(i);
-				if (painted.contains(r) == false) {
+				if (!painted.contains(r)) {
 					container.paintDebugCell(r[0], r[1], r[2], r[3]);
 					painted.add(r);
 				}
@@ -749,7 +749,7 @@ public final class Grid
 		int[] flGap = new int[] {0, 0, LayoutUtil.NOT_SET};
 
 		for (Cell cell : cells) {
-			if (cell.hasTagged == false)
+			if (!cell.hasTagged)
 				continue;
 
 			CompWrap prevCW = null;
@@ -949,7 +949,7 @@ public final class Grid
 				if (linkTargetIDs != null)
 					doAgain |= setLinkedBounds(cw.comp, cw.cc, stSz[0], stSz[0], stSz[1], stSz[1], false);
 			}
-			if (doAgain == false)
+			if (!doAgain)
 				break;
 
 			// We need to check this again since the coords may be smaller this round.
@@ -1115,7 +1115,7 @@ public final class Grid
 		int refSize = isHor ? container.getWidth() : container.getHeight();
 
 		BoundSize cSz = isHor ? lc.getWidth() : lc.getHeight();
-		if (cSz.isUnset() == false)
+		if (!cSz.isUnset())
 			refSize = cSz.constrain(refSize, getParentSize(container, isHor), container);
 
 		DimConstraint[] primDCs = (isHor? colConstr : rowConstr).getConstaints();
@@ -1282,7 +1282,7 @@ public final class Grid
 
 			boolean push = i > 0 && compWraps.get(i - 1).isPushGap(isHor, false);
 
-			if (push == false && i < (barr.length - 1))
+			if (!push && i < (barr.length - 1))
 				push = compWraps.get(i).isPushGap(isHor, true);
 
 			barr[i] = push;
@@ -1455,7 +1455,7 @@ public final class Grid
 
 				boolean isPar = (cell.flowx == isRows);
 
-				if ((isPar == false && cell.compWraps.size() > 1) || span > 1) {
+				if ((!isPar && cell.compWraps.size() > 1) || span > 1) {
 
 					int linkType = isPar ? LinkedDimGroup.TYPE_PARALLEL : LinkedDimGroup.TYPE_SERIAL;
 					LinkedDimGroup lg = new LinkedDimGroup("p," + ix, span, linkType, !isRows, fromEnd);
@@ -1481,7 +1481,7 @@ public final class Grid
 						}
 
 						// If none found and at last add a new group.
-						if (foundList == false) {
+						if (!foundList) {
 							int linkType = isBaseline ? LinkedDimGroup.TYPE_BASELINE : LinkedDimGroup.TYPE_PARALLEL;
 							LinkedDimGroup lg = new LinkedDimGroup(linkCtx, 1, linkType, !isRows, fromEnd);
 							lg.addCompWrap(cw);

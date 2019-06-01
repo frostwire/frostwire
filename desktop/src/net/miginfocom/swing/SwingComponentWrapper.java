@@ -175,7 +175,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	public final int getMinimumHeight(int sz)
 	{
-		if (prefCalled == false) {
+		if (!prefCalled) {
 			c.getPreferredSize(); // To defeat a bug where the minimum size is different before and after the first call to getPreferredSize();
 			prefCalled = true;
 		}
@@ -184,7 +184,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	public final int getMinimumWidth(int sz)
 	{
-		if (prefCalled == false) {
+		if (!prefCalled) {
 			c.getPreferredSize(); // To defeat a bug where the minimum size is different before and after the first call to getPreferredSize();
 			prefCalled = true;
 		}
@@ -335,7 +335,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	public final void paintDebugOutline()
 	{
-		if (c.isShowing() == false)
+		if (!c.isShowing())
 			return;
 
 		Graphics2D g = (Graphics2D) c.getGraphics();
@@ -431,7 +431,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	public final boolean equals(Object o)
 	{
-		if (o instanceof ComponentWrapper == false)
+		if (!(o instanceof ComponentWrapper))
 			return false;
 
 		return getComponent().equals(((ComponentWrapper) o).getComponent());

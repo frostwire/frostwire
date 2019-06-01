@@ -297,7 +297,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 	{
 		Container parent = comp.getParent();
 		synchronized(parent != null ? parent.getTreeLock() : new Object()) { // 3.7.2. No sync if not added to a hierarchy. Defeats a NPE.
-			if (noCheck == false && scrConstrMap.containsKey(comp) == false)
+			if (!noCheck && !scrConstrMap.containsKey(comp))
 				throw new IllegalArgumentException("Component must already be added to parent!");
 
 			ComponentWrapper cw = new SwingComponentWrapper(comp);
@@ -435,8 +435,8 @@ public final class MigLayout implements LayoutManager2, Externalizable
 			lastModCount = mc;
 		}
 
-		if (parent.isValid() == false) {
-			if (lastWasInvalid == false) {
+		if (!parent.isValid()) {
+			if (!lastWasInvalid) {
 				lastWasInvalid = true;
 
 				int hash = 0;

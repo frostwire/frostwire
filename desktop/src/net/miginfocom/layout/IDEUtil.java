@@ -216,7 +216,7 @@ public class IDEUtil
 		int firstComma = sb.length();
 
 		BoundSize size = dc.getSize();
-		if (size.isUnset() == false) {
+		if (!size.isUnset()) {
 			if (asAPI) {
 				sb.append(".size(\"").append(getBS(size)).append("\")");
 			} else {
@@ -312,7 +312,7 @@ public class IDEUtil
 			}
 		}
 
-		if (asAPI == false) {
+		if (!asAPI) {
 			if (sb.length() > firstComma) {
 				sb.setCharAt(firstComma, '[');
 				sb.append(']');
@@ -341,7 +341,7 @@ public class IDEUtil
 			}
 		}
 
-		if (noGrowAdd == false) {
+		if (!noGrowAdd) {
 			Float gw = dc.getGrow();
 			if (gw != null) {
 				String g = gw != 100f ? floatToString(gw, asAPI) : "";
@@ -416,7 +416,7 @@ public class IDEUtil
 
 	private static void appendBoundSize(BoundSize size, StringBuffer sb, boolean isHor, boolean asAPI)
 	{
-		if (size.isUnset() == false) {
+		if (!size.isUnset()) {
 			if (size.getPreferred() == null) {
 				if (size.getMin() == null) {
 					if (asAPI) {
@@ -629,7 +629,7 @@ public class IDEUtil
 	{
 		StringBuffer sb = new StringBuffer(16);
 
-		if (lc.isFlowX() == false)
+		if (!lc.isFlowX())
 			sb.append(asAPI ? ".flowY()" : ",flowy");
 
 		boolean fillX = lc.isFillX();
@@ -664,7 +664,7 @@ public class IDEUtil
 			} else {
 				sb.append(",pack");
 				String size = getBS(lc.getPackWidth()) + " " + getBS(lc.getPackHeight());
-				if (size.equals("pref pref") == false)
+				if (!size.equals("pref pref"))
 					sb.append(' ').append(size);
 			}
 		}
@@ -677,7 +677,7 @@ public class IDEUtil
 			}
 		}
 
-		if (lc.isTopToBottom() == false)
+		if (!lc.isTopToBottom())
 			sb.append(asAPI ? ".bottomToTop()" : ",btt");
 
 		UnitValue[] insets = lc.getInsets();
@@ -701,7 +701,7 @@ public class IDEUtil
 		if (lc.isNoGrid())
 			sb.append(asAPI ? ".noGrid()" : ",nogrid");
 
-		if (lc.isVisualPadding() == false)
+		if (!lc.isVisualPadding())
 			sb.append(asAPI ? ".noVisualPadding()" : ",novisualpadding");
 
 		int hideMode = lc.getHideMode();

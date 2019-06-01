@@ -78,7 +78,7 @@ public final class SwingContainerWrapper extends SwingComponentWrapper implement
 	public final void paintDebugCell(int x, int y, int width, int height)
 	{
 		Component c = (Component) getComponent();
-		if (c.isShowing() == false)
+		if (!c.isShowing())
 			return;
 
 		Graphics2D g = (Graphics2D) c.getGraphics();

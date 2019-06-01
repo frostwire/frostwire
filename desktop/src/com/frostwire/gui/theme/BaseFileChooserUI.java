@@ -1166,7 +1166,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
                         found = true;
                     }
                 }
-                if(found == false) {
+                if(!found) {
                     getFileChooser().addChoosableFileFilter(currentFilter);
                 }
             }

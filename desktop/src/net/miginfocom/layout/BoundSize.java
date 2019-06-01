@@ -133,7 +133,7 @@ public class BoundSize implements Serializable
 	public boolean isUnset()
 	{
 		// Most common case by far is this == ZERO_PIXEL...
-		return this == ZERO_PIXEL || (pref == null && min == null && max == null && gapPush == false);
+		return this == ZERO_PIXEL || (pref == null && min == null && max == null && !gapPush);
 	}
 
 	/** Makes sure that <code>size</code> is within min and max of this size.

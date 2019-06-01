@@ -1010,7 +1010,7 @@ public final class CC implements Externalizable
 	 */
 	public final CC newline(String gapSize)
 	{
-		BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && flowX == false));
+		BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && !flowX));
 		if (bs != null) {
 			setNewlineGapSize(bs);
 		} else {
@@ -1042,7 +1042,7 @@ public final class CC implements Externalizable
 	 */
 	public final CC wrap(String gapSize)
 	{
-		BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && flowX == false));
+		BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && !flowX));
 		if (bs != null) {
 			setWrapGapSize(bs);
 		} else {
