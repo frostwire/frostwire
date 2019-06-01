@@ -775,12 +775,12 @@ public class CheckBoxList<E> extends BoxPanel {
             private static final long serialVersionUID = -7007164079207676831L;
             private Object lastValue;
             
-            public CustomEditorDelegate() {
+            CustomEditorDelegate() {
                 this.lastValue = this.value;
             }
             
             
-            public void notifyChange() {
+            void notifyChange() {
                 this.lastValue = null;
             }
             

@@ -44,7 +44,6 @@ public class JPEGImageIO {
      * @param in An InputStream in the JPEG File Interchange Format (JFIF). 
      * @return a BufferedImage containing the decoded image converted into the
      * RGB color space.
-     * @throws java.io.IOException
      */
     public static BufferedImage read(InputStream in) throws IOException {
         return read(in, true);
@@ -65,9 +64,6 @@ public class JPEGImageIO {
         // Extract metadata from the JFIF stream. 
         // --------------------------------------
         // In particular, we are interested into the following fields:
-        int samplePrecision = 0;
-        int numberOfLines = 0;
-        int numberOfSamplesPerLine = 0;
         int numberOfComponentsInFrame = 0;
         int app14AdobeColorTransform = 0;
         ByteArrayOutputStream app2ICCProfile = new ByteArrayOutputStream();
@@ -82,9 +78,6 @@ public class JPEGImageIO {
                     0xffcd <= seg.marker && seg.marker <= 0xffcf) {
                 // SOF0 - SOF15: Start of Frame Header marker segment
                 DataInputStream dis = new DataInputStream(fifi);
-                samplePrecision = dis.readUnsignedByte();
-                numberOfLines = dis.readUnsignedShort();
-                numberOfSamplesPerLine = dis.readUnsignedShort();
                 numberOfComponentsInFrame = dis.readUnsignedByte();
                 // ...the rest of SOF header is not important to us.
                 // In fact, by encounterint a SOF header, we have reached
@@ -182,11 +175,9 @@ public class JPEGImageIO {
      * File Interchange Format (JFIF).
      * @return a BufferedImage containing the decoded image converted into the
      * RGB color space.
-     * @throws java.io.IOException
      */
-    public static BufferedImage readImageFromYUVorGray(InputStream in) throws IOException {
-        BufferedImage img = (in instanceof ImageInputStream) ? ImageIO.read((ImageInputStream) in) : ImageIO.read(in);
-        return img;
+    private static BufferedImage readImageFromYUVorGray(InputStream in) throws IOException {
+        return (in instanceof ImageInputStream) ? ImageIO.read((ImageInputStream) in) : ImageIO.read(in);
     }
 
     /**
@@ -203,16 +194,14 @@ public class JPEGImageIO {
      * to the RGB color space. If this parameter is null, a default profile is used.
      * @return a BufferedImage containing the decoded image converted into the
      * RGB color space.
-     * @throws java.io.IOException
      */
-    public static BufferedImage readRGBImageFromCMYK(InputStream in, ICC_Profile cmykProfile) throws IOException {
-        ImageInputStream inputStream = null;
+    private static BufferedImage readRGBImageFromCMYK(InputStream in, ICC_Profile cmykProfile) throws IOException {
+        ImageInputStream inputStream;
         ImageReader reader = ImageIO.getImageReadersByFormatName("JPEG").next();
         inputStream = (in instanceof ImageInputStream) ? (ImageInputStream) in : ImageIO.createImageInputStream(in);
         reader.setInput(inputStream);
         Raster raster = reader.readRaster(0, null);
-        BufferedImage image = createRGBImageFromCMYK(raster, cmykProfile);
-        return image;
+        return createRGBImageFromCMYK(raster, cmykProfile);
     }
 
     /**
@@ -229,16 +218,14 @@ public class JPEGImageIO {
      * to the RGB color space. If this parameter is null, a default profile is used.
      * @return a BufferedImage containing the decoded image converted into the
      * RGB color space.
-     * @throws java.io.IOException
      */
-    public static BufferedImage readRGBImageFromYCCK(InputStream in, ICC_Profile cmykProfile) throws IOException {
-        ImageInputStream inputStream = null;
+    private static BufferedImage readRGBImageFromYCCK(InputStream in, ICC_Profile cmykProfile) throws IOException {
+        ImageInputStream inputStream;
         ImageReader reader = ImageIO.getImageReadersByFormatName("JPEG").next();
         inputStream = (in instanceof ImageInputStream) ? (ImageInputStream) in : ImageIO.createImageInputStream(in);
         reader.setInput(inputStream);
         Raster raster = reader.readRaster(0, null);
-        BufferedImage image = createRGBImageFromYCCK(raster, cmykProfile);
-        return image;
+        return createRGBImageFromYCCK(raster, cmykProfile);
     }
 
     /**
@@ -255,17 +242,15 @@ public class JPEGImageIO {
      * to the RGB color space. If this parameter is null, a default profile is used.
      * @return a BufferedImage containing the decoded image converted into the
      * RGB color space.
-     * @throws java.io.IOException
      */
-    public static BufferedImage readRGBImageFromInvertedYCCK(InputStream in, ICC_Profile cmykProfile) throws IOException {
-        ImageInputStream inputStream = null;
+    private static BufferedImage readRGBImageFromInvertedYCCK(InputStream in, ICC_Profile cmykProfile) throws IOException {
+        ImageInputStream inputStream;
         ImageReader reader = ImageIO.getImageReadersByFormatName("JPEG").next();
         inputStream = (in instanceof ImageInputStream) ? (ImageInputStream) in : ImageIO.createImageInputStream(in);
         reader.setInput(inputStream);
         Raster raster = reader.readRaster(0, null);
         raster = convertInvertedYCCKToCMYK(raster);
-        BufferedImage image = createRGBImageFromCMYK(raster, cmykProfile);
-        return image;
+        return createRGBImageFromCMYK(raster, cmykProfile);
     }
 
     /**
@@ -276,9 +261,8 @@ public class JPEGImageIO {
      * @param cmykProfile An ICC_Profile for conversion from the CMYK color space
      * to the RGB color space. If this parameter is null, a default profile is used.
      * @return a BufferedImage in the RGB color space.
-     * @throws NullPointerException.
      */
-    public static BufferedImage createRGBImageFromYCCK(Raster ycckRaster, ICC_Profile cmykProfile) {
+    private static BufferedImage createRGBImageFromYCCK(Raster ycckRaster, ICC_Profile cmykProfile) {
         BufferedImage image;
         if (cmykProfile != null) {
             ycckRaster = convertYCCKtoCMYK(ycckRaster);
@@ -303,59 +287,13 @@ public class JPEGImageIO {
                         (0xff & (vb < 0.0f ? 0 : vb > 255.0f ? 0xff : (int) (vb + 0.5f)));
             }
 
-            Raster rgbRaster = Raster.createPackedRaster(
+            WritableRaster rgbRaster = Raster.createPackedRaster(
                     new DataBufferInt(rgb, rgb.length),
                     w, h, w, new int[]{0xff0000, 0xff00, 0xff}, null);
             ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
             ColorModel cm = new DirectColorModel(cs, 24, 0xff0000, 0xff00, 0xff, 0x0, false, DataBuffer.TYPE_INT);
 
-            image = new BufferedImage(cm, (WritableRaster) rgbRaster, true, null);
-        }
-        return image;
-    }
-
-    /**
-     * Creates a buffered image from a raster in the inverted YCCK color space, 
-     * converting the colors to RGB using the provided CMYK ICC_Profile.
-     * 
-     * @param ycckRaster A raster with (at least) 4 bands of samples.
-     * @param cmykProfile An ICC_Profile for conversion from the CMYK color space
-     * to the RGB color space. If this parameter is null, a default profile is used.
-     * @return a BufferedImage in the RGB color space.
-     */
-    public static BufferedImage createRGBImageFromInvertedYCCK(Raster ycckRaster, ICC_Profile cmykProfile) {
-        BufferedImage image;
-        if (cmykProfile != null) {
-            ycckRaster = convertInvertedYCCKToCMYK(ycckRaster);
-            image = createRGBImageFromCMYK(ycckRaster, cmykProfile);
-        } else {
-            int w = ycckRaster.getWidth(), h = ycckRaster.getHeight();
-            int[] rgb = new int[w * h];
-
-            //PixelInterleavedSampleModel pix;
-            // if (Adobe_APP14 and transform==2) then YCCK else CMYK                                                                                    
-            int[] Y = ycckRaster.getSamples(0, 0, w, h, 0, (int[]) null);
-            int[] Cb = ycckRaster.getSamples(0, 0, w, h, 1, (int[]) null);
-            int[] Cr = ycckRaster.getSamples(0, 0, w, h, 2, (int[]) null);
-            int[] K = ycckRaster.getSamples(0, 0, w, h, 3, (int[]) null);
-            float vr, vg, vb;
-            for (int i = 0, imax = Y.length; i < imax; i++) {
-                float k = 255 - K[i], y = 255 - Y[i], cb = 255 - Cb[i], cr = 255 - Cr[i];
-                vr = y + 1.402f * (cr - 128) - k;
-                vg = y - 0.34414f * (cb - 128) - 0.71414f * (cr - 128) - k;
-                vb = y + 1.772f * (cb - 128) - k;
-                rgb[i] = (0xff & (vr < 0.0f ? 0 : vr > 255.0f ? 0xff : (int) (vr + 0.5f))) << 16 |
-                        (0xff & (vg < 0.0f ? 0 : vg > 255.0f ? 0xff : (int) (vg + 0.5f))) << 8 |
-                        (0xff & (vb < 0.0f ? 0 : vb > 255.0f ? 0xff : (int) (vb + 0.5f)));
-            }
-
-            Raster rgbRaster = Raster.createPackedRaster(
-                    new DataBufferInt(rgb, rgb.length),
-                    w, h, w, new int[]{0xff0000, 0xff00, 0xff}, null);
-            ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-            ColorModel cm = new DirectColorModel(cs, 24, 0xff0000, 0xff00, 0xff, 0x0, false, DataBuffer.TYPE_INT);
-
-            image = new BufferedImage(cm, (WritableRaster) rgbRaster, true, null);
+            image = new BufferedImage(cm, rgbRaster, true, null);
         }
         return image;
     }
@@ -372,7 +310,7 @@ public class JPEGImageIO {
      * to the RGB color space. If this parameter is null, a default profile is used.
      * @return a BufferedImage in the RGB color space.
      */
-    public static BufferedImage createRGBImageFromCMYK(Raster cmykRaster, ICC_Profile cmykProfile) {
+    private static BufferedImage createRGBImageFromCMYK(Raster cmykRaster, ICC_Profile cmykProfile) {
         BufferedImage image;
         int w = cmykRaster.getWidth();
         int h = cmykRaster.getHeight();
@@ -401,12 +339,12 @@ public class JPEGImageIO {
                         (255 - Math.min(255, Y[i] + k));
             }
 
-            Raster rgbRaster = Raster.createPackedRaster(
+            WritableRaster rgbRaster = Raster.createPackedRaster(
                     new DataBufferInt(rgb, rgb.length),
                     w, h, w, new int[]{0xff0000, 0xff00, 0xff}, null);
             ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
             ColorModel cm = new DirectColorModel(cs, 24, 0xff0000, 0xff00, 0xff, 0x0, false, DataBuffer.TYPE_INT);
-            image = new BufferedImage(cm, (WritableRaster) rgbRaster, true, null);
+            image = new BufferedImage(cm, rgbRaster, true, null);
         }
         return image;
     }
@@ -477,10 +415,9 @@ public class JPEGImageIO {
                     255 - ycckK[i];
         }
 
-        Raster cmykRaster = Raster.createPackedRaster(
+        return Raster.createPackedRaster(
                 new DataBufferInt(cmyk, cmyk.length),
                 w, h, w, new int[]{0xff000000, 0xff0000, 0xff00, 0xff}, null);
-        return cmykRaster;
 
     }
 
