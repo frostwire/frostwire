@@ -22,6 +22,7 @@ import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
+import org.apache.commons.io.FilenameUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +58,8 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         displayName = matcher.group("displayname");
         hash = parseHash(matcher.group("magneturl"));
         creationTime = Long.valueOf(matcher.group("timestamp"));
-        fileName = matcher.group("displayname");
+        String extension = FilenameUtils.getExtension(displayName);
+        fileName = displayName + ((extension.isEmpty()) ? ".torrent" : extension);
         torrentUrl = urlPrefix + matcher.group("torrenturl");
         seeds = Integer.parseInt(matcher.group("seeds"));
         fileSize = parseSize(matcher.group("filesize"));
