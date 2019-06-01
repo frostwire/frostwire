@@ -13,7 +13,7 @@ public interface FileIconController {
      * @param f
      * @return
      */
-    public Icon getIconForFile(File f);
+    Icon getIconForFile(File f);
     
     /**
      * Retrieves the icon for a given extension.
@@ -24,7 +24,7 @@ public interface FileIconController {
      * @param ext
      * @return
      */
-    public Icon getIconForExtension(String ext);
+    Icon getIconForExtension(String ext);
     
     /**
      * Returns true if the controller thinks it can return the icon
@@ -33,10 +33,10 @@ public interface FileIconController {
      * @param f
      * @return
      */
-    public boolean isIconForFileAvailable(File f);
+    boolean isIconForFileAvailable(File f);
     
     /**
      * Determines if this FileIconController is valid.
      */
-    public boolean isValid();
+    boolean isValid();
 }

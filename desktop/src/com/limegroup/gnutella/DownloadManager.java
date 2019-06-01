@@ -38,5 +38,5 @@ public interface DownloadManager {
      * Performs the slow, low-priority initialization tasks: reading in
      * snapshots and scheduling snapshot checkpointing.
      */
-    public void loadSavedDownloadsAndScheduleWriting();
+    void loadSavedDownloadsAndScheduleWriting();
 }

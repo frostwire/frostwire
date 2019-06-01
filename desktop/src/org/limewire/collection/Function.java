@@ -7,5 +7,5 @@ package org.limewire.collection;
 public interface Function<I, O> {
     
     /**  Applies this function to argument, returning the result. */
-    public O apply(I argument);
+    O apply(I argument);
 }

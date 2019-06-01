@@ -2006,18 +2006,18 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     // This interface is used to access methods in the FileChooserUI
     // that are not public.
     public interface FileChooserUIAccessor {
-        public JFileChooser getFileChooser();
-        public BasicDirectoryModel getModel();
-        public JPanel createList();
-        public JPanel createDetailsView();
-        public boolean isDirectorySelected();
-        public File getDirectory();
-        public Action getApproveSelectionAction();
-        public Action getChangeToParentDirectoryAction();
-        public Action getNewFolderAction();
-        public MouseListener createDoubleClickListener(JList<Object> list);
-        public ListSelectionListener createListSelectionListener();
-        public boolean usesShellFolder();
+        JFileChooser getFileChooser();
+        BasicDirectoryModel getModel();
+        JPanel createList();
+        JPanel createDetailsView();
+        boolean isDirectorySelected();
+        File getDirectory();
+        Action getApproveSelectionAction();
+        Action getChangeToParentDirectoryAction();
+        Action getNewFolderAction();
+        MouseListener createDoubleClickListener(JList<Object> list);
+        ListSelectionListener createListSelectionListener();
+        boolean usesShellFolder();
     }
     
     /**

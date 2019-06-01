@@ -955,9 +955,9 @@ MPlayerInstance
 	protected interface
 	OutputConsumer
 	{
-		public void
+		void
 		consume(
-			String		output );
+                String output);
 	}
 
     public void doGetProperties(String fileOrUrl, final OutputConsumer _outputConsumer) {

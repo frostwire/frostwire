@@ -184,6 +184,6 @@ public class ImageCache {
         /**
          * This is called in the event that the image was downloaded and cached
          */
-        public void onLoaded(URL url, BufferedImage image, boolean fromCache, boolean fail);
+        void onLoaded(URL url, BufferedImage image, boolean fromCache, boolean fail);
     }
 }

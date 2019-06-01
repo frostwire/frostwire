@@ -11,5 +11,5 @@ public interface LazyFileTransfer {
     /**
      * Retrieve an object which can construct the file when necessary.
      */
-    public FileTransfer getFileTransfer();
+    FileTransfer getFileTransfer();
 }

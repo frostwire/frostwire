@@ -9,34 +9,34 @@ package com.limegroup.gnutella.gui.tables;
      * Reverts this table's header preferences to their default
      * values.
      */
-    public void revertToDefault();
+    void revertToDefault();
     
     /**
      * Determines whether or not the columns are already their default values.
      */
-    public boolean isDefault();
+    boolean isDefault();
 
     /**
      * Sets the headers to the correct widths, depending on
      * the user's preferences for this table.
      */
-    public void setWidths();
+    void setWidths();
 
     /**
      * Sets the headers to the correct order, depending on the
      * user's preferences for this table.
      */
-    public void setOrder();
+    void setOrder();
 
     /**
      * Sets the headers so that some may be invisible, depending
      * on the user's preferences for this table.
      */
-    public void setVisibility();
+    void setVisibility();
     
     /**
      * Sets the single SimpleColumnListener callback.
      */
-    public void setSimpleColumnListener(SimpleColumnListener scl);
+    void setSimpleColumnListener(SimpleColumnListener scl);
     
 }

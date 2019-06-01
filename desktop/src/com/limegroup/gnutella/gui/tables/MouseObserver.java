@@ -7,20 +7,20 @@ import java.awt.event.MouseEvent;
  */
 public interface MouseObserver {
     
-    public void handleMouseClick(MouseEvent e);
+    void handleMouseClick(MouseEvent e);
     
     /**
      * Handles when the mouse is double-clicked.
      */
-    public void handleMouseDoubleClick(MouseEvent e);
+    void handleMouseDoubleClick(MouseEvent e);
     
     /**
      * Handles a right-mouse click.
      */
-    public void handleRightMouseClick(MouseEvent e);
+    void handleRightMouseClick(MouseEvent e);
     
     /**
      * Handles a trigger to the popup menu.
      */
-    public void handlePopupMenu(MouseEvent e);
+    void handlePopupMenu(MouseEvent e);
 }    

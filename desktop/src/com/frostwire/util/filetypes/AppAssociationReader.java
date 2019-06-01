@@ -36,7 +36,7 @@ public interface AppAssociationReader {
      * @param mimeType Given mime type
      * @return String
      */
-    public abstract String getDescriptionByMimeType(String mimeType);
+    String getDescriptionByMimeType(String mimeType);
   
     /**
      * Returns the description associated with the given file extension.
@@ -44,7 +44,7 @@ public interface AppAssociationReader {
      * @param fileExt Given file extension
      * @return String
     */
-    public abstract String getDescriptionByFileExt(String fileExt);
+    String getDescriptionByFileExt(String fileExt);
 
     /**
      * Returns the mime type associated with the given URL, by checking the content of 
@@ -53,7 +53,7 @@ public interface AppAssociationReader {
      * @param url The specified URL
      * @return String
      */
-    public abstract String getMimeTypeByURL(URL url);
+    String getMimeTypeByURL(URL url);
 
     /**
      * Returns the file extensione list associated with the given mime type.
@@ -61,7 +61,7 @@ public interface AppAssociationReader {
      * @param mimeType Given mime type
      * @return String
      */
-    public abstract List<String> getFileExtListByMimeType(String mimeType);
+    List<String> getFileExtListByMimeType(String mimeType);
   
     /**
      * Returns the mime type associated with the given file extension.
@@ -69,7 +69,7 @@ public interface AppAssociationReader {
      * @param fileExt Given file extension
      * @return String
      */
-    public abstract String getMimeTypeByFileExt(String fileExt);
+    String getMimeTypeByFileExt(String fileExt);
   
     /**
      * Returns the icon file name associated with the given mime type.
@@ -77,7 +77,7 @@ public interface AppAssociationReader {
      * @param mimeType Given mime type.
      * @return icon file name
      */
-    public abstract String getIconFileNameByMimeType(String mimeType);
+    String getIconFileNameByMimeType(String mimeType);
   
     /**
      * Returns the icon file name associated with the given file extension.
@@ -85,7 +85,7 @@ public interface AppAssociationReader {
      * @param fileExt Given file extension.
      * @return icon file name
      */
-    public abstract String getIconFileNameByFileExt(String fileExt);
+    String getIconFileNameByFileExt(String fileExt);
  
     /**
      * Returns the action list associated with the given file extension.
@@ -93,7 +93,7 @@ public interface AppAssociationReader {
      * @param fileExt Given file extension
      * @return the action list
      */
-    public abstract List<Action> getActionListByFileExt(String fileExt);
+    List<Action> getActionListByFileExt(String fileExt);
 
     /**
      * Returns the action list associated with the given mime type.
@@ -101,7 +101,7 @@ public interface AppAssociationReader {
      * @param mimeType Given mime type
      * @return the action list
      */
-    public abstract List<Action> getActionListByMimeType(String mimeType);
+    List<Action> getActionListByMimeType(String mimeType);
     
     /**
      * Returns true if the mime type exists in the system.
@@ -109,7 +109,7 @@ public interface AppAssociationReader {
      * @param mimeType given mimeType
      * @return true if the mime type exists in the system
      */
-    public boolean isMimeTypeExist(String mimeType);
+    boolean isMimeTypeExist(String mimeType);
 
     /**
      * Returns true if the file extension exists in the system.
@@ -117,5 +117,5 @@ public interface AppAssociationReader {
      * @param fileExt given file extension 
      * @return true if the file extension exists in the system
      */
-	public boolean isFileExtExist(String fileExt);
+    boolean isFileExtExist(String fileExt);
 }

@@ -11,5 +11,5 @@ public interface SettingsGroupListener {
     /**
      * Invoked when a {@link SettingsGroup} instance changed its state
      */
-    public void settingsGroupChanged(SettingsGroupEvent evt);
+    void settingsGroupChanged(SettingsGroupEvent evt);
 }

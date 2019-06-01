@@ -22,7 +22,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * 'LimeRadio', 'Lax', 'Later', 'Lake', and 'Lovely', then
      * a lookup of 'Lime' would return 'Lime', 'LimeRadio', and 'LimeWire'.
      */
-    public SortedMap<K, V> getPrefixedBy(K key);
+    SortedMap<K, V> getPrefixedBy(K key);
     
     /**
      * Returns a view of this Trie of all elements that are
@@ -36,7 +36,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * a lookup of 'LimePlastics' with a length of 4 would
      * return 'Lime', 'LimeRadio', and 'LimeWire'.
      */
-    public SortedMap<K, V> getPrefixedBy(K key, int length);
+    SortedMap<K, V> getPrefixedBy(K key, int length);
     
     /**
      * Returns a view of this Trie of all elements that are prefixed
@@ -50,7 +50,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * a lookup of 'The Lime Plastics' with an offset of 4 and a 
      * length of 4 would return 'Lime', 'LimeRadio', and 'LimeWire'.
      */
-    public SortedMap<K, V> getPrefixedBy(K key, int offset, int length);
+    SortedMap<K, V> getPrefixedBy(K key, int offset, int length);
     
     /**
      * Returns a view of this Trie of all elements that are prefixed
@@ -62,7 +62,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * '192.168' by providing the key '192.168.X.X' and a length of 16
      * would return all addresses that begin with '192.168'.
      */
-    public SortedMap<K, V> getPrefixedByBits(K key, int bitLength);
+    SortedMap<K, V> getPrefixedByBits(K key, int bitLength);
     
     /**
      * Returns the value for the entry whose key is closest in a bitwise
@@ -76,7 +76,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * because the XOR distance between D & L is smaller than the XOR distance 
      * between D & H. 
      */
-    public V select(K key);
+    V select(K key);
     
     /**
      * Iterates through the Trie, starting with the entry whose bitwise
@@ -95,7 +95,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * @return The entry the cursor returned EXIT on, or null if it continued
      *         till the end.
      */
-    public Map.Entry<K,V> select(K key, Cursor<? super K, ? super V> cursor);
+    Map.Entry<K,V> select(K key, Cursor<? super K, ? super V> cursor);
     
     /**
      * Traverses the Trie in lexicographical order. <code>Cursor.select</code> 
@@ -110,7 +110,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * @return The entry the cursor returned EXIT on, or null if it continued
      *         till the end.
      */
-    public Map.Entry<K,V> traverse(Cursor<? super K, ? super V> cursor);
+    Map.Entry<K,V> traverse(Cursor<? super K, ? super V> cursor);
     
     /**
      * An interface used by a {@link Trie}. A {@link Trie} selects items by 
@@ -134,7 +134,7 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * @param <K> Key Type
      * @param <V> Key Value
      */
-    public static interface Cursor<K, V> {
+    interface Cursor<K, V> {
         
         /**
          * Notification that the Trie is currently looking at the given entry.
@@ -145,10 +145,10 @@ public interface Trie<K, V> extends SortedMap<K, V> {
          * Not all operations support <code>REMOVE</code>.
          * 
          */
-        public SelectStatus select(Map.Entry<? extends K, ? extends V> entry);
+        SelectStatus select(Map.Entry<? extends K, ? extends V> entry);
      
         /** The mode during selection.      */
-        public enum SelectStatus {
+        enum SelectStatus {
             EXIT, CONTINUE, REMOVE, REMOVE_AND_EXIT;
         }
     }

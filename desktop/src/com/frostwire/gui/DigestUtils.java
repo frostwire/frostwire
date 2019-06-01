@@ -120,7 +120,7 @@ public class DigestUtils {
     }
 
     public interface DigestProgressListener {
-        public void onProgress(int progressPercentage);
-        public boolean stopDigesting();
+        void onProgress(int progressPercentage);
+        boolean stopDigesting();
     }
 }

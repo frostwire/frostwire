@@ -27,5 +27,5 @@ public interface FileTransfer {
      * Null means no file availabe.  A folder means
      * all sub-files available.  A file means that file only.
      */
-    public File getFile();
+    File getFile();
 }

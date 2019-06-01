@@ -29,7 +29,7 @@ public interface AutoCompleteDictionary extends Iterable<String> {
      *
      * @param s The string to add to the dictionary.
      */
-    public void addEntry(String s);
+    void addEntry(String s);
 
     /**
      * Removes an entry from the dictionary.
@@ -38,7 +38,7 @@ public interface AutoCompleteDictionary extends Iterable<String> {
      * @return True if successful, false if the string is not contained or cannot
      *         be removed.
      */
-    public boolean removeEntry(String s);
+    boolean removeEntry(String s);
 
     /**
      * Perform a lookup and returns the closest matching string to the passed
@@ -49,22 +49,22 @@ public interface AutoCompleteDictionary extends Iterable<String> {
      *          Typically, the closest matching string that completely contains
      *          the given string is returned.
      */
-    public String lookup(String s);
+    String lookup(String s);
 
     /**
      * Returns all available entries in dictionary
      *
      */
-    public Iterator<String> iterator();
+    Iterator<String> iterator();
 
     /**
      * Returns an iterator of potential matches from the given string.
      *
      */
-    public Iterator<String> iterator(String s);
+    Iterator<String> iterator(String s);
     
     /**
      * Clears the dictionary.
      */
-    public void clear();
+    void clear();
 }

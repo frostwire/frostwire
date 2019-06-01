@@ -34,9 +34,9 @@ public interface AppAssociationWriter {
     /** 
      * Constants for the registration/unregistration level.
      */
-    public final static int USER_LEVEL = AppConstants.USER_LEVEL;
-    public final static int SYSTEM_LEVEL = AppConstants.SYSTEM_LEVEL;
-    public final static int DEFAULT_LEVEL = AppConstants.DEFAULT_LEVEL;
+    int USER_LEVEL = AppConstants.USER_LEVEL;
+    int SYSTEM_LEVEL = AppConstants.SYSTEM_LEVEL;
+    int DEFAULT_LEVEL = AppConstants.DEFAULT_LEVEL;
 
     /**
      * Checks whether the given assocation is valid for registration according to 
@@ -45,7 +45,7 @@ public interface AppAssociationWriter {
      * @param assoc a given Association object.
      * @throws IllegalArgumentException if the given association is not valid for registration. 
      */
-    public void checkAssociationValidForRegistration(Association assoc) 
+    void checkAssociationValidForRegistration(Association assoc)
         throws IllegalArgumentException;  
 
     /**
@@ -55,7 +55,7 @@ public interface AppAssociationWriter {
      * @param assoc a given Association object.
      * @throws IllegalArgumentException if the given association is not valid for unregistration.
      */
-    public void checkAssociationValidForUnregistration(Association assoc) 
+    void checkAssociationValidForUnregistration(Association assoc)
         throws IllegalArgumentException;
     
     /**
@@ -65,7 +65,7 @@ public interface AppAssociationWriter {
      * @param level a given MIME database level.
      * @return true if the given Association already exists in the specified MIME database.
      */
-    public boolean isAssociationExist(Association assoc, int level);
+    boolean isAssociationExist(Association assoc, int level);
 
     /**
      * Registers the given association within specified level. 
@@ -76,7 +76,7 @@ public interface AppAssociationWriter {
      *         been registered in the system.
      * @throws RegisterFailedException if the given association fails to be registered.
      */
-    public void registerAssociation(Association assoc, int level) 
+    void registerAssociation(Association assoc, int level)
             throws AssociationAlreadyRegisteredException, RegisterFailedException;
 
     /**
@@ -88,6 +88,6 @@ public interface AppAssociationWriter {
      *         registered before.
      * @throws RegisterFailedException if the given association fails to be unregistered.   
      */
-    public void unregisterAssociation(Association assoc, int level) 
+    void unregisterAssociation(Association assoc, int level)
             throws AssociationNotRegisteredException, RegisterFailedException;
 }

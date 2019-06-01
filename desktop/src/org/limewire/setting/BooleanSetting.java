@@ -16,19 +16,19 @@ public interface BooleanSetting extends Setting, Switch {
      * 
      * @return the value of this setting
      */
-    public abstract boolean getValue();
+    boolean getValue();
 
     /**
      * Mutator for this setting.
      *
      * @param bool the <tt>boolean</tt> to store
      */
-    public abstract void setValue(boolean bool);
+    void setValue(boolean bool);
 
     /**
      * Inverts the value of this setting.  If it was true,
      * sets it to false and vice versa.
      */
-    public abstract void invert();
+    void invert();
 
 }

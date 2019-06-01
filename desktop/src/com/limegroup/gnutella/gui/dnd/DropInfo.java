@@ -10,8 +10,8 @@ import java.awt.datatransfer.Transferable;
  *       of their DropSupport class.
  */
 public interface DropInfo {
-    public Transferable getTransferable();
-    public int getDropAction();
-    public void setDropAction(int newAction);
-    public Point getPoint();
+    Transferable getTransferable();
+    int getDropAction();
+    void setDropAction(int newAction);
+    Point getPoint();
 }

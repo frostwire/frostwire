@@ -26,7 +26,7 @@ public class StoreSaveTemplateProcessor {
     public final static String ALBUM_LABEL = "album";
     public final static String HOME_LABEL = "home";
     
-    private static interface States {
+    private interface States {
         int LOOKING_FOR_DOLLAR = 0;
 
         int HAVE_DOLLAR = 1;

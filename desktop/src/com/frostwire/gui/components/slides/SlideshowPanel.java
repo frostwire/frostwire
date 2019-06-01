@@ -28,19 +28,19 @@ import javax.swing.*;
  */
 public interface SlideshowPanel {
 
-    public void setListener(SlideshowListener listener);
+    void setListener(SlideshowListener listener);
 
-    public int getCurrentSlideIndex();
+    int getCurrentSlideIndex();
 
-    public void switchToSlide(int slideIndex);
+    void switchToSlide(int slideIndex);
 
-    public int getNumSlides();
+    int getNumSlides();
 
-    public void setVisible(boolean visible);
+    void setVisible(boolean visible);
 
-    public void setupContainerAndControls(JPanel container, boolean useControls);
+    void setupContainerAndControls(JPanel container, boolean useControls);
 
-    public interface SlideshowListener {
-        public void onSlideChanged();
+    interface SlideshowListener {
+        void onSlideChanged();
     }
 }

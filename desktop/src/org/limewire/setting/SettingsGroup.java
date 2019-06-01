@@ -15,36 +15,36 @@ public interface SettingsGroup {
     /**
      * Loads Settings from disk
      */
-    public abstract void reload();
+    void reload();
 
     /**
      * Saves the current Settings to disk
      */
-    public abstract boolean save();
+    boolean save();
 
     /**
      * Reverts all Settings to their default values
      */
-    public abstract boolean revertToDefault();
+    boolean revertToDefault();
 
     /**
      * Adds the given {@link SettingsGroupListener}
      */
-    public abstract void addSettingsGroupListener(SettingsGroupListener l);
+    void addSettingsGroupListener(SettingsGroupListener l);
 
     /**
      * Removes the given {@link SettingsGroupListener}
      */
-    public abstract void removeSettingsGroupListener(SettingsGroupListener l);
+    void removeSettingsGroupListener(SettingsGroupListener l);
 
     /**
      * Sets whether or not all Settings should be saved
      */
-    public abstract void setShouldSave(boolean shouldSave);
+    void setShouldSave(boolean shouldSave);
 
     /** 
      * Access for shouldSave
      */
-    public abstract boolean getShouldSave();
+    boolean getShouldSave();
 
 }

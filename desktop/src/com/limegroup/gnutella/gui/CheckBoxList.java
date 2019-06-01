@@ -951,16 +951,16 @@ public class CheckBoxList<E> extends BoxPanel {
      * Defines the listener to notify item a change in list selection
      *  if select first mode is enabled
      */
-    public static interface CheckBoxListSelectionListener {
-        public void valueChanged(CheckBoxListSelectionEvent e);        
+    public interface CheckBoxListSelectionListener {
+        void valueChanged(CheckBoxListSelectionEvent e);
     }
         
     /**
      * Defines the listener to notify item check/uncheck
      *  events in the list
      */
-    public static interface CheckBoxListCheckChangeListener<E> {
-        public void valueChanged(CheckBoxListCheckChangeEvent<E> e);        
+    public interface CheckBoxListCheckChangeListener<E> {
+        void valueChanged(CheckBoxListCheckChangeEvent<E> e);
     }
     
     /** 

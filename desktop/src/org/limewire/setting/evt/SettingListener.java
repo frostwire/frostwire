@@ -10,5 +10,5 @@ public interface SettingListener {
     /**
      * Invoked when a {@link AbstractSetting} changed its state
      */
-    public void settingChanged(SettingEvent evt);
+    void settingChanged(SettingEvent evt);
 }

@@ -4,51 +4,51 @@ import java.util.Map;
 
 public interface MediaPlayer {
 
-    public void open(String fileOrUrl, int initialVolume);
+    void open(String fileOrUrl, int initialVolume);
 
-    public void seek(float time);
+    void seek(float time);
 
-    public void setVolume(int volume);
+    void setVolume(int volume);
 
-    public void pause();
+    void pause();
 
-    public void play();
+    void play();
 
-    public void stop();
+    void stop();
 
-    public void togglePause();
+    void togglePause();
 
-    public void mute(boolean on);
+    void mute(boolean on);
 
-    public void addMetaDataListener(MetaDataListener listener);
+    void addMetaDataListener(MetaDataListener listener);
 
-    public void removeMetaDataListener(MetaDataListener listener);
+    void removeMetaDataListener(MetaDataListener listener);
 
-    public void addStateListener(StateListener listener);
+    void addStateListener(StateListener listener);
 
-    public void removeStateListener(StateListener listener);
+    void removeStateListener(StateListener listener);
 
-    public void addVolumeListener(VolumeListener listener);
+    void addVolumeListener(VolumeListener listener);
 
-    public void removeVolumeListener(VolumeListener listener);
+    void removeVolumeListener(VolumeListener listener);
 
-    public void addPositionListener(PositionListener listener);
+    void addPositionListener(PositionListener listener);
 
-    public void removePositionListener(PositionListener listener);
+    void removePositionListener(PositionListener listener);
 
-    public void addTaskListener(TaskListener listener);
+    void addTaskListener(TaskListener listener);
 
-    public void removeTaskListener(TaskListener listener);
+    void removeTaskListener(TaskListener listener);
 
-    public String getOpenedFile();
+    String getOpenedFile();
 
-    public int getVolume();
+    int getVolume();
 
-    public float getPositionInSecs();
+    float getPositionInSecs();
 
-    public float getDurationInSecs();
+    float getDurationInSecs();
 
-    public MediaPlaybackState getCurrentState();
+    MediaPlaybackState getCurrentState();
 
-    public Map<String, String> getProperties(String fileOrUrl);
+    Map<String, String> getProperties(String fileOrUrl);
 }
