@@ -412,10 +412,8 @@ public class SearchField extends JXSearchField {
                 }
                 break;
             case KeyEvent.KEY_TYPED:
-                switch (evt.getKeyChar()) {
-                case KeyEvent.VK_ENTER:
-                    break;
-                default:
+                if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+                } else {
                     autoCompleteInput();
                 }
             }

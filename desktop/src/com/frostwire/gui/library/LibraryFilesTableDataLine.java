@@ -273,12 +273,10 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
 
     public boolean isClippable(int idx) {
-        switch (idx) {
-            case ICON_IDX:
-                return false;
-            default:
-                return true;
+        if (idx == ICON_IDX) {
+            return false;
         }
+        return true;
     }
 
     public int getTypeAheadColumn() {

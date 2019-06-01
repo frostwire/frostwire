@@ -37,11 +37,7 @@ public final class SkinMenuItemBackgroundPainter extends AbstractSkinPainter {
 
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
-        switch (state) {
-        default:
-            paintBackground(g, width, height);
-            break;
-        }
+        paintBackground(g, width, height);
     }
 
     private void paintBackground(Graphics2D g, int width, int height) {

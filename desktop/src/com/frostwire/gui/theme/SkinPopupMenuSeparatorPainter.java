@@ -37,12 +37,8 @@ public final class SkinPopupMenuSeparatorPainter extends AbstractSkinPainter {
 
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
-        switch (state) {
-        default:
-            g.setPaint(ThemeMediator.LIGHT_BORDER_COLOR);
-            g.drawLine(0, 0, width, 0);
-            break;
-        }
+        g.setPaint(ThemeMediator.LIGHT_BORDER_COLOR);
+        g.drawLine(0, 0, width, 0);
     }
 
     public enum State {
