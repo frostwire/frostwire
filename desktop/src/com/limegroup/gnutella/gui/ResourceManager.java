@@ -184,7 +184,7 @@ public final class ResourceManager {
      * This tries, in order, the exact location, the location as a png, and the
      * location as a gif.
      */
-    private static final ImageIcon getImageFromURL(String location, boolean file) {
+    private static ImageIcon getImageFromURL(String location, boolean file) {
         // try exact filename first.
         URL img = toURL(location, file);
         if (img != null)

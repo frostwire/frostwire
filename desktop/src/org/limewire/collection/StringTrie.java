@@ -138,8 +138,8 @@ public class StringTrie<V> {
      *
      * @requires 0 &lt;= startOffset &lt;= stopOffset &lt;= a.length()
      */
-    private final int match(String a, int startOffset, int stopOffset,
-                            String b) {
+    private int match(String a, int startOffset, int stopOffset,
+                      String b) {
         //j is an index into b
         //i is a parallel index into a
         int i = startOffset;
@@ -583,7 +583,7 @@ final class TrieNode<E> {
      *
      * @requires 0 &lt;= i &lt; children.size()
      */
-    private final TrieEdge<E> get(int i) {
+    private TrieEdge<E> get(int i) {
         return children.get(i);
     }
 
@@ -624,7 +624,7 @@ final class TrieNode<E> {
      *           middle = 1, cmiddle == 'c', cmiddle < c, low = 2 (high == 1);
      *           end loop; return high == 1 (no match, insert at 2).
      */
-    private final int search(char c, boolean exact) {
+    private int search(char c, boolean exact) {
         // This code is stolen from IntSet.search.
         int low = 0;
         int high = children.size() - 1;

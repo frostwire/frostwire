@@ -669,7 +669,7 @@ public final class MessageService {
             return new MultiLineLabel(message, 400);
     }
     
-    private final JComponent doNotDisplayAgainLabel(
+    private JComponent doNotDisplayAgainLabel(
       final String message, final Switch setting) {
         JPanel thePanel = new JPanel( new BorderLayout(0, 15) ); 
         JCheckBox option = new JCheckBox(
@@ -686,7 +686,7 @@ public final class MessageService {
         return thePanel;
     }
     
-    private final JComponent alwaysUseThisAnswerLabel(
+    private JComponent alwaysUseThisAnswerLabel(
       final String message, final IntSetting setting) {
         JPanel thePanel = new JPanel( new BorderLayout(0, 15) ); 
         JCheckBox option = new JCheckBox(

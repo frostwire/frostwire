@@ -1155,7 +1155,7 @@ public final class CC implements Externalizable
 		return corrPos(y2, 3);
 	}
 
-	private final CC corrPos(String uv, int ix)
+	private CC corrPos(String uv, int ix)
 	{
 		UnitValue[] b = getPos();
 		if (b == null)

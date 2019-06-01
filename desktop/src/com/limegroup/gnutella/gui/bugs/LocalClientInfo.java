@@ -281,7 +281,7 @@ public final class LocalClientInfo extends LocalAbstractInfo {
     /**
      * Appends a NameValuePair of k/v to l if v is non-null.
      */
-    private final void append(List<? super NameValuePair> l, final String k, final String v) {
+    private void append(List<? super NameValuePair> l, final String k, final String v) {
         if (v != null)
             l.add(new NameValuePair(k, v));
     }

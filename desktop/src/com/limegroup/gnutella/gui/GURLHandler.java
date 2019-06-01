@@ -49,7 +49,7 @@ public final class GURLHandler {
         }
     }
 
-    private synchronized final native int InstallEventHandler();
+    private synchronized native int InstallEventHandler();
 
-    private synchronized final native int RemoveEventHandler();
+    private synchronized native int RemoveEventHandler();
 }

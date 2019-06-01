@@ -57,7 +57,7 @@ public class StringSetSetting extends AbstractSetting {
     /**
      * Splits the string into a Set
      */
-    private static final Set<String> encode(String src) {
+    private static Set<String> encode(String src) {
         if (src == null || src.length()==0)
             return new HashSet<String>();
         
@@ -72,7 +72,7 @@ public class StringSetSetting extends AbstractSetting {
     /**
      * Separates each field of the array by a semicolon
      */
-    private static final String decode(Set<String> src) {
+    private static String decode(Set<String> src) {
         if (src == null || src.isEmpty())
             return "";
         

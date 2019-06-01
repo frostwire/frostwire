@@ -131,7 +131,7 @@ public class FileArraySetting extends AbstractSetting {
     }
     
     /** Splits the string into an Array     */
-    private static final File[] encode(String src) {
+    private static File[] encode(String src) {
         
         if (src == null || src.length()==0) {
             return (new File[0]);
@@ -147,7 +147,7 @@ public class FileArraySetting extends AbstractSetting {
     }
     
     /** Separates each field of the array by a semicolon     */
-    private static final String decode(File[] src) {
+    private static String decode(File[] src) {
         
         if (src == null || src.length==0) {
             return "";

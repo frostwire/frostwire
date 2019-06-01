@@ -104,7 +104,7 @@ public class FileSetSetting extends AbstractSetting {
     }
     
     /** Splits the string into a Set    */
-    private static final Set<File> encode(String src) {
+    private static Set<File> encode(String src) {
         if (src == null || src.length()==0)
             return new HashSet<File>();
         
@@ -117,7 +117,7 @@ public class FileSetSetting extends AbstractSetting {
     }
     
     /** Separates each field of the array by a semicolon     */
-    private static final String decode(Set<? extends File> src) {
+    private static String decode(Set<? extends File> src) {
         if (src == null || src.isEmpty())
             return "";
         

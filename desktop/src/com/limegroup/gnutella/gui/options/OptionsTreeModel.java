@@ -88,7 +88,7 @@ final class OptionsTreeModel extends DefaultTreeModel {
 	 *         the specified key, or <tt>null</tt> if it could not be found
 	 * @throws IOException if a corresponding key does not exist
 	 */
-	private final MutableTreeNode getParentNode(
+	private MutableTreeNode getParentNode(
 			MutableTreeNode node,
 			final String parentKey) 
 			throws IOException {
