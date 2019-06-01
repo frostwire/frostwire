@@ -126,7 +126,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
         NumberFormat formatter = NumberFormat.getInstance();
         formatter.setMaximumFractionDigits(2);
 
-        String labelText = String.valueOf(formatter.format(value)) + " KB/s";
+        String labelText = formatter.format(value) + " KB/s";
 
         if (value > 100 * 1024) {
             label.setText(I18n.tr("Unlimited"));

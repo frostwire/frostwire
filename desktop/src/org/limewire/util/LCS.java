@@ -223,13 +223,13 @@ public class LCS {
             buf.append("\n");
             buf.append(" ");
             for (int j = 0; j < c[0].length; j++) {
-                buf.append(Integer.toString(c[0][j]));
+                buf.append(c[0][j]);
             }
             buf.append("\n");
             for (int i = 1; i < c.length; i++) {
                 buf.append(valueOfXInternal(i));
                 for (int j = 0; j < c[i].length; j++) {
-                    buf.append(Integer.toString(c[i][j]));
+                    buf.append(c[i][j]);
                 }
                 buf.append("\n");
             }

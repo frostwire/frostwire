@@ -24,7 +24,7 @@ public final class UploadCountHolder implements Comparable<UploadCountHolder> {
 	 *
 	 */
 	public UploadCountHolder(int attempted, int completed) {
-		_string = Integer.toString(completed) + " / " + Integer.toString(attempted);
+		_string = completed + " / " + attempted;
 		_attempted = attempted;
 		_completed = completed;
 	}

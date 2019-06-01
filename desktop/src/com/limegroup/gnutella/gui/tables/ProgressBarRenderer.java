@@ -81,7 +81,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      * @return the String that should be displayed
      */
     protected String getDescription(Object value) {
-        return Integer.toString(getBarStatus(value)) + " %";
+        return getBarStatus(value) + " %";
     }
 
     /**

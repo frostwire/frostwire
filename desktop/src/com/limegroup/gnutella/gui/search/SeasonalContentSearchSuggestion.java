@@ -61,7 +61,7 @@ final class SeasonalContentSearchSuggestion extends AbstractAction {
                 String episodeStr = matcher.group(2);
                 int nextEpisode = Integer.parseInt(episodeStr) + 1;
                 String nextEpisodeStr = (nextEpisode < 10) ?
-                        "0" + String.valueOf(nextEpisode) :
+                        "0" + nextEpisode :
                         String.valueOf(nextEpisode);
                 nextEpisodeSearchToken = "s" + season + "e" + nextEpisodeStr;
                 break;

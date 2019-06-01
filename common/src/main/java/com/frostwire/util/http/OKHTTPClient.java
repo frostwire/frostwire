@@ -235,10 +235,10 @@ public class OKHTTPClient extends AbstractHttpClient {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("bytes=");
-        sb.append(String.valueOf(rangeStart));
+        sb.append(rangeStart);
         sb.append('-');
         if (rangeEnd > 0 && rangeEnd > rangeStart) {
-            sb.append(String.valueOf(rangeEnd));
+            sb.append(rangeEnd);
         }
         builderRef.addHeader("Range", sb.toString());
     }

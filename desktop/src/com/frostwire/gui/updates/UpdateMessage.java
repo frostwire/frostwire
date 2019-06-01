@@ -214,15 +214,15 @@ final class UpdateMessage implements Serializable {
 
     public String toString() {
         return "\n" +
-                "UpdateMessage @" + String.valueOf(super.hashCode()) +
+                "UpdateMessage @" + super.hashCode() +
                 "{" +
-                "_hashCode : " + String.valueOf(hashCode()) + ", \n" +
+                "_hashCode : " + hashCode() + ", \n" +
                 "_message : " + getMessage() + ", \n" +
                 "_url : " + getUrl() + ", \n" +
                 "_messageType : " + getMessageType() + ", \n" +
                 "_version : " + getVersion() + ", \n" +
                 "build : " + getBuild() + ", \n" +
-                "_expiration : " + String.valueOf(getExpiration()) + ", \n" +
+                "_expiration : " + getExpiration() + ", \n" +
                 "_torrent : " + getTorrent() + ", \n" +
                 "installerUrl : " + getInstallerUrl() + ", \n" +
                 "_os : " + getOs() + ", \n" +

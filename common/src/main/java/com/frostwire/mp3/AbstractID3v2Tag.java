@@ -435,7 +435,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				genreDescription = "";
 			}
-			String combinedGenre = "(" + Integer.toString(genre) + ")" + genreDescription;
+			String combinedGenre = "(" + genre + ")" + genreDescription;
 			ID3v2TextFrameData frameData = new ID3v2TextFrameData(useFrameUnsynchronisation(), new EncodedText((byte)0, combinedGenre));
 			addFrame(createFrame(ID_GENRE, frameData.toBytes()), true);
 		}
