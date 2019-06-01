@@ -31,6 +31,7 @@ import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
@@ -195,7 +196,16 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine TORRENTZ2 = new SearchEngine("Torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
+
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT/2);
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
+            TORRENTZ2,
             YIFY,
             FROSTCLICK,
             ZOOQLE,
