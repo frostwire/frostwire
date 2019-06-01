@@ -37,7 +37,7 @@ public class CharSequenceKeyAnalyzer implements KeyAnalyzer<CharSequence> {
     
     private static final int[] BITS = createIntBitMask(16);
     
-    public static final int[] createIntBitMask(int bitCount) {
+    public static int[] createIntBitMask(int bitCount) {
         int[] bits = new int[bitCount];
         for(int i = 0; i < bitCount; i++) {
             bits[i] = 1 << (bitCount - i - 1);

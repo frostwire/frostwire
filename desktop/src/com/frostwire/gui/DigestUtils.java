@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class DigestUtils {
-    public final static boolean checkMD5(File f, String expectedMD5) {
+    public static boolean checkMD5(File f, String expectedMD5) {
         return checkMD5(f, expectedMD5, null);
     }
 
@@ -18,7 +18,7 @@ public class DigestUtils {
      * @return
      * @throws Exception
      */
-    public final static boolean checkMD5(File f, String expectedMD5, DigestProgressListener listener) {
+    public static boolean checkMD5(File f, String expectedMD5, DigestProgressListener listener) {
         if (!isValidMD5(expectedMD5)) {
             return false;
         }
@@ -27,7 +27,7 @@ public class DigestUtils {
         return compareMD5(md5, expectedMD5);
     }
 
-    public final static boolean compareMD5(String md5a, String md5b) {
+    public static boolean compareMD5(String md5a, String md5b) {
         if ((!isValidMD5(md5a)) || (!isValidMD5(md5b))) {
             return false;
         }
@@ -44,11 +44,11 @@ public class DigestUtils {
         return md5.matches("^[0-9A-Fa-f]{32}+$");
     }
 
-    public final static String getMD5(File f) {
+    public static String getMD5(File f) {
         return getMD5(f, null);
     }
     
-    public final static String getMD5(File f, DigestProgressListener listener) {
+    public static String getMD5(File f, DigestProgressListener listener) {
         try {
             return getMD5(new FileInputStream(f), f.length(), listener);
         } catch (FileNotFoundException e) {
@@ -56,7 +56,7 @@ public class DigestUtils {
         }
     }
 
-    public final static String getMD5(InputStream is, long streamLength, DigestProgressListener listener) {
+    public static String getMD5(InputStream is, long streamLength, DigestProgressListener listener) {
         try {
             MessageDigest m = MessageDigest.getInstance("MD5");
 
@@ -111,7 +111,7 @@ public class DigestUtils {
         }
     }
     
-    public final static String getMD5(String s) {
+    public static String getMD5(String s) {
         try {
             byte[] bytes = s.getBytes("UTF-8");
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);

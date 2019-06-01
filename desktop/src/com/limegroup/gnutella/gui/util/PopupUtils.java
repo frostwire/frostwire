@@ -28,11 +28,11 @@ import java.awt.event.ActionListener;
 public class PopupUtils {
 
     /** Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not. */
-    public static final void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable) {
+    public static void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable) {
         addMenuItem(s, l, m, enable, -1);
     }
     /** Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not at the given index. */
-    public static final void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable, int idx) {
+    public static void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable, int idx) {
         JMenuItem item = m instanceof SkinPopupMenu ? new SkinMenuItem(s) : new JMenuItem(s);
         item.addActionListener(l);
         item.setEnabled(enable);
@@ -40,12 +40,12 @@ public class PopupUtils {
     }
 
     /** Adds a menu item defined by the ActionListener & String to the JMenu, enabled or not. */
-    public static final void addMenuItem(String s, ActionListener l, JMenu m, boolean enable) {
+    public static void addMenuItem(String s, ActionListener l, JMenu m, boolean enable) {
         addMenuItem(s, l, m, enable, -1);
     }
     
     /** Adds a menu item defined by the ActionListener & String to the JMenu, enabled or not at the given index. */
-    public static final void addMenuItem(String s, ActionListener l, JMenu m, boolean enable, int idx) {
+    public static void addMenuItem(String s, ActionListener l, JMenu m, boolean enable, int idx) {
         JMenuItem item = m instanceof SkinMenu ? new SkinMenuItem(s) : new JMenuItem(s);
         item.addActionListener(l);
         item.setEnabled(enable);

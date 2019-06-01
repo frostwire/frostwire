@@ -444,7 +444,7 @@ public final class PlatformDefaults
 	 * @param x The value for the horizontal dimension. If <code>null</code> the value is not changed.
 	 * @param y The value for the vertical dimension. Might be same object as for <code>x</code>. If <code>null</code> the value is not changed.
 	 */
-	public static final void setUnitValue(String[] unitStrings, UnitValue x, UnitValue y)
+	public static void setUnitValue(String[] unitStrings, UnitValue x, UnitValue y)
 	{
 		for (String unitString : unitStrings) {
 			String s = unitString.toLowerCase().trim();

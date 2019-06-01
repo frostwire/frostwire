@@ -271,7 +271,7 @@ public class MediaType implements Serializable {
     /**
      * Returns all default media types.
      */
-    public static final MediaType[] getDefaultMediaTypes() {
+    public static MediaType[] getDefaultMediaTypes() {
         return ALL_MEDIA_TYPES;
     }
     

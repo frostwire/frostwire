@@ -30,7 +30,7 @@ public class QueryUtils {
      * in the result set
      * @return
      */
-    public static final Set<String> keywords(String fileName, boolean allowNumbers) {
+    public static Set<String> keywords(String fileName, boolean allowNumbers) {
         //Remove extension
         fileName = QueryUtils.ripExtension(fileName);
     	
@@ -62,14 +62,14 @@ public class QueryUtils {
      * @param fileName
      * @return
      */
-    public static final Set<String> keywords(String fileName) {
+    public static Set<String> keywords(String fileName) {
     	return keywords(fileName, false);
     }
 
     /**
      * Removes illegal characters from the name, inserting spaces instead.
      */
-    public static final String removeIllegalChars(String name) {
+    public static String removeIllegalChars(String name) {
         String ret = "";
         
         String delim = DELIMITERS;

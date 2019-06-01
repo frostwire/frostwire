@@ -144,7 +144,7 @@ public final class ResourceManager {
      * @return a new <tt>ImageIcon</tt> instance for the specified file, or
      * <tt>null</tt> if the resource could not be loaded
      */
-    static final ImageIcon getThemeImage(final String name) {
+    static ImageIcon getThemeImage(final String name) {
         if (name == null)
             throw new NullPointerException("null image name");
 
@@ -171,7 +171,7 @@ public final class ResourceManager {
     /**
      * Retrieves an icon from the specified path in the filesystem.
      */
-    static final ImageIcon getImageFromResourcePath(String loc) {
+    static ImageIcon getImageFromResourcePath(String loc) {
         return getImageFromURL(loc, false);
     }
 
@@ -263,7 +263,7 @@ public final class ResourceManager {
     /**
      * Instance accessor following singleton.
      */
-    public static synchronized final ResourceManager instance() {
+    public static synchronized ResourceManager instance() {
         if (_instance == null)
             _instance = new ResourceManager();
         return _instance;

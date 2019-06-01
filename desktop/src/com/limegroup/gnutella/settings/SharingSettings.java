@@ -57,7 +57,7 @@ public class SharingSettings extends LimeProps {
 
     public static final File IMAGE_CACHE_DIR = new File(CommonUtils.getUserSettingsDir(), "image_cache");
 
-    public static final File getImageCacheDirectory() {
+    public static File getImageCacheDirectory() {
         if (!IMAGE_CACHE_DIR.exists()) {
             IMAGE_CACHE_DIR.mkdirs();
         }

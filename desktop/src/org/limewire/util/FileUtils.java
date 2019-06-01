@@ -69,7 +69,7 @@ public class FileUtils {
     /**
      * Determines if file 'a' is an ancestor of file 'b'.
      */
-    public static final boolean isAncestor(File a, File b) {
+    public static boolean isAncestor(File a, File b) {
         while(b != null) {
             if(b.equals(a))
                 return true;
@@ -82,7 +82,7 @@ public class FileUtils {
      * Detects attempts at directory traversal by testing if testDirectory 
      * really is a parent of testPath.
      */
-    public static final boolean isReallyInParentPath(File testParent, File testChild) throws IOException {
+    public static boolean isReallyInParentPath(File testParent, File testChild) throws IOException {
 
     	String testParentName = getCanonicalPath(testParent);
         File testChildParentFile = testChild.getAbsoluteFile().getParentFile();

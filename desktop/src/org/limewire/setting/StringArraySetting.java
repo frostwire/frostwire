@@ -64,7 +64,7 @@ public class StringArraySetting extends AbstractSetting {
     /**
      * Splits the string into an Array
      */
-    public static final String[] decode(String src) {
+    public static String[] decode(String src) {
         
         if (src == null || src.length()==0) {
             return (new String[0]);
@@ -76,7 +76,7 @@ public class StringArraySetting extends AbstractSetting {
     /**
      * Separates each field of the array by a semicolon
      */
-    public static final String encode(String[] src) {
+    public static String encode(String[] src) {
         
         if (src == null || src.length==0) {
             return "";
