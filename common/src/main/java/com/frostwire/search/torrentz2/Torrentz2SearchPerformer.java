@@ -16,23 +16,45 @@
 
 package com.frostwire.search.torrentz2;
 
-import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.util.Logger;
 
-public class Torrentz2SearchPerformer extends TorrentRegexSearchPerformer<Torrentz2SearchResult> {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+/**
+ * This is an example of a simple search performer, it can deduct all magnet urls and search result details right out of
+ * the search result page in a single HTTP request.
+ */
+public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
+    private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
     private static final int MAX_RESULTS = 30;
-    public static final String SEARCH_RESULTS_REGEX = "(?is)<dl><dt><a href=/(?<itemid>[a-f0-9]*)>(.*?)</a>.*?";
-    public static final String TORRENT_DETAILS_PAGE_REGEX =
-            "(?is)<title>(?<filename>.*?)</title>.*?" +
-            "<div class=downlinks><div>age <span title=\"(?<time>.*?)\".*?" +
-            "<div>info_hash: (?<infohash>[a-f0-9]{32,64})</div>.*?" + // considering future SHA-256 hashes 256/8 = 32 bytes * 2 characters = 64 characters
-            "udp://(?<trackerURI>.*?)/announce.*?" +
-            "Size: (?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</div><h2>Torrent Contents</h2>";
+    public static final String REGEX =
+            "(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span><span>(?<seeds>\\d+)</span><span>.*?";
+    private String usualTrackers;
+    private final Pattern PATTERN = Pattern.compile(REGEX);
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
-        super("torrentz2.eu", token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
+        super("torrentz2.eu", token, keywords, timeout, 1, 0);
+        usualTrackers = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
+                "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
+                "tr=udp://tracker.internetwarriors.net:1337/announce&" +
+                "tr=udp://retracker.akado-ural.ru:80/announce&" +
+                "tr=udp://tracker.moeking.me:6969/announce&" +
+                "tr=udp://carapax.net:6969/announce&" +
+                "tr=udp://retracker.baikal-telecom.net:2710/announce&" +
+                "tr=udp://bt.dy20188.com:80/announce&" +
+                "tr=udp://tracker.nyaa.uk:6969/announce&" +
+                "tr=udp://carapax.net:6969/announce&" +
+                "tr=udp://amigacity.xyz:6969/announce&" +
+                "tr=udp://tracker.supertracker.net:1337/announce&" +
+                "tr=udp://tracker.cyberia.is:6969/announce&" +
+                "tr=udp://tracker.openbittorrent.com:80/announce&" +
+                "tr=udp://tracker.msm8916.com:6969/announce&" +
+                "tr=udp://tracker.sktorrent.net:6969/announce&";
     }
 
     @Override
@@ -41,26 +63,45 @@ public class Torrentz2SearchPerformer extends TorrentRegexSearchPerformer<Torren
         return "https://" + getDomainName() + "/verified?f=" + transformedKeywords;
     }
 
-    @Override
-    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String itemId = matcher.group("itemid");
-        String transformedId = itemId.replaceFirst("/", "");
-        return new Torrentz2TempSearchResult(getDomainName(), transformedId);
+    private Torrentz2SearchResult fromMatcher(SearchMatcher matcher) {
+        String infoHash = matcher.group("infohash");
+        String detailsURL = "https://" + getDomainName() + "/" + infoHash;
+        String filename = matcher.group("filename");
+        String fileSizeMagnitude = matcher.group("filesize");
+        String fileSizeUnit = matcher.group("unit");
+        String ageString = matcher.group("age");
+        int seeds = 20;
+        try {
+            seeds = Integer.parseInt(matcher.group("seeds"));
+        } catch (Throwable ignored) {
+        }
+        return new Torrentz2SearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, usualTrackers);
     }
 
     @Override
-    protected int htmlSuffixOffset(String html) {
-        int offset = html.indexOf("<div><h3>Latest Searches</h3>");
-        return offset > 0 ? offset : 0;
-    }
+    protected List<? extends Torrentz2SearchResult> searchPage(String page) {
+        if (null == page || page.isEmpty()) {
+            return Collections.emptyList();
+        }
+        ArrayList<Torrentz2SearchResult> results = new ArrayList<>(0);
+        SearchMatcher matcher = new SearchMatcher((PATTERN.matcher(page)));
+        boolean matcherFound;
+        do {
+            try {
+                matcherFound = matcher.find();
+            } catch (Throwable t) {
+                matcherFound = false;
+                LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
+            }
 
-    @Override
-    protected Torrentz2SearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        return new Torrentz2SearchResult(sr.getDetailsUrl(), matcher);
-    }
-
-    @Override
-    protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudflare");
+            if (matcherFound) {
+                Torrentz2SearchResult sr = fromMatcher(matcher);
+                if (sr != null) {
+                    results.add(sr);
+                    System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                }
+            }
+        } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
+        return results;
     }
 }

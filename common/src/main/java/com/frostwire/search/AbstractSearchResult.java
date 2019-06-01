@@ -26,8 +26,6 @@ import com.frostwire.licenses.Licenses;
  */
 public abstract class AbstractSearchResult implements SearchResult {
 
-    private int uid = -1;
-
     @Override
     public License getLicense() {
         return Licenses.UNKNOWN;

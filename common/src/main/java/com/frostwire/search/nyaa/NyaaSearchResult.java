@@ -48,8 +48,8 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         UNIT_TO_BYTES.put("KiB", (double) 1024);
         UNIT_TO_BYTES.put("MiB", (double) (1024 * 1024));
         UNIT_TO_BYTES.put("GiB", (double) (1024 * 1024 * 1024));
-        UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024));
-        UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024 * 1024));
+        UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024L));
+        UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024L * 1024L));
     }
 
     NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {

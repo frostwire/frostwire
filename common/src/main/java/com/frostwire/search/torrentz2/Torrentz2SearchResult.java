@@ -16,16 +16,12 @@
 
 package com.frostwire.search.torrentz2;
 
-import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
+import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -35,15 +31,21 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-
-    public Torrentz2SearchResult(String detailsUrl, SearchMatcher matcher) {
+    public Torrentz2SearchResult(String detailsUrl,
+                                 String infoHash,
+                                 String filename,
+                                 String fileSizeMagnitude,
+                                 String fileSizeUnit,
+                                 String ageString,
+                                 int seeds,
+                                 String trackers) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = matcher.group("infohash");
-        this.filename = parseFileName(matcher.group("filename"));
-        this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
-        this.creationTime = parseCreationTime(matcher.group("time"));
-        this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "magnet:" + matcher.group("magnet_part");
+        this.infoHash = infoHash;
+        this.filename = filename;
+        this.size = parseSize(fileSizeMagnitude + " " + fileSizeUnit);
+        this.creationTime = parseCreationTime(ageString);
+        this.seeds = seeds;
+        this.torrentUrl = "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(filename) + "&" + trackers;
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
@@ -92,37 +94,51 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
         return torrentUrl;
     }
 
-    private String parseFileName(String decodedFileName) {
-        return HtmlManipulator.replaceHtmlEntities(decodedFileName.trim()) + ".torrent";
-    }
-
-    private int parseSeeds(String group) {
-        try {
-            return Integer.parseInt(group);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     private long parseCreationTime(String dateString) {
         long result = System.currentTimeMillis();
         try {
-            if (dateString.contains("1 Year+")) {
-                return result - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
+            String[] ds = dateString.split(" ");
+
+
+            if (ds[1].contains("hours")) {
+
+                try {
+                    int hours = Integer.parseInt(ds[0]);
+                    return result - (hours * 60 * 60 * 1000L);
+                } catch (Exception ignored) {
+                }
             }
 
-            if (dateString.contains("Last Month")) {
+            if (ds[1].contains("years")) {
+                try {
+                    int years = Integer.parseInt(ds[0]);
+                    return result - (years * 365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (ds[1].contains("year")) {
+                try {
+                    return result - (365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (ds[1].contains("months")) {
+                try {
+                    int months = Integer.parseInt(ds[0]);
+                    return result - (months * 31L * 24L * 60L * 60L * 1000L); // a month in milliseconds
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (dateString.contains("1 month")) {
                 return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
             }
 
-            if (dateString.contains("Yesterday")) {
-                return result - 1L * 24L * 60L * 60L * 1000L; // one day in milliseconds
-            }
-
-            // this format seems to be not used anymore
-            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString.trim()).getTime();
+            return result;
         } catch (Throwable t) {
+            t.printStackTrace();
         }
         return result;
     }

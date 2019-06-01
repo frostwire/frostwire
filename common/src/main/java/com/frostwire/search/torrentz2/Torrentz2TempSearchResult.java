@@ -27,7 +27,7 @@ final class Torrentz2TempSearchResult extends AbstractSearchResult implements Cr
     Torrentz2TempSearchResult(String domainName, String itemId) {
         // sometimes the itemId needs to be url encoded
         itemId = UrlUtils.encode(itemId);
-        this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + ".html";
+        this.detailsUrl = "https://" + domainName + "/" + itemId;
     }
 
     @Override

@@ -32,7 +32,7 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private final long token;
 
     private SearchListener listener;
-    private boolean stopped;
+    protected boolean stopped;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;

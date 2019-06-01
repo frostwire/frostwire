@@ -75,6 +75,8 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
             return -1;
         }
 
+        amount = amount.replaceAll(",","");
+
         final Integer unitMultiplier = UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit);
         double multiplier = 1;
 

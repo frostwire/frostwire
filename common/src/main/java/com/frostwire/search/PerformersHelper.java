@@ -58,7 +58,7 @@ public final class PerformersHelper {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 matcherFound = false;
-                LOG.error(performer.getPattern().toString() + " has failed.\n" + t.getMessage(), t);
+                LOG.error("searchPageHelper(...): " + performer.getPattern().toString() + " has failed.\n" + t.getMessage(), t);
             }
 
             if (matcherFound) {
