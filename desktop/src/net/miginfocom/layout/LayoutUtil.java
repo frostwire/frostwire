@@ -250,7 +250,7 @@ public final class LayoutUtil
 				if (resC != null)
 					prioList.add(isGrow ? resC.growPrio : resC.shrinkPrio);
 			}
-			Integer[] prioIntegers = prioList.toArray(new Integer[prioList.size()]);
+			Integer[] prioIntegers = prioList.toArray(new Integer[0]);
 
 			for (int force = 0; force <= ((isGrow && defPushWeights != null) ? 1 : 0); force++) {    // Run twice if defGrow and the need for growing.
 				for (int pr = prioIntegers.length - 1; pr >= 0; pr--) {

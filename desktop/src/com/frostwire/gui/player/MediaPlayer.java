@@ -232,7 +232,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             this.currentPlaylist = currentPlaylist;
 
             if (playlistFilesView != null) {
-                this.playlistFilesView = playlistFilesView.toArray(new MediaSource[playlistFilesView.size()]);
+                this.playlistFilesView = playlistFilesView.toArray(new MediaSource[0]);
             } else {
                 this.playlistFilesView = null;
             }
@@ -656,7 +656,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     public synchronized void setPlaylistFilesView(List<MediaSource> playlistFilesView) {
-        this.playlistFilesView = playlistFilesView.toArray(new MediaSource[playlistFilesView.size()]);
+        this.playlistFilesView = playlistFilesView.toArray(new MediaSource[0]);
     }
 
     private MediaSource getNextRandomSong(MediaSource currentMedia) {

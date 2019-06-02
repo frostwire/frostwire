@@ -382,6 +382,6 @@ public class MediaType implements Serializable {
     private static String[] makeArray(Set<String> one, Set<String> two) {
         Set<String> all = new HashSet<String>(one);
         all.addAll(two);
-        return all.toArray(new String[all.size()]);
+        return all.toArray(new String[0]);
     }
 }

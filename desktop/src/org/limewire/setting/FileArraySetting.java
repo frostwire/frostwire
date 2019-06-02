@@ -176,6 +176,6 @@ public class FileArraySetting extends AbstractSetting {
 				continue;
 			list.add(file);
 		}
-		setValue(list.toArray(new File[list.size()]));
+		setValue(list.toArray(new File[0]));
 	}
 }

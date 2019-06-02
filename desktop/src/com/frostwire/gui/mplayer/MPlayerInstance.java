@@ -990,7 +990,7 @@ MPlayerInstance
 
             cmdList.add(fileOrUrl);
 
-            String[] cmd = cmdList.toArray(new String[cmdList.size()]);
+            String[] cmd = cmdList.toArray(new String[0]);
 
             //COMMENT/UNCOMMENT THIS FOR TO SEE WHAT COMMAND IS BEING SENT TO MPLAYER
             //printCommand(cmd);

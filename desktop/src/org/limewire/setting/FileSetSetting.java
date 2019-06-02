@@ -43,7 +43,7 @@ public class FileSetSetting extends AbstractSetting {
 	
 	/** Gets the value as an array. */
 	public synchronized File[] getValueAsArray() {
-	    return value.toArray(new File[value.size()]);
+	    return value.toArray(new File[0]);
     }
 
 	/**

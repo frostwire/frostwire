@@ -43,7 +43,7 @@ public class StringSetSetting extends AbstractSetting {
      * Gets the value as an array.
      */
     public synchronized String[] getValueAsArray() {
-        return value.toArray(new String[value.size()]);
+        return value.toArray(new String[0]);
     }
 
     /** Load value from property string value

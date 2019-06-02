@@ -125,7 +125,7 @@ public final class iTunesMediator {
             }
         }
 
-        files = completeFiles.toArray(new File[completeFiles.size()]);
+        files = completeFiles.toArray(new File[0]);
 
         if (files.length == 0) {
             return;
@@ -197,7 +197,7 @@ public final class iTunesMediator {
         command.add("-e");
         command.add("end tell");
 
-        return command.toArray(new String[command.size()]);
+        return command.toArray(new String[0]);
     }
 
     private static String[] createWSHScriptCommand(String playlist, File[] files) {
@@ -211,7 +211,7 @@ public final class iTunesMediator {
             command.add(file.getAbsolutePath());
         }
 
-        return command.toArray(new String[command.size()]);
+        return command.toArray(new String[0]);
     }
 
     /**
@@ -359,7 +359,7 @@ public final class iTunesMediator {
                 command.add(new File(CommonUtils.getUserSettingsDir(), JS_REMOVE_PLAYLIST_SCRIPT_NAME).getAbsolutePath());
                 command.add(playlistName);
 
-                Runtime.getRuntime().exec(command.toArray(new String[command.size()]));
+                Runtime.getRuntime().exec(command.toArray(new String[0]));
             }
         } catch (IOException e) {
             LOG.error("Error executing itunes command", e);

@@ -83,7 +83,7 @@ public class DNDUtils {
                 // ignore
             }
         }
-        return uris.toArray(new URI[uris.size()]);
+        return uris.toArray(new URI[0]);
     }
 
     /**
@@ -135,7 +135,7 @@ public class DNDUtils {
                 files.add(new File(path));
             }
         }
-        return files.toArray(new File[files.size()]);
+        return files.toArray(new File[0]);
     }
 
     public static boolean supportCanImport(DataFlavor dataFlavor, TransferHandler.TransferSupport support, TransferHandler fallbackTransferHandler, boolean fallback) {

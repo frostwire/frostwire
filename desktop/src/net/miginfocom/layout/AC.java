@@ -70,7 +70,7 @@ public final class AC implements Externalizable
 	 */
 	public final DimConstraint[] getConstaints()
 	{
-		return cList.toArray(new DimConstraint[cList.size()]);
+		return cList.toArray(new DimConstraint[0]);
 	}
 
 	/** Sets the different {@link net.miginfocom.layout.DimConstraint}s that this object should consists of.

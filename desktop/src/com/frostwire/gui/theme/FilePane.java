@@ -544,7 +544,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
             if (action != null) {
                 actionList.add(action);
             }
-            actions = actionList.toArray(new Action[actionList.size()]);
+            actions = actionList.toArray(new Action[0]);
         }
 
         return actions;

@@ -68,7 +68,7 @@ public class MulticastTransferHandler extends LimeTransferHandler {
 	}
 	
 	private LimeTransferHandler[] getHandlers() {
-		return handlers.toArray(new LimeTransferHandler[handlers.size()]);
+		return handlers.toArray(new LimeTransferHandler[0]);
 	}
 	
 	@Override

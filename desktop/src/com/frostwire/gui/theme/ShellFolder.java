@@ -128,7 +128,7 @@ abstract class ShellFolder extends File {
                     v.addElement(files[i]);
                 }
             }
-            files = v.toArray(new File[v.size()]);
+            files = v.toArray(new File[0]);
         }
 
         return files;

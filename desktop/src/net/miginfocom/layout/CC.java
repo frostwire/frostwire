@@ -105,7 +105,7 @@ public final class CC implements Externalizable
 					addLinkTargetIDs(targets, pos[i]);
 			}
 
-			linkTargets = targets.size() == 0 ? EMPTY_ARR : targets.toArray(new String[targets.size()]);
+			linkTargets = targets.size() == 0 ? EMPTY_ARR : targets.toArray(new String[0]);
 		}
 		return linkTargets;
 	}

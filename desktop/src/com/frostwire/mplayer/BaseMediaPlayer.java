@@ -547,7 +547,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 		synchronized (audioTracks) {
 			result.addAll(audioTracks);
 		}
-		return result.toArray(new Language[result.size()]);
+		return result.toArray(new Language[0]);
 	}
 	
 	
@@ -556,7 +556,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 		synchronized (subtitles) {
 			result.addAll(subtitles);
 		}
-		return result.toArray(new Language[result.size()]);
+		return result.toArray(new Language[0]);
 	}
 	
 	

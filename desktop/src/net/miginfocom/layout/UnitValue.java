@@ -569,7 +569,7 @@ public final class UnitValue implements Serializable
 	 */
 	public synchronized static UnitConverter[] getGlobalUnitConverters()
 	{
-		return CONVERTERS.toArray(new UnitConverter[CONVERTERS.size()]);
+		return CONVERTERS.toArray(new UnitConverter[0]);
 	}
 
 	/** Returns the current default unit. The default unit is the unit used if no unit is set. E.g. "width 10".

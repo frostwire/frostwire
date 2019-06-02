@@ -47,7 +47,7 @@ public class IntSetSetting extends AbstractSetting {
 
     /** Gets the value as an array. */
     public synchronized Integer[] getValueAsArray() {
-        return value.toArray(new Integer[value.size()]);
+        return value.toArray(new Integer[0]);
     }
 
     /**
