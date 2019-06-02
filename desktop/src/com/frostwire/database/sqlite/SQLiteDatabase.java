@@ -40,7 +40,7 @@ public class SQLiteDatabase {
     private static final Logger LOG = Logger.getLogger(SQLiteDatabase.class);
 
     private String path;
-    private Connection connection;
+    private final Connection connection;
 
     private final AtomicBoolean open = new AtomicBoolean(false);
 

@@ -20,12 +20,12 @@ import java.util.List;
 
 public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,StateListener,VolumeListener,PositionListener,TaskListener, IcyInfoListener {
 
-	private List<MetaDataListener> metaDataListeners;
-	private List<StateListener> stateListeners;
-	private List<VolumeListener> volumeListeners;
-	private List<PositionListener> positionListeners;
-	private List<TaskListener> taskListeners;
-	private List<IcyInfoListener> icyInfoListeners;
+	private final List<MetaDataListener> metaDataListeners;
+	private final List<StateListener> stateListeners;
+	private final List<VolumeListener> volumeListeners;
+	private final List<PositionListener> positionListeners;
+	private final List<TaskListener> taskListeners;
+	private final List<IcyInfoListener> icyInfoListeners;
 	
 	private MediaPlaybackState 	currentState;	
 	private int					currentVolume;
@@ -59,12 +59,12 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	public BaseMediaPlayer(PlayerPreferences preferences) {
 		this.preferences = preferences;
 		
-		metaDataListeners = new ArrayList<MetaDataListener>(1);
-		stateListeners = new ArrayList<StateListener>(1);
+		metaDataListeners = new ArrayList<>(1);
+		stateListeners = new ArrayList<>(1);
 		volumeListeners = new ArrayList<VolumeListener>(1);
-		positionListeners = new ArrayList<PositionListener>(1);
-		taskListeners = new ArrayList<TaskListener>(1);
-		icyInfoListeners = new ArrayList<IcyInfoListener>(1);
+		positionListeners = new ArrayList<>(1);
+		taskListeners = new ArrayList<>(1);
+		icyInfoListeners = new ArrayList<>(1);
 		
 		initialize();
 		
@@ -78,8 +78,8 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	private void initialize() {
 		openedFile = null;
 		
-		audioTracks = new ArrayList<Language>();
-		subtitles = new ArrayList<Language>();
+		audioTracks = new ArrayList<>();
+		subtitles = new ArrayList<>();
 		
 		activeAudioTrackId = "0";
 		activeSubtitleId = null;
@@ -145,7 +145,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	public abstract void doSetVolume(int volume);	
 	public abstract void doLoadSubtitlesFile(String file,boolean autoPlay);
 
-	public void doLoadSubtitlesFile(String file) {
+	private void doLoadSubtitlesFile(String file) {
 		doLoadSubtitlesFile(file, true);
 	}
 	
@@ -369,7 +369,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	}
 	
 	
-	public Language getSubtitleByIdAndSource(String subtitleId,LanguageSource source) {
+	private Language getSubtitleByIdAndSource(String subtitleId, LanguageSource source) {
 		if(subtitleId == null) return null;
 		synchronized (subtitles) {
 			for(Language l : subtitles) {
@@ -543,7 +543,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	
 	
 	public Language[] getAudioTracks() {
-		List<Language> result = new ArrayList<Language>();
+		List<Language> result = new ArrayList<>();
 		synchronized (audioTracks) {			
 			for(Language language : audioTracks) {
 				result.add(language);			
@@ -554,7 +554,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	
 	
 	public Language[] getSubtitles() {
-		List<Language> result = new ArrayList<Language>();		
+		List<Language> result = new ArrayList<>();
 		synchronized (subtitles) {			
 			for(Language language : subtitles) {
 				result.add(language);			
