@@ -111,7 +111,7 @@ public class AssociationService {
 
             if (iter != null) {
                 while (iter.hasNext()) {
-                    assoc.addFileExtension((String) iter.next());
+                    assoc.addFileExtension(iter.next());
                 }
             }
         }
@@ -129,7 +129,7 @@ public class AssociationService {
 
             if (iter != null) {
                 while (iter.hasNext()) {
-                    assoc.addAction((Action) iter.next());
+                    assoc.addAction(iter.next());
                 }
             }
         }
@@ -188,7 +188,7 @@ public class AssociationService {
 
             if (iter != null) {
                 while (iter.hasNext()) {
-                    assoc.addAction((Action) iter.next());
+                    assoc.addAction(iter.next());
                 }
             }
         }

@@ -100,7 +100,7 @@ public final class SkinTreeUI extends SynthTreeUI {
             }
 
             boolean wasDoubleBuffered = false;
-            if ((c instanceof JComponent) && ((JComponent) c).isDoubleBuffered()) {
+            if ((c instanceof JComponent) && c.isDoubleBuffered()) {
                 wasDoubleBuffered = true;
                 ((JComponent) c).setDoubleBuffered(false);
             }

@@ -353,7 +353,7 @@ public class Association {
             iter = actionList.iterator();
             if (iter != null) {
                 while (iter.hasNext()) {
-                    Action temAction = (Action) iter.next();
+                    Action temAction = iter.next();
                     String temVerb = temAction.getVerb();
 
                     if (temVerb.equalsIgnoreCase(verb)) {

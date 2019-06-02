@@ -90,7 +90,7 @@ public class SQLiteDatabase {
 
         try {
             synchronized (connection) {
-                statement = prepareStatement(connection, sql, (Object[]) selectionArgs);
+                statement = prepareStatement(connection, sql, selectionArgs);
 
                 resultSet = statement.executeQuery();
 

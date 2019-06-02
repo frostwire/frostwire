@@ -99,7 +99,7 @@ public class AESemaphore {
 
                         // we don't hugely care about spurious wakeups here, it'll just appear
                         // as a failed reservation a bit early
-                        wait((long) 0);
+                        wait(0);
                     }
 
                     if (total_reserve == total_release) {

@@ -832,7 +832,7 @@ public class WinRegistryUtil {
                 Iterator<Action> actionIter = actionList.iterator();
                 // Add action to under the class ID key one by one
                 while (actionIter.hasNext()) {
-                    oneAction = (Action) actionIter.next();
+                    oneAction = actionIter.next();
                     if ((oneAction != null) && (clsID != null)) {
                         addActionByClsID(oneAction, clsID, regLevel);
                     }

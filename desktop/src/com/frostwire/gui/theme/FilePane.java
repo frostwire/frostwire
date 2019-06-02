@@ -2045,7 +2045,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
      */
     private static boolean pointIsInActualBounds(JList<Object> list, int index,
                                                 Point point) {
-        ListCellRenderer<Object> renderer = (ListCellRenderer<Object>) list.getCellRenderer();
+        ListCellRenderer<Object> renderer = list.getCellRenderer();
         ListModel<Object> dataModel = list.getModel();
         Object value = dataModel.getElementAt(index);
         Component item = renderer.getListCellRendererComponent(list,

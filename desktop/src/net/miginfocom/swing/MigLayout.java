@@ -381,7 +381,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 						Container p = parent.getParent();
 						if (p != null) {
 							if (p instanceof JComponent) {
-								((JComponent) p).revalidate();
+								p.revalidate();
 							} else {
 								parent.invalidate();
 								p.validate();

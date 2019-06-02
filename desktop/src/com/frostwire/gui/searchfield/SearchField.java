@@ -367,7 +367,7 @@ public class SearchField extends JXSearchField {
      */
     protected void fireActionPerformed() {
         if (popup != null) {
-            String selection = (String) entryList.getSelectedValue();
+            String selection = entryList.getSelectedValue();
             if (selection != null) {
                 hidePopup();
                 setText(selection);
@@ -640,7 +640,7 @@ public class SearchField extends JXSearchField {
             if (me.getID() == MouseEvent.MOUSE_CLICKED) {
                 int idx = locationToIndex(me.getPoint());
                 if (idx != -1 && isSelectedIndex(idx)) {
-                    String selection = (String) getSelectedValue();
+                    String selection = getSelectedValue();
                     SearchField.this.setText(selection);
                     SearchField.this.hidePopup();
                 }
@@ -665,7 +665,7 @@ public class SearchField extends JXSearchField {
                 int selectedIndex = getSelectedIndex() + 1;
                 setSelectedIndex(selectedIndex);
                 ensureIndexIsVisible(selectedIndex);
-                SearchField.this.setText((String) getSelectedValue());
+                SearchField.this.setText(getSelectedValue());
             }
         }
 
@@ -684,7 +684,7 @@ public class SearchField extends JXSearchField {
                     selectedIndex--;
                 setSelectedIndex(selectedIndex);
                 ensureIndexIsVisible(selectedIndex);
-                SearchField.this.setText((String) getSelectedValue());
+                SearchField.this.setText(getSelectedValue());
             }
         }
 

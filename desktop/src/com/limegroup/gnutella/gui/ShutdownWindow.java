@@ -54,7 +54,7 @@ class ShutdownWindow extends JDialog {
         backgroundPanel.add(bar);
         bar.setBounds(55 + insets.left, 428 + insets.top, 680, 30);
         
-        ((JComponent)getContentPane()).setPreferredSize(new Dimension(800, 500));
+        getContentPane().setPreferredSize(new Dimension(800, 500));
         pack();
     }
     

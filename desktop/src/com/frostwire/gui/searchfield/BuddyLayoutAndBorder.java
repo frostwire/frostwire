@@ -134,7 +134,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
 	 * 
 	 */
 	protected Rectangle getVisibleRect() {
-		Rectangle alloc = (Rectangle) SwingUtilities.getLocalBounds(textField);
+		Rectangle alloc = SwingUtilities.getLocalBounds(textField);
 
 		substractInsets(alloc, getRealBorderInsets());
 		substractInsets(alloc, BuddySupport.getOuterMargin(textField));
@@ -202,7 +202,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
 			return null;
 		}
 
-		Insets insets = (Insets) borderDelegate.getBorderInsets(textField);
+		Insets insets = borderDelegate.getBorderInsets(textField);
 
 		// for some reason, all LnFs add the margin to the insets.
 		// we want the insets without the margin, so substract the margin here!!

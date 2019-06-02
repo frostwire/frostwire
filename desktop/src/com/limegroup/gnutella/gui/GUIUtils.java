@@ -153,14 +153,14 @@ public final class GUIUtils {
             unitName = GENERAL_UNIT_TERABYTES;
         }
         NumberFormat numberFormat; // one of localizable formats
-        if ((double)bytes * 100 / unitValue < 99995)
+        if (bytes * 100 / unitValue < 99995)
             // return a minimum "100.0xB", and maximum "999.9xB"
             numberFormat = NUMBER_FORMAT1; // localized "#,##0.0"
         else
             // return a minimum "1,000xB"
             numberFormat = NUMBER_FORMAT0; // localized "#,##0"
         try {
-            return numberFormat.format((double)bytes / unitValue) + " " + unitName;
+            return numberFormat.format(bytes / unitValue) + " " + unitName;
         } catch(ArithmeticException ae) {
             return "0 " + unitName;
             // internal java error, just return 0.

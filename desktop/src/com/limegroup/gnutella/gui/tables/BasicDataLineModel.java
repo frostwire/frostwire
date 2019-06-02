@@ -216,7 +216,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public T createDataLine() {
         try {
-            return (T) _dataLineClass.getDeclaredConstructor().newInstance();
+            return _dataLineClass.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

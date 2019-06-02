@@ -62,7 +62,7 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 	 */
 	@SuppressWarnings("unchecked")
     public CheckBoxListPanel() {
-		list = new CheckBoxList<E>((Collection<E>)Collections.emptyList());
+		list = new CheckBoxList<E>(Collections.emptyList());
 		initialize();
 	}
 	

@@ -68,7 +68,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
             }
             if (iter != null) {
                 if (iter.hasNext()) {
-                    curFileExt = (String) iter.next();   
+                    curFileExt = iter.next();
                 }
             }
             
@@ -335,7 +335,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
 
         if (temFileExtIter != null) {
             if (temFileExtIter.hasNext()) {
-                temFileExt = (String) temFileExtIter.next();
+                temFileExt = temFileExtIter.next();
             }
         }
 
