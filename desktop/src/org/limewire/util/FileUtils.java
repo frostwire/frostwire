@@ -267,18 +267,10 @@ public class FileUtils {
      * ProcessBuilder.redirectErrorStream()
      */
     private static void consumeAllInput(Process p) throws IOException {
-        InputStream in = null;
 
-        try {
-            in = new BufferedInputStream(p.getInputStream());
+        try (InputStream in = new BufferedInputStream(p.getInputStream())) {
             byte[] buf = new byte[1024];
-            while(in.read(buf, 0, buf.length) >= 0);
-        } finally {
-            try {
-                if(in != null) {
-                    in.close();
-                }
-            } catch(IOException ignored) {}
+            while (in.read(buf, 0, buf.length) >= 0) ;
         }
     }
 

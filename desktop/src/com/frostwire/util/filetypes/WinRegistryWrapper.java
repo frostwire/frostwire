@@ -628,26 +628,17 @@ public class WinRegistryWrapper {
             return byteArrayToString(result);
         } else {
             byte[] dataBytes = new byte[256];
-      
-            DataInputStream inStream = null;
-            try {
-                inStream = new DataInputStream(url.openStream());
+
+            try (DataInputStream inStream = new DataInputStream(url.openStream())) {
                 // Read a buffer size of 256 bytes of data to sniff the mime type.
                 inStream.read(dataBytes, 0, 256);
                 inStream.close();
             } catch (IOException e) {
                 // Cannot open the connection to the URL, return.
                 return null;
-            } finally {
-                // No matter what happens, always close streams already opened.
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (IOException e) {
-                    }
-                }
             }
-            
+            // No matter what happens, always close streams already opened.
+
             result = FindMimeFromData(null, dataBytes);
             if (result != null) {
                 return byteArrayToString(result);

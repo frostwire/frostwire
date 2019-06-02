@@ -35,18 +35,12 @@ public class DumpDatabase {
     }
 
     public void dump() {
-        PrintWriter out = null;
 
-        try {
-            out = new PrintWriter(file);
+        try (PrintWriter out = new PrintWriter(file)) {
             dumpPlaylists(out);
             dumpPlaylistItems(out);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (out != null) {
-                out.close();
-            }
         }
     }
 
