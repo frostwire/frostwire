@@ -201,8 +201,7 @@ public final class Initializer {
      * Wires together LimeWire.
      */
     private LimeWireGUI createLimeWire() {
-        LimeWireGUI limeWireGUI = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI();
-        return limeWireGUI;
+        return LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI();
     }
 
     /**

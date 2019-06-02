@@ -65,9 +65,8 @@ public final class SkinTabbedPaneTabBackgroundPainter extends AbstractSkinPainte
 
     private void paintDefaultTab(Graphics2D g, int width, int height) {
         int w = width - 4;
-        int h = height;
-        if (testValid(0, 0, w, h)) {
-            Shape s = shapeGenerator.createRectangle(0, 0, w, h);
+        if (testValid(0, 0, w, height)) {
+            Shape s = shapeGenerator.createRectangle(0, 0, w, height);
             g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
             g.fill(s);
 

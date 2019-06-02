@@ -86,8 +86,7 @@ abstract class AbstractMenu implements Menu {
     }
 
     protected JMenuItem addToggleMenuItem(ToggleSettingAction action) {
-        JMenuItem item = addToggleMenuItem(action, action.getSetting().getValue());
-        return item;
+        return addToggleMenuItem(action, action.getSetting().getValue());
     }
 
     /**

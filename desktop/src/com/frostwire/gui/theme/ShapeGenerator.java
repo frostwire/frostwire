@@ -443,32 +443,30 @@ public final class ShapeGenerator {
      * @return a path representing the shape.
      */
     public Shape createFillableFocusRectangle(int x, int y, int w, int h) {
-        final int left   = x;
-        final int top    = y;
         final int right  = x + w;
         final int bottom = y + h;
 
         path.reset();
-        path.moveTo(left, top);
-        path.lineTo(left, bottom);
+        path.moveTo(x, y);
+        path.lineTo(x, bottom);
         path.lineTo(right, bottom);
-        path.lineTo(right, top);
+        path.lineTo(right, y);
 
         final float offset = 1.4f;
 
-        final float left2   = left + offset;
-        final float top2    = top + offset;
+        final float left2   = x + offset;
+        final float top2    = y + offset;
         final float right2  = right - offset;
         final float bottom2 = bottom - offset;
 
         // TODO These two lines were curveTo in Nimbus. Perhaps we should
         // revisit this?
-        path.lineTo(right2, top);
+        path.lineTo(right2, y);
         path.lineTo(right2, bottom2);
         path.lineTo(left2, bottom2);
         path.lineTo(left2, top2);
         path.lineTo(right2, top2);
-        path.lineTo(right2, top);
+        path.lineTo(right2, y);
         path.closePath();
 
         return path;
@@ -780,8 +778,6 @@ public final class ShapeGenerator {
     private Shape createRoundRectangleInternal(final int x, final int y, final int w, final int h, final double radius,
             final CornerStyle topLeft, final CornerStyle bottomLeft, final CornerStyle bottomRight, final CornerStyle topRight) {
         // Convenience variables.
-        final int left   = x;
-        final int top    = y;
         final int right  = x + w;
         final int bottom = y + h;
 
@@ -792,12 +788,12 @@ public final class ShapeGenerator {
         switch (topLeft) {
 
         case SQUARE:
-            path.moveTo(left, top);
+            path.moveTo(x, y);
             break;
 
         case ROUNDED:
-            path.moveTo(left + radius, top);
-            path.quadTo(left, top, left, top + radius);
+            path.moveTo(x + radius, y);
+            path.quadTo(x, y, x, y + radius);
             break;
         }
 
@@ -805,12 +801,12 @@ public final class ShapeGenerator {
         switch (bottomLeft) {
 
         case SQUARE:
-            path.lineTo(left, bottom);
+            path.lineTo(x, bottom);
             break;
 
         case ROUNDED:
-            path.lineTo(left, bottom - radius);
-            path.quadTo(left, bottom, left + radius, bottom);
+            path.lineTo(x, bottom - radius);
+            path.quadTo(x, bottom, x + radius, bottom);
             break;
         }
 
@@ -830,12 +826,12 @@ public final class ShapeGenerator {
         switch (topRight) {
 
         case SQUARE:
-            path.lineTo(right, top);
+            path.lineTo(right, y);
             break;
 
         case ROUNDED:
-            path.lineTo(right, top + radius);
-            path.quadTo(right, top, right - radius, top);
+            path.lineTo(right, y + radius);
+            path.quadTo(right, y, right - radius, y);
             break;
         }
 

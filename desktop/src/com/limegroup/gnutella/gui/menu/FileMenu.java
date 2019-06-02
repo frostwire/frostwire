@@ -54,7 +54,6 @@ final class FileMenu extends AbstractMenu {
 	 * the action.
 	 */
 	private JMenuItem createMenuItem(Action action) {
-		JMenuItem menuItem = new JMenuItem(action);
-		return menuItem;
+        return new JMenuItem(action);
 	}
 }

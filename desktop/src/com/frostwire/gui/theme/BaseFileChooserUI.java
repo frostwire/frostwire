@@ -905,8 +905,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             }
             File directory = (File)value;
             setText(getFileChooser().getName(directory));
-            Icon icon = getFileChooser().getIcon(directory);
-            ii.icon = icon;
+            ii.icon = getFileChooser().getIcon(directory);
             ii.depth = directoryComboBoxModel.getDepth(index);
             setIcon(ii);
 
@@ -1008,7 +1007,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             // Get the canonical (full) path. This has the side
             // benefit of removing extraneous chars from the path,
             // for example /foo/bar/ becomes /foo/bar
-            File canonical = null;
+            File canonical;
             try {
                 canonical = ShellFolder.getNormalizedFile(directory);
             } catch (IOException e) {

@@ -29,11 +29,9 @@ import java.awt.*;
  */
 public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
 
-    private final State state;
     private final Color color;
 
     public SkinSeparatorBackgroundPainter(State state, Color color) {
-        this.state = state;
         this.color = color;
     }
 

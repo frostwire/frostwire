@@ -75,10 +75,9 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         long downSpeedSetMax = 0;
 
         for (com.frostwire.bittorrent.BTDownload btDownload : dms) {
-            com.frostwire.bittorrent.BTDownload dm = btDownload;
 
             try {
-                int maxul = dm.getUploadRateLimit();
+                int maxul = btDownload.getUploadRateLimit();
                 if (maxul == 0) {
                     upSpeedUnlimited = true;
                 } else {
@@ -92,7 +91,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
                 }
                 totalUpSpeed += maxul;
 
-                int maxdl = dm.getDownloadRateLimit();
+                int maxdl = btDownload.getDownloadRateLimit();
                 if (maxdl == 0) {
                     downSpeedUnlimited = true;
                 } else {

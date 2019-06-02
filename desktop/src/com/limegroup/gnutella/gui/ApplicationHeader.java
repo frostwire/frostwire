@@ -366,8 +366,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
         //start animation thread.
         Thread t = new Thread("update-button-animation") {
-            private final long ANIMATION_DURATION = 30000;
-            private final long ANIMATION_INTERVAL = 1000;
             private long updateButtonAnimationLastChange;
 
             public void run() {
@@ -375,7 +373,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 updateButtonAnimationLastChange = now;
 
                 boolean buttonState = true;
+                long ANIMATION_DURATION = 30000;
                 while (now - updateButtonAnimationStartedTimestamp < ANIMATION_DURATION) {
+                    long ANIMATION_INTERVAL = 1000;
                     if (now - updateButtonAnimationLastChange >= ANIMATION_INTERVAL) {
                         switchButtonImage(buttonState);
                         buttonState = !buttonState;

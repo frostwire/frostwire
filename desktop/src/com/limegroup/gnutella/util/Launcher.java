@@ -246,18 +246,16 @@ public final class Launcher {
         } catch (IOException err) {
             path = file.getAbsolutePath();
         }
-        
-        String[] command = new String[] { 
-                "osascript", 
+
+        return new String[] {
+                "osascript",
                 "-e", "set unixPath to \"" + path + "\"",
                 "-e", "set hfsPath to POSIX file unixPath",
-                "-e", "tell application \"Finder\"", 
-                "-e",    "activate", 
+                "-e", "tell application \"Finder\"",
+                "-e",    "activate",
                 "-e",    "select hfsPath",
-                "-e", "end tell" 
+                "-e", "end tell"
         };
-        
-        return command;
     }
     
 	/**

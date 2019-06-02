@@ -767,10 +767,9 @@ public class WinRegistryUtil {
      */
     private static List<Action> getUserAddedActionListByFileExt(String fileExt) {
         String fileExtKey = USER_FILE_EXT_KEY_PREFIX + "\\" + fileExt;
-        String valueName = USER_FILE_EXT_VALUENAME;
         int hKey = WinRegistryWrapper.HKEY_CURRENT_USER;
         //Get application name, e.g. notepad.exe
-        String appName = WinRegistryWrapper.WinRegQueryValueEx(hKey, fileExtKey, valueName);
+        String appName = WinRegistryWrapper.WinRegQueryValueEx(hKey, fileExtKey, USER_FILE_EXT_VALUENAME);
         //Get the corresponding application's shell keys
         String[] verbs = null;
         String appShellKey = USER_FILE_EXT_APP_PREFIX + "\\" + appName + "\\" + KN_SHELL;

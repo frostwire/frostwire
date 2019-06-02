@@ -215,7 +215,6 @@ public class ISO639 {
 	
 	public static String getISO639_2FromLocale(Locale locale) {
 		if(locale == null) return null;
-		String iso1 = ISO_639_1_to_ISO_639_2.get(locale.getLanguage());
-		return iso1;
+        return ISO_639_1_to_ISO_639_2.get(locale.getLanguage());
 	}
 }

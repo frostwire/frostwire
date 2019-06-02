@@ -386,9 +386,8 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Deselected root folders are not returned. Why???
      */
     public Set<File> getFoldersToExclude() {
-        Set<File> result = new HashSet<File>(deselected);
         //result.removeAll(roots);
-        return result;
+        return new HashSet<File>(deselected);
     }
 
     /**

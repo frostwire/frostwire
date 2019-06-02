@@ -54,13 +54,11 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
     private void paintBar(Graphics2D g, JComponent c, int width, int height) {
         int d = padding - 1;
         int d2 = 2 * d;
-        int x = d;
-        int y = d;
         width = width - d2;
         height = height - d2 - 1;
         
-        if (testValid(x, y, width, height)) {
-            Shape s = shapeGenerator.createRectangle(x, y, width, height);
+        if (testValid(d, d, width, height)) {
+            Shape s = shapeGenerator.createRectangle(d, d, width, height);
             g.setPaint(getProgressBarPaint(s));
             g.fill(s);
             

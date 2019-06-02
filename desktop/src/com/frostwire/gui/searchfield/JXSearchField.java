@@ -381,9 +381,8 @@ public class JXSearchField extends JXTextField {
 	 * @return the cancel button
 	 */
 	protected JButton createCancelButton() {
-		BuddyButton btn = new BuddyButton();
 
-		return btn;
+        return new BuddyButton();
 	}
 
 	/**
@@ -442,9 +441,8 @@ public class JXSearchField extends JXTextField {
 	 * @return the find button
 	 */
 	protected JButton createFindButton() {
-		BuddyButton btn = new BuddyButton();
 
-		return btn;
+        return new BuddyButton();
 	}
 
 	/**

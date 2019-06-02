@@ -115,10 +115,9 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
                     noLines++;
                 }
 
-                int width = TOOLTIP_WIDTH;
                 int height = fm.getHeight() * noLines + 10;
 
-                dimension = new Dimension(width, height);
+                dimension = new Dimension(TOOLTIP_WIDTH, height);
             }
         } catch (Throwable e) {
             // in case there is a problem with swing

@@ -39,8 +39,6 @@ public final class SkinEtchedBorder implements Border {
     }
 
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-        int w = width;
-        int h = height;
 
         Graphics2D g2d = (Graphics2D) g.create();
         //float strokeWidth = SubstanceSizeUtils.getBorderStrokeWidth(SubstanceSizeUtils.getComponentFontSize(c));
@@ -49,10 +47,10 @@ public final class SkinEtchedBorder implements Border {
 
         g2d.setColor(color);
         //g2d.drawRect(x, y, w - 1, h - 1);
-        g2d.drawRoundRect(x, y, w - 1, h - 2, 16, 16);
+        g2d.drawRoundRect(x, y, width - 1, height - 2, 16, 16);
         g2d.setColor(bottomShadeColor);
 
-        g2d.drawLine(x + 7, h - 1, w - 7, h - 1);
+        g2d.drawLine(x + 7, height - 1, width - 7, height - 1);
         /*
         g2d.translate(x, y);
 

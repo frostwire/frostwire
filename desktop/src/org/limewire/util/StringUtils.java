@@ -157,21 +157,20 @@ public class StringUtils {
      *  Note that this is <b>not internationalized</b>; but it is fast.
      */
     private static char toOtherCase(char c) {
-        int i = c;
         final int A = 'A'; //65
         final int Z = 'Z'; //90
         final int a = 'a'; //97
         final int z = 'z'; //122
         final int SHIFT = a - A;
 
-        if (i < A) { //non alphabetic
+        if ((int) c < A) { //non alphabetic
             return c;
-        } else if (i <= Z) { //upper-case
-            return (char) (i + SHIFT);
-        } else if (i < a) { //non alphabetic
+        } else if ((int) c <= Z) { //upper-case
+            return (char) ((int) c + SHIFT);
+        } else if ((int) c < a) { //non alphabetic
             return c;
-        } else if (i <= z) { //lower-case
-            return (char) (i - SHIFT);
+        } else if ((int) c <= z) { //lower-case
+            return (char) ((int) c - SHIFT);
         } else { //non alphabetic
             return c;
         }

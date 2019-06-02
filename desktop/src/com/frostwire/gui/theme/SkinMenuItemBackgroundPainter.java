@@ -29,10 +29,7 @@ import java.awt.*;
  */
 public final class SkinMenuItemBackgroundPainter extends AbstractSkinPainter {
 
-    private final State state;
-
     public SkinMenuItemBackgroundPainter(State state) {
-        this.state = state;
     }
 
     @Override

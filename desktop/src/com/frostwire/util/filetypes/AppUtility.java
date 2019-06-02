@@ -45,7 +45,7 @@ public class AppUtility {
     public static String getFileExtensionByURL(URL url) {
         String trimFile = url.getFile().trim();
 
-        if (trimFile == null || trimFile == "" || trimFile == "/") {
+        if (trimFile == null || trimFile.equals("") || trimFile.equals("/")) {
             return null;
         }
          
@@ -56,9 +56,7 @@ public class AppUtility {
         if (strIndex == -1 || strIndex == filePart.length() - 1) {
             return null;
         } else {
-            String fileExt = filePart.substring(strIndex, filePart.length());
-
-            return fileExt;
+            return filePart.substring(strIndex, filePart.length());
         }
     }
 

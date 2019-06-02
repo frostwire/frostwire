@@ -290,8 +290,7 @@ public class NativeFileIconController implements FileIconController {
         @Override
         public Icon getIcon(final File f) {
             try {
-                Icon icon = DELEGATE.getIcon(f);
-                return icon;
+                return DELEGATE.getIcon(f);
             } catch(NullPointerException npe) {
                 return null;
             } catch(UnsatisfiedLinkError ule) {

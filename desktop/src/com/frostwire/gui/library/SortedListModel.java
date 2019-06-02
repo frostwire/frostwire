@@ -98,8 +98,7 @@ public class SortedListModel extends AbstractListModel<Object> {
      */
     public Object getElementAt(int index) throws IndexOutOfBoundsException {
         int modelIndex = toUnsortedModelIndex(index);
-        Object element = unsortedModel.getElementAt(modelIndex);
-        return element;
+        return unsortedModel.getElementAt(modelIndex);
     }
     
     /**
@@ -107,8 +106,7 @@ public class SortedListModel extends AbstractListModel<Object> {
      * @return size of the model
      */
     public int getSize() {
-        int size = sortedModel.size();
-        return size;
+        return sortedModel.size();
     }
 
     

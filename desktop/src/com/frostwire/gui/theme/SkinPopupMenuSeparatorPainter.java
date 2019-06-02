@@ -29,10 +29,7 @@ import java.awt.*;
  */
 public final class SkinPopupMenuSeparatorPainter extends AbstractSkinPainter {
 
-    private final State state;
-
     public SkinPopupMenuSeparatorPainter(State state) {
-        this.state = state;
     }
 
     @Override

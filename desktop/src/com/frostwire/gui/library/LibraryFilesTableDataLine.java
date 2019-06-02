@@ -293,7 +293,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
 
     private LimeTableColumn[] getLimeTableColumns() {
         if (ltColumns == null) {
-            LimeTableColumn[] temp = {new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
+            ltColumns = new LimeTableColumn[]{new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
 
                     //new LimeTableColumn(SHARE_IDX, "LIBRARY_TABLE_SHARE", I18n.tr("Wi-Fi Shared"), 18, true, FileShareCell.class),
 
@@ -313,7 +313,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
 
                     new LimeTableColumn(LICENSE_IDX, "LIBRARY_TABLE_LICENSE", I18n.tr("License"), 100, true, String.class),
             };
-            ltColumns = temp;
         }
         return ltColumns;
     }

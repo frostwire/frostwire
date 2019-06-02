@@ -302,19 +302,17 @@ public class FileUtils {
     	}
     	
     	String fileOrFolder = (file.isFile() ? "file" : "folder");
-    	
-    	String[] command = new String[] { 
-    			"osascript", 
-    			"-e", "set unixPath to \"" + path + "\"",
-    			"-e", "set hfsPath to POSIX file unixPath",
-    			"-e", "tell application \"Finder\"", 
-    			"-e",    "if " + fileOrFolder + " hfsPath exists then", 
-    			"-e",        "move " + fileOrFolder + " hfsPath to trash",
-    			"-e",    "end if",
-    			"-e", "end tell" 
-    	};
-    	
-    	return command;
+
+        return new String[] {
+                "osascript",
+                "-e", "set unixPath to \"" + path + "\"",
+                "-e", "set hfsPath to POSIX file unixPath",
+                "-e", "tell application \"Finder\"",
+                "-e",    "if " + fileOrFolder + " hfsPath exists then",
+                "-e",        "move " + fileOrFolder + " hfsPath to trash",
+                "-e",    "end if",
+                "-e", "end tell"
+        };
     }
     
     
