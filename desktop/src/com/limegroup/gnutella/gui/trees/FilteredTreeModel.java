@@ -287,10 +287,8 @@ public class FilteredTreeModel implements TreeModel {
 			if (visibleNodes != null) {
 				List<Object> children = new ArrayList<Object>(event.getChildren().length);
 				List<Integer> indicieList = new ArrayList<Integer>(event.getChildIndices().length);
-				
-				for (Object node : event.getChildren()) {
-					visibleNodes.add(node);
-				}
+
+				visibleNodes.addAll(Arrays.asList(event.getChildren()));
 				
 				Object parent = event.getTreePath().getLastPathComponent();
 				for (Object node : event.getChildren()) {

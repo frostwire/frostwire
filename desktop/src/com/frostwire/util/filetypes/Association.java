@@ -227,12 +227,9 @@ public class Association {
             return null;
         } else {
             List<String> retList = new ArrayList<String>();
-            
-            Iterator<String> iter = fileExtensionList.iterator();
-            while (iter.hasNext()) {
-                retList.add(iter.next());
-            }
-            
+
+            retList.addAll(fileExtensionList);
+
             return retList;
         }            
     }

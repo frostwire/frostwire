@@ -2,6 +2,7 @@ package net.miginfocom.layout;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * License (BSD):
@@ -86,8 +87,7 @@ public final class AC implements Externalizable
 
 		cList.clear();
 		cList.ensureCapacity(constr.length);
-		for (DimConstraint c : constr)
-			cList.add(c);
+		cList.addAll(Arrays.asList(constr));
 	}
 
 	/** Returns the number of rows/columns that this constraints currently have.

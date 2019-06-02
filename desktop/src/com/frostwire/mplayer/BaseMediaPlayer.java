@@ -544,10 +544,8 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	
 	public Language[] getAudioTracks() {
 		List<Language> result = new ArrayList<>();
-		synchronized (audioTracks) {			
-			for(Language language : audioTracks) {
-				result.add(language);			
-			}			
+		synchronized (audioTracks) {
+			result.addAll(audioTracks);
 		}
 		return result.toArray(new Language[result.size()]);
 	}
@@ -555,10 +553,8 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 	
 	public Language[] getSubtitles() {
 		List<Language> result = new ArrayList<>();
-		synchronized (subtitles) {			
-			for(Language language : subtitles) {
-				result.add(language);			
-			}			
+		synchronized (subtitles) {
+			result.addAll(subtitles);
 		}
 		return result.toArray(new Language[result.size()]);
 	}
