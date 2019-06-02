@@ -62,7 +62,7 @@ public final class SkinTreeUI extends SynthTreeUI {
 
             if (selected) {
                 g.setColor(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
-            } else if (row >= 0 && row % 2 == 1) {
+            } else if (row % 2 == 1) {
                 g.setColor(SkinColors.TABLE_ALTERNATE_ROW_COLOR);
             } else if (row % 2 == 0) {
                 g.setColor(Color.WHITE);

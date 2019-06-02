@@ -128,7 +128,7 @@ public class Playlist extends LibraryDatabaseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Playlist)) {
+        if (!(obj instanceof Playlist)) {
             return false;
         }
 

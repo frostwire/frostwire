@@ -1106,7 +1106,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            if (value != null && value instanceof FileFilter) {
+            if (value instanceof FileFilter) {
                 setText(((FileFilter)value).getDescription());
             }
 

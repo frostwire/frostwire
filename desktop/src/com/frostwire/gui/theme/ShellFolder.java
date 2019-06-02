@@ -167,8 +167,8 @@ abstract class ShellFolder extends File {
      * @see #compareTo(Object)
      */
     public int compareTo(File file2) {
-        if (file2 == null || !(file2 instanceof ShellFolder)
-            || ((file2 instanceof ShellFolder) && ((ShellFolder)file2).isFileSystem())) {
+        if (!(file2 instanceof ShellFolder)
+                || ((file2 instanceof ShellFolder) && ((ShellFolder) file2).isFileSystem())) {
 
             if (isFileSystem()) {
                 return super.compareTo(file2);

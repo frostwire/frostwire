@@ -1741,8 +1741,7 @@ public final class Grid
 
 			if (eHideMode > 1) {
 				gaps = new int[4][];
-				for (int i = 0; i < gaps.length; i++)
-					gaps[i] = new int[3];
+				Arrays.fill(gaps, new int[3]);
 			}
 		}
 

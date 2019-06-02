@@ -186,10 +186,9 @@ final class UpdateMessage implements Serializable {
     }
 
     public boolean equals(Object obj) {
-        return obj!=null &&
-               obj instanceof UpdateMessage &&
-               obj.hashCode() == this.hashCode() &&
-               isIntro() == ((UpdateMessage) obj).isIntro();
+        return obj instanceof UpdateMessage &&
+                obj.hashCode() == this.hashCode() &&
+                isIntro() == ((UpdateMessage) obj).isIntro();
     }
 
     public int hashCode() {

@@ -140,9 +140,8 @@ public final class ButtonRow extends JPanel {
                      String[] iconNames,
                      int orientation,
                      int glue) {                        
-		if((labelKeys.length != toolTipKeys.length) ||
-		   (labelKeys.length != listeners.length) ||
-		   (toolTipKeys.length != listeners.length)) {
+		if((labelKeys.length != listeners.length) ||
+				(toolTipKeys.length != listeners.length)) {
 			throw new IllegalArgumentException("invalid ButtonRow constructor: "+
 											   "array lengths must be equal");
 		}
