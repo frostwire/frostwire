@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,19 +45,19 @@ import java.util.List;
  * @author aldenml
  *
  */
-public abstract class AbstractLibraryListPanel extends JPanel implements RefreshListener {
-	
-    private List<Runnable> PENDING_RUNNABLES;
+abstract class AbstractLibraryListPanel extends JPanel implements RefreshListener {
+
+    private final List<Runnable> PENDING_RUNNABLES;
     
-    public AbstractLibraryListPanel() {
-    	    PENDING_RUNNABLES = Collections.synchronizedList(new ArrayList<Runnable>());
+    AbstractLibraryListPanel() {
+    	    PENDING_RUNNABLES = Collections.synchronizedList(new ArrayList<>());
     }
     
-    public void enqueueRunnable(Runnable r) {
+    void enqueueRunnable(Runnable r) {
         PENDING_RUNNABLES.add(r);
     }
     
-    public void executePendingRunnables() {
+    void executePendingRunnables() {
         if (PENDING_RUNNABLES != null && PENDING_RUNNABLES.size() > 0) {
             synchronized(PENDING_RUNNABLES) {
                 Iterator<Runnable> it = PENDING_RUNNABLES.iterator();
@@ -74,7 +74,7 @@ public abstract class AbstractLibraryListPanel extends JPanel implements Refresh
         }
     }
 
-    public List<Runnable> getPendingRunnables() {
+    List<Runnable> getPendingRunnables() {
         return PENDING_RUNNABLES;
     }
 }
