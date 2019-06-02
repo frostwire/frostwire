@@ -37,7 +37,7 @@ public final class UrlUtils {
             return "";
         }
         try {
-            return URLEncoder.encode(s, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "";
@@ -49,7 +49,7 @@ public final class UrlUtils {
             return "";
         }
         try {
-            return URLDecoder.decode(s, StandardCharsets.UTF_8.toString());
+            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "";

@@ -104,7 +104,7 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
         String decodedFileName = fallbackName;
         if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
             try {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.toString());
+                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.name());
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
