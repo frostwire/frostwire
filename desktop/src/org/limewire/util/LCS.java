@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Longest_common_subsequence#Java
- * 
+ *
  * @author gubatron
  * @author aldenml
  */
@@ -73,12 +73,11 @@ public class LCS {
     }
 
     /**
-     * A class to compute the longest common subsequence in two strings.  
+     * A class to compute the longest common subsequence in two strings.
      * Algorithms from Wikipedia:
      * http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
-     * 
-     * @author jhess
      *
+     * @author jhess
      */
     public static abstract class LongestCommonSubsequence<VALUE> {
         private int[][] c;
@@ -86,8 +85,8 @@ public class LCS {
         private ArrayList<VALUE> backtrack;
 
         /**
-         * A constructor for classes inheriting this one, allowing them to 
-         * do some initialization before setting the values of X and Y.  Once 
+         * A constructor for classes inheriting this one, allowing them to
+         * do some initialization before setting the values of X and Y.  Once
          * the initialization is complete, the inheriting class must call
          * initValues(VALUE[] x, VALUE[] y)
          */
@@ -296,7 +295,7 @@ public class LCS {
     }
 
     public static class LcsString extends LongestCommonSubsequence<Character> {
-        
+
         private String x;
         private String y;
         private final boolean ignoreCase;
@@ -306,7 +305,7 @@ public class LCS {
             this.y = to;
             this.ignoreCase = ignoreCase;
         }
-        
+
         public LcsString(String from, String to) {
             this(from, to, false);
         }
@@ -326,7 +325,7 @@ public class LCS {
         protected Character valueOfY(int index) {
             return y.charAt(index);
         }
-        
+
         @Override
         protected boolean equals(Character x1, Character y1) {
             if (ignoreCase) {
@@ -374,24 +373,22 @@ public class LCS {
                         }
                     }
                     switch (entry.getType()) {
-                    case REMOVE:
-                        type = null;
-                        break;
-                    case ADD:
-                        type = null;
-                        break;
-                    default:
-                        buf.append("<b>");
-                        type = entry.getType();
+                        case REMOVE:
+                        case ADD:
+                            type = null;
+                            break;
+                        default:
+                            buf.append("<b>");
+                            type = entry.getType();
                     }
                 }
 
                 switch (entry.getType()) {
-                case REMOVE:
-                    break;
-                case ADD:
-                default:
-                    buf.append(escapeHtml(entry.getValue()));
+                    case REMOVE:
+                        break;
+                    case ADD:
+                    default:
+                        buf.append(escapeHtml(entry.getValue()));
                 }
             }
             if (type != null) {
@@ -402,14 +399,14 @@ public class LCS {
 
         private String escapeHtml(Character ch) {
             switch (ch) {
-            case '<':
-                return "&lt;";
-            case '>':
-                return "&gt;";
-            case '"':
-                return "\\&quot;";
-            default:
-                return ch.toString();
+                case '<':
+                    return "&lt;";
+                case '>':
+                    return "&gt;";
+                case '"':
+                    return "\\&quot;";
+                default:
+                    return ch.toString();
             }
         }
     }

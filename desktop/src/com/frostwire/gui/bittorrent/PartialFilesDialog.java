@@ -34,10 +34,8 @@ import java.awt.event.*;
 import java.io.File;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class PartialFilesDialog extends JDialog {
     private LabeledTextField filter;
@@ -54,7 +52,9 @@ public class PartialFilesDialog extends JDialog {
     private boolean[] filesSelection;
     private JCheckBox checkBoxToggleAll;
 
-    /** Has the table been painted at least once? */
+    /**
+     * Has the table been painted at least once?
+     */
     private boolean tablePainted;
 
     PartialFilesDialog(JFrame frame, File torrentFile) {
@@ -384,20 +384,18 @@ public class PartialFilesDialog extends JDialog {
         public Class<?> getColumnClass(int columnIndex) {
 
             switch (columnIndex) {
-            case 0:
-                return Boolean.class;
-            case 1:
-                return Icon.class;
-            case 2:
-                return String.class;
-            case 3:
-                return String.class;
-            case 4:
-                return String.class;
-            case 5:
-                return SizeHolder.class;
-            default:
-                return null;
+                case 0:
+                    return Boolean.class;
+                case 1:
+                    return Icon.class;
+                case 2:
+                case 3:
+                case 4:
+                    return String.class;
+                case 5:
+                    return SizeHolder.class;
+                default:
+                    return null;
             }
         }
 
@@ -407,26 +405,26 @@ public class PartialFilesDialog extends JDialog {
             String extension = FilenameUtils.getExtension(filePath);
 
             switch (columnIndex) {
-            case 0:
-                //checkbox
-                return _fileInfos[rowIndex].selected;
-            case 1:
-                //icon
-                return IconManager.instance().getIconForExtension(extension);
-            case 2:
-                //path
-                return filePath;
-            case 3:
-                //human type
-                return guessHumanType(extension);
-            case 4:
-                //extension
-                return extension;
-            case 5:
-                //file size
-                return new SizeHolder(_fileInfos[rowIndex].size);
-            default:
-                return null;
+                case 0:
+                    //checkbox
+                    return _fileInfos[rowIndex].selected;
+                case 1:
+                    //icon
+                    return IconManager.instance().getIconForExtension(extension);
+                case 2:
+                    //path
+                    return filePath;
+                case 3:
+                    //human type
+                    return guessHumanType(extension);
+                case 4:
+                    //extension
+                    return extension;
+                case 5:
+                    //file size
+                    return new SizeHolder(_fileInfos[rowIndex].size);
+                default:
+                    return null;
             }
         }
 

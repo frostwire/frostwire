@@ -65,12 +65,10 @@ public final class SkinScrollBarButtonPainter extends AbstractSkinPainter {
         case Disabled:
             return SkinColors.SCROLL_BUTTON_ARROW_DISABLED_COLOR;
         case Enabled:
-            return SkinColors.SCROLL_BUTTON_ARROW_ENABLED_COLOR;
-        case MouseOver:
-            return SkinColors.SCROLL_BUTTON_ARROW_ENABLED_COLOR;
-        case Pressed:
-            return SkinColors.SCROLL_BUTTON_ARROW_ENABLED_COLOR;
-        default:
+            case Pressed:
+            case MouseOver:
+                return SkinColors.SCROLL_BUTTON_ARROW_ENABLED_COLOR;
+            default:
             throw new IllegalArgumentException("Not supported state");
         }
     }
@@ -93,14 +91,11 @@ public final class SkinScrollBarButtonPainter extends AbstractSkinPainter {
     private Paint getScrollBarButtonBoxBorderColor() {
         switch (state) {
         case Disabled:
-            return SkinColors.SCROLL_BUTTON_ARROW_BOX_BORDER_COLOR;
-        case Enabled:
-            return SkinColors.SCROLL_BUTTON_ARROW_BOX_BORDER_COLOR;
-        case MouseOver:
-            return SkinColors.SCROLL_BUTTON_ARROW_BOX_BORDER_COLOR;
-        case Pressed:
-            return SkinColors.SCROLL_BUTTON_ARROW_BOX_BORDER_COLOR;
-        default:
+            case Pressed:
+            case MouseOver:
+            case Enabled:
+                return SkinColors.SCROLL_BUTTON_ARROW_BOX_BORDER_COLOR;
+            default:
             throw new IllegalArgumentException("Not supported state");
         }
     }

@@ -23,10 +23,8 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinTableHeaderPainter extends AbstractSkinPainter {
 
@@ -60,14 +58,13 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
 
     private Paint getTableHeaderPaint(Shape s) {
         switch (state) {
-        case Enabled:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_ENABLED_COLORS);
-        case MouseOver:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS); // not an error, neede to check deep in nimbus
-        case Pressed:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS);
-        default:
-            throw new IllegalArgumentException("Not supported state");
+            case Enabled:
+                return createVerticalGradient(s, SkinColors.TABLE_HEADER_ENABLED_COLORS);
+            case MouseOver:
+            case Pressed:
+                return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS); // not an error, neede to check deep in nimbus
+            default:
+                throw new IllegalArgumentException("Not supported state");
         }
     }
 
