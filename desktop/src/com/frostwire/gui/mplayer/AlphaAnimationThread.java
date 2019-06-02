@@ -24,22 +24,22 @@ public class AlphaAnimationThread extends Thread {
     private static final int ALPHA_STEP = 20;
 
     private boolean disposed = false;
-    private Object animationStart = new Object();
+    private final Object animationStart = new Object();
     private boolean isHiding;
     private boolean isShowing;
     private int currentAlpha = TARGET_ALPHA;
 
     private AlphaTarget target;
 
-    public AlphaAnimationThread(AlphaTarget target) {
+    AlphaAnimationThread(AlphaTarget target) {
         this.target = target;
     }
 
-    public void setDisposed() {
+    void setDisposed() {
         disposed = true;
     }
 
-    public void animateToTransparent() {
+    void animateToTransparent() {
         if (isHiding) {
             return;
         }
@@ -52,7 +52,7 @@ public class AlphaAnimationThread extends Thread {
         }
     }
 
-    public void animateToOpaque() {
+    void animateToOpaque() {
         if (isShowing) {
             return;
         }
