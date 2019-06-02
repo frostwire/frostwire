@@ -253,6 +253,7 @@ public class DisplayFormatters {
         System.out.println("123456:" + DisplayFormatters.formatDecimal(123456, 0));
         // should display 123456
         System.out.println("123456:" + DisplayFormatters.formatDecimal(123456.999, 0));
+        //noinspection divzero
         System.out.println(DisplayFormatters.formatDecimal(0.0 / 0, 3));
     }
 }

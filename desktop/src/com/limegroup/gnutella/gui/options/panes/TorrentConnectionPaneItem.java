@@ -21,7 +21,6 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 public final class TorrentConnectionPaneItem extends AbstractPaneItem {
 

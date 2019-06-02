@@ -17,7 +17,6 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
 
-import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

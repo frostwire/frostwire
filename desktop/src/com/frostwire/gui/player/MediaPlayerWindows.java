@@ -21,7 +21,6 @@ package com.frostwire.gui.player;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 

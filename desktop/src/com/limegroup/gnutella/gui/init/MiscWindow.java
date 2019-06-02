@@ -19,8 +19,6 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.WindowsUtils;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.MacOSXUtils;
 import org.limewire.util.OSUtils;
@@ -38,7 +36,6 @@ final class MiscWindow extends SetupWindow {
      * System Startup
      */
     private JCheckBox _startup;
-    private JCheckBox checkBoxUXStats;
 
     /**
      * Creates the window and its components.
