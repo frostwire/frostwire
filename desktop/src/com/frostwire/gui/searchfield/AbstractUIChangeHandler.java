@@ -7,7 +7,7 @@ import java.util.Set;
 
 public abstract class AbstractUIChangeHandler implements PropertyChangeListener {
 	//prevent double installation.
-	private final Set<JComponent> installed = new HashSet<JComponent>();
+	private final Set<JComponent> installed = new HashSet<>();
 	
 	public void install(JComponent c){
 		if(isInstalled(c)){

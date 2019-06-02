@@ -32,7 +32,7 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
      * All Strings are stored with the case of the last entry added.
      */
     public StringTrieSet(boolean caseSensitive) {
-        map = new StringTrie<String>(caseSensitive);
+        map = new StringTrie<>(caseSensitive);
     }
 
     /**
@@ -100,7 +100,7 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
      * Clears all items in the dictionary.
      */
     public void clear() {
-        List<String> l = new LinkedList<String>();
+        List<String> l = new LinkedList<>();
         for(String string : this)
             l.add(string);
         for(String string : l)

@@ -43,8 +43,8 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
 
 	public SearchEnginesPaneItem() {
 	    super(TITLE, LABEL);
-        searchEngineCheckboxes = new LinkedList<JCheckBox>();
-        cBoxes = new HashMap<JCheckBox, BooleanSetting>();
+        searchEngineCheckboxes = new LinkedList<>();
+        cBoxes = new HashMap<>();
         searchEnginesCheckboxListener = new SearchEngineCheckboxListener(cBoxes);
 		add(createSearchEnginesCheckboxPanel());
         add(createToggleAllCheckbox());

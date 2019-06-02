@@ -88,8 +88,8 @@ public final class PlatformDefaults
 
 	private static String BUTTON_FORMAT = null;
 
-	private static final HashMap<String, UnitValue> HOR_DEFS = new HashMap<String, UnitValue>(32);
-	private static final HashMap<String, UnitValue> VER_DEFS = new HashMap<String, UnitValue>(32);
+	private static final HashMap<String, UnitValue> HOR_DEFS = new HashMap<>(32);
+	private static final HashMap<String, UnitValue> VER_DEFS = new HashMap<>(32);
 	private static BoundSize DEF_VGAP = null, DEF_HGAP = null;
 	static BoundSize RELATED_X = null, RELATED_Y = null, UNRELATED_X = null, UNRELATED_Y = null;
 	private static UnitValue BUTT_WIDTH = null;

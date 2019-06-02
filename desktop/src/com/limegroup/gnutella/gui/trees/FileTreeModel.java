@@ -44,7 +44,7 @@ public class FileTreeModel extends AbstractTreeModel {
 
     private List<File> subRoots;
 
-    private Hashtable<String, List<File>> subChildren = new Hashtable<String, List<File>>();
+    private Hashtable<String, List<File>> subChildren = new Hashtable<>();
 
     private File cachedDir;
 
@@ -64,12 +64,12 @@ public class FileTreeModel extends AbstractTreeModel {
         super(root);
 
         if (roots != null) {
-            subRoots = new ArrayList<File>(roots.length);
+            subRoots = new ArrayList<>(roots.length);
             for (File file : roots) {
                 addSubRoot(file);
             }
         } else {
-            subRoots = new ArrayList<File>();
+            subRoots = new ArrayList<>();
         }
     }
 

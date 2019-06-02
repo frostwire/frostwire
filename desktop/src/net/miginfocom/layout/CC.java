@@ -98,7 +98,7 @@ public final class CC implements Externalizable
 	String[] getLinkTargets()
 	{
 		if (linkTargets == null) {
-			final ArrayList<String> targets = new ArrayList<String>(2);
+			final ArrayList<String> targets = new ArrayList<>(2);
 
 			if (pos != null) {
                 for (UnitValue po : pos) addLinkTargetIDs(targets, po);

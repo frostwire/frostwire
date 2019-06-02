@@ -36,7 +36,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
     /** 
      * HashMap for quick access to indexes.
      */
-    protected HashMap<E, Integer> _indexes = new HashMap<E, Integer>();
+    protected HashMap<E, Integer> _indexes = new HashMap<>();
     
     /**
      * Constructor -- this HashBasedDataLineModel supports the

@@ -489,7 +489,7 @@ public class SearchField extends JXSearchField {
         getPopupComponent(); // construct the component.
 
         boolean different = false;
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         ListModel<String> model = entryList.getModel();
         for (int i = 0; iter.hasNext(); i++) {
             String next = iter.next();

@@ -44,7 +44,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * Internally used list object storing the DataLines.
      */
-    protected List<T> _list = new ArrayList<T>();
+    protected List<T> _list = new ArrayList<>();
 
     private static final int ASCENDING = 1;
     private static final int DESCENDING = -1;

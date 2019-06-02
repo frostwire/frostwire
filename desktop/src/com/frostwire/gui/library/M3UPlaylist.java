@@ -43,7 +43,7 @@ public final class M3UPlaylist {
      * ----------------------<br>
      */
     public static List<File> load(String fileName) throws IOException {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         File playListFile = new File(fileName);
         BufferedReader m3uFile = null;
         try {

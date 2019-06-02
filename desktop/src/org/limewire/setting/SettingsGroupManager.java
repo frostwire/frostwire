@@ -33,7 +33,7 @@ public final class SettingsGroupManager {
     /**
      * A list of Settings this SettingsHandler is managing
      */
-    private final Collection<SettingsGroup> PROPS = Collections.synchronizedList(new ArrayList<SettingsGroup>());
+    private final Collection<SettingsGroup> PROPS = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * A list of {@link SettingsGroupManagerListener}s
@@ -58,7 +58,7 @@ public final class SettingsGroupManager {
         
         synchronized (this) {
             if (listeners == null) {
-                listeners = new ArrayList<SettingsGroupManagerListener>();
+                listeners = new ArrayList<>();
             }
             listeners.add(l);
         }        

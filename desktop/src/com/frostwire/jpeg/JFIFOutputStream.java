@@ -43,7 +43,7 @@ public class JFIFOutputStream extends OutputStream {
      * This hash set holds the Id's of markers which stand alone,
      * respectively do no have a data segment.
      */
-    private final HashSet<Integer> standaloneMarkers = new HashSet<Integer>();
+    private final HashSet<Integer> standaloneMarkers = new HashSet<>();
     /** Start of image */
     public final static int SOI_MARKER = 0xffd8;
     /** End of image */
@@ -99,7 +99,7 @@ public class JFIFOutputStream extends OutputStream {
     public final static int RST7_MARKER = 0xffd7;
     private ImageOutputStream out;
     private long streamOffset;
-    private Stack<Segment> stack = new Stack<Segment>();
+    private Stack<Segment> stack = new Stack<>();
 
     public JFIFOutputStream(ImageOutputStream out) throws IOException {
         this.out = out;
@@ -135,7 +135,7 @@ public class JFIFOutputStream extends OutputStream {
          * This hash set holds the Id's of markers which have a data
          * segment followed by a entropy-coded data segment.
          */
-        HashSet<Integer> doubleSegMarkers = new HashSet<Integer>();
+        HashSet<Integer> doubleSegMarkers = new HashSet<>();
         doubleSegMarkers.add(SOS_MARKER); // SOS_MARKER Start of Scan
 
     }

@@ -176,7 +176,7 @@ public class GoogleSearchField extends SearchField {
 
         private List<String> readSuggestions(JsonArray array) {
             String t = input.getText();
-            List<String> suggestions = new ArrayList<String>(array.size());
+            List<String> suggestions = new ArrayList<>(array.size());
             if (!StringUtils.isNullOrEmpty(t, true)) {
                 for (int i = 0; i < array.size(); i++) {
                     try {

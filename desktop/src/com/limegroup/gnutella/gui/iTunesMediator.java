@@ -114,7 +114,7 @@ public final class iTunesMediator {
         //remove incomplete files from files.
         Set<File> ignorableFiles = TorrentUtil.getIgnorableFiles();
 
-        List<File> completeFiles = new ArrayList<File>(files.length);
+        List<File> completeFiles = new ArrayList<>(files.length);
         for (File f : files) {
             if (ignorableFiles.contains(f)) {
                 continue;
@@ -160,7 +160,7 @@ public final class iTunesMediator {
      * Constructs and returns a osascript command.
      */
     private static String[] createOSAScriptCommand(String playlist, File[] files) {
-        List<String> command = new ArrayList<String>();
+        List<String> command = new ArrayList<>();
         command.add("osascript");
         command.add("-e");
         command.add("tell application \"Finder\"");
@@ -201,7 +201,7 @@ public final class iTunesMediator {
     }
 
     private static String[] createWSHScriptCommand(String playlist, File[] files) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("wscript");
         command.add("//B");
         command.add("//NoLogo");
@@ -352,7 +352,7 @@ public final class iTunesMediator {
 
                 Runtime.getRuntime().exec(command);
             } else if (OSUtils.isWindows()) {
-                ArrayList<String> command = new ArrayList<String>();
+                ArrayList<String> command = new ArrayList<>();
                 command.add("wscript");
                 command.add("//B");
                 command.add("//NoLogo");
@@ -385,7 +385,7 @@ public final class iTunesMediator {
     // I use this to split list of files to be imported to itunes
     // because the script interpreters can only handle so many characters as arguments.
     private static <T> List<T[]> splitArray(T[] items, int maxSubArraySize) {
-        List<T[]> result = new ArrayList<T[]>();
+        List<T[]> result = new ArrayList<>();
         if (items == null || items.length == 0) {
             return result;
         }

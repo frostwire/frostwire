@@ -35,7 +35,7 @@ public class MPlayerUIEventHandler {
 
     }
 
-    private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<MPlayerUIEventListener>();
+    private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
 
     public void addListener(MPlayerUIEventListener listener) {
         listeners.add(listener);

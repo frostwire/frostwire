@@ -50,11 +50,11 @@ public class LanguagePanel extends JPanel {
         this.actionListener = actionListener;
         this.languageLabel = new JLabel();
 
-        languageOptions = new JComboBox<Object>();
+        languageOptions = new JComboBox<>();
         Font font = new Font("Dialog", Font.PLAIN, 11);
         languageOptions.setFont(font);
         Locale[] locales = LanguageUtils.getLocales(font);
-        languageOptions.setModel(new DefaultComboBoxModel<Object>(locales));
+        languageOptions.setModel(new DefaultComboBoxModel<>(locales));
         languageOptions.setRenderer(LanguageFlagFactory.getListRenderer());
 
         Locale locale = guessLocale(locales);
@@ -157,7 +157,7 @@ public class LanguagePanel extends JPanel {
      * for the Windows LCID.
      */
     private String[] getLCID(String code) {
-        Map<String, String[]> map = new HashMap<String, String[]>();
+        Map<String, String[]> map = new HashMap<>();
         map.put("1078", new String[] { "af", "", "" });
         map.put("1052", new String[] { "sq", "", "" });
         map.put("5121", new String[] { "ar", "", "" });

@@ -219,7 +219,7 @@ public class MediaType implements Serializable {
             this.extsArray = new String[0];
         } else {
             Set<String> set =
-                new TreeSet<String>(Comparators.caseInsensitiveStringComparator());
+                    new TreeSet<>(Comparators.caseInsensitiveStringComparator());
             set.addAll(Arrays.asList(extensions));
             this.exts = set;
             this.extsArray = exts.toArray(new String[0]);
@@ -360,7 +360,7 @@ public class MediaType implements Serializable {
      */
     public static class Aggregator {
         /** A list of MediaType objects. */
-        private List<MediaType> _filters = new LinkedList<MediaType>();
+        private List<MediaType> _filters = new LinkedList<>();
 
         private Aggregator() {}
 
@@ -380,7 +380,7 @@ public class MediaType implements Serializable {
      * Utility that makes an array out of two sets.
      */
     private static String[] makeArray(Set<String> one, Set<String> two) {
-        Set<String> all = new HashSet<String>(one);
+        Set<String> all = new HashSet<>(one);
         all.addAll(two);
         return all.toArray(new String[0]);
     }

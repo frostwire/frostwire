@@ -42,7 +42,7 @@ public class MagnetOptions implements Serializable {
      * @return array may be empty, but is never <code>null</code>
      */
     public static MagnetOptions[] parseMagnets(String magnets) {
-        List<MagnetOptions> list = new ArrayList<MagnetOptions>();
+        List<MagnetOptions> list = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer
                 (magnets, System.getProperty("line.separator"));
         while (tokens.hasMoreTokens()) {
@@ -63,7 +63,7 @@ public class MagnetOptions implements Serializable {
      */
     public static MagnetOptions[] parseMagnet(String arg) {
 
-        Map<Integer, Map<Option, List<String>>> options = new HashMap<Integer, Map<Option, List<String>>>();
+        Map<Integer, Map<Option, List<String>>> options = new HashMap<>();
 
         // Strip out any single quotes added to escape the string
         if (arg.startsWith("'"))

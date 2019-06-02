@@ -36,7 +36,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
     private final LimeCoreGlue limeCoreGlue;
     
     /** A list of items that require running prior to shutting down LW. */
-    private final List<Thread> SHUTDOWN_ITEMS =  Collections.synchronizedList(new LinkedList<Thread>());
+    private final List<Thread> SHUTDOWN_ITEMS =  Collections.synchronizedList(new LinkedList<>());
     /** The time when this finished starting. */
     private long startFinishedTime;
     

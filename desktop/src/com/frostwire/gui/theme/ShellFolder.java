@@ -121,7 +121,7 @@ abstract class ShellFolder extends File {
         File[] files = super.listFiles();
 
         if (!includeHiddenFiles) {
-            Vector<File> v = new Vector<File>();
+            Vector<File> v = new Vector<>();
             int nameCount = (files == null) ? 0 : files.length;
             for (int i = 0; i < nameCount; i++) {
                 if (!files[i].isHidden()) {

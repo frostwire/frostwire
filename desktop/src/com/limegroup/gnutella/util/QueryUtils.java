@@ -35,7 +35,7 @@ public class QueryUtils {
         fileName = QueryUtils.ripExtension(fileName);
     	
         //Separate by whitespace and _, etc.
-        Set<String> ret=new LinkedHashSet<String>();
+        Set<String> ret= new LinkedHashSet<>();
         String delim = DELIMITERS;
         char[] illegal = SearchSettings.ILLEGAL_CHARS.getValue();
         StringBuilder sb = new StringBuilder(delim.length() + illegal.length);

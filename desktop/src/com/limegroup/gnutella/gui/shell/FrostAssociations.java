@@ -62,7 +62,7 @@ public class FrostAssociations {
 			return Collections.emptyList();
 		}
 
-		Collection<LimeAssociationOption> ret = new ArrayList<LimeAssociationOption>();
+		Collection<LimeAssociationOption> ret = new ArrayList<>();
 
 		// strings that the shell will understand 
 		String fileOpener = null;

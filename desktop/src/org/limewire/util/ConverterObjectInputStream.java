@@ -56,7 +56,7 @@ public class ConverterObjectInputStream extends ObjectInputStream {
 
     private static final Logger LOG = Logger.getLogger(ConverterObjectInputStream.class);
 
-    private Map<String, String> lookups = new HashMap<String, String>(8);
+    private Map<String, String> lookups = new HashMap<>(8);
 
     /**
      * Constructs a new <code>ConverterObjectInputStream</code> wrapping the 

@@ -89,7 +89,7 @@ public class BuddySupport {
 		if (buddies != null) {
 			return buddies;
 		}
-		return new ArrayList<Component>();
+		return new ArrayList<>();
 	}
 
 	public static boolean isBuddy(Component c, JTextField textField) {

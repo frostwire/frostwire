@@ -39,7 +39,7 @@ public class ProgressSlider extends JPanel {
 	
 	private boolean mousePressed = false;
 	
-	private LinkedList<ProgressSliderListener> listeners = new LinkedList<ProgressSliderListener>();
+	private LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
 	
 	public ProgressSlider() {
 		

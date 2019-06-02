@@ -35,7 +35,7 @@ public class SearchFilterFactoryImpl implements SearchFilterFactory {
 
     public SearchFilter createFilter() {
 
-        Vector<SearchFilter> buf = new Vector<SearchFilter>();
+        Vector<SearchFilter> buf = new Vector<>();
 
         String[] badWords = FilterSettings.BANNED_WORDS.getValue();
 

@@ -59,11 +59,11 @@ public class StringSetSetting extends AbstractSetting {
      */
     private static Set<String> encode(String src) {
         if (src == null || src.length()==0)
-            return new HashSet<String>();
+            return new HashSet<>();
         
         StringTokenizer tokenizer = new StringTokenizer(src, ";");
         int size = tokenizer.countTokens();
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         for(int i = 0; i < size; i++)
             set.add(tokenizer.nextToken());
         return set;

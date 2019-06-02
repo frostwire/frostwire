@@ -818,7 +818,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     private void updateSocialButton(final MediaSource currentMedia) {
-        SwingWorker<Void, Void> swingWorker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> swingWorker = new SwingWorker<>() {
 
             private boolean foundSocialLink;
             private String socialLink;
@@ -906,7 +906,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     private void updateMediaSourceButton(final MediaSource currentMedia) {
-        SwingWorker<Void, Void> swingWorker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> swingWorker = new SwingWorker<>() {
 
             private boolean isLocalFile;
             private boolean isPlaylistItem;

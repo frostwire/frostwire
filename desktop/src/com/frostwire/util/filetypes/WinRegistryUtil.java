@@ -705,7 +705,7 @@ public class WinRegistryUtil {
                 int verbsNum = verbs.length;
                 // Construct relevant actions one by one
                 if (verbsNum > 0) {
-                    actionList = new ArrayList<Action>();
+                    actionList = new ArrayList<>();
                     for (String verb : verbs) {
                         String verbKey = shellKey + "\\" + verb;
                         String cmdKey = verbKey + "\\" + KN_COMMAND;
@@ -781,7 +781,7 @@ public class WinRegistryUtil {
         if (verbs != null) {
             int verbsNum = verbs.length;
             if (verbsNum > 0) {
-                actionList = new ArrayList<Action>();
+                actionList = new ArrayList<>();
                 for (String verb : verbs) {
                     String verbKey = appShellKey + "\\" + verb;
                     String cmdKey = verbKey + "\\" + KN_COMMAND;

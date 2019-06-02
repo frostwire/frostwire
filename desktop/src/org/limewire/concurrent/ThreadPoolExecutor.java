@@ -401,7 +401,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * Set containing all worker threads in pool. Accessed only when
      * holding mainLock.
      */
-    private final HashSet<Worker> workers = new HashSet<Worker>();
+    private final HashSet<Worker> workers = new HashSet<>();
 
     /**
      * Wait condition to support awaitTermination
@@ -751,7 +751,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      */
     private List<Runnable> drainQueue() {
         BlockingQueue<Runnable> q = workQueue;
-        List<Runnable> taskList = new ArrayList<Runnable>();
+        List<Runnable> taskList = new ArrayList<>();
         q.drainTo(taskList);
         if (!q.isEmpty()) {
             for (Runnable r : q.toArray(new Runnable[0])) {

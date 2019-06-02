@@ -160,9 +160,9 @@ public class FileUtils {
      */
     public static File[] getFilesRecursive(File directory,
                                            String[] filter) {
-        List<File> dirs = new ArrayList<File>();
+        List<File> dirs = new ArrayList<>();
         // the return array of files...
-        List<File> retFileArray = new ArrayList<File>();
+        List<File> retFileArray = new ArrayList<>();
         File[] retArray = new File[0];
 
         // bootstrap the process
@@ -428,7 +428,7 @@ public class FileUtils {
 
     // aldenml: Why are we using NIO2 for this?
     public static File[] listFiles(File directoryFile) {
-        List<File> files = new LinkedList<File>();
+        List<File> files = new LinkedList<>();
         DirectoryStream<Path> dir = null;
         try  {
             dir = Files.newDirectoryStream(directoryFile.toPath());

@@ -30,7 +30,7 @@ public class RemoveFuzzyFromMessageBundlesCommand {
         
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8));
         String line =null;
-        List<String> lines = new LinkedList<String>();
+        List<String> lines = new LinkedList<>();
         while ((line = br.readLine())!=null) {
             if (!line.startsWith("#, fuzzy")) {
                 lines.add(line);

@@ -517,7 +517,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
                 }
             }
 
-            ArrayList<Action> actionList = new ArrayList<Action>(8);
+            ArrayList<Action> actionList = new ArrayList<>(8);
             Action action;
 
             actionList.add(new FilePaneAction(ACTION_CANCEL));
@@ -580,9 +580,9 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     public JPanel createList() {
         JPanel p = new JPanel(new BorderLayout());
         final JFileChooser fileChooser = getFileChooser();
-        final JList<Object> list = new JList<Object>() {
+        final JList<Object> list = new JList<>() {
             /**
-             * 
+             *
              */
             private static final long serialVersionUID = 7343396893205583428L;
 
@@ -594,8 +594,8 @@ public class FilePane extends JPanel implements PropertyChangeListener {
                 }
                 // start search from the next element before/after the selected element
                 boolean backwards = (bias == Position.Bias.Backward);
-                for (int i = startIndex; backwards ? i >= 0 : i < max; i += (backwards ?  -1 : 1)) {
-                    String filename = fileChooser.getName((File)model.getElementAt(i));
+                for (int i = startIndex; backwards ? i >= 0 : i < max; i += (backwards ? -1 : 1)) {
+                    String filename = fileChooser.getName((File) model.getElementAt(i));
                     if (filename.regionMatches(true, 0, prefix, 0, prefix.length())) {
                         return i;
                     }
@@ -726,7 +726,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
             ShellFolderColumnInfo[] allColumns = ShellFolder.getFolderColumns(dir);
 
             ArrayList<ShellFolderColumnInfo> visibleColumns =
-                    new ArrayList<ShellFolderColumnInfo>();
+                    new ArrayList<>();
             columnMap = new int[allColumns.length];
             for (int i = 0; i < allColumns.length; i++) {
                 ShellFolderColumnInfo column = allColumns[i];

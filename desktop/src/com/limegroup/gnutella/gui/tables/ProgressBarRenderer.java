@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
 
-    private Map<Color, Border> borders = new HashMap<Color, Border>();
+    private Map<Color, Border> borders = new HashMap<>();
     private boolean isSelected;
 
     /**

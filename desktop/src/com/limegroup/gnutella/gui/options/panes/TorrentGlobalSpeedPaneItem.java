@@ -60,7 +60,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
         DOWNLOAD_SLIDER.setMajorTickSpacing(1024);
 
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
         JLabel label1 = new JLabel(I18n.tr("Min speed"));
         JLabel label2 = new JLabel(I18n.tr("Max speed"));
         Font font = new Font("Helvetica", Font.BOLD, 10);
@@ -89,7 +89,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
         UPLOAD_SLIDER.setMajorTickSpacing(1024);
 
-        Hashtable<Integer, JLabel> labelTableUp = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTableUp = new Hashtable<>();
         JLabel label1Up = new JLabel(I18n.tr("Min speed"));
         JLabel label2Up = new JLabel(I18n.tr("Max speed"));
         label1Up.setFont(font);

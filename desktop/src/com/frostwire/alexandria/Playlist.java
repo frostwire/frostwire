@@ -45,7 +45,7 @@ public class Playlist extends LibraryDatabaseEntity {
     public Playlist(LibraryDatabase libraryDB) {
         super(libraryDB);
         _id = LibraryDatabase.OBJECT_INVALID_ID;
-        _items = Collections.synchronizedList(new LinkedList<PlaylistItem>());
+        _items = Collections.synchronizedList(new LinkedList<>());
         this.deleted = false;
     }
 

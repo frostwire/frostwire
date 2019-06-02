@@ -28,7 +28,7 @@ public class FileSetSetting extends AbstractSetting {
 	 * @param defaultValue the default value to use for the setting
 	 */
 	FileSetSetting(Properties defaultProps, Properties props, String key, File[] defaultValue) {
-        super(defaultProps, props, key, decode(new HashSet<File>(Arrays.asList(defaultValue))));
+        super(defaultProps, props, key, decode(new HashSet<>(Arrays.asList(defaultValue))));
         setPrivate(true);
 	}
 
@@ -106,11 +106,11 @@ public class FileSetSetting extends AbstractSetting {
     /** Splits the string into a Set    */
     private static Set<File> encode(String src) {
         if (src == null || src.length()==0)
-            return new HashSet<File>();
+            return new HashSet<>();
         
         StringTokenizer tokenizer = new StringTokenizer(src, ";");
         int size = tokenizer.countTokens();
-        Set<File> set = new HashSet<File>();
+        Set<File> set = new HashSet<>();
         for(int i = 0; i < size; i++)
             set.add(new File(tokenizer.nextToken()));
         return set;

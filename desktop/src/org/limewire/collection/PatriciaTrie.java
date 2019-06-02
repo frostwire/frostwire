@@ -1054,10 +1054,10 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
                 Map.Entry<?, ?> e = (Map.Entry<?, ?>)o;
                 Object k1 = getKey();
                 Object k2 = e.getKey();
-                if (k1 == k2 || (k1 != null && k1.equals(k2))) {
+                if (Objects.equals(k1, k2)) {
                     Object v1 = getValue();
                     Object v2 = e.getValue();
-                    if (v1 == v2 || (v1 != null && v1.equals(v2))) 
+                    if (Objects.equals(v1, v2))
                         return true;
                 }
                 return false;
@@ -1502,7 +1502,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     
     /** Test two values for equality.  Works with null values. */
     private static boolean valEquals(Object o1, Object o2) {
-        return (o1==null ? o2==null : o1.equals(o2));
+        return (Objects.equals(o1, o2));
     }
 
     private class Values extends AbstractCollection<V> {

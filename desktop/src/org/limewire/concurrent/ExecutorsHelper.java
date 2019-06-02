@@ -61,7 +61,7 @@ public class ExecutorsHelper {
     public static java.util.concurrent.ThreadPoolExecutor newSingleThreadExecutor(ThreadFactory factory) {
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, 1,
                 5L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(),
+                new LinkedBlockingQueue<>(),
                 factory);
         tpe.allowCoreThreadTimeOut(true);
         return tpe;
@@ -80,7 +80,7 @@ public class ExecutorsHelper {
         return Executors.unconfigurableExecutorService(
                 new ThreadPoolExecutor(0, Integer.MAX_VALUE,
                         5L, TimeUnit.SECONDS,
-                        new SynchronousQueue<Runnable>(),
+                        new SynchronousQueue<>(),
                         factory));
     }
     
@@ -92,7 +92,7 @@ public class ExecutorsHelper {
     public static ExecutorService newFixedSizeThreadPool(int size, String name) {
         ThreadPoolExecutor tpe =  new ThreadPoolExecutor(size, size,
                 5L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(),
+                new LinkedBlockingQueue<>(),
                 daemonThreadFactory(name));
         tpe.allowCoreThreadTimeOut(true);
         return Executors.unconfigurableExecutorService(tpe);

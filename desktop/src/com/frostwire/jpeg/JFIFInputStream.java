@@ -57,12 +57,12 @@ public class JFIFInputStream extends FilterInputStream {
      * This hash set holds the Id's of markers which stand alone,
      * respectively do no have a data segment.
      */
-    private final HashSet<Integer> standaloneMarkers = new HashSet<Integer>();
+    private final HashSet<Integer> standaloneMarkers = new HashSet<>();
     /** 
      * This hash set holds the Id's of markers which have a data
      * segment followed by a entropy-coded data segment.
      */
-    private final HashSet<Integer> doubleSegMarkers = new HashSet<Integer>();
+    private final HashSet<Integer> doubleSegMarkers = new HashSet<>();
 
     /** Represents a segment within a JFIF File. 
      */

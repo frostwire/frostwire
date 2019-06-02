@@ -21,6 +21,8 @@
 package com.frostwire.util.filetypes;
 
 
+import java.util.Objects;
+
 /**
  * This class represents an action that could be applied to a particular file type.
  * An action could be added to an <code>Association</code> object as part of an
@@ -163,15 +165,9 @@ public class Action {
             String otherVerb = otherAction.getVerb();
             String otherCommand = otherAction.getCommand();
 
-            if ((description == null
-                            ? otherDescription == null
-                            : description.equals(otherDescription))
-                    && (verb == null
-                            ? otherVerb == null
-                            : verb.equals(otherVerb))
-                    && (command == null
-                            ? otherCommand == null
-                            : command.equals(otherCommand))) {
+            if ((Objects.equals(description, otherDescription))
+                    && (Objects.equals(verb, otherVerb))
+                    && (Objects.equals(command, otherCommand))) {
                 return true;
             }
         }

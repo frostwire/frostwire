@@ -166,7 +166,7 @@ public class FileArraySetting extends AbstractSetting {
 
 	/** Removes non-existent members from this.	 */
 	public synchronized void clean() {
-		List<File> list = new ArrayList<File>(value.length);
+		List<File> list = new ArrayList<>(value.length);
 		File file = null;
         for (File item : value) {
             file = item;

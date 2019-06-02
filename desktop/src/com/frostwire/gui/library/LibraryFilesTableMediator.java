@@ -853,7 +853,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             }
             LibraryMediator.instance().getLibrarySearch().pushStatus(status);
 
-            SwingWorker<Void, Void> demuxWorker = new SwingWorker<Void, Void>() {
+            SwingWorker<Void, Void> demuxWorker = new SwingWorker<>() {
 
                 @SuppressWarnings("RedundantThrows")
                 @Override

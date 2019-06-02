@@ -247,7 +247,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         topPanel.add(lookInLabel, BorderLayout.BEFORE_LINE_BEGINS);
 
         // CurrentDir ComboBox
-        directoryComboBox = new JComboBox<Object>() {
+        directoryComboBox = new JComboBox<>() {
 
             public Dimension getPreferredSize() {
                 Dimension d = super.getPreferredSize();
@@ -433,7 +433,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
         filterComboBoxModel = createFilterComboBoxModel();
         fc.addPropertyChangeListener(filterComboBoxModel);
-        JComboBox<Object> filterComboBox = new JComboBox<Object>(filterComboBoxModel);
+        JComboBox<Object> filterComboBox = new JComboBox<>(filterComboBoxModel);
         filterComboBox.putClientProperty(AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                                          filesOfTypeLabelText);
         filesOfTypeLabel.setLabelFor(filterComboBox);
@@ -952,7 +952,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
          * 
          */
         private static final long serialVersionUID = -4248097879659126453L;
-        Vector<File> directories = new Vector<File>();
+        Vector<File> directories = new Vector<>();
         int[] depths = null;
         File selectedDirectory = null;
         JFileChooser chooser = getFileChooser();
@@ -983,7 +983,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
             File[] baseFolders;
             if (useShellFolder) {
-                baseFolders = AccessController.doPrivileged(new PrivilegedAction<File[]>() {
+                baseFolders = AccessController.doPrivileged(new PrivilegedAction<>() {
                     public File[] run() {
                         return (File[]) ShellFolder.get("fileChooserComboBoxFolders");
                     }
@@ -1020,7 +1020,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
                 File sf = useShellFolder ? ShellFolder.getShellFolder(canonical)
                                          : canonical;
                 File f = sf;
-                Vector<File> path = new Vector<File>(10);
+                Vector<File> path = new Vector<>(10);
                 do {
                     path.addElement(f);
                 } while ((f = f.getParentFile()) != null);

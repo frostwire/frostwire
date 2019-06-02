@@ -108,7 +108,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * List of all settings associated with this factory 
      * LOCKING: must hold this monitor
      */
-    private ArrayList<AbstractSetting> settings = new ArrayList<AbstractSetting>(10);
+    private ArrayList<AbstractSetting> settings = new ArrayList<>(10);
     
     /** Whether or not expirable settings have expired. */
     private boolean expired = false;

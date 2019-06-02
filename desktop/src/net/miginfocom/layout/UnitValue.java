@@ -42,9 +42,9 @@ import java.util.HashMap;
 
 public final class UnitValue implements Serializable
 {
-	private static final HashMap<String, Integer> UNIT_MAP = new HashMap<String, Integer>(32);
+	private static final HashMap<String, Integer> UNIT_MAP = new HashMap<>(32);
 
-	private static final ArrayList<UnitConverter> CONVERTERS = new ArrayList<UnitConverter>();
+	private static final ArrayList<UnitConverter> CONVERTERS = new ArrayList<>();
 
 	/** An operation indicating a static value.
 	 */

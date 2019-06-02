@@ -31,7 +31,7 @@ public class LanguageFlagFactory {
 
     static {
         //found using google, cia worldbook of facts and wikipedia.
-        lc2cc = new HashMap<String, String>();
+        lc2cc = new HashMap<>();
         lc2cc.put("en", "US");
         lc2cc.put("af", "ZA"); //Aafrican, South Africa
         lc2cc.put("am", "ET"); //Amharic, Ethiopia

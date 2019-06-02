@@ -81,7 +81,7 @@ public class LimeJFrame extends JFrame {
         MenuSelectionManager msm = MenuSelectionManager.defaultManager();
         MenuElement[] p = msm.getSelectedPath();
 
-        List<JPopupMenu> list = new ArrayList<JPopupMenu>(p.length);
+        List<JPopupMenu> list = new ArrayList<>(p.length);
         for (MenuElement element : p) {
             if (element instanceof JPopupMenu) {
                 list.add((JPopupMenu) element);

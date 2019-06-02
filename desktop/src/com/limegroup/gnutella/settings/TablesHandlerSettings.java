@@ -41,7 +41,7 @@ public final class TablesHandlerSettings extends LimeWireSettings {
     * The name of the setting is in the format of:
     * <columnId>_<width|order|visible>
     */
-    private static final Map<String, Setting> SETS = new HashMap<String, Setting>();
+    private static final Map<String, Setting> SETS = new HashMap<>();
 
     /**
      * Returns the IntSetting for the specified column's width.

@@ -24,6 +24,7 @@ import org.limewire.util.OSUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 //import org.jdesktop.jdic.filetypes.Association;
 //import org.jdesktop.jdic.filetypes.RegisterFailedException;
 
@@ -357,12 +358,8 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
     
             return ((WinRegistryUtil.isMimeTypeExist(temMimeType, regLevel))
                     && (WinRegistryUtil.isFileExtExist(temFileExt, regLevel))
-                    && (temFileExt == null
-                            ? regFileExt == null
-                            : temFileExt.equals(regFileExt))
-                    && (temMimeType == null
-                            ? regMimeType == null
-                            : temMimeType.equals(regMimeType)));
+                    && (Objects.equals(temFileExt, regFileExt))
+                    && (Objects.equals(temMimeType, regMimeType)));
         }
     }
   

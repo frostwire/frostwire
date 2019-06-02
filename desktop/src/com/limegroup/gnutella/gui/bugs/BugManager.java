@@ -526,7 +526,7 @@ public final class BugManager {
     static {
         errorDescs = new EnumMap<>(ErrorType.class);
         for(ErrorType type : ErrorType.values())
-            errorDescs.put(type, new EnumMap<DetailErrorType, String>(DetailErrorType.class));
+            errorDescs.put(type, new EnumMap<>(DetailErrorType.class));
         
         errorDescs.get(ErrorType.GENERIC).put(DetailErrorType.DISK_FULL, 
             I18n.tr("FrostWire was unable to write a necessary file because your hard drive is full. To continue using FrostWire you must free up space on your hard drive."));

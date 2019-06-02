@@ -48,9 +48,9 @@ public final class LinkHandler
 	public static final int X2 = 4;
 	public static final int Y2 = 5;
 
-	private static final ArrayList<WeakReference<Object>> LAYOUTS = new ArrayList<WeakReference<Object>>(4);
-	private static final ArrayList<HashMap<String, int[]>> VALUES = new ArrayList<HashMap<String, int[]>>(4);
-	private static final ArrayList<HashMap<String, int[]>> VALUES_TEMP = new ArrayList<HashMap<String, int[]>>(4);
+	private static final ArrayList<WeakReference<Object>> LAYOUTS = new ArrayList<>(4);
+	private static final ArrayList<HashMap<String, int[]>> VALUES = new ArrayList<>(4);
+	private static final ArrayList<HashMap<String, int[]>> VALUES_TEMP = new ArrayList<>(4);
 
 	private LinkHandler()
 	{
@@ -152,15 +152,15 @@ public final class LinkHandler
 			}
 		}
 
-		LAYOUTS.add(new WeakReference<Object>(layout));
+		LAYOUTS.add(new WeakReference<>(layout));
 		int[] bounds = new int[] {x, y, width, height, x + width, y + height};
 
-		HashMap<String, int[]> values = new HashMap<String, int[]>(4);
+		HashMap<String, int[]> values = new HashMap<>(4);
 		if (temporary)
 			values.put(key, bounds);
 		VALUES_TEMP.add(values);
 
-		values = new HashMap<String, int[]>(4);
+		values = new HashMap<>(4);
 		if (!temporary)
 			values.put(key, bounds);
 		VALUES.add(values);

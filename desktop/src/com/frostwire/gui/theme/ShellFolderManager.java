@@ -110,9 +110,9 @@ class ShellFolderManager {
         Collections.sort(files, fileComparator);
     }
 
-    private Comparator<Object> fileComparator = new Comparator<Object>() {
+    private Comparator<Object> fileComparator = new Comparator<>() {
         public int compare(Object a, Object b) {
-            return compare((File)a, (File)b);
+            return compare((File) a, (File) b);
         }
 
         public int compare(File f1, File f2) {
@@ -120,13 +120,13 @@ class ShellFolderManager {
             ShellFolder sf2 = null;
 
             if (f1 instanceof ShellFolder) {
-                sf1 = (ShellFolder)f1;
+                sf1 = (ShellFolder) f1;
                 if (sf1.isFileSystem()) {
                     sf1 = null;
                 }
             }
             if (f2 instanceof ShellFolder) {
-                sf2 = (ShellFolder)f2;
+                sf2 = (ShellFolder) f2;
                 if (sf2.isFileSystem()) {
                     sf2 = null;
                 }

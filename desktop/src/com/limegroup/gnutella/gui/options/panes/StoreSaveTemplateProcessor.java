@@ -41,7 +41,7 @@ public class StoreSaveTemplateProcessor {
     final static String TEMPLATE_PROCESSOR_UNKNOWN_REPLACEMENT = "STORE_TEMPLATE_PROCESSOR_UNKNOWN_REPLACEMENT";
     final static String TEMPLATE_PROCESSOR_UNCLOSED_VARIABLE = "STORE_TEMPLATE_PROCESSOR_UNCLOSED_VARIABLE";
 
-    private final static List<Character> END_DELIMS = new ArrayList<Character>();
+    private final static List<Character> END_DELIMS = new ArrayList<>();
     static {
         END_DELIMS.add('{');
         END_DELIMS.add('}');
@@ -101,7 +101,7 @@ public class StoreSaveTemplateProcessor {
      * @return whether the template is valid
      */
     public boolean isValid(String template) throws IllegalTemplateException{
-        final Map<String, String> subs = new HashMap<String, String>();
+        final Map<String, String> subs = new HashMap<>();
         subs.put(ARTIST_LABEL, "");
         subs.put(ALBUM_LABEL, "");
         subs.put(HOME_LABEL, "");

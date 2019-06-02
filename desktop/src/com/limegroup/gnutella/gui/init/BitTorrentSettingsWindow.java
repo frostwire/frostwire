@@ -91,7 +91,7 @@ class BitTorrentSettingsWindow extends SetupWindow {
      * This method applies any settings associated with this setup window.
      */
     public void applySettings(boolean loadCoreComponents) throws ApplySettingsException {
-        List<String> errors = new ArrayList<String>(2);
+        List<String> errors = new ArrayList<>(2);
 
         applyTorrentDataSaveFolderSettings(errors);
 

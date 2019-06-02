@@ -123,7 +123,7 @@ public final class LayoutUtil
 	public static void setDesignTime(ContainerWrapper cw, boolean b)
 	{
 		if (DT_MAP == null)
-			DT_MAP = new WeakHashMap<Object, Boolean>();
+			DT_MAP = new WeakHashMap<>();
 
 		DT_MAP.put((cw != null ? cw.getComponent() : null), b);
 	}
@@ -176,7 +176,7 @@ public final class LayoutUtil
 	{
 		if (s != null && con != null && isDesignTime(null)) {
 			if (CR_MAP == null)
-				CR_MAP = new WeakHashMap<Object, String>(64);
+				CR_MAP = new WeakHashMap<>(64);
 
 			CR_MAP.put(con, s);
 		}
@@ -244,7 +244,7 @@ public final class LayoutUtil
 			boolean isGrow = useLengthI < bounds;
 
 			// Create a Set with the available priorities
-			TreeSet<Integer> prioList = new TreeSet<Integer>();
+			TreeSet<Integer> prioList = new TreeSet<>();
 			for (int i = 0; i < sizes.length; i++) {
 				ResizeConstraint resC = (ResizeConstraint) getIndexSafe(resConstr, i);
 				if (resC != null)
@@ -540,7 +540,7 @@ public final class LayoutUtil
 		return o;
 	}
 
-	private static final IdentityHashMap<Object, Object> SER_MAP = new IdentityHashMap<Object, Object>(2);
+	private static final IdentityHashMap<Object, Object> SER_MAP = new IdentityHashMap<>(2);
 
 	/** Sets the serialized object and associates it with <code>caller</code>.
 	 * @param caller The object created <code>o</code>

@@ -91,7 +91,7 @@ public class StringTrie<V> {
      * @modifies this.
      */
     public void clear() {
-        this.root = new TrieNode<V>();
+        this.root = new TrieNode<>();
     }
 
     /**
@@ -171,7 +171,7 @@ public class StringTrie<V> {
             TrieEdge<V> edge = node.get(key.charAt(i));
             if (edge == null) {
                 // 1) Additive insert.
-                TrieNode<V> newNode = new TrieNode<V>(value);
+                TrieNode<V> newNode = new TrieNode<>(value);
                 node.put(key.substring(i), newNode);
                 return null;
             }
@@ -192,7 +192,7 @@ public class StringTrie<V> {
                 // ...unless c = "", in which case you just do a "splice
                 // insert" by omitting newNew and setting intermediate's value.
                 TrieNode<V> child = edge.getChild();
-                TrieNode<V> intermediate = new TrieNode<V>();
+                TrieNode<V> intermediate = new TrieNode<>();
                 String a = label.substring(0, j);
                 //Assert.that(canonicalCase(a).equals(a), "Bad edge a");
                 String b = label.substring(j);
@@ -200,7 +200,7 @@ public class StringTrie<V> {
                 String c = key.substring(i + j);
                 if (c.length() > 0) {
                     // Split.
-                    TrieNode<V> newNode = new TrieNode<V>(value);
+                    TrieNode<V> newNode = new TrieNode<>(value);
                     node.remove(label.charAt(0));
                     node.put(a, intermediate);
                     intermediate.put(b, child);
@@ -418,7 +418,7 @@ public class StringTrie<V> {
 
     public class NodeIterator extends UnmodifiableIterator<TrieNode<V>> {
         /** Stack for DFS. Push and pop from back. */
-        private ArrayList<Iterator<TrieNode<V>>> stack = new ArrayList<Iterator<TrieNode<V>>>();
+        private ArrayList<Iterator<TrieNode<V>>> stack = new ArrayList<>();
         /** The next node to return. */
         private TrieNode<V> nextNode;
         private boolean withNulls;
@@ -549,7 +549,7 @@ final class TrieNode<E> {
      * i.e., for all i &lt; j,<br>
      *       children[i].edge.charAt(0) &lt; children[j].edge.charAt(0)
      */
-    private ArrayList<TrieEdge<E>> children = new ArrayList<TrieEdge<E>>(0);
+    private ArrayList<TrieEdge<E>> children = new ArrayList<>(0);
 
     /**
      * Creates a trie with no children and no value.
@@ -676,7 +676,7 @@ final class TrieNode<E> {
             assert get(i).getLabelStart() != labelStart :
                         "Precondition of TrieNode.put violated.";
         }
-        children.add(i + 1, new TrieEdge<E>(label, child));
+        children.add(i + 1, new TrieEdge<>(label, child));
     }
 
     /**

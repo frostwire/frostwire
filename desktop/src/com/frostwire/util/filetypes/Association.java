@@ -21,10 +21,7 @@
 package com.frostwire.util.filetypes;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 //import org.jdesktop.jdic.filetypes.internal.AppUtility;
 
 
@@ -185,7 +182,7 @@ public class Association {
         fileExt = AppUtility.addDotToFileExtension(fileExt);
         
         if (fileExtensionList == null) {
-            fileExtensionList = new ArrayList<String>();
+            fileExtensionList = new ArrayList<>();
         }
         
         return fileExtensionList.add(fileExt);
@@ -226,7 +223,7 @@ public class Association {
         if (fileExtensionList == null) {
             return null;
         } else {
-            List<String> retList = new ArrayList<String>();
+            List<String> retList = new ArrayList<>();
 
             retList.addAll(fileExtensionList);
 
@@ -286,7 +283,7 @@ public class Association {
         }
     
         if (actionList == null) {
-            actionList = new ArrayList<Action>();
+            actionList = new ArrayList<>();
         } 
         
         return actionList.add(new Action(action.getVerb(), action.getCommand(),
@@ -331,7 +328,7 @@ public class Association {
 			return Collections.emptyList();
 			
 		} else {
-			return new ArrayList<Action>(actionList);
+			return new ArrayList<>(actionList);
 		}
 	}
 
@@ -390,15 +387,9 @@ public class Association {
         String otherIconFileName = otherAssoc.getIconFileName();
         String otherMimeType = otherAssoc.getMimeType();
 
-        isBasicEquals = ((description == null
-                        ? otherDesc == null
-                        : description.equals(otherDesc))
-                && (iconFileName == null
-                        ? otherIconFileName == null
-                        : iconFileName.equals(otherIconFileName))
-                && (mimeType == null
-                        ? otherMimeType == null
-                        : mimeType.equals(otherMimeType)));
+        isBasicEquals = ((Objects.equals(description, otherDesc))
+                && (Objects.equals(iconFileName, otherIconFileName))
+                && (Objects.equals(mimeType, otherMimeType)));
                      
         if (!isBasicEquals) {
             return false; 

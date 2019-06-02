@@ -122,7 +122,7 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
 		initialFoldersToInclude = LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue();
 		initialFoldersToExclude = LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue();
 		
-		List<File> roots = new ArrayList<File>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+		List<File> roots = new ArrayList<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
 		roots.addAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
 		directoryPanel.setRoots(roots.toArray(new File[0]));
 		directoryPanel.setFoldersToExclude(initialFoldersToExclude);
@@ -145,8 +145,8 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
 	 */
 	public boolean applyOptions() throws IOException {
 	    
-	    LibrarySettings.DIRECTORIES_TO_INCLUDE.setValue(new HashSet<File>());
-	    LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.setValue(new HashSet<File>());
+	    LibrarySettings.DIRECTORIES_TO_INCLUDE.setValue(new HashSet<>());
+	    LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.setValue(new HashSet<>());
 	    
 	    for(File f : directoryPanel.getRootsToInclude()) {
 	        if (f != null) {

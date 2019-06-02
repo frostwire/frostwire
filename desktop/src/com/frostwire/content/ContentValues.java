@@ -45,7 +45,7 @@ public final class ContentValues /*implements Parcelable*/ {
     public ContentValues() {
         // Choosing a default size of 8 based on analysis of typical
         // consumption by applications.
-        mValues = new HashMap<String, Object>(8);
+        mValues = new HashMap<>(8);
     }
 
     /**
@@ -54,7 +54,7 @@ public final class ContentValues /*implements Parcelable*/ {
      * @param size the initial size of the set of values
      */
     public ContentValues(int size) {
-        mValues = new HashMap<String, Object>(size, 1.0f);
+        mValues = new HashMap<>(size, 1.0f);
     }
 
     /**
@@ -63,7 +63,7 @@ public final class ContentValues /*implements Parcelable*/ {
      * @param from the values to copy
      */
     public ContentValues(ContentValues from) {
-        mValues = new HashMap<String, Object>(from.mValues);
+        mValues = new HashMap<>(from.mValues);
     }
 
     @Override

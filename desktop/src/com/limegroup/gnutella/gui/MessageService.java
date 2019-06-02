@@ -32,7 +32,7 @@ public final class MessageService {
     /**
      * A Map containing disposable messages
      */
-    private final Map<String, JDialog> _disposableMessageMap = new HashMap<String, JDialog>();
+    private final Map<String, JDialog> _disposableMessageMap = new HashMap<>();
 
 	/**
 	 * <tt>MessageService</tt> instance, following singleton.
@@ -363,7 +363,7 @@ public final class MessageService {
      */
     final int showConfirmListMessage(String message, Object[] listModel,
             int messageType, ListCellRenderer<Object> listRenderer, String title) {
-            JList<Object> list = new JList<Object>(listModel);
+            JList<Object> list = new JList<>(listModel);
             list.setVisibleRowCount(5);
             list.setSelectionForeground(list.getForeground());
             list.setSelectionBackground(list.getBackground());

@@ -26,9 +26,9 @@ public class RecentSearches implements ActionListener {
 
 	private int maxRecents = 5;
 
-	private List<String> recentSearches = new ArrayList<String>();
+	private List<String> recentSearches = new ArrayList<>();
 
-	private List<ChangeListener> listeners = new ArrayList<ChangeListener>();
+	private List<ChangeListener> listeners = new ArrayList<>();
 
 	/**
 	 * Creates a list of recent searches and uses <code>saveName</code> to

@@ -74,7 +74,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
     public List<String> getFileExtListByMimeType(String mimeType) {
         String fileExt = WinRegistryUtil.getFileExtByMimeType(mimeType);
         if (fileExt != null) {
-          List<String> fileExtList = new ArrayList<String>();
+          List<String> fileExtList = new ArrayList<>();
           fileExtList.add(fileExt);
           
           return fileExtList;

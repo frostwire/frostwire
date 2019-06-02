@@ -61,7 +61,7 @@ public class SkinFileChooserUI extends BaseFileChooserUI {
         /**
          * Cache for the file icons.
          */
-        private final Map<String, Icon> pathIconCache = new HashMap<String, Icon>();
+        private final Map<String, Icon> pathIconCache = new HashMap<>();
 
         /*
          * (non-Javadoc)

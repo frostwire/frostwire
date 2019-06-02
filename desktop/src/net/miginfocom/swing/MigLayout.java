@@ -55,7 +55,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 
 	/** The component to string constraints mappings.
 	 */
-	private final Map<Component, Object> scrConstrMap = new IdentityHashMap<Component, Object>(8);
+	private final Map<Component, Object> scrConstrMap = new IdentityHashMap<>(8);
 
 	/** Hold the serializable text representation of the constraints.
 	 */
@@ -65,7 +65,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 
 	private transient ContainerWrapper cacheParentW = null;
 
-	private transient final Map<ComponentWrapper, CC> ccMap = new HashMap<ComponentWrapper, CC>(8);
+	private transient final Map<ComponentWrapper, CC> ccMap = new HashMap<>(8);
 	private transient javax.swing.Timer debugTimer = null;
 
 	private transient LC lc = null;
@@ -241,7 +241,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 	 */
 	public Map<Component, Object> getConstraintMap()
 	{
-		return new IdentityHashMap<Component, Object>(scrConstrMap);
+		return new IdentityHashMap<>(scrConstrMap);
 	}
 
 	/** Sets the constraints map.
@@ -339,7 +339,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 			throw new NullPointerException();
 
 		if (callbackList == null)
-			callbackList = new ArrayList<LayoutCallback>(1);
+			callbackList = new ArrayList<>(1);
 
 		callbackList.add(callback);
 	}

@@ -122,7 +122,7 @@ public abstract class AbstractSetting implements Setting {
         
         synchronized (this) {
             if (listeners == null) {
-                listeners = new ArrayList<SettingListener>();
+                listeners = new ArrayList<>();
             }
             listeners.add(l);
         }        

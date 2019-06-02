@@ -119,7 +119,7 @@ public final class TipOfTheDayMediator {
     private TipOfTheDayMediator() {
         tipPane = new JEditorPane();
         dialog = new JDialog(GUIMediator.getAppFrame(), TOTD_TITLE, false);
-        this.messages = new ArrayList<String>();
+        this.messages = new ArrayList<>();
         initializeMessages(this.messages);
 
         dialog.setResizable(true);

@@ -80,7 +80,7 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
         int numSlides = _thePanel.getNumSlides();
 
         ButtonGroup _buttonGroup = new ButtonGroup();
-        _buttons = new ArrayList<JRadioButton>(numSlides);
+        _buttons = new ArrayList<>(numSlides);
 
         for (int i = 0; i < numSlides; i++) {
             JRadioButton radio = new JRadioButton();

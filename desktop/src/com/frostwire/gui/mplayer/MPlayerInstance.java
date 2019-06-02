@@ -78,7 +78,7 @@ MPlayerInstance
 
 	private boolean	paused;
 
-	private List<String> 	commands 	= new LinkedList<String>();
+	private List<String> 	commands 	= new LinkedList<>();
 	private AESemaphore		command_sem = new AESemaphore();
 
 	private boolean 		isSeeking;
@@ -139,7 +139,7 @@ MPlayerInstance
 
 			//fileOpened = fileOrUrl;
 
-			List<String> cmdList = new ArrayList<String>();
+			List<String> cmdList = new ArrayList<>();
 
 			cmdList.add( BINARY_PATH.getAbsolutePath());
 

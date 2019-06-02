@@ -30,7 +30,7 @@ public class VPNStatusRefresher {
 
     private Set<VPNStatusListener> clients = new HashSet<>();
 
-    private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<Runnable>(), true);
+    private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
 
     private boolean active = true;
 

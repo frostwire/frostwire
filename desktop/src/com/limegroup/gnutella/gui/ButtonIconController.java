@@ -28,7 +28,7 @@ public class ButtonIconController {
      * A mapping of the file name of the icon to the icon itself,
      * so we don't load the resource multiple times.
      */
-    private final Map<String, Icon> BUTTON_CACHE = new HashMap<String, Icon>();
+    private final Map<String, Icon> BUTTON_CACHE = new HashMap<>();
     
     
     /**

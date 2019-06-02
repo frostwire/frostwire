@@ -439,7 +439,7 @@ public final class ConstraintParser
 	 */
 	public static Map<ComponentWrapper, CC> parseComponentConstraints(Map<ComponentWrapper, String> constrMap)
 	{
-		HashMap<ComponentWrapper, CC> flowConstrMap = new HashMap<ComponentWrapper, CC>();
+		HashMap<ComponentWrapper, CC> flowConstrMap = new HashMap<>();
 
         for (Map.Entry<ComponentWrapper, String> entry : constrMap.entrySet()) {
             flowConstrMap.put(entry.getKey(), parseComponentConstraint(entry.getValue()));
@@ -1383,7 +1383,7 @@ public final class ConstraintParser
 		if (s.indexOf('|') != -1)
 			s = s.replaceAll("\\|", "][");
 
-		ArrayList<String> retList = new ArrayList<String>(Math.max(s.length() >> 2 + 1, 3)); // Approx return length.
+		ArrayList<String> retList = new ArrayList<>(Math.max(s.length() >> 2 + 1, 3)); // Approx return length.
 		int s0 = 0, s1 = 0; // '[' and ']' count.
 		int st = 0; // Start of "next token to add".
 		for (int i = 0, iSz = s.length(); i < iSz; i++) {

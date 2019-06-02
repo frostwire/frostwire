@@ -55,7 +55,7 @@ public class LCS {
         //System.out.println("length of LCS = " + num[s1.length][s2.length]);
 
         int s1position = s1.length, s2position = s2.length;
-        List<E> result = new LinkedList<E>();
+        List<E> result = new LinkedList<>();
 
         while (s1position != 0 && s2position != 0) {
             if (s1[s1position - 1].equals(s2[s2position - 1])) {
@@ -152,7 +152,7 @@ public class LCS {
         public List<VALUE> backtrack() {
             calculateLcs();
             if (this.backtrack == null) {
-                this.backtrack = new ArrayList<VALUE>();
+                this.backtrack = new ArrayList<>();
                 backtrack(lengthOfX(), lengthOfY());
             }
             return this.backtrack;
@@ -179,7 +179,7 @@ public class LCS {
             calculateLcs();
 
             if (this.diff == null) {
-                this.diff = new ArrayList<DiffEntry<VALUE>>();
+                this.diff = new ArrayList<>();
                 diff(lengthOfX(), lengthOfY());
             }
             return this.diff;
@@ -190,18 +190,18 @@ public class LCS {
 
             while (!(i == 0 && j == 0)) {
                 if (i > 0 && j > 0 && isXYEqual(i, j)) {
-                    this.diff.add(new DiffEntry<VALUE>(DiffType.NONE, valueOfYInternal(j)));
+                    this.diff.add(new DiffEntry<>(DiffType.NONE, valueOfYInternal(j)));
                     i--;
                     j--;
 
                 } else {
                     if (j > 0 && (i == 0 || c[i][j - 1] >= c[i - 1][j])) {
-                        this.diff.add(new DiffEntry<VALUE>(DiffType.ADD, valueOfYInternal(j)));
+                        this.diff.add(new DiffEntry<>(DiffType.ADD, valueOfYInternal(j)));
                         j--;
 
                     } else if (i > 0 && (j == 0 || c[i][j - 1] < c[i - 1][j])) {
 
-                        this.diff.add(new DiffEntry<VALUE>(DiffType.REMOVE, valueOfXInternal(i)));
+                        this.diff.add(new DiffEntry<>(DiffType.REMOVE, valueOfXInternal(i)));
                         i--;
                     }
                 }

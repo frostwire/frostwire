@@ -34,7 +34,7 @@ public class AssociationsWindow extends SetupWindow {
     private static final long serialVersionUID = -8599946599240459538L;
 
     /** a mapping of checkboxes to associations */
-    private Map<JCheckBox, LimeAssociationOption> associations = new HashMap<JCheckBox, LimeAssociationOption>();
+    private Map<JCheckBox, LimeAssociationOption> associations = new HashMap<>();
 
     /** Check box to check associations on startup. */
     private JRadioButton always;

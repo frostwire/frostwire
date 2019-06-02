@@ -8,8 +8,8 @@ public class ISO639 {
 	private static Map<String,String> ISO_639_1_to_ISO_639_2;
 	
 	static {
-		ISO_639_2_to_ISO_639_1 = new HashMap<String, String>();
-		ISO_639_1_to_ISO_639_2 =  new HashMap<String, String>();
+		ISO_639_2_to_ISO_639_1 = new HashMap<>();
+		ISO_639_1_to_ISO_639_2 = new HashMap<>();
 		addCode("﻿aar","aa");
 		addCode("abk","ab");
 		addCode("afr","af");

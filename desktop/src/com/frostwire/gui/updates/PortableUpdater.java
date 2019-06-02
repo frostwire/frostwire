@@ -128,7 +128,7 @@ public final class PortableUpdater {
     }
 
     private static String[] createWSHScriptCommand(File source, File dest) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add("wscript");
         command.add("//B");
         command.add("//NoLogo");
@@ -140,7 +140,7 @@ public final class PortableUpdater {
     }
 
     private static String[] createMacOSXScriptCommand(File source, File dest) {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add(new File(CommonUtils.getUserSettingsDir(), PORTABLE_UPDATER_SCRIPT_MACOSX).getAbsolutePath());
         command.add(source.getAbsolutePath());
         command.add(dest.getAbsolutePath());

@@ -41,7 +41,7 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 	 */
 	public CheckBoxListPanel(Collection<E> elements, CheckBoxList.TextProvider<E> provider,
 			boolean selected) {
-	    list = new CheckBoxList<E>(elements, provider, selected, CheckBoxList.SELECT_FIRST_OFF);
+	    list = new CheckBoxList<>(elements, provider, selected, CheckBoxList.SELECT_FIRST_OFF);
 		initialize();
 	}
 	
@@ -51,7 +51,7 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 	 * See {@link CheckBoxList#CheckBoxList(Collection<E>)}.
 	 */
 	public CheckBoxListPanel(Collection<E> elements) {
-		list = new CheckBoxList<E>(elements);
+		list = new CheckBoxList<>(elements);
 		initialize();
 	}
 	
@@ -62,7 +62,7 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 	 */
 	@SuppressWarnings("unchecked")
     public CheckBoxListPanel() {
-		list = new CheckBoxList<E>(Collections.emptyList());
+		list = new CheckBoxList<>(Collections.emptyList());
 		initialize();
 	}
 	

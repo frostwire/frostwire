@@ -47,23 +47,23 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * The set of elements included on the panel.
      */
-    private final Set<E>     elements  = new HashSet<E>();
+    private final Set<E>     elements  = new HashSet<>();
     
     /**
      * The subsets of unchecked and checked elements on the panel.
      */
-    private final Set<E>     unchecked = new HashSet<E>();
-    private final Set<E>     checked   = new HashSet<E>();
+    private final Set<E>     unchecked = new HashSet<>();
+    private final Set<E>     checked   = new HashSet<>();
     
     /**
      * The subset of individual items that have been force disabled.
      */
-    private final Set<E>     disabled  = new HashSet<E>();
+    private final Set<E>     disabled  = new HashSet<>();
     
     /**
      * The subset of items that are bolded for notification in the panel.
      */
-    private final Set<E>     bolded    = new HashSet<E>();
+    private final Set<E>     bolded    = new HashSet<>();
    
         
     private Object selected;
@@ -133,21 +133,21 @@ public class CheckBoxList<E> extends BoxPanel {
     
     
     public CheckBoxList(Collection<E> elements, TextProvider<E> provider, boolean checkAll, int mode) {
-        this(elements, checkAll ? new HashSet<E>() : elements, provider, null, mode);
+        this(elements, checkAll ? new HashSet<>() : elements, provider, null, mode);
     }
 
     
     public CheckBoxList(Collection<E> totalElements, Collection<E> notCheckedElements, int mode) {
-        this(totalElements, notCheckedElements, new DefaultTextProvider<E>(), null, mode);
+        this(totalElements, notCheckedElements, new DefaultTextProvider<>(), null, mode);
     }    
     
    public CheckBoxList(Collection<E> elements, TextProvider<E> provider, int mode) {
-        this(elements, new HashSet<E>(), provider, null, mode);
+        this(elements, new HashSet<>(), provider, null, mode);
     }
     
     
     public CheckBoxList(Collection<E> elements) {
-        this(elements, new DefaultTextProvider<E>(), SELECT_FIRST_ON);
+        this(elements, new DefaultTextProvider<>(), SELECT_FIRST_ON);
     }
     
     public CheckBoxList(Collection<E> elements, TextProvider<E> provider) {
@@ -172,7 +172,7 @@ public class CheckBoxList<E> extends BoxPanel {
      */
     public void setElements(Collection<E> elements, boolean checked) {
         if (checked) {
-            this.setElements(elements, new HashSet<E>());
+            this.setElements(elements, new HashSet<>());
         } 
         else {
             this.setElements(elements, elements);
@@ -183,7 +183,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Sets the element list.
      */
     public void setElements(Collection<E> elements, Collection<E> notCheckedElements) {
-        this.items = new ArrayList<E>(elements);
+        this.items = new ArrayList<>(elements);
         
         Object[][] rowData = new Object[elements.size()][1];        
         for ( int i=0 ; i<elements.size() ; i++ )
@@ -219,8 +219,8 @@ public class CheckBoxList<E> extends BoxPanel {
      * Deletes an item from the list with key "key"
      */
     public void removeItem(Object key) {
-        Set<E> newElements = new HashSet<E>(this.elements);
-        Set<E> newUnchecked = new HashSet<E>(this.unchecked);
+        Set<E> newElements = new HashSet<>(this.elements);
+        Set<E> newUnchecked = new HashSet<>(this.unchecked);
         newElements.remove(key);
         newUnchecked.remove(key);
         this.setElements(newElements, newUnchecked);
@@ -346,7 +346,7 @@ public class CheckBoxList<E> extends BoxPanel {
      */
     public void setItemsEnabled(Set<E> keys, boolean state) {
         if (state) {
-            Set<E> toUncheck = new HashSet<E>(this.checked);
+            Set<E> toUncheck = new HashSet<>(this.checked);
             toUncheck.retainAll(keys);
             toUncheck.retainAll(this.disabled);
             
@@ -434,9 +434,9 @@ public class CheckBoxList<E> extends BoxPanel {
      */
     public List<E> getCheckedElements() {
         if (this.checkBoxList.isEnabled() && this.checked.size() > 0) {
-            Set<E> totalChecked = new HashSet<E>(checked);
+            Set<E> totalChecked = new HashSet<>(checked);
             totalChecked.removeAll(this.disabled);
-            return new LinkedList<E>(totalChecked);
+            return new LinkedList<>(totalChecked);
         }
         else {
             return Collections.emptyList();
@@ -450,20 +450,20 @@ public class CheckBoxList<E> extends BoxPanel {
      */
     public List<E> getUncheckedElements() {
         if (!this.checkBoxList.isEnabled()) {
-            return new LinkedList<E>(this.elements);
+            return new LinkedList<>(this.elements);
         }
         
-        Set<E> toUncheck = new HashSet<E>(this.checked);
+        Set<E> toUncheck = new HashSet<>(this.checked);
         toUncheck.retainAll(this.disabled);
         
         if (this.unchecked.size() > 0) {
-            Set<E> totalUnchecked = new HashSet<E>(this.unchecked);
+            Set<E> totalUnchecked = new HashSet<>(this.unchecked);
             totalUnchecked.addAll(toUncheck);
 
-            return new LinkedList<E>(totalUnchecked);
+            return new LinkedList<>(totalUnchecked);
         }
         else {
-            return new LinkedList<E>(toUncheck);
+            return new LinkedList<>(toUncheck);
         }
     }
 
@@ -472,7 +472,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Returns a new list of the total elements contained
      */
     public Set<E> getElements() {
-        return new HashSet<E>(this.elements);
+        return new HashSet<>(this.elements);
     }
     
     /**
@@ -481,7 +481,7 @@ public class CheckBoxList<E> extends BoxPanel {
      *  of the component or elements
      */
     public Set<E> getRawUncheckedElementsAsSet() {
-        return new HashSet<E>(this.unchecked);
+        return new HashSet<>(this.unchecked);
     }
     
     

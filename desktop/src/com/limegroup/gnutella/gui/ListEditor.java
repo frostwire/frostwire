@@ -52,7 +52,7 @@ public class ListEditor extends JPanel {
      * @see setModel
      */
     public ListEditor() {
-        this(new Vector<String>());
+        this(new Vector<>());
     }
 
     /**
@@ -61,7 +61,7 @@ public class ListEditor extends JPanel {
      * @see setModel
      */
     public ListEditor(Vector<String> model) {
-        this.listeners=new Vector<ListDataListener>();
+        this.listeners= new Vector<>();
 
         setLayout(new GridBagLayout());
 
@@ -97,7 +97,7 @@ public class ListEditor extends JPanel {
         add(removeButton, gbc);
         
         //Bottom half of the editor
-        list=new JList<Object>();
+        list= new JList<>();
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(new ListListener());
         GUIUtils.bindKeyToAction(list,
@@ -140,7 +140,7 @@ public class ListEditor extends JPanel {
      public synchronized void setModel(Vector<String> model) {
          //Copy model into realModel.
          this.model=model;        
-         this.realModel=new DefaultListModel<Object>();
+         this.realModel= new DefaultListModel<>();
          for (String s : model) realModel.addElement(s);
          list.setModel(realModel);
      }

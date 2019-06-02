@@ -89,7 +89,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	/** Cache.
 	 */
-	private final static IdentityHashMap<FontMetrics, Point.Float> FM_MAP = new IdentityHashMap<FontMetrics, Point.Float>(4);
+	private final static IdentityHashMap<FontMetrics, Point.Float> FM_MAP = new IdentityHashMap<>(4);
 	private final static Font SUBST_FONT = new Font("sansserif", Font.PLAIN, 11);
 
 	public final float getPixelUnitFactor(boolean isHor)

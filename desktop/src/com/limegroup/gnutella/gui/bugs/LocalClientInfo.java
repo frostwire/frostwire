@@ -111,7 +111,7 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         Thread[] allThreads = new Thread[Thread.activeCount()];
         int copied = Thread.enumerate(allThreads);
         _threadCount = "" + copied;
-        Map<String, Integer> threads = new HashMap<String, Integer>();
+        Map<String, Integer> threads = new HashMap<>();
         for (int i = 0; i < copied; i++) {
             String name = allThreads[i].getName();
             Integer val = threads.get(name);

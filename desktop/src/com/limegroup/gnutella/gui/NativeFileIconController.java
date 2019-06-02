@@ -28,7 +28,7 @@ public class NativeFileIconController implements FileIconController {
     private final SmartFileView VIEW;
     
     /** A mapping from String (extension) to Icon. */
-    private final Map<String, Icon> EXTENSIONS = new HashMap<String, Icon>();
+    private final Map<String, Icon> EXTENSIONS = new HashMap<>();
     
     /**
      * A marker null icon so we don't create a file everytime
@@ -134,7 +134,7 @@ public class NativeFileIconController implements FileIconController {
      * deadlocks when constructing JFileChooser ones outside the Swing thread.
      */
     public SmartFileView constructFSVView() {
-        final AtomicReference<SmartFileView> ref = new AtomicReference<SmartFileView>();
+        final AtomicReference<SmartFileView> ref = new AtomicReference<>();
         GUIMediator.safeInvokeAndWait(new Runnable() {
             public void run() {
                 ref.set(new FSVFileView());
@@ -364,7 +364,7 @@ public class NativeFileIconController implements FileIconController {
      */
     private static class FSVFileView extends SmartFileView {
         private final FileSystemView VIEW = FileSystemView.getFileSystemView();        
-        private final Map<File, Icon> CACHE = new FixedsizeForgetfulHashMap<File, Icon>(50000);        
+        private final Map<File, Icon> CACHE = new FixedsizeForgetfulHashMap<>(50000);
         
         @Override
         public String getDescription(File f) {
@@ -417,7 +417,7 @@ public class NativeFileIconController implements FileIconController {
         private final FileView DELEGATE;
         
         /** A set of the most recently requested Files. */
-        private final Set<File> CACHE = new FixedsizeForgetfulHashSet<File>(5000, 1000); 
+        private final Set<File> CACHE = new FixedsizeForgetfulHashSet<>(5000, 1000);
 
         public SmartChooserView(FileView delegate) {
             DELEGATE = delegate;

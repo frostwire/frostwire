@@ -25,7 +25,7 @@ public class FilteredTreeModel implements TreeModel {
 
 	private FilteredTreeModelListener listener;
 	
-	private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
+	private List<TreeModelListener> listeners = new ArrayList<>();
 
 	/** The underlying data model. */
 	private TreeModel model;
@@ -33,7 +33,7 @@ public class FilteredTreeModel implements TreeModel {
 	private ParentProvider parentProvider;
 
 	/** Maps search keywords to lists of matching nodes. */ 
-	private PatriciaTrie<String, List<Object>> searchTrie = new PatriciaTrie<String, List<Object>>(new CharSequenceKeyAnalyzer());
+	private PatriciaTrie<String, List<Object>> searchTrie = new PatriciaTrie<>(new CharSequenceKeyAnalyzer());
 
 	/** Currently visible nodes. If <code>null</code>, all nodes are visible. */
 	private Set<Object> visibleNodes;
@@ -69,7 +69,7 @@ public class FilteredTreeModel implements TreeModel {
 		key = normalize(key);
 		List<Object> value = searchTrie.get(key);
 		if (value == null) {
-			value = new ArrayList<Object>(1);
+			value = new ArrayList<>(1);
 			searchTrie.put(key, value);
 		}
 		value.add(node);
@@ -96,7 +96,7 @@ public class FilteredTreeModel implements TreeModel {
 		if (text == null || text.length() == 0) {
 			visibleNodes = null;
 		} else {
-            visibleNodes = new HashSet<Object>();
+            visibleNodes = new HashSet<>();
             String[] keywords = StringUtils.split(I18NConvert.instance().getNorm(text), " "); 
             for(int i = 0; i < keywords.length; i++) {
                 SortedMap<String, List<Object>> nodeListByKey = searchTrie.getPrefixedBy(keywords[i]);
@@ -105,7 +105,7 @@ public class FilteredTreeModel implements TreeModel {
                         visibleNodes.addAll(nodes);
                     }
                 } else {
-                    Set<Object> allNew = new HashSet<Object>();
+                    Set<Object> allNew = new HashSet<>();
                     for(List<Object> nodes : nodeListByKey.values()) {
                         allNew.addAll(nodes);
                     }
@@ -263,7 +263,7 @@ public class FilteredTreeModel implements TreeModel {
 	 * Sets all parents of the visible nodes visible.
 	 */
 	private void ensureParentsVisible() {
-		Set<Object> parentNodes = new HashSet<Object>();
+		Set<Object> parentNodes = new HashSet<>();
 		for (Object node : visibleNodes) {
 			Object parentNode = parentProvider.getParent(node);
 			while (parentNode != null) {
@@ -285,8 +285,8 @@ public class FilteredTreeModel implements TreeModel {
 
 		public TreeModelEvent refactorEvent(TreeModelEvent event) {
 			if (visibleNodes != null) {
-				List<Object> children = new ArrayList<Object>(event.getChildren().length);
-				List<Integer> indicieList = new ArrayList<Integer>(event.getChildIndices().length);
+				List<Object> children = new ArrayList<>(event.getChildren().length);
+				List<Integer> indicieList = new ArrayList<>(event.getChildIndices().length);
 
 				visibleNodes.addAll(Arrays.asList(event.getChildren()));
 				

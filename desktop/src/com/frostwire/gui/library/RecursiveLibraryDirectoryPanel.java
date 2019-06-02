@@ -97,11 +97,11 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      */
     public RecursiveLibraryDirectoryPanel(boolean precheckFolders, Set<File> blackListSet, File... roots) {
         super(new BorderLayout());
-        this.roots = new TreeSet<File>(FileTreeModel.DEFAULT_COMPARATOR);
-        this.deselected = new HashSet<File>(blackListSet);
+        this.roots = new TreeSet<>(FileTreeModel.DEFAULT_COMPARATOR);
+        this.deselected = new HashSet<>(blackListSet);
 
         if (!precheckFolders) {
-            addFoldersToExclude(new HashSet<File>(Arrays.asList(roots)));
+            addFoldersToExclude(new HashSet<>(Arrays.asList(roots)));
         }
 
         // center
@@ -159,8 +159,8 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         directoryTreeModel.removeSubRoots();
         this.roots.addAll(retainAncestors(newRoots));
 
-        List<File> list = new ArrayList<File>(roots);
-        Collections.sort(list, new Comparator<File>() {
+        List<File> list = new ArrayList<>(roots);
+        Collections.sort(list, new Comparator<>() {
             public int compare(File o1, File o2) {
                 if (o1.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
                     return -1;
@@ -279,7 +279,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      */
     static Set<File> retainAncestors(File... roots) {
         if (roots == null) {
-            return new HashSet<File>();
+            return new HashSet<>();
         }
         for (int i = 0; i < roots.length; i++) {
             for (int j = i + 1; j < roots.length && roots[i] != null; j++) {
@@ -292,7 +292,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
                 }
             }
         }
-        Set<File> retained = new HashSet<File>(roots.length);
+        Set<File> retained = new HashSet<>(roots.length);
         for (File file : roots) {
             if (file != null) {
                 retained.add(file);
@@ -375,7 +375,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Deselected root folders are not returned.
      */
     public Set<File> getRootsToInclude() {
-        Set<File> ret = new HashSet<File>(roots);
+        Set<File> ret = new HashSet<>(roots);
         ret.removeAll(deselected);
         return ret;
     }
@@ -394,7 +394,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Constructs the tree path for a directory.
      */
     private TreePath getTreePath(File dir) {
-        LinkedList<File> files = new LinkedList<File>();
+        LinkedList<File> files = new LinkedList<>();
         files.add(dir);
         File parent = dir.getParentFile();
         while (parent != null && !directoryTreeModel.isSubRoot(dir)) {

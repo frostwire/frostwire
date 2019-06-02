@@ -54,21 +54,21 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      * Constructs a new, empty set.
      */
     public FixedsizeForgetfulHashSet(int size) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size);
+        map = new FixedsizeForgetfulHashMap<>(size);
     }
     
     /**
      * Constructs a new, empty set, using the given initialCapacity.
      */
     public FixedsizeForgetfulHashSet(int size, int initialCapacity) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size, initialCapacity);
+        map = new FixedsizeForgetfulHashMap<>(size, initialCapacity);
     }
     
     /**
      * Constructs a new, empty set, using the given initialCapacity & loadFactor.
      */
     public FixedsizeForgetfulHashSet(int size, int initialCapacity, float loadFactor) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size, initialCapacity, loadFactor);
+        map = new FixedsizeForgetfulHashMap<>(size, initialCapacity, loadFactor);
     }
     
     /**

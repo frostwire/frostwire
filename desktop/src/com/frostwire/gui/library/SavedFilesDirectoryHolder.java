@@ -48,7 +48,7 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
     public SavedFilesDirectoryHolder(FileSetting saveDir, String name) {
         super(saveDir, name);
         type = MediaType.getAnyTypeMediaType();
-        cache = new HashSet<File>();
+        cache = new HashSet<>();
     }
 
     public Icon getIcon() {
@@ -115,7 +115,7 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
             files.addAll(getFilesRecursively(directory, directoriesToNotInclude));
         }
 
-        cache = new HashSet<File>(files);
+        cache = new HashSet<>(files);
 
         return cache.toArray(new File[0]);
     }

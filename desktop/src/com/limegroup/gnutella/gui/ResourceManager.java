@@ -78,7 +78,7 @@ public final class ResourceManager {
     /**
      * Cache of theme images (name as String -> image as ImageIcon)
      */
-    private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<String, ImageIcon>();
+    private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
 
 
     /**

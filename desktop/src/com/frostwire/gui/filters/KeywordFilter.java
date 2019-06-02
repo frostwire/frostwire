@@ -36,7 +36,7 @@ import java.util.Locale;
 public class KeywordFilter implements SearchFilter {
 
     /** INVARIANT: strings in ban contain only lowercase */
-    private List<String> ban = new ArrayList<String>();
+    private List<String> ban = new ArrayList<>();
 
     /** 
      * @modifies this

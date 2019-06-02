@@ -19,8 +19,8 @@ class BasicTransferableCreator {
     }
     
     Transferable getTransferable() {
-        List<File> l = new LinkedList<File>();
-        List<FileTransfer> lazy = new LinkedList<FileTransfer>();
+        List<File> l = new LinkedList<>();
+        List<FileTransfer> lazy = new LinkedList<>();
   
 //      TODO dnd
 //        if (component instanceof LimeJTable)

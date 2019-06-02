@@ -61,7 +61,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer,MetaDataListener,St
 		
 		metaDataListeners = new ArrayList<>(1);
 		stateListeners = new ArrayList<>(1);
-		volumeListeners = new ArrayList<VolumeListener>(1);
+		volumeListeners = new ArrayList<>(1);
 		positionListeners = new ArrayList<>(1);
 		taskListeners = new ArrayList<>(1);
 		icyInfoListeners = new ArrayList<>(1);

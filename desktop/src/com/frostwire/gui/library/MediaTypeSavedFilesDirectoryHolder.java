@@ -42,7 +42,7 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
 
 	public MediaTypeSavedFilesDirectoryHolder(MediaType type) {
 		this.type = type;
-		cache = new HashSet<File>();
+		cache = new HashSet<>();
 	}
 
 	public MediaType getMediaType() {

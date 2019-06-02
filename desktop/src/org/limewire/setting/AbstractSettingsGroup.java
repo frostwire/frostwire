@@ -32,7 +32,7 @@ public abstract class AbstractSettingsGroup implements SettingsGroup {
         
         synchronized (this) {
             if (listeners == null) {
-                listeners = new ArrayList<SettingsGroupListener>();
+                listeners = new ArrayList<>();
             }
             listeners.add(l);
         }        

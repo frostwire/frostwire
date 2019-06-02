@@ -61,7 +61,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
 	 */
 	public void initOptions() {
 		String[] bannedWords = FilterSettings.BANNED_WORDS.getValue();
-		RESULTS_LIST.setModel(new Vector<String>(Arrays.asList(bannedWords)));
+		RESULTS_LIST.setModel(new Vector<>(Arrays.asList(bannedWords)));
 		IGNORE_ADULT_CHECK_BOX.setSelected(FilterSettings.FILTER_ADULT.getValue());
 	}
 
