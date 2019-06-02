@@ -56,8 +56,8 @@ public class SearchAction extends AbstractAction {
 	public SearchAction(SearchInformation info, String messageKey){
 		this.info = info;
 		putValue(Action.NAME, MessageFormat.format
-				(I18n.tr(messageKey), 
-						new Object[] { info.getTitle() }));
+				(I18n.tr(messageKey),
+                        info.getTitle()));
 
         if (SearchMediator.validateInfo(info) != SearchMediator.QUERY_VALID) {
 			throw new IllegalArgumentException("invalid search info: " + info);

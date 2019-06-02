@@ -78,7 +78,7 @@ public class Main {
             // which would slow the speed of class-loading, causing the splash to be
             // displayed later.
             try {
-                Class.forName("com.limegroup.gnutella.gui.GUILoader").getMethod("load", new Class[] { String[].class, Frame.class }).invoke(null, new Object[] { args, splash });
+                Class.forName("com.limegroup.gnutella.gui.GUILoader").getMethod("load", new Class[] { String[].class, Frame.class }).invoke(null, args, splash);
             } catch (Exception e) {
                 e.printStackTrace();
             }

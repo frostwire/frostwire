@@ -190,17 +190,17 @@ public class MacEventHandler {
 
                 try {
                     setMethod = applicationClass.getDeclaredMethod(methodName,
-                            new Class<?>[]{handlerClass});
+                            handlerClass);
                 } catch (NoSuchMethodException ignore) {
                     // try first interface
                     setMethod = applicationClass.getDeclaredMethod(methodName,
-                            new Class<?>[]{handlerClass.getInterfaces()[0]});
+                            handlerClass.getInterfaces()[0]);
                 }
 
                 MacOSHandler adapter = new MacOSHandler(handlerMethod, handler);
                 Object proxy = Proxy.newProxyInstance(MacOSHandler.class.getClassLoader(),
                         new Class<?>[]{handlerClass}, adapter);
-                setMethod.invoke(application, new Object[]{proxy});
+                setMethod.invoke(application, proxy);
             } catch (Throwable e) {
                 LOG.error("Error setting application handler", e);
             }

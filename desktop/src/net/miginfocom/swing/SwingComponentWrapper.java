@@ -443,7 +443,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 	private static Method BL_RES_METHOD = null;
 	static {
 		try {
-			BL_METHOD = Component.class.getDeclaredMethod("getBaseline", new Class[] {int.class, int.class});
+			BL_METHOD = Component.class.getDeclaredMethod("getBaseline", int.class, int.class);
 			BL_RES_METHOD = Component.class.getDeclaredMethod("getBaselineResizeBehavior"); // 3.7.2: Removed Class<?> null since that made the method inaccessible.
 		} catch (Throwable e) { // No such method or security exception
 		}

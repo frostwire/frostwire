@@ -171,8 +171,8 @@ public class DeadlockSupport {
     private static ThreadInfo[] getThreadInfo(long[] ids) {
         if(VersionUtils.isJava16OrAbove()) {
             try {
-                Method m = ThreadMXBean.class.getDeclaredMethod("getThreadInfo", new Class[] { long[].class, boolean.class, boolean.class } );
-                Object o = m.invoke(ManagementFactory.getThreadMXBean(), new Object[] { ids, true, true } );
+                Method m = ThreadMXBean.class.getDeclaredMethod("getThreadInfo", long[].class, boolean.class, boolean.class);
+                Object o = m.invoke(ManagementFactory.getThreadMXBean(), ids, true, true);
                 return (ThreadInfo[])o;
             } catch (Throwable t) {
                 LOG.info("Error retrieving detailed thread info", t);

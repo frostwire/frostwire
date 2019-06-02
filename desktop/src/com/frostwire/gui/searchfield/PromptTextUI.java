@@ -318,7 +318,7 @@ public abstract class PromptTextUI extends TextUI  {
 	public int getBaseline(JComponent c, int width, int height) {
 		try {
 			Method m = delegate.getClass().getMethod("getBaseline", JComponent.class, int.class, int.class);
-			Object o = m.invoke(delegate, new Object[] { c, width, height });
+			Object o = m.invoke(delegate, c, width, height);
 			return (Integer) o;
 		} catch (Exception ex) {
 			// ignore
