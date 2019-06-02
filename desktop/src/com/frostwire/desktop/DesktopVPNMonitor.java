@@ -119,7 +119,7 @@ public final class DesktopVPNMonitor implements VPNMonitor {
             try {
                 StringBuilder sb = new StringBuilder();
                 while ((line = brstdout.readLine()) != null) {
-                    sb.append(line + "\r\n");
+                    sb.append(line).append("\r\n");
                 }
 
                 result = sb.toString();

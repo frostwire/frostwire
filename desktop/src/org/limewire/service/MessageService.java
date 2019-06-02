@@ -152,7 +152,7 @@ public class MessageService {
         public void showFormattedMessage(String messageKey, Object... args) {
             StringBuilder sb = new StringBuilder("message key: " + messageKey + " ");
             for(int i = 0; i < args.length; i++) {
-                sb.append("arg[" + i + "]: " + args[i]);
+                sb.append("arg[").append(i).append("]: ").append(args[i]);
                 if(i < args.length - 1)
                     sb.append(", ");
             }
@@ -166,7 +166,7 @@ public class MessageService {
         public void showFormattedError(String errorKey, Object... args) {
             StringBuilder sb = new StringBuilder("error key: " + errorKey + " ");
             for(int i = 0; i < args.length; i++) {
-                sb.append("arg[" + i + "]: " + args[i]);
+                sb.append("arg[").append(i).append("]: ").append(args[i]);
                 if(i < args.length - 1)
                     sb.append(", ");
             }

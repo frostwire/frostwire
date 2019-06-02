@@ -345,7 +345,7 @@ public class LCS {
                     if (type != null) {
                         buf.append("</span>");
                     }
-                    buf.append("<span class=\"" + entry.getType().getName() + "\">");
+                    buf.append("<span class=\"").append(entry.getType().getName()).append("\">");
                     type = entry.getType();
                 }
                 buf.append(escapeHtml(entry.getValue()));

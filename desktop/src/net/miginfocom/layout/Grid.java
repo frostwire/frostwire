@@ -2290,8 +2290,7 @@ public final class Grid
 		}
 
 		Float[] newArr = new Float[len];
-		for (int i = 0; i < len; i++)
-			newArr[i] = arr[ix + i];
+		System.arraycopy(arr, ix + 0, newArr, 0, len);
 		return newArr;
 	}
 

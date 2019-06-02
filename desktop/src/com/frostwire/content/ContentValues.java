@@ -483,7 +483,7 @@ public final class ContentValues /*implements Parcelable*/ {
         for (String name : mValues.keySet()) {
             String value = getAsString(name);
             if (sb.length() > 0) sb.append(" ");
-            sb.append(name + "=" + value);
+            sb.append(name).append("=").append(value);
         }
         return sb.toString();
     }

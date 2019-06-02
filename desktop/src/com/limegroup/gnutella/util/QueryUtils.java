@@ -70,7 +70,7 @@ public class QueryUtils {
      * Removes illegal characters from the name, inserting spaces instead.
      */
     public static String removeIllegalChars(String name) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         
         String delim = DELIMITERS;
         char[] illegal = SearchSettings.ILLEGAL_CHARS.getValue();
@@ -78,8 +78,8 @@ public class QueryUtils {
         sb.append(illegal).append(delim);
         StringTokenizer st = new StringTokenizer(name, sb.toString());        
         while(st.hasMoreTokens())
-            ret += st.nextToken().trim() + " ";
-        return ret.trim();
+            ret.append(st.nextToken().trim()).append(" ");
+        return ret.toString().trim();
     }
 
     /**

@@ -44,9 +44,9 @@ public class DeadlockSupport {
                     StackTraceElement[] firstStackTrace = null;
                     ThreadInfo[] allThreadInfo = getThreadInfo(ids);
                     for (ThreadInfo info : allThreadInfo) {
-                        sb.append("\"" + info.getThreadName() + "\" (id=" + info.getThreadId() + ")");
-                        sb.append(" " + info.getThreadState() + " on " + info.getLockName() + " owned by ");
-                        sb.append("\"" + info.getLockOwnerName() + "\" (id=" + info.getLockOwnerId() + ")");
+                        sb.append("\"").append(info.getThreadName()).append("\" (id=").append(info.getThreadId()).append(")");
+                        sb.append(" ").append(info.getThreadState()).append(" on ").append(info.getLockName()).append(" owned by ");
+                        sb.append("\"").append(info.getLockOwnerName()).append("\" (id=").append(info.getLockOwnerId()).append(")");
                         if (info.isSuspended())
                             sb.append(" (suspended)");
                         if (info.isInNative())
@@ -56,7 +56,7 @@ public class DeadlockSupport {
                         if(firstStackTrace == null)
                             firstStackTrace = trace;
                         for(int i = 0; i < trace.length; i++) {
-                            sb.append("\tat " + trace[i].toString() + "\n");
+                            sb.append("\tat ").append(trace[i].toString()).append("\n");
                             if(i == 0)
                                 addLockInfo(info, sb);
                             addMonitorInfo(info, sb, i);
@@ -91,9 +91,9 @@ public class DeadlockSupport {
                 if(o != null) {
                     int length = Array.getLength(o);
                     if(length > 0) {
-                        sb.append("\n\tNumber of locked synchronizers = " + length + "\n");
+                        sb.append("\n\tNumber of locked synchronizers = ").append(length).append("\n");
                         for(int i = 0; i < length; i++)
-                            sb.append("\t- " + Array.get(o, i) + "\n");
+                            sb.append("\t- ").append(Array.get(o, i)).append("\n");
                     }
                 }
             } catch(Throwable t) {
@@ -116,7 +116,7 @@ public class DeadlockSupport {
                         Method depthMethod = monitorInfoClass.getMethod("getLockedStackDepth");
                         Object depth = depthMethod.invoke(mi);
                         if(depth != null && depth.equals(Integer.valueOf(stackDepth)))
-                            sb.append("\t-  locked " + mi + "\n");
+                            sb.append("\t-  locked ").append(mi).append("\n");
                     }
                 }
             } catch(Throwable t) {
@@ -135,11 +135,11 @@ public class DeadlockSupport {
                     Thread.State ts = info.getThreadState();
                     switch (ts) {
                         case BLOCKED: 
-                            sb.append("\t-  blocked on " + o + "\n");
+                            sb.append("\t-  blocked on ").append(o).append("\n");
                             break;
                         case WAITING:
                         case TIMED_WAITING:
-                            sb.append("\t-  waiting on " + o + "\n");
+                            sb.append("\t-  waiting on ").append(o).append("\n");
                             break;
                         default:
                     }

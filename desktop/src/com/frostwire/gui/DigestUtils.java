@@ -92,16 +92,16 @@ public class DigestUtils {
             in.close();
 
             if (!stopped) {
-                String result = new BigInteger(1, m.digest()).toString(16);
+                StringBuilder result = new StringBuilder(new BigInteger(1, m.digest()).toString(16));
     
                 // pad with zeros if until it's 32 chars long.
                 if (result.length() < 32) {
                     int paddingSize = 32 - result.length();
                     for (int i = 0; i < paddingSize; i++) {
-                        result = "0" + result;
+                        result.insert(0, "0");
                     }
                 }
-                return result;
+                return result.toString();
             } else {
                 return null;
             }

@@ -1162,8 +1162,9 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             boolean found = false;
             if(currentFilter != null) {
                 for(int i=0; i < filters.length; i++) {
-                    if(filters[i] == currentFilter) {
+                    if (filters[i] == currentFilter) {
                         found = true;
+                        break;
                     }
                 }
                 if(!found) {
