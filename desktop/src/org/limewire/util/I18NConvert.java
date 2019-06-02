@@ -44,10 +44,8 @@ public class I18NConvert {
             //of abstract class AbstractI18NConverter
             _convertDelegator = new I18NConvertICU();
             _convertDelegator.getNorm("touch ICU code");
-        } catch(IOException te) {
+        } catch(IOException | ClassNotFoundException te) {
             throw new ExceptionInInitializerError(te);
-        } catch(ClassNotFoundException cnf) {
-            throw new ExceptionInInitializerError(cnf);
         }
     }
 

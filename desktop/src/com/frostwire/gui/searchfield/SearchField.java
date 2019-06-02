@@ -59,8 +59,7 @@ public class SearchField extends JXSearchField {
         try {
             if (undoManager != null)
                 undoManager.undoOrRedo();
-        } catch (CannotUndoException ignored) {
-        } catch (CannotRedoException ignored) {
+        } catch (CannotUndoException | CannotRedoException ignored) {
         }
     }
 
@@ -170,9 +169,7 @@ public class SearchField extends JXSearchField {
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             return clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
-        } catch (UnsupportedOperationException he) {
-            return false;
-        } catch (IllegalStateException ise) {
+        } catch (UnsupportedOperationException | IllegalStateException he) {
             return false;
         }
     }

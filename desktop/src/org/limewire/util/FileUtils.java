@@ -142,9 +142,7 @@ public class FileUtils {
                 Process p = Runtime.getRuntime().exec(cmds);
                 p.waitFor();
             }
-            catch(SecurityException ignored) { }
-            catch(IOException ignored) { }
-            catch(InterruptedException ignored) { }
+            catch(SecurityException | InterruptedException | IOException ignored) { }
         }
         
 		return f.canWrite();

@@ -72,9 +72,7 @@ public final class ColorSetting extends AbstractSetting {
             int g = Integer.parseInt(sValue.substring(3, 5), 16);
             int b = Integer.parseInt(sValue.substring(5, 7), 16);
             value = new Color(r,g,b);
-        } catch(NumberFormatException nfe) {
-            revertToDefault();
-        } catch(StringIndexOutOfBoundsException sioobe) {
+        } catch(NumberFormatException | StringIndexOutOfBoundsException nfe) {
             revertToDefault();
         }
 	}

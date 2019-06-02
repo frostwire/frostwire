@@ -471,15 +471,12 @@ public final class MessageService {
                     JOptionPane.YES_NO_OPTION, 
                     JOptionPane.WARNING_MESSAGE, null,
                     options, defaultOption.getText());
-        } catch(ArrayIndexOutOfBoundsException aioobe) {
+        } catch(ArrayIndexOutOfBoundsException | InternalError aioobe) {
             // happens occasionally on windows, assume no.
             option = JOptionPane.NO_OPTION;
-        } catch(InternalError ie) {
-            // happens occasionally, assume no.
-            option = JOptionPane.NO_OPTION;
-        }
-                
-                       
+        } // happens occasionally, assume no.
+
+
         if(option == JOptionPane.YES_OPTION)
             ret = DialogOption.YES;
         else
@@ -547,14 +544,12 @@ public final class MessageService {
                     alwaysUseThisAnswerLabel(message, defValue),
                     I18n.tr("Message"),
                     JOptionPane.YES_NO_CANCEL_OPTION );
-        } catch(ArrayIndexOutOfBoundsException aioobe) {
+        } catch(ArrayIndexOutOfBoundsException | InternalError aioobe) {
             // happens occasionally on windows, assume cancel.
             option = JOptionPane.CANCEL_OPTION;
-        } catch(InternalError ie) {
-            // happens occasionally, assume cancel.
-            option = JOptionPane.CANCEL_OPTION;
-        }
-                            
+        } // happens occasionally, assume cancel.
+
+
         if (option == JOptionPane.YES_OPTION)
             ret = DialogOption.YES;
         else if (option == JOptionPane.NO_OPTION)
@@ -603,14 +598,12 @@ public final class MessageService {
                         null,
                         options,
                         DialogOption.YES.getText());
-        } catch(ArrayIndexOutOfBoundsException aioobe) {
+        } catch(ArrayIndexOutOfBoundsException | InternalError aioobe) {
             // happens occasionally on windows, assume cancel.
             option = JOptionPane.CLOSED_OPTION;
-        } catch(InternalError ie) {
-            // happens occasionally, assume cancel.
-            option = JOptionPane.CLOSED_OPTION;
-        }
-                
+        } // happens occasionally, assume cancel.
+
+
         if(option == 0) // Yes
             ret = DialogOption.YES;
         else if(option == 1) // No

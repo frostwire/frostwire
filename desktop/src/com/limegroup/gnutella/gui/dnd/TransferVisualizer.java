@@ -43,12 +43,10 @@ class TransferVisualizer {
         List<?> l = null;
         try {
             l = (List<?>)t.getTransferData(DataFlavor.javaFileListFlavor);
-        } catch(UnsupportedFlavorException ufe) {
-            return null;
-        } catch(IOException ioe) {
+        } catch(UnsupportedFlavorException | IOException ufe) {
             return null;
         }
-        
+
         // if no data, there's nothing to draw.
         if(l.size() == 0)
             return null;

@@ -71,10 +71,9 @@ public class TorrentFilesTransferHandler extends LimeTransferHandler {
 			    }
 			    return true;
 			}
-		} catch (UnsupportedFlavorException e) {
-		} catch (IOException e) {
+		} catch (UnsupportedFlavorException | IOException e) {
 		}
-		return false;
+        return false;
 	}		
 	
 	// made package private for tests

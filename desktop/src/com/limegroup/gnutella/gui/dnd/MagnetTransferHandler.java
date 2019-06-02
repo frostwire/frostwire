@@ -79,10 +79,9 @@ public class MagnetTransferHandler extends LimeTransferHandler {
 				MagnetClipboardListener.handleMagnets(magnets, false);
 				return true;
 			}
-		} catch (UnsupportedFlavorException e) {
-		} catch (IOException e) {
+		} catch (UnsupportedFlavorException | IOException e) {
 		}
-		return false;
+        return false;
 	}
 	
 }

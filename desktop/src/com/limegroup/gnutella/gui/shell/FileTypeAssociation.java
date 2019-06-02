@@ -79,13 +79,11 @@ public class FileTypeAssociation implements ShellAssociation {
 		try {
 			SERVICE.registerUserAssociation(association);
             SystemUtils.flushIconCache();
-        } catch (AssociationAlreadyRegisteredException ignore){
-            LOG.error("can't addRefreshListener", ignore);
-		} catch (RegisterFailedException ignore){
+        } catch (AssociationAlreadyRegisteredException | RegisterFailedException ignore){
             LOG.error("can't addRefreshListener", ignore);
 		}
-        
-	}
+
+    }
 
 	public void unregister() {
 	    try {
@@ -103,12 +101,10 @@ public class FileTypeAssociation implements ShellAssociation {
 		try {
 			SERVICE.unregisterUserAssociation(f);
             SystemUtils.flushIconCache();
-		} catch (AssociationNotRegisteredException ignore) { 
-            LOG.error("can't unregister", ignore);
-        } catch (RegisterFailedException ignore) { 
+		} catch (AssociationNotRegisteredException | RegisterFailedException ignore) {
             LOG.error("can't unregister", ignore);
         }
-	}
+    }
 	
 	public String toString() {
 		return extension +":"+mimeType+":"+executable+":"+verb;

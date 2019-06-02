@@ -190,9 +190,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
             
             try {
                 PROPS.load(fis);
-            } catch(IllegalArgumentException e) {
-                // Ignored -- Use best guess
-            } catch(StringIndexOutOfBoundsException e) {
+            } catch(IllegalArgumentException | StringIndexOutOfBoundsException e) {
                 // Ignored -- Use best guess
             } catch(IOException e) {
                 // Serious Problems --- Use defaults

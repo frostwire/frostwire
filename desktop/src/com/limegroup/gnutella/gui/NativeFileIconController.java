@@ -113,10 +113,9 @@ public class NativeFileIconController implements FileIconController {
                         setFileView(ui.getFileView(this));
                     }
                 };
-            } catch(NullPointerException ignored) {
-            } catch(ArrayIndexOutOfBoundsException ignored) {
+            } catch(NullPointerException | ArrayIndexOutOfBoundsException ignored) {
             }
-            
+
             if(chooser != null)
                 break;
         }
