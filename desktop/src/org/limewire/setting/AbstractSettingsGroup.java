@@ -103,11 +103,9 @@ public abstract class AbstractSettingsGroup implements SettingsGroup {
         
         final SettingsGroupListener[] listeners = getSettingsGroupListeners();
         if (listeners != null) {
-            Runnable command = new Runnable() {
-                public void run() {
-                    for (SettingsGroupListener l : listeners) {
-                        l.settingsGroupChanged(evt);
-                    }
+            Runnable command = () -> {
+                for (SettingsGroupListener l : listeners) {
+                    l.settingsGroupChanged(evt);
                 }
             };
             

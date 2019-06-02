@@ -201,15 +201,13 @@ class ProgressMonitor implements Accessible
                 }
             });
 
-            addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent event) {
-                    if(dialog.isVisible() &&
-                       event.getSource() == ProgressOptionPane.this &&
-                       (event.getPropertyName().equals(VALUE_PROPERTY) ||
-                        event.getPropertyName().equals(INPUT_VALUE_PROPERTY))){
-                        dialog.setVisible(false);
-                        dialog.dispose();
-                    }
+            addPropertyChangeListener(event -> {
+                if(dialog.isVisible() &&
+                   event.getSource() == ProgressOptionPane.this &&
+                   (event.getPropertyName().equals(VALUE_PROPERTY) ||
+                    event.getPropertyName().equals(INPUT_VALUE_PROPERTY))){
+                    dialog.setVisible(false);
+                    dialog.dispose();
                 }
             });
             
@@ -288,12 +286,7 @@ class ProgressMonitor implements Accessible
                         dialog = pane.createDialog(parentComponent,
                             UIManager.getString(
                                 "ProgressMonitor.progressText"));
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.setVisible(true);
-                            }
-                        }).start();
+                        new Thread(() -> dialog.setVisible(true)).start();
                     }
                 }
             }

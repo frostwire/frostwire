@@ -58,13 +58,11 @@ public final class BugManager {
      * The queue that processes the bugs.
      */
     private final ExecutorService BUGS_QUEUE = ExecutorsHelper.newProcessingQueue(
-                new ThreadFactory() {
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r, "BugProcessor");
-                        t.setDaemon(true);
-                        return t;
-                    }
-                });
+            r -> {
+                Thread t = new Thread(r, "BugProcessor");
+                t.setDaemon(true);
+                return t;
+            });
 
     /**
 	 * A lock to be used when writing to the logfile, if the log is to be
@@ -165,11 +163,7 @@ public final class BugManager {
 	    */
         int MAX_DIALOGS = 3;
         if (!BugSettings.USE_AUTOMATIC_BUG.getValue() &&  _dialogsShowing < MAX_DIALOGS) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                public void run() {
-                    reviewBug(info);
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> reviewBug(info));
         }
     }
     
@@ -253,35 +247,29 @@ public final class BugManager {
         
         JPanel buttonPanel = new JPanel();
         JButton sendButton = new JButton(I18n.tr("Send"));
-        sendButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    info.addUserComments(userCommentsTextArea.getText());
-			    sendToServlet(info);
-				DIALOG.dispose();
-				_dialogsShowing--;
-			}
-		});
+        sendButton.addActionListener(e -> {
+            info.addUserComments(userCommentsTextArea.getText());
+            sendToServlet(info);
+            DIALOG.dispose();
+            _dialogsShowing--;
+        });
         JButton reviewButton = new JButton(I18n.tr("Review"));
-        reviewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {			    
-			    info.addUserComments(userCommentsTextArea.getText());
-		        JTextArea textArea = new JTextArea(info.toBugReport());
-                textArea.setColumns(50);
-                textArea.setEditable(false);
-                textArea.setCaretPosition(0);
-                JScrollPane scroller = new JScrollPane(textArea);
-                scroller.setBorder(BorderFactory.createEtchedBorder());
-                scroller.setPreferredSize( new Dimension(500, 200) );
-                MessageService.instance().showMessage(scroller);
-			}
-		});
+        reviewButton.addActionListener(e -> {
+            info.addUserComments(userCommentsTextArea.getText());
+JTextArea textArea = new JTextArea(info.toBugReport());
+textArea.setColumns(50);
+textArea.setEditable(false);
+textArea.setCaretPosition(0);
+JScrollPane scroller = new JScrollPane(textArea);
+scroller.setBorder(BorderFactory.createEtchedBorder());
+scroller.setPreferredSize( new Dimension(500, 200) );
+MessageService.instance().showMessage(scroller);
+        });
 		JButton discardButton = new JButton(I18n.tr("Discard"));
-		discardButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        DIALOG.dispose();
-		        _dialogsShowing--;
-		    }
-		});
+		discardButton.addActionListener(e -> {
+            DIALOG.dispose();
+            _dialogsShowing--;
+        });
         buttonPanel.add(sendButton);
 		buttonPanel.add(reviewButton);
         buttonPanel.add(discardButton);
@@ -303,17 +291,15 @@ public final class BugManager {
         bg.add(alwaysReview);
         bg.add(alwaysDiscard);
         bg.setSelected(alwaysReview.getModel(), true);
-        ActionListener alwaysListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if( e.getSource() == alwaysSend ) {
-                    BugSettings.IGNORE_ALL_BUGS.setValue(false);
-                    BugSettings.USE_AUTOMATIC_BUG.setValue(true);
-                } else if (e.getSource() == alwaysReview ) {
-                    BugSettings.IGNORE_ALL_BUGS.setValue(false);
-                    BugSettings.USE_AUTOMATIC_BUG.setValue(false);
-                } else if( e.getSource() == alwaysDiscard ) {                    
-                    BugSettings.IGNORE_ALL_BUGS.setValue(true);
-                }
+        ActionListener alwaysListener = e -> {
+            if( e.getSource() == alwaysSend ) {
+                BugSettings.IGNORE_ALL_BUGS.setValue(false);
+                BugSettings.USE_AUTOMATIC_BUG.setValue(true);
+            } else if (e.getSource() == alwaysReview ) {
+                BugSettings.IGNORE_ALL_BUGS.setValue(false);
+                BugSettings.USE_AUTOMATIC_BUG.setValue(false);
+            } else if( e.getSource() == alwaysDiscard ) {
+                BugSettings.IGNORE_ALL_BUGS.setValue(true);
             }
         };
         alwaysSend.addActionListener(alwaysListener);
@@ -413,20 +399,16 @@ public final class BugManager {
 
         JPanel buttonPanel = new JPanel();
         JButton copyButton = new JButton(I18n.tr("Copy Report"));
-        copyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			    textArea.selectAll();
-				textArea.copy();
-				textArea.setCaretPosition(0);
-			}
-		});
+        copyButton.addActionListener(e -> {
+            textArea.selectAll();
+            textArea.copy();
+            textArea.setCaretPosition(0);
+        });
         JButton quitButton = new JButton(I18n.tr("OK"));
-        quitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				DIALOG.dispose();
-				_dialogsShowing--;
-			}
-		});
+        quitButton.addActionListener(e -> {
+            DIALOG.dispose();
+            _dialogsShowing--;
+        });
         buttonPanel.add(copyButton);
         buttonPanel.add(quitButton);
 
@@ -498,11 +480,7 @@ public final class BugManager {
             }
 
             if (response == null) { // could not connect
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        servletSendFailed(INFO);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> servletSendFailed(INFO));
                 return;
             }
 

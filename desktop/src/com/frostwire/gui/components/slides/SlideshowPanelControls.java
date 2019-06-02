@@ -60,13 +60,9 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
     }
 
     private void buildItemListener() {
-        _selectionAdapter = new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (((JRadioButton) e.getItemSelectable()).isSelected()) {
-                    onRadioButtonClicked(e);
-                }
+        _selectionAdapter = e -> {
+            if (((JRadioButton) e.getItemSelectable()).isSelected()) {
+                onRadioButtonClicked(e);
             }
         };
     }

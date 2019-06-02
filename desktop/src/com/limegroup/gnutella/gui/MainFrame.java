@@ -146,11 +146,7 @@ public final class MainFrame {
         });
 
         // Listen for the size/state changing.
-        FRAME.addWindowStateListener(new WindowStateListener() {
-            public void windowStateChanged(WindowEvent e) {
-                saveWindowState();
-            }
-        });
+        FRAME.addWindowStateListener(e -> saveWindowState());
 
         // Listen for the window closing, to save settings.
         FRAME.addWindowListener(new WindowAdapter() {

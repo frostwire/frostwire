@@ -78,13 +78,10 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private void updateTextArea() {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                textArea.setText(I18n.tr("Download") + " \"" + torrent_name.replace("_", " ") + "\" " + I18n.tr("at") + " "
-                        + getLink().trim() + " " + I18n.tr("via FrostWire"));
-                textArea.selectAll();
-            }
+        GUIMediator.safeInvokeLater(() -> {
+            textArea.setText(I18n.tr("Download") + " \"" + torrent_name.replace("_", " ") + "\" " + I18n.tr("at") + " "
+                    + getLink().trim() + " " + I18n.tr("via FrostWire"));
+            textArea.selectAll();
         });
     }
 
@@ -212,12 +209,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private void addEscapeKeyListener() {
-        getRootPane().registerKeyboardAction(new ActionListener() {
-                                                 @Override
-                                                 public void actionPerformed(ActionEvent e) {
-                                                     dispose();
-                                                 }
-                                             },
+        getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
@@ -344,15 +336,12 @@ public class ShareTorrentDialog extends JDialog {
         }
 
         protected Runnable getHttpRequestRunnable(final HttpClient browser) {
-            return new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        System.out.println("Shortening with " + getShortenerURL());
-                        link = browser.get(getShortenerURL(), 2000);
-                        updateTextArea(); //happens safely on UI thread.
-                    } catch (Throwable ignored) {
-                    }
+            return () -> {
+                try {
+                    System.out.println("Shortening with " + getShortenerURL());
+                    link = browser.get(getShortenerURL(), 2000);
+                    updateTextArea(); //happens safely on UI thread.
+                } catch (Throwable ignored) {
                 }
             };
         }
@@ -370,17 +359,14 @@ public class ShareTorrentDialog extends JDialog {
 
         @Override
         protected Runnable getHttpRequestRunnable(final HttpClient browser) {
-            return new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        final String jsonRequest = "{\"longUrl\": \"" + getLink() + "\"}";
-                        final String jsonResponse = browser.post(getShortenerURL(), 2000, UserAgentGenerator.getUserAgent(), jsonRequest, "application/json", false);
-                        GoogleURLShortenerResponse response = JsonUtils.toObject(jsonResponse, GoogleURLShortenerResponse.class);
-                        link = response.id;
-                        updateTextArea(); //happens safely on UI thread.
-                    } catch (Throwable ignored) {
-                    }
+            return () -> {
+                try {
+                    final String jsonRequest = "{\"longUrl\": \"" + getLink() + "\"}";
+                    final String jsonResponse = browser.post(getShortenerURL(), 2000, UserAgentGenerator.getUserAgent(), jsonRequest, "application/json", false);
+                    GoogleURLShortenerResponse response = JsonUtils.toObject(jsonResponse, GoogleURLShortenerResponse.class);
+                    link = response.id;
+                    updateTextArea(); //happens safely on UI thread.
+                } catch (Throwable ignored) {
                 }
             };
         }

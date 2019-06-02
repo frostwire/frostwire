@@ -65,13 +65,11 @@ public final class BugsPaneItem extends AbstractPaneItem {
          */
         String VIEW_EXAMPLE = I18n.tr("View Example");
         JButton example = new JButton(VIEW_EXAMPLE);
-        example.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                Exception e = new Exception("Example Bug");
-                LocalClientInfo info = localClientInfoFactory.
-                        createLocalClientInfo(e, Thread.currentThread().getName(), "Example", false);
-                BugManager.instance().handleBug(e, "test-bug-report-thread", info.toBugReport());
-            }
+        example.addActionListener(ae -> {
+            Exception e = new Exception("Example Bug");
+            LocalClientInfo info = localClientInfoFactory.
+                    createLocalClientInfo(e, Thread.currentThread().getName(), "Example", false);
+            BugManager.instance().handleBug(e, "test-bug-report-thread", info.toBugReport());
         });
 
         SEND_BOX.setText(I18n.tr("Always Send Immediately"));

@@ -961,11 +961,7 @@ MPlayerInstance
 	}
 
     public void doGetProperties(String fileOrUrl, final OutputConsumer _outputConsumer) {
-        final OutputConsumer output_consumer = new OutputConsumer() {
-            public void consume(String output) {
-                _outputConsumer.consume(output);
-            }
-        };
+        final OutputConsumer output_consumer = output -> _outputConsumer.consume(output);
 
 		final CountDownLatch signal = new CountDownLatch(1);
 

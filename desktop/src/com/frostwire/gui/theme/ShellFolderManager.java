@@ -110,12 +110,12 @@ class ShellFolderManager {
         Collections.sort(files, fileComparator);
     }
 
-    private Comparator<Object> fileComparator = new Comparator<>() {
+    private Comparator<Object> fileComparator = new Comparator<Object>() {
         public int compare(Object a, Object b) {
-            return compare((File) a, (File) b);
+            return cmp((File) a, (File) b);
         }
 
-        public int compare(File f1, File f2) {
+        int cmp(File f1, File f2) {
             ShellFolder sf1 = null;
             ShellFolder sf2 = null;
 

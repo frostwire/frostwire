@@ -111,14 +111,12 @@ public final class UpdateMediator {
     }
 
     public void startUpdate() {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                File executableFile = getUpdateBinaryFile();
-                if (executableFile == null || latestMsg == null) {
-                    return;
-                }
-                openInstallerAndShutdown(executableFile);
+        GUIMediator.safeInvokeLater(() -> {
+            File executableFile = getUpdateBinaryFile();
+            if (executableFile == null || latestMsg == null) {
+                return;
             }
+            openInstallerAndShutdown(executableFile);
         });
     }
 

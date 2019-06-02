@@ -490,10 +490,7 @@ public final class LayoutUtil
 
 		writeOutputStream.reset();
 
-		writeXMLObject(writeOutputStream, o, new ExceptionListener() {
-			public void exceptionThrown(Exception e) {
-				e.printStackTrace();
-			}});
+		writeXMLObject(writeOutputStream, o, e -> e.printStackTrace());
 
 		byte[] buf = writeOutputStream.toByteArray();
 

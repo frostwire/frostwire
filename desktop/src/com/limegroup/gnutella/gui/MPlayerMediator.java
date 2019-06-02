@@ -44,12 +44,7 @@ public class MPlayerMediator {
     public static MPlayerMediator instance() {
         if (instance == null) {
             try {
-                GUIMediator.safeInvokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        instance = new MPlayerMediator();
-                    }
-                });
+                GUIMediator.safeInvokeAndWait(() -> instance = new MPlayerMediator());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -63,11 +58,9 @@ public class MPlayerMediator {
 
     public void showPlayerWindow(final boolean visible) {
         try {
-            GUIMediator.safeInvokeAndWait(new Runnable() {
-                public void run() {
-                    if (mplayerWindow != null) {
-                        mplayerWindow.setVisible(visible);
-                    }
+            GUIMediator.safeInvokeAndWait(() -> {
+                if (mplayerWindow != null) {
+                    mplayerWindow.setVisible(visible);
                 }
             });
         } catch (Exception e) {
@@ -77,11 +70,7 @@ public class MPlayerMediator {
 
     public void toggleFullScreen() {
         try {
-            GUIMediator.safeInvokeAndWait(new Runnable() {
-                public void run() {
-                    mplayerWindow.toggleFullScreen();
-                }
-            });
+            GUIMediator.safeInvokeAndWait(() -> mplayerWindow.toggleFullScreen());
         } catch (Exception e) {
             e.printStackTrace();
         }

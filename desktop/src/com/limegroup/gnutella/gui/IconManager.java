@@ -47,14 +47,12 @@ public class IconManager {
         // Then, in a new thread, try to change it to a controller
         // that can block.
         if(OSUtils.isMacOSX() || OSUtils.isWindows()) {
-        	SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					FileIconController newController = new NativeFileIconController();
-                    if(newController.isValid()) {
-                    	fileController = newController;
-                    }
-				}
-			});
+        	SwingUtilities.invokeLater(() -> {
+                FileIconController newController = new NativeFileIconController();
+if(newController.isValid()) {
+fileController = newController;
+}
+            });
         }
     }
     

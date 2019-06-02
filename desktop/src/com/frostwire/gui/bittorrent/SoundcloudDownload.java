@@ -97,15 +97,12 @@ public class SoundcloudDownload extends HttpBTDownload {
     private void start(final File temp) {
         state = TransferState.WAITING;
 
-        SOUNDCLOUD_THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    httpClient.save(sr.getDownloadUrl(), temp, false);
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                    httpClientListener.onError(httpClient, e);
-                }
+        SOUNDCLOUD_THREAD_POOL.execute(() -> {
+            try {
+                httpClient.save(sr.getDownloadUrl(), temp, false);
+            } catch (Throwable e) {
+                e.printStackTrace();
+                httpClientListener.onError(httpClient, e);
             }
         });
     }

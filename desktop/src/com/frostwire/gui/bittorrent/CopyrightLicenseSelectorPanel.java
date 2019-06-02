@@ -232,12 +232,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
                     pickedLicenseLabel.removeActionListener(listener);
                 }
             }
-            pickedLicenseLabel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GUIMediator.openURL(licenseBroker.license.getUrl());
-                }
-            });
+            pickedLicenseLabel.addActionListener(e -> GUIMediator.openURL(licenseBroker.license.getUrl()));
         } else {
             pickedLicenseLabel.setText("");
         }
@@ -292,12 +287,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initListeners() {
-        confirmRightfulUseOfLicense.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onConfirmRightfulUseOfLicenseAction();
-            }
-        });
+        confirmRightfulUseOfLicense.addActionListener(e -> onConfirmRightfulUseOfLicenseAction());
 
         initLicenseTypeRadioButtonsListener();
         initCreativeCommonsLicenseToggleListeners();
@@ -306,13 +296,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initOpenSourceLicensesToggleListeners() {
-        LicenseToggleButtonOnToggleListener openSourceToggleListener = new LicenseToggleButtonOnToggleListener() {
-            
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onOpenSourceButtonToggled(button);
-            }
-        };
+        LicenseToggleButtonOnToggleListener openSourceToggleListener = button -> onOpenSourceButtonToggled(button);
         
         apacheButton.setOnToggleListener(openSourceToggleListener);
         bsd2ClauseButton.setOnToggleListener(openSourceToggleListener);
@@ -328,12 +312,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initCreativeCommonsLicenseToggleListeners() {
-        LicenseToggleButtonOnToggleListener ccToggleListener = new LicenseToggleButtonOnToggleListener() {
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onCreativeCommonsButtonToggled(button);                
-            }
-        };
+        LicenseToggleButtonOnToggleListener ccToggleListener = button -> onCreativeCommonsButtonToggled(button);
         
         ncButton.setOnToggleListener(ccToggleListener);
         ndButton.setOnToggleListener(ccToggleListener);
@@ -341,23 +320,13 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
     
     private void initPublicDomainToggleListeners() {
-        LicenseToggleButtonOnToggleListener pdToggleListener = new LicenseToggleButtonOnToggleListener() {
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onPublicDomainButtonToggled(button);                
-            }
-        };
+        LicenseToggleButtonOnToggleListener pdToggleListener = button -> onPublicDomainButtonToggled(button);
         cc0Button.setOnToggleListener(pdToggleListener);
         publicDomainButton.setOnToggleListener(pdToggleListener);
     }
 
     private void initLicenseTypeRadioButtonsListener() {
-        ActionListener licenseTypeChangeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onLicenseTypeChanged();
-            }
-        };
+        ActionListener licenseTypeChangeListener = e -> onLicenseTypeChanged();
 
         licenseTypeCC.addActionListener(licenseTypeChangeListener);
         licenseTypeOpenSource.addActionListener(licenseTypeChangeListener);

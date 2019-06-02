@@ -163,32 +163,28 @@ public final class TipOfTheDayMediator {
      * Causes the TOTD window to become visible.
      */
     public void displayTipWindow() {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            public void run() {
-                if (!_canDisplay)
-                    return;
+        GUIMediator.safeInvokeLater(() -> {
+            if (!_canDisplay)
+                return;
 
-                if (dialog.isShowing()) {
-                    dialog.setVisible(false);
-                    dialog.setVisible(true);
-                    dialog.toFront();
-                    return;
-                }
-
-                GUIUtils.centerOnScreen(dialog);
+            if (dialog.isShowing()) {
+                dialog.setVisible(false);
                 dialog.setVisible(true);
-
-                if (!"text/html".equals(tipPane.getContentType())) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            tipPane.setContentType("text/html");
-                            setText(getRandomTip());
-                        }
-                    });
-                }
-
                 dialog.toFront();
+                return;
             }
+
+            GUIUtils.centerOnScreen(dialog);
+            dialog.setVisible(true);
+
+            if (!"text/html".equals(tipPane.getContentType())) {
+                SwingUtilities.invokeLater(() -> {
+                    tipPane.setContentType("text/html");
+                    setText(getRandomTip());
+                });
+            }
+
+            dialog.toFront();
         });
     }
 

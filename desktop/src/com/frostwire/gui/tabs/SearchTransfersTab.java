@@ -52,15 +52,13 @@ public final class SearchTransfersTab extends AbstractTab {
         searchDownloadSplitPane.setResizeWeight(0.6);
         searchDownloadSplitPane.setDividerLocation(UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
 
-        searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                JSplitPane splitPane = (JSplitPane) evt.getSource();
-                int current = splitPane.getDividerLocation();
-                if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
-                    splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
-                }
-                UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
+        searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
+            JSplitPane splitPane = (JSplitPane) evt.getSource();
+            int current = splitPane.getDividerLocation();
+            if (splitPane.getSize().height - current < BTDownloadMediator.MIN_HEIGHT) {
+                splitPane.setDividerLocation(splitPane.getSize().height - BTDownloadMediator.MIN_HEIGHT);
             }
+            UISettings.UI_TRANSFERS_DIVIDER_LOCATION.setValue(splitPane.getDividerLocation());
         });
     }
 

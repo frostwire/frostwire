@@ -167,12 +167,7 @@ public final class OptionsConstructor {
         filterTextField = new SearchField();
         filterTextField.setPrompt(I18n.tr("Search here"));
         filterTextField.setMinimumSize(new Dimension(100, 27));
-        filterTextField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                filter();
-            }
-        });
+        filterTextField.addActionListener(e -> filter());
         filterPanel.add(filterTextField);
 
         filterPanel.add(Box.createHorizontalStrut(2));

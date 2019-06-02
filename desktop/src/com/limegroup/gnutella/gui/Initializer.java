@@ -248,12 +248,10 @@ public final class Initializer {
      * Sets up ResourceManager.
      */
     private void installResources() {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                //stopwatch.resetAndLog("wait for event queue");
-                ResourceManager.instance();
-                //stopwatch.resetAndLog("ResourceManager instance");
-            }
+        GUIMediator.safeInvokeAndWait(() -> {
+            //stopwatch.resetAndLog("wait for event queue");
+            ResourceManager.instance();
+            //stopwatch.resetAndLog("ResourceManager instance");
         });
         //stopwatch.resetAndLog("come back from evt queue");
     }
@@ -276,14 +274,12 @@ public final class Initializer {
      * Switches from the AWT splash to the Swing splash.
      */
     private void switchSplashes(Frame awtSplash) {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                // Show the splash screen if we're not starting automatically on 
-                // system startup
-                if (!isStartup) {
-                    SplashWindow.instance().begin();
-                    //stopwatch.resetAndLog("begin splash window");
-                }
+        GUIMediator.safeInvokeAndWait(() -> {
+            // Show the splash screen if we're not starting automatically on
+            // system startup
+            if (!isStartup) {
+                SplashWindow.instance().begin();
+                //stopwatch.resetAndLog("begin splash window");
             }
         });
 
@@ -301,19 +297,17 @@ public final class Initializer {
         GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
         //stopwatch.resetAndLog("update splash for HTML engine");
 
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                //stopwatch.resetAndLog("enter evt queue");
+        GUIMediator.safeInvokeAndWait(() -> {
+            //stopwatch.resetAndLog("enter evt queue");
 
-                JLabel label = new JLabel();
-                // setting font and color to null to minimize generated css
-                // script
-                // which causes a parser exception under circumstances
-                label.setFont(null);
-                label.setForeground(null);
-                BasicHTML.createHTMLView(label, "<html>.</html>");
-                //stopwatch.resetAndLog("create HTML view");
-            }
+            JLabel label = new JLabel();
+            // setting font and color to null to minimize generated css
+            // script
+            // which causes a parser exception under circumstances
+            label.setFont(null);
+            label.setForeground(null);
+            BasicHTML.createHTMLView(label, "<html>.</html>");
+            //stopwatch.resetAndLog("create HTML view");
         });
         //stopwatch.resetAndLog("return from evt queue");
 
@@ -328,13 +322,11 @@ public final class Initializer {
     private void startSetupManager(final SetupManager setupManager) {
         // Run through the initialization sequence -- this must always be
         // called before GUIMediator constructs the LibraryTree!
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                //stopwatch.resetAndLog("event evt queue");
-                // Then create the setup manager if needed.
-                setupManager.createIfNeeded();
-                //stopwatch.resetAndLog("create setupManager if needed");
-            }
+        GUIMediator.safeInvokeAndWait(() -> {
+            //stopwatch.resetAndLog("event evt queue");
+            // Then create the setup manager if needed.
+            setupManager.createIfNeeded();
+            //stopwatch.resetAndLog("create setupManager if needed");
         });
         //stopwatch.resetAndLog("return from evt queue");
     }
@@ -345,12 +337,10 @@ public final class Initializer {
     private void loadUI() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading User Interface..."));
 
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                // stopwatch.resetAndLog("enter evt queue");
-                GUIMediator.instance();
-                // stopwatch.resetAndLog("GUImediator instance");
-            }
+        GUIMediator.safeInvokeAndWait(() -> {
+            // stopwatch.resetAndLog("enter evt queue");
+            GUIMediator.instance();
+            // stopwatch.resetAndLog("GUImediator instance");
         });
 
         GUIMediator.setSplashScreenString(I18n.tr("Loading Core Components..."));
@@ -365,20 +355,18 @@ public final class Initializer {
         // This must be done before the GUI is made visible,
         // otherwise the user can close it and not see the
         // tray icon.
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                //stopwatch.resetAndLog("enter evt queue");
+        GUIMediator.safeInvokeAndWait(() -> {
+            //stopwatch.resetAndLog("enter evt queue");
 
-                NotifyUserProxy.instance();
-                //stopwatch.resetAndLog("NotifYUserProxy instance");
+            NotifyUserProxy.instance();
+            //stopwatch.resetAndLog("NotifYUserProxy instance");
 
-                if (!ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
-                    NotifyUserProxy.instance().hideTrayIcon();
+            if (!ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
+                NotifyUserProxy.instance().hideTrayIcon();
 
-                SettingsWarningManager.checkSettingsLoadSaveFailure();
+            SettingsWarningManager.checkSettingsLoadSaveFailure();
 
-                //stopwatch.resetAndLog("end notify runner");
-            }
+            //stopwatch.resetAndLog("end notify runner");
         });
         //stopwatch.resetAndLog("return from evt queue");
     }
@@ -408,11 +396,9 @@ public final class Initializer {
     private void loadLateTasksForUI() {
         // Initialize IconManager.
         //GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
-                IconManager.instance();
-            }
+        GUIMediator.safeInvokeAndWait(() -> {
+            GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
+            IconManager.instance();
         });
 
         // Touch the I18N stuff to ensure it loads properly.
@@ -525,14 +511,10 @@ public final class Initializer {
      */
     private void fail(final String msgKey) {
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    JOptionPane.showMessageDialog(null,
-                            new MultiLineLabel(I18n.tr(msgKey), 400),
-                            I18n.tr("Error"),
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            });
+            SwingUtilities.invokeAndWait(() -> JOptionPane.showMessageDialog(null,
+                    new MultiLineLabel(I18n.tr(msgKey), 400),
+                    I18n.tr("Error"),
+                    JOptionPane.ERROR_MESSAGE));
         } catch (InterruptedException ignored) {
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();

@@ -64,12 +64,10 @@ class LibDispatchSerialQueue extends AbstractExecutorService {
                         if (runState != RUNNING) return;
 
                         runState = SHUTDOWN;
-                        execute(new Runnable() {
-                                public void run() {
-                                        synchronized (lock) {
-                                                runState = TERMINATED;
-                                                lock.notifyAll(); // for the benefit of awaitTermination()
-                                        }
+                        execute(() -> {
+                                synchronized (lock) {
+                                        runState = TERMINATED;
+                                        lock.notifyAll(); // for the benefit of awaitTermination()
                                 }
                         });
                         nativeQueueWrapper = null;

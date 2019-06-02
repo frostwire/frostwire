@@ -74,13 +74,11 @@ final class IntentWindow extends SetupWindow {
         intentPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
 
         setNext(null);
-        intentPanel.addButtonListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (intentPanel.hasSelection()) {
-                    setNext(IntentWindow.this);
-                    setWillNot = intentPanel.isWillNot();
-                    _manager.enableActions(getAppropriateActions());
-                }
+        intentPanel.addButtonListener(e -> {
+            if (intentPanel.hasSelection()) {
+                setNext(IntentWindow.this);
+                setWillNot = intentPanel.isWillNot();
+                _manager.enableActions(getAppropriateActions());
             }
         });
     }

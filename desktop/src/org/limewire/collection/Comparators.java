@@ -80,11 +80,7 @@ public final class Comparators {
         new CaseInsensitiveStringComparator();
     
     private static final Comparator<Double> INVERSE_DOUBLE_COMPARATOR =
-            new Comparator<>() {
-                public int compare(Double a, Double b) {
-                    return b.compareTo(a);
-                }
-            };
+            (a, b) -> b.compareTo(a);
     
     /**
      * Ensure that this class cannot be constructed.
@@ -169,11 +165,7 @@ public final class Comparators {
      * given objects.
      */
     public static <T extends Comparable<T>> Comparator<T> naturalComparator(Class<? extends T> clazz) {
-        return new Comparator<>() {
-            public int compare(T o1, T o2) {
-                return o1.compareTo(o2);
-            }
-        };
+        return (o1, o2) -> o1.compareTo(o2);
     }
     
     /**

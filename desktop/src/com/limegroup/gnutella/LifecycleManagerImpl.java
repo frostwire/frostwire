@@ -89,11 +89,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
 
         installListeners();
         
-        ThreadExecutor.startThread(new Runnable() {
-            public void run() {
-                doBackgroundTasks();
-            }
-        }, "BackgroundTasks");
+        ThreadExecutor.startThread(() -> doBackgroundTasks(), "BackgroundTasks");
     }
     
     private void loadBackgroundTasksBlocking() {
@@ -240,18 +236,16 @@ public class LifecycleManagerImpl implements LifecycleManager {
 
     /** Starts a manual GC thread. */
     private void startManualGCThread() {
-        Thread t = ThreadExecutor.newManagedThread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(5 * 60 * 1000);
-                    } catch(InterruptedException ignored) {}
-                    //LOG.info("Running GC");
-                    System.gc();
-                    //LOG.info("GC finished, running finalizers");
-                    System.runFinalization();
-                    //LOG.info("Finalizers finished.");
-                }
+        Thread t = ThreadExecutor.newManagedThread(() -> {
+            while(true) {
+                try {
+                    Thread.sleep(5 * 60 * 1000);
+                } catch(InterruptedException ignored) {}
+                //LOG.info("Running GC");
+                System.gc();
+                //LOG.info("GC finished, running finalizers");
+                System.runFinalization();
+                //LOG.info("Finalizers finished.");
             }
         }, "ManualGC");
         t.setDaemon(true);

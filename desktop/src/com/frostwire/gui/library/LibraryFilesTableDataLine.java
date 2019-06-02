@@ -321,17 +321,11 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            BackgroundExecutorService.schedule(new Runnable() {
-                public void run() {
-                    GUIMediator.safeInvokeAndWait(new Runnable() {
-                        public void run() {
-                            IconManager.instance().getIconForFile(initializer);
-                            _iconLoaded = true;
-                            _model.refresh();
-                        }
-                    });
-                }
-            });
+            BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> {
+                IconManager.instance().getIconForFile(initializer);
+                _iconLoaded = true;
+                _model.refresh();
+            }));
             return null;
         } else if (_iconLoaded || iconAvailable) {
             return IconManager.instance().getIconForFile(initializer);

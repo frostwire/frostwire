@@ -79,12 +79,9 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         allCheckbox = new JCheckBox(I18n.tr("Check/Uncheck all"));
         panel.add(allCheckbox);
         allCheckbox.setSelected(areAll(true));
-        allCheckbox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cBox = (JCheckBox) e.getItemSelectable();
-                checkAll(cBox.isSelected());
-            }
+        allCheckbox.addItemListener(e -> {
+            JCheckBox cBox = (JCheckBox) e.getItemSelectable();
+            checkAll(cBox.isSelected());
         });
         return panel;
     }

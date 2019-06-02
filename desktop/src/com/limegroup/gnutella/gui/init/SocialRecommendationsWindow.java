@@ -57,12 +57,7 @@ class SocialRecommendationsWindow extends SetupWindow {
 
     private IconButton createSocialButton(String iconName, final String clickURL, int height) {
         IconButton button = new IconButton(iconName,height,height);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.openURL(clickURL);
-            }
-        });
+        button.addActionListener(e -> GUIMediator.openURL(clickURL));
         return button;
     }
 }

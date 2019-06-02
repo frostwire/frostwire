@@ -143,12 +143,7 @@ public final class FrostwireInputDialog extends JDialog {
     }
 
     private ActionListener getActionListener(final boolean cancelled) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onButtonClicked(cancelled);
-            }
-        };
+        return e -> onButtonClicked(cancelled);
     }
 
     private void onButtonClicked(boolean cancelled) {

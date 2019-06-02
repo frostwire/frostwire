@@ -43,12 +43,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     }
 
     private void initActionListener() {
-        iconButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.openURL(VPN_URL);
-            }
-        });
+        iconButton.addActionListener(e -> GUIMediator.openURL(VPN_URL));
     }
 
     /**
@@ -78,12 +73,9 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     }
 
     private void onVPNBitTorrentDisabledWarningLabelClicked() {
-        VPNDropGuard.canUseBitTorrent(true, new Runnable() {
-            @Override
-            public void run() {
-                updateVPNIcon(false);
-                GUIMediator.instance().getStatusLine().refresh();
-            }
+        VPNDropGuard.canUseBitTorrent(true, () -> {
+            updateVPNIcon(false);
+            GUIMediator.instance().getStatusLine().refresh();
         });
     }
 

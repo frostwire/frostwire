@@ -125,14 +125,12 @@ public final class SplashWindow {
         if(initialized.getAndSet(true)) 
             return;
         
-        runLater(new Runnable() {
-            public void run() {
-                initialize();
-                splashWindow.toFront();
-                splashWindow.setVisible(true);
-                glassPane.setVisible(true);
-                setStatusText(I18n.tr("Loading FrostWire..."));
-            }
+        runLater(() -> {
+            initialize();
+            splashWindow.toFront();
+            splashWindow.setVisible(true);
+            glassPane.setVisible(true);
+            setStatusText(I18n.tr("Loading FrostWire..."));
         });
     }
 
@@ -143,13 +141,11 @@ public final class SplashWindow {
      * @param text the text to display
      */
     public void setStatusText(final String text) {
-        runLater(new Runnable() {
-            public void run() {
-                glassPane.setText(text);
-                // force a redraw so the status is shown immediately,
-                // even if we're currently in the Swing thread.
-                glassPane.paintImmediately(0, 0, glassPane.getWidth(), glassPane.getHeight());
-            }
+        runLater(() -> {
+            glassPane.setText(text);
+            // force a redraw so the status is shown immediately,
+            // even if we're currently in the Swing thread.
+            glassPane.paintImmediately(0, 0, glassPane.getWidth(), glassPane.getHeight());
         });
     }
 
@@ -158,14 +154,12 @@ public final class SplashWindow {
      * This method is used primarily during theme change.
      */
     public void refreshImage() {
-        runLater(new Runnable() {
-            public void run() {
-            	splashLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(Main.getChosenSplashURL())));
-            	glassPane.setVisible(false);
-            	splashWindow.pack();
-            	//  force redraw so that splash is drawn before rest of theme changes
-            	splashLabel.paintImmediately(0, 0, splashLabel.getWidth(), splashLabel.getHeight());
-            }
+        runLater(() -> {
+            splashLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(Main.getChosenSplashURL())));
+            glassPane.setVisible(false);
+            splashWindow.pack();
+            //  force redraw so that splash is drawn before rest of theme changes
+            splashLabel.paintImmediately(0, 0, splashLabel.getWidth(), splashLabel.getHeight());
         });
     }
     
@@ -175,11 +169,7 @@ public final class SplashWindow {
     }
 
     public void dispose() {
-        runLater(new Runnable() {
-            public void run() {
-                splashWindow.dispose();
-            }
-        });
+        runLater(() -> splashWindow.dispose());
     }
 
     public boolean isShowing() {
@@ -187,19 +177,11 @@ public final class SplashWindow {
     }
 
     public void setVisible(final boolean b) {
-        runLater(new Runnable() {
-            public void run() {
-                splashWindow.setVisible(b);
-            }
-        });
+        runLater(() -> splashWindow.setVisible(b));
     }
 
     public void toBack() {
-        runLater(new Runnable() {
-            public void run() {
-                splashWindow.toBack();
-            }
-        });
+        runLater(() -> splashWindow.toBack());
     }
 }
 

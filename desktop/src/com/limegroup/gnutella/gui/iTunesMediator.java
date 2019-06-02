@@ -369,15 +369,12 @@ public final class iTunesMediator {
     public void resetFrostWirePlaylist() {
         deleteFrostWirePlaylist();
 
-        QUEUE.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-                iTunesMediator.instance().scanForSongs(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
+        QUEUE.execute(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
             }
+            iTunesMediator.instance().scanForSongs(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
         });
     }
 

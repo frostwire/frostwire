@@ -110,11 +110,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         // ------------
         Point playButtonPos = new Point(236, 13);
         playButton = MPlayerOverlayControls.createMPlayerButton("fc_play", playButtonPos);
-        playButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MPlayerOverlayControls.this.onPlayPressed();
-            }
-        });
+        playButton.addActionListener(e -> MPlayerOverlayControls.this.onPlayPressed());
         
         OverlayControlsMouseAdapter overlayControlsMouseAdapter = new OverlayControlsMouseAdapter();
         
@@ -125,11 +121,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         // --------------
         Point pauseButtonPos = new Point(236, 13);
         pauseButton = MPlayerOverlayControls.createMPlayerButton("fc_pause", pauseButtonPos);
-        pauseButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MPlayerOverlayControls.this.onPausePressed();
-            }
-        });
+        pauseButton.addActionListener(e -> MPlayerOverlayControls.this.onPausePressed());
         pauseButton.addMouseListener(overlayControlsMouseAdapter);
         pauseButton.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(pauseButton);
@@ -139,11 +131,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         Point fastForwardButtonPos = new Point(306, 18);
         JButton fastForwardButton;
         fastForwardButton = MPlayerOverlayControls.createMPlayerButton("fc_next", fastForwardButtonPos);
-        fastForwardButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                MPlayerOverlayControls.this.onFastForwardPressed();
-            }
-        });
+        fastForwardButton.addActionListener(e -> MPlayerOverlayControls.this.onFastForwardPressed());
         fastForwardButton.addMouseListener(overlayControlsMouseAdapter);
         fastForwardButton.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(fastForwardButton);
@@ -153,11 +141,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         Point rewindButtonPos = new Point(182, 18);
         JButton rewindButton;
         rewindButton = MPlayerOverlayControls.createMPlayerButton("fc_previous", rewindButtonPos);
-        rewindButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                MPlayerOverlayControls.this.onRewindPressed();
-            }
-        });
+        rewindButton.addActionListener(arg0 -> MPlayerOverlayControls.this.onRewindPressed());
         rewindButton.addMouseListener(overlayControlsMouseAdapter);
         rewindButton.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(rewindButton);
@@ -166,11 +150,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         // ------------------------
         Point fullscreenButtonPos = new Point(390, 22);
         fullscreenExitButton = MPlayerOverlayControls.createMPlayerButton("fc_fullscreen_exit", fullscreenButtonPos);
-        fullscreenExitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                MPlayerOverlayControls.this.onFullscreenExitPressed();
-            }
-        });
+        fullscreenExitButton.addActionListener(arg0 -> MPlayerOverlayControls.this.onFullscreenExitPressed());
         fullscreenExitButton.addMouseListener(overlayControlsMouseAdapter);
         fullscreenExitButton.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(fullscreenExitButton);
@@ -178,11 +158,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         // full screen enter button
         // ------------------------
         fullscreenEnterButton = MPlayerOverlayControls.createMPlayerButton("fc_fullscreen_enter", fullscreenButtonPos);
-        fullscreenEnterButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                MPlayerOverlayControls.this.onFullscreenEnterPressed();
-            }
-        });
+        fullscreenEnterButton.addActionListener(arg0 -> MPlayerOverlayControls.this.onFullscreenEnterPressed());
         fullscreenEnterButton.addMouseListener(overlayControlsMouseAdapter);
         fullscreenEnterButton.addMouseMotionListener(overlayControlsMouseAdapter);
         panel.add(fullscreenEnterButton);
@@ -202,11 +178,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
         volumeSlider = new JSlider();
         volumeSlider.setOpaque(false);
         volumeSlider.setFocusable(false);
-        volumeSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                MPlayerOverlayControls.this.onVolumeChanged(((JSlider) e.getSource()).getValue());
-            }
-        });
+        volumeSlider.addChangeListener(e -> MPlayerOverlayControls.this.onVolumeChanged(((JSlider) e.getSource()).getValue()));
         volumeSlider.addMouseListener(overlayControlsMouseAdapter);
         volumeSlider.addMouseMotionListener(overlayControlsMouseAdapter);
         volumePanel.add(volumeSlider, BorderLayout.CENTER);
@@ -232,18 +204,15 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
 
     @Override
     public void setAlpha(final float alpha) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                
-                // only on windows/mac handle alpha
-                if (!OSUtils.isLinux()) {
-                    setOpacity(alpha);
-                }
+        SwingUtilities.invokeLater(() -> {
 
-                // set component visibility as appropriate
-                MPlayerOverlayControls.this.setVisible(alpha != 0.0);
+            // only on windows/mac handle alpha
+            if (!OSUtils.isLinux()) {
+                setOpacity(alpha);
             }
+
+            // set component visibility as appropriate
+            MPlayerOverlayControls.this.setVisible(alpha != 0.0);
         });
     }
 

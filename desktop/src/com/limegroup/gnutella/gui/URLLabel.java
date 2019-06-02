@@ -153,12 +153,10 @@ public class URLLabel extends JLabel  {
        
     private PropertyChangeListener getListener() {
         if (listener == null) {
-            listener = new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) { 
-                    //update label properties
-                    updateLabel();
-                    
-                }
+            listener = evt -> {
+                //update label properties
+                updateLabel();
+
             };
         }
         return listener;

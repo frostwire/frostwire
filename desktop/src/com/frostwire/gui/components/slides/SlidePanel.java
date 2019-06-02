@@ -101,21 +101,13 @@ class SlidePanel extends JPanel {
         add(layeredPane, BorderLayout.CENTER);
 
         try {
-            ImageCache.instance().getImage(new URL(controller.getSlide().imageSrc), new OnLoadedListener() {
-                public void onLoaded(URL url, final BufferedImage image, boolean fromCache, boolean fail) {
-                    GUIMediator.safeInvokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (image != null) {
-                                imageLabel.setIcon(new ImageIcon(image));
-                                imageLabel.setBounds(0, 0, image.getWidth(), image.getHeight());
-                                overlayControls.setBounds(0, 0, image.getWidth(), image.getHeight());
-                            }
-                        }
-                    });
+            ImageCache.instance().getImage(new URL(controller.getSlide().imageSrc), (url, image, fromCache, fail) -> GUIMediator.safeInvokeLater(() -> {
+                if (image != null) {
+                    imageLabel.setIcon(new ImageIcon(image));
+                    imageLabel.setBounds(0, 0, image.getWidth(), image.getHeight());
+                    overlayControls.setBounds(0, 0, image.getWidth(), image.getHeight());
                 }
-            });
+            }));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

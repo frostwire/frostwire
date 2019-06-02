@@ -62,11 +62,9 @@ public final class LibraryCoverArtPanel extends JPanel {
 
     public void setDefault() {
         this.tagsReader = null;
-        LibraryUtils.getExecutor().submit(new Runnable() {
-            public void run() {
-                Image image = retrieveImage();
-                setPrivateImage(image);
-            }
+        LibraryUtils.getExecutor().submit(() -> {
+            Image image = retrieveImage();
+            setPrivateImage(image);
         });
     }
 
@@ -81,12 +79,10 @@ public final class LibraryCoverArtPanel extends JPanel {
             System.err.println("LibraryCoverArtPanel.asyncFetchImage() aborted. No tagsReader set. Check your logic");
             return;
         }
-        LibraryUtils.getExecutor().submit(new Runnable() {
-            public void run() {
-                Image image = retrieveImage();
-                if (tagsReader.getFile() != null) {
-                    setPrivateImage(image);
-                }
+        LibraryUtils.getExecutor().submit(() -> {
+            Image image = retrieveImage();
+            if (tagsReader.getFile() != null) {
+                setPrivateImage(image);
             }
         });
     }

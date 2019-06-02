@@ -97,13 +97,7 @@ public class SendFileProgressDialog extends JDialog {
 
     private void initCancelButton() {
         JButton _cancelButton = new JButton(I18n.tr("Cancel"));
-		_cancelButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onCancelButton();
-			}
-		});
+		_cancelButton.addActionListener(e -> onCancelButton());
 
         GridBagConstraints c;
         c = new GridBagConstraints();
@@ -134,11 +128,7 @@ public class SendFileProgressDialog extends JDialog {
 		if (_preselectedFile == null) {
 			chooseFile();
         } else {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-                    onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile());
-				}}).start();
+			new Thread(() -> onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile())).start();
 		}
     }
 
@@ -151,12 +141,7 @@ public class SendFileProgressDialog extends JDialog {
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             final File selectedFile = fileChooser.getSelectedFile();
-            new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile());
-				}}).start();
+            new Thread(() -> onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile())).start();
         } else if (result == JFileChooser.CANCEL_OPTION) {
             onCancelButton();
         } else if (result == JFileChooser.ERROR_OPTION) {
@@ -171,12 +156,7 @@ public class SendFileProgressDialog extends JDialog {
     private class TorrentMakerListener implements TorrentUtil.UITorrentMakerListener {
         @Override
         public void onCreateTorrentError(final error_code ec) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    _progressBar.setString("Error: " + ec.message());
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> _progressBar.setString("Error: " + ec.message()));
         }
 
         @Override
@@ -186,12 +166,7 @@ public class SendFileProgressDialog extends JDialog {
 
         @Override
         public void onException() {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    _progressBar.setString("There was an error. Make sure the file/folder is not empty.");
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> _progressBar.setString("There was an error. Make sure the file/folder is not empty."));
         }
     }
 }

@@ -50,12 +50,7 @@ public class PaymentOptionsPanel extends JPanel {
     }
 
     private void initListeners() {
-        confirmationCheckbox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onConfirmationCheckbox();
-            }
-        });
+        confirmationCheckbox.addActionListener(e -> onConfirmationCheckbox());
         
         bitcoinAddress.addKeyListener(new KeyAdapter() {
             @Override

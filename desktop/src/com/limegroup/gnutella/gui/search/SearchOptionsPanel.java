@@ -148,11 +148,7 @@ final class SearchOptionsPanel extends JPanel {
     private LabeledRangeSlider createSizeFilter() {
         LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Size"), null, 0, 1000);
         slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
-        slider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                sliderSize_stateChanged();
-            }
-        });
+        slider.addChangeListener(e -> sliderSize_stateChanged());
 
         return slider;
     }
@@ -160,11 +156,7 @@ final class SearchOptionsPanel extends JPanel {
     private LabeledRangeSlider createSeedsFilter() {
         LabeledRangeSlider slider = new LabeledRangeSlider(I18n.tr("Seeds"), null, 0, 1000);
         slider.setPreferredSize(new Dimension(240, (int) slider.getPreferredSize().getHeight()));
-        slider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                sliderSeeds_stateChanged();
-            }
-        });
+        slider.addChangeListener(e -> sliderSeeds_stateChanged());
 
         return slider;
     }
@@ -173,15 +165,13 @@ final class SearchOptionsPanel extends JPanel {
 
         final Map<JCheckBox, BooleanSetting> cBoxes = new HashMap<>();
 
-        ItemListener listener = new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if (areAll(false)) {
-                    ((JCheckBox) e.getItemSelectable()).setSelected(true);
-                }
+        ItemListener listener = e -> {
+            if (areAll(false)) {
+                ((JCheckBox) e.getItemSelectable()).setSelected(true);
+            }
 
-                if (resultPanel != null) {
-                    resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
-                }
+            if (resultPanel != null) {
+                resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);
             }
         };
 

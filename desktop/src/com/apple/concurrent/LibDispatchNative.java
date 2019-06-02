@@ -25,15 +25,15 @@
 
 package com.apple.concurrent;
 
+import java.security.PrivilegedAction;
+
 final class LibDispatchNative {
     static {
         java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<Void>() {
-                public Void run() {
+                (PrivilegedAction<Void>) () -> {
                     System.loadLibrary("osx_jdk8");
                     return null;
-                }
-            });
+                });
     }
 
     static native boolean nativeIsDispatchSupported();

@@ -208,57 +208,54 @@ public final class ThemeMediator {
 
     // Where Tab shortcuts, Font Size changes,
     private static void setupGlobalKeyManager() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                // handle Ctrl+- for font change in tables
-                //System.out.println(e.getSource());
-                if (e.getID() == KeyEvent.KEY_PRESSED && (e.isMetaDown() || e.isControlDown())) {
-                    switch (e.getKeyCode()) {
-                    case KeyEvent.VK_EQUALS:
-                        if (OSUtils.isMacOSX()) {
-                            if (e.getKeyChar() == '+') {
-                                modifyTablesFont(1);
-                            }
-                        } else {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            // handle Ctrl+- for font change in tables
+            //System.out.println(e.getSource());
+            if (e.getID() == KeyEvent.KEY_PRESSED && (e.isMetaDown() || e.isControlDown())) {
+                switch (e.getKeyCode()) {
+                case KeyEvent.VK_EQUALS:
+                    if (OSUtils.isMacOSX()) {
+                        if (e.getKeyChar() == '+') {
                             modifyTablesFont(1);
                         }
-                        return true;
-                    case KeyEvent.VK_MINUS:
-                        modifyTablesFont(-1);
-                        return true;
-                    case KeyEvent.VK_0:
-                        modifyTablesFont(0);
-                        return true;
-                    case KeyEvent.VK_W:
-                        closeCurrentSearchTab(e);
+                    } else {
+                        modifyTablesFont(1);
+                    }
+                    return true;
+                case KeyEvent.VK_MINUS:
+                    modifyTablesFont(-1);
+                    return true;
+                case KeyEvent.VK_0:
+                    modifyTablesFont(0);
+                    return true;
+                case KeyEvent.VK_W:
+                    closeCurrentSearchTab(e);
+                }
+
+                //Ctrl+Tab, Ctrl+Shift Tab to switch search tabs (Windows/Firefox Style)
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_TAB) {
+                    int offset = (e.isShiftDown()) ? -1 : 1;
+                    SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
+                    return true;
+                }
+
+                //Cmd+Shift+[, Cmd+Shift+] Chrome Style.
+                if (e.isMetaDown() && e.isShiftDown()) {
+                    int offset = 0;
+                    if (e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET) {
+                        offset = -1;
+                    } else if (e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET) {
+                        offset = 1;
                     }
 
-                    //Ctrl+Tab, Ctrl+Shift Tab to switch search tabs (Windows/Firefox Style)
-                    if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_TAB) {
-                        int offset = (e.isShiftDown()) ? -1 : 1;
+                    if (offset != 0) {
                         SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
                         return true;
                     }
-
-                    //Cmd+Shift+[, Cmd+Shift+] Chrome Style.
-                    if (e.isMetaDown() && e.isShiftDown()) {
-                        int offset = 0;
-                        if (e.getKeyCode() == KeyEvent.VK_OPEN_BRACKET) {
-                            offset = -1;
-                        } else if (e.getKeyCode() == KeyEvent.VK_CLOSE_BRACKET) {
-                            offset = 1;
-                        }
-
-                        if (offset != 0) {
-                            SearchMediator.getSearchResultDisplayer().switchToTabByOffset(offset);
-                            return true;
-                        }
-                    }
                 }
-
-                return false;
             }
+
+            return false;
         });
     }
 

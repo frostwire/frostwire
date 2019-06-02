@@ -48,11 +48,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
      * Show active downloads
      */
     public void showDownloads() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL));
     }
 
     private class AddDownload implements Runnable {
@@ -71,11 +67,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
      * Tell the GUI to deiconify.
      */
     public void restoreApplication() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.restoreView();
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.restoreView());
     }
 
     /**
@@ -87,21 +79,15 @@ public final class VisualConnectionCallback implements ActivityCallback {
 
 
     public void handleTorrent(final File torrentFile) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().openTorrentFile(torrentFile, false);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.instance().openTorrentFile(torrentFile, false));
     }
 
     public void handleTorrentMagnet(final String request, final boolean partialDownload) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().setRemoteDownloadsAllowed(partialDownload);
-                System.out.println("VisualConnectionCallback about to call openTorrentURI of request.");
-                System.out.println(request);
-                GUIMediator.instance().openTorrentURI(request, partialDownload);
-            }
+        SwingUtilities.invokeLater(() -> {
+            GUIMediator.instance().setRemoteDownloadsAllowed(partialDownload);
+            System.out.println("VisualConnectionCallback about to call openTorrentURI of request.");
+            System.out.println(request);
+            GUIMediator.instance().openTorrentURI(request, partialDownload);
         });
     }
 
@@ -119,11 +105,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
 
     public boolean isRemoteDownloadsAllowed() {
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    GUIMediator.instance();
-                }
-            });
+            SwingUtilities.invokeAndWait(() -> GUIMediator.instance());
         } catch (Exception e) {
             System.out.println("Failed to create GUIMediator");
             e.printStackTrace();

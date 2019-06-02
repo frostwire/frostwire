@@ -55,11 +55,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
 
         CUSTOM = new JCheckBox(I18n.tr("Use a specific network interface."));
         CUSTOM.setSelected(ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue());
-        CUSTOM.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                updateButtons(CUSTOM.isSelected());
-            }
-        });
+        CUSTOM.addItemListener(e -> updateButtons(CUSTOM.isSelected()));
         add(CUSTOM);
 
         try {

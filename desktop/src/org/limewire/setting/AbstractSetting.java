@@ -298,11 +298,9 @@ public abstract class AbstractSetting implements Setting {
         
         final SettingListener[] listeners = getSettingListeners();
         if (listeners != null) {
-            Runnable command = new Runnable() {
-                public void run() {
-                    for (SettingListener l : listeners) {
-                        l.settingChanged(evt);
-                    }
+            Runnable command = () -> {
+                for (SettingListener l : listeners) {
+                    l.settingChanged(evt);
                 }
             };
             

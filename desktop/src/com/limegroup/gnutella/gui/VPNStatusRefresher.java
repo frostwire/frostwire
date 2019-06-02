@@ -69,18 +69,15 @@ public class VPNStatusRefresher {
                     if (!active) {
                         return;
                     }
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!active) {
-                                return;
-                            }
-                            for (VPNStatusListener client : clients) {
-                                try {
-                                    client.onStatusUpdated(isVPNActive);
-                                } catch (Exception e) { //client messed up in some way, but we go on.
-                                    e.printStackTrace();
-                                }
+                    GUIMediator.safeInvokeLater(() -> {
+                        if (!active) {
+                            return;
+                        }
+                        for (VPNStatusListener client : clients) {
+                            try {
+                                client.onStatusUpdated(isVPNActive);
+                            } catch (Exception e) { //client messed up in some way, but we go on.
+                                e.printStackTrace();
                             }
                         }
                     });

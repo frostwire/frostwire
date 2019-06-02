@@ -148,32 +148,29 @@ public class HttpDownload extends HttpBTDownload {
 
         saveFile = completeFile;
 
-        HTTP_THREAD_POOL.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File expectedFile = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
-                    if (md5 != null &&
-                        expectedFile.length() == size &&
-                        checkMD5(expectedFile)) {
-                        saveFile = expectedFile;
-                        bytesReceived = expectedFile.length();
-                        state = TransferState.FINISHED;
-                        onComplete();
-                        return;
-                    }
-
-                    if (resume) {
-                        if (incompleteFile.exists()) {
-                            bytesReceived = incompleteFile.length();
-                        }
-                    }
-
-                    httpClient.save(url, incompleteFile, resume);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    httpClientListener.onError(httpClient, e);
+        HTTP_THREAD_POOL.execute(() -> {
+            try {
+                File expectedFile = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
+                if (md5 != null &&
+                    expectedFile.length() == size &&
+                    checkMD5(expectedFile)) {
+                    saveFile = expectedFile;
+                    bytesReceived = expectedFile.length();
+                    state = TransferState.FINISHED;
+                    onComplete();
+                    return;
                 }
+
+                if (resume) {
+                    if (incompleteFile.exists()) {
+                        bytesReceived = incompleteFile.length();
+                    }
+                }
+
+                httpClient.save(url, incompleteFile, resume);
+            } catch (IOException e) {
+                e.printStackTrace();
+                httpClientListener.onError(httpClient, e);
             }
         });
     }

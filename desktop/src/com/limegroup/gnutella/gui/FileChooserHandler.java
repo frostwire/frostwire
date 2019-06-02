@@ -638,11 +638,7 @@ public final class FileChooserHandler {
         dialog.setDirectory(suggestedFile.getParent());
         dialog.setFile(suggestedFile.getName());
         if(filter != null) {
-            FilenameFilter f = new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return filter.accept(new File(dir, name));
-                }
-            };
+            FilenameFilter f = (dir, name) -> filter.accept(new File(dir, name));
             dialog.setFilenameFilter(f);
         }
 
@@ -687,11 +683,7 @@ public final class FileChooserHandler {
 			dialog.setFile(suggestedFile.getName());
 
 			if (filter != null) {
-				FilenameFilter f = new FilenameFilter() {
-					public boolean accept(File dir, String name) {
-						return filter.accept(new File(dir, name));
-					}
-				};
+				FilenameFilter f = (dir, name) -> filter.accept(new File(dir, name));
 				dialog.setFilenameFilter(f);
 			}
 
@@ -786,13 +778,11 @@ public final class FileChooserHandler {
                 dialog.setTitle(I18n.tr(titleKey));
 
                 if(filter != null) {
-                    FilenameFilter f = new FilenameFilter() {
-                        public boolean accept(File dir, String name) {
-                            if (mode == JFileChooser.DIRECTORIES_ONLY) {
-                                return  new File(dir,name).isDirectory();
-                            }
-                            return filter.accept(new File(dir, name));
+                    FilenameFilter f = (dir, name) -> {
+                        if (mode == JFileChooser.DIRECTORIES_ONLY) {
+                            return  new File(dir,name).isDirectory();
                         }
+                        return filter.accept(new File(dir, name));
                     };
                     dialog.setFilenameFilter(f);
                 }

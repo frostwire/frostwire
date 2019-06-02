@@ -158,15 +158,13 @@ public class GoogleSearchField extends SearchField {
                     JsonArray arr = new JsonParser().parse(json).getAsJsonArray();
                     final List<String> suggestions = readSuggestions(arr.get(1).getAsJsonArray());
 
-                    GUIMediator.safeInvokeLater(new Runnable() {
-                        public void run() {
-                            Iterator<String> it = suggestions.iterator();
-                            if (it.hasNext())
-                                if (!StringUtils.isNullOrEmpty(input.getText(), true)) {
-                                    input.showPopup(it);
-                                } else
-                                    input.hidePopup();
-                        }
+                    GUIMediator.safeInvokeLater(() -> {
+                        Iterator<String> it = suggestions.iterator();
+                        if (it.hasNext())
+                            if (!StringUtils.isNullOrEmpty(input.getText(), true)) {
+                                input.showPopup(it);
+                            } else
+                                input.hidePopup();
                     });
                 }
             } catch (Throwable e) {

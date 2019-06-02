@@ -48,19 +48,10 @@ public final class SmartSearchDBPaneItem extends AbstractPaneItem {
         add(getVerticalSeparator());
 
         JButton resetButton = new JButton(I18n.tr("Reset Smart Search Database"));
-        resetButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GUIMediator.safeInvokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        resetSmartSearchDB();
-                        initOptions();
-                    }
-                });
-            }
-        });
+        resetButton.addActionListener(e -> GUIMediator.safeInvokeLater(() -> {
+            resetSmartSearchDB();
+            initOptions();
+        }));
 
         add(smartSearchEnabled);
 
@@ -91,18 +82,12 @@ public final class SmartSearchDBPaneItem extends AbstractPaneItem {
      */
     public void initOptions() {
         _numTorrentsLabel.setText("...");
-        BackgroundExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                _numTorrents = SearchMediator.instance().getTotalTorrents();
-                GUIMediator.safeInvokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        _numTorrentsLabel.setText(String.valueOf(_numTorrents));
-                        smartSearchEnabled.setSelected(SearchSettings.SMART_SEARCH_ENABLED.getValue());
-                    }
-                });
-            }
+        BackgroundExecutorService.schedule(() -> {
+            _numTorrents = SearchMediator.instance().getTotalTorrents();
+            GUIMediator.safeInvokeLater(() -> {
+                _numTorrentsLabel.setText(String.valueOf(_numTorrents));
+                smartSearchEnabled.setSelected(SearchSettings.SMART_SEARCH_ENABLED.getValue());
+            });
         });
     }
 

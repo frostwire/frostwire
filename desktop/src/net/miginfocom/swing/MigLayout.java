@@ -376,19 +376,17 @@ public final class MigLayout implements LayoutManager2, Externalizable
 			debugTimer = new Timer(getDebugMillis(), new MyDebugRepaintListener());
 
 			if (parent != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						Container p = parent.getParent();
-						if (p != null) {
-							if (p instanceof JComponent) {
-								p.revalidate();
-							} else {
-								parent.invalidate();
-								p.validate();
-							}
-						}
-					}
-				});
+				SwingUtilities.invokeLater(() -> {
+                    Container p = parent.getParent();
+                    if (p != null) {
+                        if (p instanceof JComponent) {
+                            p.revalidate();
+                        } else {
+                            parent.invalidate();
+                            p.validate();
+                        }
+                    }
+                });
 			}
 
 			debugTimer.setInitialDelay(100);
@@ -530,11 +528,7 @@ public final class MigLayout implements LayoutManager2, Externalizable
 				Window win = ((Window) SwingUtilities.getAncestorOfClass(Window.class, (Component)containerWrapper.getComponent()));
 				if (win != null) {
 				   if (win.isVisible()) {
-					   SwingUtilities.invokeLater(new Runnable() {
-						   public void run() {
-							   adjustWindowSize(containerWrapper);
-						   }
-					   });
+					   SwingUtilities.invokeLater(() -> adjustWindowSize(containerWrapper));
 				   } else {
 					   adjustWindowSize(containerWrapper);
 				   }

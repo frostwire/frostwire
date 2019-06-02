@@ -201,11 +201,9 @@ public final class SettingsGroupManager {
         
         final SettingsGroupManagerListener[] listeners = getSettingsHandlerListeners();
         if (listeners != null) {
-            Runnable command = new Runnable() {
-                public void run() {
-                    for (SettingsGroupManagerListener l : listeners) {
-                        l.handleGroupManagerEvent(evt);
-                    }
+            Runnable command = () -> {
+                for (SettingsGroupManagerListener l : listeners) {
+                    l.handleGroupManagerEvent(evt);
                 }
             };
             

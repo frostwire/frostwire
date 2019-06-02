@@ -26,55 +26,53 @@ public class DeadlockSupport {
     private static final int DEADLOCK_CHECK_INTERVAL = 3001;
 
     public static void startDeadlockMonitoring() {
-        Thread t = ThreadExecutor.newManagedThread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(DEADLOCK_CHECK_INTERVAL);
-                    } catch (InterruptedException ignored) {}
-                    //LOG.info("deadlock check start");
-                    long [] ids = findDeadlockedThreads(ManagementFactory.getThreadMXBean());
-                    
-                    if (ids == null) {
-                        //LOG.info("no deadlocks found");
-                        continue;
-                    }
-                    
-                    StringBuilder sb = new StringBuilder("Deadlock Report:\n");
-                    StackTraceElement[] firstStackTrace = null;
-                    ThreadInfo[] allThreadInfo = getThreadInfo(ids);
-                    for (ThreadInfo info : allThreadInfo) {
-                        sb.append("\"").append(info.getThreadName()).append("\" (id=").append(info.getThreadId()).append(")");
-                        sb.append(" ").append(info.getThreadState()).append(" on ").append(info.getLockName()).append(" owned by ");
-                        sb.append("\"").append(info.getLockOwnerName()).append("\" (id=").append(info.getLockOwnerId()).append(")");
-                        if (info.isSuspended())
-                            sb.append(" (suspended)");
-                        if (info.isInNative())
-                            sb.append(" (in native)");
-                        sb.append("\n");
-                        StackTraceElement[] trace = info.getStackTrace();
-                        if(firstStackTrace == null)
-                            firstStackTrace = trace;
-                        for(int i = 0; i < trace.length; i++) {
-                            sb.append("\tat ").append(trace[i].toString()).append("\n");
-                            if(i == 0)
-                                addLockInfo(info, sb);
-                            addMonitorInfo(info, sb, i);
-                        }
-                        
-                        addLockedSynchronizers(info, sb);
-                        
-                        sb.append("\n");
-                    }
-                    
-                    DeadlockException deadlock = new DeadlockException();
-                    // Redirect the stack trace to separate deadlock reports.
-                    if(firstStackTrace != null)
-                        deadlock.setStackTrace(firstStackTrace);
-                    
-                    DeadlockBugManager.handleDeadlock(deadlock, Thread.currentThread().getName(), sb.toString());
-                    return;
+        Thread t = ThreadExecutor.newManagedThread(() -> {
+            while(true) {
+                try {
+                    Thread.sleep(DEADLOCK_CHECK_INTERVAL);
+                } catch (InterruptedException ignored) {}
+                //LOG.info("deadlock check start");
+                long [] ids = findDeadlockedThreads(ManagementFactory.getThreadMXBean());
+
+                if (ids == null) {
+                    //LOG.info("no deadlocks found");
+                    continue;
                 }
+
+                StringBuilder sb = new StringBuilder("Deadlock Report:\n");
+                StackTraceElement[] firstStackTrace = null;
+                ThreadInfo[] allThreadInfo = getThreadInfo(ids);
+                for (ThreadInfo info : allThreadInfo) {
+                    sb.append("\"").append(info.getThreadName()).append("\" (id=").append(info.getThreadId()).append(")");
+                    sb.append(" ").append(info.getThreadState()).append(" on ").append(info.getLockName()).append(" owned by ");
+                    sb.append("\"").append(info.getLockOwnerName()).append("\" (id=").append(info.getLockOwnerId()).append(")");
+                    if (info.isSuspended())
+                        sb.append(" (suspended)");
+                    if (info.isInNative())
+                        sb.append(" (in native)");
+                    sb.append("\n");
+                    StackTraceElement[] trace = info.getStackTrace();
+                    if(firstStackTrace == null)
+                        firstStackTrace = trace;
+                    for(int i = 0; i < trace.length; i++) {
+                        sb.append("\tat ").append(trace[i].toString()).append("\n");
+                        if(i == 0)
+                            addLockInfo(info, sb);
+                        addMonitorInfo(info, sb, i);
+                    }
+
+                    addLockedSynchronizers(info, sb);
+
+                    sb.append("\n");
+                }
+
+                DeadlockException deadlock = new DeadlockException();
+                // Redirect the stack trace to separate deadlock reports.
+                if(firstStackTrace != null)
+                    deadlock.setStackTrace(firstStackTrace);
+
+                DeadlockBugManager.handleDeadlock(deadlock, Thread.currentThread().getName(), sb.toString());
+                return;
             }
         });
         t.setDaemon(true);

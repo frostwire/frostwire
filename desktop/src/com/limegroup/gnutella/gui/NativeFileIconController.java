@@ -134,11 +134,7 @@ public class NativeFileIconController implements FileIconController {
      */
     public SmartFileView constructFSVView() {
         final AtomicReference<SmartFileView> ref = new AtomicReference<>();
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
-                ref.set(new FSVFileView());
-            }
-        });
+        GUIMediator.safeInvokeAndWait(() -> ref.set(new FSVFileView()));
         return ref.get();
     }
     
@@ -230,17 +226,11 @@ public class NativeFileIconController implements FileIconController {
             final Set<?> exts = types[i].getExtensions();
             for(Iterator<?> j = exts.iterator(); j.hasNext() && continueLoading.get(); ) {
                 final String next = (String)j.next();
-                queue.execute(new Runnable() {
-                    public void run() {
-                        GUIMediator.safeInvokeAndWait(new Runnable() {
-                            public void run() {
-                                getIconForExtension(next);
-                                if(!VIEW.isViewAvailable())
-                                    continueLoading.set(false);
-                            }
-                        });
-                    }
-                });
+                queue.execute(() -> GUIMediator.safeInvokeAndWait(() -> {
+                    getIconForExtension(next);
+                    if (!VIEW.isViewAvailable())
+                        continueLoading.set(false);
+                }));
             }
         }
     }

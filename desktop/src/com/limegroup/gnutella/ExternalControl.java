@@ -57,54 +57,50 @@ public class ExternalControl {
     }
 
     public void startServer() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    ServerSocket serverSocket = new ServerSocket(SERVER_PORT, 50, InetAddress.getByName(LOCALHOST_IP));
-                    while (true) {
-                        final Socket socket = serverSocket.accept();
-                        new Thread(new Runnable() {
-                            public void run() {
+        new Thread(() -> {
+            try {
+                ServerSocket serverSocket = new ServerSocket(SERVER_PORT, 50, InetAddress.getByName(LOCALHOST_IP));
+                while (true) {
+                    final Socket socket = serverSocket.accept();
+                    new Thread(() -> {
 
-                                boolean closeSocket = true;
-                                try {
-                                    String address = socket.getInetAddress().getHostAddress();
+                        boolean closeSocket = true;
+                        try {
+                            String address = socket.getInetAddress().getHostAddress();
 
-                                    if (address.equals(LOCALHOST_NAME) || address.equals(LOCALHOST_IP)) {
+                            if (address.equals(LOCALHOST_NAME) || address.equals(LOCALHOST_IP)) {
 
-                                        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), GUIUtils.DEFAULT_ENCODING));
+                                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), GUIUtils.DEFAULT_ENCODING));
 
-                                        String line = br.readLine();
+                                String line = br.readLine();
 
-                                        if (line != null) {
+                                if (line != null) {
 
-                                            if (line.toUpperCase().startsWith("GET ")) {
+                                    if (line.toUpperCase().startsWith("GET ")) {
 
-                                                line = line.substring(4);
+                                        line = line.substring(4);
 
-                                                int pos = line.lastIndexOf(' ');
+                                        int pos = line.lastIndexOf(' ');
 
-                                                line = line.substring(0, pos);
-                                                closeSocket = process(line, socket.getOutputStream());
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    if (closeSocket) {
-                                        try {
-                                            socket.close();
-                                        } catch (Exception ignored) {
-                                        }
+                                        line = line.substring(0, pos);
+                                        closeSocket = process(line, socket.getOutputStream());
                                     }
                                 }
                             }
-                        }).start();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (closeSocket) {
+                                try {
+                                    socket.close();
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        }
+                    }).start();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }

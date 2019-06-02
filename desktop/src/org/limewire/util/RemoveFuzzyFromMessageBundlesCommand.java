@@ -8,13 +8,7 @@ import java.util.List;
 public class RemoveFuzzyFromMessageBundlesCommand {
     
     public static void main(String[] args) {
-        File[] listFiles = new File("/Users/gubatron/workspace.frostwire/frostwire.desktop/lib/messagebundles/").listFiles(new FilenameFilter() {
-            
-            @Override
-            public boolean accept(File arg0, String arg1) {
-                return arg1.endsWith(".po");
-            }
-        });
+        File[] listFiles = new File("/Users/gubatron/workspace.frostwire/frostwire.desktop/lib/messagebundles/").listFiles((arg0, arg1) -> arg1.endsWith(".po"));
         
         for (File f : listFiles) {
             try {

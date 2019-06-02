@@ -105,8 +105,7 @@ final class CancelSearchIconProxy implements Icon {
 
     // resets the cached icons for each kind of icon
     static void updateTheme() {
-        GUIMediator.safeInvokeAndWait(new Runnable() {
-            public void run() {
+        GUIMediator.safeInvokeAndWait(() -> {
 
 //                if (ThemeSettings.isWindowsTheme() && WindowsXPIcon.isAvailable()) {
 //                    try {
@@ -124,14 +123,13 @@ final class CancelSearchIconProxy implements Icon {
 //                    // if construction failed, fall through...
 //                }
 
-                PLAIN_ICON = GUIMediator.getThemeImage("kill");
-                try {
-                    SELECTED_ICON = GUIMediator.getThemeImage("kill_on");
-                } catch (MissingResourceException mre) {
-                    SELECTED_ICON = PLAIN_ICON;
-                }
-                ARMED_ICON = SELECTED_ICON;
+            PLAIN_ICON = GUIMediator.getThemeImage("kill");
+            try {
+                SELECTED_ICON = GUIMediator.getThemeImage("kill_on");
+            } catch (MissingResourceException mre) {
+                SELECTED_ICON = PLAIN_ICON;
             }
+            ARMED_ICON = SELECTED_ICON;
         });
     }
 

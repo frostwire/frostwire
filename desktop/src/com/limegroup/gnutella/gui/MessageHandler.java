@@ -19,78 +19,46 @@ public class MessageHandler implements MessageCallback {
 
     // Inherit doc comment.
     public void showError(final String messageKey) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showError(I18n.tr(messageKey));
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(messageKey)));
     }
     
     // Inherit doc comment.
     public void showError(final String messageKey,
                           final Switch ignore) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showError(I18n.tr(messageKey), ignore);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(messageKey), ignore));
     }  
 
     // Inherit doc comment.
     public void showMessage(final String messageKey) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showMessage(I18n.tr(messageKey));
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showMessage(I18n.tr(messageKey)));
     }
 
     // Inherit doc comment.
     public void showMessage(final String messageKey,
                             final Switch ignore) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showMessage(I18n.tr(messageKey), ignore);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showMessage(I18n.tr(messageKey), ignore));
     }
 
     public void showFormattedError(final String errorKey,
                                    final Object... args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showError(I18n.tr(errorKey, args));
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(errorKey, args)));
     }
 
     public void showFormattedError(final String errorKey,
                                    final Switch ignore,
                                    final Object... args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showError(I18n.tr(errorKey, args), ignore);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(errorKey, args), ignore));
     }
 
     public void showFormattedMessage(final String messageKey,
                                      final Object... args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showMessage(I18n.tr(messageKey, args));
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showMessage(I18n.tr(messageKey, args)));
     }
 
     public void showFormattedMessage(final String messageKey,
                                      final Switch ignore,
                                      final Object... args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.showMessage(I18n.tr(messageKey, args), ignore);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.showMessage(I18n.tr(messageKey, args), ignore));
     }
 
 }

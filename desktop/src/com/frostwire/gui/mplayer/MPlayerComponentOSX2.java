@@ -86,12 +86,9 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     public void addNotify() {
         super.addNotify();
 
-        com.apple.concurrent.Dispatch.getInstance().getBlockingMainQueueExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                view = createNSView(getImagesPath());
-                sendMsg(JMPlayer_addNotify);
-            }
+        com.apple.concurrent.Dispatch.getInstance().getBlockingMainQueueExecutor().execute(() -> {
+            view = createNSView(getImagesPath());
+            sendMsg(JMPlayer_addNotify);
         });
     }
 
@@ -109,120 +106,55 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
      * JNI Hook methods - forward all to the UIEventHandler
      */
     public void onVolumeChanged(final float volume) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeChanged(volume);
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeChanged(volume));
     }
 
     public void onIncrementVolumePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeIncremented();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeIncremented());
     }
 
     public void onDecrementVolumePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeDecremented();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeDecremented());
     }
 
     public void onSeekToTime(final float seconds) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onSeekToTime(seconds);
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onSeekToTime(seconds));
     }
 
     public void onPlayPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onPlayPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onPlayPressed());
     }
 
     public void onPausePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onPausePressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onPausePressed());
     }
 
     public void onFastForwardPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onFastForwardPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onFastForwardPressed());
     }
 
     public void onRewindPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onRewindPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onRewindPressed());
     }
 
     public void onToggleFullscreenPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onToggleFullscreenPressed());
     }
 
     public void onProgressSliderStarted() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onProgressSlideStart();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onProgressSlideStart());
     }
 
     public void onProgressSliderEnded() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onProgressSlideEnd();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onProgressSlideEnd());
     }
     
     public void onMouseMoved() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerMediator.instance().getMPlayerWindow().showOverlayControls();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().showOverlayControls());
     }
     
     public void onMouseDoubleClick() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerMediator.instance().getMPlayerWindow().toggleFullScreen();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().toggleFullScreen());
     }
 
     @Override
@@ -290,12 +222,7 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     private void sendMsg(final int messageID, final Object message) {
-        com.apple.concurrent.Dispatch.getInstance().getNonBlockingMainQueueExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                awtMessage(view, messageID, message);
-            }
-        });
+        com.apple.concurrent.Dispatch.getInstance().getNonBlockingMainQueueExecutor().execute(() -> awtMessage(view, messageID, message));
     }
 
     protected String getImagesPath() {

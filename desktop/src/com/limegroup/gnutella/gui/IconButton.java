@@ -127,13 +127,7 @@ public class IconButton extends JButton {
 	
 	private PropertyChangeListener getListener() {
 		if (listener == null) {
-			listener = new PropertyChangeListener() {
-
-				public void propertyChange(PropertyChangeEvent evt) {
-					setButtonFromAction((Action)evt.getSource());
-				}
-				
-			};
+			listener = evt -> setButtonFromAction((Action)evt.getSource());
 		}
 		return listener;
 	}

@@ -158,23 +158,15 @@ public final class PortableUpdater {
 
         @Override
         public Void doInBackground() {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    progressMonitor.setProgress(0);
-                }
-            });
+            SwingUtilities.invokeLater(() -> progressMonitor.setProgress(0));
 
             ZipUtils.unzip(zipFile, tempDir, new ZipListener() {
 
                 @Override
                 public void onUnzipping(final String fileName, final int progress) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressMonitor.setNote(fileName);
-                            progressMonitor.setProgress(progress);
-                        }
+                    SwingUtilities.invokeLater(() -> {
+                        progressMonitor.setNote(fileName);
+                        progressMonitor.setProgress(progress);
                     });
                 }
 

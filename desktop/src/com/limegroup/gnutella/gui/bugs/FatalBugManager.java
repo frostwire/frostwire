@@ -38,12 +38,7 @@ public final class FatalBugManager {
         LocalClientInfoFactory factoryToUse = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
         final LocalClientInfo info = factoryToUse.createLocalClientInfo(bug, Thread.currentThread().getName(), null, true);
         
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                reviewBug(info);
-            }
-        });
+        SwingUtilities.invokeLater(() -> reviewBug(info));
     }
     
     private static String warning() {
@@ -91,37 +86,31 @@ public final class FatalBugManager {
 
         JPanel buttonPanel = new JPanel();
         JButton sendButton = new JButton("Send");
-        sendButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				sendToServlet(info);
-				DIALOG.dispose();
-				System.exit(1);
-			}
-		});
+        sendButton.addActionListener(e -> {
+            sendToServlet(info);
+            DIALOG.dispose();
+            System.exit(1);
+        });
 
         JButton reviewButton = new JButton("Review");
-        reviewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-                JTextArea textArea = new JTextArea(info.toBugReport());
-                textArea.setColumns(50);
-                textArea.setEditable(false);
-                textArea.selectAll();
-                textArea.copy();
-                textArea.setCaretPosition(0);                
-                JScrollPane scroller = new JScrollPane(textArea);
-                scroller.setBorder(BorderFactory.createEtchedBorder());
-                scroller.setPreferredSize( new Dimension(500, 200) );
-                showMessage(DIALOG, scroller);
-			}
-		});
+        reviewButton.addActionListener(e -> {
+JTextArea textArea = new JTextArea(info.toBugReport());
+textArea.setColumns(50);
+textArea.setEditable(false);
+textArea.selectAll();
+textArea.copy();
+textArea.setCaretPosition(0);
+JScrollPane scroller = new JScrollPane(textArea);
+scroller.setBorder(BorderFactory.createEtchedBorder());
+scroller.setPreferredSize( new Dimension(500, 200) );
+showMessage(DIALOG, scroller);
+        });
 
 		JButton discardButton = new JButton("Discard");
-		discardButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        DIALOG.dispose();
-		        System.exit(1);
-		    }
-		});
+		discardButton.addActionListener(e -> {
+            DIALOG.dispose();
+            System.exit(1);
+        });
         buttonPanel.add(sendButton);
         buttonPanel.add(reviewButton);
         buttonPanel.add(discardButton);

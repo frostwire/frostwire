@@ -47,83 +47,66 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
     }
 
     private static void showExplanationDialog(final Runnable uiCallback) {
-        GUIMediator.safeInvokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final JDialog dialog = new JDialog();
-                dialog.setTitle(tr("VPN-Drop Protection Active"));
-                dialog.setLayout(new FlowLayout()); // gets rid of that default border layout
-                dialog.setModal(true);
-                dialog.setResizable(false);
+        GUIMediator.safeInvokeLater(() -> {
+            final JDialog dialog = new JDialog();
+            dialog.setTitle(tr("VPN-Drop Protection Active"));
+            dialog.setLayout(new FlowLayout()); // gets rid of that default border layout
+            dialog.setModal(true);
+            dialog.setResizable(false);
 
-                // Icon and labels
-                JLabel icon = new JLabel(GUIMediator.getThemeImage("vpn_drop_guard_dialog_icon"));
-                icon.setPreferredSize(new Dimension(115,96));
+            // Icon and labels
+            JLabel icon = new JLabel(GUIMediator.getThemeImage("vpn_drop_guard_dialog_icon"));
+            icon.setPreferredSize(new Dimension(115,96));
 
-                JPanel labelPanel = new JPanel(new MigLayout());
-                labelPanel.add(new JLabel("<html><p><strong>" + tr("BitTorrent is off because your VPN is disconnected") + "</strong></p></html>"), "wrap");
-                labelPanel.add(new JLabel("<html><p>" + tr("Check the status of your VPN connection or disable the VPN-Drop Protection") + ".</p></html>"), "wrap");
+            JPanel labelPanel = new JPanel(new MigLayout());
+            labelPanel.add(new JLabel("<html><p><strong>" + tr("BitTorrent is off because your VPN is disconnected") + "</strong></p></html>"), "wrap");
+            labelPanel.add(new JLabel("<html><p>" + tr("Check the status of your VPN connection or disable the VPN-Drop Protection") + ".</p></html>"), "wrap");
 
-                JPanel upperPanel = new JPanel(new MigLayout());
-                upperPanel.add(icon);
-                upperPanel.add(labelPanel);
+            JPanel upperPanel = new JPanel(new MigLayout());
+            upperPanel.add(icon);
+            upperPanel.add(labelPanel);
 
-                // Buttons
-                JButton whatIsAVPN = new JButton(tr("What is a VPN?"));
-                whatIsAVPN.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                        GUIMediator.openURL(VPNStatusButton.VPN_URL);
+            // Buttons
+            JButton whatIsAVPN = new JButton(tr("What is a VPN?"));
+            whatIsAVPN.addActionListener(e -> {
+                dialog.dispose();
+                GUIMediator.openURL(VPNStatusButton.VPN_URL);
+            });
+            JButton disableVPNDrop = new JButton(tr("Disable VPN-Drop protection"));
+            disableVPNDrop.addActionListener(e -> {
+                dialog.dispose();
+                ConnectionSettings.VPN_DROP_PROTECTION.setValue(false);
+                if (uiCallback != null) {
+                    try {
+                        uiCallback.run();
+                    } catch (Throwable ignored) {
+                    }
+                }
+                MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
+                BackgroundExecutorService.schedule(() -> {
+                    if (BTEngine.getInstance().isPaused()) {
+                        BTEngine.getInstance().resume();
                     }
                 });
-                JButton disableVPNDrop = new JButton(tr("Disable VPN-Drop protection"));
-                disableVPNDrop.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                        ConnectionSettings.VPN_DROP_PROTECTION.setValue(false);
-                        if (uiCallback != null) {
-                            try {
-                                uiCallback.run();
-                            } catch (Throwable ignored) {
-                            }
-                        }
-                        MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
-                        BackgroundExecutorService.schedule(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(BTEngine.getInstance().isPaused()) {
-                                    BTEngine.getInstance().resume();
-                                }
-                            }
-                        });
-                    }
-                });
-                JButton ok = new JButton(tr("Ok"));
-                ok.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                    }
-                });
-                JPanel buttonsPanel = new JPanel(new MigLayout("insets 10px 0 0 0, align right",""));
-                buttonsPanel.add(whatIsAVPN);
-                buttonsPanel.add(disableVPNDrop);
-                buttonsPanel.add(ok,"growx, shrink 0");
+            });
+            JButton ok = new JButton(tr("Ok"));
+            ok.addActionListener(e -> dialog.dispose());
+            JPanel buttonsPanel = new JPanel(new MigLayout("insets 10px 0 0 0, align right",""));
+            buttonsPanel.add(whatIsAVPN);
+            buttonsPanel.add(disableVPNDrop);
+            buttonsPanel.add(ok,"growx, shrink 0");
 
-                // Put it all together
-                JPanel panel = new JPanel(new MigLayout());
-                panel.add(upperPanel, "wrap");
-                panel.add(buttonsPanel, "growx");
+            // Put it all together
+            JPanel panel = new JPanel(new MigLayout());
+            panel.add(upperPanel, "wrap");
+            panel.add(buttonsPanel, "growx");
 
-                // Add it to the dialog
-                dialog.add(panel);
-                dialog.setPreferredSize(new Dimension(700, 225));
-                dialog.pack();
-                dialog.setLocationRelativeTo(GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
-                dialog.setVisible(true);
-            }
+            // Add it to the dialog
+            dialog.add(panel);
+            dialog.setPreferredSize(new Dimension(700, 225));
+            dialog.pack();
+            dialog.setLocationRelativeTo(GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
+            dialog.setVisible(true);
         });
 
     }

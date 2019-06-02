@@ -160,16 +160,14 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         this.roots.addAll(retainAncestors(newRoots));
 
         List<File> list = new ArrayList<>(roots);
-        Collections.sort(list, new Comparator<>() {
-            public int compare(File o1, File o2) {
-                if (o1.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
-                    return -1;
-                }
-                if (o2.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
-                    return 1;
-                }
-                return o1.compareTo(o2);
+        Collections.sort(list, (o1, o2) -> {
+            if (o1.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
+                return -1;
             }
+            if (o2.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
+                return 1;
+            }
+            return o1.compareTo(o2);
         });
 
         for (File root : list) {

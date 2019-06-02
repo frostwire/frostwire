@@ -21,13 +21,7 @@ public class AutomaticInstallerDownloadPaneItem extends AbstractPaneItem {
 	public AutomaticInstallerDownloadPaneItem() {
 		super(TITLE,LABEL);
 		_checkbox = new JCheckBox(I18n.tr("Download new installers for me (Recommended)"));
-		_checkbox.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isDirty = true;
-			}
-		});
+		_checkbox.addActionListener(e -> isDirty = true);
 	}
 	
 	@Override

@@ -56,15 +56,13 @@ public class ProgressSlider extends JPanel {
         progressSlider = new JSlider();
         progressSlider.setOpaque(false);
         progressSlider.setFocusable(false);
-        progressSlider.addChangeListener( new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if ( mousePressed ) {
-					float seconds = (float) (progressSlider.getValue() / 100.0 * totalTime);
-					for (ProgressSliderListener l : listeners ) {
-						l.onProgressSliderTimeValueChange(seconds);
-					}
-				}
-			}
+        progressSlider.addChangeListener(e -> {
+            if ( mousePressed ) {
+                float seconds = (float) (progressSlider.getValue() / 100.0 * totalTime);
+                for (ProgressSliderListener l : listeners ) {
+                    l.onProgressSliderTimeValueChange(seconds);
+                }
+            }
         });
         
         progressSlider.addMouseListener( new MouseAdapter() {

@@ -20,12 +20,10 @@ public class LanguageButton extends JPanel {
         updateLanguageFlag();
 		
 		//when pressed displays a dialog that allows you to change the language.
-        ActionListener languageButtonListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	LanguageWindow lw = new LanguageWindow();
-            	GUIUtils.centerOnScreen(lw);
-                lw.setVisible(true);
-            }
+        ActionListener languageButtonListener = e -> {
+            LanguageWindow lw = new LanguageWindow();
+            GUIUtils.centerOnScreen(lw);
+            lw.setVisible(true);
         };
         bheader.addActionListener(languageButtonListener);
         

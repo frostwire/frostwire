@@ -56,11 +56,7 @@ public class MagnetClipboardListener extends WindowAdapter {
      */
     private final ExecutorService clipboardParser = ExecutorsHelper.newProcessingQueue("clipboard parser");
 
-    private Runnable parser = new Runnable() {
-        public void run() {
-            parseAndLaunch();
-        }
-    };
+    private Runnable parser = () -> parseAndLaunch();
 
     /**
      * @return true if no errors occurred.  False if we should not try to 
@@ -146,31 +142,29 @@ public class MagnetClipboardListener extends WindowAdapter {
         final MagnetOptions[] downloadCandidates = extractDownloadableMagnets(magnets);
 
         // and fire off the download
-        Runnable r = new Runnable() {
-            public void run() {
-                if (!showDialog) {
-                    //    				for (MagnetOptions magnet : downloadCandidates) {
-                    //						//TODO: DownloaderUtils.createDownloader(magnet);
-                    //					}
-                } else if (downloadCandidates.length > 0) {
-                    //List<MagnetOptions> userChosen = showStartDownloadsDialog(downloadCandidates);
-                    //					for (MagnetOptions magnet : userChosen) {
-                    //					  //TODO: DownloaderUtils.createDownloader(magnet);
-                    //					}
-                }
-                boolean oneSearchStarted = false;
-                for (MagnetOptions magnet : magnets) {
-                    if (!magnet.isDownloadable() && magnet.isKeywordTopicOnly() && !oneSearchStarted) {
-                        String query = QueryUtils.createQueryString(magnet.getKeywordTopic());
-                        SearchInformation info = SearchInformation.createKeywordSearch(query, null, MediaType.getAnyTypeMediaType());
-                        if (SearchMediator.validateInfo(info) == SearchMediator.QUERY_VALID) {
-                            oneSearchStarted = true;
-                            SearchMediator.instance().triggerSearch(info);
-                        }
+        Runnable r = () -> {
+            if (!showDialog) {
+                //    				for (MagnetOptions magnet : downloadCandidates) {
+                //						//TODO: DownloaderUtils.createDownloader(magnet);
+                //					}
+            } else if (downloadCandidates.length > 0) {
+                //List<MagnetOptions> userChosen = showStartDownloadsDialog(downloadCandidates);
+                //					for (MagnetOptions magnet : userChosen) {
+                //					  //TODO: DownloaderUtils.createDownloader(magnet);
+                //					}
+            }
+            boolean oneSearchStarted = false;
+            for (MagnetOptions magnet : magnets) {
+                if (!magnet.isDownloadable() && magnet.isKeywordTopicOnly() && !oneSearchStarted) {
+                    String query = QueryUtils.createQueryString(magnet.getKeywordTopic());
+                    SearchInformation info = SearchInformation.createKeywordSearch(query, null, MediaType.getAnyTypeMediaType());
+                    if (SearchMediator.validateInfo(info) == SearchMediator.QUERY_VALID) {
+                        oneSearchStarted = true;
+                        SearchMediator.instance().triggerSearch(info);
                     }
                 }
-                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
             }
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
         };
         GUIMediator.safeInvokeLater(r);
     }

@@ -113,26 +113,16 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
         MPlayer.initialise(new File(playerPath));
         mplayer = new MPlayer();
-        mplayer.addPositionListener(new PositionListener() {
-            public void positionChanged(float currentTimeInSecs) {
-                notifyProgress(currentTimeInSecs);
+        mplayer.addPositionListener(currentTimeInSecs -> notifyProgress(currentTimeInSecs));
+        mplayer.addStateListener(newState -> {
+            if (newState == MediaPlaybackState.Closed) { // This is the case
+                                                         // mplayer is
+                                                         // done with the
+                                                         // current file
+                playNextMedia();
             }
         });
-        mplayer.addStateListener(new StateListener() {
-            public void stateChanged(MediaPlaybackState newState) {
-                if (newState == MediaPlaybackState.Closed) { // This is the case
-                                                             // mplayer is
-                                                             // done with the
-                                                             // current file
-                    playNextMedia();
-                }
-            }
-        });
-        mplayer.addIcyInfoListener(new IcyInfoListener() {
-            public void newIcyInfoData(String data) {
-                notifyIcyInfo(data);
-            }
-        });
+        mplayer.addIcyInfoListener(data -> notifyIcyInfo(data));
 
         repeatMode = RepeatMode.values()[PlayerSettings.LOOP_PLAYLIST.getValue()];
         shuffle = PlayerSettings.SHUFFLE_PLAYLIST.getValue();
@@ -140,19 +130,15 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         volume = PlayerSettings.PLAYER_VOLUME.getValue();
         notifyVolumeChanged();
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    Object s = e.getComponent();
-                    if (!(s instanceof JTextField) && !(s instanceof JCheckBox) && !(s instanceof JTable && ((JTable) s).isEditing())) {
-                        togglePause();
-                        return true;
-                    }
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_SPACE) {
+                Object s = e.getComponent();
+                if (!(s instanceof JTextField) && !(s instanceof JCheckBox) && !(s instanceof JTable && ((JTable) s).isEditing())) {
+                    togglePause();
+                    return true;
                 }
-                return false;
             }
+            return false;
         });
         // prepare to receive UI events
         MPlayerUIEventHandler.instance().addListener(this);
@@ -304,11 +290,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     public void asyncLoadMedia(final MediaSource source, final boolean playNextSong, final Playlist currentPlaylist, final List<MediaSource> playlistFilesView) {
-        playExecutor.execute(new Runnable() {
-            public void run() {
-                loadMedia(source, false, playNextSong, currentPlaylist, playlistFilesView);
-            }
-        });
+        playExecutor.execute(() -> loadMedia(source, false, playNextSong, currentPlaylist, playlistFilesView));
     }
 
     public void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong) {
@@ -316,11 +298,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     public void asyncLoadMedia(final MediaSource source, final boolean isPreview, final boolean playNextSong) {
-        playExecutor.execute(new Runnable() {
-            public void run() {
-                loadMedia(source, isPreview, playNextSong);
-            }
-        });
+        playExecutor.execute(() -> loadMedia(source, isPreview, playNextSong));
     }
 
     private String stopAndPrepareFilename() {
@@ -447,11 +425,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     private void notifyVolumeChanged() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireVolumeChanged(volume);
-            }
-        });
+        SwingUtilities.invokeLater(() -> fireVolumeChanged(volume));
     }
 
     public static boolean isPlayableFile(File file) {
@@ -480,11 +454,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * Notify listeners when a new audio source has been opened.
      */
     private void notifyOpened(final MediaSource mediaSource) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireOpened(mediaSource);
-            }
-        });
+        SwingUtilities.invokeLater(() -> fireOpened(mediaSource));
     }
 
     /**
@@ -495,11 +465,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     private void notifyState(final MediaPlaybackState state) {
 
         if (stateNotificationsEnabled) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    fireState(state);
-                }
-            });
+            SwingUtilities.invokeLater(() -> fireState(state));
         }
     }
 
@@ -508,19 +474,11 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * off of the player thread while using a lock on the input stream
      */
     private void notifyProgress(final float currentTimeInSecs) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireProgress(currentTimeInSecs);
-            }
-        });
+        SwingUtilities.invokeLater(() -> fireProgress(currentTimeInSecs));
     }
 
     private void notifyIcyInfo(final String data) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireIcyInfo(data);
-            }
-        });
+        SwingUtilities.invokeLater(() -> fireIcyInfo(data));
     }
 
     /**

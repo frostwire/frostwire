@@ -51,17 +51,15 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
 		directoryPanel.getTree().setShowsRootHandles(true);
 		
 		if (!isPortable) {
-            directoryPanel.getTree().addTreeSelectionListener(new TreeSelectionListener() {
-                public void valueChanged(TreeSelectionEvent e) {
-                    Object comp = e.getPath().getLastPathComponent();
-                    if (comp instanceof File) {
-                        if (comp.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
-                            buttonRemoveLibraryDirectory.setEnabled(false);
-                            return;
-                        }
+            directoryPanel.getTree().addTreeSelectionListener(e -> {
+                Object comp = e.getPath().getLastPathComponent();
+                if (comp instanceof File) {
+                    if (comp.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
+                        buttonRemoveLibraryDirectory.setEnabled(false);
+                        return;
                     }
-                    buttonRemoveLibraryDirectory.setEnabled(true);
                 }
+                buttonRemoveLibraryDirectory.setEnabled(true);
             });
 		} else {
 		    removeTreeSelectionListeners();

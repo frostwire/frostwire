@@ -127,30 +127,28 @@ public class ImageCache {
     }
 
     private void loadFromUrl(final URL url, final OnLoadedListener listener) {
-        ThreadExecutor.startThread(new Thread(new Runnable() {
-            public void run() {
-                try {
-                    BufferedImage image = null;
-                    HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-                    byte[] data = newInstance.getBytes(url.toString());
-                    
-                    if (data == null) {
-                        throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
+        ThreadExecutor.startThread(new Thread(() -> {
+            try {
+                BufferedImage image = null;
+                HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+                byte[] data = newInstance.getBytes(url.toString());
 
-                    }
-                    
-                    if (data != null) {
-                        image = ImageIO.read(new ByteArrayInputStream(data));
-                        saveToCache(url, image, System.currentTimeMillis());
-                    }
-                    
-                    if (listener != null && image != null) {
-                        listener.onLoaded(url, image, false, false);
-                    }
-                } catch (Throwable e) {
-                    LOG.error("Failed to load image from: " + url, e);
-                    listener.onLoaded(url, null, false, true);
+                if (data == null) {
+                    throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
+
                 }
+
+                if (data != null) {
+                    image = ImageIO.read(new ByteArrayInputStream(data));
+                    saveToCache(url, image, System.currentTimeMillis());
+                }
+
+                if (listener != null && image != null) {
+                    listener.onLoaded(url, image, false, false);
+                }
+            } catch (Throwable e) {
+                LOG.error("Failed to load image from: " + url, e);
+                listener.onLoaded(url, null, false, true);
             }
         }),"ImageCache.loadFromUrl");
     }

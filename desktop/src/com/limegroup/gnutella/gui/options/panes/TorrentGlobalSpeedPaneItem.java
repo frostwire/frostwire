@@ -72,11 +72,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
         DOWNLOAD_SLIDER.setLabelTable(labelTable);
         DOWNLOAD_SLIDER.setPaintLabels(true);
 
-        DOWNLOAD_SLIDER.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateSpeedLabel(DOWNLOAD_SLIDER, DOWNLOAD_SLIDER_LABEL);
-            }
-        });
+        DOWNLOAD_SLIDER.addChangeListener(e -> updateSpeedLabel(DOWNLOAD_SLIDER, DOWNLOAD_SLIDER_LABEL));
 
         String LABEL_DOWNLOAD_SPEED = I18n.tr("Download Speed:");
         LabeledComponent comp = new LabeledComponent(LABEL_DOWNLOAD_SPEED, DOWNLOAD_SLIDER_LABEL,
@@ -100,11 +96,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
         UPLOAD_SLIDER.setLabelTable(labelTableUp);
         UPLOAD_SLIDER.setPaintLabels(true);
 
-        UPLOAD_SLIDER.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                updateSpeedLabel(UPLOAD_SLIDER, UPLOAD_SLIDER_LABEL);
-            }
-        });
+        UPLOAD_SLIDER.addChangeListener(e -> updateSpeedLabel(UPLOAD_SLIDER, UPLOAD_SLIDER_LABEL));
 
         String LABEL_UPLOAD_SPEED = I18n.tr("Upload Speed:");
         LabeledComponent compUp = new LabeledComponent(LABEL_UPLOAD_SPEED, UPLOAD_SLIDER_LABEL,
