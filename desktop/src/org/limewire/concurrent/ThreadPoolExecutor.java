@@ -676,9 +676,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
         try {
-            Iterator<Worker> it = workers.iterator();
-            while (it.hasNext()) {
-                Worker w = it.next();
+            for (Worker w : workers) {
                 Thread t = w.thread;
                 if (!t.isInterrupted() && w.tryLock()) {
                     try {

@@ -468,7 +468,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         Boolean prop =
             (Boolean)fc.getClientProperty("FileChooser.useShellFolder");
         if (prop != null) {
-            useShellFolder = prop.booleanValue();
+            useShellFolder = prop;
         } else {
             useShellFolder = fc.getFileSystemView().equals(FileSystemView.getFileSystemView());
         }
@@ -646,7 +646,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     }
 
     private String fileNameString(File[] files) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; files != null && i < files.length; i++) {
             if (i > 0) {
                 buf.append(" ");
@@ -1160,8 +1160,8 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             FileFilter currentFilter = getFileChooser().getFileFilter();
             boolean found = false;
             if(currentFilter != null) {
-                for(int i=0; i < filters.length; i++) {
-                    if (filters[i] == currentFilter) {
+                for (FileFilter filter : filters) {
+                    if (filter == currentFilter) {
                         found = true;
                         break;
                     }
@@ -1284,8 +1284,8 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
                     int       extraWidth = cInsets.left + cInsets.right;
                     int       maxWidth = 0;
 
-                    for (int counter = 0; counter < numChildren; counter++) {
-                        Dimension aSize = children[counter].getPreferredSize();
+                    for (Component child : children) {
+                        Dimension aSize = child.getPreferredSize();
                         height = Math.max(height, aSize.height);
                         maxWidth = Math.max(maxWidth, aSize.width);
                     }
@@ -1305,8 +1305,8 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     }
 
     private static void groupLabels(AlignedLabel[] group) {
-        for (int i = 0; i < group.length; i++) {
-            group[i].group = group;
+        for (AlignedLabel alignedLabel : group) {
+            alignedLabel.group = group;
         }
     }
 
@@ -1338,11 +1338,11 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         private int getMaxWidth() {
             if (maxWidth == 0 && group != null) {
                 int max = 0;
-                for (int i = 0; i < group.length; i++) {
-                    max = Math.max(group[i].getSuperPreferredWidth(), max);
+                for (AlignedLabel label : group) {
+                    max = Math.max(label.getSuperPreferredWidth(), max);
                 }
-                for (int i = 0; i < group.length; i++) {
-                    group[i].maxWidth = max;
+                for (AlignedLabel alignedLabel : group) {
+                    alignedLabel.maxWidth = max;
                 }
             }
             return maxWidth;

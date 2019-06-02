@@ -148,19 +148,18 @@ public class TableRowFilteredModel extends ResultPanelModel {
 
         // For stuff in _list, we can just re-add the DataLines as-is.
         if (isSorted()) {
-            for (int i = 0; i < existing.size(); i++) {
-                addSorted(existing.get(i));
+            for (SearchResultDataLine searchResultDataLine : existing) {
+                addSorted(searchResultDataLine);
             }
         } else {
-            for (int i = 0; i < existing.size(); i++) {
-                add(existing.get(i));
+            for (SearchResultDataLine searchResultDataLine : existing) {
+                add(searchResultDataLine);
             }
         }
 
         // Merge the hidden TableLines
         Map<String, SearchResultDataLine> mergeMap = new HashMap<>();
-        for (int i = 0; i < hidden.size(); i++) {
-            SearchResultDataLine tl = hidden.get(i);
+        for (SearchResultDataLine tl : hidden) {
             //SearchResult sr = tl.getInitializeObject();
             //String urn = sr.getHash();
 

@@ -272,8 +272,8 @@ public class MultiLineLabel extends JTextArea {
      */
     private String createSizedString(final String[] strs) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < strs.length; i++) {
-            sb.append(strs[i]);
+        for (String str : strs) {
+            sb.append(str);
             sb.append("\n");
         }
         return sb.toString();

@@ -46,7 +46,7 @@ public final class BooleanSettingImpl extends AbstractSetting implements Boolean
      * @param sValue property string value
      */
     protected void loadValue(String sValue) {
-        value = Boolean.valueOf(sValue.trim()).booleanValue();
+        value = Boolean.valueOf(sValue.trim());
     }
 	
 	/* (non-Javadoc)

@@ -92,7 +92,7 @@ final class SchemaBox extends JPanel {
         String text = button.getText();
         int n = 0;
         try { // only justified situation of using try-catch for logic flow, since regex is slower
-            n = Integer.valueOf(text);
+            n = Integer.parseInt(text);
         } catch (Throwable e) {
             // no an integer
         }

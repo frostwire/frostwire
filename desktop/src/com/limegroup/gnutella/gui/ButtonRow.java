@@ -334,9 +334,9 @@ public final class ButtonRow extends JPanel {
 	 * @param enabled the enabled/disabled state of the buttons
 	 */
 	public void setButtonsEnabled(final boolean enabled) {
-		for(int i=0; i<_buttons.length; i++) {
-			_buttons[i].setEnabled(enabled);		
-		}
+        for (JButton button : _buttons) {
+            button.setEnabled(enabled);
+        }
 	}
 
     /**

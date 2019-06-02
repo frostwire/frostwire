@@ -227,7 +227,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         if (idx == null)
             return -1;
         else
-            return idx.intValue();
+            return idx;
     }
 
     public int getTotalResults() {

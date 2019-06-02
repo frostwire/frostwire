@@ -123,9 +123,8 @@ public class KeywordFilter implements SearchFilter {
      */
     protected boolean matches(String phrase) {
         String canonical = phrase.toLowerCase(Locale.US);
-        for (int i = 0; i < ban.size(); i++) {
-            String badWord = ban.get(i);
-            if (canonical.indexOf(badWord) != -1)
+        for (String badWord : ban) {
+            if (canonical.contains(badWord))
                 return true;
         }
         return false;

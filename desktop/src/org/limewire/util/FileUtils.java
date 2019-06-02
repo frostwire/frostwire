@@ -45,7 +45,7 @@ public class FileUtils {
         } catch(IOException ioe) {
             String msg = ioe.getMessage();
             // windows bugs out :(
-            if(OSUtils.isWindows() && msg != null && msg.indexOf("There are no more files") != -1)
+            if(OSUtils.isWindows() && msg != null && msg.contains("There are no more files"))
                 return f.getAbsolutePath();
             else
                 throw ioe;
@@ -59,7 +59,7 @@ public class FileUtils {
         } catch(IOException ioe) {
             String msg = ioe.getMessage();
             // windows bugs out :(
-            if(OSUtils.isWindows() && msg != null && msg.indexOf("There are no more files") != -1)
+            if(OSUtils.isWindows() && msg != null && msg.contains("There are no more files"))
                 return f.getAbsoluteFile();
             else
                 throw ioe;
@@ -340,17 +340,17 @@ public class FileUtils {
 			return directory.delete();
 
 		File[] files = directory.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			try {
-				if (!getCanonicalPath(files[i]).startsWith(canonicalParent))
-					continue;
-			} catch (IOException ioe) {
-				return false;
-			}
-            
-			if (!deleteRecursive(files[i]))
-				return false;
-		}
+        for (File file : files) {
+            try {
+                if (!getCanonicalPath(file).startsWith(canonicalParent))
+                    continue;
+            } catch (IOException ioe) {
+                return false;
+            }
+
+            if (!deleteRecursive(file))
+                return false;
+        }
 
 		return directory.delete();
 	}

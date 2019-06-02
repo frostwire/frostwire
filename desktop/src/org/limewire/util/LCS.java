@@ -214,7 +214,7 @@ public class LCS {
         public String toString() {
             calculateLcs();
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("  ");
             for (int j = 1; j <= lengthOfY(); j++) {
                 buf.append(valueOfYInternal(j));
@@ -338,7 +338,7 @@ public class LCS {
         public String getHtmlDiff() {
             DiffType type = null;
             List<DiffEntry<Character>> diffs = diff();
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             for (DiffEntry<Character> entry : diffs) {
                 if (type != entry.getType()) {
@@ -360,7 +360,7 @@ public class LCS {
             if (reverse) {
                 Collections.reverse(diffs);
             }
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             for (DiffEntry<Character> entry : diffs) {
                 if (type != entry.getType()) {

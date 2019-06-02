@@ -343,8 +343,7 @@ public final class ResourceManager {
                 "OptionPane.buttonFont", "ToolTip.font",};
 
         boolean displayable = false;
-        for (int i = 0; i < comps.length; i++)
-            displayable |= checkFont(comps[i], newFont, testString, false);
+        for (String comp : comps) displayable |= checkFont(comp, newFont, testString, false);
 
         // Then do it the automagic way.
         // note that this could work all the time (without requiring the above)

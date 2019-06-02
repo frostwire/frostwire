@@ -706,8 +706,8 @@ public class WinRegistryUtil {
                 // Construct relevant actions one by one
                 if (verbsNum > 0) {
                     actionList = new ArrayList<Action>();
-                    for (int i = 0; i < verbsNum; i++) {
-                        String verbKey = shellKey + "\\" + verbs[i];
+                    for (String verb : verbs) {
+                        String verbKey = shellKey + "\\" + verb;
                         String cmdKey = verbKey + "\\" + KN_COMMAND;
                         if (cmdKey != null) {
                             Action oneAction;
@@ -718,7 +718,7 @@ public class WinRegistryUtil {
                             } else {
                                 temCmd = ExpandEnvironmentStrings(temCmd);
                             }
-                            oneAction = new Action(verbs[i], temCmd, getDefaultValue(verbKey, regLevel));
+                            oneAction = new Action(verb, temCmd, getDefaultValue(verbKey, regLevel));
                             actionList.add(oneAction);
                         }
                     }
@@ -782,8 +782,8 @@ public class WinRegistryUtil {
             int verbsNum = verbs.length;
             if (verbsNum > 0) {
                 actionList = new ArrayList<Action>();
-                for (int i = 0; i < verbsNum; i++) {
-                    String verbKey = appShellKey + "\\" + verbs[i];
+                for (String verb : verbs) {
+                    String verbKey = appShellKey + "\\" + verb;
                     String cmdKey = verbKey + "\\" + KN_COMMAND;
                     if (cmdKey != null) {
                         Action oneAction;
@@ -794,7 +794,7 @@ public class WinRegistryUtil {
                         } else {
                             temCmd = ExpandEnvironmentStrings(temCmd);
                         }
-                        oneAction = new Action(verbs[i], temCmd, getDefaultValue(verbKey, ROOT_LEVEL));
+                        oneAction = new Action(verb, temCmd, getDefaultValue(verbKey, ROOT_LEVEL));
                         actionList.add(oneAction);
                     }
                 }
@@ -828,10 +828,9 @@ public class WinRegistryUtil {
         Action oneAction;
         if (clsID != null) {
             if (actionList != null) {
-                Iterator<Action> actionIter = actionList.iterator();
                 // Add action to under the class ID key one by one
-                while (actionIter.hasNext()) {
-                    oneAction = actionIter.next();
+                for (Action action : actionList) {
+                    oneAction = action;
                     if ((oneAction != null) && (clsID != null)) {
                         addActionByClsID(oneAction, clsID, regLevel);
                     }

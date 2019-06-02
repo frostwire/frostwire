@@ -223,8 +223,8 @@ public class ExternalControl {
         LOG.info("enter proprocessArgs");
 
         StringBuilder arg = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            arg.append(args[i]);
+        for (String s : args) {
+            arg.append(s);
         }
         return arg.toString();
     }

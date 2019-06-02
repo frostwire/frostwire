@@ -55,8 +55,8 @@ class CompositeFilter implements TableLineFilter<SearchResultDataLine> {
      * can be displayed.
      */
     public boolean allow(SearchResultDataLine line) {
-        for (int i=0; i<delegates.size(); i++) {
-            if (! delegates.get(i).allow(line))
+        for (TableLineFilter<SearchResultDataLine> delegate : delegates) {
+            if (!delegate.allow(line))
                 return false;
         }
         return true;

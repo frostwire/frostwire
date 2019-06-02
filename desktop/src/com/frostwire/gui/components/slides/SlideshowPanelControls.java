@@ -97,8 +97,8 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
     }
 
     private void attachListeners() {
-        for (int i = 0; i < _buttons.size(); i++) {
-            _buttons.get(i).addItemListener(_selectionAdapter);
+        for (JRadioButton button : _buttons) {
+            button.addItemListener(_selectionAdapter);
         }
     }
 

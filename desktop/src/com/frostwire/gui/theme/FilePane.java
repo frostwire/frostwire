@@ -557,11 +557,10 @@ public class FilePane extends JPanel implements PropertyChangeListener {
 
     public static void addActionsToMap(ActionMap map, Action[] actions) {
         if (map != null && actions != null) {
-            for (int i = 0; i < actions.length; i++) {
-                Action a = actions[i];
-                String cmd = (String)a.getValue(Action.ACTION_COMMAND_KEY);
+            for (Action a : actions) {
+                String cmd = (String) a.getValue(Action.ACTION_COMMAND_KEY);
                 if (cmd == null) {
-                    cmd = (String)a.getValue(Action.NAME);
+                    cmd = (String) a.getValue(Action.NAME);
                 }
                 map.put(cmd, a);
             }
@@ -1761,10 +1760,10 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     private void updateViewMenu() {
         if (viewMenu != null) {
             Component[] comps = viewMenu.getMenuComponents();
-            for (int i = 0; i < comps.length; i++) {
-                if (comps[i] instanceof JRadioButtonMenuItem) {
-                    JRadioButtonMenuItem mi = (JRadioButtonMenuItem)comps[i];
-                    if (((ViewTypeAction)mi.getAction()).viewType == viewType) {
+            for (Component comp : comps) {
+                if (comp instanceof JRadioButtonMenuItem) {
+                    JRadioButtonMenuItem mi = (JRadioButtonMenuItem) comp;
+                    if (((ViewTypeAction) mi.getAction()).viewType == viewType) {
                         mi.setSelected(true);
                     }
                 }
@@ -2031,7 +2030,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         int index = list.locationToIndex(point);
         if (index != -1) {
             Object bySize = list.getClientProperty("List.isFileList");
-            if (bySize instanceof Boolean && ((Boolean)bySize).booleanValue() &&
+            if (bySize instanceof Boolean && (Boolean) bySize &&
                 !pointIsInActualBounds(list, index, point)) {
                 index = -1;
             }

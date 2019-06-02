@@ -41,7 +41,7 @@ public final class PlaylistItemBitRateProperty extends PlaylistItemIntProperty {
 
         if (s.length() > 0) {
             try {
-                value = Integer.valueOf(s);
+                value = Integer.parseInt(s);
             } catch (NumberFormatException e) {
                 // ignore
             }

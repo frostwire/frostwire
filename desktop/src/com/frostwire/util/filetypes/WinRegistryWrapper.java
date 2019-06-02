@@ -245,8 +245,8 @@ public class WinRegistryWrapper {
 
                 if (subSubKeys == null)
 					return result;
-                for (int keyIndex = 0; keyIndex < subSubKeys.length; keyIndex++) {
-                    subSubKey = subKey + "\\" + subSubKeys[keyIndex];
+                for (String key : subSubKeys) {
+                    subSubKey = subKey + "\\" + key;
                     if (subSubKey != null) {
                         WinRegDeleteKey(hKey, subSubKey);
                     }

@@ -140,7 +140,7 @@ public class StoreSaveTemplateProcessor {
         if (template.equals("")) return outDir;
         if (template.equals(".")) return outDir;
         
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         StringBuffer var = new StringBuffer();
         int s = States.LOOKING_FOR_DOLLAR;
         for (int i=0; i<template.length(); i++) {
@@ -193,7 +193,7 @@ public class StoreSaveTemplateProcessor {
      */
     private boolean isDelim(char c) {
         for( Character ch  : END_DELIMS) {
-            if( ch.charValue() == c) 
+            if(ch == c)
                 return true;
         }
         return false;

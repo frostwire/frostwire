@@ -177,9 +177,9 @@ public final class FrostWireUtils {
      */
     public static void getFrostWireVersionBuild(final int[] result) {
         String[] vStrArray = getFrostWireVersion().split("\\.");
-        result[0] = Integer.valueOf(vStrArray[0]);
-        result[1] = Integer.valueOf(vStrArray[1]);
-        result[2] = Integer.valueOf(vStrArray[2]);
+        result[0] = Integer.parseInt(vStrArray[0]);
+        result[1] = Integer.parseInt(vStrArray[1]);
+        result[2] = Integer.parseInt(vStrArray[2]);
         result[3] = getBuildNumber();
     }
 }

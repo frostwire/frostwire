@@ -233,12 +233,12 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
 
     @Override
     public void progressChange(MediaPlayer mediaPlayer, float currentTimeInSecs) {
-        sendMsg(JMPlayer_progressChanged, Float.valueOf(currentTimeInSecs));
+        sendMsg(JMPlayer_progressChanged, currentTimeInSecs);
     }
 
     @Override
     public void volumeChange(MediaPlayer mediaPlayer, double currentVolume) {
-        sendMsg(JMPlayer_volumeChanged, Float.valueOf((float) currentVolume));
+        sendMsg(JMPlayer_volumeChanged, (float) currentVolume);
     }
 
     @Override
@@ -262,7 +262,7 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
 
         if (state == MediaPlaybackState.Playing && refreshPlayTime) {
             refreshPlayTime = false;
-            sendMsg(JMPlayer_timeInitialized, Float.valueOf(MediaPlayer.instance().getDurationInSecs()));
+            sendMsg(JMPlayer_timeInitialized, MediaPlayer.instance().getDurationInSecs());
         }
 
         if (state != MediaPlaybackState.Playing) {
@@ -270,7 +270,7 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
         }
 
         if (s != -1) {
-            sendMsg(JMPlayer_stateChanged, Integer.valueOf(s));
+            sendMsg(JMPlayer_stateChanged, s);
         }
     }
 

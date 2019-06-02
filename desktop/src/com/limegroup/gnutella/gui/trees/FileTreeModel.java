@@ -65,8 +65,8 @@ public class FileTreeModel extends AbstractTreeModel {
 
         if (roots != null) {
             subRoots = new ArrayList<File>(roots.length);
-            for (int i = 0; i < roots.length; i++) {
-                addSubRoot(roots[i]);
+            for (File file : roots) {
+                addSubRoot(file);
             }
         } else {
             subRoots = new ArrayList<File>();
@@ -182,8 +182,7 @@ public class FileTreeModel extends AbstractTreeModel {
 
     public void removeSubRoots() {
         /* remove respective Lists in hash tree */
-        for (int i = 0; i < subRoots.size(); i++)
-            subChildren.remove(subRoots.get(i));
+        for (File subRoot : subRoots) subChildren.remove(subRoot);
 
         subRoots.clear();
 

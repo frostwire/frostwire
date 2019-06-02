@@ -89,7 +89,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      * @return what the progress bar component should be set to
      */
     protected int getBarStatus(Object value) {
-        return value == null ? 0 : ((Integer) value).intValue();
+        return value == null ? 0 : (Integer) value;
     }
 
     @Override

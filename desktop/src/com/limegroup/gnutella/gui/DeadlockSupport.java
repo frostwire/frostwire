@@ -115,7 +115,7 @@ public class DeadlockSupport {
                         Object mi = Array.get(o, i);
                         Method depthMethod = monitorInfoClass.getMethod("getLockedStackDepth");
                         Object depth = depthMethod.invoke(mi);
-                        if(depth != null && depth.equals(Integer.valueOf(stackDepth)))
+                        if(depth != null && depth.equals(stackDepth))
                             sb.append("\t-  locked ").append(mi).append("\n");
                     }
                 }

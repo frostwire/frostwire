@@ -60,9 +60,9 @@ public class FilePaneEx extends FilePane {
     private void updateViewMenu() {
         if (viewMenu != null) {
             Component[] comps = viewMenu.getMenuComponents();
-            for (int i = 0; i < comps.length; i++) {
-                if (comps[i] instanceof SkinRadioButtonMenuItem) {
-                    SkinRadioButtonMenuItem mi = (SkinRadioButtonMenuItem) comps[i];
+            for (Component comp : comps) {
+                if (comp instanceof SkinRadioButtonMenuItem) {
+                    SkinRadioButtonMenuItem mi = (SkinRadioButtonMenuItem) comp;
                     if (((ViewTypeAction) mi.getAction()).viewType == getViewType()) {
                         mi.setSelected(true);
                     }

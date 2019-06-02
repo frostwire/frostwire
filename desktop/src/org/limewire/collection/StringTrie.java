@@ -511,8 +511,7 @@ public class StringTrie<V> {
         //For each child...
         for (Iterator<?> iter = start.labelsForward(); iter.hasNext(); ) {
             // Indent child appropriately.
-            for (int i = 0; i < indent; i++)
-                buf.append(" ");
+            buf.append(" ".repeat(Math.max(0, indent)));
             // Print edge.
             String label = (String)iter.next();
             buf.append(label);

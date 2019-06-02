@@ -75,7 +75,7 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
      */
     protected void loadValue(String sValue) {
         try {
-            value = Float.valueOf(sValue.trim());
+            value = Float.parseFloat(sValue.trim());
         } catch(NumberFormatException nfe) {
             revertToDefault();
         }

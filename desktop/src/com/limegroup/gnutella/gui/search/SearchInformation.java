@@ -85,7 +85,7 @@ public class SearchInformation {
         Integer type = (Integer) map.get(MAP_TYPE);
         if ( type == null )
             throw new NullPointerException("null type");
-        this.type = type.intValue();
+        this.type = type;
 
         query = (String) map.get(MAP_QUERY);
         xml   = (String) map.get(MAP_XML);

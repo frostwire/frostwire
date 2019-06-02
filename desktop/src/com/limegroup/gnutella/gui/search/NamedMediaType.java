@@ -157,9 +157,9 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
 
         //Add any default media types that haven't been added already.
         MediaType[] allTypes = MediaType.getDefaultMediaTypes();
-        for (int i = 0; i < allTypes.length; i++) {
-            if (!containsMediaType(allSchemas, allTypes[i]))
-                allSchemas.add(getFromMediaType(allTypes[i]));
+        for (MediaType allType : allTypes) {
+            if (!containsMediaType(allSchemas, allType))
+                allSchemas.add(getFromMediaType(allType));
         }
 
         return allSchemas;

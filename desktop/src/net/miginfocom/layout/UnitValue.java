@@ -326,7 +326,7 @@ public final class UnitValue implements Serializable
 					Integer sz = LinkHandler.getValue(parent.getLayout(), "visual", isHor ? LinkHandler.WIDTH : LinkHandler.HEIGHT);
 					if (st == null || sz == null)
 						return 0;
-					return value * (Math.max(0, sz.intValue()) - refValue) + st;
+					return value * (Math.max(0, sz) - refValue) + st;
 
 				case MIN_SIZE:
 					if (comp == null)

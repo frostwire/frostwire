@@ -260,8 +260,8 @@ public final class Comparators {
      * must use this method.
      */
     public static int intCompareTo(Integer thisInt, Integer anotherInt) {
-    	int thisVal = thisInt.intValue();
-    	int anotherVal = anotherInt.intValue();
+    	int thisVal = thisInt;
+    	int anotherVal = anotherInt;
     	return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
     }
     
@@ -282,8 +282,8 @@ public final class Comparators {
      *  argument (signed comparison).
      */
     public static int longCompareTo(Long firstLong, Long secondLong) {
-        long firstVal = firstLong.longValue();
-        long secondVal = secondLong.longValue();
+        long firstVal = firstLong;
+        long secondVal = secondLong;
         return (firstVal<secondVal ? -1 : (firstVal==secondVal ? 0 : 1));
     }
 }

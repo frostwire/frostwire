@@ -171,8 +171,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     //Cleans up all the datalines.
     protected void cleanup() {
         int end = _list.size();
-        for(int i = 0; i < end; i++) {
-            _list.get(i).cleanup();
+        for (T t : _list) {
+            t.cleanup();
         }
     }
 
@@ -186,8 +186,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public Object refresh() {
         int end = _list.size();
-        for (int i = 0; i < end; i++)
-            _list.get(i).update();
+        for (T t : _list) t.update();
         fireTableRowsUpdated(0, end);
         return null;
     }
@@ -435,8 +434,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public boolean contains(Object o, int col) {
         int end = _list.size();
-        for (int i = 0; i < end; i++) {
-            if (_list.get(i).getValueAt(col).equals(o))
+        for (T t : _list) {
+            if (t.getValueAt(col).equals(o))
                 return true;
         }
         return false;
@@ -452,8 +451,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public boolean contains(Object o) {
         int end = _list.size();
-        for (int i = 0; i < end; i++) {
-            if (_list.get(i).getInitializeObject().equals(o))
+        for (T t : _list) {
+            if (t.getInitializeObject().equals(o))
                 return true;
         }
         return false;

@@ -289,7 +289,7 @@ public class HttpDownload extends HttpBTDownload {
 
             if (headerFields.containsKey("Content-Length")) {
                 try {
-                    size = Long.valueOf(headerFields.get("Content-Length").get(0));
+                    size = Long.parseLong(headerFields.get("Content-Length").get(0));
                 } catch (Throwable ignored) {}
             }
             
@@ -300,7 +300,7 @@ public class HttpDownload extends HttpBTDownload {
                 if (responseCodeStr.contains(String.valueOf(HttpURLConnection.HTTP_OK))) {
                     if (headerFields.containsKey("Content-Length")) {
                         try {
-                            size = Long.valueOf(headerFields.get("Content-Length").get(0));
+                            size = Long.parseLong(headerFields.get("Content-Length").get(0));
                         } catch (Exception ignored) {}
                     }
                 } 

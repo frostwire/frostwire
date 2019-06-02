@@ -967,80 +967,76 @@ MPlayerInstance
             }
         };
 
-        try {
+		final CountDownLatch signal = new CountDownLatch(1);
 
-            final CountDownLatch signal = new CountDownLatch(1);
+		List<String> cmdList = new ArrayList<String>();
 
-            List<String> cmdList = new ArrayList<String>();
+		cmdList.add(BINARY_PATH.getAbsolutePath());
 
-            cmdList.add(BINARY_PATH.getAbsolutePath());
+		cmdList.add("-slave");
+		cmdList.add("-identify");
+		cmdList.add("-prefer-ipv4");
+		cmdList.add("-osdlevel");
+		cmdList.add("0");
+		cmdList.add("-noautosub");
+		cmdList.add("-vo");
+		cmdList.add("null");
+		cmdList.add("-ao");
+		cmdList.add("null");
+		cmdList.add("-frames");
+		cmdList.add("0");
 
-            cmdList.add("-slave");
-            cmdList.add("-identify");
-            cmdList.add("-prefer-ipv4");
-            cmdList.add("-osdlevel");
-            cmdList.add("0");
-            cmdList.add("-noautosub");
-            cmdList.add("-vo");
-            cmdList.add("null");
-            cmdList.add("-ao");
-            cmdList.add("null");
-            cmdList.add("-frames");
-            cmdList.add("0");
+		cmdList.add(fileOrUrl);
 
-            cmdList.add(fileOrUrl);
+		String[] cmd = cmdList.toArray(new String[0]);
 
-            String[] cmd = cmdList.toArray(new String[0]);
+		//COMMENT/UNCOMMENT THIS FOR TO SEE WHAT COMMAND IS BEING SENT TO MPLAYER
+		//printCommand(cmd);
 
-            //COMMENT/UNCOMMENT THIS FOR TO SEE WHAT COMMAND IS BEING SENT TO MPLAYER
-            //printCommand(cmd);
+		try {
+			InputStream stdOut = Runtime.getRuntime().exec(cmd).getInputStream();
 
-            try {
-                InputStream stdOut = Runtime.getRuntime().exec(cmd).getInputStream();
+			final BufferedReader brStdOut = new BufferedReader(new InputStreamReader(stdOut));
 
-                final BufferedReader brStdOut = new BufferedReader(new InputStreamReader(stdOut));
+			Thread stdOutReader = new Thread("Player Console Out Reader") {
+				public void run() {
+					try {
+						String line;
+						while ((line = brStdOut.readLine()) != null) {
+							if (line.startsWith("ID_EXIT")) {
+								signal.countDown();
+								break;
+							}
+							output_consumer.consume(line);
+						}
+					} catch (Exception e) {
+						//e.printStackTrace();
+					}
+				}
+			};
+			stdOutReader.setDaemon(true);
+			stdOutReader.start();
 
-                Thread stdOutReader = new Thread("Player Console Out Reader") {
-                    public void run() {
-                        try {
-                            String line;
-                            while ((line = brStdOut.readLine()) != null) {
-                                if (line.startsWith("ID_EXIT")) {
-                                    signal.countDown();
-                                    break;
-                                }
-                                output_consumer.consume(line);
-                            }
-                        } catch (Exception e) {
-                            //e.printStackTrace();
-                        }
-                    }
-                };
-                stdOutReader.setDaemon(true);
-                stdOutReader.start();
+			signal.await(5, TimeUnit.SECONDS);
 
-                signal.await(5, TimeUnit.SECONDS);
+		} catch (Throwable e) {
 
-            } catch (Throwable e) {
-
-                e.printStackTrace();
-            }
-        } finally {
-        }
-    }
+			e.printStackTrace();
+		}
+	}
 
     @SuppressWarnings("unused")
     private void printCommand(String[] cmd) {
-        for (int i = 0; i < cmd.length; i++) {
-            if (cmd[i].contains(" ")) {
-                System.out.print("\"");
-            }
-            System.out.print(cmd[i]);
-            if (cmd[i].contains(" ")) {
-                System.out.print("\"");
-            }
-            System.out.print(" ");
-        }
+		for (String s : cmd) {
+			if (s.contains(" ")) {
+				System.out.print("\"");
+			}
+			System.out.print(s);
+			if (s.contains(" ")) {
+				System.out.print("\"");
+			}
+			System.out.print(" ");
+		}
         System.out.println("\n");
     }
 }

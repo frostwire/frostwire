@@ -487,40 +487,38 @@ public final class Grid
 					doAgain = false;
 					for (Cell cell : grid.values()) {
 						ArrayList<CompWrap> compWraps = cell.compWraps;
-						for (int i = 0, iSz = compWraps.size(); i < iSz; i++) {
-							CompWrap cw = compWraps.get(i);
+                        for (CompWrap cw : compWraps) {
+                            if (j == 0) {
+                                doAgain |= doAbsoluteCorrections(cw, bounds);
+                                if (!doAgain) { // If we are going to do this again, do not bother this time around
+                                    if (cw.cc.getHorizontal().getEndGroup() != null)
+                                        endGrpXMap = addToEndGroup(endGrpXMap, cw.cc.getHorizontal().getEndGroup(), cw.x + cw.w);
+                                    if (cw.cc.getVertical().getEndGroup() != null)
+                                        endGrpYMap = addToEndGroup(endGrpYMap, cw.cc.getVertical().getEndGroup(), cw.y + cw.h);
+                                }
 
-							if (j == 0) {
-								doAgain |= doAbsoluteCorrections(cw, bounds);
-								if (!doAgain) { // If we are going to do this again, do not bother this time around
-									if (cw.cc.getHorizontal().getEndGroup() != null)
-										endGrpXMap = addToEndGroup(endGrpXMap, cw.cc.getHorizontal().getEndGroup(), cw.x + cw.w);
-									if (cw.cc.getVertical().getEndGroup() != null)
-										endGrpYMap = addToEndGroup(endGrpYMap, cw.cc.getVertical().getEndGroup(), cw.y + cw.h);
-								}
+                                // @since 3.7.2 Needed or absolute "pos" pointing to "visual" or "container" didn't work if
+                                // their bounds changed during the layout cycle. At least not in SWT.
+                                if (linkTargetIDs != null && (linkTargetIDs.containsKey("visual") || linkTargetIDs.containsKey("container")))
+                                    layoutAgain = true;
+                            }
 
-								// @since 3.7.2 Needed or absolute "pos" pointing to "visual" or "container" didn't work if
-								// their bounds changed during the layout cycle. At least not in SWT.
-								if (linkTargetIDs != null && (linkTargetIDs.containsKey("visual") || linkTargetIDs.containsKey("container")))
-									layoutAgain = true;
-							}
+                            if (linkTargetIDs == null || j == 1) {
+                                if (cw.cc.getHorizontal().getEndGroup() != null)
+                                    cw.w = endGrpXMap.get(cw.cc.getHorizontal().getEndGroup()) - cw.x;
+                                if (cw.cc.getVertical().getEndGroup() != null)
+                                    cw.h = endGrpYMap.get(cw.cc.getVertical().getEndGroup()) - cw.y;
 
-							if (linkTargetIDs == null || j == 1) {
-								if (cw.cc.getHorizontal().getEndGroup() != null)
-									cw.w = endGrpXMap.get(cw.cc.getHorizontal().getEndGroup()) - cw.x;
-								if (cw.cc.getVertical().getEndGroup() != null)
-									cw.h = endGrpYMap.get(cw.cc.getVertical().getEndGroup()) - cw.y;
+                                cw.x += bounds[0];
+                                cw.y += bounds[1];
+                                layoutAgain |= cw.transferBounds(checkPrefChange && !layoutAgain);
 
-								cw.x += bounds[0];
-								cw.y += bounds[1];
-								layoutAgain |= cw.transferBounds(checkPrefChange && !layoutAgain);
-
-								if (callbackList != null) {
-									for (LayoutCallback callback : callbackList)
-										callback.correctBounds(cw.comp);
-								}
-							}
-						}
+                                if (callbackList != null) {
+                                    for (LayoutCallback callback : callbackList)
+                                        callback.correctBounds(cw.comp);
+                                }
+                            }
+                        }
 					}
 					clearGroupLinkBounds();
 					if (++count > ((compCount << 3) + 10)) {
@@ -536,14 +534,13 @@ public final class Grid
 		if (debug) {
 			for (Cell cell : grid.values()) {
 				ArrayList<CompWrap> compWraps = cell.compWraps;
-				for (int i = 0, iSz = compWraps.size(); i < iSz; i++) {
-					CompWrap cw = compWraps.get(i);
-					LinkedDimGroup hGrp = getGroupContaining(colGroupLists, cw);
-					LinkedDimGroup vGrp = getGroupContaining(rowGroupLists, cw);
+                for (CompWrap cw : compWraps) {
+                    LinkedDimGroup hGrp = getGroupContaining(colGroupLists, cw);
+                    LinkedDimGroup vGrp = getGroupContaining(rowGroupLists, cw);
 
-					if (hGrp != null && vGrp != null)
-						debugRects.add(new int[]{hGrp.lStart + bounds[0] - (hGrp.fromEnd ? hGrp.lSize : 0), vGrp.lStart + bounds[1] - (vGrp.fromEnd ? vGrp.lSize : 0), hGrp.lSize, vGrp.lSize});
-				}
+                    if (hGrp != null && vGrp != null)
+                        debugRects.add(new int[]{hGrp.lStart + bounds[0] - (hGrp.fromEnd ? hGrp.lSize : 0), vGrp.lStart + bounds[1] - (vGrp.fromEnd ? vGrp.lSize : 0), hGrp.lSize, vGrp.lSize});
+                }
 			}
 		}
 		return layoutAgain;
@@ -555,18 +552,16 @@ public final class Grid
 			container.paintDebugOutline();
 
 			ArrayList<int[]> painted = new ArrayList<int[]>();
-			for (int i = 0, iSz = debugRects.size(); i < iSz; i++) {
-				int[] r = debugRects.get(i);
-				if (!painted.contains(r)) {
-					container.paintDebugCell(r[0], r[1], r[2], r[3]);
-					painted.add(r);
-				}
-			}
+            for (int[] r : debugRects) {
+                if (!painted.contains(r)) {
+                    container.paintDebugCell(r[0], r[1], r[2], r[3]);
+                    painted.add(r);
+                }
+            }
 
 			for (Cell cell : grid.values()) {
 				ArrayList<CompWrap> compWraps = cell.compWraps;
-				for (int i = 0, iSz = compWraps.size(); i < iSz; i++)
-					compWraps.get(i).comp.paintDebugOutline();
+                for (CompWrap compWrap : compWraps) compWrap.comp.paintDebugOutline();
 			}
 		}
 	}
@@ -840,7 +835,7 @@ public final class Grid
 					int hideMode = cw.comp.isVisible() ? -1 : cw.cc.getHideMode() != -1 ? cw.cc.getHideMode() : lc.getHideMode();
 
 					Float pushWeight = hideMode < 2 ? (isRows ? cw.cc.getPushY() : cw.cc.getPushX()) : null;
-					if (rowPushWeight == null || (pushWeight != null && pushWeight.floatValue() > rowPushWeight.floatValue()))
+					if (rowPushWeight == null || (pushWeight != null && pushWeight > rowPushWeight))
 						rowPushWeight = pushWeight;
 				}
 			}
@@ -895,13 +890,13 @@ public final class Grid
 	private static LinkedDimGroup getGroupContaining(ArrayList<LinkedDimGroup>[] groupLists, CompWrap cw)
 	{
 		for (ArrayList<LinkedDimGroup> groups : groupLists) {
-			for (int j = 0, jSz = groups.size(); j < jSz; j++) {
-				ArrayList<CompWrap> cwList = groups.get(j)._compWraps;
-				for (int k = 0, kSz = cwList.size(); k < kSz; k++) {
-					if (cwList.get(k) == cw)
-						return groups.get(j);
-				}
-			}
+            for (LinkedDimGroup group : groups) {
+                ArrayList<CompWrap> cwList = group._compWraps;
+                for (CompWrap compWrap : cwList) {
+                    if (compWrap == cw)
+                        return group;
+                }
+            }
 		}
 		return null;
 	}
@@ -1321,7 +1316,7 @@ public final class Grid
 			if (edgeBefore && edgeAfter)
 				continue;
 
-			BoundSize wrapGapSize = (wrapGapMap == null || isHor == lc.isFlowX() ? null : wrapGapMap.get(Integer.valueOf(wgIx++)));
+			BoundSize wrapGapSize = (wrapGapMap == null || isHor == lc.isFlowX() ? null : wrapGapMap.get(wgIx++));
 
 			if (wrapGapSize == null) {
 
@@ -1533,7 +1528,7 @@ public final class Grid
 
 	private Cell getCell(int r, int c)
 	{
-		return grid.get(Integer.valueOf((r << 16) + c));
+		return grid.get((r << 16) + c);
 	}
 
 	private void setCell(int r, int c, Cell cell)
@@ -1928,12 +1923,11 @@ public final class Grid
 			align = UnitValue.CENTER;
 
 		int offset = start + aboveBelow[0] + (align != null ? Math.max(0, align.getPixels(size - blRowSize, parent, null)) : 0);
-		for (int i = 0, iSz = compWraps.size(); i < iSz; i++) {
-			CompWrap cw = compWraps.get(i);
-			cw.y += offset;
-			if (cw.y + cw.h > start + size)
-				cw.h = start + size - cw.y;
-		}
+        for (CompWrap cw : compWraps) {
+            cw.y += offset;
+            if (cw.y + cw.h > start + size)
+                cw.h = start + size - cw.y;
+        }
 	}
 
 	private static void layoutSerial(ContainerWrapper parent, ArrayList<CompWrap> compWraps, DimConstraint dc, int start, int size, boolean isHor, int spanCount, boolean fromEnd)
@@ -2048,21 +2042,19 @@ public final class Grid
 	{
 		int maxAbove = Short.MIN_VALUE;
 		int maxBelow = Short.MIN_VALUE;
-		for (int i = 0, iSz = compWraps.size(); i < iSz; i++) {
-			CompWrap cw = compWraps.get(i);
+        for (CompWrap cw : compWraps) {
+            int height = cw.getSize(sType, false);
+            if (height >= LayoutUtil.INF)
+                return new int[]{LayoutUtil.INF / 2, LayoutUtil.INF / 2};
 
-			int height = cw.getSize(sType, false);
-			if (height >= LayoutUtil.INF)
-				return new int[] {LayoutUtil.INF / 2, LayoutUtil.INF / 2};
+            int baseline = cw.getBaseline(sType);
+            int above = baseline + cw.getGapBefore(sType, false);
+            maxAbove = Math.max(above, maxAbove);
+            maxBelow = Math.max(height - baseline + cw.getGapAfter(sType, false), maxBelow);
 
-			int baseline = cw.getBaseline(sType);
-			int above = baseline + cw.getGapBefore(sType, false);
-			maxAbove = Math.max(above, maxAbove);
-			maxBelow = Math.max(height - baseline + cw.getGapAfter(sType, false), maxBelow);
-
-			if (centerBaseline)
-				cw.setDimBounds(-baseline, height, false);
-		}
+            if (centerBaseline)
+                cw.setDimBounds(-baseline, height, false);
+        }
 		return new int[] {maxAbove, maxBelow};
 	}
 
@@ -2070,15 +2062,14 @@ public final class Grid
 	{
 		int size = sType == LayoutUtil.MAX ? LayoutUtil.INF : 0;
 
-		for (int i = 0, iSz = compWraps.size(); i < iSz; i++) {
-			CompWrap cw = compWraps.get(i);
-			int cwSize = cw.getSizeInclGaps(sType, isHor);
-			if (cwSize >= LayoutUtil.INF)
-				return LayoutUtil.INF;
+        for (CompWrap cw : compWraps) {
+            int cwSize = cw.getSizeInclGaps(sType, isHor);
+            if (cwSize >= LayoutUtil.INF)
+                return LayoutUtil.INF;
 
-			if (sType == LayoutUtil.MAX ? cwSize < size : cwSize > size)
-		        size = cwSize;
-		}
+            if (sType == LayoutUtil.MAX ? cwSize < size : cwSize > size)
+                size = cwSize;
+        }
 		return constrainSize(size);
 	}
 
@@ -2103,17 +2094,16 @@ public final class Grid
 	private static int getTotalGroupsSizeParallel(ArrayList<LinkedDimGroup> groups, int sType, boolean countSpanning)
 	{
 		int size = sType == LayoutUtil.MAX ? LayoutUtil.INF : 0;
-		for (int i = 0, iSz = groups.size(); i < iSz; i++) {
-			LinkedDimGroup group = groups.get(i);
-			if (countSpanning || group.span == 1) {
-				int grpSize = group.getMinPrefMax()[sType];
-				if (grpSize >= LayoutUtil.INF)
-					return LayoutUtil.INF;
+        for (LinkedDimGroup group : groups) {
+            if (countSpanning || group.span == 1) {
+                int grpSize = group.getMinPrefMax()[sType];
+                if (grpSize >= LayoutUtil.INF)
+                    return LayoutUtil.INF;
 
-				if (sType == LayoutUtil.MAX ? grpSize < size : grpSize > size)
-			        size = grpSize;
-			}
-		}
+                if (sType == LayoutUtil.MAX ? grpSize < size : grpSize > size)
+                    size = grpSize;
+            }
+        }
 		return constrainSize(size);
 	}
 

@@ -191,7 +191,7 @@ public class SoundcloudDownload extends HttpBTDownload {
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
             if (headerFields != null && headerFields.containsKey("Content-Length")) {
                 String lengthStr = headerFields.get("Content-Length").get(0);
-                SoundcloudDownload.this.size = Long.valueOf(lengthStr);
+                SoundcloudDownload.this.size = Long.parseLong(lengthStr);
             }
         }
     }

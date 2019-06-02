@@ -43,8 +43,7 @@ public class SearchFilterFactoryImpl implements SearchFilterFactory {
 
         if (badWords.length != 0 || filterAdult) {
             KeywordFilter kf = new KeywordFilter();
-            for (int i = 0; i < badWords.length; i++)
-                kf.disallow(badWords[i]);
+            for (String badWord : badWords) kf.disallow(badWord);
             if (filterAdult)
                 kf.disallowAdult();
 

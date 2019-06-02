@@ -141,8 +141,7 @@ public class ListEditor extends JPanel {
          //Copy model into realModel.
          this.model=model;        
          this.realModel=new DefaultListModel<Object>();
-         for (int i=0; i<model.size(); i++)
-             realModel.addElement(model.get(i));
+         for (String s : model) realModel.addElement(s);
          list.setModel(realModel);
      }
 
@@ -172,8 +171,7 @@ public class ListEditor extends JPanel {
         
         ListDataEvent event=new ListDataEvent(model, 
             ListDataEvent.INTERVAL_REMOVED, i, i);
-        for (int j=0; j<listeners.size(); j++) {
-            ListDataListener listener=listeners.get(j);
+        for (ListDataListener listener : listeners) {
             listener.intervalRemoved(event);
         }
     }
@@ -238,8 +236,7 @@ public class ListEditor extends JPanel {
 
                 ListDataEvent event=new ListDataEvent(model, 
                   ListDataEvent.CONTENTS_CHANGED, i, i);
-                for (int j=0; j<listeners.size(); j++) {
-                    ListDataListener listener=listeners.get(j);
+                for (ListDataListener listener : listeners) {
                     listener.contentsChanged(event);
                 }                    
             }
@@ -260,8 +257,7 @@ public class ListEditor extends JPanel {
                 }
                 ListDataEvent event=new ListDataEvent(model, 
                   ListDataEvent.INTERVAL_ADDED, last, last);
-                for (int j=0; j<listeners.size(); j++) {
-                    ListDataListener listener=listeners.get(j);
+                for (ListDataListener listener : listeners) {
                     listener.intervalAdded(event);
                 }                    
             }

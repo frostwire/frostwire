@@ -347,7 +347,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         ActionListener itemsUpSpeedListener = e -> {
             if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
                 SkinMenuItem item = (SkinMenuItem) e.getSource();
-                int speed = item.getClientProperty("maxul") == null ? 0 : ((Integer) item.getClientProperty("maxul")).intValue();
+                int speed = item.getClientProperty("maxul") == null ? 0 : (Integer) item.getClientProperty("maxul");
                 adapter.setUpSpeed(speed);
             }
         };

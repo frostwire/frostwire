@@ -61,8 +61,8 @@ class TransferVisualizer {
         label.setVerticalAlignment(SwingConstants.TOP);
         label.setOpaque(false);
         int y = 0;
-        for(Iterator<?> i = l.iterator(); i.hasNext(); ) {
-            File f = (File)i.next();
+        for (Object o : l) {
+            File f = (File) o;
             Icon icon = IconManager.instance().getIconForFile(f);
             label.setIcon(icon);
             label.setText(f.getName());

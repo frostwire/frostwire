@@ -101,8 +101,7 @@ public final class CC implements Externalizable
 			final ArrayList<String> targets = new ArrayList<String>(2);
 
 			if (pos != null) {
-				for (int i = 0; i < pos.length ; i++)
-					addLinkTargetIDs(targets, pos[i]);
+                for (UnitValue po : pos) addLinkTargetIDs(targets, po);
 			}
 
 			linkTargets = targets.size() == 0 ? EMPTY_ARR : targets.toArray(new String[0]);

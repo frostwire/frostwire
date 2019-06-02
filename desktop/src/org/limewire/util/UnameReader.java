@@ -48,17 +48,7 @@ public final class UnameReader {
 			int exit = -1;
 
 			while ((line = br.readLine()) != null) {
-			    
 				output = line;
-			    
-			    try {
-//			        exit = proc.exitValue();
-//			        if (exit == 0)  {
-//			            // Process finished
-//			        }
-			    } catch (IllegalThreadStateException t) {
-			        proc.destroy();
-			    }
 			}
 		} catch (Exception e) {
 		    // ignore

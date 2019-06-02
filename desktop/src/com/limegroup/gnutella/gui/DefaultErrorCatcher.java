@@ -51,81 +51,81 @@ public class DefaultErrorCatcher {
 	        return true;
 	        
         // frickin' repaint manager stinks.
-        if(msg.indexOf("javax.swing.RepaintManager") != -1)
+        if(msg.contains("javax.swing.RepaintManager"))
             return true;
-        if(msg.indexOf("sun.awt.RepaintArea.paint") != -1)
+        if(msg.contains("sun.awt.RepaintArea.paint"))
             return true;
          
         // display manager on OSX goes out of whack   
         if(bug instanceof ArrayIndexOutOfBoundsException) {
-            if(msg.indexOf("apple.awt.CWindow.displayChanged") != -1)
+            if(msg.contains("apple.awt.CWindow.displayChanged"))
                 return true;
-            if(msg.indexOf("javax.swing.plaf.basic.BasicTabbedPaneUI.getTabBounds") != -1)
+            if(msg.contains("javax.swing.plaf.basic.BasicTabbedPaneUI.getTabBounds"))
                 return true;
         }
         
         // system clipboard can be held, preventing us from getting.
         // throws a RuntimeException through stuff we don't control...
         if(bug instanceof IllegalStateException) {
-            if(msg.indexOf("cannot open system clipboard") != -1)
+            if(msg.contains("cannot open system clipboard"))
                 return true;
         }
         
         // odd component exception
         if(bug instanceof IllegalComponentStateException) {
-            if(msg.indexOf("component must be showing on the screen to determine its location") != -1)
+            if(msg.contains("component must be showing on the screen to determine its location"))
                 return true;
         }
 	        
         // various NPEs we can ignore:
         if(bug instanceof NullPointerException) {
-            if(msg.indexOf("MetalFileChooserUI") != -1)
+            if(msg.contains("MetalFileChooserUI"))
                 return true;
-            if(msg.indexOf("WindowsFileChooserUI") != -1)
+            if(msg.contains("WindowsFileChooserUI"))
                 return true;
-            if(msg.indexOf("AquaDirectoryModel") != -1)
+            if(msg.contains("AquaDirectoryModel"))
                 return true;
-            if(msg.indexOf("SizeRequirements.calculateAlignedPositions") != -1)
+            if(msg.contains("SizeRequirements.calculateAlignedPositions"))
                 return true;
-            if(msg.indexOf("BasicTextUI.damageRange") != -1)
+            if(msg.contains("BasicTextUI.damageRange"))
                 return true;
-            if(msg.indexOf("null pData") != -1)
+            if(msg.contains("null pData"))
                 return true;
-            if(msg.indexOf("disposed component") != -1)
+            if(msg.contains("disposed component"))
                 return true;
             
-            if (msg.indexOf("javax.swing.JComponent.repaint") != -1
-                    && msg.indexOf("com.limegroup.gnutella.gui.FileChooserHandler.getSaveAsFile") != -1) {
+            if (msg.contains("javax.swing.JComponent.repaint")
+                    && msg.contains("com.limegroup.gnutella.gui.FileChooserHandler.getSaveAsFile")) {
                 return true;
             }
             
-            if (msg.indexOf("javax.swing.JComponent.repaint") != -1
-                    && msg.indexOf("com.limegroup.gnutella.gui.FileChooserHandler.getInput") != -1) {
+            if (msg.contains("javax.swing.JComponent.repaint")
+                    && msg.contains("com.limegroup.gnutella.gui.FileChooserHandler.getInput")) {
                 return true;
             }
         }
         
         if (bug instanceof IndexOutOfBoundsException) {
-            if (msg.indexOf("Invalid index") != -1
-                    && msg.indexOf("com.limegroup.gnutella.gui.FileChooserHandler.getSaveAsFile") != -1) {
+            if (msg.contains("Invalid index")
+                    && msg.contains("com.limegroup.gnutella.gui.FileChooserHandler.getSaveAsFile")) {
                 return true;
             }
             
-            if (msg.indexOf("Invalid index") != -1
-                    && msg.indexOf("com.limegroup.gnutella.gui.FileChooserHandler.getInput") != -1) {
+            if (msg.contains("Invalid index")
+                    && msg.contains("com.limegroup.gnutella.gui.FileChooserHandler.getInput")) {
                 return true;
             }
         }
         
         // various InternalErrors we can ignore.
         if(bug instanceof InternalError) {
-            if(msg.indexOf("getGraphics not implemented for this component") != -1)
+            if(msg.contains("getGraphics not implemented for this component"))
                 return true;
         }
 	    
 	    // if we're not somewhere in the bug, ignore it.
 	    // no need for us to debug sun's internal errors.
-	    if(msg.indexOf("com.limegroup.gnutella") == -1 && msg.indexOf("org.limewire") == -1)
+	    if(!msg.contains("com.limegroup.gnutella") && !msg.contains("org.limewire"))
 	        return true;
 	        
         // we intercept calls in various places -- check if the only

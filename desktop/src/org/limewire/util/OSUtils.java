@@ -105,21 +105,21 @@ public class OSUtils {
 		os = os.toLowerCase(Locale.US);
 
 		// set the operating system variables
-		_isWindows	= os.indexOf("windows") != -1;
-		_isSolaris	= os.indexOf("solaris") != -1;
-		_isLinux	= os.indexOf("linux") != -1;
-		_isOS2		= os.indexOf("os/2") != -1;
+		_isWindows	= os.contains("windows");
+		_isSolaris	= os.contains("solaris");
+		_isLinux	= os.contains("linux");
+		_isOS2		= os.contains("os/2");
 
 		if(_isWindows){
-		    _isWindows10 = os.indexOf("windows 10") != -1;
-			_isWindows8	= os.indexOf("windows 8") != -1;
-			_isWindows7	= os.indexOf("windows 7") != -1;
-			_isWindowsVista	= os.indexOf("windows vista") != -1;
-			_isWindowsXP	= os.indexOf("windows xp") != -1;
-			_isWindowsNT	= os.indexOf("windows nt") != -1;
-			_isWindowsMe	= os.indexOf("windows me") != -1;
-			_isWindows98	= os.indexOf("windows 98") != -1;
-			_isWindows95	= os.indexOf("windows 95") != -1;
+		    _isWindows10 = os.contains("windows 10");
+			_isWindows8	= os.contains("windows 8");
+			_isWindows7	= os.contains("windows 7");
+			_isWindowsVista	= os.contains("windows vista");
+			_isWindowsXP	= os.contains("windows xp");
+			_isWindowsNT	= os.contains("windows nt");
+			_isWindowsMe	= os.contains("windows me");
+			_isWindows98	= os.contains("windows 98");
+			_isWindows95	= os.contains("windows 95");
 		}
 
 		if (_isLinux) {

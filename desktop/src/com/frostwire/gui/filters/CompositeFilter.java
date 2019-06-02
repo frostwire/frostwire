@@ -28,8 +28,8 @@ public class CompositeFilter implements SearchFilter {
     }
 
     public boolean allow(UISearchResult m) {
-        for (int i = 0; i < _delegates.length; i++) {
-            if (!_delegates[i].allow(m))
+        for (SearchFilter delegate : _delegates) {
+            if (!delegate.allow(m))
                 return false;
         }
         return true;

@@ -165,7 +165,7 @@ public class InstallerUpdater implements Runnable {
                 @Override
                 public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
                     if (headerFields.containsKey("Content-Length")) {
-                        contentLength = Long.valueOf(headerFields.get("Content-Length").get(0));
+                        contentLength = Long.parseLong(headerFields.get("Content-Length").get(0));
                     }
                 }
             });

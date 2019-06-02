@@ -168,14 +168,14 @@ public class FileArraySetting extends AbstractSetting {
 	public synchronized void clean() {
 		List<File> list = new ArrayList<File>(value.length);
 		File file = null;
-		for (int i = 0; i < value.length; i++) {
-			file = value[i];
-			if (file == null)
-				continue;
-			if (!file.exists())
-				continue;
-			list.add(file);
-		}
+        for (File item : value) {
+            file = item;
+            if (file == null)
+                continue;
+            if (!file.exists())
+                continue;
+            list.add(file);
+        }
 		setValue(list.toArray(new File[0]));
 	}
 }

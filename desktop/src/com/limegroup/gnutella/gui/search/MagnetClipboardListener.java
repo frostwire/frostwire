@@ -159,9 +159,9 @@ public class MagnetClipboardListener extends WindowAdapter {
                     //					}
                 }
                 boolean oneSearchStarted = false;
-                for (int i = 0; i < magnets.length; i++) {
-                    if (!magnets[i].isDownloadable() && magnets[i].isKeywordTopicOnly() && !oneSearchStarted) {
-                        String query = QueryUtils.createQueryString(magnets[i].getKeywordTopic());
+                for (MagnetOptions magnet : magnets) {
+                    if (!magnet.isDownloadable() && magnet.isKeywordTopicOnly() && !oneSearchStarted) {
+                        String query = QueryUtils.createQueryString(magnet.getKeywordTopic());
                         SearchInformation info = SearchInformation.createKeywordSearch(query, null, MediaType.getAnyTypeMediaType());
                         if (SearchMediator.validateInfo(info) == SearchMediator.QUERY_VALID) {
                             oneSearchStarted = true;
@@ -248,10 +248,9 @@ public class MagnetClipboardListener extends WindowAdapter {
      */
     private static MagnetOptions[] extractDownloadableMagnets(MagnetOptions[] magnets) {
         List<MagnetOptions> dls = new ArrayList<>(magnets.length);
-        for (int i = 0; i < magnets.length; i++) {
-            MagnetOptions magnet = magnets[i];
+        for (MagnetOptions magnet : magnets) {
             if (!magnet.isKeywordTopicOnly()) {
-                dls.add(magnets[i]);
+                dls.add(magnet);
             }
         }
         // all magnets are downloadable, return original array
