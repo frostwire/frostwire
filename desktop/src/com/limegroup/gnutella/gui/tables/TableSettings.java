@@ -47,21 +47,7 @@ public class TableSettings {
         REAL_TIME_SORT = FACTORY.createBooleanSetting(id + SORT, getDefaultSorting());
         DISPLAY_TOOLTIPS = FACTORY.createBooleanSetting(id + TOOLTIP, getDefaultTooltips());
     }
-    
-    /**
-     * Gets the ID of this TableSettings object.
-     */
-    public String getID() {
-        return ID;
-    }
-    
-    /**
-     * Returns the default value for row striping.
-     */
-    protected boolean getDefaultRowStripe() {
-        return true;
-    }
-    
+
     /**
      * Returns the default value for sorting.
      */

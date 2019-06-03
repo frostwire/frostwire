@@ -149,7 +149,7 @@ public final class CrawlCacheDB {
 
         // 4MB cache size and scan-resistant cache algorithm "Two Queue" (2Q) with second level soft reference
         DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION, "CACHE_SIZE=4096;CACHE_TYPE=SOFT_TQ");
+            super(context, DATABASE_NAME, DATABASE_VERSION, "CACHE_SIZE=4096;CACHE_TYPE=SOFT_TQ");
         }
 
         @Override

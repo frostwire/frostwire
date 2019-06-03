@@ -1,5 +1,6 @@
 package com.frostwire.mplayer;
 
+@SuppressWarnings("unused")
 public interface TaskListener {
 	
 	void taskStarted(String taskName);

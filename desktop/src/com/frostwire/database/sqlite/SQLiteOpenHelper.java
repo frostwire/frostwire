@@ -38,7 +38,7 @@ public abstract class SQLiteOpenHelper {
     private final SQLiteDatabase db;
     private String folderpath;
 
-    public SQLiteOpenHelper(Context context, String name, CursorFactory factory, int version, String extraArgs) {
+    public SQLiteOpenHelper(Context context, String name, int version, String extraArgs) {
         String dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
     }
@@ -75,28 +75,6 @@ public abstract class SQLiteOpenHelper {
      * @param newVersion The new database version.
      */
     public abstract void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
-
-    /**
-     * Called when the database needs to be downgraded. This is stricly similar to
-     * onUpgrade() method, but is called whenever current version is newer than requested one.
-     * However, this method is not abstract, so it is not mandatory for a customer to
-     * implement it. If not overridden, default implementation will reject downgrade and
-     * throws SQLiteException
-     *
-     * @param db The database.
-     * @param oldVersion The old database version.
-     * @param newVersion The new database version.
-     */
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        throw new SQLiteException("Can't downgrade database from version " + oldVersion + " to " + newVersion);
-    }
-
-    /**
-     * Called when the database has been opened
-     * @param db The database.
-     */
-    public void onOpen(SQLiteDatabase db) {
-    }
 
     private SQLiteDatabase openDatabase(String dbpath, String name, int version, String extraArgs) {
         try {

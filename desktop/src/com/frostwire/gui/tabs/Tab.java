@@ -40,5 +40,6 @@ public interface Tab {
 	Icon getIcon();
 	
 	/** Adds a listener to property changes on this tab. */
+	@SuppressWarnings("unused")
 	void addPropertyChangeListener(PropertyChangeListener listener);
 }

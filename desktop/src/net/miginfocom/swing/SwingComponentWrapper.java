@@ -47,9 +47,6 @@ import java.util.IdentityHashMap;
  */
 public class SwingComponentWrapper implements ComponentWrapper
 {
-	private static boolean maxSet = false;
-
-	private static boolean vp = true;
 
 	/** Debug color for component bounds outline.
 	 */
@@ -60,7 +57,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 	private Boolean bl = null;
 	private boolean prefCalled = false;
 
-	public SwingComponentWrapper(Component c)
+	SwingComponentWrapper(Component c)
 	{
 		this.c = c;
 	}
@@ -305,6 +302,7 @@ public class SwingComponentWrapper implements ComponentWrapper
 
 	public final int[] getVisualPadding()
 	{
+		boolean vp = true;
 		if (vp && c instanceof JTabbedPane) {
 			if (UIManager.getLookAndFeel().getClass().getName().endsWith("WindowsLookAndFeel"))
 				return new int[] {-1, 0, 2, 2};
@@ -313,24 +311,9 @@ public class SwingComponentWrapper implements ComponentWrapper
 		return null;
 	}
 
-	public static boolean isMaxSizeSetOn1_4()
+	private static boolean isMaxSizeSetOn1_4()
 	{
-		return maxSet;
-	}
-
-	public static void setMaxSizeSetOn1_4(boolean b)
-	{
-		maxSet = b;
-	}
-
-	public static boolean isVisualPaddingEnabled()
-	{
-		return vp;
-	}
-
-	public static void setVisualPaddingEnabled(boolean b)
-	{
-		vp = b;
+		return false;
 	}
 
 	public final void paintDebugOutline()

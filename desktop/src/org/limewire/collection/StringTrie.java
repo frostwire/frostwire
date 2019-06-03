@@ -39,6 +39,7 @@ import java.util.NoSuchElementException;
  *      added getIterator() for enhanced AutoCompleteTextField use.
  *
  */
+@SuppressWarnings("ALL")
 public class StringTrie<V> {
     /**
      * Our representation consists of a tree of nodes whose edges are labelled

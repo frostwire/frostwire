@@ -63,14 +63,6 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
     }
 
     /**
-     * Return all the Strings that can be prefixed by this String.
-     * All values returned by the iterator have their case preserved.
-     */
-    public Iterator<?> getPrefixedBy(String data) {
-        return map.getPrefixedBy(data);
-    }
-
-    /**
      * Return the last String in the set that can be prefixed by this String
      * (Trie's are stored in alphabetical order).
      * Return null if no such String exist in the current set.

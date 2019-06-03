@@ -102,12 +102,7 @@ public class SystemUtils {
     /** A list of places that getSpecialPath uses. */
     public enum SpecialLocations {
         DOCUMENTS("Documents"),
-        DOWNLOADS("Downloads"),
-        APPLICATION_DATA("ApplicationData"),
-        DESKTOP("Desktop"),
-        START_MENU("StartMenu"),
-        START_MENU_PROGRAMS("StartMenuPrograms"),
-        START_MENU_STARTUP("StartMenuStartup");
+        DOWNLOADS("Downloads");
         
         private final String name;
         SpecialLocations(String name) {
