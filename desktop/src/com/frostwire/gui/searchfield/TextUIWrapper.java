@@ -76,15 +76,6 @@ public abstract class TextUIWrapper<UI extends TextUI> {
 	public abstract UI wrapUI(JTextComponent textComponent);
 
 	/**
-	 * Returns the wrapper class.
-	 * 
-	 * @return the wrapper class
-	 */
-	public Class<UI> getWrapperClass() {
-		return wrapperClass;
-	}
-
-	/**
 	 * <p>
 	 * Removes the {@link PropertyChangeListener}, which listens for "UI"
 	 * property changes (if installed) and then calls

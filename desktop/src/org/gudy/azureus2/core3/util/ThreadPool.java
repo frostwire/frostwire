@@ -130,8 +130,6 @@ public class ThreadPool {
 
                         ThreadPoolTask task = (ThreadPoolTask) runnable;
 
-                        task.worker = recursive_worker;
-
                         runIt(runnable);
                         task.join();
                     } else {
@@ -143,8 +141,6 @@ public class ThreadPool {
                 }
             }
         }
-
-        threadPoolWorker allocated_worker;
 
         synchronized (this) {
 
@@ -274,7 +270,6 @@ public class ThreadPool {
 
                         if (runnable instanceof ThreadPoolTask) {
                             ThreadPoolTask tpt = (ThreadPoolTask) runnable;
-                            tpt.worker = this;
                             String task_name = NAME_THREADS ? tpt.getName() : null;
                             try {
                                 if (task_name != null)
@@ -335,15 +330,6 @@ public class ThreadPool {
 
                 tls.set(null);
             }
-        }
-
-        public void setState(String _state) {
-            //System.out.println( "state = " + _state );
-            state = _state;
-        }
-
-        public String getState() {
-            return (state);
         }
 
         String getWorkerName() {

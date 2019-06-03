@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 
 import javax.swing.JTabbedPane;
 
+@SuppressWarnings("ALL")
 public class AquaTabbedPaneUI {
     
     protected JTabbedPane tabPane;

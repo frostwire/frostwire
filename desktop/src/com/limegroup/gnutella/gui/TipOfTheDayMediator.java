@@ -153,13 +153,6 @@ public final class TipOfTheDayMediator {
     }
 
     /**
-     * Redraws the whole dialog upon theme change.
-     */
-    public void updateComponentTreeUI() {
-        SwingUtilities.updateComponentTreeUI(dialog);
-    }
-
-    /**
      * Causes the TOTD window to become visible.
      */
     public void displayTipWindow() {
@@ -256,28 +249,6 @@ public final class TipOfTheDayMediator {
             previousButton.setEnabled(true);
 
         return message;
-    }
-
-    /**
-     * Recreates the dialog box to update the theme.
-     */
-    public void updateTheme() {
-        boolean wasShowing = dialog.isShowing();
-
-        dialog.setVisible(false);
-        dialog.getContentPane().removeAll();
-        // Lower the size of the font in the TIP because
-        // it's going to get larger again.
-        Font tipFont = new Font(tipPane.getFont().getName(), tipPane.getFont().getStyle(), tipPane.getFont().getSize() - 2);
-        tipPane.setFont(tipFont);
-        constructDialog();
-        tipPane.setContentType("text/html");
-        setText(getRandomTip());
-
-        if (wasShowing) {
-            dialog.setVisible(true);
-            dialog.toFront();
-        }
     }
 
     /**

@@ -106,32 +106,6 @@ public class TitledPaddedPanel extends JPanel {
     }
 
     /**
-     * Creates a <tt>TitledPaddedPanel</tt> with the specified title.
-     *
-     * @param title the title to use for the panel
-     */
-    public TitledPaddedPanel(String title) {
-        this(title, OUT_MARGIN, TITLED_MARGIN);
-    }
-
-    /**
-     * Creates a <tt>TitledPaddedPanel</tt> with the specified title
-     * and the specified orientation for the inner panel.
-     *
-     * @param title the title to use for the panel
-     * @param orientation the orientation to use for the layout of the 
-     *                    inner panel
-     */
-    public TitledPaddedPanel(String title, int orientation) throws IllegalArgumentException {
-        this(title, OUT_MARGIN, TITLED_MARGIN);
-        if (orientation != X_AXIS && orientation != Y_AXIS)
-            throw new IllegalArgumentException("Invalid orientation");
-        if (orientation == X_AXIS) {
-            setInnerLayout(new BoxLayout(_mainPanel, BoxLayout.X_AXIS));
-        }
-    }
-
-    /**
      * Sets the title displayed in the panel.
      *
      * @param title the title to use for the panel.
@@ -141,24 +115,6 @@ public class TitledPaddedPanel extends JPanel {
     }
 
     /**
-     * Accessor for the title displayed in the panel.
-     *
-     * @return the title to use for the panel
-     */
-    public String getTitle() {
-        return _titledBorder.getTitle();
-    }
-
-    /** 
-     * Sets the layout for the main panel directly.
-     *
-     * @param mgr the <tt>LayoutManager</tt> to use for the layout
-     */
-    public void setInnerLayout(LayoutManager mgr) {
-        _mainPanel.setLayout(mgr);
-    }
-
-    /** 
      * Overrides the add(Component comp) method in the <tt>Container</tt>
      * class, adding the <tt>Component</tt> to the inner panel.
      *

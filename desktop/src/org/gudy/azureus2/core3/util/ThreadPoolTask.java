@@ -33,9 +33,7 @@ ThreadPoolTask
 	private static final int RELEASE_MANUAL_ALLOWED = 0x02;
 	
 	private int manualRelease;
-	
-	ThreadPool.threadPoolWorker		worker;
-	
+
 
 	public String
 	getName()
@@ -66,13 +64,7 @@ ThreadPoolTask
 	{
 		manualRelease = ThreadPoolTask.RELEASE_MANUAL;
 	}
-	
-	synchronized final boolean
-	canManualRelease()
-	{
-		return( manualRelease == ThreadPoolTask.RELEASE_MANUAL_ALLOWED );
-	}
-	
+
 	/**
 	 * only invoke this method after the first run of the thread pool task as it is only meant to
 	 * update the state of a task when it has child tasks and thus is running in manual release mode

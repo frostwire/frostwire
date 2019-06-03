@@ -288,7 +288,7 @@ public class Timer
     private synchronized TimerEvent
     addEvent(
             String name,
-            long creation_time,
+            @SuppressWarnings("unused") long creation_time,
             long when,
             boolean absolute,
             TimerEventPerformer performer) {

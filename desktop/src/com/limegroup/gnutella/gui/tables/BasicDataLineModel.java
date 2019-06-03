@@ -149,7 +149,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Implementation of resorting.
      */
     protected void doResort() {
-        Collections.sort(_list, this);
+        _list.sort(this);
     }
 
     /*

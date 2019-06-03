@@ -734,16 +734,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * State check needed by ScheduledThreadPoolExecutor to
-     * enable running tasks during shutdown;
-     * @param shutdownOK true if should return true if SHUTDOWN
-     */
-    final boolean isRunningOrShutdown2(boolean shutdownOK) {
-        int rs = runStateOf(ctl.get());
-        return rs == RUNNING || (rs == SHUTDOWN && shutdownOK);
-    }
-
-    /**
      * Drains the task queue into a new list, normally using
      * drainTo. But if the queue is a DelayQueue or any other kind of
      * queue for which poll or drainTo may fail to remove some
@@ -1014,38 +1004,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
 
     /**
      * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
-     * parameters and default thread factory and rejected execution handler.
-     * It may be more convenient to use one of the {@link Executors} factory
-     * methods instead of this general purpose constructor.
-     *
-     * @param corePoolSize the number of threads to keep in the
-     * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
-     * pool.
-     * @param keepAliveTime when the number of threads is greater than
-     * the core, this is the maximum time that excess idle threads
-     * will wait for new tasks before terminating.
-     * @param unit the time unit for the keepAliveTime
-     * argument.
-     * @param workQueue the queue to use for holding tasks before they
-     * are executed. This queue will hold only the <tt>Runnable</tt>
-     * tasks submitted by the <tt>execute</tt> method.
-     * @throws IllegalArgumentException if corePoolSize or
-     * keepAliveTime less than zero, or if maximumPoolSize less than or
-     * equal to zero, or if corePoolSize greater than maximumPoolSize.
-     * @throws NullPointerException if <tt>workQueue</tt> is null
-     */
-    public ThreadPoolExecutor(int corePoolSize,
-                              int maximumPoolSize,
-                              long keepAliveTime,
-                              TimeUnit unit,
-                              BlockingQueue<Runnable> workQueue) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
-             Executors.defaultThreadFactory(), defaultHandler);
-    }
-
-    /**
-     * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
      * parameters and default rejected execution handler.
      *
      * @param corePoolSize the number of threads to keep in the
@@ -1076,40 +1034,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                               ThreadFactory threadFactory) {
         this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
              threadFactory, defaultHandler);
-    }
-
-    /**
-     * Creates a new <tt>ThreadPoolExecutor</tt> with the given initial
-     * parameters and default thread factory.
-     *
-     * @param corePoolSize the number of threads to keep in the
-     * pool, even if they are idle.
-     * @param maximumPoolSize the maximum number of threads to allow in the
-     * pool.
-     * @param keepAliveTime when the number of threads is greater than
-     * the core, this is the maximum time that excess idle threads
-     * will wait for new tasks before terminating.
-     * @param unit the time unit for the keepAliveTime
-     * argument.
-     * @param workQueue the queue to use for holding tasks before they
-     * are executed. This queue will hold only the <tt>Runnable</tt>
-     * tasks submitted by the <tt>execute</tt> method.
-     * @param handler the handler to use when execution is blocked
-     * because the thread bounds and queue capacities are reached.
-     * @throws IllegalArgumentException if corePoolSize or
-     * keepAliveTime less than zero, or if maximumPoolSize less than or
-     * equal to zero, or if corePoolSize greater than maximumPoolSize.
-     * @throws NullPointerException if <tt>workQueue</tt>
-     * or <tt>handler</tt> are null.
-     */
-    public ThreadPoolExecutor(int corePoolSize,
-                              int maximumPoolSize,
-                              long keepAliveTime,
-                              TimeUnit unit,
-                              BlockingQueue<Runnable> workQueue,
-                              RejectedExecutionHandler handler) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
-             Executors.defaultThreadFactory(), handler);
     }
 
     /**
@@ -1801,10 +1725,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * is discarded.
      */
     public static class CallerRunsPolicy implements RejectedExecutionHandler {
-        /**
-         * Creates a <tt>CallerRunsPolicy</tt>.
-         */
-        public CallerRunsPolicy() { }
 
         /**
          * Executes task r in the caller's thread, unless the executor
@@ -1845,10 +1765,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * rejected task.
      */
     public static class DiscardPolicy implements RejectedExecutionHandler {
-        /**
-         * Creates a <tt>DiscardPolicy</tt>.
-         */
-        public DiscardPolicy() { }
 
         /**
          * Does nothing, which has the effect of discarding task r.
@@ -1865,10 +1781,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * is shut down, in which case the task is discarded.
      */
     public static class DiscardOldestPolicy implements RejectedExecutionHandler {
-        /**
-         * Creates a <tt>DiscardOldestPolicy</tt> for the given executor.
-         */
-        public DiscardOldestPolicy() { }
 
         /**
          * Obtains and ignores the next task that the executor

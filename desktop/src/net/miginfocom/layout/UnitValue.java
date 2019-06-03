@@ -460,11 +460,6 @@ public final class UnitValue implements Serializable
 		throw new IllegalArgumentException("Unknown keyword: " + unitStr);
 	}
 
-	final boolean isLinked()
-	{
-		return linkId != null;
-	}
-
 	final boolean isLinkedDeep()
 	{
 		if (subUnits == null)
@@ -493,29 +488,9 @@ public final class UnitValue implements Serializable
 		return subUnits != null ? subUnits.length : 0;
 	}
 
-	public final UnitValue[] getSubUnits()
-	{
-		return subUnits != null ? subUnits.clone() : null;
-	}
-
 	public final int getUnit()
 	{
 		return unit;
-	}
-
-	public final String getUnitString()
-	{
-		return unitStr;
-	}
-
-	public final int getOperation()
-	{
-		return oper;
-	}
-
-	public final float getValue()
-	{
-		return value;
 	}
 
 	public final boolean isHorizontal()
@@ -540,36 +515,6 @@ public final class UnitValue implements Serializable
 	public final int hashCode()
 	{
 		return (int) (value * 12345) + (oper >>> 5) + unit >>> 17;
-	}
-
-	/** Adds a global unit converter that can convert from some <code>unit</code> to pixels.
-	 * <p>
-	 * This converter will be asked before the platform converter so the values for it (e.g. "related" and "unrelated")
-	 * can be overridden. It is however not possible to override the built in ones (e.g. "mm", "pixel" or "lp").
-	 * @param conv The converter. Not <code>null</code>.
-	 */
-	public synchronized static void addGlobalUnitConverter(UnitConverter conv)
-	{
-		if (conv == null)
-			throw new NullPointerException();
-		CONVERTERS.add(conv);
-	}
-
-	/** Removed the converter.
-	 * @param unit The converter.
-	 * @return If there was a converter found and thus removed.
-	 */
-	public synchronized static boolean removeGlobalUnitConverter(UnitConverter unit)
-	{
-		return CONVERTERS.remove(unit);
-	}
-
-	/** Returns the global converters currently registered. The platform converter will not be in this list.
-	 * @return The converters. Never <code>null</code>.
-	 */
-	public synchronized static UnitConverter[] getGlobalUnitConverters()
-	{
-		return CONVERTERS.toArray(new UnitConverter[0]);
 	}
 
 	/** Returns the current default unit. The default unit is the unit used if no unit is set. E.g. "width 10".

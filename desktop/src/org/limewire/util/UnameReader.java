@@ -45,7 +45,6 @@ public final class UnameReader {
 			BufferedReader br = new BufferedReader(isr);
 
 			String line;
-			int exit = -1;
 
 			while ((line = br.readLine()) != null) {
 				output = line;

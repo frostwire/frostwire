@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * 
@@ -95,11 +94,9 @@ public final class TorrentSaveFolderComponent extends JPanel {
      * the Gnutella Save Folder.
      * 
      * This folder cannot also be a parent of the Gnutella Save folder.
-     * 
-     * @param gnutellaSaveFolders
-     * @return
+     *
      */
-    public static boolean isTorrentSaveFolderPathValid(boolean checkExist, File folder) {
+    private static boolean isTorrentSaveFolderPathValid(boolean checkExist, File folder) {
 
         if (checkExist) {
             //is folder useable
@@ -111,45 +108,14 @@ public final class TorrentSaveFolderComponent extends JPanel {
         String lowerCaseFolderPath = folder.getAbsolutePath().toLowerCase();
 
         //avoid user stupidity, do not save files anywhere in program files.
-        if (OSUtils.isWindows() && lowerCaseFolderPath.contains(System.getenv("ProgramFiles").toLowerCase())) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public static boolean isParentOrChild(File torrentFolder, File otherFolder, String errorMessageSuffix) {
-        //is folder inside gnutella save folder?
-        try {
-            if (torrentFolder.getCanonicalPath().startsWith(otherFolder.getCanonicalPath())) {
-                errorMessage = I18n.tr("The Torrent Data Folder cannot be inside the") +" "+ errorMessageSuffix;
-                return true;
-            }
-        } catch (IOException e) {
-            errorMessage = I18n.tr("Could not resolve folder path.");
-            return true;
-        }
-
-        //is folder a parent of the gnutella save folder?
-        try {
-            if (otherFolder.getCanonicalPath().startsWith(torrentFolder.getCanonicalPath())) {
-                errorMessage = I18n.tr("The Torrent Data Folder cannot be a parent folder of the") + " " + errorMessageSuffix;
-                return true;
-            }
-        } catch (IOException e) {
-            errorMessage = I18n.tr("Could not resolve folder path.");
-            return true;
-        }
-
-        return false;
-
+        return !OSUtils.isWindows() || !lowerCaseFolderPath.contains(System.getenv("ProgramFiles").toLowerCase());
     }
 
     private class DefaultAction extends AbstractAction {
 
         private static final long serialVersionUID = 7266666461649699221L;
 
-        public DefaultAction() {
+        DefaultAction() {
             putValue(Action.NAME, I18n.tr("Use Default"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Use the Default Folder"));
         }
@@ -163,7 +129,7 @@ public final class TorrentSaveFolderComponent extends JPanel {
 
         private static final long serialVersionUID = 2976380710515726420L;
 
-        public BrowseAction() {
+        BrowseAction() {
             putValue(Action.NAME, I18n.tr("Browse..."));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Choose Another Folder"));
         }

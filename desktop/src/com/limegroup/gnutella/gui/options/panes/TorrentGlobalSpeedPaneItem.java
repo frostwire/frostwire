@@ -43,7 +43,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
 
     private final JLabel DOWNLOAD_SLIDER_LABEL = new JLabel();
 
-    public final static String DESCRIPTION_UPLOAD_SPEED = "<html>"+I18n.tr("Set the Maximum BitTorrent upload speed in KB/s.")+"<p>"+ I18n.tr("Note: Too low upload speeds (leeching) could be penalized by some trackers, resulting in slower downloads.")+"</p></html>";
+    private final static String DESCRIPTION_UPLOAD_SPEED = "<html>"+I18n.tr("Set the Maximum BitTorrent upload speed in KB/s.")+"<p>"+ I18n.tr("Note: Too low upload speeds (leeching) could be penalized by some trackers, resulting in slower downloads.")+"</p></html>";
 
     /**
      * Speeds in Kilobytes/sec
@@ -52,8 +52,6 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     private JSlider UPLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
 
     private final JLabel UPLOAD_SLIDER_LABEL = new JLabel();
-
-    private String globalUploadSpeedConfigKey = "Max Upload Speed KBs";
 
     public TorrentGlobalSpeedPaneItem() {
         super(TITLE_DOWNLOAD_SPEED, DESCRIPTION_DOWNLOAD_SPEED);
@@ -153,7 +151,7 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         int newUpload = UPLOAD_SLIDER.getValue();
         int newDownload = DOWNLOAD_SLIDER.getValue();
 
@@ -166,18 +164,6 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
         if (newDownload == MAX_SLIDER_VALUE) {
             newDownload = 0;
         }
-
-        /**
-         //if you're trying to download
-         if (newUpload < (newDownload/3) && (newUpload != 0)) {
-         newUpload = (newDownload+1)/3;
-         }
-         //wanna receive? you gotta give.
-         else
-         if (newDownload == 0) {
-         newUpload = 0;
-         }
-         */
 
         BTEngine.getInstance().downloadRateLimit(newDownload * 1024);
         BTEngine.getInstance().uploadRateLimit(newUpload * 1024);

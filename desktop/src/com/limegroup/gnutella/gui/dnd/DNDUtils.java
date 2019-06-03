@@ -55,8 +55,7 @@ public class DNDUtils {
          * on limewire's JFrame is not a JComponent.
          * See TransferHandlerDropTargetListener to see how they are invoked
          */
-        DEFAULT_TRANSFER_HANDLERS = Collections.unmodifiableList(Arrays.asList(new MagnetTransferHandler(), new TorrentURITransferHandler(),
-                new TorrentFilesTransferHandler(), new SendFileTransferHandler()));
+        DEFAULT_TRANSFER_HANDLERS = List.of(new MagnetTransferHandler(), new TorrentURITransferHandler(), new TorrentFilesTransferHandler(), new SendFileTransferHandler());
 
         DEFAULT_TRANSFER_HANDLER = new MulticastTransferHandler(DEFAULT_TRANSFER_HANDLERS);
     }

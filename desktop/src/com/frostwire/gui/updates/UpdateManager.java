@@ -454,10 +454,4 @@ public final class UpdateManager implements Serializable {
             System.out.println(e);
         }
     }
-
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-    }
-
-    private void writeObject(ObjectOutputStream oos) throws IOException {
-    }
 }

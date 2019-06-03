@@ -83,10 +83,10 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
 
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
-        updateUIData((SeedingHolder) dataHolder, table, row, column);
+        updateUIData((SeedingHolder) dataHolder);
     }
 
-    private void updateUIData(SeedingHolder actionsHolder, JTable table, int row, int column) {
+    private void updateUIData(SeedingHolder actionsHolder) {
         if (actionsHolder != null) {
             dl = actionsHolder.getDl();
             boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);

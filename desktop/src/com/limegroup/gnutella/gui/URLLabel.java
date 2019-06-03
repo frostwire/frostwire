@@ -20,10 +20,7 @@ import com.limegroup.gnutella.gui.actions.LimeAction;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URI;
-import java.net.URL;
 
 /**
  * A label that has a clickable text. The text is rendered as an HTML link and
@@ -42,26 +39,7 @@ public class URLLabel extends JLabel  {
     private String text;
     
     private Color linkColor = UIManager.getColor("Label.foreground");
-    /**
-     * Constructs a new clickable label.
-     * 
-     * @param url the URL to open when the label is clicked
-     * @param display the label's text
-     */
-    public URLLabel(final URL url, final String display) {
-        this(url.toExternalForm(), display);
-    }
-    
-    /**
-     * Constructs a new clickable label.
-     * 
-     * @param uri the URL to open when the label is clicked
-     * @param display the label's text
-     */
-    public URLLabel(final URI uri, final String display) {
-        this(uri.toString(), display);
-    }
-    
+
     /**
      * Constructs a new clickable label with <code>url</code> as the
      * text.
@@ -84,35 +62,8 @@ public class URLLabel extends JLabel  {
         setToolTipText(url);
         installListener(GUIUtils.getURLInputListener(url));
     }
-    
-    
-    /**
-     * Constructs a new clickable label with an icon only.
-     * 
-     * @param url the URL to open when the label is clicked
-     * @param icon the icon to display
-     */    
-    public URLLabel(final String url, final Icon icon) {
-       this.url = url;
-       setText(null);
-       setIcon(icon);
-       setToolTipText(url);
-       installListener(GUIUtils.getURLInputListener(url));
-    }    
 
-   
 
-    /**
-     * Constructs a new clickable label whose text is in the hex color described.
-     * 
-     * @param action
-     * @param color
-     */
-    public URLLabel(Action action) {
-        setAction(action);
-       
-    }
-    
     @Override
     public void setText(String text) {
         this.text = text;

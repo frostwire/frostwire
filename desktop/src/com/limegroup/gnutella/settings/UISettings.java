@@ -31,13 +31,7 @@ public final class UISettings extends LimeProps {
      */
     public static final BooleanSetting AUTOCOMPLETE_ENABLED =
 		FACTORY.createBooleanSetting("AUTOCOMPLETE_ENABLED", true);
-		
-    /**
-     * Setting for search-result filters.
-     */
-    public static final BooleanSetting SEARCH_RESULT_FILTERS =
-        FACTORY.createBooleanSetting("SEARCH_RESULT_FILTERS", true);
-                                     
+
     /**
      * Setting for using small icons.
      */
@@ -51,24 +45,6 @@ public final class UISettings extends LimeProps {
         FACTORY.createBooleanSetting("UI_TEXT_WITH_ICONS", true);
 
     /**
-     * Setting for displaying smileys in chat window.
-     */
-    public static final BooleanSetting SMILEYS_IN_CHAT =
-        FACTORY.createBooleanSetting("UI_SMILEYS_IN_CHAT", true);        
-                       
-    /**
-     * Setting for not grouping search results in GUI
-     */
-    public static final BooleanSetting UI_GROUP_RESULTS =
-        FACTORY.createBooleanSetting("UI_GROUP_RESULTS", true);
-        
-    /**
-     * Setting to allow ignoring of alt-locs in replies.
-     */
-    public static final BooleanSetting UI_ADD_REPLY_ALT_LOCS =
-        FACTORY.createBooleanSetting("UI_ADD_REPLY_ALT_LOCS", true);
-        
-    /**
      * For people with bad eyes.
      */
     private static boolean isResolutionLow() {
@@ -76,19 +52,7 @@ public final class UISettings extends LimeProps {
         return screenSize.width <= 800 || screenSize.height <= 600;
     }
 
-    /**
-     * Setting to persist monitor check box state.
-     */
-    public static final BooleanSetting UI_MONITOR_SHOW_INCOMING_SEARCHES =
-        FACTORY.createBooleanSetting("UI_MONITOR_SHOW_INCOMING_SEARCHES", false);
-	
-	/**
-	 * Setting for the divider location between library tree and table.
-	 */
-	public static final IntSetting UI_LIBRARY_TREE_DIVIDER_LOCATION =
-		FACTORY.createIntSetting("UI_LIBRARY_TREE_DIVIDER_LOCATION", -1);
-	
-	public static final IntSetting UI_LIBRARY_MAIN_DIVIDER_LOCATION =
+    public static final IntSetting UI_LIBRARY_MAIN_DIVIDER_LOCATION =
 	        FACTORY.createIntSetting("UI_LIBRARY_MAIN_DIVIDER_LOCATION", -1);
 	
 	public static final IntSetting UI_LIBRARY_EXPLORER_DIVIDER_POSITION =

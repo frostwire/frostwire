@@ -63,23 +63,7 @@ public class Version implements Comparable<Version> {
         service = nums[2];
         revision = nums[3];
     }
-    
-    public int getMajor() {
-        return major;
-    }
-    
-    public int getMinor() {
-        return minor;
-    }
-    
-    public int getService() {
-        return service;
-    }
-    
-    public int getRevision() {
-        return revision;
-    }
-    
+
     /**
      * Returns the version.
      */
@@ -112,22 +96,7 @@ public class Version implements Comparable<Version> {
             
         return retVal;
     }
-    
-    /**
-     * Compares major.minor only.
-     * @param other
-     * @return >= 0 if this version is greater or equal.
-     */
-    public int compareMajorMinorTo(Version other) {
-        int retVal;
-        if(major == other.major)
-            retVal = minor - other.minor;
-        else
-            retVal = major - other.major;
-            
-        return retVal;
-    }
-    
+
     /**
      * Equality.
      */

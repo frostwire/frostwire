@@ -98,10 +98,10 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
 
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
-        updateUIData((TransferHolder) dataHolder, table, row, column);
+        updateUIData((TransferHolder) dataHolder);
     }
 
-    private void updateUIData(TransferHolder actionsHolder, JTable table, int row, int column) {
+    private void updateUIData(TransferHolder actionsHolder) {
         dl = actionsHolder.getDl();
         boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);
         labelShare.setIcon(canShareNow ? share_solid : share_faded);

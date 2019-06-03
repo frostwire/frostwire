@@ -107,7 +107,7 @@ class ShellFolderManager {
     }
 
     public void sortFiles(List<Object> files) {
-        Collections.sort(files, fileComparator);
+        files.sort(fileComparator);
     }
 
     private Comparator<Object> fileComparator = new Comparator<Object>() {

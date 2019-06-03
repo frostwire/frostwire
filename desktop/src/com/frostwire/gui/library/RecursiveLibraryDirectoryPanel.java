@@ -160,7 +160,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         this.roots.addAll(retainAncestors(newRoots));
 
         List<File> list = new ArrayList<>(roots);
-        Collections.sort(list, (o1, o2) -> {
+        list.sort((o1, o2) -> {
             if (o1.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
                 return -1;
             }

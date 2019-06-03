@@ -183,15 +183,7 @@ public class TorrentFetcherDownload implements BTDownload {
         return "";
     }
 
-    public boolean isDeleteTorrentWhenRemove() {
-        return false;
-    }
-
     public void setDeleteTorrentWhenRemove(boolean deleteTorrentWhenRemove) {
-    }
-
-    public boolean isDeleteDataWhenRemove() {
-        return false;
     }
 
     public void setDeleteDataWhenRemove(boolean deleteDataWhenRemove) {
