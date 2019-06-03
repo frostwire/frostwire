@@ -104,12 +104,9 @@ If you are developing in Windows we recommend you work with [MinGW](https://sour
 We also recommend you use [git for window's terminal](https://git-scm.com/download/win) instead of `cmd.exe`. All of our scripts will work as if you were working in Linux/Mac. Git's terminal supports window resizing, more convenient copying and pasting, `Tab` text completion, `Ctrl+R` reverse search, common bash keyboard shortcuts and basic GNU tools right out of the box.
 
 ### Android
-Go inside the `android` directory and type:
-`./gradlew assembleDebug`
+Build with Android studio or go inside the `android` directory and type:
+`./gradlew assembleDebug`, debug builds will be created inside the `android/build` folder.
 
-**Additional Android requirements**
-
-For Android developers we recommend working with [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) and the [Stand-Alone SDK Tools](http://developer.android.com/sdk/index.html#Other) (instead of Android Studio, which in our experience falls short if you want to also develop for our desktop client)
 
 ### License
 
