@@ -76,7 +76,7 @@ be part of the development team._
 
 # How to build
 
-To build you will need the [Java Developer Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html), [Apache Ant](http://ant.apache.org/) and [Gradle](http://gradle.org/)
+To build you will need the [Java Developer Kit 12](https://jdk.java.net/12/), [Apache Ant](http://ant.apache.org/) and [Gradle](http://gradle.org/)
 
 ### Desktop
 Go inside the `desktop` directory and type:
