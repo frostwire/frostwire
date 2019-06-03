@@ -19,20 +19,12 @@ package com.limegroup.gnutella.gui.init;
  * Signifies that an exception has occurred in applying a setting during
  * setup.
  */
-public class ApplySettingsException extends Exception {
+class ApplySettingsException extends Exception {
 
     /**
      * 
      */
     private static final long serialVersionUID = 6921739192150900295L;
-
-    /**
-     * Constructs an ApplySettingsException with <code>null</code>
-     * as its error detail message.
-     */
-    public ApplySettingsException() {
-        super();
-    }
 
     /**
      * Constructs an ApplySettingsException with the specified detail
@@ -42,7 +34,7 @@ public class ApplySettingsException extends Exception {
      *
      * @param   s   the detail message.
      */
-    public ApplySettingsException(String s) {
+    ApplySettingsException(String s) {
         super(s);
     }
 }

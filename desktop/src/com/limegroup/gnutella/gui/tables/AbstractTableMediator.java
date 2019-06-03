@@ -910,13 +910,6 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         return retval;
     }
 
-    /**
-     * Returns whether the table is resorting. 
-     */
-    boolean isResorting() {
-        return isResorting;
-    }
-
     protected TableCellRenderer getProgressBarRenderer() {
         if (PROGRESS_BAR_RENDERER == null) {
             PROGRESS_BAR_RENDERER = new ProgressBarRenderer();

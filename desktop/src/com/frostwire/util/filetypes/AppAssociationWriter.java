@@ -36,7 +36,6 @@ public interface AppAssociationWriter {
      */
     int USER_LEVEL = AppConstants.USER_LEVEL;
     int SYSTEM_LEVEL = AppConstants.SYSTEM_LEVEL;
-    int DEFAULT_LEVEL = AppConstants.DEFAULT_LEVEL;
 
     /**
      * Checks whether the given assocation is valid for registration according to 

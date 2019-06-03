@@ -175,11 +175,4 @@ public class AESemaphore {
         }
     }
 
-    public String
-    getString() {
-        synchronized (this) {
-
-            return ("value=" + dont_wait + ",waiting=" + waiting + ",res=" + total_reserve + ",rel=" + total_release);
-        }
-    }
 }

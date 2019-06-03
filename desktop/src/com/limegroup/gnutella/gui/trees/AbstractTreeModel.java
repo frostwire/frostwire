@@ -110,11 +110,6 @@ public abstract class AbstractTreeModel implements TreeModel {
 
     public abstract boolean isLeaf(Object node);
 
-    public void reload() {
-        Object[] path = new Object[] { getRoot() };
-        fireTreeStructureChanged(new TreeModelEvent(this, path));
-    }
-
     public void removeTreeModelListener(TreeModelListener l) {
         listenerList.remove(TreeModelListener.class, l);
     }

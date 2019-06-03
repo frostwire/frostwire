@@ -61,10 +61,4 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
         super.putValue(key, newValue);
     }
 
-    /**
-     * Swing thread-safe way to enable/disable the action from any thread. 
-     */
-    public void setEnabledLater(final boolean enabled) {
-        GUIMediator.safeInvokeLater(() -> setEnabled(enabled));
-    }
 }

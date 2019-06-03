@@ -36,22 +36,6 @@ public class AlphaIcon implements Icon {
   }
 
   /**
-   * Gets this <CODE>AlphaIcon</CODE>'s opacity
-   * @return the opacity, in the range 0.0 to 1.0
-   */
-  public float getAlpha() {
-    return alpha;
-  }
-
-  /**
-   * Gets the icon wrapped by this <CODE>AlphaIcon</CODE>
-   * @return the wrapped icon
-   */
-  public Icon getIcon() {
-    return icon;
-  }
-
-  /**
    * Paints the wrapped icon with this <CODE>AlphaIcon</CODE>'s transparency.
    *
    * @param c The component to which the icon is painted

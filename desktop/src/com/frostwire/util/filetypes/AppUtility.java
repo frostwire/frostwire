@@ -61,21 +61,6 @@ public class AppUtility {
     }
 
     /**
-     * Removes the leading '.' character from the specified file extension.
-     *
-     * @param fileExt the specified file extension.
-     * @return file extension without a leading '.' character.
-     */
-    public static String removeDotFromFileExtension(String fileExt) {
-        String temFileExt = fileExt;
-        if (fileExt.charAt(0) == '.') {
-            temFileExt = fileExt.substring(1, fileExt.length());
-        }
-        
-        return temFileExt;
-    }
-
-    /**
      * Adds one leading '.' character for the specified file extension.
      * If the leading '.' character already exists, it just returns. 
      *

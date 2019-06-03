@@ -97,19 +97,7 @@ public class Action {
     public String getDescription() {
         return description;
     }
-  
-    /**
-     * Sets the description field.
-     * <P>
-     * This field is optional for a valid action, and only used for Microsoft 
-     * Windows platforms.
-     * 
-     * @param description a given description value.
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-  
+
     /**
      * Returns the value of the verb field.
      * 
@@ -118,16 +106,7 @@ public class Action {
     public String getVerb() {
         return verb;
     }
-  
-    /**
-     * Sets the verb field.
-     * 
-     * @param verb a given verb value.
-     */
-    public void setVerb(String verb) {
-        this.verb = verb;
-    }
-  
+
     /**
      * Returns the value of the command field.
      *
@@ -136,16 +115,7 @@ public class Action {
     public String getCommand() {
         return command;
     }
-  
-    /**
-     * Sets the command field.
-     * 
-     * @param command a given command value.
-     */
-    public void setCommand(String command) {
-        this.command = command;
-    }
-  
+
     /**
      * Overrides the same method of <code>java.lang.Object</code>.
      * <p>
