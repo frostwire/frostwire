@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
 
 import org.limewire.util.OSUtils;
@@ -28,9 +45,6 @@ public final class SplashWindow {
      */
     private volatile StatusComponent glassPane;
 
-    /**  Constant handle to the label that represents the splash image. */
-    private volatile JLabel splashLabel;
-    
     /** The JWindow the splash uses. */
     private volatile JWindow splashWindow;
 
@@ -43,13 +57,13 @@ public final class SplashWindow {
     }    
     
     /** Determines if the splash is constructed. */
-    public static synchronized boolean isSplashConstructed() {
+    static synchronized boolean isSplashConstructed() {
         return INSTANCE != null;
     }
     
     private void initialize() {
         glassPane = new StatusComponent(15);
-        splashLabel = new JLabel() {
+        var splashLabel = new JLabel() {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
@@ -109,7 +123,7 @@ public final class SplashWindow {
         }
     }
     
-    private void paintOSIcon(String osName, boolean on, int x, int y, Graphics g) throws Throwable {
+    private void paintOSIcon(String osName, boolean on, int x, @SuppressWarnings("SameParameterValue") int y, Graphics g) throws Throwable {
         String prefix = "org/limewire/gui/images/";
         String suffix = "_desktop_splash.png";
         String on_off = on ? "on": "off";
@@ -140,7 +154,7 @@ public final class SplashWindow {
      *
      * @param text the text to display
      */
-    public void setStatusText(final String text) {
+    void setStatusText(final String text) {
         runLater(() -> {
             glassPane.setText(text);
             // force a redraw so the status is shown immediately,
@@ -149,20 +163,6 @@ public final class SplashWindow {
         });
     }
 
-    /**
-     * Refreshes the image on the SplashWindow based on the current theme.
-     * This method is used primarily during theme change.
-     */
-    public void refreshImage() {
-        runLater(() -> {
-            splashLabel.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(Main.getChosenSplashURL())));
-            glassPane.setVisible(false);
-            splashWindow.pack();
-            //  force redraw so that splash is drawn before rest of theme changes
-            splashLabel.paintImmediately(0, 0, splashLabel.getWidth(), splashLabel.getHeight());
-        });
-    }
-    
     private void runLater(Runnable runner) {
         if(initialized.get())
             GUIMediator.safeInvokeAndWait(runner);
@@ -180,7 +180,7 @@ public final class SplashWindow {
         runLater(() -> splashWindow.setVisible(b));
     }
 
-    public void toBack() {
+    void toBack() {
         runLater(() -> splashWindow.toBack());
     }
 }
