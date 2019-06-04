@@ -52,7 +52,7 @@ public class SQLiteDatabase {
         }
     }
 
-    public SQLiteDatabase(String path, Connection connection) {
+    SQLiteDatabase(String path, Connection connection) {
         this.path = path;
         this.connection = connection;
 
@@ -71,16 +71,14 @@ public class SQLiteDatabase {
     /**
      * Runs the provided SQL and returns a cursor over the result set.
      *
-     * @param cursorFactory the cursor factory to use, or null for the default factory
      * @param sql the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
      *     which will be replaced by the values from selectionArgs. The
      *     values will be bound as Strings.
-     * @param editTable the name of the first table, which is editable
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
-    public Cursor rawQueryWithFactory(CursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable) {
+    Cursor rawQueryWithFactory(String sql, String[] selectionArgs) {
         verifyDbIsOpen();
 
         Cursor cursor = null;
@@ -110,70 +108,13 @@ public class SQLiteDatabase {
      * It has no means to return any data (such as the number of affected rows).
      * Instead, you're encouraged to use {@link #insert(String, String, ContentValues)},
      * {@link #update(String, ContentValues, String, String[])}, et al, when possible.
-     * </p>
-     * <p>
-     * When using {@link #enableWriteAheadLogging()}, journal_mode is
-     * automatically managed by this class. So, do not set journal_mode
-     * using "PRAGMA journal_mode'<value>" statement if your app is using
-     * {@link #enableWriteAheadLogging()}
-     * </p>
-     *
+     * </p>*
      * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are
      * not supported.
      * @throws SQLException if the SQL string is invalid
      */
     public void execSQL(String sql) throws SQLException {
         executeSql(sql, null);
-    }
-
-    /**
-     * Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE.
-     * <p>
-     * For INSERT statements, use any of the following instead.
-     * <ul>
-     *   <li>{@link #insert(String, String, ContentValues)}</li>
-     *   <li>{@link #insertOrThrow(String, String, ContentValues)}</li>
-     *   <li>{@link #insertWithOnConflict(String, String, ContentValues, int)}</li>
-     * </ul>
-     * <p>
-     * For UPDATE statements, use any of the following instead.
-     * <ul>
-     *   <li>{@link #update(String, ContentValues, String, String[])}</li>
-     *   <li>{@link #updateWithOnConflict(String, ContentValues, String, String[], int)}</li>
-     * </ul>
-     * <p>
-     * For DELETE statements, use any of the following instead.
-     * <ul>
-     *   <li>{@link #delete(String, String, String[])}</li>
-     * </ul>
-     * <p>
-     * For example, the following are good candidates for using this method:
-     * <ul>
-     *   <li>ALTER TABLE</li>
-     *   <li>CREATE or DROP table / trigger / view / index / virtual table</li>
-     *   <li>REINDEX</li>
-     *   <li>RELEASE</li>
-     *   <li>SAVEPOINT</li>
-     *   <li>PRAGMA that returns no data</li>
-     * </ul>
-     * </p>
-     * <p>
-     * When using {@link #enableWriteAheadLogging()}, journal_mode is
-     * automatically managed by this class. So, do not set journal_mode
-     * using "PRAGMA journal_mode'<value>" statement if your app is using
-     * {@link #enableWriteAheadLogging()}
-     * </p>
-     *
-     * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are
-     * not supported.
-     * @param bindArgs only byte[], String, Long and Double are supported in bindArgs.
-     * @throws SQLException if the SQL string is invalid
-     */
-    public void execSQL(String sql, Object[] bindArgs) throws SQLException {
-        if (bindArgs == null) {
-            throw new IllegalArgumentException("Empty bindArgs");
-        }
-        executeSql(sql, bindArgs);
     }
 
     /**
@@ -321,36 +262,13 @@ public class SQLiteDatabase {
             if (statement != null) {
                 try {
                     statement.close();
-                } catch (Throwable e) {
+                } catch (Throwable ignored) {
                 }
             }
         }
     }
 
-    /**
-     * Finds the name of the first table, which is editable.
-     *
-     * @param tables a list of tables
-     * @return the first table listed
-     */
-    public static String findEditTable(String tables) {
-        if (!StringUtils.isEmpty(tables)) {
-            // find the first word terminated by either a space or a comma
-            int spacepos = tables.indexOf(' ');
-            int commapos = tables.indexOf(',');
-
-            if (spacepos > 0 && (spacepos < commapos || commapos < 0)) {
-                return tables.substring(0, spacepos);
-            } else if (commapos > 0 && (commapos < spacepos || spacepos < 0)) {
-                return tables.substring(0, commapos);
-            }
-            return tables;
-        } else {
-            throw new IllegalStateException("Invalid tables");
-        }
-    }
-
-    void verifyDbIsOpen() {
+    private void verifyDbIsOpen() {
         if (!isOpen()) {
             throw new IllegalStateException("database " + getPath() + " already closed");
         }
@@ -366,18 +284,5 @@ public class SQLiteDatabase {
             }
         }
         return statement;
-    }
-
-    /**
-     * Used to allow returning sub-classes of {@link Cursor} when calling query.
-     */
-    public interface CursorFactory {
-        /**
-         * See
-         * {@link SQLiteCursor#SQLiteCursor(SQLiteCursorDriver, String, SQLiteQuery)}.
-         */
-        //        public Cursor newCursor(SQLiteDatabase db,
-        //                SQLiteCursorDriver masterQuery, String editTable,
-        //                SQLiteQuery query);
     }
 }

@@ -19,7 +19,6 @@
 package com.frostwire.database.sqlite;
 
 import com.frostwire.content.Context;
-import com.frostwire.database.sqlite.SQLiteDatabase.CursorFactory;
 import com.frostwire.util.Logger;
 
 import java.io.File;
@@ -74,6 +73,7 @@ public abstract class SQLiteOpenHelper {
      * @param oldVersion The old database version.
      * @param newVersion The new database version.
      */
+    @SuppressWarnings("unused")
     public abstract void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
 
     private SQLiteDatabase openDatabase(String dbpath, String name, int version, String extraArgs) {

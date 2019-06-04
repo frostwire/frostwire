@@ -19,12 +19,6 @@ package com.frostwire.database;
 /**
  * An exception that indicates there was an error with SQL parsing or execution.
  */
-public class SQLException extends RuntimeException
-{
-    public SQLException() {}
+public class SQLException extends RuntimeException {
 
-    public SQLException(String error)
-    {
-        super(error);
-    }
 }
