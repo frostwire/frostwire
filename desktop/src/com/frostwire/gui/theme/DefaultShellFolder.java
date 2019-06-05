@@ -86,35 +86,10 @@ class DefaultShellFolder extends ShellFolder {
     }
 
     /**
-     * @return The shell folder linked to by this shell folder, or null
-     * if this shell folder is not a link
-     */
-    public ShellFolder getLinkLocation() {
-        return null; // Not supported by default
-    }
-
-    /**
      * @return The name used to display this shell folder
      */
     public String getDisplayName() {
         return getName();
     }
 
-    /**
-     * @return The type of shell folder as a string
-     */
-    public String getFolderType() {
-        if (isDirectory()) {
-            return "File Folder"; // TODO : LOCALIZE THIS STRING!!!
-        } else {
-            return "File"; // TODO : LOCALIZE THIS STRING!!!
-        }
-    }
-
-    /**
-     * @return The executable type as a string
-     */
-    public String getExecutableType() {
-        return null; // Not supported by default
-    }
 }

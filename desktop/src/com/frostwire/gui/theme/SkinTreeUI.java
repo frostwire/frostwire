@@ -32,6 +32,7 @@ import java.awt.event.MouseListener;
  * @author aldenml
  *
  */
+@SuppressWarnings("unused")
 public final class SkinTreeUI extends SynthTreeUI {
 
     private SkinMouseListener mouseListener;

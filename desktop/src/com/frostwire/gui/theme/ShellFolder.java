@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -52,7 +51,7 @@ abstract class ShellFolder extends File {
     /**
      * @return Whether this is a file system shell folder
      */
-    public boolean isFileSystem() {
+    boolean isFileSystem() {
         return (!getPath().startsWith("ShellFolder"));
     }
 
@@ -63,7 +62,6 @@ abstract class ShellFolder extends File {
      * <code>java.io.File</code> instead. If not, then the object is most likely
      * depending on some internal (native) state and cannot be serialized.
      *
-     * @returns a <code>java.io.File</code> replacement object, or <code>null</code>
      * if no suitable replacement can be found.
      */
     protected abstract Object writeReplace() throws java.io.ObjectStreamException;
@@ -141,25 +139,9 @@ abstract class ShellFolder extends File {
     public abstract boolean isLink();
 
     /**
-     * @return The shell folder linked to by this shell folder, or null
-     * if this shell folder is not a link
-     */
-    public abstract ShellFolder getLinkLocation();
-
-    /**
      * @return The name used to display this shell folder
      */
     public abstract String getDisplayName();
-
-    /**
-     * @return The type of shell folder as a string
-     */
-    public abstract String getFolderType();
-
-    /**
-     * @return The executable type as a string
-     */
-    public abstract String getExecutableType();
 
     /**
      * Compares this ShellFolder with the specified ShellFolder for order.
@@ -185,10 +167,9 @@ abstract class ShellFolder extends File {
     }
 
     /**
-     * @param getLargeIcon whether to return large icon (ignored in base implementation)
      * @return The icon used to display this shell folder
      */
-    public Image getIcon(boolean getLargeIcon) {
+    public Image getIcon() {
         return null;
     }
 
@@ -222,7 +203,7 @@ abstract class ShellFolder extends File {
      * Return a shell folder from a file object
      * @exception FileNotFoundException if file does not exist
      */
-    public static ShellFolder getShellFolder(File file) throws FileNotFoundException {
+    static ShellFolder getShellFolder(File file) throws FileNotFoundException {
         if (file instanceof ShellFolder) {
             return (ShellFolder)file;
         }
@@ -242,17 +223,9 @@ abstract class ShellFolder extends File {
     }
 
     /**
-     * Does <code>dir</code> represent a "computer" such as a node on the network, or
-     * "My Computer" on the desktop.
-     */
-    public static boolean isComputerNode(File dir) {
-        return shellFolderManager.isComputerNode(dir);
-    }
-
-    /**
      * @return Whether this is a file system root directory
      */
-    public static boolean isFileSystemRoot(File dir) {
+    private static boolean isFileSystemRoot(File dir) {
         return shellFolderManager.isFileSystemRoot(dir);
     }
 
@@ -260,7 +233,7 @@ abstract class ShellFolder extends File {
      * Canonicalizes files that don't have symbolic links in their path.
      * Normalizes files that do, preserving symbolic links from being resolved.
      */
-    public static File getNormalizedFile(File f) throws IOException {
+    static File getNormalizedFile(File f) throws IOException {
         File canonical = f.getCanonicalFile();
         if (f.equals(canonical)) {
             // path of f doesn't contain symbolic links
@@ -272,10 +245,6 @@ abstract class ShellFolder extends File {
     }
 
     // Override File methods
-
-    public static void sortFiles(List<Object> files) {
-        shellFolderManager.sortFiles(files);
-    }
 
     public boolean isAbsolute() {
         return (!isFileSystem() || super.isAbsolute());
@@ -358,19 +327,19 @@ abstract class ShellFolder extends File {
         return (isFileSystem() ? super.toString() : getDisplayName());
     }
 
-    public static ShellFolderColumnInfo[] getFolderColumns(File dir) {
+    static ShellFolderColumnInfo[] getFolderColumns(File dir) {
         return shellFolderManager.getFolderColumns(dir);
     }
 
-    public static Object getFolderColumnValue(File file, int column) {
+    static Object getFolderColumnValue(File file, int column) {
         return shellFolderManager.getFolderColumnValue(file, column);
     }
 
-    public ShellFolderColumnInfo[] getFolderColumns() {
+    ShellFolderColumnInfo[] getFolderColumns() {
         return null;
     }
 
-    public Object getFolderColumnValue(int column) {
+    Object getFolderColumnValue() {
         return null;
     }
 }

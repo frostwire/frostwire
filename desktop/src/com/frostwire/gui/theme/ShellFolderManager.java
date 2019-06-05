@@ -27,7 +27,6 @@ package com.frostwire.gui.theme;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +45,7 @@ class ShellFolderManager {
      * Create a shell folder from a file.
      * Override to return machine-dependent behavior.
      */
-    public ShellFolder createShellFolder(File file) {
+    ShellFolder createShellFolder(File file) {
         return new DefaultShellFolder(null, file);
     }
 
@@ -70,23 +69,24 @@ class ShellFolderManager {
      * @return An Object matching the key string.
      */
     public Object get(String key) {
-        if (key.equals("fileChooserDefaultFolder")) {
-            // Return the default shellfolder for a new filechooser
-            File homeDir = new File(System.getProperty("user.home"));
-            return createShellFolder(homeDir);
-        } else if (key.equals("roots")) {
-            // The root(s) of the displayable hieararchy
-            return File.listRoots();
-        } else if (key.equals("fileChooserComboBoxFolders")) {
-            // Return an array of ShellFolders representing the list to
-            // show by default in the file chooser's combobox
-            return get("roots");
-        } else if (key.equals("fileChooserShortcutPanelFolders")) {
-            // Return an array of ShellFolders representing well-known
-            // folders, such as Desktop, Documents, History, Network, Home, etc.
-            // This is used in the shortcut panel of the filechooser on Windows 2000
-            // and Windows Me
-            return new File[] { (File)get("fileChooserDefaultFolder") };
+        switch (key) {
+            case "fileChooserDefaultFolder":
+                // Return the default shellfolder for a new filechooser
+                File homeDir = new File(System.getProperty("user.home"));
+                return createShellFolder(homeDir);
+            case "roots":
+                // The root(s) of the displayable hieararchy
+                return File.listRoots();
+            case "fileChooserComboBoxFolders":
+                // Return an array of ShellFolders representing the list to
+                // show by default in the file chooser's combobox
+                return get("roots");
+            case "fileChooserShortcutPanelFolders":
+                // Return an array of ShellFolders representing well-known
+                // folders, such as Desktop, Documents, History, Network, Home, etc.
+                // This is used in the shortcut panel of the filechooser on Windows 2000
+                // and Windows Me
+                return new File[]{(File) get("fileChooserDefaultFolder")};
         }
         return null;
     }
@@ -95,18 +95,18 @@ class ShellFolderManager {
      * Does <code>dir</code> represent a "computer" such as a node on the network, or
      * "My Computer" on the desktop.
      */
-    public boolean isComputerNode(File dir) {
+    boolean isComputerNode() {
         return false;
     }
 
-    public boolean isFileSystemRoot(File dir) {
+    boolean isFileSystemRoot(File dir) {
         if (dir instanceof ShellFolder && !((ShellFolder)dir).isFileSystem()) {
             return false;
         }
         return (dir.getParentFile() == null);
     }
 
-    public void sortFiles(List<Object> files) {
+    void sortFiles(List<Object> files) {
         files.sort(fileComparator);
     }
 
@@ -155,7 +155,7 @@ class ShellFolderManager {
         }
     };
 
-    public ShellFolderColumnInfo[] getFolderColumns(File dir) {
+    ShellFolderColumnInfo[] getFolderColumns(File dir) {
         ShellFolderColumnInfo[] columns = null;
 
         if (dir instanceof ShellFolder) {
@@ -165,13 +165,13 @@ class ShellFolderManager {
         if (columns == null) {
             columns = new ShellFolderColumnInfo[]{
                 new ShellFolderColumnInfo(COLUMN_NAME, 150,
-                        SwingConstants.LEADING, true, null,
+                        SwingConstants.LEADING, true,
                         fileComparator),
                 new ShellFolderColumnInfo(COLUMN_SIZE, 75,
-                        SwingConstants.RIGHT, true, null,
+                        SwingConstants.RIGHT, true,
                         ComparableComparator.getInstance(), true),
                 new ShellFolderColumnInfo(COLUMN_DATE, 130,
-                        SwingConstants.LEADING, true, null,
+                        SwingConstants.LEADING, true,
                         ComparableComparator.getInstance(), true)
             };
         }
@@ -179,9 +179,9 @@ class ShellFolderManager {
         return columns;
     }
 
-    public Object getFolderColumnValue(File file, int column) {
+    Object getFolderColumnValue(File file, int column) {
         if (file instanceof ShellFolder) {
-            Object value = ((ShellFolder)file).getFolderColumnValue(column);
+            Object value = ((ShellFolder)file).getFolderColumnValue();
             if (value != null) {
                 return value;
             }

@@ -46,7 +46,7 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
     /**
      * Indicates a margin has been changed since we last released the mouse.
      */
-    protected boolean marginChanged;
+    private boolean marginChanged;
 
     /**
      * Constructs a new DefaultColumnPreferences object for this table.
@@ -252,7 +252,7 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                     if (listener != null)
                         listener.columnAdded(ltc, table);
                 }
-            } catch (LastColumnException impossible) {
+            } catch (LastColumnException ignored) {
             }
 
         }
@@ -406,21 +406,21 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
         TablesHandlerSettings.instance().save();
     }
 
-    protected void startListening() {
+    private void startListening() {
         table.getTableHeader().addMouseListener(this);
         table.getColumnModel().addColumnModelListener(this);
     }
 
-    protected void stopListening() {
+    private void stopListening() {
         table.getTableHeader().removeMouseListener(this);
         table.getColumnModel().removeColumnModelListener(this);
     }
 
-    protected LimeTableColumn getToColumn(TableColumnModelEvent e) {
+    private LimeTableColumn getToColumn(TableColumnModelEvent e) {
         return (LimeTableColumn) table.getColumnModel().getColumn(e.getToIndex());
     }
 
-    protected LimeTableColumn getFromColumn(TableColumnModelEvent e) {
+    private LimeTableColumn getFromColumn(TableColumnModelEvent e) {
         return (LimeTableColumn) table.getColumnModel().getColumn(e.getFromIndex());
     }
 

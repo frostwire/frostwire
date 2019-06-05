@@ -37,42 +37,31 @@ public class ShellFolderColumnInfo {
      * {@link SwingConstants#TRAILING}, {@link SwingConstants#CENTER}
      */
     private Integer alignment;
-    private SortOrder sortOrder;
     private Comparator<Object> comparator;
     /**
-     * <code>false</code> (default) if the {@link comparator} expects folders as arguments,
+     * <code>false</code> (default) if the comparator expects folders as arguments,
      * and <code>true</code> if folder's column values. The first option is used default for comparison
      * on Windows and also for separating files from directories when sorting using
      * ShellFolderManager's inner comparator.
      */
     private boolean compareByColumn;
 
-    public ShellFolderColumnInfo(String title, Integer width,
-                                 Integer alignment, boolean visible,
-                                 SortOrder sortOrder, Comparator<Object> comparator,
-                                 boolean compareByColumn) {
+    ShellFolderColumnInfo(String title, Integer width,
+                          Integer alignment, boolean visible,
+                          Comparator<Object> comparator,
+                          boolean compareByColumn) {
         this.title = title;
         this.width = width;
         this.alignment = alignment;
         this.visible = visible;
-        this.sortOrder = sortOrder;
         this.comparator = comparator;
         this.compareByColumn = compareByColumn;
     }
 
-    public ShellFolderColumnInfo(String title, Integer width,
-                                 Integer alignment, boolean visible,
-                                 SortOrder sortOrder, Comparator<Object> comparator) {
-        this(title, width, alignment, visible, sortOrder, comparator, false);
-    }
-
-    /**
-     * This constructor is used by native code when getting column set for
-     * a folder under Windows
-     */
-    public ShellFolderColumnInfo(String title, int width, int alignment,
-                                 boolean visible) {
-        this(title, width, alignment, visible, null, null);
+    ShellFolderColumnInfo(String title, Integer width,
+                          Integer alignment, boolean visible,
+                          Comparator<Object> comparator) {
+        this(title, width, alignment, visible, comparator, false);
     }
 
     public String getTitle() {
@@ -95,24 +84,12 @@ public class ShellFolderColumnInfo {
         return alignment;
     }
 
-    public void setAlignment(Integer alignment) {
-        this.alignment = alignment;
-    }
-
     public boolean isVisible() {
         return visible;
     }
 
     public void setVisible(boolean visible) {
         this.visible = visible;
-    }
-
-    public SortOrder getSortOrder() {
-        return sortOrder;
-    }
-
-    public void setSortOrder(SortOrder sortOrder) {
-        this.sortOrder = sortOrder;
     }
 
     public Comparator<Object> getComparator() {
@@ -123,11 +100,8 @@ public class ShellFolderColumnInfo {
         this.comparator = comparator;
     }
 
-    public boolean isCompareByColumn() {
+    boolean isCompareByColumn() {
         return compareByColumn;
     }
 
-    public void setCompareByColumn(boolean compareByColumn) {
-        this.compareByColumn = compareByColumn;
-    }
 }

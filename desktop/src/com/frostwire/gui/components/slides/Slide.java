@@ -58,9 +58,9 @@ public class Slide {
      * 
      * @param imgSrc - slide overlay image url
      * @param clickUrl - url where to take user on click (optional)
-     * @param durationInMilliseconds - for how long to show the overlay before autoswitching
+     * @param durationInMilliseconds - for how long to show the overlay before auto switching
      * @param torrentURL - .torrent file (optional)
-     * @param httpDownloadUrl - an http url where to download the file from (check downloadMethod on how to procede)
+     * @param httpDownloadUrl - an http url where to download the file from (check downloadMethod on how to proceed)
      * @param lang - language code in case you want to filter slides by language
      * @param OS - comma separated os names (windows,mac,linux,android)
      * @param theTitle - the title of this download (useful for download manager and human presentation)
@@ -75,7 +75,7 @@ public class Slide {
      * @param facebookURL - optional, related Facebook page url
      * @param twitterURL - optional, related Twitter page url
      * @param youtubeURL - optional, youtube channel
-     * @param instagramURL - optional, instagram feed
+     * @param instagramURL - optional, Instagram feed
      * @param slideFlags - these determine how the slide will behave
      */
     public Slide(String imgSrc, String clickUrl, long durationInMilliseconds, String torrentURL, String httpDownloadUrl, String lang, String OS, String theTitle, String theAuthor, long theSize, int downloadMethod, String md5hash, String saveAs,
