@@ -357,9 +357,7 @@ public final class SetupManager {
 
         InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(String.valueOf(FrostWireUtils.getBuildNumber()));
 
-        BackgroundExecutorService.schedule(() -> {
-            SettingsGroupManager.instance().save();
-        });
+        BackgroundExecutorService.schedule(() -> SettingsGroupManager.instance().save());
 
         if (_currentWindow instanceof IntentWindow) {
             IntentWindow intent = (IntentWindow) _currentWindow;
@@ -394,10 +392,6 @@ public final class SetupManager {
         window.handleWindowOpeningEvent();
         _setupWindowHolder.show(window.getKey());
         _currentWindow = window;
-    }
-
-    void add(SetupWindow window) {
-        _setupWindowHolder.add(window, window.getKey());
     }
 
     private abstract class LanguageAwareAction extends AbstractAction {

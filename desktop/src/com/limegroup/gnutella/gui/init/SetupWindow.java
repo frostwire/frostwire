@@ -33,12 +33,12 @@ abstract class SetupWindow extends JPanel {
     /**
      * The width of the setup window.
      */
-    public static final int SETUP_WIDTH = 700;
+    static final int SETUP_WIDTH = 700;
 
     /**
      * The height of the setup window.
      */
-    public static final int SETUP_HEIGHT = 520;
+    static final int SETUP_HEIGHT = 520;
 
     /**
      * Variable for the name of this window for use with <tt>CardLayout</tt>.
@@ -66,7 +66,7 @@ abstract class SetupWindow extends JPanel {
     /**
      * Constant handle to the setup manager mediator class.
      */
-    protected final SetupManager _manager;
+    final SetupManager _manager;
 
     /**
      * Creates a new setup window with the specified label.
@@ -89,7 +89,6 @@ abstract class SetupWindow extends JPanel {
      *  window
      * @param labelKey the key for locale-specific label to be displayed 
      *  in the window
-     * @param String where more info about this option exists
      */
     SetupWindow(SetupManager manager, String key, String labelKey, String moreInfoURL) {
         _manager = manager;
@@ -168,13 +167,6 @@ abstract class SetupWindow extends JPanel {
         return _key;
     }
 
-    /**
-     * Mutator for the labelKey.
-     */
-    protected void setLabelKey(String newKey) {
-        _labelKey = newKey;
-    }
-
     public Icon getIcon() {
         return null;
     }
@@ -200,7 +192,6 @@ abstract class SetupWindow extends JPanel {
     /**
      * Sets the next SetupWindow in the sequence.
      *
-     * @param previous the window to set as the previous window
      */
     public void setNext(SetupWindow next) {
         _next = next;
@@ -218,12 +209,12 @@ abstract class SetupWindow extends JPanel {
     /**
      * Called each time this window is opened.
      */
-    public void handleWindowOpeningEvent() {
+    void handleWindowOpeningEvent() {
         createWindow();
         _manager.enableActions(getAppropriateActions());
     }
 
-    protected int getAppropriateActions() {
+    int getAppropriateActions() {
         // always enable cancel
         int actions = SetupManager.ACTION_CANCEL;
 
@@ -262,10 +253,9 @@ abstract class SetupWindow extends JPanel {
      *
      * @param setupComponent the <tt>Component</tt> to add to this window
      */
-    protected void setSetupComponent(JComponent setupComponent) {
+    void setSetupComponent(JComponent setupComponent) {
         setupComponent.setBorder(new EmptyBorder(20, 10, 10, 10));
         add(setupComponent, BorderLayout.CENTER);
-        //revalidate();
         invalidate();
         validate();
     }
@@ -278,24 +268,16 @@ abstract class SetupWindow extends JPanel {
          *
          * @param s the <tt>String</tt> to display in the label
          */
-        public MultiLineLabel(String s) {
+        MultiLineLabel(String s) {
             setEditable(false);
             setLineWrap(true);
             setWrapStyleWord(true);
             setHighlighter(null);
-            //LookAndFeel.installBorder(this, "Label.border");
-            //LookAndFeel.installColorsAndFont(this, "Label.background", "Label.foreground", "Label.font");
-            //setSelectedTextColor(UIManager.getColor("Label.foreground"));
             setText(s);
         }
-
-        public MultiLineLabel() {
-            this(" ");
-        }
-
     }
 
-    public Dimension calculatePreferredSize() {
+    Dimension calculatePreferredSize() {
         createWindow();
         return getLayout().preferredLayoutSize(this);
     }

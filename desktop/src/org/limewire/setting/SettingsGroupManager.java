@@ -35,11 +35,7 @@ public final class SettingsGroupManager {
      */
     private final Collection<SettingsGroup> PROPS = Collections.synchronizedList(new ArrayList<>());
 
-    /**
-     * A list of {@link SettingsGroupManagerListener}s
-     */
-    private Collection<SettingsGroupManagerListener> listeners;
-    
+
     /**
      * The Executor for the Events
      */
@@ -47,81 +43,23 @@ public final class SettingsGroupManager {
     
     // never instantiate this class.
     private SettingsGroupManager() {}
-    
-    /**
-     * Registers a {@link SettingsGroupManagerListener}
-     */
-    public void addSettingsHandlerListener(SettingsGroupManagerListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingsGroupManagerListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners == null) {
-                listeners = new ArrayList<>();
-            }
-            listeners.add(l);
-        }        
-    }
-    
-    /**
-     * Removes a {@link SettingsGroupManagerListener}
-     */
-    public void removeSettingsHandlerListener(SettingsGroupManagerListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingsGroupManagerListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners != null) {
-                listeners.remove(l);
-                
-                if (listeners.isEmpty()) {
-                    listeners = null;
-                }
-            }
-        }
-    }
-    
+
     /**
      * Returns all {@link SettingsGroupManagerListener}s or null if there are none
      */
-    public SettingsGroupManagerListener[] getSettingsHandlerListeners() {
-        synchronized (this) {
-            if (listeners == null) {
-                return null;
-            }
-            
-            return listeners.toArray(new SettingsGroupManagerListener[0]);
-        }
+    private SettingsGroupManagerListener[] getSettingsHandlerListeners() {
+        return null;
     }
     
     /**
      * Adds a settings class to the list of factories that 
      * this handler will act upon.
      */
-    public void addSettingsGroup(SettingsGroup group) {
+    void addSettingsGroup(SettingsGroup group) {
         PROPS.add(group);
         fireSettingsHandlerEvent(EventType.SETTINGS_GROUP_ADDED, group);
     }
-    
-    /**
-     * Removes a settings class from the list of factories that
-     * this handler will act upon.
-     */
-    public void removeSettingsGroup(SettingsGroup group) {
-        if (PROPS.remove(group)) {
-            fireSettingsHandlerEvent(EventType.SETTINGS_GROUP_REMOVED, group);
-        }
-    }
 
-    /**
-     * Returns all {@link SettingsGroup}s that are currently registered
-     */
-    public SettingsGroup[] getSettingsGroups() {
-        return PROPS.toArray(new SettingsGroup[0]);
-    }
-    
     /**
      * Reload settings from both the property and configuration files.
      */
@@ -172,42 +110,18 @@ public final class SettingsGroupManager {
     }
     
     /**
-     * Mutator for shouldSave.
-     */
-    public void setShouldSave(boolean shouldSave) {
-        synchronized (PROPS) {
-            for (SettingsGroup group : PROPS) {
-                group.setShouldSave(shouldSave);
-            }
-        }
-        
-        fireSettingsHandlerEvent(EventType.SHOULD_SAVE, null);
-    }
-    
-    /**
      * Fires a SettingsHandlerEvent
      */
-    protected void fireSettingsHandlerEvent(EventType type, SettingsGroup group) {
+    private void fireSettingsHandlerEvent(EventType type, SettingsGroup group) {
         fireSettingsHandlerEvent(new SettingsGroupManagerEvent(type, this, group));
     }
     
     /**
      * Fires a SettingsHandlerEvent
      */
-    protected void fireSettingsHandlerEvent(final SettingsGroupManagerEvent evt) {
+    private void fireSettingsHandlerEvent(final SettingsGroupManagerEvent evt) {
         if (evt == null) {
             throw new NullPointerException("SettingsHandlerEvent is null");
-        }
-        
-        final SettingsGroupManagerListener[] listeners = getSettingsHandlerListeners();
-        if (listeners != null) {
-            Runnable command = () -> {
-                for (SettingsGroupManagerListener l : listeners) {
-                    l.handleGroupManagerEvent(evt);
-                }
-            };
-            
-            execute(command);
         }
     }
     
@@ -217,15 +131,5 @@ public final class SettingsGroupManager {
     protected void execute(Runnable evt) {
         executor.execute(evt);
     }
-    
-    /**
-     * Replaces the current Executor
-     */
-    public void setExecutor(Executor executor) {
-        if (executor == null) {
-            throw new NullPointerException("Executor is null");
-        }
-        
-        this.executor = executor;
-    }
-}    
+
+}

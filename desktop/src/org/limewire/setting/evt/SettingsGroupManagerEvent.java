@@ -71,29 +71,7 @@ public class SettingsGroupManagerEvent {
         this.manager = manager;
         this.group = group;
     }
-    
-    /**
-     * Returns the type of the event
-     */
-    public EventType getEventType() {
-        return type;
-    }
-    
-    /**
-     * Returns the SettingsHandler instance that triggered this event
-     */
-    public SettingsGroupManager getSettingsManager() {
-        return manager;
-    }
-    
-    /**
-     * The SettingsGroup instance that was added or removed. It's null in
-     * all other cases
-     */
-    public SettingsGroup getSettingsGroup() {
-        return group;
-    }
-    
+
     public String toString() {
         return type.toString();
     }

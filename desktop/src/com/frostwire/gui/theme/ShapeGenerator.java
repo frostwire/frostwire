@@ -206,7 +206,7 @@ public final class ShapeGenerator {
      *
      * @return a path representing the shape.
      */
-    public Shape createRoundRectangle(final int x, final int y, final int w, final int h, final CornerSize size) {
+    Shape createRoundRectangle(final int x, final int y, final int w, final int h, final CornerSize size) {
         return createRoundRectangle(x, y, w, h, size, CornerStyle.ROUNDED, CornerStyle.ROUNDED, CornerStyle.ROUNDED, CornerStyle.ROUNDED);
     }
 
@@ -236,59 +236,9 @@ public final class ShapeGenerator {
      *
      * @return a path representing the shape.
      */
-    public Shape createRoundRectangle(final int x, final int y, final int w, final int h, final CornerSize size, final CornerStyle topLeft,
-            final CornerStyle bottomLeft, final CornerStyle bottomRight, final CornerStyle topRight) {
+    private Shape createRoundRectangle(final int x, final int y, final int w, final int h, final CornerSize size, final CornerStyle topLeft,
+                                       final CornerStyle bottomLeft, final CornerStyle bottomRight, final CornerStyle topRight) {
         return createRoundRectangleInternal(x, y, w, h, size.getRadius(w, h), topLeft, bottomLeft, bottomRight, topRight);
-    }
-
-    /**
-     * Return a path for a rectangle with square corners and no right side. This
-     * is used for text fields that are part of a larger control, which is
-     * placed to their left, e.g. spinners and editable combo boxes.
-     *
-     * <p>This path is suitable for drawing, not for filling.</p>
-     *
-     * @param  x the X coordinate of the upper-left corner of the rectangle
-     * @param  y the Y coordinate of the upper-left corner of the rectangle
-     * @param  w the width of the rectangle
-     * @param  h the height of the rectangle
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createOpenRectangle(final int x, final int y, final int w, final int h) {
-        path.reset();
-        path.moveTo(x + w, y);
-        path.lineTo(x, y);
-        path.lineTo(x, y + h);
-        path.lineTo(x + w, y + h);
-
-        return path;
-    }
-
-    /**
-     * Return a path for a check mark.
-     *
-     * @param  x the X coordinate of the upper-left corner of the check mark
-     * @param  y the Y coordinate of the upper-left corner of the check mark
-     * @param  w the width of the check mark
-     * @param  h the height of the check mark
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createCheckMark(final int x, final int y, final int w, final int h) {
-        double xf = w / 12.0;
-        double hf = h / 12.0;
-
-        path.reset();
-        path.moveTo(x, y + 7.0 * hf);
-        path.lineTo(x + 2.0 * xf, y + 7.0 * hf);
-        path.lineTo(x + 4.75 * xf, y + 10.0 * hf);
-        path.lineTo(x + 9.0 * xf, y);
-        path.lineTo(x + 11.0 * xf, y);
-        path.lineTo(x + 5.0 * xf, y + 12.0 * hf);
-        path.closePath();
-
-        return path;
     }
 
     /**
@@ -301,71 +251,11 @@ public final class ShapeGenerator {
      *
      * @return a path representing the shape.
      */
-    public Shape createArrowLeft(final double x, final double y, final double w, final double h) {
+    Shape createArrowLeft(final double x, final double y, final double w, final double h) {
         path.reset();
         path.moveTo(x + w, y);
         path.lineTo(x, y + h / 2.0);
         path.lineTo(x + w, y + h);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for an arrow pointing to the right.
-     *
-     * @param  x the X coordinate of the upper-left corner of the arrow
-     * @param  y the Y coordinate of the upper-left corner of the arrow
-     * @param  w the width of the arrow
-     * @param  h the height of the arrow
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createArrowRight(final double x, final double y, final double w, final double h) {
-        path.reset();
-        path.moveTo(x, y);
-        path.lineTo(x + w, y + h / 2);
-        path.lineTo(x, y + h);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for an arrow pointing up.
-     *
-     * @param  x the X coordinate of the upper-left corner of the arrow
-     * @param  y the Y coordinate of the upper-left corner of the arrow
-     * @param  w the width of the arrow
-     * @param  h the height of the arrow
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createArrowUp(final double x, final double y, final double w, final double h) {
-        path.reset();
-        path.moveTo(x, y + h);
-        path.lineTo(x + w / 2, y);
-        path.lineTo(x + w, y + h);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for an arrow pointing down.
-     *
-     * @param  x the X coordinate of the upper-left corner of the arrow
-     * @param  y the Y coordinate of the upper-left corner of the arrow
-     * @param  w the width of the arrow
-     * @param  h the height of the arrow
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createArrowDown(final double x, final double y, final double w, final double h) {
-        path.reset();
-        path.moveTo(x, y);
-        path.lineTo(x + w / 2, y + h);
-        path.lineTo(x + w, y);
         path.closePath();
 
         return path;
@@ -381,7 +271,7 @@ public final class ShapeGenerator {
      *
      * @return a path representing the shape.
      */
-    public Shape createProgressBarIndeterminatePattern(int x, int y, int w, int h) {
+    Shape createProgressBarIndeterminatePattern(int x, int y, int w, int h) {
       final double wHalf   = w / 2.0;
       final double xOffset = 5;
       path.reset();
@@ -393,96 +283,6 @@ public final class ShapeGenerator {
       path.closePath();
 
         return path;
-    }
-
-    /**
-     * Return a path for a rounded internal drop shadow. This is used for
-     * progress bar tracks and search fields.
-     *
-     * @param  x the X coordinate of the upper-left corner of the shadow
-     * @param  y the Y coordinate of the upper-left corner of the shadow
-     * @param  w the width of the shadow
-     * @param  h the height of the rectangle
-     *
-     * @return a path representing the shadow.
-     */
-    public Shape createInternalDropShadowRounded(final int x, final int y, final int w, final int h) {
-        final double radius = h / 2;
-        final int    right  = x + w;
-        final double bottom = y + radius;
-
-        path.reset();
-
-        // Upper edge.
-        path.moveTo(x, bottom);
-        path.quadTo(x, y, x + radius, y);
-        path.lineTo(right - radius, y);
-        path.quadTo(right, y, right, bottom);
-
-        // Lower edge.
-        path.lineTo(right - 1, bottom);
-        path.quadTo(right - 2, y + 2, right - radius - 1, y + 2);
-        path.lineTo(x + radius + 1, y + 2);
-        path.quadTo(x + 2, y + 2, x + 1, bottom);
-
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a focus rectangle.
-     *
-     * <p>This path is suitable for filling.</p>
-     *
-     * @param  x the X coordinate of the upper-left corner of the rectangle
-     * @param  y the Y coordinate of the upper-left corner of the rectangle
-     * @param  w the width of the rectangle
-     * @param  h the height of the rectangle
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createFillableFocusRectangle(int x, int y, int w, int h) {
-        final int right  = x + w;
-        final int bottom = y + h;
-
-        path.reset();
-        path.moveTo(x, y);
-        path.lineTo(x, bottom);
-        path.lineTo(right, bottom);
-        path.lineTo(right, y);
-
-        final float offset = 1.4f;
-
-        final float left2   = x + offset;
-        final float top2    = y + offset;
-        final float right2  = right - offset;
-        final float bottom2 = bottom - offset;
-
-        // TODO These two lines were curveTo in Nimbus. Perhaps we should
-        // revisit this?
-        path.lineTo(right2, y);
-        path.lineTo(right2, bottom2);
-        path.lineTo(left2, bottom2);
-        path.lineTo(left2, top2);
-        path.lineTo(right2, top2);
-        path.lineTo(right2, y);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a simple bullet.
-     *
-     * @param  x        the X coordinate of the upper-left corner of the bullet
-     * @param  y        the Y coordinate of the upper-left corner of the bullet
-     * @param  diameter the diameter of the bullet
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createBullet(int x, int y, int diameter) {
-        return createEllipseInternal(x, y, diameter, diameter);
     }
 
     /**
@@ -498,241 +298,6 @@ public final class ShapeGenerator {
         return createEllipseInternal(x, y, diameter, diameter);
     }
 
-    /**
-     * Return a path for a continuous slider thumb's concentric sections.
-     *
-     * @param  x        the X coordinate of the upper-left corner of the section
-     * @param  y        the Y coordinate of the upper-left corner of the section
-     * @param  diameter the diameter of the section
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createSliderThumbContinuous(final int x, final int y, final int diameter) {
-        return createEllipseInternal(x, y, diameter, diameter);
-    }
-
-    /**
-     * Return a path for a discrete slider thumb's concentric sections.
-     *
-     * @param  x    the X coordinate of the upper-left corner of the section
-     * @param  y    the Y coordinate of the upper-left corner of the section
-     * @param  w    the width of the section
-     * @param  h    the height of the section
-     * @param  size the CornerSize representing the rounding amount for the
-     *              section
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createSliderThumbDiscrete(final int x, final int y, final int w, final int h, final CornerSize size) {
-        final double topArc     = size.getRadius(w, h);
-        final double bottomArcH = size == CornerSize.INTERIOR ? 0 : 1;
-        final double bottomArcW = 3;
-
-        path.reset();
-        path.moveTo(x, y + topArc);
-        path.quadTo(x, y, x + topArc, y);
-        path.lineTo(x + w - topArc, y);
-        path.quadTo(x + w, y, x + w, y + topArc);
-        path.lineTo(x + w, y + h / 2.0);
-        path.quadTo(x + w - bottomArcW, y + h - bottomArcH, x + w / 2.0, y + h);
-        path.quadTo(x + bottomArcW, y + h - bottomArcH, x, y + h / 2.0);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a "cancel" icon. This is a circle with a punched out
-     * "x" in it.
-     *
-     * @param  x the X coordinate of the upper-left corner of the icon
-     * @param  y the Y coordinate of the upper-left corner of the icon
-     * @param  w the width of the icon
-     * @param  h the height of the icon
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createCancelIcon(int x, int y, int w, int h) {
-        final double xMid = x + w / 2.0;
-        final double yMid = y + h / 2.0;
-
-        // Draw the circle.
-        path.reset();
-        path.moveTo(xMid, y);
-        path.quadTo(x, y, x, yMid);
-        path.quadTo(x, y + h, xMid, y + h);
-        path.quadTo(x + w, y + h, x + w, yMid);
-        path.quadTo(x + w, y, xMid, y);
-        path.closePath();
-
-        final double xOffsetL = w / 2.0 - 3;
-        final double xOffsetS = w / 2.0 - 4;
-        final double yOffsetL = h / 2.0 - 3;
-        final double yOffsetS = h / 2.0 - 4;
-        final double offsetC  = 1.5;
-
-        // Erase the "x" with an inner subpath.
-        path.moveTo(xMid, yMid - offsetC);
-        path.lineTo(xMid + xOffsetS, yMid - yOffsetL);
-        path.lineTo(yMid + xOffsetL, yMid - yOffsetS);
-        path.lineTo(xMid + offsetC, yMid);
-        path.lineTo(xMid + xOffsetL, yMid + yOffsetS);
-        path.lineTo(xMid + xOffsetS, yMid + yOffsetL);
-        path.lineTo(xMid, yMid + offsetC);
-        path.lineTo(xMid - xOffsetS, yMid + yOffsetL);
-        path.lineTo(xMid - xOffsetL, yMid + yOffsetS);
-        path.lineTo(xMid - offsetC, yMid);
-        path.lineTo(xMid - xOffsetL, yMid - yOffsetS);
-        path.lineTo(xMid - xOffsetS, yMid - yOffsetL);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a "cancel" icon. This is a circle with a punched out
-     * "x" in it.
-     *
-     * @param  x the X coordinate of the upper-left corner of the icon
-     * @param  y the Y coordinate of the upper-left corner of the icon
-     * @param  w the width of the icon
-     * @param  h the height of the icon
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createTabCloseIcon(int x, int y, int w, int h) {
-        final double xMid = x + w / 2.0;
-        final double yMid = y + h / 2.0;
-
-        path.reset();
-
-        final double xOffsetL = w / 2.0;
-        final double xOffsetS = w / 2.0 - 1;
-        final double yOffsetL = h / 2.0;
-        final double yOffsetS = h / 2.0 - 1;
-        final double offsetC  = 1;
-
-        path.moveTo(xMid, yMid - offsetC);
-        path.lineTo(xMid + xOffsetS, yMid - yOffsetL);
-        path.lineTo(yMid + xOffsetL, yMid - yOffsetS);
-        path.lineTo(xMid + offsetC, yMid);
-        path.lineTo(xMid + xOffsetL, yMid + yOffsetS);
-        path.lineTo(xMid + xOffsetS, yMid + yOffsetL);
-        path.lineTo(xMid, yMid + offsetC);
-        path.lineTo(xMid - xOffsetS, yMid + yOffsetL);
-        path.lineTo(xMid - xOffsetL, yMid + yOffsetS);
-        path.lineTo(xMid - offsetC, yMid);
-        path.lineTo(xMid - xOffsetL, yMid - yOffsetS);
-        path.lineTo(xMid - xOffsetS, yMid - yOffsetL);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a scroll bar cap. This is used when the buttons are
-     * placed together at the opposite end of the scroll bar.
-     *
-     * @param  x the X coordinate of the upper-left corner of the cap
-     * @param  y the Y coordinate of the upper-left corner of the cap
-     * @param  w the width of the cap
-     * @param  h the height of the cap
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createScrollCap(int x, int y, int w, int h) {
-        path.reset();
-        path.moveTo(x, y);
-        path.lineTo(x, y + h);
-        path.lineTo(x + w, y + h);
-        addScrollGapPath(x, y, w, h, true);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a scroll bar button. This is used when the buttons are
-     * placed apart at opposite ends of the scroll bar. This is a common shape
-     * that is transformed to the appropriate button.
-     *
-     * @param  x the X coordinate of the upper-left corner of the button
-     * @param  y the Y coordinate of the upper-left corner of the button
-     * @param  w the width of the button
-     * @param  h the height of the button
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createScrollButtonApart(int x, int y, int w, int h) {
-        path.reset();
-        path.moveTo(x, y);
-        path.lineTo(x, y + h);
-        path.lineTo(x + w, y + h);
-        addScrollGapPath(x, y, w, h, true);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a scroll bar decrease button. This is used when the
-     * buttons are placed together at one end of the scroll bar.
-     *
-     * @param  x the X coordinate of the upper-left corner of the button
-     * @param  y the Y coordinate of the upper-left corner of the button
-     * @param  w the width of the button
-     * @param  h the height of the button
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createScrollButtonTogetherDecrease(int x, int y, int w, int h) {
-        path.reset();
-        path.moveTo(x + w, y);
-        path.lineTo(x + w, y + h);
-        path.lineTo(x, y + h);
-        addScrollGapPath(x, y, w, h, false);
-        path.closePath();
-
-        return path;
-    }
-
-    /**
-     * Return a path for a scroll bar increase button. This is used when the
-     * buttons are placed together at one end of the scroll bar.
-     *
-     * @param  x the X coordinate of the upper-left corner of the button
-     * @param  y the Y coordinate of the upper-left corner of the button
-     * @param  w the width of the button
-     * @param  h the height of the button
-     *
-     * @return a path representing the shape.
-     */
-    public Shape createScrollButtonTogetherIncrease(int x, int y, int w, int h) {
-        return createRectangle(x, y, w, h);
-    }
-
-    /**
-     * Adds a hemispherical section to the current path. This is used to create
-     * the gap in a scroll bar button or cap into which the scroll bar thumb
-     * will fit.
-     *
-     * @param x        the X coordinate of the upper-left corner of the button
-     *                 or cap
-     * @param y        the Y coordinate of the upper-left corner of the button
-     *                 or cap
-     * @param w        the width of the button or cap
-     * @param h        the height of the button or cap
-     * @param isAtLeft {@code true} if the gap is at the left end of the button,
-     *                 {@code false} if it is at the right.
-     */
-    private void addScrollGapPath(int x, int y, int w, int h, boolean isAtLeft) {
-        final double hHalf    = h / 2.0;
-        final double wFull    = isAtLeft ? w : 0;
-        final double wHalfOff = isAtLeft ? w - hHalf : hHalf;
-
-        path.quadTo(x + wHalfOff, y + h, x + wHalfOff, y + hHalf);
-        path.quadTo(x + wHalfOff, y, x + wFull, y);
-    }
 
     /**
      * Return a path for an ellipse.
