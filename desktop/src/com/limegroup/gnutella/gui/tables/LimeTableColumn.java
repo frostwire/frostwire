@@ -233,7 +233,7 @@ public class LimeTableColumn extends TableColumn {
     private TableCellRenderer getInvisSortRenderer() {
         if (INVIS_RENDERER == null) {
             SortHeaderRenderer rnd = new SortHeaderRenderer();
-            rnd.setAllowIcon(false);
+            rnd.setAllowIcon();
             INVIS_RENDERER = rnd;
         }
         return INVIS_RENDERER;

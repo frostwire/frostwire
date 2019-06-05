@@ -72,7 +72,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
         } else {
             setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
         }
-        updateUI((SourceHolder) value, table, row);
+        updateUI((SourceHolder) value, table);
 
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
     }
@@ -91,7 +91,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
         addMouseListener(mouseAdapter);
     }
 
-    private void updateUI(SourceHolder value, JTable table, int row) {
+    private void updateUI(SourceHolder value, JTable table) {
         sourceHolder = value;
         updateIcon();
         updateLinkLabel(table);

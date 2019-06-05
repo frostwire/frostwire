@@ -29,8 +29,8 @@ import java.awt.*;
 
 public final class SortHeaderRenderer extends DefaultTableCellRenderer {
 
-    public static Icon ASCENDING;
-    public static Icon DESCENDING;
+    private static Icon ASCENDING;
+    private static Icon DESCENDING;
 
     static {
         setupIcons();
@@ -38,14 +38,14 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
 
     private boolean allowIcon = true;
 
-    public SortHeaderRenderer() {
+    SortHeaderRenderer() {
         setHorizontalAlignment(CENTER);
         setIconTextGap(2); // reduce from the default of 4 pixels
         setHorizontalTextPosition(LEFT);
     }
 
-    public void setAllowIcon(boolean allow) {
-        allowIcon = allow;
+    void setAllowIcon() {
+        allowIcon = false;
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {

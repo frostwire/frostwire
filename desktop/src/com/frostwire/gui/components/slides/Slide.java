@@ -1,20 +1,20 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.frostwire.gui.components.slides;
 
@@ -32,27 +32,27 @@ public class Slide {
     public static final int SLIDE_DOWNLOAD_METHOD_OPEN_URL = 0;
 
     /** Download using the torrent URL */
-    public static final int SLIDE_DOWNLOAD_METHOD_TORRENT = 1;
+    static final int SLIDE_DOWNLOAD_METHOD_TORRENT = 1;
 
     /** Download via HTTP */
-    public static final int SLIDE_DOWNLOAD_METHOD_HTTP = 2;
+    static final int SLIDE_DOWNLOAD_METHOD_HTTP = 2;
 
+    @SuppressWarnings("unused")
     public static final int POST_DOWNLOAD_UNZIP = 1;
+    @SuppressWarnings("unused")
     public static final int POST_DOWNLOAD_DELETE_ZIP_FILE = 1 << 1;
-    public static final int POST_DOWNLOAD_EXECUTE = 1 << 2;
-    public static final int PREVIEW_AUDIO_USING_FWPLAYER = 1 << 3;
-    public static final int PREVIEW_AUDIO_USING_BROWSER = 1 << 4;
-    public static final int PREVIEW_VIDEO_USING_FWPLAYER = 1 << 5;
+    static final int POST_DOWNLOAD_EXECUTE = 1 << 2;
+    static final int PREVIEW_AUDIO_USING_FWPLAYER = 1 << 3;
+    static final int PREVIEW_AUDIO_USING_BROWSER = 1 << 4;
+    static final int PREVIEW_VIDEO_USING_FWPLAYER = 1 << 5;
+    @SuppressWarnings("unused")
     public static final int PREVIEW_VIDEO_USING_BROWSER = 1 << 6;
-    public static final int SHOW_AUDIO_PREVIEW_BUTTON = 1 << 7;
-    public static final int SHOW_VIDEO_PREVIEW_BUTTON = 1 << 8;
+    static final int SHOW_AUDIO_PREVIEW_BUTTON = 1 << 7;
+    static final int SHOW_VIDEO_PREVIEW_BUTTON = 1 << 8;
     public static final int OPEN_CLICK_URL_ON_DOWNLOAD = 1 << 9;
-    public static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
+    static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
+    @SuppressWarnings("unused")
     public static final int IS_ADVERTISEMENT = 1 << 11;
-
-    public Slide() {
-
-    }
 
     /**
      * 
@@ -69,7 +69,6 @@ public class Slide {
      * @param downloadMethod - what to do with the slide.
      * @param md5hash - optional, string with md5 hash of the finished http download
      * @param saveAs - optional, name of the file if downloaded via http
-     * @param executionParameters - parameters to pass to executable download
      * @param includeTheseVersions - comma separated versions that are not supposed to see this slide.
      * @param audioPreviewURL - HTTP URL of audio file so user can preview before download.
      * @param videoPreviewURL - HTTP URL of video file (youtube maybe) so user can preview promo.
@@ -79,8 +78,8 @@ public class Slide {
      * @param instagramURL - optional, instagram feed
      * @param slideFlags - these determine how the slide will behave
      */
-    public Slide(String imgSrc, String clickUrl, long durationInMilliseconds, String torrentURL, String httpDownloadUrl, String lang, String OS, String theTitle, String theAuthor, long theSize, int downloadMethod, String md5hash, String saveAs, String executionParameters,
-            String includeTheseVersions, String audioPreviewURL, String videoPreviewURL, String facebookURL, String twitterURL, String youtubeURL, String instagramURL, int slideFlags) {
+    public Slide(String imgSrc, String clickUrl, long durationInMilliseconds, String torrentURL, String httpDownloadUrl, String lang, String OS, String theTitle, String theAuthor, long theSize, int downloadMethod, String md5hash, String saveAs,
+                 String includeTheseVersions, String audioPreviewURL, String videoPreviewURL, String facebookURL, String twitterURL, String youtubeURL, String instagramURL, int slideFlags) {
         imageSrc = imgSrc;
         clickURL = clickUrl;
         duration = durationInMilliseconds;
@@ -94,7 +93,7 @@ public class Slide {
         method = downloadMethod;
         md5 = md5hash;
         saveFileAs = saveAs;
-        executeParameters = executionParameters;
+        /* If != null && execute, pass these parameters to the finished downloaded file. */
         includedVersions = includeTheseVersions;
         audioURL = audioPreviewURL;
         videoURL = videoPreviewURL;
@@ -108,7 +107,7 @@ public class Slide {
     /**
      * http address where to go if user clicks on this slide
      */
-    public String clickURL;
+    String clickURL;
 
     /**
      * url of torrent file that should be opened if user clicks on this slide
@@ -123,7 +122,7 @@ public class Slide {
     /**
      * url of image that will be displayed on this slide
      */
-    public String imageSrc;
+    String imageSrc;
 
     /**
      * length of time this slide will be shown
@@ -140,7 +139,7 @@ public class Slide {
     public String language;
 
     /**
-     * os (optional filter) = Can be given in the forms of commq separated:
+     * os (optional filter) = Can be given in the forms of comma separated:
      * windows
      * mac
      * linux
@@ -174,37 +173,34 @@ public class Slide {
     /** If != null, rename file to this file name. */
     public String saveFileAs;
 
-    /** If != null && execute, pass these parameters to the finished downloaded file. */
-    public String executeParameters;
-
     /** Comma separated list of versions that should not use this */
-    public String includedVersions;
+    String includedVersions;
 
     /** audio file url so user can play preview/promotional audio for promo. */
-    public String audioURL;
+    String audioURL;
 
     /** video file url so frostwire player can be opened, could be a youtube url, player
      * should default to high quality playback */
-    public String videoURL;
+    String videoURL;
 
     /** Facebook page associated with slide */
-    public String facebook;
+    String facebook;
 
     /** Twitter page associated with slide */
     public String twitter;
 
     /** Youtube channel */
-    public String youtube;
+    String youtube;
 
     /** Instagram feed */
-    public String instagram;
+    String instagram;
 
     /** Use these flags to determine how the slide will behave. */
     public int flags;
     
     public PaymentOptions paymentOptions;
 
-    public boolean hasFlag(int flag) {
+    boolean hasFlag(int flag) {
         return (flags & flag) == flag;
     }
 }

@@ -25,30 +25,25 @@ import java.awt.*;
  */
 public class SortArrowIcon implements Icon {
   public static final int NONE = 0;
-  public static final int DESCENDING = 1;
-  public static final int ASCENDING = 2;
+  static final int DESCENDING = 1;
+  static final int ASCENDING = 2;
 
-  protected int direction;
+  int direction;
   protected int width = 8;
   protected int height = 8;
   
   private static final Icon DESCENDING_ICON = new SortArrowIcon(DESCENDING);
   private static final Icon ASCENDING_ICON = new SortArrowIcon(ASCENDING);
-  private static final Icon NONE_ICON = new SortArrowIcon(NONE);
   
-  public static Icon getAscendingIcon() {
+  static Icon getAscendingIcon() {
     return ASCENDING_ICON;
   }
   
-  public static Icon getDescendingIcon() {
+  static Icon getDescendingIcon() {
     return DESCENDING_ICON;
   }
-  
-  public static Icon getNoneIcon() {
-    return NONE_ICON;
-  }
-  
-  public SortArrowIcon(int direction) {
+
+  SortArrowIcon(int direction) {
     this.direction = direction;
   }
   
@@ -66,8 +61,8 @@ public class SortArrowIcon implements Icon {
 
     Color bg = c.getBackground();
     // Compute two good contrasting shades of the background colors
-    Color light = null;
-    Color shade = null;
+    Color light;
+    Color shade;
     if (bg.getRed() >= 0xFC && bg.getGreen() >= 0xFC && bg.getBlue() >= 0xFC) {
       light = bg.darker();
       shade = light.darker();
