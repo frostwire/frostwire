@@ -112,40 +112,6 @@ public abstract class AbstractSetting implements Setting {
         loadValue(defaultValue);
 	}
     
-	/* (non-Javadoc)
-     * @see org.limewire.setting.Setting#addSettingListener(org.limewire.setting.evt.SettingListener)
-     */
-	public void addSettingListener(SettingListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners == null) {
-                listeners = new ArrayList<>();
-            }
-            listeners.add(l);
-        }        
-    }
-    
-	/* (non-Javadoc)
-     * @see org.limewire.setting.Setting#removeSettingListener(org.limewire.setting.evt.SettingListener)
-     */
-    public void removeSettingListener(SettingListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners != null) {
-                listeners.remove(l);
-                if (listeners.isEmpty()) {
-                    listeners = null;
-                }
-            }
-        }
-    }
-    
     /* (non-Javadoc)
      * @see org.limewire.setting.Setting#getSettingListeners()
      */

@@ -60,21 +60,7 @@ public class SettingEvent {
         this.type = type;
         this.setting = setting;
     }
-    
-    /**
-     * Returns the type of the event  
-     */
-    public EventType getEventType() {
-        return type;
-    }
-    
-    /**
-     * Returns the Setting that triggered the event
-     */
-    public Setting getSetting() {
-        return setting;
-    }
-    
+
     public String toString() {
         return type + ": " + setting;
     }

@@ -31,19 +31,16 @@ public class TableSettings {
     /**
      * The setting for whether or not to display tooltips.
      */
-    public BooleanSetting DISPLAY_TOOLTIPS;
-    
-    /**
-     * The id of this settings object.
-     */
-    private final String ID;
-    
+    BooleanSetting DISPLAY_TOOLTIPS;
+
     /**
      * Constructs a new TableSettings whose settings
      * are identified by the specified ID.
      */
     public TableSettings(String id) {
-        ID = id;
+        /*
+          The id of this settings object.
+         */
         REAL_TIME_SORT = FACTORY.createBooleanSetting(id + SORT, getDefaultSorting());
         DISPLAY_TOOLTIPS = FACTORY.createBooleanSetting(id + TOOLTIP, getDefaultTooltips());
     }
@@ -51,7 +48,7 @@ public class TableSettings {
     /**
      * Returns the default value for sorting.
      */
-    protected boolean getDefaultSorting() {
+    private boolean getDefaultSorting() {
         return true;
     }
     

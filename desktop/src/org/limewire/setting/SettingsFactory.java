@@ -112,17 +112,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     
     /** Whether or not expirable settings have expired. */
     private boolean expired = false;
-    
-    /**
-     * Creates a new <tt>SettingsFactory</tt> instance with the specified file
-     * to read from and write to.
-     *
-     * @param settingsFile the file to read from and to write to
-     */
-    public SettingsFactory(File settingsFile) {
-        this(settingsFile, "");
-    }
-    
+
     /**
      * Creates a new <tt>SettingsFactory</tt> instance with the specified file
      * to read from and write to.
@@ -386,8 +376,8 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * @param key the key for the setting
      * @param defaultValue the default value for the setting
      */
-    public synchronized ByteSetting createByteSetting(String key, 
-                                                      byte defaultValue) {
+    synchronized ByteSetting createByteSetting(String key,
+                                               byte defaultValue) {
         ByteSetting result = 
              new ByteSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
         handleSettingInternal(result, null);

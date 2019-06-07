@@ -4,7 +4,6 @@ import org.limewire.setting.evt.SettingsGroupEvent;
 import org.limewire.setting.evt.SettingsGroupEvent.EventType;
 import org.limewire.setting.evt.SettingsGroupListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -21,40 +20,6 @@ public abstract class AbstractSettingsGroup implements SettingsGroup {
      * Value for whether or not settings should be saved to file.
      */
     private volatile boolean shouldSave = true;
-    
-    /* (non-Javadoc)
-     * @see org.limewire.setting.SettingsGroup#addSettingsGroupListener(org.limewire.setting.evt.SettingsGroupListener)
-     */
-    public void addSettingsGroupListener(SettingsGroupListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingsGroupListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners == null) {
-                listeners = new ArrayList<>();
-            }
-            listeners.add(l);
-        }        
-    }
-    
-    /* (non-Javadoc)
-     * @see org.limewire.setting.SettingsGroup#removeSettingsGroupListener(org.limewire.setting.evt.SettingsGroupListener)
-     */
-    public void removeSettingsGroupListener(SettingsGroupListener l) {
-        if (l == null) {
-            throw new NullPointerException("SettingsGroupListener is null");
-        }
-        
-        synchronized (this) {
-            if (listeners != null) {
-                listeners.remove(l);
-                if (listeners.isEmpty()) {
-                    listeners = null;
-                }
-            }
-        }
-    }
 
     /**
      * Returns all {@link SettingsGroupListener}s or null if there are none
@@ -68,17 +33,7 @@ public abstract class AbstractSettingsGroup implements SettingsGroup {
             return listeners.toArray(new SettingsGroupListener[0]);
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.limewire.setting.SettingsGroup#setShouldSave(boolean)
-     */
-    public void setShouldSave(boolean shouldSave) {
-        if (this.shouldSave != shouldSave) {
-            this.shouldSave = shouldSave;
-            fireSettingsEvent(EventType.SHOULD_SAVE);
-        }
-    }
-    
+
     /* (non-Javadoc)
      * @see org.limewire.setting.SettingsGroup#getShouldSave()
      */

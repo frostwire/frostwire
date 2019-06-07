@@ -9,16 +9,6 @@ import org.limewire.setting.evt.SettingListener;
 public interface Setting {
 
     /**
-     * Registers a {@link SettingListener}
-     */
-    void addSettingListener(SettingListener l);
-
-    /**
-     * Removes a {@link SettingListener}
-     */
-    void removeSettingListener(SettingListener l);
-
-    /**
      * Returns all {@link SettingListener}s or null of there are none
      */
     SettingListener[] getSettingListeners();
