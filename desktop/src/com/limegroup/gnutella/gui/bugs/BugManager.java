@@ -9,6 +9,7 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import org.apache.commons.io.IOUtils;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
+import org.limewire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
@@ -129,10 +130,10 @@ public final class BugManager {
         
         //Get the classpath
         StringBuilder classPath = new StringBuilder();
-        ClassLoader sysClassLoader = ClassLoader.getSystemClassLoader();
-        URL[] urls = ((URLClassLoader)sysClassLoader).getURLs();
-        for (URL url : urls) {
-            classPath.append("  ").append(url.getFile()).append("\n");
+        String classPathSeparator = OSUtils.isWindows() ? ";" : ":";
+        String[] classpaths = System.getProperty("java.class.path").split(classPathSeparator);
+        for (String classpath : classpaths) {
+            classPath.append("  ").append(classpath).append("\n");
         }       
           
         // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
