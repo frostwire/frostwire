@@ -4,7 +4,6 @@ import org.limewire.setting.evt.SettingEvent;
 import org.limewire.setting.evt.SettingEvent.EventType;
 import org.limewire.setting.evt.SettingListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -18,7 +17,6 @@ import java.util.Properties;
  * method to {@link SettingsFactory} to create an instance of the setting. 
  * For example, subclass {@link IntSetting}, <code>SettingsFactory</code> has 
  * {@link SettingsFactory#createIntSetting(String, int)} and
- * {@link SettingsFactory#createRemoteIntSetting(String, int, String, int, int)}.
  * <p>
  * <code>AbstractSetting</code> includes an abstract method to load a <code>String</code>
  * into the key-value property. You are responsible to convert the 
@@ -56,23 +54,23 @@ public abstract class AbstractSetting implements Setting {
 	/**
 	 * Protected default <tt>Properties</tt> instance for subclasses.
 	 */
-	protected final Properties DEFAULT_PROPS;
+	private final Properties DEFAULT_PROPS;
 
 	/**
 	 * Protected <tt>Properties</tt> instance containing properties for any
 	 * subclasses.
 	 */
-	protected final Properties PROPS;
+	private final Properties PROPS;
 
 	/**
 	 * The constant key for this property, specified upon construction.
 	 */
-	protected final String KEY;
+	private final String KEY;
 
 	/**
 	 * Constant for the default value for this <tt>Setting</tt>.
 	 */
-	protected final String DEFAULT_VALUE;
+	final String DEFAULT_VALUE;
     
 	/**
 	 * Value for whether or not this setting should always save.
@@ -97,7 +95,6 @@ public abstract class AbstractSetting implements Setting {
 	 *
 	 * @param key the key for the setting
 	 * @param defaultValue the defaultValue for the setting
-	 * @throws <tt>IllegalArgumentException</tt> if the key for this 
 	 *  setting is already contained in the map of default settings
 	 */
 	protected AbstractSetting(Properties defaultProps, Properties props, String key, 
@@ -250,14 +247,14 @@ public abstract class AbstractSetting implements Setting {
     /**
      * Fires a SettingEvent
      */
-    protected void fireSettingEvent(EventType type) {
+    private void fireSettingEvent(EventType type) {
         fireSettingEvent(new SettingEvent(type, this));
     }
     
     /**
      * Fires a SettingEvent
      */
-    protected void fireSettingEvent(final SettingEvent evt) {
+    private void fireSettingEvent(final SettingEvent evt) {
         if (evt == null) {
             throw new NullPointerException("SettingEvent is null");
         }

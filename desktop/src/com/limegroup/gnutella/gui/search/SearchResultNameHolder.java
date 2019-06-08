@@ -17,7 +17,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 
 import java.util.HashSet;
@@ -29,18 +28,16 @@ import java.util.HashSet;
  * 
  */
 final class SearchResultNameHolder extends NameHolder {
-    private final UISearchResult sr;
     private final String displayName;
 
     SearchResultNameHolder(final UISearchResult sr) {
         super(buildHTMLString(sr));
-        this.sr = sr;
         this.displayName = sr.getDisplayName();
     }
 
-    public int compareTo(SearchResultNameHolder o) {
-        return AbstractTableMediator.compare(sr.getDisplayName(), o.sr.getDisplayName());
-    }
+//    public int compareTo(SearchResultNameHolder o) {
+//        return AbstractTableMediator.compare(sr.getDisplayName(), o.sr.getDisplayName());
+//    }
 
     public String toString() {
         return displayName;

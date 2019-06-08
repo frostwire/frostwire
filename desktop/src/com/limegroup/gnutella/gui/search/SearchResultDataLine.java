@@ -24,9 +24,7 @@ import com.limegroup.gnutella.gui.tables.SizeHolder;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 /** 
  * A single line of a search result.
@@ -41,11 +39,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * The SearchResult that created this particular line.
      */
     private UISearchResult RESULT;
-
-    /**
-     * The list of other SearchResults that match this line.
-     */
-    private List<UISearchResult> _otherResults;
 
     /**
      * The media type of this document.
@@ -102,26 +95,8 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     /**
      * Returns the NamedMediaType.
      */
-    public NamedMediaType getNamedMediaType() {
+    NamedMediaType getNamedMediaType() {
         return _mediaType;
-    }
-
-    /**
-     * Gets the other results for this line.
-     */
-    List<UISearchResult> getOtherResults() {
-        if (_otherResults == null) {
-            return Collections.emptyList();
-        } else {
-            return _otherResults;
-        }
-    }
-
-    /**
-     * Determines if this line is launchable.
-     */
-    boolean isLaunchable() {
-        return false;
     }
 
     /**
@@ -166,13 +141,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      */
     public double getSize() {
         return RESULT.getSize();
-    }
-
-    /**
-     * Returns the vendor code of the result.
-     */
-    String getVendor() {
-        return RESULT.getSource();
     }
 
     /**
@@ -249,7 +217,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      *         is the same kind as <code>line</code>'s, e.g. one from
      *         gnutella and one from gnutella
      */
-    public final boolean isSameKindAs(SearchResultDataLine line) {
+    final boolean isSameKindAs(SearchResultDataLine line) {
         return getSearchResult().getClass().equals(line.getSearchResult().getClass());
     }
 
@@ -258,7 +226,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * 
      * @return the underlying search result
      */
-    public final UISearchResult getSearchResult() {
+    final UISearchResult getSearchResult() {
         return RESULT;
     }
 

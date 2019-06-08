@@ -269,16 +269,6 @@ public final class LocalClientInfo extends LocalAbstractInfo {
     }
 
     /**
-     * @return compact printout of the list of parameters
-     */
-    public String getShortParamList() {
-        StringBuilder sb = new StringBuilder(2000);
-        for (NameValuePair nvp : getPostRequestParams())
-            sb.append(nvp.name).append("=").append(nvp.value).append("\n");
-        return sb.toString();
-    }
-
-    /**
      * Appends a NameValuePair of k/v to l if v is non-null.
      */
     private void append(List<? super NameValuePair> l, final String k, final String v) {

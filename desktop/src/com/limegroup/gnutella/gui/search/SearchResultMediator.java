@@ -386,10 +386,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
 
-    void selectSchemaBoxByMediaType(NamedMediaType type) {
-        schemaBox.selectMediaType(type);
-    }
-
     /**
      * Gets the query of the search.
      */
@@ -409,13 +405,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     boolean isStopped() {
         return token == 0;
-    }
-
-    /**
-     * Determines if this is empty.
-     */
-    boolean isEmpty() {
-        return DATA_MODEL.getRowCount() == 0;
     }
 
     /**

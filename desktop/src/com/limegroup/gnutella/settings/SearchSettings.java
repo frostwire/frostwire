@@ -46,21 +46,21 @@ public final class SearchSettings extends LimeProps {
         // Characters that turn into ';'
         '\u037E', // GREEK QUESTION MARK
         '\uFE54', // SMALL SEMICOLON
-        '\uFF1B', // FULLWIDTH SEMICOLON
+        '\uFF1B', // FULL WIDTH SEMICOLON
 
         // Characters that turn into '!'
         '\u203C', // DOUBLE EXCLAMATION MARK
         '\u2048', // QUESTION EXCLAMATION MARK
         '\u2049', // EXCLAMATION QUESTION MARK
         '\uFE57', // SMALL EXCLAMATION MARK
-        '\uFF01', // FULLWIDTH EXCLAMATION MARK
+        '\uFF01', // FULL WIDTH EXCLAMATION MARK
 
         // Characters that turn into '?'
         '\u2047', // DOUBLE QUESTION MARK
         // '\u2048', // QUESTION EXCLAMATION MARK (see '!')
         // '\u2049', // EXCLAMATION QUESTION MARK (see '!')
         '\uFE56', // SMALL QUESTION MARK
-        '\uFF1F', // FULLWIDTH QUESTION MARK
+        '\uFF1F', // FULL WIDTH QUESTION MARK
 
         // Characters that turn into '('
         '\u207D', // SUPERSCRIPT LEFT PARENTHESIS
@@ -251,9 +251,8 @@ public final class SearchSettings extends LimeProps {
         '\uFF5C', // FULLWIDTH VERTICAL LINE
     };
 
-    public static final int DISPLAY_JUNK_IN_PLACE = 0;
-    public static final int MOVE_JUNK_TO_BOTTOM = 1;
-    public static final int HIDE_JUNK = 2;
+    private static final int MOVE_JUNK_TO_BOTTOM = 1;
+    private static final int HIDE_JUNK = 2;
 
     /**
      * Setting for the characters that are not allowed in search strings
@@ -267,12 +266,6 @@ public final class SearchSettings extends LimeProps {
     public static final IntSetting MAX_QUERY_LENGTH =
         FACTORY.createIntSetting("MAX_QUERY_LENGTH", 512);
 
-    /**
-	 * The minimum speed for search results to display.
-	 */
-    public static final IntSetting MINIMUM_SEARCH_SPEED =
-        FACTORY.createIntSetting("MINIMUM_SEARCH_SPEED", 0);
-    
     public static final int MAXIMUM_PARALLEL_SEARCH = 10;
     
     /**
@@ -291,7 +284,7 @@ public final class SearchSettings extends LimeProps {
     /**
      * The display mode for junk search results
      */    
-    public static final IntSetting DISPLAY_JUNK_MODE =
+    private static final IntSetting DISPLAY_JUNK_MODE =
         FACTORY.createIntSetting("DISPLAY_JUNK_MODE", HIDE_JUNK);
     
     public static boolean moveJunkToBottom() {

@@ -25,7 +25,7 @@ public class SearchInformation {
     /**
      * A keyword search.
      */
-    public static final int KEYWORD = 0;
+    private static final int KEYWORD = 0;
     
     /**
      * The kind of search this is.
@@ -73,32 +73,7 @@ public class SearchInformation {
 			MediaType media) {
 		this(type, query, xml, media, null);
 	}
-    
-    /**
-     * Creates a new keyword, but state is loaded from Map generated
-     * by {@link toMap()}.
-     * @param map The map with storred state.
-     * @see toMap()
-     * @see fromMap(Map)
-     */
-    private SearchInformation(Map<?, ?> map) {
-        Integer type = (Integer) map.get(MAP_TYPE);
-        if ( type == null )
-            throw new NullPointerException("null type");
-        this.type = type;
 
-        query = (String) map.get(MAP_QUERY);
-        xml   = (String) map.get(MAP_XML);
-        media = (MediaType) map.get(MAP_MEDIA);
-        title = (String) map.get(MAP_TITLE);
-
-        if(media == null)
-            throw new NullPointerException("null media");
-        if(query == null)
-            throw new NullPointerException("null query");
-    }
-    
-    
     /**
      * Creates a keyword search.
      */
@@ -110,12 +85,7 @@ public class SearchInformation {
 	
 	/**
 	 * Creates a keyword search with a title different from the query string.
-	 * @param query
-	 * @param xml
-	 * @param media
-	 * @param title
-	 * @return
-	 */
+     */
 	public static SearchInformation createTitledKeywordSearch(String query,
 			String xml, MediaType media, String title) {
 		return new SearchInformation(KEYWORD, query, xml, media, title);
@@ -128,13 +98,6 @@ public class SearchInformation {
         return query;
     }
 
-    /**
-     * Retrieves the MediaType of the search.
-     */
-    public MediaType getMediaType() {
-        return media;
-    }
-    
 	public String getTitle() {
 		return title;
 	}
@@ -162,10 +125,9 @@ public class SearchInformation {
      * Converts state storred in the object into map. In this way, state
      * can be storred in classes unawre of this class existance.
      * @return A map which holds parameters of the class.
-     * @see fromMap()
      * @see SearchInformation(Map)
      */
-    public Map<String, Serializable> toMap() {
+    private Map<String, Serializable> toMap() {
         Map<String, Serializable> map = new HashMap<>(5);
         map.put(MAP_TYPE, type);
         map.put(MAP_QUERY, query);

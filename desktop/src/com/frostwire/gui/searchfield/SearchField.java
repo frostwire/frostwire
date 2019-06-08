@@ -55,7 +55,7 @@ public class SearchField extends JXSearchField {
     /**
      * Undoes the last action.
      */
-    public void undo() {
+    private void undo() {
         try {
             if (undoManager != null)
                 undoManager.undoOrRedo();
@@ -64,16 +64,9 @@ public class SearchField extends JXSearchField {
     }
 
     /**
-     * Sets the UndoManager (but does NOT add it to the document).
-     */
-    public void setUndoManager(UndoManager undoer) {
-        undoManager = undoer;
-    }
-
-    /**
      * Gets the undo manager.
      */
-    public UndoManager getUndoManager() {
+    private UndoManager getUndoManager() {
         return undoManager;
     }
 
@@ -182,14 +175,14 @@ public class SearchField extends JXSearchField {
         /**
          * Constructs a new FieldAction looking up the name from the MessagesBundles.
          */
-        public FieldAction(String name) {
+        FieldAction(String name) {
             super(I18n.tr(name));
         }
 
         /**
          * Gets the LimeTextField for the given ActionEvent.
          */
-        protected SearchField getField(ActionEvent e) {
+        SearchField getField(ActionEvent e) {
             JMenuItem source = (JMenuItem) e.getSource();
             JPopupMenu menu = (JPopupMenu) source.getParent();
             return (SearchField) menu.getInvoker();
@@ -263,41 +256,10 @@ public class SearchField extends JXSearchField {
     //----------------------------------------------------------------------------
 
     /**
-    * Set the dictionary that autocomplete lookup should be performed by.
-    *
-    * @param dict The dictionary that will be used for the autocomplete lookups.
-    */
-    public void setDictionary(AutoCompleteDictionary dict) {
-        // lazily create the listeners
-        if (this.dict == null)
-            setUp();
-        this.dict = dict;
-    }
-
-    /**
-    * Gets the dictionary currently used for lookups.
-    *
-    * @return dict The dictionary that will be used for the autocomplete lookups.
-    */
-    public AutoCompleteDictionary getDictionary() {
-        return dict;
-    }
-
-    /**
     * Creates the default dictionary object
     */
-    public AutoCompleteDictionary createDefaultDictionary() {
+    AutoCompleteDictionary createDefaultDictionary() {
         return new StringTrieSet(true);
-    }
-
-    /**
-    * Sets whether the component is currently performing autocomplete lookups as
-    * keystrokes are performed.
-    *
-    * @param val True or false.
-    */
-    public void setAutoComplete(boolean val) {
-        UISettings.AUTOCOMPLETE_ENABLED.setValue(val);
     }
 
     /**
@@ -306,7 +268,7 @@ public class SearchField extends JXSearchField {
     *
     * @return True or false.
     */
-    public boolean getAutoComplete() {
+    boolean getAutoComplete() {
         return UISettings.AUTOCOMPLETE_ENABLED.getValue();
     }
 
@@ -324,20 +286,6 @@ public class SearchField extends JXSearchField {
         dict.addEntry(getText().trim());
     }
 
-    /**
-     * Adds the specified string to the underlying dictionary
-     */
-    public void addToDictionary(String s) {
-        if (!getAutoComplete())
-            return;
-
-        if (dict == null) {
-            setUp();
-            this.dict = createDefaultDictionary();
-        }
-        dict.addEntry(s.trim());
-    }
-
     //----------------------------------------------------------------------------
     // Protected methods
     //----------------------------------------------------------------------------
@@ -351,7 +299,7 @@ public class SearchField extends JXSearchField {
     //----------------------------------------------------------------------------
     // Fields
     //----------------------------------------------------------------------------
-    protected AutoCompleteDictionary dict;
+    AutoCompleteDictionary dict;
 
     /// from ClearableAutoComplete
 
@@ -451,7 +399,7 @@ public class SearchField extends JXSearchField {
     //----------------------------------------------------------------------------
 
     // overwritten to disable
-    protected void setUp() {
+    private void setUp() {
     }
 
     /**
@@ -482,7 +430,7 @@ public class SearchField extends JXSearchField {
     /**
      * Fills the popup with text & shows it.
      */
-    protected void showPopup(Iterator<String> iter) {
+    void showPopup(Iterator<String> iter) {
         getPopupComponent(); // construct the component.
 
         boolean different = false;
@@ -511,7 +459,7 @@ public class SearchField extends JXSearchField {
     /**
      * Shows the popup.
      */
-    public void showPopup() {
+    private void showPopup() {
         // only show the popup if we're currently visible.
         // due to delay in focus-forwarding & key-pressing events,
         // we may not be visible by the time this is called.
@@ -574,13 +522,13 @@ public class SearchField extends JXSearchField {
     // Fields
     //----------------------------------------------------------------------------
     /** The list auto-completable items are shown in */
-    protected AutoCompleteList entryList;
+    AutoCompleteList entryList;
     /** The panel the popup is shown in. */
-    protected JPanel entryPanel;
+    JPanel entryPanel;
     /** The popup the scroll pane is in */
     protected Popup popup;
     /** Whether or not we tried to show a popup while this wasn't showing */
-    protected boolean showPending;
+    private boolean showPending;
 
     /**
      * Component that clears the history of the dictionary when clicked.
@@ -618,7 +566,7 @@ public class SearchField extends JXSearchField {
         private static final long serialVersionUID = -7324769835640667828L;
         private String currentText;
 
-        public AutoCompleteList() {
+        AutoCompleteList() {
             super();
             enableEvents(AWTEvent.MOUSE_EVENT_MASK);
             setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -700,7 +648,7 @@ public class SearchField extends JXSearchField {
      * Subclass that provides access to the constructor.
      */
     private static class MyPopup extends Popup {
-        public MyPopup(Component owner, Component contents, int x, int y) {
+        MyPopup(Component owner, Component contents, int x, int y) {
             super(owner, contents, x, y);
         }
     }

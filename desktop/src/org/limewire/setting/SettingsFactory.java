@@ -37,7 +37,6 @@ import java.util.Properties;
  * method to <code>SettingsFactory</code> to create an instance of the setting.
  * For example, subclass {@link IntSetting}, <code>SettingsFactory</code> has 
  * {@link #createIntSetting(String, int)} and
- * {@link #createRemoteIntSetting(String, int, String, int, int)}.
  * <p>
  * An example of creating an {@link IntSetting} that uses setting.txt, without the key 
  * MAX_MESSAGE_SIZE previously included:
@@ -99,10 +98,10 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     private final String HEADING;
 
     /** <tt>Properties</tt> instance for the default values. */
-    protected final Properties DEFAULT_PROPS = new Properties();
+    private final Properties DEFAULT_PROPS = new Properties();
 
     /** The <tt>Properties</tt> instance containing all settings.  */
-    protected final Properties PROPS = new Properties(DEFAULT_PROPS);
+    private final Properties PROPS = new Properties(DEFAULT_PROPS);
     
     /**
      * List of all settings associated with this factory 
@@ -311,13 +310,6 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
         return PROPS;
     }
     
-    /** Returns settings properties with default values
-     * 
-     */
-    public Properties getDefaultProperties() {
-    	return DEFAULT_PROPS;
-    }
-    
     /**
      * Creates a new <tt>StringSetting</tt> instance with the specified
      * key and default value.
@@ -329,7 +321,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                           String defaultValue) {
         StringSetting result = 
             new StringSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
 
@@ -344,7 +336,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                         boolean defaultValue) {
         BooleanSetting result =
           new BooleanSettingImpl(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal((AbstractSetting)result, null);
+        handleSettingInternal((AbstractSetting)result);
         return result;
     }
 
@@ -359,13 +351,14 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                          int defaultValue) {
         IntSetting result = 
             new IntSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
     
+    @SuppressWarnings("unused")
     public synchronized IntSetSetting createIntSetSetting(String key, Integer[] defaultValue) {
         IntSetSetting result = new IntSetSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
 
@@ -380,7 +373,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                byte defaultValue) {
         ByteSetting result = 
              new ByteSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
   
@@ -395,7 +388,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                       long defaultValue) {
          LongSetting result = 
              new LongSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-         handleSettingInternal(result, null);
+         handleSettingInternal(result);
          return result;
     }
 
@@ -419,7 +412,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
         FileSetting result = 
             new FileSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
         
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
 
@@ -430,11 +423,11 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * @param key the key for the setting
      * @param defaultValue the default value for the setting
      */
-    public synchronized ColorSetting createColorSetting(String key, 
-                                                        Color defaultValue) {
+    synchronized ColorSetting createColorSetting(String key,
+                                                 Color defaultValue) {
         ColorSetting result = 
         ColorSetting.createColorSetting(DEFAULT_PROPS, PROPS, key,defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
 
@@ -448,7 +441,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     public synchronized CharArraySetting createCharArraySetting(String key, 
                                                         char[] defaultValue) {
         CharArraySetting result = new CharArraySetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
    
@@ -463,7 +456,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
                                                         float defaultValue) {
         FloatSetting result = 
             new FloatSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
 
@@ -479,16 +472,16 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
         StringArraySetting result = 
                        new StringArraySetting(DEFAULT_PROPS, PROPS, key, 
                                                                  defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
    
-    public synchronized StringSetSetting
+    synchronized StringSetSetting
         createStringSetSetting(String key, String defaultValue) {
         StringSetSetting result =
             new StringSetSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
         
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
     
@@ -499,10 +492,10 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * @param key the key for the setting
      * @param defaultValue the default value for the setting
      */
-    public synchronized FileArraySetting createFileArraySetting(String key, File[] defaultValue) {
+    synchronized FileArraySetting createFileArraySetting(String key, File[] defaultValue) {
         FileArraySetting result = 
         new FileArraySetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
    
@@ -515,7 +508,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      */
     public synchronized FileSetSetting createFileSetSetting(String key, File[] defaultValue) {
         FileSetSetting result = new FileSetSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
     
@@ -526,7 +519,8 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * @param key the key for the setting
      * @param defaultValue the default value for the setting
      */
-    public synchronized IntSetting createExpirableIntSetting(String key, 
+    @SuppressWarnings("unused")
+    public synchronized IntSetting createExpirableIntSetting(String key,
                                                              int defaultValue) {
         IntSetting result = createIntSetting(key, defaultValue);
         
@@ -543,15 +537,15 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      * @param key the key for the setting
      * @param defaultValue the default value for the setting
      */
-    public synchronized FontNameSetting createFontNameSetting(String key, 
-                                                           String defaultValue){
+    synchronized FontNameSetting createFontNameSetting(String key,
+                                                       String defaultValue){
         FontNameSetting result = 
         new FontNameSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result, null);
+        handleSettingInternal(result);
         return result;
     }
     
-    private synchronized void handleSettingInternal(AbstractSetting setting, String remoteKey) {
+    private synchronized void handleSettingInternal(AbstractSetting setting) {
         settings.add(setting);
         setting.reload();
     }
