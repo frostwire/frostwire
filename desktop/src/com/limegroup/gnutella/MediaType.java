@@ -23,25 +23,23 @@ public class MediaType implements Serializable {
     
     // These values should match standard MIME content-type
     // categories and/or XSD schema names.
-    public static final String SCHEMA_ANY_TYPE = "*";
-    public static final String SCHEMA_CUSTOM = "custom";
+    static final String SCHEMA_ANY_TYPE = "*";
     public static final String SCHEMA_DOCUMENTS = "document";
     public static final String SCHEMA_PROGRAMS = "application";
     public static final String SCHEMA_AUDIO = "audio";
     public static final String SCHEMA_VIDEO = "video";
     public static final String SCHEMA_IMAGES = "image";
     public static final String SCHEMA_TORRENTS = "torrent"; //possibly magnet might be added in the future
-    public static final String SCHEMA_OTHER = "other";
-    
+
     // These are used as resource keys to retreive descriptions in the GUI 
-    public static final String ANY_TYPE = I18n.tr("All Types");
+    static final String ANY_TYPE = I18n.tr("All Types");
     
-    public static final String DOCUMENTS = I18n.tr("Books/Docs");
-    public static final String PROGRAMS = I18n.tr("Programs");
-    public static final String AUDIO = I18n.tr("Audio");
-    public static final String VIDEO = I18n.tr("Video");
-    public static final String IMAGES = I18n.tr("Images");
-    public static final String TORRENTS = I18n.tr("Torrents");
+    private static final String DOCUMENTS = I18n.tr("Books/Docs");
+    private static final String PROGRAMS = I18n.tr("Programs");
+    private static final String AUDIO = I18n.tr("Audio");
+    private static final String VIDEO = I18n.tr("Video");
+    private static final String IMAGES = I18n.tr("Images");
+    private static final String TORRENTS = I18n.tr("Torrents");
     
     /**
      * Type for 'any file'
@@ -352,30 +350,7 @@ public class MediaType implements Serializable {
     public static MediaType getProgramMediaType() {
         return TYPE_PROGRAMS;
     }
-    
 
-    /** Utility class for aggregating MediaTypes.
-     *  This class is not synchronized - it should never be used in a fashion
-     *  where synchronization is necessary.  If that changes, add synch.
-     */
-    public static class Aggregator {
-        /** A list of MediaType objects. */
-        private List<MediaType> _filters = new LinkedList<>();
-
-        private Aggregator() {}
-
-        /** @return true if the Response falls within one of the MediaTypes
-         *  this aggregates.
-         */
-        public boolean allow(final String fName) {
-            for(MediaType mt : _filters) {
-                if(mt.matches(fName))
-                    return true;
-            }
-            return false;
-        }
-    }
-    
     /**
      * Utility that makes an array out of two sets.
      */

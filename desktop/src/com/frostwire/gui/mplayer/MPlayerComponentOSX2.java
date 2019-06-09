@@ -207,7 +207,7 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     @Override
-    public void icyInfo(MediaPlayer mediaPlayer, String data) {
+    public void icyInfo(String data) {
         // TODO Auto-generated method stub
 
     }

@@ -17,6 +17,6 @@ public class MediaPlayerAdapter implements MediaPlayerListener {
 	public void stateChange(MediaPlayer mediaPlayer, MediaPlaybackState state) {}
 
 	@Override
-	public void icyInfo(MediaPlayer mediaPlayer, String data) {}
+	public void icyInfo(String data) {}
 
 }

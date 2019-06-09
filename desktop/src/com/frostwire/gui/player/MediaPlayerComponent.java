@@ -351,15 +351,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         PAUSE_BUTTON.addMouseListener(longPressListener);
     }
 
-    public void unregisterListeners() {
-        PLAY_BUTTON.removeActionListener(new PlayListener());
-        PAUSE_BUTTON.removeActionListener(new PauseListener());
-        NEXT_BUTTON.removeActionListener(new NextListener());
-        PREV_BUTTON.removeActionListener(new BackListener());
-        VOLUME.removeChangeListener(new VolumeSliderListener());
-        PROGRESS.removeMouseListener(new ProgressBarMouseAdapter());
-    }
-
     /**
      * Updates the audio player.
      */
@@ -430,14 +421,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             float timeInSecs = mediaPlayer.getDurationInSecs() * percent;
             mediaPlayer.seek(timeInSecs);
         }
-    }
-
-    /**
-     * @return the current song that is playing, null if there is no song loaded
-     * or the song is streaming audio
-     */
-    public MediaSource getCurrentMedia() {
-        return currentPlayListItem;
     }
 
     /**
@@ -574,144 +557,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     /**
-     * Begins playing the loaded song in url of args.
-     */
-    String playSong(Map<String, String> args) {
-
-        // Tagged<String> urlString = FrostWireUtils.getArg(args, "url",
-        // "AddToPlaylist");
-        // if (!urlString.isValid())
-        // return urlString.getValue();
-        // String url = urlString.getValue();
-        //
-        // // Find the song with this url
-        // PlaylistMediator pl = GUIMediator.getPlayList();
-        // List<PlayListItem> songs = pl.getSongs();
-        // PlayListItem targetTrack = null;
-        // for (PlayListItem it : songs) {
-        // try {
-        // String thatOne = URLDecoder.decode(it.getURI().toString());
-        // String thisOne = URLDecoder.decode(url);
-        // if (thatOne.equals(thisOne)) {
-        // targetTrack = it;
-        // break;
-        // }
-        // } catch (IOException e) {
-        // // ignore
-        // }
-        // }
-        //
-        // if (targetTrack != null) {
-        // loadSong(targetTrack);
-        // return "ok";
-        // }
-        //
-        // if (PLAYER.getStatus() == MediaPlaybackState.Paused ||
-        // PLAYER.getStatus() == MediaPlaybackState.Playing)
-        // PLAYER.unpause();
-        // else {
-        // loadSong(currentPlayListItem);
-        // }
-
-        return "ok";
-    }
-
-    /**
-     * Returns "ok" on success and a failure message on failure after taking an
-     * index into the playlist and remove it.
-     *
-     * @param index index of the item to remove
-     * @return "ok" on success and a failure message on failure after taking an
-     * index into the playlist and remove it;
-     */
-    String removeFromPlaylist(int index) {
-        // PlaylistMediator pl = GUIMediator.getPlayList();
-        // if (pl.removeFileFromPlaylist(index)) {
-        // return "ok";
-        // }
-        return "invalid.index: " + index;
-    }
-
-    /**
-     * Returns "ok" on success and a failure message on failure after taking an
-     * index into the playlist and remove it.
-     *
-     * @param index index of the item to remove
-     * @return "ok" on success and a failure message on failure after taking an
-     * index into the playlist and remove it;
-     */
-    String playIndexInPlaylist(int index) {
-        // PlaylistMediator pl = GUIMediator.getPlayList();
-        // if (pl.removeFileFromPlaylist(index)) {
-        // return "ok";
-        // }
-        return "invalid.index: " + index;
-    }
-
-    /**
-     * @return <code>PROGRESS.getValue() + "\t" + PROGRESS.getMaximum()</code>
-     * or <code>"stopped"</code> if we're not playing
-     */
-    String getProgress() {
-        String res;
-        if (isPlaying()) {
-            int secs = PROGRESS.getValue();
-            int length = PROGRESS.getMaximum();
-            System.out.println(secs + ":" + length);
-            res = secs + "\t" + length;
-        } else {
-            res = "stopped";
-        }
-        return res;
-    }
-
-    // private String getName(String url) {
-    // int ilast = url.lastIndexOf('/');
-    // if (ilast == -1) {
-    // ilast = url.lastIndexOf('\\');
-    // }
-    // if (ilast == -1) {
-    // return url;
-    // }
-    // return url.substring(ilast + 1);
-    // }
-
-    private boolean isPlaying() {
-        return !(mediaPlayer.getState() == MediaPlaybackState.Stopped || mediaPlayer.getState() == MediaPlaybackState.Uninitialized || mediaPlayer.getState() == MediaPlaybackState.Paused || mediaPlayer.getState() == MediaPlaybackState.Failed || mediaPlayer.getState() == MediaPlaybackState.Closed);
-    }
-
-    /**
-     * Attempts to stop a song if its playing any song
-     * <p>
-     * Returns true if it actually stopped, false if there was no need to do so.
-     */
-    public boolean attemptStop() {
-
-        if (mediaPlayer.getState() != MediaPlaybackState.Stopped) {
-            mediaPlayer.stop();
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Disables the Volume Slider, And Pause Button
-     */
-    public void disableControls() {
-        VOLUME.setEnabled(false);
-        PAUSE_BUTTON.setEnabled(false);
-    }
-
-    /**
-     * Enables the Volume Slider, And Pause Button
-     */
-    public void enableControls() {
-        VOLUME.setEnabled(true);
-        PAUSE_BUTTON.setEnabled(true);
-    }
-
-    /**
      * Listens for the play button being pressed.
      */
     private class PlayListener implements ActionListener {
@@ -796,7 +641,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     @Override
-    public void icyInfo(MediaPlayer mediaPlayer, String data) {
+    public void icyInfo(String data) {
         if (data != null) {
             for (String s : data.split(";")) {
                 if (s.startsWith("StreamTitle=")) {

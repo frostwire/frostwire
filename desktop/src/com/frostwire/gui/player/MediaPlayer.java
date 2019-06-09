@@ -25,10 +25,7 @@ import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.mplayer.MPlayer;
 import com.frostwire.mp4.IsoFile;
 import com.frostwire.mp4.MovieHeaderBox;
-import com.frostwire.mplayer.IcyInfoListener;
 import com.frostwire.mplayer.MediaPlaybackState;
-import com.frostwire.mplayer.PositionListener;
-import com.frostwire.mplayer.StateListener;
 import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -523,7 +520,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     private void fireIcyInfo(String data) {
         for (MediaPlayerListener listener : listenerList) {
-            listener.icyInfo(this, data);
+            listener.icyInfo(data);
         }
     }
 

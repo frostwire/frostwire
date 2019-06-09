@@ -27,8 +27,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.*;
@@ -329,7 +327,7 @@ public final class MPlayerOverlayControls extends JDialog implements ProgressSli
     }
 
     @Override
-    public void icyInfo(MediaPlayer mediaPlayer, String data) {
+    public void icyInfo(String data) {
     }
 
     /*

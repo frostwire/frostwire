@@ -111,12 +111,4 @@ public final class MenuMediator {
         MENU_BAR.add(menu.getMenu());
     }
 
-    /**
-     * Returns the height of the main menu bar.
-     *
-     * @return the height of the main menu bar
-     */
-    public int getMenuBarHeight() {
-        return MENU_BAR.getHeight();
-    }
 }

@@ -30,12 +30,8 @@ final class MediaTypeFilter implements TableLineFilter<SearchResultDataLine> {
 
     private final NamedMediaType nmt;
 
-    public MediaTypeFilter(NamedMediaType nmt) {
+    MediaTypeFilter(NamedMediaType nmt) {
         this.nmt = nmt;
-    }
-
-    public NamedMediaType getMediaType() {
-        return nmt;
     }
 
     @Override

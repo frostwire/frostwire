@@ -36,10 +36,8 @@ public interface MediaPlayerListener {
 
     /**
      * Notification callback for basicplayer events such as opened, eom ...
-     *
-     * @param event
      */
     void stateChange(MediaPlayer mediaPlayer, MediaPlaybackState state);
     
-    void icyInfo(MediaPlayer mediaPlayer, String data);
+    void icyInfo(String data);
 }
