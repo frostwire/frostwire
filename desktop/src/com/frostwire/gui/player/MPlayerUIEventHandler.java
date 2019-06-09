@@ -37,12 +37,8 @@ public class MPlayerUIEventHandler {
 
     private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
 
-    public void addListener(MPlayerUIEventListener listener) {
+    void addListener(MPlayerUIEventListener listener) {
         listeners.add(listener);
-    }
-
-    public void removeListener(MPlayerUIEventListener listener) {
-        listeners.remove(listener);
     }
 
     public void onVolumeChanged(float volume) {

@@ -81,14 +81,12 @@ public final class OptionsConstructor {
     static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
     static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
     static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
-    static final String IP_FILTER_KEY = "OPTIONS_IP_FILTER_MAIN_TITLE";
     static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
     static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
     static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
     static final String EXPERIMENTAL_KEY = "OPTIONS_EXPERIMENTAL_MAIN_TITLE";
     static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
     static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
-    static final String UXSTATS_KEY = "OPTIONS_UXSTATS_MAIN_TITLE";
     static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
     static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
     static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";

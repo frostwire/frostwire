@@ -12,7 +12,7 @@ public interface MouseObserver {
     /**
      * Handles when the mouse is double-clicked.
      */
-    void handleMouseDoubleClick(MouseEvent e);
+    void handleMouseDoubleClick();
     
     /**
      * Handles a right-mouse click.

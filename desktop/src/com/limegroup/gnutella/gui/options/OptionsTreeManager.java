@@ -138,24 +138,7 @@ final class OptionsTreeManager {
 			}				
 		}
 	}
-	
-	void setDefaultSelection() {
-		OptionsTreeNode root = (OptionsTreeNode)TREE_MODEL.getRoot();
-		if (root == null)
-			return;
-		OptionsTreeNode node = null;
-		Enumeration<?> en = root.children();
-		if (!en.hasMoreElements())
-			return;
-		node = (OptionsTreeNode)en.nextElement();
-		if (node == null)
-			return;
-		TreePath tp = new TreePath(node.getPath());
-		TREE.scrollPathToVisible(tp);
-		TREE.setSelectionPath(tp);
-		TREE.collapsePath(tp);
-	}
-	
+
 	void setFilterText(String text) {
 		TreePath path = TREE.getSelectionPath();
         boolean collapsed = TREE.isCollapsed(path);

@@ -145,14 +145,6 @@ public final class OptionsMediator {
     }
 
     /**
-     * Sets the Options selection to the given key.
-     */
-    public final void setSelection(final String key) {
-        //  set value in tree
-        _treeManager.setSelection(key);
-    }
-
-    /**
      * Applies the current settings in the options windows, storing them
      * to disk.  This method delegates to the <tt>OptionsPaneManager</tt>.
      *

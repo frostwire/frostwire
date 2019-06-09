@@ -39,7 +39,7 @@ final class TreeMouseObserver implements MouseObserver {
     /**
      * Handles when the mouse is double-clicked.
      */
-    public void handleMouseDoubleClick(MouseEvent e) {
+    public void handleMouseDoubleClick() {
     }
 
     /**

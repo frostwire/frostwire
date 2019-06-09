@@ -615,7 +615,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         /**
          * Handles when the mouse is double-clicked.
          */
-        public void handleMouseDoubleClick(MouseEvent e) {
+        public void handleMouseDoubleClick() {
         }
 
         /**

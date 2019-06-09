@@ -667,7 +667,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Forwards a double click to the 'action key'.
      */
-    public void handleMouseDoubleClick(MouseEvent e) {
+    public void handleMouseDoubleClick() {
         handleActionKey();
     }
 

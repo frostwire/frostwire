@@ -37,7 +37,7 @@ class MP4Parser extends AbstractTagParser {
 
     private static final Logger LOG = Logger.getLogger(MP4Parser.class);
 
-    public MP4Parser(File file) {
+    MP4Parser(File file) {
         super(file);
     }
 
@@ -52,7 +52,7 @@ class MP4Parser extends AbstractTagParser {
             try {
 
                 int duration = getDuration(boxes);
-                String bitrate = getBitRate(boxes);
+                String bitrate = "";
 
                 AppleItemListBox ilst = Box.findFirst(boxes, Box.ilst);
 
@@ -83,7 +83,7 @@ class MP4Parser extends AbstractTagParser {
         return getArtworkFromMP4(file);
     }
 
-    static BufferedImage getArtworkFromMP4(File file) {
+    private static BufferedImage getArtworkFromMP4(File file) {
         BufferedImage image = null;
 
         try {
@@ -120,24 +120,20 @@ class MP4Parser extends AbstractTagParser {
         return (int) (mvhd.duration() / mvhd.timescale());
     }
 
-    private String getBitRate(LinkedList<Box> boxes) {
-        return ""; // TODO: deep research of atoms per codec
-    }
-
     private <T extends AppleUtf8Box> String getBoxValue(AppleItemListBox ilst, int type) {
         T b = ilst.findFirst(type);
         return b != null ? b.value() : "";
     }
 
-    private <T extends AppleIntegerBox> long getBoxLongValue(AppleItemListBox ilst, int type) {
-        AppleIntegerBox b = ilst.findFirst(type);
+    private long getBoxLongValue(AppleItemListBox ilst) {
+        AppleIntegerBox b = ilst.findFirst(Box.gnre);
         return b != null ? b.value() : -1;
     }
 
     private String getGenre(AppleItemListBox ilst) {
         String value = null;
 
-        long valueId = getBoxLongValue(ilst, Box.gnre);
+        long valueId = getBoxLongValue(ilst);
 
         if (0 <= valueId && valueId < ID3_GENRES.length) {
             value = ID3_GENRES[(int) valueId];

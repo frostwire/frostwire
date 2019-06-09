@@ -58,8 +58,6 @@ public class MultiLineLabel extends JTextArea {
      * default width.
      *
      * @param s the <tt>String</tt> to display in the label
-     * @throws <tt>NullPointerException</tt> if the string argument is 
-     *  <tt>null</tt>
      */
     public MultiLineLabel(String s) {
         this(s, false);
@@ -80,8 +78,6 @@ public class MultiLineLabel extends JTextArea {
      * 
      * @param s the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line
-     * @throws <tt>NullPointerException</tt> if the string argument is 
-     *  <tt>null</tt>
      */
     public MultiLineLabel(String s, int pixels) {
         this(s, pixels, false);
@@ -119,8 +115,6 @@ public class MultiLineLabel extends JTextArea {
      * @param pixels the pixel limit for each line.
      * @param rows the number of rows to include in the label
      * @param cols the number of columns to include in the label
-     * @throws <tt>NullPointerException</tt> if the string argument is 
-     *  <tt>null</tt>
      */
     public MultiLineLabel(String s, int pixels, int rows, int cols) {
         super(rows, cols);

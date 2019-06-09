@@ -20,7 +20,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.SharingSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Allows the user to change whether or not partial files are shared.
@@ -44,9 +43,9 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
     public PartialFileSharingPaneItem() {
         super(TITLE, LABEL);
 
-        /**
-         * Constant for the key of the locale-specific <code>String</code> for the
-         * upload pane check box label in the options window.
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          upload pane check box label in the options window.
          */
         String CHECK_BOX_LABEL = I18n.tr("Allow Partial Sharing:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
@@ -58,7 +57,7 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
         CHECK_BOX.setSelected(SharingSettings.ALLOW_PARTIAL_SHARING.getValue());
     }
 
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         SharingSettings.ALLOW_PARTIAL_SHARING.setValue(CHECK_BOX.isSelected());
         return false;
     }

@@ -375,7 +375,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     @Override
-    public void handleMouseDoubleClick(MouseEvent e) {
+    public void handleMouseDoubleClick() {
         DOWNLOAD_LISTENER.actionPerformed(null);
     }
 

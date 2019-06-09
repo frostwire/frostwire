@@ -402,17 +402,6 @@ public class MPlayer extends BaseMediaPlayer {
         }
     }
 
-    public void showMessage(String message, int duration) {
-        MPlayerInstance instance = getCurrentInstance();
-
-        if (instance != null) {
-
-            instance.sendCommand("osd_show_text \"" + message + "\" "
-                    + duration + " " + 0);
-        }
-
-    }
-
     private void reportSubtitleChanged(String subtitleId, LanguageSource source) {
         if (metaDataListener != null) {
             metaDataListener.activeSubtitleChanged(subtitleId, source);

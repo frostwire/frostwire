@@ -251,9 +251,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                     return new PlayableCell(this, _path, isPlaying, idx);
                 case MODIFICATION_TIME_IDX:
                     return new PlayableCell(this, lastModified, lastModified.toString(), isPlaying, idx);
-//            case SHARE_IDX:
-//                return new FileShareCell(this, initializer.getAbsolutePath(), shared);
-                case PAYMENT_OPTIONS_IDX:
+               case PAYMENT_OPTIONS_IDX:
                     return paymentOptions;
                 case LICENSE_IDX:
                     return license;

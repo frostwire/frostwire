@@ -22,7 +22,10 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.IconAndNameHolder;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
 
 /**
  * Associates a MediaType with a LimeXMLSchema.
@@ -60,7 +63,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      * Constructs a new NamedMediaType, associating the MediaType with the
      * LimeXMLSchema.
      */
-    public NamedMediaType(MediaType mt) {
+    private NamedMediaType(MediaType mt) {
         if (mt == null)
             throw new NullPointerException("Null media type.");
 
@@ -150,22 +153,6 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
     }
 
     /**
-     * Retrieves all possible media types, wrapped in a NamedMediaType.
-     */
-    public static List<NamedMediaType> getAllNamedMediaTypes() {
-        List<NamedMediaType> allSchemas = new LinkedList<>();
-
-        //Add any default media types that haven't been added already.
-        MediaType[] allTypes = MediaType.getDefaultMediaTypes();
-        for (MediaType allType : allTypes) {
-            if (!containsMediaType(allSchemas, allType))
-                allSchemas.add(getFromMediaType(allType));
-        }
-
-        return allSchemas;
-    }
-
-    /**
      * Retrieves the named media type for the specified media type.
      */
     public static NamedMediaType getFromMediaType(MediaType media) {
@@ -177,18 +164,6 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
         type = new NamedMediaType(media);
         CACHED_TYPES.put(description, type);
         return type;
-    }
-
-    /**
-     * Determines whether or not the specified MediaType is in a list of
-     * NamedMediaTypes.
-     */
-    private static boolean containsMediaType(List<? extends NamedMediaType> named, MediaType type) {
-        for (NamedMediaType nmt : named) {
-            if (nmt.getMediaType().equals(type))
-                return true;
-        }
-        return false;
     }
 
     /**

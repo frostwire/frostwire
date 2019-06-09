@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.mplayer.MPlayerWindow;
-import com.frostwire.gui.player.MediaPlayer;
 
 public class MPlayerMediator {
 
@@ -32,13 +31,6 @@ public class MPlayerMediator {
 
     public MPlayerWindow getMPlayerWindow() {
         return mplayerWindow;
-    }
-
-    public MediaPlayer getMediaPlayer() {
-        if (mplayerWindow == null) {
-            return null;
-        }
-        return mplayerWindow.getMediaPlayer();
     }
 
     public static MPlayerMediator instance() {
@@ -70,7 +62,7 @@ public class MPlayerMediator {
 
     public void toggleFullScreen() {
         try {
-            GUIMediator.safeInvokeAndWait(() -> mplayerWindow.toggleFullScreen());
+            GUIMediator.safeInvokeAndWait(mplayerWindow::toggleFullScreen);
         } catch (Exception e) {
             e.printStackTrace();
         }

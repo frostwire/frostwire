@@ -11,16 +11,6 @@ import javax.swing.border.Border;
 public class PaddedPanel extends JPanel {
 
 	/**
-     * 
-     */
-    private static final long serialVersionUID = 4986909888220284988L;
-    /**
-	 * Stores an internal reference to the optional title label,
-	 * whose text may be altered later by setTitle()
-	 */
-	private JLabel _titleLabel = null;
-
-	/** 
 	 * Constructor for a padded panel with the margins and the label text
 	 * specified as parameters.
 	 */
@@ -35,7 +25,11 @@ public class PaddedPanel extends JPanel {
 		if(label != null && !label.equals("")) {
 			JPanel panel = new JPanel();
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-			_titleLabel = new JLabel(label);
+			/*
+			  Stores an internal reference to the optional title label,
+			  whose text may be altered later by setTitle()
+			 */
+			JLabel _titleLabel = new JLabel(label);
 			panel.add(_titleLabel);
 			panel.add(Box.createHorizontalGlue());
 			add(panel);
@@ -80,22 +74,6 @@ public class PaddedPanel extends JPanel {
 		this(label, GUIConstants.OUTER_MARGIN);
 	}
 
-	/**
-	 * Sets the title for the <tt>PaddedPanel</tt>.
-	 *
-	 * @param title the title to add
-	 */
-	public void setTitle(String title) {
-		if (_titleLabel == null) {
-			BoxPanel panel = new BoxPanel(BoxPanel.X_AXIS);
-			_titleLabel = new JLabel(title);
-			panel.add(_titleLabel);
-			panel.add(Box.createHorizontalGlue());
-			add(panel);
-		} else {
-			_titleLabel.setText(title);
-		}
-	}
 }
 
 

@@ -30,17 +30,10 @@ import javax.swing.*;
  */
 public final class MultilineToolTip extends JToolTip {
 
-    private String[] tipArray;
-
     public MultilineToolTip() {
     }
 
-    public String[] getTipArray() {
-        return tipArray;
-    }
-
     public void setTipArray(String[] arr) {
-        this.tipArray = arr;
         super.setTipText(join(arr));
     }
 

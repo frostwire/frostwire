@@ -21,8 +21,6 @@ public class OSUtils {
     private static boolean _isWindowsMe;
     private static boolean _isWindowsVista;
     private static boolean _isWindows7;
-    private static boolean _isWindows8;
-    private static boolean _isWindows10;
 
     /** 
      * Variable for whether or not the operating system allows the 
@@ -35,24 +33,15 @@ public class OSUtils {
      */
     private static boolean _isMacOSX;
 
-    /**
-     * OSX versions
-     * 10.5 - Leopard
-     * 10.6 - Snow Leopard
-     * 10.7 - Lion
-     * 10.8 - Mountain Lion
-     * --- no more cats, now it's mountains
-     * 10.9 - Mavericks
-     * 10.10 - Yosemite
-     * 10.11 - El Capitan
-     * -- No longer called OSX, now called macOS
-     * 10.12 - Sierra
+    /*
+      OSX versions
+      10.9 - Mavericks
+      10.10 - Yosemite
+      10.11 - El Capitan
+      -- No longer called OSX, now called macOS
+      10.12 - Sierra
      */
-    private static boolean _isMacOSX105;
-    private static boolean _isMacOSX106;
-    private static boolean _isMacOSX107;
-
-    /** 
+    /**
      * Variable for whether or not we're on Linux.
      */
     private static boolean _isLinux;
@@ -81,9 +70,8 @@ public class OSUtils {
 	/**
 	 * Sets the operating system variables.
 	 */
-	public static void setOperatingSystems() {
+	private static void setOperatingSystems() {
 		_isWindows = false;
-		_isWindows8 = false;
 		_isWindows7 = false;
 		_isWindowsVista = false;
 		_isWindowsXP = false;
@@ -95,8 +83,6 @@ public class OSUtils {
 		_isUbuntu = false;
 		_isFedora = false;
 		_isMacOSX = false;
-		_isMacOSX105 = false;
-		_isMacOSX106 = false;
 		_isSolaris = false;
 		_isOS2 = false;
 
@@ -111,8 +97,6 @@ public class OSUtils {
 		_isOS2		= os.contains("os/2");
 
 		if(_isWindows){
-		    _isWindows10 = os.contains("windows 10");
-			_isWindows8	= os.contains("windows 8");
 			_isWindows7	= os.contains("windows 7");
 			_isWindowsVista	= os.contains("windows vista");
 			_isWindowsXP	= os.contains("windows xp");
@@ -134,9 +118,6 @@ public class OSUtils {
 		if(os.startsWith("mac os")) {
 			if(os.endsWith("x")) {
 				_isMacOSX = true;
-                _isMacOSX105 = System.getProperty("os.version").startsWith("10.5");
-                _isMacOSX106 = System.getProperty("os.version").startsWith("10.6");
-                _isMacOSX107 = System.getProperty("os.version").startsWith("10.7");
 			}
 		}
 	}
@@ -151,7 +132,7 @@ public class OSUtils {
     /**
      * Returns the operating system version.
      */
-    public static String getOSVersion() {
+    private static String getOSVersion() {
         return System.getProperty("os.version");
     }
     
@@ -228,14 +209,6 @@ public class OSUtils {
     public static boolean isWindows7() {
         return _isWindows7;
     }
-    
-    public static boolean isWindows8() {
-        return _isWindows8;
-    }
-
-    public static boolean isWindows10() {
-        return _isWindows10;
-    }
 
     /**
      * @return true if the application is running on a windows 
@@ -251,7 +224,7 @@ public class OSUtils {
      * @return <tt>true</tt> if the application is running on OS/2,
      *         <tt>false</tt> otherwise
      */
-    public static boolean isOS2() {
+    static boolean isOS2() {
         return _isOS2;
     }
 
@@ -265,37 +238,7 @@ public class OSUtils {
     	return _isMacOSX;
     }
 
-    /**
-     * Returns whether or not the OS version of Mac OS X is 10.5.x.
-     *  
-     * @return <tt>true</tt> if the application is running on Mac OS X 10.5.x,
-     *         <tt>false</tt> otherwise
-     */
-    public static boolean isMacOSX105() {
-        return _isMacOSX105;
-    }
-    
-    /**
-     * Returns whether or not the OS version of Mac OS X is 10.6.x.
-     * 
-     *  @return <tt>true</tt> if the application is running on Mac OS X 10.6.x,
-     *         <tt>false</tt> otherwise
-     */
-    public static boolean isMacOSX106() {
-        return _isMacOSX106;
-    }
-    
-    /**
-     * Returns whether or not the OS version of Mac OS X is 10.6.x.
-     * 
-     *  @return <tt>true</tt> if the application is running on Mac OS X 10.6.x,
-     *         <tt>false</tt> otherwise
-     */
-    public static boolean isMacOSX107() {
-        return _isMacOSX107;
-    }
 
-    
     /** 
      * Returns whether or not the OS is any Mac OS.
      *
@@ -312,7 +255,7 @@ public class OSUtils {
      * @return <tt>true</tt> if the application is running on Solaris, 
      *         <tt>false</tt> otherwise
      */
-    public static boolean isSolaris() {
+    static boolean isSolaris() {
     	return _isSolaris;
     }
 
@@ -361,7 +304,7 @@ public class OSUtils {
      * @return <tt>true</tt> if this OS meets high load server requirements,
      *         <tt>false</tt> otherwise
      */
-    public static boolean isHighLoadOS() {
+    private static boolean isHighLoadOS() {
         return !(_isWindows98 || _isWindows95 || _isWindowsMe || _isWindowsNT);
     }
 

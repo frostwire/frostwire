@@ -27,7 +27,7 @@ public final class DefaultMouseListener implements MouseListener {
         if (SwingUtilities.isRightMouseButton(event)) {
             cm.handleRightMouseClick(event);
         } else if (event.getClickCount() >= 2) {
-            cm.handleMouseDoubleClick(event);
+            cm.handleMouseDoubleClick();
         } else {
             cm.handleMouseClick(event);
         }
