@@ -21,11 +21,8 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.theme.SkinProgressBarUI;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class handles rendering a <tt>JProgressBar</tt> for improved
@@ -37,33 +34,15 @@ import java.util.Map;
  */
 public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
 
-    private Map<Color, Border> borders = new HashMap<>();
     private boolean isSelected;
 
     /**
      * Sets the font, border, and colors for the progress bar.
      *
      */
-    public ProgressBarRenderer() {
+    ProgressBarRenderer() {
         setUI(SkinProgressBarUI.createUI(this));
         setStringPainted(true);
-    }
-
-    /**
-     * Gets a new or old border for this color.
-     */
-    public Border getCachedOrNewBorder(Color c) {
-        if (c == null)
-            return null;
-        if (borders == null)
-            return null;
-
-        Border b = borders.get(c);
-        if (b == null) {
-            b = BorderFactory.createMatteBorder(2, 5, 2, 5, c);
-            borders.put(c, b);
-        }
-        return b;
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSel, boolean hasFocus, int row, int column) {
@@ -88,7 +67,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      * @param value the same value that initializes the cell
      * @return what the progress bar component should be set to
      */
-    protected int getBarStatus(Object value) {
+    private int getBarStatus(Object value) {
         return value == null ? 0 : (Integer) value;
     }
 
@@ -165,7 +144,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         // Strings get interned...
-        if (propertyName == "text") {
+        if (propertyName.equals("text")) {
             super.firePropertyChange(propertyName, oldValue, newValue);
         }
     }

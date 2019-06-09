@@ -76,7 +76,7 @@ class ProgressMonitor implements Accessible
     private JLabel          noteLabel;
     private Component       parentComponent;
     private String          note;
-    private Object[]        cancelOption = null;
+    private Object[]        cancelOption;
     private Object          message;
     private long            T0;
     private int             millisToDecideToPopup = 500;
@@ -94,7 +94,7 @@ class ProgressMonitor implements Accessible
      *        to the user to indicate what operation is being monitored.
      *        This does not change as the operation progresses.
      *        See the message parameters to methods in
-     *        {@link JOptionPane#message}
+     *
      *        for the range of values.
      * @param note a short note describing the state of the
      *        operation.  As the operation progresses, you can call
@@ -108,11 +108,11 @@ class ProgressMonitor implements Accessible
      * @see JDialog
      * @see JOptionPane
      */
-    public ProgressMonitor(Component parentComponent,
-                           Object message,
-                           String note,
-                           int min,
-                           int max) {
+    ProgressMonitor(Component parentComponent,
+                    Object message,
+                    String note,
+                    int min,
+                    int max) {
         this(parentComponent, message, note, min, max, null);
     }
 
@@ -173,12 +173,7 @@ class ProgressMonitor implements Accessible
             } else {
                 dialog = new JDialog((Dialog)window, title, true);
             }
-//            if (window instanceof SwingUtilities.SharedOwnerFrame) {
-//                WindowListener ownerShutdownListener =
-//                        SwingUtilities.getSharedOwnerFrameShutdownListener();
-//                dialog.addWindowListener(ownerShutdownListener);
-//            }
-            
+
             Container contentPane = dialog.getContentPane();
 
             contentPane.setLayout(new BorderLayout());
@@ -376,23 +371,9 @@ class ProgressMonitor implements Accessible
      * Specifies the amount of time to wait before deciding whether or
      * not to popup a progress monitor.
      *
-     * @param millisToDecideToPopup  an int specifying the time to wait,
-     *        in milliseconds
-     * @see #getMillisToDecideToPopup
      */
-    public void setMillisToDecideToPopup(int millisToDecideToPopup) {
-        this.millisToDecideToPopup = millisToDecideToPopup;
-    }
-
-
-    /**
-     * Returns the amount of time this object waits before deciding whether
-     * or not to popup a progress monitor.
-     *
-     * @see #setMillisToDecideToPopup
-     */
-    public int getMillisToDecideToPopup() {
-        return millisToDecideToPopup;
+    void setMillisToDecideToPopup() {
+        this.millisToDecideToPopup = 0;
     }
 
 
@@ -401,21 +382,9 @@ class ProgressMonitor implements Accessible
      * (If the predicted time remaining is less than this time, the popup
      * won't be displayed.)
      *
-     * @param millisToPopup  an int specifying the time in milliseconds
-     * @see #getMillisToPopup
      */
-    public void setMillisToPopup(int millisToPopup) {
-        this.millisToPopup = millisToPopup;
-    }
-
-
-    /**
-     * Returns the amount of time it will take for the popup to appear.
-     *
-     * @see #setMillisToPopup
-     */
-    public int getMillisToPopup() {
-        return millisToPopup;
+    void setMillisToPopup() {
+        this.millisToPopup = 0;
     }
 
 
@@ -454,7 +423,7 @@ class ProgressMonitor implements Accessible
      * The <code>AccessibleContext</code> for the <code>ProgressMonitor</code>
      * @since 1.5
      */
-    protected AccessibleContext accessibleContext = null;
+    private AccessibleContext accessibleContext = null;
 
     private AccessibleContext accessibleJOptionPane = null;
 
@@ -505,14 +474,14 @@ class ProgressMonitor implements Accessible
          *           JLabel
          *           JProgressBar
          *
-         * The AccessibleProgessMonitor accessibility hierarchy is:
+         * The AccessibleProgressMonitor accessibility hierarchy is:
          *   AccessibleJDialog
          *     AccessibleProgressMonitor
          *       AccessibleJLabel
          *       AccessibleJLabel
          *       AccessibleJProgressBar
          *
-         * The abstraction presented to assitive technologies by
+         * The abstraction presented to assistive technologies by
          * the AccessibleProgressMonitor is that a dialog contains a
          * progress monitor with three children: a message, a note
          * label and a progress bar.
@@ -523,7 +492,7 @@ class ProgressMonitor implements Accessible
         /**
          * AccessibleProgressMonitor constructor
          */
-        protected AccessibleProgressMonitor() {
+        AccessibleProgressMonitor() {
         }
 
         /*
@@ -581,13 +550,13 @@ class ProgressMonitor implements Accessible
          * @throws NullPointerException if the parameter is null.
          */
         public void propertyChange(PropertyChangeEvent e) {
-            if (e.getSource() == noteLabel && e.getPropertyName() == "text") {
+            if (e.getSource() == noteLabel && e.getPropertyName().equals("text")) {
                 // the note label text changed
                 firePropertyChange(ACCESSIBLE_TEXT_PROPERTY, null, 0);
             }
         }
 
-        /* ===== Begin AccessileContext ===== */
+        /* ===== Begin AccessibleContext ===== */
 
         /**
          * Gets the accessibleName property of this object.  The accessibleName
@@ -644,7 +613,7 @@ class ProgressMonitor implements Accessible
          * a set of predefined roles.  This enables assistive technologies to
          * provide a consistent interface to various tweaked subclasses of
          * components (e.g., use AccessibleRole.PUSH_BUTTON for all components
-         * that act like a push button) as well as distinguish between sublasses
+         * that act like a push button) as well as distinguish between subclasses
          * that behave differently (e.g., AccessibleRole.CHECK_BOX for check boxes
          * and AccessibleRole.RADIO_BUTTON for radio buttons).
          * <p>Note that the AccessibleRole class is also extensible, so
@@ -905,7 +874,7 @@ class ProgressMonitor implements Accessible
         }
 
         /**
-         * Returns the number of characters (valid indicies)
+         * Returns the number of characters (valid indices)
          *
          * @return the number of characters
          */

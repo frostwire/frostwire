@@ -23,18 +23,14 @@ public abstract class PlaylistItemProperty<T> implements Comparable<T> {
     protected final boolean exists;
     protected final LibraryPlaylistsTableDataLine line;
     
-    public PlaylistItemProperty(LibraryPlaylistsTableDataLine line, boolean playing, boolean exists) {
+    PlaylistItemProperty(LibraryPlaylistsTableDataLine line, boolean playing, boolean exists) {
         this.playing = playing;
         this.exists = exists;
         this.line = line;
     }
     
     abstract public String getStringValue();
-    
-    public boolean isPlaying() {
-        return playing;
-    }
-    
+
     public boolean exists() {
         return exists;
     }

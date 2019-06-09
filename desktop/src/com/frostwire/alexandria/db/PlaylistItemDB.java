@@ -28,16 +28,6 @@ public class PlaylistItemDB {
 
     private PlaylistItemDB() {}
 
-    public static void fill(LibraryDatabase db, PlaylistItem obj) {
-        List<List<Object>> result = db
-                .query("SELECT playlistItemId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred "
-                        + "FROM PlaylistItems WHERE playlistItemId = ?", obj.getId());
-        if (result.size() > 0) {
-            List<Object> row = result.get(0);
-            fill(row, obj);
-        }
-    }
-
     public static void fill(List<Object> row, PlaylistItem obj) {
         int id = (Integer) row.get(0);
         String filePath = (String) row.get(1);

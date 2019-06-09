@@ -12,14 +12,6 @@ public class PlaylistDB {
 
     private PlaylistDB() { } // don't allow explicit constructions
 
-    public static void fill(LibraryDatabase db, Playlist obj) {
-        List<List<Object>> result = db.query("SELECT playlistId, name, description FROM Playlists WHERE playlistId = ?", obj.getId());
-        if (result.size() > 0) {
-            List<Object> row = result.get(0);
-            fill(row, obj);
-        }
-    }
-
     public static void fill(List<Object> row, Playlist p) {
         int id = (Integer) row.get(0);
         String name = (String) row.get(1);
@@ -72,17 +64,6 @@ public class PlaylistDB {
         return playlists;
     }
 
-    public static Playlist getPlaylist(LibraryDatabase db, String name) {
-        List<List<Object>> result = db.query("SELECT playlistId, name, description FROM Playlists WHERE name = ?", name);
-        Playlist playlist = null;
-        if (result.size() > 0) {
-            List<Object> row = result.get(0);
-            playlist = new Playlist(db);
-            PlaylistDB.fill(row, playlist);
-        }
-        return playlist;
-    }
-    
     public static Playlist getStarredPlaylist(LibraryDatabase db) {
         String query = "SELECT playlistItemId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred " + "FROM PlaylistItems WHERE starred = ?";
         List<List<Object>> result = db.query(query, true);

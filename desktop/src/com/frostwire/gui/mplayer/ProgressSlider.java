@@ -19,15 +19,13 @@
 package com.frostwire.gui.mplayer;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 
 
-public class ProgressSlider extends JPanel {
+class ProgressSlider extends JPanel {
 
 	private static final long serialVersionUID = 8000075870624583383L;
 	private JSlider progressSlider;
@@ -41,7 +39,7 @@ public class ProgressSlider extends JPanel {
 	
 	private LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
 	
-	public ProgressSlider() {
+	ProgressSlider() {
 		
 		setLayout(new BorderLayout());
 		setOpaque(false);
@@ -91,15 +89,11 @@ public class ProgressSlider extends JPanel {
         
 	}
 	
-	public void addProgressSliderListener( ProgressSliderListener listener ) {
+	void addProgressSliderListener(ProgressSliderListener listener) {
 		listeners.add(listener);
 	}
-	
-	public void removeProgressSliderListener( ProgressSliderListener listener ) {
-		listeners.remove(listener);
-	}
-	
-	public void setTotalTime(float seconds) {
+
+	void setTotalTime(float seconds) {
 		if ( seconds != totalTime ) {
 			totalTime = seconds;
 			currentTime = 0;
@@ -107,7 +101,7 @@ public class ProgressSlider extends JPanel {
 		}
 	}
 	
-	public void setCurrentTime(float seconds) {
+	void setCurrentTime(float seconds) {
 		if ( seconds != currentTime) {
 			currentTime = seconds;
 			updateUIControls();

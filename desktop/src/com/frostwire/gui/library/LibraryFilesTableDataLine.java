@@ -240,7 +240,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                     actionsHolder.setPlaying(isPlaying);
                     return actionsHolder;
                 case ICON_IDX:
-                    return new PlayableIconCell(getIcon(), isPlaying);
+                    return new PlayableIconCell(getIcon());
                 case NAME_IDX:
                     return nameCell;
                 case SIZE_IDX:
