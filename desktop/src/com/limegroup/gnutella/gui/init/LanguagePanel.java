@@ -18,7 +18,6 @@ package com.limegroup.gnutella.gui.init;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LanguageFlagFactory;
 import com.limegroup.gnutella.gui.LanguageUtils;
-import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.apache.commons.io.IOUtils;
 import org.limewire.util.OSUtils;
@@ -44,7 +43,7 @@ public class LanguagePanel extends JPanel {
      * Constructs a LanguagePanel that will notify the given listener when the
      * language changes.
      */
-    public LanguagePanel(ActionListener actionListener) {
+    LanguagePanel(ActionListener actionListener) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         this.actionListener = actionListener;
@@ -60,7 +59,7 @@ public class LanguagePanel extends JPanel {
         Locale locale = guessLocale(locales);
         languageOptions.setSelectedItem(locale);
 
-        applySettings(false);
+        applySettings();
 
         // It is important that the listener is added after the selected item
         // is set. Otherwise the listener will call methods that are not ready
@@ -76,17 +75,16 @@ public class LanguagePanel extends JPanel {
      * Overrides applySettings in SetupWindow superclass.
      * Applies the settings handled in this window.
      */
-    public void applySettings(boolean loadCoreComponents) {
+    public void applySettings() {
         Locale locale = (Locale) languageOptions.getSelectedItem();
         LanguageUtils.setLocale(locale);
-        ResourceManager.validateLocaleAndFonts(locale);
         languageLabel.setText(I18n.tr("Language:"));
     }
 
     private class StateListener implements ItemListener {
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                applySettings(false);
+                applySettings();
                 actionListener.actionPerformed(null);
                 languageOptions.requestFocus();
             }
@@ -123,7 +121,7 @@ public class LanguagePanel extends JPanel {
         String cn = ApplicationSettings.COUNTRY.getValue();
         String vn = ApplicationSettings.LOCALE_VARIANT.getValue();
 
-        String[] registryLocale = null;
+        String[] registryLocale;
         if (OSUtils.isWindows() && (registryLocale = getDisplayLanguageFromWindowsRegistry()) != null) {
             return registryLocale;
         }
@@ -305,7 +303,7 @@ public class LanguagePanel extends JPanel {
                 break;
             }
 
-        } catch (Throwable e) {
+        } catch (Throwable ignored) {
 
         }
         return result;

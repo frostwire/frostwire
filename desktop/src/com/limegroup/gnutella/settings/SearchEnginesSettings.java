@@ -30,8 +30,6 @@ public class SearchEnginesSettings extends LimeProps {
 
     public static final BooleanSetting TPB_SEARCH_ENABLED = FACTORY.createBooleanSetting("TPB_SEARCH2_ENABLED", true);
 
-    public static final BooleanSetting YOUTUBE_SEARCH_ENABLED = FACTORY.createBooleanSetting("YOUTUBE_SEARCH2_ENABLED", true);
-
     public static final BooleanSetting SOUNDCLOUD_SEARCH_ENABLED = FACTORY.createBooleanSetting("SOUNDCLOUD_SEARCH2_ENABLED", true);
 
     public static final BooleanSetting ARCHIVEORG_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);

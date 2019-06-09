@@ -23,7 +23,7 @@ import java.awt.event.ActionEvent;
 /**
  * Extend <tt>JScrollPane</tt> so that a scrolled html file is shown
  */
-public final class ScrollingTextPane extends JScrollPane {
+final class ScrollingTextPane extends JScrollPane {
 
     /**
      * 
@@ -38,14 +38,14 @@ public final class ScrollingTextPane extends JScrollPane {
     /**
      * Timer to control scrolling
      */
-    protected Timer _timer;
+    private Timer _timer;
 
     /**
      * Constructs the elements of the about window.
      * 
      * @param html The text of the HTML to load into the scrolling pane.
      */
-    public ScrollingTextPane(String html) {
+    ScrollingTextPane(String html) {
         if (html == null)
             throw new NullPointerException("null html");
         
@@ -78,23 +78,16 @@ public final class ScrollingTextPane extends JScrollPane {
     }
 
     /**
-     * Start scrolling.
-     */
-    public void startScroll() {
-        _timer.start();
-    }
-
-    /**
      * Stop scrolling.
      */
-    public void stopScroll() {
+    void stopScroll() {
         _timer.stop();
     }
 
     /**
      * Scroll the content of the JEditorPane
      */
-    protected void scroll() {
+    private void scroll() {
         // calculate visible rectangle
         Rectangle rect = EDITOR_PANE.getVisibleRect();
         
@@ -125,7 +118,7 @@ public final class ScrollingTextPane extends JScrollPane {
      *
      * @param listener the listener for hyperlinks
      */
-    public void addHyperlinkListener(HyperlinkListener listener) {
+    void addHyperlinkListener(HyperlinkListener listener) {
         EDITOR_PANE.addHyperlinkListener(listener);
     }
 }

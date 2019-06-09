@@ -5,7 +5,6 @@ import com.frostwire.gui.theme.SkinTextFieldBackgroundPainter;
 
 import javax.accessibility.Accessible;
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.TextUI;
 import javax.swing.plaf.synth.SynthTextFieldUI;
 import javax.swing.text.*;
@@ -31,7 +30,7 @@ import java.lang.reflect.Method;
  * 
  */
 public abstract class PromptTextUI extends TextUI  {
-	static final FocusHandler focusHandler = new FocusHandler();
+	private static final FocusHandler focusHandler = new FocusHandler();
 	
 	private final SkinTextFieldBackgroundPainter backgroundPainter;
 
@@ -45,23 +44,20 @@ public abstract class PromptTextUI extends TextUI  {
 	/**
 	 * This component ist painted when rendering the prompt text.
 	 */
-	protected JTextComponent promptComponent;
+	private JTextComponent promptComponent;
 
 	/**
 	 * Creates a new {@link PromptTextUI} which delegates most work to another
 	 * {@link TextUI}.
-	 * 
-	 * @param delegate
+	 *
 	 */
-	public PromptTextUI(TextUI delegate) {
+	PromptTextUI(TextUI delegate) {
 		this.delegate = delegate;
 		this.backgroundPainter = new SkinTextFieldBackgroundPainter(SkinTextFieldBackgroundPainter.State.Enabled);
 	}
 
 	/**
 	 * Creates a component which should be used to render the prompt text.
-	 * 
-	 * @return
 	 */
 	protected abstract JTextComponent createPromptComponent();
 
@@ -93,8 +89,6 @@ public abstract class PromptTextUI extends TextUI  {
 	 * Creates a label component, if none has already been created. Sets the
 	 * prompt components properties to reflect the given {@link JTextComponent}s
 	 * properties and returns it.
-	 * 
-	 * @param txt
 	 * @return the adjusted prompt component
 	 */
 	public JTextComponent getPromptComponent(JTextComponent txt) {
@@ -147,7 +141,7 @@ public abstract class PromptTextUI extends TextUI  {
 	 * When {@link #shouldPaintPrompt(JTextComponent)} returns true, the prompt
 	 * component is retrieved by calling
 	 * {@link #getPromptComponent(JTextComponent)} and it's preferred size is
-	 * returned. Otherwise super{@link #getPreferredSize(JComponent)} is
+	 * returned. Otherwise super.getPreferredSize(JComponent) is
 	 * called.
 	 */
 	public Dimension getPreferredSize(JComponent c) {
@@ -177,7 +171,7 @@ public abstract class PromptTextUI extends TextUI  {
 		}
 	}
 
-	protected void paintPromptComponent(Graphics g, JTextComponent txt) {
+	private void paintPromptComponent(Graphics g, JTextComponent txt) {
 		JTextComponent lbl = getPromptComponent(txt);
 		lbl.paint(g);
 
@@ -189,16 +183,14 @@ public abstract class PromptTextUI extends TextUI  {
 	/**
 	 * Returns if the prompt or the text field should be painted, depending on
 	 * the state of <code>txt</code>.
-	 * 
-	 * @param txt
 	 * @return true when <code>txt</code> contains not text, otherwise false
 	 */
-	public boolean shouldPaintPrompt(JTextComponent txt) {
+	private boolean shouldPaintPrompt(JTextComponent txt) {
 		return txt.getText() == null || txt.getText().length() == 0;
 	}
 
 	/**
-	 * Calls super.{@link #update(Graphics, JComponent)}, which in turn calls
+	 * Calls super.update(Graphics, JComponent), which in turn calls
 	 * the paint method of this object.
 	 */
 	public void update(Graphics g, JComponent c) {
@@ -285,10 +277,6 @@ public abstract class PromptTextUI extends TextUI  {
 		return delegate.getToolTipText2D(t, pt);
 	}
 
-	public String getToolTipText2D(JTextComponent t, Point pt) {
-		return delegate.getToolTipText2D(t, pt);
-	}
-
 	public int hashCode() {
 		return delegate.hashCode();
 	}
@@ -306,7 +294,7 @@ public abstract class PromptTextUI extends TextUI  {
 	}
 
 	/**
-	 * Tries to call {@link ComponentUI#getBaseline(int, int)} on the delegate
+	 * Tries to call ComponentUI#getBaseline(int, int) on the delegate
 	 * via Reflection. Workaround to maintain compatibility with Java 5. Ideally
 	 * we should also override {@link #getBaselineResizeBehavior(JComponent)},
 	 * but that's impossible since the {@link BaselineResizeBehavior} class,

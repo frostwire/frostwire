@@ -47,7 +47,7 @@ public abstract class SearchEngine {
 
     private static final int DEFAULT_TIMEOUT = 5000;
 
-    public String redirectUrl = null;
+    private String redirectUrl = null;
 
     private final int _id;
     private final String _name;
@@ -233,5 +233,13 @@ public abstract class SearchEngine {
 
     public BooleanSetting getEnabledSetting() {
         return _setting;
+    }
+
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
     }
 }

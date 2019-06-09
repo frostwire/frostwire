@@ -71,11 +71,6 @@ public final class ResourceManager {
     private static Locale _locale;
 
     /**
-     * Whether or not LimeWire was started in the 'brushed metal' look.
-     */
-    private final boolean BRUSHED_METAL;
-
-    /**
      * Cache of theme images (name as String -> image as ImageIcon)
      */
     private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
@@ -86,9 +81,6 @@ public final class ResourceManager {
      */
     private static boolean loadFailureEncountered = false;
 
-    /**
-     * Statically initialize necessary resources.
-     */
     static {
         resetLocaleOptions();
     }
@@ -98,7 +90,7 @@ public final class ResourceManager {
         setLocaleOptions();
     }
 
-    static void setLocaleOptions() {
+    private static void setLocaleOptions() {
         if (!_localeOptionsSet) {
             if (ApplicationSettings.LANGUAGE.getValue().equals(""))
                 ApplicationSettings.LANGUAGE.setValue("en");
@@ -125,14 +117,14 @@ public final class ResourceManager {
     /**
      * Indicated if a failure has occurred for delayed reporting
      */
-    public static boolean hasLoadFailure() {
+    static boolean hasLoadFailure() {
         return loadFailureEncountered;
     }
 
     /**
      * Resets the failure flag
      */
-    public static void resetLoadFailure() {
+    static void resetLoadFailure() {
         loadFailureEncountered = false;
     }
 
@@ -148,7 +140,7 @@ public final class ResourceManager {
         if (name == null)
             throw new NullPointerException("null image name");
 
-        ImageIcon icon = null;
+        ImageIcon icon;
 
         // First try to get theme image from cache
         icon = THEME_IMAGES.get(name);
@@ -274,51 +266,6 @@ public final class ResourceManager {
      * constructed from outside this class.
      */
     private ResourceManager() {
-        String bMetal = System.getProperty("apple.awt.brushMetalLook");
-        BRUSHED_METAL = bMetal != null && bMetal.equalsIgnoreCase("true");
-
-        try {
-            validateLocaleAndFonts(Locale.getDefault());
-        } catch (NullPointerException npe) {
-            // ignore, can't do much about it -- internal ignorable error.
-        }
-    }
-
-    /**
-     * Validates the locale, determining if the current locale's resources can
-     * be displayed using the current fonts. If not, then the locale is reset to
-     * English.
-     * <p>
-     * This prevents the UI from appearing as all boxes.
-     */
-    public static void validateLocaleAndFonts(Locale locale) {
-//        if (true) {
-//            return;
-//        }
-//        // OSX can always display everything, and if it can't,
-//        // we have no way of correcting things 'cause canDisplayUpTo
-//        // is broken on it.
-////        if (OSUtils.isMacOSX())
-////            return;
-//
-//        String s = locale.getDisplayName();
-//        if (!checkUIFonts("dialog", s)) {
-//            // if it couldn't display, revert the locale to english.
-//            ApplicationSettings.LANGUAGE.setValue("en");
-//            ApplicationSettings.COUNTRY.setValue("");
-//            ApplicationSettings.LOCALE_VARIANT.setValue("");
-//            GUIMediator.resetLocale();
-//        }
-//
-//        // Ensure that the Table.font can always display intl characters
-//        // since we can always get i18n stuff there, but only if we'd actually
-//        // be capable of displaying an intl character with the font...
-//        // unicode string == country name of simplified chinese
-//        String i18n = "\u4e2d\u56fd";
-//        checkFont("TextField.font", "dialog", i18n, true);
-//        checkFont("Table.font", "dialog", i18n, true);
-//        checkFont("ProgressBar.font", "dialog", i18n, true);
-//        checkFont("TabbedPane.font", "dialog", i18n, true);
     }
 
     /**
@@ -395,13 +342,6 @@ public final class ResourceManager {
      */
     public boolean isTrayIconAvailable() {
         return (OSUtils.isWindows() || OSUtils.isLinux()) && NotifyUserProxy.instance().supportsSystemTray();
-    }
-
-    /**
-     * Determines if the brushed metal property is set.
-     */
-    public boolean isBrushedMetalSet() {
-        return BRUSHED_METAL;
     }
 
     /**

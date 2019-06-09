@@ -352,7 +352,7 @@ final class UpdateMessageReader implements ContentHandler {
 
                 List<SearchEngine> searchEngines = SearchEngine.getEngines();
                 for (SearchEngine searchEngine : searchEngines) {
-                    searchEngine.redirectUrl = torrentDetailsUrl;
+                    searchEngine.setRedirectUrl(torrentDetailsUrl);
                 }
             }
         } else if (localName.equalsIgnoreCase("message")) {

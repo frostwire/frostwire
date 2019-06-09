@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
  */
 public class QuotedStringTokenizer {
 
-	public static final char QUOTE_CHAR = '"';
+	private static final char QUOTE_CHAR = '"';
 
 	private final boolean returnSeparators;
 
@@ -28,8 +28,8 @@ public class QuotedStringTokenizer {
 	 * 
 	 * @see java.util.StringTokenizer
 	 */
-	public QuotedStringTokenizer(String text, String separators,
-			boolean returnSeparators) {
+	private QuotedStringTokenizer(String text, String separators,
+								  boolean returnSeparators) {
 		this.text = text;
 		this.maxIndex = text.length() - 1;
 		this.separators = separators;
@@ -41,20 +41,11 @@ public class QuotedStringTokenizer {
 	 * 
 	 * @see java.util.StringTokenizer
 	 */
-	public QuotedStringTokenizer(String text, String separators) {
-		this(text, separators, false);
-	}
-
-	/**
-	 * Constructs a <code>QuotedStringTokenizer</code>.
-	 * 
-	 * @see java.util.StringTokenizer
-	 */
-	public QuotedStringTokenizer(String text) {
+	QuotedStringTokenizer(String text) {
 		this(text, " ", false);
 	}
 
-	public int countTokens() {
+	int countTokens() {
 		int count = 0;
 		int i = index;
 		Token token;
@@ -63,10 +54,6 @@ public class QuotedStringTokenizer {
 			i = token.nextIndex;
 		}
 		return count;
-	}
-
-	public boolean hasMoreTokens() {
-		return nextToken(index) != null;
 	}
 
 	public String nextToken(String separators) {

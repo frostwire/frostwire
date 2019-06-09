@@ -33,20 +33,12 @@ public class RegisterFailedException extends AssociationException {
     private static final long serialVersionUID = -7837641271063350515L;
 
     /**
-     * Constructs a <code>RegisterFailedException</code> object with no detail 
-     * message.
-     */
-    public RegisterFailedException() {
-        super();
-    }
-  
-    /**
      * Constructs a <code>RegisterFailedException</code> object with the specified 
      * detail message.
      * 
      * @param msg the detail message pertaining to this exception.
      */
-    public RegisterFailedException(String msg) {
+    RegisterFailedException(String msg) {
         super(msg);
     }
 }

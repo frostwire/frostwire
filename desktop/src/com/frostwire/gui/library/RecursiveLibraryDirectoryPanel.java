@@ -95,7 +95,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * @param blackListSet set of subfolders that are marked as not included, cannot be null
      * @param roots list of roots, can be null
      */
-    public RecursiveLibraryDirectoryPanel(boolean precheckFolders, Set<File> blackListSet, File... roots) {
+    private RecursiveLibraryDirectoryPanel(boolean precheckFolders, Set<File> blackListSet, File... roots) {
         super(new BorderLayout());
         this.roots = new TreeSet<>(FileTreeModel.DEFAULT_COMPARATOR);
         this.deselected = new HashSet<>(blackListSet);
@@ -110,9 +110,9 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
 
         directoryTree = new RootNotEditableTree(directoryTreeModel);
         directoryTree.setBorder(new EmptyBorder(4, 4, 4, 4));
-        /**
-         * Cell renderer for the tree that uses a check box for rendering of file tree
-         * data. Kept around here so its color configurations can be used.
+        /*
+          Cell renderer for the tree that uses a check box for rendering of file tree
+          data. Kept around here so its color configurations can be used.
          */
         FileTreeCellRenderer fileTreeCellRenderer = new FileTreeCellRenderer();
         directoryTree.setCellRenderer(fileTreeCellRenderer);
@@ -135,7 +135,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     }
 
     /** Resets the text of various components to the current language. */
-    public void updateLanguage() {
+    private void updateLanguage() {
         createLegendPanel(legendPanel);
         directoryTreeModel.changeRootText(I18n.tr("Library Folders"));
     }
@@ -179,12 +179,12 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     /**
      * Returns true if <code>dir</code> is on of the currenlty included roots.
      */
-    public boolean isRoot(File dir) {
+    boolean isRoot(File dir) {
         return roots.contains(dir);
     }
 
     /**
-     * Sets the set of subfolders to mark as not included. 
+     * Sets the set of sub folders to mark as not included.
      */
     public void setFoldersToExclude(Set<File> blackListSet) {
         deselected.clear();
@@ -200,27 +200,17 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     }
 
     /**
-     * Expand the root nodes.
-     */
-    public void setRootsExpanded() {
-        for (File root : roots) {
-            setExpanded(root);
-        }
-    }
-
-    /**
      * Expand the visible or invisible root node.
      */
-    public void setRootExpanded() {
+    private void setRootExpanded() {
         directoryTree.expandPath(new TreePath(directoryTreeModel.getRoot()));
     }
 
     /**
      * Adds a root to the tree if it's not already in there.
-     * 
-     * @return false if dir is already in the tree
+     *
      */
-    public boolean addRoot(File dir) {
+    public void addRoot(File dir) {
         // remove from deselected in any case
         boolean changed = deselected.remove(dir);
         // check if already included
@@ -230,27 +220,26 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
                     if (changed) {
                         directoryTreeModel.valueForPathChanged(getTreePath(dir), null);
                     }
-                    return changed;
+                    return;
                 }
                 // make sure it is included
                 removeFromPath(dir);
                 TreePath path = getTreePath(dir);
                 directoryTree.scrollPathToVisible(path);
-                return changed;
+                return;
             } else if (FileUtils.isAncestor(dir, root)) {
                 removeRoot(root);
                 addDirToTree(dir);
                 // expand to root and its parent, since expand has no effect if root
-                // doesn't have subfolders
+                // doesn't have sub folders
                 setExpanded(root);
                 // guaranteed to not be null since at least dir is its real ancestor
                 setExpanded(root.getParentFile());
-                return true;
+                return;
             }
         }
         addDirToTree(dir);
         setRootExpanded();
-        return true;
     }
 
     private void addDirToTree(File dir) {
@@ -261,7 +250,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     /**
      * Removes <code>root</code> from the tree of included roots. 
      */
-    public void removeRoot(File root) {
+    void removeRoot(File root) {
         if (roots.remove(root)) {
             // remove old root and add dir and expand to root
             // cancel editing, since we're removing from the tree
@@ -272,10 +261,10 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     }
 
     /**
-     * Retains common ancestors and removes subfolders since they will be part
+     * Retains common ancestors and removes sub folders since they will be part
      * of the recursive sharing. 
      */
-    static Set<File> retainAncestors(File... roots) {
+    private static Set<File> retainAncestors(File... roots) {
         if (roots == null) {
             return new HashSet<>();
         }
@@ -304,7 +293,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * 
      * If basePanel is non-null, the legend panel replaces the contents of that panel.
      */
-    private JPanel createLegendPanel(JPanel basePanel) {
+    private void createLegendPanel(JPanel basePanel) {
         final JPanel panel;
         if (basePanel != null) {
             basePanel.removeAll();
@@ -351,7 +340,6 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
         gbc.insets = null;
         panel.add(label, labelGbc);
 
-        return panel;
     }
 
     /**
@@ -384,8 +372,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Deselected root folders are not returned. Why???
      */
     public Set<File> getFoldersToExclude() {
-        //result.removeAll(roots);
-        return new HashSet<File>(deselected);
+        return new HashSet<>(deselected);
     }
 
     /**
@@ -416,12 +403,12 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
     /**
      * Expands node in the tree corresponding to <code>dir</code>.  
      */
-    public void setExpanded(File dir) {
+    private void setExpanded(File dir) {
         directoryTree.expandPath(getTreePath(dir));
     }
 
     /**
-     * Configures a checkbox with the properties of tree cell renderes. 
+     * Configures a checkbox with the properties of tree cell rendererjs.
      */
     private static JCheckBox configureCheckBox(JCheckBox checkBox) {
         checkBox.setHorizontalAlignment(JCheckBox.LEFT);
@@ -580,7 +567,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
          */
         private static final long serialVersionUID = -8422311328409412824L;
 
-        public FileTreeCellEditor() {
+        FileTreeCellEditor() {
             super(configureCheckBox(new JCheckBox()));
             //setColors((JCheckBox)editorComponent, true);
 
@@ -631,7 +618,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
          */
         private static final long serialVersionUID = 3856730985269585441L;
 
-        public RootNotEditableTree(TreeModel newModel) {
+        RootNotEditableTree(TreeModel newModel) {
             super(newModel);
         }
 

@@ -16,15 +16,12 @@ import java.util.prefs.Preferences;
 /**
  * Maintains a list of recent searches and persists this list automatically
  * using {@link Preferences}. A recent searches popup menu can be installed on
- * a {@link JXSearchField} using {@link #install(JXSearchField)}.
  * 
  * @author Peter Weishapl <petw@gmx.net>
  * 
  */
 public class RecentSearches implements ActionListener {
 	private Preferences prefsNode;
-
-	private int maxRecents = 5;
 
 	private List<String> recentSearches = new ArrayList<>();
 
@@ -38,7 +35,7 @@ public class RecentSearches implements ActionListener {
 	 * @param saveName
 	 *            a unique name for saving this list of recent searches
 	 */
-	public RecentSearches(String saveName) {
+	RecentSearches(String saveName) {
 		this(null, saveName);
 	}
 
@@ -47,16 +44,12 @@ public class RecentSearches implements ActionListener {
 	 * persist this list under the <code>prefs</code> node. Existing entries
 	 * will be loaded automatically.
 	 * 
-	 * @param prefsNode
-	 *            the preferences node under which this list will be persisted.
-	 *            If prefsNode is <code>null</code> the preferences node will
-	 *            be set to the user root node
 	 * @param saveName
 	 *            a unique name for saving this list of recent searches. If
 	 *            saveName is <code>null</code>, the list will not be
 	 *            persisted
 	 */
-	public RecentSearches(Preferences prefs, String saveName) {
+	private RecentSearches(Preferences prefs, String saveName) {
 		if (prefs == null) {
 			try {
 				prefs = Preferences.userRoot();
@@ -138,7 +131,7 @@ public class RecentSearches implements ActionListener {
 	 * 
 	 * @return the recent searches
 	 */
-	public String[] getRecentSearches() {
+	private String[] getRecentSearches() {
 		return recentSearches.toArray(new String[] {});
 	}
 
@@ -166,19 +159,8 @@ public class RecentSearches implements ActionListener {
 	 * @see #put(String)
 	 * @return the maximum number of recent searches
 	 */
-	public int getMaxRecents() {
-		return maxRecents;
-	}
-
-	/**
-	 * Set the maximum number of recent searches.
-	 * 
-	 * @see #put(String)
-	 * @param maxRecents
-	 *            maximum number of recent searches
-	 */
-	public void setMaxRecents(int maxRecents) {
-		this.maxRecents = maxRecents;
+	private int getMaxRecents() {
+		return 5;
 	}
 
 	/**
@@ -198,17 +180,8 @@ public class RecentSearches implements ActionListener {
 	 * @param l
 	 *            a registered {@link ChangeListener}
 	 */
-	public void removeChangeListener(ChangeListener l) {
+	private void removeChangeListener(ChangeListener l) {
 		listeners.remove(l);
-	}
-
-	/**
-	 * Returns all registered {@link ChangeListener}s.
-	 * 
-	 * @return all registered {@link ChangeListener}s
-	 */
-	public ChangeListener[] getChangeListeners() {
-		return listeners.toArray(new ChangeListener[] {});
 	}
 
 	private void fireChangeEvent() {
@@ -221,7 +194,6 @@ public class RecentSearches implements ActionListener {
 
 	/**
 	 * Creates the recent searches popup menu which will be used by
-	 * {@link #install(JXSearchField)} to set a search popup menu on
 	 * <code>searchField</code>.
 	 * 
 	 * Override to return a custom popup menu.
@@ -236,7 +208,6 @@ public class RecentSearches implements ActionListener {
 
 	/**
 	 * Install a recent the searches popup menu returned by
-	 * {@link #createPopupMenu(JXSearchField)} on <code>searchField</code>.
 	 * Also registers an {@link ActionListener} on <code>searchField</code>
 	 * and adds the search string to the list of recent searches whenever a
 	 * {@link ActionEvent} is received.
@@ -260,7 +231,7 @@ public class RecentSearches implements ActionListener {
 	 * @param searchField
 	 *            uninstall recent searches popup menu
 	 */
-	public void uninstall(JXSearchField searchField) {
+	void uninstall(JXSearchField searchField) {
 		searchField.removeActionListener(this);
 		if (searchField.getFindPopupMenu() instanceof RecentSearchesPopup) {
 			removeChangeListener((ChangeListener) searchField.getFindPopupMenu());
@@ -278,7 +249,6 @@ public class RecentSearches implements ActionListener {
 
 	/**
 	 * The popup menu returned by
-	 * {@link RecentSearches#createPopupMenu(JXSearchField)}.
 	 */
 	public static class RecentSearchesPopup extends JPopupMenu implements ActionListener, ChangeListener {
 		
@@ -294,10 +264,8 @@ public class RecentSearches implements ActionListener {
 		 * Creates a new popup menu based on the given {@link RecentSearches}
 		 * and {@link JXSearchField}.
 		 * 
-		 * @param recentSearches
-		 * @param searchField
 		 */
-		public RecentSearchesPopup(RecentSearches recentSearches, JTextField searchField) {
+		RecentSearchesPopup(RecentSearches recentSearches, JTextField searchField) {
 			this.searchField = searchField;
 			this.recentSearches = recentSearches;
 

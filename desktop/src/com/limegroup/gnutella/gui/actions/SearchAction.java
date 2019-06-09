@@ -32,22 +32,10 @@ public class SearchAction extends AbstractAction {
 				I18n.tr("Search for Keywords: {0}"));
 		
 	}
-	
+
 	/**
 	 * Constructs an action that triggers a search for the given search
 	 * information.
-	 * @param info
-	 * @throws IllegalArgumentException if the search information is not
-	 * {@link SearchMediator#validateInfo(SearchInformation) valid}
-	 */
-	public SearchAction(SearchInformation info) {
-		this(info, I18n.tr("Search for: {0}")); 
-	}
-	
-	/**
-	 * Constructs an action that triggers a search for the given search
-	 * information.
-	 * @param info
 	 * @param messageKey the key that surrounds the title of the search information, e.g
 	 * "Search for: {0}", {0} is replaced by the title of the search information
 	 * @throws IllegalArgumentException if the search information is not

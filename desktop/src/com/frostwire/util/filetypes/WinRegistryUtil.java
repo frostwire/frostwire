@@ -22,7 +22,6 @@ package com.frostwire.util.filetypes;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 //import org.jdesktop.jdic.filetypes.Action;
 //import org.jdesktop.jdic.filetypes.RegisterFailedException;
