@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ public class LibraryDatabase {
     private static final int LIBRARY_DATABASE_VERSION = 5;
 
     static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
-    
-    private final String _name;
+
     private Connection _connection;
     private boolean _closed;
 
@@ -53,7 +52,7 @@ public class LibraryDatabase {
         }
 
         if (databaseFile != null && databaseFile.isDirectory() && databaseFile.canRead() && databaseFile.canWrite()) {
-            _name = databaseFile.getName();
+            String _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
         } else {
             if (databaseFile != null) {
@@ -62,14 +61,6 @@ public class LibraryDatabase {
                 throw new IllegalArgumentException("Null library database file parameter received.");
             }
         }
-    }
-
-    public String getName() {
-        return _name;
-    }
-
-    public Connection getConnection() {
-        return _connection;
     }
 
     public boolean isClosed() {

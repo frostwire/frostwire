@@ -793,6 +793,7 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
+        LibraryMediator.getLibrary().close();
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
         hideVideoPlayerWindow();
         Finalizer.shutdown();
@@ -1047,7 +1048,7 @@ public final class GUIMediator {
      * @param msgType    The <tt>JOptionPane</tt> message type. @see
      *                   javax.swing.JOptionPane.
      */
-    private static void showDisposableMessage(final String messageKey, final String message, final Switch ignore, int msgType) {
+    private static void showDisposableMessage(@SuppressWarnings("SameParameterValue") final String messageKey, final String message, @SuppressWarnings("SameParameterValue") final Switch ignore, @SuppressWarnings("SameParameterValue") int msgType) {
         MessageService.instance().showDisposableMessage(messageKey, message, ignore, msgType);
     }
 
@@ -1061,7 +1062,7 @@ public final class GUIMediator {
      *
      * @param messageKey the key for the locale-specific message to display
      */
-    private static void hideDisposableMessage(final String messageKey) {
+    private static void hideDisposableMessage(@SuppressWarnings("SameParameterValue") final String messageKey) {
         MessageService.instance().hideDisposableMessage(messageKey);
     }
 

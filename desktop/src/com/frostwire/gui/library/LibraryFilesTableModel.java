@@ -20,7 +20,6 @@ package com.frostwire.gui.library;
 
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
 
-import javax.swing.*;
 import java.io.File;
 
 /**
@@ -38,13 +37,6 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      */
     private static final long serialVersionUID = 2859783399965055446L;
 
-    /**
-     * The table this model is used for.
-     * (Needed to make sure isCellEditable
-     *  is only true when a single thing is selected.)
-     */
-    //private JTable _table;
-
     LibraryFilesTableModel() {
         super(LibraryFilesTableDataLine.class);
     }
@@ -54,14 +46,6 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      */
     public LibraryFilesTableDataLine createDataLine() {
         return new LibraryFilesTableDataLine(this);
-    }
-
-    /**
-     * Set the table this model is used for
-     * Needed for isCellEditable to work
-     */
-    void setTable(JTable table) {
-        //_table = table;
     }
 
     /**

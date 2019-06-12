@@ -8,15 +8,12 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.FileUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -87,29 +84,6 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
         }
     }
 
-    /**
-     * Adds a directory to the internal list, resetting 'dirty' only if it wasn't
-     * dirty already.
-     */
-    void addAndKeepDirtyStatus(Set<File> foldersToShare, Set<File> foldersToExclude) {
-        for (File folder : foldersToShare) {
-            directoryPanel.addRoot(folder);
-        }
-        directoryPanel.addFoldersToExclude(foldersToExclude);
-    }
-    
-    boolean isAlreadyGoingToBeIncluded(File dir) {
-        if (directoryPanel.getFoldersToExclude().contains(dir)) {
-            return false;
-        }
-        for (File folder : directoryPanel.getRootsToInclude()) {
-            if (FileUtils.isAncestor(folder, dir)) {
-                return true;
-            }
-        }
-        return false;
-    }
-        
 	/**
 	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
 	 *
@@ -137,11 +111,8 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
      * 
 	 * Applies the options currently set in this window, displaying an
 	 * error message to the user if a setting could not be applied.
-	 *
-	 * @throws <tt>IOException</tt> if the options could not be applied 
-     *  for some reason
-	 */
-	public boolean applyOptions() throws IOException {
+	 **/
+	public boolean applyOptions() {
 	    
 	    LibrarySettings.DIRECTORIES_TO_INCLUDE.setValue(new HashSet<>());
 	    LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.setValue(new HashSet<>());

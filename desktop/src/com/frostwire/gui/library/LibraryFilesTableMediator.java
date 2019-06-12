@@ -133,7 +133,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         DATA_MODEL.sort(LibraryFilesTableDataLine.MODIFICATION_TIME_IDX);
 
         TABLE = new LimeJTable(DATA_MODEL);
-        DATA_MODEL.setTable(TABLE);
         Action[] aa = new Action[] { LAUNCH_ACTION, OPEN_IN_FOLDER_ACTION, SEND_TO_FRIEND_ACTION, DELETE_ACTION, OPTIONS_ACTION };
 
         BUTTON_ROW = new ButtonRow(aa, ButtonRow.X_AXIS, ButtonRow.NO_GLUE);
@@ -332,15 +331,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
      */
     File getFile(int row) {
         return DATA_MODEL.getFile(row);
-    }
-
-    /**
-     * Accessor for the table that this class wraps.
-     *
-     * @return The <tt>JTable</tt> instance used by the library.
-     */
-    JTable getTable() {
-        return TABLE;
     }
 
     /**

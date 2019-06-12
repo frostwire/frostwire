@@ -279,11 +279,6 @@ public class LibraryMediator {
         return panel;
     }
 
-    public void setSelectedFile(File file) {
-        getLibraryExplorer().selectFinishedDownloads();
-        LibraryFilesTableMediator.instance().setFileSelected(file);
-    }
-
     public void selectCurrentMedia() {
         //Select current playlist.
         Playlist currentPlaylist = MediaPlayer.instance().getCurrentPlaylist();
@@ -341,7 +336,7 @@ public class LibraryMediator {
             List<MediaTypeSavedFilesDirectoryHolder> holders = getLibraryExplorer().getMediaTypeSavedFilesDirectoryHolders();
             for (MediaTypeSavedFilesDirectoryHolder holder : holders) {
                 Set<File> cache = holder.getCache();
-                if (holder.accept(location) && !cache.isEmpty() && !cache.contains(location)) {
+                if (holder.accept(location) && !cache.isEmpty()) {
                     cache.add(location);
                 }
             }

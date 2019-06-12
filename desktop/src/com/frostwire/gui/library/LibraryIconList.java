@@ -28,21 +28,15 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class LibraryIconList extends JList<Object> {
 
     private Image speaker;
     private Image loading;
 
-    public LibraryIconList() {
-        loadIcons();
-    }
-
-    public LibraryIconList(ListModel<Object> dataModel) {
+    LibraryIconList(ListModel<Object> dataModel) {
         super(dataModel);
         loadIcons();
     }
@@ -52,9 +46,9 @@ public class LibraryIconList extends JList<Object> {
         super.paintComponent(g);
         MediaPlayer player = MediaPlayer.instance();
 
-        if (player.getState() != MediaPlaybackState.Stopped && 
-            player.getState() != MediaPlaybackState.Closed &&
-            player.getState() != MediaPlaybackState.Failed) {
+        if (player.getState() != MediaPlaybackState.Stopped &&
+                player.getState() != MediaPlaybackState.Closed &&
+                player.getState() != MediaPlaybackState.Failed) {
             if (player.getCurrentMedia() != null && player.getCurrentPlaylist() != null && player.getPlaylistFilesView() != null) {
                 int index = getPlaylistIndex(player.getCurrentPlaylist());
                 if (index != -1) {
