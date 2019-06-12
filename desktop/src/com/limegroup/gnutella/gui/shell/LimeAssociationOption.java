@@ -25,9 +25,9 @@ public class LimeAssociationOption {
      * @param name A short name of the association
      * @param description A description of the association
      */
-	public LimeAssociationOption(ShellAssociation association,
-			BooleanSetting setting,
-			String name, String description) {
+	LimeAssociationOption(ShellAssociation association,
+						  BooleanSetting setting,
+						  String name, String description) {
 		this.association = association;
 		this.setting = setting;
 		this.name = name;
@@ -35,10 +35,8 @@ public class LimeAssociationOption {
 	}
 	
     /**
-     * Either links or delinks the association to this program.
+     * Either links or de-links the association to this program.
      * This does not effect the setting.
-     * 
-     * @param enabled
      */
 	public void setEnabled(boolean enabled) {
 		if (enabled) {
@@ -57,8 +55,6 @@ public class LimeAssociationOption {
 	
     /**
      * Either allows or disallows the program from registering the association.
-     * 
-     * @param allow
      */
 	public void setAllowed(boolean allow) {
 		if (setting != null)

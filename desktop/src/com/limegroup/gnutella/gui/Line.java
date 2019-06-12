@@ -8,21 +8,9 @@ import java.awt.*;
  */
 public class Line extends JComponent {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 3079143371460914806L;
     private Color color;
 	private Color uiColor;
-    
-    /**
-     * Creates a line that uses a <tt>color</tt>.
-     */
-    public Line(Color color) {
-        setColor(color);
-        initSize();
-    }
-    
+
     /**
      * Creates a line that uses a color from the current theme.
      */

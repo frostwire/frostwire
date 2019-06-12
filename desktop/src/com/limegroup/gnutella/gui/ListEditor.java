@@ -31,25 +31,18 @@ public class ListEditor extends JPanel {
     private static final long serialVersionUID = 5689653237762528073L;
     /** INVARIANT: model contains exactly the same elements as realModel. */
     protected Vector<String> model;
-    protected DefaultListModel<Object> /* of String */ realModel;
+    private DefaultListModel<Object> /* of String */ realModel;
 
     protected Vector<ListDataListener> listeners;
 
     private static final int DEFAULT_COLUMNS=10;  //size of editor
     protected JTextField editor;
-    protected JButton addButton;
-    protected JButton removeButton;
+    private JButton removeButton;
     protected JList<Object> list;
 
-    /** True if I should append new items to end of the list; false if I should
-     *  add them to the end of the list. */
-    private boolean addTail=true;
-
-    
     /** 
      * Creates a new list editor with an empty underlying model.
      * New elements are added to the tail of the list by default.
-     * @see setModel
      */
     public ListEditor() {
         this(new Vector<>());
@@ -58,9 +51,8 @@ public class ListEditor extends JPanel {
     /**
      * Creates a new list editor with the given underlying model.
      * New elements are added to the tail of the list by default.
-     * @see setModel
      */
-    public ListEditor(Vector<String> model) {
+    private ListEditor(Vector<String> model) {
         this.listeners= new Vector<>();
 
         setLayout(new GridBagLayout());
@@ -79,7 +71,7 @@ public class ListEditor extends JPanel {
 		add(editor, gbc);
 		
 		Action addAction = new AddAction();
-        addButton =  new JButton(addAction);
+        JButton addButton = new JButton(addAction);
         GUIUtils.bindKeyToAction(editor, 
         		KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), addAction);
                 
@@ -121,8 +113,6 @@ public class ListEditor extends JPanel {
     }
 
     /** 
-     * @requires model not subsequently modified
-     * @effects returns the underlying model of this, as a Vector of Strings.
      *  Changes to this will <i>not</i> be reflected in the GUI.  However,
      *  changes made through the GUI will be reflected in the model. 
      */
@@ -131,9 +121,6 @@ public class ListEditor extends JPanel {
     }
 
     /**
-     * @requires model contains only Strings, model not subsequently modified
-     * @modifies this
-     * @effects sets the underlying model.  This will be reflected in the
      *  GUI. Modifications to this will <i>not</i> be reflected in the GUI.  
      *  However, changes made through the GUI will be reflected in the model. 
      */
@@ -145,26 +132,10 @@ public class ListEditor extends JPanel {
          list.setModel(realModel);
      }
 
-    /** 
-     * @modifies this
-     * @effects if addTail is true, new elements will be added to
-     *  the end of the list.  Otherwise, they'll be added to the
-     *  beginning.
-     */
-    public void setAddTail(boolean addTail) {
-        this.addTail=addTail;
-    }
-
-    /** Returns true if items are added to the tail of the list,
-     *  false otherwise. */
-    public boolean getAddTail() {
-        return addTail;
-    }
-    
     /**
      * Removes an item from the list.
      */
-    public synchronized void removeItem(int i) {
+    private synchronized void removeItem(int i) {
         model.remove(i);
         realModel.remove(i);
         editor.setText("");
@@ -177,16 +148,6 @@ public class ListEditor extends JPanel {
     }
 
 
-    /**
-     * @modifies this
-     * @effects adds listener to the list of listeners to be notified when
-     *  the underlying model changes.
-     */
-    public synchronized void addListDataListener(ListDataListener listener) {
-        listeners.add(listener);
-    }
-
-    
     /**
      * Enables the remove button if the selection of the lis is not empty, otherwise disables it.
      * Also sets the text of the currently selected value in the edit field.
@@ -203,10 +164,9 @@ public class ListEditor extends JPanel {
 			
             //Put it in the editor.
             Object val=list.getSelectedValue();
-            if (val==null) 
-                return;
-            else
+            if (val != null) {
                 editor.setText((String)val);
+            }
         }
     }
 
@@ -218,7 +178,7 @@ public class ListEditor extends JPanel {
          */
         private static final long serialVersionUID = 8474390737220207662L;
 
-        public AddAction()
+        AddAction()
     	{
     		putValue(Action.NAME, I18n.tr("Add"));
     	}
@@ -244,6 +204,9 @@ public class ListEditor extends JPanel {
 	           // Notify listeners.
             else {
                 int last;
+                /* True if I should append new items to end of the list; false if I should
+                   add them to the end of the list. */
+                boolean addTail = true;
                 if (addTail) {
                     //add to tail
                     model.addElement(text);
@@ -274,7 +237,7 @@ public class ListEditor extends JPanel {
          */
         private static final long serialVersionUID = 6931596656024307229L;
 
-        public RemoveAction()
+        RemoveAction()
     	{
     		putValue(Action.NAME, I18n.tr("Remove"));
     	}

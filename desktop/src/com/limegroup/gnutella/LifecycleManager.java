@@ -25,16 +25,13 @@ public interface LifecycleManager {
     /** Shuts down & executes something after shutdown completes. */
     void shutdown(String toExecute);
 
-    /** Gets the time this finished starting. */
-    long getStartFinishedTime();
-
     /**
      * Adds something that requires shutting down.
      *
-     * TODO: Make this take a 'Service' or somesuch that
+     * TODO: Make this take a 'Service' or some such that
      *       has a shutdown method, and run the method in its
      *       own thread.
      */
-    boolean addShutdownItem(Thread t);
+    void addShutdownItem(Thread t);
 
 }

@@ -55,7 +55,7 @@ public class LicenseToggleButton extends JPanel {
         PUBLICDOMAIN
     }
 
-    public LicenseToggleButton(LicenseIcon iconName, String text, String description, boolean selected, boolean toggleable) {
+    LicenseToggleButton(LicenseIcon iconName, String text, String description, boolean selected, boolean toggleable) {
         this.toggleable = toggleable;
         setMeUp();
 
@@ -80,11 +80,11 @@ public class LicenseToggleButton extends JPanel {
         return title;
     }
     
-    public void setToggleable(boolean t) {
+    void setToggleable(boolean t) {
         toggleable = t;
     }
 
-    public LicenseIcon getLicenseIcon() {
+    LicenseIcon getLicenseIcon() {
         return licenseIcon;
     }
 
@@ -97,7 +97,7 @@ public class LicenseToggleButton extends JPanel {
         updateComponents();
     }
 
-    public void setOnToggleListener(LicenseToggleButtonOnToggleListener listener) {
+    void setOnToggleListener(LicenseToggleButtonOnToggleListener listener) {
         this.listener = listener;
     }
     

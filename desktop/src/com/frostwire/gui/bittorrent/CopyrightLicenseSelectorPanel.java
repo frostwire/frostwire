@@ -31,7 +31,6 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,7 +82,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     private final JButton pickedLicenseLabel;
     private CopyrightLicenseBroker licenseBroker;
 
-    public CopyrightLicenseSelectorPanel() {
+    CopyrightLicenseSelectorPanel() {
         setLayout(new MigLayout("fill"));
         GUIUtils.setTitledBorderOnPanel(this, I18n.tr("Choose a Copyright License for this work"));
 
@@ -144,13 +143,13 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         initListeners();
         initComponents();
     }
-    
-    public boolean hasConfirmedRightfulUseOfLicense() {
-        return confirmRightfulUseOfLicense.isSelected();
-    }
 
-    public CopyrightLicenseBroker getLicenseBroker() {
+    CopyrightLicenseBroker getLicenseBroker() {
         return licenseBroker;
+    }
+    
+    boolean hasConfirmedRightfulUseOfLicense() {
+        return confirmRightfulUseOfLicense.isSelected();
     }
 
     private void initOpenSourceButtonList() {
@@ -296,7 +295,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initOpenSourceLicensesToggleListeners() {
-        LicenseToggleButtonOnToggleListener openSourceToggleListener = button -> onOpenSourceButtonToggled(button);
+        LicenseToggleButtonOnToggleListener openSourceToggleListener = this::onOpenSourceButtonToggled;
         
         apacheButton.setOnToggleListener(openSourceToggleListener);
         bsd2ClauseButton.setOnToggleListener(openSourceToggleListener);
@@ -312,7 +311,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initCreativeCommonsLicenseToggleListeners() {
-        LicenseToggleButtonOnToggleListener ccToggleListener = button -> onCreativeCommonsButtonToggled(button);
+        LicenseToggleButtonOnToggleListener ccToggleListener = this::onCreativeCommonsButtonToggled;
         
         ncButton.setOnToggleListener(ccToggleListener);
         ndButton.setOnToggleListener(ccToggleListener);
@@ -320,7 +319,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
     
     private void initPublicDomainToggleListeners() {
-        LicenseToggleButtonOnToggleListener pdToggleListener = button -> onPublicDomainButtonToggled(button);
+        LicenseToggleButtonOnToggleListener pdToggleListener = this::onPublicDomainButtonToggled;
         cc0Button.setOnToggleListener(pdToggleListener);
         publicDomainButton.setOnToggleListener(pdToggleListener);
     }
@@ -446,7 +445,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         }
     }
 
-    protected void onConfirmRightfulUseOfLicenseAction() {
+    private void onConfirmRightfulUseOfLicenseAction() {
         boolean rightfulUseConfirmed = hasConfirmedRightfulUseOfLicense();
 
         authorsNameLabel.setEnabled(rightfulUseConfirmed);
