@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
- *
  */
 public class LabeledRangeSlider extends JPanel {
 
@@ -37,13 +35,10 @@ public class LabeledRangeSlider extends JPanel {
     private final JLabel maxLabel;
 
     /**
-     * 
-     * @param title - No need to pass through I18n.tr()
+     * @param title          - No need to pass through I18n.tr()
      * @param defaultMaxText - optional. No need to pass through I18n.tr()
-     * @param minValue
-     * @param maxValue
      */
-    public LabeledRangeSlider(String title, String defaultMaxText, int minValue, int maxValue) {
+    LabeledRangeSlider(String title, String defaultMaxText, int minValue, int maxValue) {
         slider = new RangeSlider();
         slider.setValue(minValue);
         slider.setUpperValue(maxValue);
@@ -100,19 +95,19 @@ public class LabeledRangeSlider extends JPanel {
     /**
      * Sets the lower value in the range.
      */
-    public void setLowerValue(int value) {
+    void setLowerValue(@SuppressWarnings("SameParameterValue") int value) {
         slider.setLowerValue(value);
     }
 
-    public int getLowerValue() {
+    int getLowerValue() {
         return slider.getLowerValue();
     }
 
-    public int getUpperValue() {
+    int getUpperValue() {
         return slider.getUpperValue();
     }
 
-    public void setUpperValue(int value) {
+    void setUpperValue(@SuppressWarnings("SameParameterValue") int value) {
         slider.setUpperValue(value);
     }
 
@@ -124,11 +119,11 @@ public class LabeledRangeSlider extends JPanel {
         slider.setMaximum(max);
     }
 
-    public JLabel getMinimumValueLabel() {
+    JLabel getMinimumValueLabel() {
         return minLabel;
     }
 
-    public JLabel getMaximumValueLabel() {
+    JLabel getMaximumValueLabel() {
         return maxLabel;
     }
 

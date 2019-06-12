@@ -28,10 +28,6 @@ public final class InstallSettings extends LimeWireSettings {
     private static final InstallSettings INSTANCE = new InstallSettings();
     private static final SettingsFactory FACTORY = INSTANCE.getFactory();
 
-    public static InstallSettings instance() {
-        return INSTANCE;
-    }
-
     private InstallSettings() {
         super("installation.props", "FrostWire installs file");
     }

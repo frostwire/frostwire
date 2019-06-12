@@ -30,49 +30,49 @@ public final class LabeledComponent {
 	 * Constant alignment key for aligning the label on the top of the 
 	 * <tt>Component</tt> justified in the center.
 	 */
-	public static final int TOP_CENTER = 12;
+	private static final int TOP_CENTER = 12;
 
 	/**
 	 * Constant alignment key for aligning the label on the top of the 
 	 * <tt>Component</tt> with left justification.
 	 */
-	public static final int TOP_LEFT = 13;
+	private static final int TOP_LEFT = 13;
 
 	/**
 	 * Constant alignment key for aligning the label on the top of the 
 	 * <tt>Component</tt> with right justification.
 	 */
-	public static final int TOP_RIGHT = 14;
+	private static final int TOP_RIGHT = 14;
 
 	/**
 	 * Constant alignment key for aligning the label onthe bottom of the 
 	 * <tt>Component</tt> justified in the center.
 	 */
-	public static final int BOTTOM_CENTER = 15;
+	private static final int BOTTOM_CENTER = 15;
 
 	/**
 	 * Constant alignment key for aligning the label onthe bottom of the 
 	 * <tt>Component</tt> with left justification.
 	 */
-	public static final int BOTTOM_LEFT = 16;
+	private static final int BOTTOM_LEFT = 16;
 
 	/**
 	 * Constant alignment key for aligning the label on the bottom of the 
 	 * <tt>Component</tt> with right justification.
 	 */
-	public static final int BOTTOM_RIGHT = 17;
+	private static final int BOTTOM_RIGHT = 17;
 
 	/**
 	 * This will create a "glue" at the top of the panel, pushing the
 	 * label/component pair to the bottom.
 	 */
-    public static final int TOP_GLUE = 100;
+    private static final int TOP_GLUE = 100;
 
 	/**
 	 * This will create a "glue" at the bottom of the panel, pushing the
 	 * label/component pair to the top.
 	 */
-    public static final int BOTTOM_GLUE = 110;
+    private static final int BOTTOM_GLUE = 110;
 
 	/**
 	 * This will create a "glue" at the left of the panel, pushing the
@@ -84,13 +84,13 @@ public final class LabeledComponent {
 	 * This will create a "glue" at the right of the panel, pushing the
 	 * label/component pair to the right.
 	 */
-    public static final int RIGHT_GLUE = 130;
+    private static final int RIGHT_GLUE = 130;
 
 	/**
 	 * This will give the panel glue at the right and left or top and bottom of
 	 * the panel, pushing the label/component pair in the middle.
 	 */
-    public static final int SURROUND_GLUE = 140;
+    private static final int SURROUND_GLUE = 140;
 
 	/**
 	 * This will give the panel no glue.
@@ -142,7 +142,7 @@ public final class LabeledComponent {
 	 * glue on any of the four sides that forces the label/component
 	 * pair to one side of the panel.
 	 *
-	 * @param label the key for the locale-specific label
+	 * @param key the key for the locale-specific label
 	 * @param comp the component to put the label next to
 	 * @param alignment specifies the placement of the label in relation
 	 *                  to the <tt>Component</tt>
@@ -165,7 +165,7 @@ public final class LabeledComponent {
 			}
 		}
 		if(alignment == TOP_LEFT || alignment == TOP_CENTER ||
-		   alignment == TOP_RIGHT || alignment == BOTTOM_LEFT || 
+		   alignment == TOP_RIGHT || alignment == BOTTOM_LEFT ||
 		   alignment == BOTTOM_CENTER || alignment == BOTTOM_RIGHT) {
 			PANEL.setOrientation(BoxPanel.Y_AXIS);
 			if(glue == TOP_GLUE || glue == SURROUND_GLUE) {
@@ -243,7 +243,7 @@ public final class LabeledComponent {
 		}
 
 		if(alignment == TOP_LEFT || alignment == TOP_CENTER ||
-		   alignment == TOP_RIGHT || alignment == BOTTOM_LEFT || 
+		   alignment == TOP_RIGHT || alignment == BOTTOM_LEFT ||
 		   alignment == BOTTOM_CENTER || alignment == BOTTOM_RIGHT) {
 			PANEL.setOrientation(BoxPanel.Y_AXIS);
 			if(glue == BOTTOM_GLUE || glue == SURROUND_GLUE) {

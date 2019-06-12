@@ -13,10 +13,6 @@ public final class iTunesImportSettings extends LimeWireSettings {
     private static final iTunesImportSettings INSTANCE = new iTunesImportSettings();
     private static final SettingsFactory FACTORY = INSTANCE.getFactory();
 
-    public static iTunesImportSettings instance() {
-        return INSTANCE;
-    }
-
     private iTunesImportSettings() {
         super("itunes.props", "FrostWire iTunes import settings");
     }

@@ -10,7 +10,9 @@
  */
 package com.frostwire.jpeg;
 
-import java.io.*;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 
 /**
@@ -72,7 +74,7 @@ public class JFIFInputStream extends FilterInputStream {
          * Holds the marker code.
          * A marker is an unsigned short between 0xff01 and 0xfffe.
          */
-        public final int marker;
+        final int marker;
         /**
          * Holds the offset of the first data byte to the beginning
          * of the stream.
@@ -86,13 +88,13 @@ public class JFIFInputStream extends FilterInputStream {
          */
         public final int length;
 
-        public Segment(int marker, long offset, int length) {
+        Segment(int marker, long offset, int length) {
             this.marker = marker;
             this.offset = offset;
             this.length = length;
         }
 
-        public boolean isEntropyCoded() {
+        boolean isEntropyCoded() {
             return length == -1;
         }
 
@@ -111,69 +113,36 @@ public class JFIFInputStream extends FilterInputStream {
     private long offset = 0;
     private boolean isStuffed0xff = false;
     /** JUNK_MARKER Marker (for data which is not part of the JFIF stream. */
-    public final static int JUNK_MARKER = -1;
+    private final static int JUNK_MARKER = -1;
     /** Start of image */
-    public final static int SOI_MARKER = 0xffd8;
+    private final static int SOI_MARKER = 0xffd8;
     /** End of image */
-    public final static int EOI_MARKER = 0xffd9;
+    private final static int EOI_MARKER = 0xffd9;
     /** Temporary private use in arithmetic coding */
-    public final static int TEM_MARKER = 0xff01;
+    private final static int TEM_MARKER = 0xff01;
     /** Start of scan */
-    public final static int SOS_MARKER = 0xffda;
-    /** APP1_MARKER Reserved for application use */
-    public final static int APP1_MARKER = 0xffe1;
-    /** APP2_MARKER Reserved for application use */
-    public final static int APP2_MARKER = 0xffe2;
+    private final static int SOS_MARKER = 0xffda;
     /** Reserved for JPEG extensions */
-    public final static int JPG0_MARKER = 0xfff0;
-    public final static int JPG1_MARKER = 0xfff1;
-    public final static int JPG2_MARKER = 0xfff2;
-    public final static int JPG3_MARKER = 0xfff3;
-    public final static int JPG4_MARKER = 0xfff4;
-    public final static int JPG5_MARKER = 0xfff5;
-    public final static int JPG6_MARKER = 0xfff6;
-    public final static int JPG7_MARKER = 0xfff7;
-    public final static int JPG8_MARKER = 0xfff8;
-    public final static int JPG9_MARKER = 0xfff9;
-    public final static int JPGA_MARKER = 0xfffA;
-    public final static int JPGB_MARKER = 0xfffB;
-    public final static int JPGC_MARKER = 0xfffC;
-    public final static int JPGD_MARKER = 0xfffD;
-    /** Start of frame markers */
-    public final static int SOF0_MARKER = 0xffc0;//nondifferential Huffman-coding frames with baseline DCT.
-    public final static int SOF1_MARKER = 0xffc1;//nondifferential Huffman-coding frames with extended sequential DCT.
-    public final static int SOF2_MARKER = 0xffc2;//nondifferential Huffman-coding frames with progressive DCT.
-    public final static int SOF3_MARKER = 0xffc3;//nondifferential Huffman-coding frames with lossless (sequential) data.
-
-    //public final static int SOF4_MARKER = 0xffc4;//
-    public final static int SOF5_MARKER = 0xffc5;//differential Huffman-coding frames with differential sequential DCT.
-    public final static int SOF6_MARKER = 0xffc6;//differential Huffman-coding frames with differential progressive DCT.
-    public final static int SOF7_MARKER = 0xffc7;//differential Huffman-coding frames with differential lossless data.
-
-    //public final static int SOF8_MARKER = 0xffc8;//
-    public final static int SOF9_MARKER = 0xffc9;//nondifferential Arithmetic-coding frames with extended sequential DCT.
-    public final static int SOFA_MARKER = 0xffcA;//nondifferential Arithmetic-coding frames with progressive DCT.
-    public final static int SOFB_MARKER = 0xffcB;//nondifferential Arithmetic-coding frames with lossless (sequential) data.
-    //public final static int SOFC_MARKER = 0xffcC;//
-    public final static int SOFD_MARKER = 0xffcD;//differential Arithmetic-coding frames with differential sequential DCT.
-    public final static int SOFE_MARKER = 0xffcE;//differential Arithmetic-coding frames with differential progressive DCT.
-    public final static int SOFF_MARKER = 0xffcF;//differential Arithmetic-coding frames with differential lossless DCT.
+    private final static int JPG0_MARKER = 0xfff0;
+    private final static int JPG1_MARKER = 0xfff1;
+    private final static int JPG2_MARKER = 0xfff2;
+    private final static int JPG3_MARKER = 0xfff3;
+    private final static int JPG4_MARKER = 0xfff4;
+    private final static int JPG5_MARKER = 0xfff5;
+    private final static int JPG6_MARKER = 0xfff6;
+    private final static int JPG7_MARKER = 0xfff7;
+    private final static int JPG8_MARKER = 0xfff8;
+    private final static int JPG9_MARKER = 0xfff9;
+    private final static int JPGA_MARKER = 0xfffA;
+    private final static int JPGB_MARKER = 0xfffB;
+    private final static int JPGC_MARKER = 0xfffC;
+    private final static int JPGD_MARKER = 0xfffD;
 
     // Restart markers
-    public final static int RST0_MARKER = 0xffd0;
-    public final static int RST1_MARKER = 0xffd1;
-    public final static int RST2_MARKER = 0xffd2;
-    public final static int RST3_MARKER = 0xffd3;
-    public final static int RST4_MARKER = 0xffd4;
-    public final static int RST5_MARKER = 0xffd5;
-    public final static int RST6_MARKER = 0xffd6;
-    public final static int RST7_MARKER = 0xffd7;
+    private final static int RST0_MARKER = 0xffd0;
+    private final static int RST7_MARKER = 0xffd7;
 
-    public JFIFInputStream(File f) throws IOException {
-       this(new BufferedInputStream(new FileInputStream(f)));
-    }
-
-    public JFIFInputStream(InputStream in) {
+    JFIFInputStream(InputStream in) {
         super(in);
 
         for (int i = RST0_MARKER; i <= RST7_MARKER; i++) {
@@ -204,24 +173,12 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Gets the current segment from the input stream.
-     *
-     * @return The current segment. Returns null, if we encountered
-     * the end of the stream.
-     * @throws java.io.IOException
-     */
-    public Segment getSegment() {
-        return segment;
-    }
-
-    /**
      * Gets the next segment from the input stream.
      * 
      * @return The next segment. Returns null, if we encountered
      * the end of the stream.
-     * @throws java.io.IOException
      */
-    public Segment getNextSegment() throws IOException {
+    Segment getNextSegment() throws IOException {
         // If we are inside of a marker segment, skip the
         // marker
         if (!segment.isEntropyCoded()) {
@@ -290,10 +247,6 @@ public class JFIFInputStream extends FilterInputStream {
             segment = new Segment(0xff00 | marker, offset, length - 2);
         }
         return segment;
-    }
-
-    public long getStreamPosition() {
-        return offset;
     }
 
     private int read0() throws IOException {
@@ -402,19 +355,6 @@ public class JFIFInputStream extends FilterInputStream {
             }
         }
         return count;
-    }
-
-    /** Fully skips the specified number of bytes. */
-    public final void skipFully(long n) throws IOException {
-        long total = 0;
-        long cur = 0;
-
-        while ((total < n) && ((cur = (int) in.skip(n - total)) > 0)) {
-            total += cur;
-        }
-        if (total < n) {
-            throw new EOFException();
-        }
     }
 
     /**

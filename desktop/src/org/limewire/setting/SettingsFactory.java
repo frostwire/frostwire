@@ -354,13 +354,6 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
         handleSettingInternal(result);
         return result;
     }
-    
-    @SuppressWarnings("unused")
-    public synchronized IntSetSetting createIntSetSetting(String key, Integer[] defaultValue) {
-        IntSetSetting result = new IntSetSetting(DEFAULT_PROPS, PROPS, key, defaultValue);
-        handleSettingInternal(result);
-        return result;
-    }
 
     /**
      * Creates a new <tt>ByteSetting</tt> instance with the specified
