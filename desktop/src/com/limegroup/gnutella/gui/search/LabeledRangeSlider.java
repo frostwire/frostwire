@@ -132,10 +132,6 @@ public class LabeledRangeSlider extends JPanel {
         return maxLabel;
     }
 
-    public JLabel getTitleLabel() {
-        return titleLabel;
-    }
-
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);

@@ -262,8 +262,5 @@ public final class LabeledComponent {
 	public JComponent getComponent() {
 		return PANEL;
 	}
-	
-	public BoxPanel getBoxPanelComponent() {
-		return PANEL;
-	}
+
 }

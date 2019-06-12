@@ -39,22 +39,8 @@ public class LabeledTextField extends JPanel {
         this(lab, textWidth, -1, 500);
 	}
 
-    
+
 	/**
-	 * Constructor with the specified width of the text box and a
-	 * specified margin in pixels to the left of the labeled field.
-	 *
-	 * @param lab the label for the text field
-	 * @param textWidth the number of columns in the text field
-	 * @param strutSize the size (in pixels) of the margin to the left of
-	 *  the labeled field
-	 */
-    public LabeledTextField(String lab, int textWidth, int strutSize) {
-        this(lab, textWidth, strutSize, 500);
-    }    
-
-
-    /**
      * Constructor with the specified width of the text box and a
      * specified margin in pixels to the left of the labeled field.
      *
@@ -108,30 +94,12 @@ public class LabeledTextField extends JPanel {
 	public void setToolTipText(String text) {
 		_field.setToolTipText(text);
 	}
-	
-	/**
-	 * Sets whether or not the <tt>JTextField</tt> can be edited by the user.
-	 *
-	 * @param editable sets whether the enclosed <tt>JTextField</tt> is 
-	 *                 editable or not
-	 */
-	public void setEditable(boolean editable) {
-		_field.setEditable(editable);
-	}
-	
+
 	public void setEnabled(boolean enabled) {
 		_field.setEnabled(enabled);
 	}
 
-    /** 
-     * Adds a ActionListener to the TextField.
-     * @param aa AbstractAction implementation.
-     */
-    public void addActionListener(AbstractAction aa) {
-        _field.addActionListener(aa);
-    }
-    
-    @Override
+	@Override
     public synchronized void addKeyListener(KeyListener l) {
     	super.addKeyListener(l);
     	_field.addKeyListener(l);
