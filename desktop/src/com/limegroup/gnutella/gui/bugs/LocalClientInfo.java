@@ -34,7 +34,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * This class encapsulates all of the data for an individual client machine
@@ -44,8 +46,6 @@ import java.util.*;
  * access to that data in url-encoded form.
  */
 public final class LocalClientInfo extends LocalAbstractInfo {
-
-    final SettingsFactory sf = LimeProps.instance().getFactory();
 
     /**
      * Creates information about this bug from the bug, thread, and detail.
@@ -89,12 +89,12 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         // Load the properties from SettingsFactory, excluding
         // FileSettings and FileArraySettings.
 
-        synchronized (sf) {
-            for (Setting set : sf) {
-                if (!set.isPrivate() && !set.isDefault())
-                    props.put(set.getKey(), set.getValueAsString());
-            }
+        SettingsFactory sf = LimeProps.instance().getFactory();
+        for (Setting set : sf) {
+            if (!set.isPrivate() && !set.isDefault())
+                props.put(set.getKey(), set.getValueAsString());
         }
+
         // list the properties in the PrintWriter.
         props.list(pw);
         pw.flush();
@@ -191,99 +191,4 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         else return value;
     }
 
-    /**
-     * Returns a an array of the name/value pairs of this info.
-     *
-     * @return an array of the name/value pairs of this info.
-     */
-    //public final NameValuePair[] getPostRequestParams() {
-    private List<NameValuePair> getPostRequestParams() {
-        List<NameValuePair> params = new LinkedList<>();
-        append(params, LIMEWIRE_VERSION, _limewireVersion);
-        append(params, JAVA_VERSION, _javaVersion);
-        append(params, OS, _os);
-        append(params, OS_VERSION, _osVersion);
-        append(params, ARCHITECTURE, _architecture);
-        append(params, FREE_MEMORY, _freeMemory);
-        append(params, TOTAL_MEMORY, _totalMemory);
-        append(params, BUG, _bug);
-        append(params, CURRENT_THREAD, _currentThread);
-        append(params, PROPS, _props);
-        append(params, UPTIME, _upTime);
-        append(params, CONNECTED, _connected);
-        append(params, UP_TO_UP, _upToUp);
-        append(params, UP_TO_LEAF, _upToLeaf);
-        append(params, LEAF_TO_UP, _leafToUp);
-        append(params, OLD_CONNECTIONS, _oldConnections);
-        append(params, ULTRAPEER, _ultrapeer);
-        append(params, LEAF, _leaf);
-        append(params, ACTIVE_UPLOADS, _activeUploads);
-        append(params, QUEUED_UPLOADS, _queuedUploads);
-        append(params, ACTIVE_DOWNLOADS, _activeDownloads);
-        append(params, HTTP_DOWNLOADERS, _httpDownloaders);
-        append(params, WAITING_DOWNLOADERS, _waitingDownloaders);
-        append(params, ACCEPTED_INCOMING, _acceptedIncoming);
-        append(params, SHARED_FILES, _sharedFiles);
-        append(params, OTHER_THREADS, _otherThreads);
-        append(params, DETAIL, _detail);
-        append(params, OTHER_BUG, _otherBug);
-        append(params, JAVA_VENDOR, _javaVendor);
-        append(params, THREAD_COUNT, _threadCount);
-        append(params, BUG_NAME, _bugName);
-        append(params, GUESS_CAPABLE, _guessCapable);
-        append(params, SOLICITED_CAPABLE, _solicitedCapable);
-        append(params, LATEST_SIMPP, _latestSIMPP);
-        //append(params, IP_STABLE,_ipStable);
-        append(params, PORT_STABLE, _portStable);
-        append(params, CAN_DO_FWT, _canDoFWT);
-        append(params, LAST_REPORTED_PORT, _lastReportedPort);
-        append(params, EXTERNAL_PORT, _externalPort);
-        append(params, RECEIVED_IP_PONG, _receivedIpPong);
-        append(params, FATAL_ERROR, _fatalError);
-        append(params, RESPONSE_SIZE, _responseSize);
-        append(params, CT_SIZE, _creationCacheSize);
-        append(params, VF_BYTE_SIZE, _vfByteSize);
-        append(params, VF_VERIFY_SIZE, _vfVerifyingSize);
-        append(params, BB_BYTE_SIZE, _bbSize);
-        append(params, VF_QUEUE_SIZE, _vfQueueSize);
-        append(params, WAITING_SOCKETS, _waitingSockets);
-        append(params, PENDING_TIMEOUTS, _pendingTimeouts);
-        append(params, PEAK_THREADS, _peakThreads);
-        append(params, SP2_WORKAROUNDS, _sp2Workarounds);
-        append(params, LOAD_AVERAGE, _loadAverage);
-        append(params, PENDING_GCOBJ, _pendingObjects);
-        append(params, SETTINGS_FREE_SPACE, _settingsFreeSpace);
-        append(params, INCOMPLETES_FREE_SPACE, _incompleteFreeSpace);
-        append(params, DOWNLOAD_FREE_SPACE, _downloadFreeSpace);
-        append(params, HEAP_USAGE, _heapUsage);
-        append(params, NON_HEAP_USAGE, _nonHeapUsage);
-        append(params, SLOT_MANAGER, _slotManager);
-        append(params, NUM_SELECTS, _numSelects);
-        append(params, NUM_IMMEDIATE_SELECTS, _numImmediateSelects);
-        append(params, AVG_SELECT_TIME, _avgSelectTime);
-        append(params, USER_COMMENTS, _userComments);
-        // APPEND OTHER PARAMETERS HERE.
-
-        return params;
-        //return params.toArray(new NameValuePair[params.size()]);
-    }
-
-    /**
-     * Appends a NameValuePair of k/v to l if v is non-null.
-     */
-    private void append(List<? super NameValuePair> l, final String k, final String v) {
-        if (v != null)
-            l.add(new NameValuePair(k, v));
-    }
-
-    private static final class NameValuePair {
-
-        private final String name;
-        private final String value;
-
-        public NameValuePair(final String name, final String value) {
-            this.name = name;
-            this.value = value;
-        }
-    }
 }

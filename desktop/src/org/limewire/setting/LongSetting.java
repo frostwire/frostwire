@@ -42,12 +42,6 @@ public class LongSetting extends AbstractNumberSetting<Long> {
                                                               false, null, null);
 	}
 
-	LongSetting(Properties defaultProps, Properties props, String key, 
-                long defaultLong, long min, long max) {
-		super(defaultProps, props, key, String.valueOf(defaultLong), 
-                                 true, min, max);
-	}
-        
 	/**
 	 * Returns the value of this setting.
 	 * 

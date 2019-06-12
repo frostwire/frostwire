@@ -18,27 +18,9 @@ public interface MediaPlayer {
 
     void togglePause();
 
-    void mute(boolean on);
-
-    void addMetaDataListener(MetaDataListener listener);
-
-    void removeMetaDataListener(MetaDataListener listener);
-
     void addStateListener(StateListener listener);
 
-    void removeStateListener(StateListener listener);
-
-    void addVolumeListener(VolumeListener listener);
-
-    void removeVolumeListener(VolumeListener listener);
-
     void addPositionListener(PositionListener listener);
-
-    void removePositionListener(PositionListener listener);
-
-    void addTaskListener(TaskListener listener);
-
-    void removeTaskListener(TaskListener listener);
 
     String getOpenedFile();
 

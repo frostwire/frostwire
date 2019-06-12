@@ -348,8 +348,6 @@ public class MPlayer extends BaseMediaPlayer {
             }
         } else if (line
                 .startsWith("<vo_direct3d>Reading display capabilities failed")) {
-
-            MediaPlaybackState.Failed.setDetails("azemp.failed.d3dbad");
             reportNewState(MediaPlaybackState.Failed);
         } else if (line.startsWith(ID_EXIT)) {
             reportNewState(MediaPlaybackState.Closed);

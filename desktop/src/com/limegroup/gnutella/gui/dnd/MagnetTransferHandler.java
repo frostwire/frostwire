@@ -33,11 +33,6 @@ import java.io.IOException;
  */
 public class MagnetTransferHandler extends LimeTransferHandler {
 
-	/**
-     * 
-     */
-    private static final long serialVersionUID = 5866840096804306495L;
-
     @Override
 	public boolean canImport(JComponent c, DataFlavor[] flavors, DropInfo ddi) {
 		return canImport(c, flavors);
@@ -45,10 +40,7 @@ public class MagnetTransferHandler extends LimeTransferHandler {
 	
 	@Override
 	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-		if (DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor)) {
-			return true;
-		}
-		return false;
+		return DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor);
 	}
 	
 	@Override
@@ -76,10 +68,10 @@ public class MagnetTransferHandler extends LimeTransferHandler {
 			
 			
 			if (magnets.length > 0) {
-				MagnetClipboardListener.handleMagnets(magnets, false);
+				MagnetClipboardListener.handleMagnets(magnets);
 				return true;
 			}
-		} catch (UnsupportedFlavorException | IOException e) {
+		} catch (UnsupportedFlavorException | IOException ignored) {
 		}
         return false;
 	}

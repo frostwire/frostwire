@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
@@ -28,8 +30,6 @@ import java.awt.datatransfer.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -56,7 +56,7 @@ public class MagnetClipboardListener extends WindowAdapter {
      */
     private final ExecutorService clipboardParser = ExecutorsHelper.newProcessingQueue("clipboard parser");
 
-    private Runnable parser = () -> parseAndLaunch();
+    private Runnable parser = this::parseAndLaunch;
 
     /**
      * @return true if no errors occurred.  False if we should not try to 
@@ -86,7 +86,7 @@ public class MagnetClipboardListener extends WindowAdapter {
         //purge the clipboard at this point
         purgeClipboard();
 
-        handleMagnets(opts, true);
+        handleMagnets(opts);
     }
 
     private MagnetClipboardListener() {
@@ -95,16 +95,6 @@ public class MagnetClipboardListener extends WindowAdapter {
 
     public static MagnetClipboardListener getInstance() {
         return instance;
-    }
-
-    /**
-     * Sets the text that is going to be copied to the clipboard from withing 
-     * LimeWire, so that the listener can discern between our own copied magnet 
-     * links and the ones pasted from the outside.
-     * @param text
-     */
-    public void setCopiedText(String text) {
-        copiedText = text;
     }
 
     /**
@@ -132,27 +122,15 @@ public class MagnetClipboardListener extends WindowAdapter {
      * 
      * Once single search is also started for a magnet that is 
      * {@link MagnetOptions#isKeywordTopicOnly()}.
-     * 
-     * @param showDialog if true a dialog with the magnets is shown asking
-     * the user if s/he wants to download them
+     *
      */
-    public static void handleMagnets(final MagnetOptions[] magnets, final boolean showDialog) {
+    public static void handleMagnets(final MagnetOptions[] magnets) {
         // get a nicer looking address from the magnet
         // turns out magnets are very liberal.. so display the whole thing
-        final MagnetOptions[] downloadCandidates = extractDownloadableMagnets(magnets);
+        //final MagnetOptions[] downloadCandidates = extractDownloadableMagnets(magnets);
 
         // and fire off the download
         Runnable r = () -> {
-            if (!showDialog) {
-                //    				for (MagnetOptions magnet : downloadCandidates) {
-                //						//TODO: DownloaderUtils.createDownloader(magnet);
-                //					}
-            } else if (downloadCandidates.length > 0) {
-                //List<MagnetOptions> userChosen = showStartDownloadsDialog(downloadCandidates);
-                //					for (MagnetOptions magnet : userChosen) {
-                //					  //TODO: DownloaderUtils.createDownloader(magnet);
-                //					}
-            }
             boolean oneSearchStarted = false;
             for (MagnetOptions magnet : magnets) {
                 if (!magnet.isDownloadable() && magnet.isKeywordTopicOnly() && !oneSearchStarted) {
@@ -169,9 +147,9 @@ public class MagnetClipboardListener extends WindowAdapter {
         GUIMediator.safeInvokeLater(r);
     }
 
-    public static String extractStringContentFromClipboard(Object requestor) {
+    private static String extractStringContentFromClipboard(Object requestor) {
         try {
-            Transferable data = null;
+            Transferable data;
             try {
                 //check if there's anything in the clipboard
                 data = CLIPBOARD.getContents(requestor);
@@ -233,25 +211,5 @@ public class MagnetClipboardListener extends WindowAdapter {
         }
 
         return null;
-    }
-
-    /**
-     * Extracts magnets that are not keyword topic only magnets
-     * @param magnets
-     * @return
-     */
-    private static MagnetOptions[] extractDownloadableMagnets(MagnetOptions[] magnets) {
-        List<MagnetOptions> dls = new ArrayList<>(magnets.length);
-        for (MagnetOptions magnet : magnets) {
-            if (!magnet.isKeywordTopicOnly()) {
-                dls.add(magnet);
-            }
-        }
-        // all magnets are downloadable, return original array
-        if (dls.size() == magnets.length) {
-            return magnets;
-        } else {
-            return dls.toArray(new MagnetOptions[0]);
-        }
     }
 }
