@@ -20,8 +20,9 @@ frostwire (6.8.0) stable; urgency=high
   * libtorrent: update symlinks to conform to BEP 47
   * libtorrent: source code cleanup, performance and stability
   * Pixabay search removed
+  * macos: Rebuilt libSystemUtilities.jnilib shared library for x86_64 arch only
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 01 June 2019 09:36:15 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 13 June 2019 14:53:17 -0600
 
 
 frostwire (6.7.9) stable; urgency=high
