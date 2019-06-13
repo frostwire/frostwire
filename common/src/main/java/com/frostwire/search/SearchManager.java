@@ -45,13 +45,13 @@ public final class SearchManager {
     private SearchListener listener;
 
     private SearchManager(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<>(), true);
-        this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
-        this.tables = Collections.synchronizedList(new LinkedList<WeakReference<SearchTable>>());
+        this.executor = new ThreadPool("SearchManager", 2, nThreads, 5000L, new PriorityBlockingQueue<>(), true);
+        this.tasks = Collections.synchronizedList(new LinkedList<>());
+        this.tables = Collections.synchronizedList(new LinkedList<>());
     }
 
     private static class Loader {
-        static final SearchManager INSTANCE = new SearchManager(6);
+        static final SearchManager INSTANCE = new SearchManager(8);
     }
 
     public static SearchManager getInstance() {
@@ -238,7 +238,7 @@ public final class SearchManager {
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
         protected final SearchManager manager;
-        protected final SearchPerformer performer;
+        final SearchPerformer performer;
         private final int ordinal;
 
         SearchTask(SearchManager manager, SearchPerformer performer, int ordinal) {
@@ -262,9 +262,7 @@ public final class SearchManager {
 
         @Override
         public int compareTo(SearchTask o) {
-            int x = ordinal;
-            int y = o.ordinal;
-            return (x < y) ? -1 : ((x == y) ? 0 : 1);
+            return Integer.compare(ordinal, o.ordinal);
         }
     }
 
