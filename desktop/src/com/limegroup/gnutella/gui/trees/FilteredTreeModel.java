@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui.trees;
 
 import org.limewire.collection.CharSequenceKeyAnalyzer;
@@ -55,7 +72,7 @@ public class FilteredTreeModel implements TreeModel {
 	 * @param ignoreCase if true, filtering is case insensitive
 	 * @param parentProvider used to retrieve parents of nodes
 	 */
-	public FilteredTreeModel(TreeModel model, boolean ignoreCase, ParentProvider parentProvider) {
+	private FilteredTreeModel(TreeModel model, boolean ignoreCase, ParentProvider parentProvider) {
 		this.ignoreCase = ignoreCase;
 
 		this.listener = new FilteredTreeModelListener();
@@ -67,11 +84,7 @@ public class FilteredTreeModel implements TreeModel {
 	 */
 	public void addSearchKey(Object node, String key) {
 		key = normalize(key);
-		List<Object> value = searchTrie.get(key);
-		if (value == null) {
-			value = new ArrayList<>(1);
-			searchTrie.put(key, value);
-		}
+		List<Object> value = searchTrie.computeIfAbsent(key, k -> new ArrayList<>(1));
 		value.add(node);
 	}
 	
@@ -79,14 +92,7 @@ public class FilteredTreeModel implements TreeModel {
 		listeners.add(l);
 	}
 
-	/** 
-     * Makes all nodes in the tree visible.
-     */
-	public void clearFilter() {
-	    filterByText(null);
-	}
-	
-	/** 
+	/**
 	 * Hides nodes from the tree that do not match <code>text</code>.
 	 * 
 	 * @param text search text
@@ -168,14 +174,7 @@ public class FilteredTreeModel implements TreeModel {
 		return -1;    	
     }
 
-	/**
-	 * Returns the underlying data model.
-	 */
-	public TreeModel getModel() {
-		return model;
-	}
-	
-    public Object getRoot() {
+	public Object getRoot() {
 		return model.getRoot();
 	}
 
@@ -203,38 +202,18 @@ public class FilteredTreeModel implements TreeModel {
 		}
 	}
 
-	public void removeSearchKey(Object node, String key) {
-		key = normalize(key);
-		List<Object> value = searchTrie.get(key);
-		if (value != null) {
-			value.remove(node);
-			if (value.isEmpty()) {
-				searchTrie.remove(key);
-			}
-		}
-	}
-
 	public void removeTreeModelListener(TreeModelListener l) {
 		listeners.remove(l);
 	}
 
-	
-	/**
-	 * Sets the underlying data model.
-	 * 
-	 * @param model data model
-	 */
-	public void setModel(DefaultTreeModel model) {
-		setModel(model, new TreeNodeParentProvider());
-	}
-	
+
 	/**
 	 * Sets the underlying data model.
 	 * 
 	 * @param model data model
 	 * @param parentProvider used to retrieve parents of nodes
 	 */
-	public void setModel(TreeModel model, ParentProvider parentProvider) {
+	private void setModel(TreeModel model, ParentProvider parentProvider) {
 		if (model == null || parentProvider == null) {
 			throw new IllegalArgumentException();
 		}
@@ -283,7 +262,7 @@ public class FilteredTreeModel implements TreeModel {
 	 */
 	private class FilteredTreeModelListener implements TreeModelListener {
 
-		public TreeModelEvent refactorEvent(TreeModelEvent event) {
+		TreeModelEvent refactorEvent(TreeModelEvent event) {
 			if (visibleNodes != null) {
 				List<Object> children = new ArrayList<>(event.getChildren().length);
 				List<Integer> indicieList = new ArrayList<>(event.getChildIndices().length);

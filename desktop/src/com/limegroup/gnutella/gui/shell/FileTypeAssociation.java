@@ -50,7 +50,7 @@ public class FileTypeAssociation implements ShellAssociation {
 	    }
 		
 		// still check for a default handler.
-		String extHandler = SystemUtils.getDefaultExtentionHandler(extension);
+		String extHandler = SystemUtils.getDefaultExtensionHandler(extension);
 		return ("".equals(extHandler) && 
 				"".equals(SystemUtils.getDefaultMimeHandler(mimeType)));
 	}
@@ -71,7 +71,7 @@ public class FileTypeAssociation implements ShellAssociation {
 			return false;
 		if (executable.equals(open.getCommand()))
 			return true;
-		return executable.equals(SystemUtils.getDefaultExtentionHandler(extension)) &&
+		return executable.equals(SystemUtils.getDefaultExtensionHandler(extension)) &&
 				executable.equals(SystemUtils.getDefaultMimeHandler(mimeType));
 	}
 

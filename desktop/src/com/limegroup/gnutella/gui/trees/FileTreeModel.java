@@ -23,7 +23,6 @@
 package com.limegroup.gnutella.gui.trees;
 
 import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.FileFilter;
@@ -132,10 +131,6 @@ public class FileTreeModel extends AbstractTreeModel {
 
     /**
      * Guaranteed to not return null.
-     * 
-     * @param f
-     * @param doSort
-     * @return
      */
     private File[] getSubDirs(File f, boolean doSort) {
         if (f == cachedDir && cacheSorted == doSort)
@@ -195,19 +190,6 @@ public class FileTreeModel extends AbstractTreeModel {
         fireTreeNodesChanged(new TreeModelEvent(this, path));
     }
 
-    // TODO: this looks like it'll never do anything, because
-    // subRoots is a List<File>, so it can't contain a String.
-    //  ???
-    public void removeChildrenOfSubRoot(String s) {
-        if (!subRoots.contains(s))
-            return;
-
-        subChildren.get(s).clear();
-
-        Object[] path = { root, s };
-        fireTreeStructureChanged(new TreeModelEvent(this, path));
-    }
-
     public static class FileComparator implements Comparator<File> {
 
         public int compare(File o1, File o2) {
@@ -229,43 +211,10 @@ public class FileTreeModel extends AbstractTreeModel {
         this.filter = filter;
     }
 
-    /**
-     * Returns the currently set file filter.
-     * 
-     * @return can be <code>null</code>
-     */
-    public FileFilter getFileFilter() {
-        return filter;
-    }
-
     private class DefaultFilter implements FileFilter {
         public boolean accept(File file) {
             return file.isDirectory() && !file.isHidden();
         }
     }
 
-    /**
-     * Sets whether the listed files of a directory should be sorted.
-     * <p>
-     * Fires
-     * {@link TreeModelListener#treeStructureChanged(javax.swing.event.TreeModelEvent)}
-     * with the root node as parameter to make sure the whole tree is updated
-     * correctly.
-     * 
-     * @param sort
-     */
-    public void setSortListedFiles(boolean sort) {
-        if (this.sort != sort) {
-            this.sort = sort;
-            fireTreeStructureChanged(new TreeModelEvent(this,
-                    new Object[] { getRoot() }));
-        }
-    }
-
-    /**
-     * Returns whether the listed files of a directory are being sorted.
-     */
-    public boolean getSortListedFiles() {
-        return sort;
-    }
 }

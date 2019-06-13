@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.limewire.setting;
 
 import java.io.File;
@@ -40,11 +57,6 @@ public class FileSetSetting extends AbstractSetting {
 	public Set<File> getValue() {
         return value;
 	}
-	
-	/** Gets the value as an array. */
-	public synchronized File[] getValueAsArray() {
-	    return value.toArray(new File[0]);
-    }
 
 	/**
 	 * Mutator for this setting.
@@ -89,13 +101,8 @@ public class FileSetSetting extends AbstractSetting {
 	public synchronized boolean contains(File file) {
 	    return value.contains(file);
 	}
-	
-	/** Returns the length of the array. */
-	public synchronized int length() {
-	    return value.size();
-	}
-	
-    /** Load value from property string value
+
+	/** Load value from property string value
      * @param sValue property string value
      *
      */
@@ -132,14 +139,4 @@ public class FileSetSetting extends AbstractSetting {
         return buffer.toString();
     }
 
-	/** Removes non-existent members.	 */
-	public synchronized void clean() {
-	    for(Iterator<File> i = value.iterator(); i.hasNext(); ) {
-	        File next = i.next();
-	        if(!next.exists())
-	            i.remove();
-        }
-        
-	    setValue(value);
-    }
 }

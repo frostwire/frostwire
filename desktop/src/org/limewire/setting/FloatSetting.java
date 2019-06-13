@@ -45,12 +45,6 @@ public class FloatSetting extends AbstractNumberSetting<Float> {
                                                              false, null, null);
 	}
 
-    FloatSetting(Properties defaultProps, Properties props, String key, 
-                 float defaultFloat, float min, float max) {
-		super(defaultProps, props, key, String.valueOf(defaultFloat), 
-              true, min, max);
-	}
-        
 	/**
 	 * Returns the value of this setting.
 	 * 

@@ -6,14 +6,12 @@
 
 package org.limewire.collection;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
 * Provides a better-defined replacement policy version of 
-* {@link ForgetfulHashMap}. Like <code>ForgetfulHashMap</code>, this is a
+* Like <code>ForgetfulHashMap</code>, this is a
 * mapping that "forgets" keys and values using a FIFO replacement policy, much
 * like a cache. 
 * <p>
@@ -70,7 +68,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param size the number of entries to hold
      * @exception IllegalArgumentException if size is less < 1.
      */
-    public FixedsizeForgetfulHashMap(int size, int initialCapacity) {
+    FixedsizeForgetfulHashMap(int size, int initialCapacity) {
         this(size, initialCapacity, 0.75f);
     }
     
@@ -81,7 +79,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
      * @param size the number of entries to hold
      * @exception IllegalArgumentException if size is less < 1.
      */
-    public FixedsizeForgetfulHashMap(int size, int initialCapacity, float loadFactor) {
+    private FixedsizeForgetfulHashMap(int size, int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
         
         //if size is < 1
@@ -102,23 +100,7 @@ public class FixedsizeForgetfulHashMap<K, V> extends LinkedHashMap<K, V> {
     public boolean isFull() {
         return size() >= MAXIMUM_SIZE;
     }
-    
-    /**
-     * Removes the least recently used entry from the map
-     * @return A Map.Entry object
-     * @modifies this.
-     */
-    public Map.Entry<K, V> removeLRUEntry() {
-        //if there are no elements, return null.
-        if(isEmpty())
-            return null;
-        
-        Iterator<Map.Entry<K, V>> i = entrySet().iterator();
-        Map.Entry<K, V> value = i.next();
-        i.remove();
-        return value;
-    }
-    
+
     /**
      * Returns a shallow copy of this Map instance: the keys and
      * values themselves are not cloned.

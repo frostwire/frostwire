@@ -823,7 +823,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     }
 
     public void ensureFileIsVisible(JFileChooser fc, File f) {
-        filePane.ensureFileIsVisible(fc, f);
+        filePane.ensureFileIsVisible(f);
     }
 
     public void rescanCurrentDirectory(JFileChooser fc) {

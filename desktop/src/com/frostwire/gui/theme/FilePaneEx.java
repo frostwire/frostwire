@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.frostwire.gui.theme;
 
 import javax.swing.*;
@@ -6,24 +23,15 @@ import java.awt.event.ActionEvent;
 import java.util.Locale;
 
 public class FilePaneEx extends FilePane {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 153183794490651820L;
-
     private SkinPopupMenu contextMenu;
     private SkinMenu viewMenu;
-
     private String viewMenuLabelText;
-
     private boolean listViewWindowsStyle;
-
     private static final int VIEWTYPE_COUNT = 2;
-
     private String[] viewTypeActionNames;
 
-    public FilePaneEx(FileChooserUIAccessor fileChooserUIAccessor) {
+    @SuppressWarnings("unused")
+    FilePaneEx(FileChooserUIAccessor fileChooserUIAccessor) {
         super(fileChooserUIAccessor);
     }
 
@@ -104,7 +112,7 @@ public class FilePaneEx extends FilePane {
     class ViewTypeAction extends AbstractAction {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 3795594739034737323L;
 
@@ -116,14 +124,14 @@ public class FilePaneEx extends FilePane {
 
             String cmd;
             switch (viewType) {
-            case VIEWTYPE_LIST:
-                cmd = ACTION_VIEW_LIST;
-                break;
-            case VIEWTYPE_DETAILS:
-                cmd = ACTION_VIEW_DETAILS;
-                break;
-            default:
-                cmd = (String) getValue(Action.NAME);
+                case VIEWTYPE_LIST:
+                    cmd = ACTION_VIEW_LIST;
+                    break;
+                case VIEWTYPE_DETAILS:
+                    cmd = ACTION_VIEW_DETAILS;
+                    break;
+                default:
+                    cmd = (String) getValue(Action.NAME);
             }
             putValue(Action.ACTION_COMMAND_KEY, cmd);
         }
